@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "PickingPrintView";
+}
+<input type="hidden" id="rowID" value="@ViewBag.rowIDs" />
+
+<script src="../../Locale/@Html.Raw(Request.Cookies["lang"]==null? "zh-TW":Request.Cookies["lang"].ToString())/Product/ProductLang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimePicker.js" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimeField.js" type="text/javascript"></script>
+<script src="../../Scripts/Common/ToolAuthority.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/SendProduct/PickingPrint.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+
+<div id="div_html"></div>
+@Html.Partial("Loading")

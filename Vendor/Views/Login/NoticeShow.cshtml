@@ -1,0 +1,42 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+
+    <link href="../../Content/css/login/login.css?v=@Context.Application["Version"].ToString()" rel="stylesheet" type="text/css" />
+    <script src="../../Scripts/jquery-1.4.4.js" type="text/javascript"></script>
+    <script src="../../Scripts/Views/login/jshash-2.2/sha256.js" type="text/javascript"></script>
+    <title>@Resources.Login.STRING_NOTICE_INFO</title>
+    <style type="text/css">
+        
+    </style>
+</head>
+<body>
+    <form id="form1" method="post">
+        <table cellpadding="0" cellspacing="0" style="width: 585px; margin: 200px auto auto auto">
+            <tr>
+                <td colspan="2">
+                    <div style="width: 69px; height: 73px; float: left; background-image: url('../Content/img/login/u0_normal.png');">
+                    </div>
+                    <div style="padding-top: 30px; width: auto; float: left;">
+                        <p style="text-align: left; width: 377px;">
+                            <span style="font-family: 新宋体; font-size: 28px; color: #3C3C3C; font-weight: normal; font-style: normal; text-decoration: none;">@Resources.Login.STRING_LOGO_NAME</span>
+                        </p>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="width: 524px; height: 42px; padding: 10px 0; border: 1px solid black;">
+                    <div id="divNotice" style="width: 520px; height: 30px; padding: 15px 0 10px 0; margin-left: auto; margin-right: auto; font-family: Arial; text-align: center; border: 1px solid #FFB468; background-color: #FFFFE6;">
+                        <span id="span_notice" style="font-size: 13px; font-weight: bold; font-family: @@微軟正黑體; font-style: normal; text-decoration: none;">@ViewBag.ConfirmSend</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>
+
+

@@ -1,0 +1,14 @@
+﻿@{
+  ViewBag.Title = "VerifyList";
+}
+@section Js{
+  <script src="../../Scripts/Ext4.0/src/selection/Model.js" type="text/javascript"></script>
+  <script src="../../Scripts/Ext4.0/src/selection/RowModel.js" type="text/javascript"></script>
+  <script src="../../Scripts/Ext4.0/src/selection/CheckboxModel.js" type="text/javascript"></script>
+  <script src="../../Locale/zh-TW/ProductList/ProductListLang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+  <script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/ProductList/VerifyLang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+  <script src="../../Scripts/Common/ComboTree.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+  <script src="../../Scripts/Views/VendorProductList/ProFormControl.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+  <script src="../../Scripts/Views/VendorProductList/productVerifyList.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+}
+@Html.Partial("Loading",1000)

@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Working.OnlyOneWork">
+    <Position X="1.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Mgr\Work\OnlyOneWork.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Working.DayWork" Collapsed="true">
+    <Position X="6.25" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Mgr\Work\RepeatWork\DayWork.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Working.MonthWork" Collapsed="true">
+    <Position X="9.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAAQAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Mgr\Work\RepeatWork\MonthWork\MonthWork.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Working.MonthWorkWithDay" Collapsed="true">
+    <Position X="8.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAgAAAAAAAAAAAAAAAAAAQAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Mgr\Work\RepeatWork\MonthWork\MonthWorkWithDay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Working.MonthWorkWithWeek" Collapsed="true">
+    <Position X="10.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAgAAAAAEAAAAAAAAQAAAQAAAAAgAAAAAAAgAA=</HashCode>
+      <FileName>Mgr\Work\RepeatWork\MonthWork\MonthWorkWithWeek.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Working.RepeatWork" Collapsed="true">
+    <Position X="7" Y="2.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAAAiAAAAQAAAQAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Mgr\Work\RepeatWork\RepeatWork.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Working.WeekWork" Collapsed="true">
+    <Position X="4" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQQAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Mgr\Work\RepeatWork\WeekWork.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Working.Work" Collapsed="true">
+    <Position X="6.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAIAAAAAAAAAAAAIAQAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Mgr\Work\Work.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="微軟正黑體" Size="9" />
+</ClassDiagram>

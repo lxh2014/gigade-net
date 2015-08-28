@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "DelayDelivers";
+}
+@section Js{
+    <script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/WareHouse/lang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimePicker.js" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimeField.js" type="text/javascript"></script>
+    <script src="../../Scripts/Common/ComboTree.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+        <script src="../../Scripts/Views/SendProduct/AllStore.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Views/SendProduct/DelayDeliverList.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+
+
+}

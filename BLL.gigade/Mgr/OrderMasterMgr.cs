@@ -1,0 +1,907 @@
+﻿/* 
+ * Copyright (c) 2013，武漢聯綿信息技術有限公司
+ * All rights reserved. 
+ *  
+ * 文件名称：OrderMasterMgr 
+ * 摘   要： 
+ *  
+ * 当前版本：1.0 
+ * 作   者：lhInc 
+ * 完成日期：2013/8/22 16:06:53 
+ * 
+ */
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using BLL.gigade.Mgr.Impl;
+using BLL.gigade.Dao.Impl;
+using BLL.gigade.Dao;
+using System.Collections;
+using System.Data;
+using BLL.gigade.Model;
+using BLL.gigade.Model.Query;
+using BLL.gigade.Model.Custom;
+using BLL.gigade.Common;
+
+namespace BLL.gigade.Mgr
+{
+    public class OrderMasterMgr : IOrderMasterImplMgr
+    {
+        private IOrderMasterImplDao _orderMasterDao;
+        //private OrderMasterDao orderMasterDao;
+        private BonusMasterDao bonusMasterDao;
+        private BonusMasterMgr _bonusMasterMgr;
+        private HappyGoMgr _happyGoMgr;
+        //Se_serialDao
+        private MySqlDao _mysqlDao;
+      private  SerialDao _serialDao;
+      private OrderReturnStatusDao _orsDao;
+    
+        private string conn;
+        public OrderMasterMgr(string connectionStr)
+        {
+            _orderMasterDao = new OrderMasterDao(connectionStr);
+            //orderMasterDao = new OrderMasterDao(connectionStr);
+            bonusMasterDao = new BonusMasterDao(connectionStr);
+            _bonusMasterMgr = new BonusMasterMgr(connectionStr);
+            _happyGoMgr = new HappyGoMgr(connectionStr);
+            _serialDao = new SerialDao(connectionStr);
+            _mysqlDao = new MySqlDao(connectionStr);
+            _orsDao = new OrderReturnStatusDao(connectionStr);
+            conn = connectionStr;
+        }
+
+        public string Save(BLL.gigade.Model.OrderMaster orderMaster, OrderMasterPattern op = null)
+        {
+            // edit by xiangwang0413w 20140827
+            //不管是訂單匯入還是訂單輸入，order_master.export_flag = 1;order_master.order_invoice = 0
+
+            //判斷前臺輸入的是報廢單還是其他，如果是報廢單則 order_master.export_flag = 4 edit by zhuoqin0830w  2015/03/12
+            if (op != null && op.Pattern == 20)
+            {
+                orderMaster.Export_Flag = 4;
+            }
+            else
+            {
+                orderMaster.Export_Flag = 1;
+            }
+            orderMaster.Order_Invoice = "0";
+            return _orderMasterDao.Save(orderMaster);
+        }
+
+        public int Delete(int orderId)
+        {
+            return _orderMasterDao.Delete(orderId);
+        }
+
+        public bool SaveOrder(string orderMaster, string orderMasterPattern, string orderPayment, ArrayList orderSlaves, ArrayList orderDetails, ArrayList otherSqls, string bonusMaster, string bonusRecord)
+        {
+            return _orderMasterDao.SaveOrder(orderMaster, orderMasterPattern, orderPayment, orderSlaves, orderDetails, otherSqls, bonusMaster, bonusRecord);
+        }
+
+        public OrderMaster GetPaymentById(uint order_id)
+        {
+            try
+            {
+                return _orderMasterDao.GetPaymentById(order_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr.GetPaymentById-->" + ex.Message, ex);
+            }
+        }
+
+        public List<OrderMasterQuery> getOrderSearch(OrderMasterQuery query, string sqladdstr, out int totalCount, string addSerch)
+        {
+            try
+            {
+                return _orderMasterDao.getOrderSearch(query, sqladdstr, out totalCount, addSerch);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->getOrderSearch-->" + ex.Message, ex);
+            }
+        }
+
+        public List<OrderMasterQuery> Export(OrderMasterQuery query, string sqladdstr, out int totalCount)
+        {
+            return _orderMasterDao.Export(query, sqladdstr, out totalCount);
+        }
+
+        public OrderShowMasterQuery GetData(uint orderId)
+        {
+            try
+            {
+                return _orderMasterDao.GetData(orderId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->GetData-->" + ex.Message, ex);
+            }
+        }
+
+        public string VerifyData(uint orderId)
+        {
+            try
+            {
+                return _orderMasterDao.VerifyData(orderId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->VerifyData-->" + ex.Message, ex);
+            }
+        }
+
+        public int SaveNoteOrder(OrderShowMasterQuery store)
+        {
+            try
+            {
+                return _orderMasterDao.SaveNoteOrder(store);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->VerifyData-->" + ex.Message, ex);
+            }
+        }
+
+        public int SaveNoteAdmin(OrderShowMasterQuery store)
+        {
+            try
+            {
+                return _orderMasterDao.SaveNoteAdmin(store);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->SaveNoteAdmin-->" + ex.Message, ex);
+            }
+        }
+
+        public int SaveStatus(OrderShowMasterQuery store)
+        {
+            try
+            {
+                return _orderMasterDao.SaveStatus(store);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->SaveStatus-->" + ex.Message, ex);
+            }
+        }
+
+        public UsersListQuery GetUserInfo(uint user_id)
+        {
+            try
+            {
+                return _orderMasterDao.GetUserInfo(user_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->GetUserInfo-->" + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// 根據條件獲取出貨列表
+        /// </summary>
+        /// <param name="query">查詢條件</param>
+        /// <param name="totalCount">返回數據總條數</param>
+        /// <returns>出貨列表信息</returns>
+        public List<OrderMasterQuery> GetShipmentList(OrderMasterQuery query, out int totalCount)
+        {
+            try
+            {
+                return _orderMasterDao.GetShipmentList(query, out totalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->GetShipmentList-->" + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// 查詢購買次數
+        /// </summary>
+        /// <param name="orderMasterQuery">查詢條件</param>
+        /// <returns>購買次數</returns>
+        public int GetBuyCount(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.GetBuyCount(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->GetBuyCount-->" + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// 匯入會計賬款實收時間
+        /// </summary>
+        /// <param name="dt">匯入入賬時間表</param>
+        /// <returns></returns>
+        public int OrderMasterImport(List<OrderAccountCollection> oacli)
+        {
+            try
+            {
+                ArrayList arryList = new ArrayList();
+                foreach (var item in oacli)
+                {
+                    if (item.order_id != 0)
+                    {
+                        if (_orderMasterDao.IsNotOrderId(item.order_id))
+                        {
+                            DataTable DtTemp = IsExistOrderId(item.order_id);
+                            if (DtTemp.Rows.Count > 0)
+                            {
+                                if (string.IsNullOrEmpty(DtTemp.Rows[0]["account_collection_time"].ToString()) ||
+                                    (string.IsNullOrEmpty(DtTemp.Rows[0]["account_collection_money"].ToString()) && DtTemp.Rows[0]["account_collection_money"] != "0") ||
+                                   (string.IsNullOrEmpty(DtTemp.Rows[0]["poundage"].ToString()) && DtTemp.Rows[0]["poundage"] != "0") ||
+                                   string.IsNullOrEmpty(DtTemp.Rows[0]["return_collection_time"].ToString()) ||
+                                       (string.IsNullOrEmpty(DtTemp.Rows[0]["return_collection_money"].ToString()) && DtTemp.Rows[0]["return_collection_money"] != "0") ||
+                                       (string.IsNullOrEmpty(DtTemp.Rows[0]["return_poundage"].ToString()) && DtTemp.Rows[0]["return_poundage"] != "0")
+                                       || string.IsNullOrEmpty(DtTemp.Rows[0]["remark"].ToString()))
+                                {
+                                    arryList.Add(_orderMasterDao.UpdateOac(DtTemp, item));
+            }
+                            }
+                            else
+                            {
+                                arryList.Add(_orderMasterDao.InsertOac(item));
+                            }
+                        }
+                    }
+
+                }
+                if (arryList.Count != 0)
+                {
+                    if (_mysqlDao.ExcuteSqls(arryList))
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
+                else
+                {
+                    return 99999;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->OrderMasterImport-->" + ex.Message, ex);
+            }
+        }
+        /// <summary>
+        /// 會計入賬時間匯出
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public DataTable OrderMasterExport(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.OrderMasterExport(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->OrderMasterExport-->" + ex.Message, ex);
+            }
+        }
+        /// <summary>
+        /// 異常訂單列表
+        /// </summary>
+        /// <param name="query">查詢條件</param>
+        /// <returns></returns>
+        public DataTable ArrorOrderList(OrderMasterQuery query, out int totalCount)
+        {
+            try
+            {
+                return _orderMasterDao.ArrorOrderList(query, out totalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->ArrorOrderList-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable ExportArrorOrderExcel(OrderMasterQuery query)
+        {
+            try
+            {
+                DataTable _list = _orderMasterDao.ExportArrorOrderExcel(query);
+                _list.Columns.Add("remark");
+                _list.Columns.Add("mode_name");
+                _list.Columns.Add("combined_mode_name");
+                if (_list.Rows.Count > 0)
+                {
+                    ParametersrcDao _pDao = new ParametersrcDao(conn);
+                    List<Parametersrc> parameterList = _pDao.QueryParametersrcByTypes("order_status");
+                    foreach (DataRow item in _list.Rows)
+                    {
+                        var alist = parameterList.Find(m => m.ParameterCode == item["order_status"].ToString());
+                        if (alist != null)
+                        {
+                            item["remark"] = alist.remark.ToString();
+            }
+                        switch (item["item_mode"].ToString())
+                        {
+                            case "0":
+                                item["mode_name"] = "單一商品";
+                                break;
+                            case "1":
+                                item["mode_name"] = "父商品";
+                                break;
+                            case "2":
+                                item["mode_name"] = "子商品";
+                                break;
+                            default:
+                                item["mode_name"] = "";
+                                break;
+                        }
+                        //0:一般 1:組合 2:子商品
+                        switch (item["combined_mode"].ToString())
+                        {
+                            case "0":
+                                item["combined_mode_name"] = "一般";
+                                break;
+                            case "1":
+                                item["combined_mode_name"] = "組合";
+                                break;
+                            case "2":
+                                item["combined_mode_name"] = "子商品";
+                                break;
+                            default:
+                                item["combined_mode_name"] = "";
+                                break;
+                        }
+                    }
+                }
+                return _list;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->ExportArrorOrderExcel-->" + ex.Message, ex);
+            }
+        }
+        /// <summary>
+        /// 會計入賬匯出列表
+        /// </summary>
+        /// <param name="query">查詢條件</param>
+        /// <returns></returns>
+        public DataTable OrderMasterExportList(OrderMasterQuery query, out int totalCount)
+        {
+            try
+            {
+                return _orderMasterDao.OrderMasterExportList(query, out totalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->OrderMasterExportList-->" + ex.Message, ex);
+            }
+        }
+        /// <summary>
+        /// 會計入賬匯出數據匯總
+        /// </summary>
+        /// <param name="query">查詢條件</param>
+        /// <returns></returns>
+        public DataTable OrderMasterHuiZong(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.OrderMasterHuiZong(query);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("OrderMasterMgr-->OrderMasterHuiZong-->" + ex.Message, ex);
+            }
+        }
+        #region 現金,外站,貨到付款對賬
+
+        #region 獲取泛用對賬列表 + List<OrderMasterQuery> GetOBCList(OrderMaster query, out int totalCount)
+        public List<OrderMasterQuery> GetOBCList(OrderMasterQuery query, out int totalCount)
+        {
+            try
+            {
+                return _orderMasterDao.GetOBCList(query, out totalCount);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("OrderMasterMgr-->GetOBCList-->" + ex.Message, ex);
+            }
+        }
+        #endregion
+
+        #region  賣場store + DataTable GetChannelList(Channel query)
+        public List<Channel> GetChannelList(Channel query)
+        {
+            try
+            {
+                return _orderMasterDao.GetChannelList(query);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("OrderMasterMgr-->GetChannelList-->" + ex.Message, ex);
+            }
+        }
+        #endregion
+
+        #region 付款方式store + List<Parametersrc> GetPaymentList(OrderMasterQuery query)
+        public List<Parametersrc> GetPaymentList(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.GetPaymentList(query);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("OrderMasterMgr-->GetPaymentList-->" + ex.Message, ex);
+            }
+        }
+        #endregion
+
+        #region 修改確認對賬狀態 + int UpdateOrderBilling(OrderMaster query)
+        public int UpdateOrderBilling(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.UpdateOrderBilling(query);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("OrderMasterMgr-->UpdateOrderBilling-->" + ex.Message, ex);
+            }
+        }
+        #endregion
+
+        #region 泛用對賬匯出 + DataTable ReportOrderBillingExcel(OrderMasterQuery query)
+        public DataTable ReportOrderBillingExcel(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.ReportOrderBillingExcel(query);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("OrderMasterMgr-->ReportOrderBillingExcel-->" + ex.Message, ex);
+            }
+        }
+        #endregion
+
+        #region 泛用對賬匯入對賬檢測 + DataTable CheckedImport(OrderMasterQuery query)
+        public DataTable CheckedImport(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.CheckedImport(query);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("OrderMasterMgr-->CheckedImport-->" + ex.Message, ex);
+            }
+        }
+        #endregion
+
+        #endregion
+
+        #region 根據定單編號獲取定單信息
+        /// <summary>
+        /// 根據定單編號獲取定單信息
+        /// </summary>
+        /// <param name="order_id">定單編號</param>
+        /// <returns>定單信息</returns>
+        public OrderMaster GetOrderMasterByOrderId(int order_id)
+        {
+            try
+            {
+                return _orderMasterDao.GetOrderMasterByOrderId(order_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->GetOrderMasterByOrderId-->" + ex.Message, ex);
+            }
+        }
+        #endregion
+
+        #region 更新定單狀態以開立發票
+        /// <summary>
+        /// 根據定單編號更新定單狀態以開立發票
+        /// </summary>
+        /// <param name="order_id">定單編號</param>
+        /// <returns>執行結果</returns>
+        public int UpdateOrderToOpenInvoice(int order_id)
+        {
+            try
+            {
+                return _orderMasterDao.UpdateOrderToOpenInvoice(order_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->UpdateOrderToOpenInvoice-->" + ex.Message, ex);
+            }
+        }
+        #endregion
+
+        #region 根據條件查詢要開立發票的訂單信息
+        /// <summary>
+        /// 根據條件查詢要開立發票的訂單信息
+        /// </summary>
+        /// <param name="query">查詢條件</param>
+        /// <returns></returns>
+        public OrderMasterQuery GetOrderMasterInvoice(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.GetOrderMasterInvoice(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->GetOrderMasterInvoice-->" + ex.Message, ex);
+            }
+        }
+        #endregion
+
+        #region 檢查是否可以進行轉單 +bool isCanModifyForDeliver(int order_id)
+        /// <summary>
+        /// 檢查是否可以進行轉單
+        /// </summary>
+        /// <param name="order_id"></param>
+        /// <returns></returns>
+        public bool isCanModifyForDeliver(int order_id)
+        {
+
+            OrderMaster omModel = _orderMasterDao.GetOrderMasterByOrderId4Change(order_id);
+            if (null == omModel)
+            {
+                return false;
+            }
+            if (0 != omModel.Order_Status && 90 != omModel.Order_Status)
+            {
+                return false;
+            }
+
+            return true;
+
+        }
+        #endregion
+
+        public bool ModifyOrderMsaterForDeliver(OrderModifyModel order)
+        {
+            try
+            {
+                OrderMaster omModel = _orderMasterDao.GetOrderMasterByOrderId4Change(order.order_id);
+                StringBuilder sbSql = new StringBuilder();
+                sbSql.Append(@" om.order_status = 2,
+os.slave_status=2,
+od.detail_status=2,
+om.order_date_cancel=0,
+om.money_cancel=0,
+om.export_flag=1,");
+
+                sbSql.AppendFormat("om.order_date_pay ={0}", Common.CommonFunction.GetPHPTime());
+
+                if (!isCanModifyForDeliver(order.order_id))
+                {
+                    return false;
+                }
+                //1、是否寫入對帳
+                if (order.isBilling_checked)
+                {
+                    sbSql.Append(",om.billing_checked=1,");
+                    sbSql.AppendFormat("om.money_collect_date={0}", Common.CommonFunction.GetPHPTime());
+                }
+                //2、紅利折抵
+                if (order.deduct_card_bonus != 0)
+                {
+                    if (omModel.Order_Amount < order.deduct_card_bonus)
+                    {
+                        return false;
+                }
+                    sbSql.AppendFormat(",om.deduct_card_bonus={0},", order.deduct_card_bonus);
+                    sbSql.AppendFormat("om.order_amount={0}", omModel.Order_Amount - order.deduct_card_bonus);
+                }
+                //3、要不要扣除消費者抵用購物金
+                if (order.isCash_record_bonus)
+                {
+                    order.user_id = Convert.ToInt32(omModel.user_id);
+                    //order.bonus_num = 
+                    order.bonus_num = Convert.ToInt32(omModel.Deduct_Bonus);
+
+                    order.record_note = "強制轉單扣點";
+                    order.record_writer = "server";
+                    AddBonusRecord(order);//扣除
+
+                }
+
+                #region //4、要不要給hg點或購物金
+                if (order.isHGBonus)
+                {
+                    #region 購物金
+                    if (omModel.Accumulated_Bonus > 0)
+                    {
+                        //訂單取消後,回撥購物金的使用日期限制
+                        int nExpire_Day = 90;
+                        DateTime nMaster_Start = DateTime.Now.Date;
+                        DateTime nMaster_End = DateTime.Now.AddDays(omModel.BonusExpireDay).Date.AddSeconds(-1);
+                        // DateTime nMaster_End = DateTime.Now.AddDays(1).Date.AddSeconds(-1);
+
+                        //OrderModifyModel orderModifyModel = new OrderModifyModel();
+                        ////$amego_bonus->bonus_master_add($aOrder['user_id'], 30, $aOrder['accumulated_bonus'], $nMaster_Start, $nMaster_End, $aOrder['order_id'], '商品回饋購物金' , 1);
+                        //orderModifyModel.user_id =Convert.ToInt32( omModel.User_Id);
+                        //orderModifyModel.order_id = Convert.ToInt32(omModel.Order_Id);
+                        //orderModifyModel.bonus_num = Convert.ToInt32(omModel.Deduct_Bonus);
+                        //orderModifyModel.use_note ="強制轉單扣點";
+                        //orderModifyModel.use_writer = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+                        // 會員目前可用購物金
+                        BonusMasterQuery query = new BonusMasterQuery();
+                        query.user_id = omModel.User_Id;
+                        query.type_id = 30;
+                        query.master_total = Convert.ToUInt32(omModel.Accumulated_Bonus);
+                        query.master_balance = omModel.Accumulated_Bonus;
+                        query.smaster_start = nMaster_Start;
+                        query.smaster_end = nMaster_End;
+                        query.smaster_createtime = DateTime.Now;
+                        query.smaster_updatedate = DateTime.Now;
+                        query.master_writer = string.Format("Writer:{0}", (System.Web.HttpContext.Current.Session["caller"] as Caller).user_username);
+
+                        query.bonus_type = 1;
+                        query.master_note = "商品回饋購物金";
+                        //Serial ser = _serialDao.GetSerialById(27);
+                        //ser.Serial_Value = ser.Serial_Value+1;
+                        //_serialDao.Update(ser);
+                        //query.master_id = Convert.ToUInt32(ser.Serial_Value);
+                        query.master_ipfrom = order.ip_from;
+                        List<BonusMasterQuery> queryList = new List<BonusMasterQuery>();
+                        queryList.Add(query);
+                        _bonusMasterMgr.BonusMasterAdd(queryList);
+                        //bonusMasterDao.InsertBonusMaster(query); 
+                    }
+                    #endregion
+                    #region hg點
+                        if (omModel.Accumulated_Happygo > 0)
+                        {
+                            if (_happyGoMgr.GetHGDeductList(omModel.Order_Id).Count > 0)
+                            {
+                                //有則進行點數累積，無則發信通知
+                            }
+                            else
+                            {
+                                MailHelper mailHelper = new MailHelper();
+                                string MailTitle = "HG累點失敗";
+                                string MailBody = string.Format("{0}無HG資料，無法累點。", omModel.Order_Id);
+                                mailHelper.SendToGroup("BonusFailure", MailTitle, MailBody);
+                            }
+
+                        }
+                    #endregion
+                    }
+                #endregion
+                    //更新條件
+                    StringBuilder sql = new StringBuilder();
+                sql.Append(@"update order_master om,order_slave os,order_detail od
+set ");
+                    sql.Append(sbSql);
+                    sql.AppendFormat(@" where om.order_id={0}  AND om.order_id = os.order_id
+ AND os.slave_id = od.slave_id ", order.order_id);
+                    try
+                    {
+                    _orderMasterDao.UpdateOrderMaster(sql.ToString());
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("OrderMasterMgr-->ModifyOrderMsaterForDeliver-->" + ex.Message, ex);
+
+                    }
+            }
+            catch (Exception ex)
+            {
+                
+                throw new Exception("OrderMasterMgr-->ModifyOrderMsaterForDeliver-->" + ex.Message, ex);
+            }
+            
+        }
+
+        public void AddBonusRecord(OrderModifyModel model)
+        {
+            // 會員目前可用購物金
+            int userBonus = bonusMasterDao.GetUserBonus(model.user_id);
+            if (model.bonus_num < 0)
+            {
+                model.bonus_num = model.bonus_num * -1;
+            }
+            if (model.bonus_num > userBonus)
+            {
+                return;
+            }
+            List<BonusMasterQuery> bonusQuery = bonusMasterDao.GetBonusMasterListByUser(model.user_id);
+            foreach (BonusMasterQuery bonus in bonusQuery)
+            {
+                if (model.bonus_num > 0)
+                {
+                BonusRecord bonusRecord = new BonusRecord();
+                int decuteBonusNum = bonus.master_balance > model.bonus_num ? model.bonus_num : bonus.master_balance;
+                Serial ser = _serialDao.GetSerialById(28);
+                    ser.Serial_Value = ser.Serial_Value + 1;
+                _serialDao.Update(ser);
+                bonusRecord.record_id = Convert.ToUInt32(ser.Serial_Value);
+                bonusRecord.master_id = bonus.master_id;
+                bonusRecord.type_id = bonus.type_id;
+                bonusRecord.order_id = Convert.ToUInt32(model.order_id);
+                bonusRecord.record_use = Convert.ToUInt32(decuteBonusNum);
+                bonusRecord.record_note = model.record_note;
+                bonusRecord.record_writer = model.record_writer;
+                    bonusRecord.record_ipfrom = model.ip_from;
+                bonusMasterDao.InsertIntoBonusRecord(bonusRecord);
+                bonus.master_balance = bonus.master_balance - decuteBonusNum;//減去扣除的購物金
+                bonusMasterDao.UpdateBonusMasterMasterBalance(bonus);
+                model.bonus_num -= decuteBonusNum;//更新
+            }
+                else
+                {
+                    return;
+                }
+            }
+        }
+
+
+
+
+        public bool IsNotOrderId(uint orderId)
+        {
+            try
+            {
+                return _orderMasterDao.IsNotOrderId(orderId);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("OrderMasterMgr-->IsNotOrderId-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable IsExistOrderId(uint order_id)
+        {
+            try
+            {
+                return _orderMasterDao.IsExistOrderId(order_id);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("OrderMasterMgr-->IsExistOrderId-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetOrderidAndName(int order_id)
+        {
+            try
+            {
+                return _orderMasterDao.GetOrderidAndName(order_id);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("OrderMasterMgr-->IsExistOrderId-->" + ex.Message, ex);
+            }
+        }
+
+        public string ChangePayMent(OrderMasterQuery query)
+        {
+            string json = string.Empty;
+            ArrayList arrList = new ArrayList();
+            OrderSlaveQuery slaveQuery = new OrderSlaveQuery();
+            OrderDetailQuery detailQuery = new OrderDetailQuery();
+            OrderMasterStatusQuery omsQuery = new OrderMasterStatusQuery();
+            OrderShowMasterQuery osmQuery = new OrderShowMasterQuery();
+            try
+            {
+                DataTable _dt = _orderMasterDao.GetInfo(query);
+                if (_dt != null && _dt.Rows.Count > 0)
+                {
+                    slaveQuery.Slave_Id = Convert.ToUInt32(_dt.Rows[0]["slave_id"] );
+                    detailQuery.Detail_Id = Convert.ToUInt32(_dt.Rows[0]["detail_id"]);
+                    osmQuery = _orderMasterDao.GetData(query.Order_Id);
+                    if (query.payment == "T_CAT")
+                    {
+                        int t_cat_amount = 0;
+                        query.status_description =  query.username+ "轉黑貓貨到付款";//todo user_name
+                         arrList= ModifyOrderStatus(query, slaveQuery, detailQuery, omsQuery);
+                        //加30運費
+                        if (osmQuery.order_freight_normal != 0)
+                        {
+                            query.Order_Freight_Normal = osmQuery.order_freight_normal += 30;
+                            t_cat_amount += 30;
+                        }
+                        if (osmQuery.order_freight_low != 0)
+                        {
+                            query.Order_Freight_Low = osmQuery.order_freight_low += 30;
+                            t_cat_amount += 30;
+                        }
+                        if (t_cat_amount != 0)
+                        {
+                            query.Order_Amount = osmQuery.order_amount +=(uint)t_cat_amount;
+                        }
+                    }
+                    if (query.delivery == 12)
+                    {
+                        arrList.Add(_orderMasterDao.UpDeliveryMaster(query.Order_Id));
+                        query.Order_Amount=osmQuery.order_amount-(osmQuery.order_freight_normal+osmQuery.order_freight_low);
+                        query.Order_Freight_Normal = 0;
+                        query.Order_Freight_Low = 0;
+                        query.Order_Payment = 9;
+                        query.Order_Date_Pay =(uint)CommonFunction.GetPHPTime();
+                        query.status_description = query.username + "轉自取，現金";
+                        arrList = ModifyOrderStatus(query, slaveQuery, detailQuery, omsQuery);
+                        int master_total = osmQuery.accumulated_bonus;
+                        if (master_total > 0)
+                        {
+                            BonusMaster bm = new BonusMaster();
+                            bm.master_start = (uint)CommonFunction.GetPHPTime();
+                            bm.master_end = bm.master_start + (86400 * 90);
+                            bm.master_note = "";
+                            bm.master_writer = "Writer : 轉自取發放購物金";
+                            bm.type_id = 30;
+                            bm.master_total = (uint)master_total;
+                            _orsDao.Bonus_Master_Add(bm);
+                        }
+                        else
+                        {
+                            omsQuery.serial_id = Convert.ToUInt64(_orderMasterDao.GetNextSerial(new Serial { Serial_id = 29 }));
+                            arrList.Add(_orderMasterDao.OMSRecord(omsQuery));
+                        }
+                    }
+                    //更新order_master
+                    arrList.Add(_orderMasterDao.UpDeliveryStore(query));
+                    if (_mysqlDao.ExcuteSqlsThrowException(arrList))
+                    {
+                        json = "{success:true}";
+                    }
+                    else
+                    {
+                        json = "{success:false}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->ChangePayMent-->" + ex.Message, ex);
+            }
+            return json;
+        }
+
+        public ArrayList ModifyOrderStatus(OrderMasterQuery query,OrderSlaveQuery slaveQuery, OrderDetailQuery detailQuery, OrderMasterStatusQuery omsQuery)
+        {
+            ArrayList arrList = new ArrayList();
+            try
+            {
+                //更新order_master
+                arrList.Add(_orderMasterDao.UpOrderMaster(query));
+                //更新order_slave
+                arrList.Add(_orderMasterDao.UpOrderSlave(slaveQuery));
+                //更新order_detail
+                arrList.Add(_orderMasterDao.UpOrderDetail(detailQuery));
+                //向order_master_status中插入記錄
+                omsQuery.serial_id = Convert.ToUInt64(_orderMasterDao.GetNextSerial(new Serial { Serial_id = 29 }));
+                arrList.Add(_orderMasterDao.OMSRecord(omsQuery));
+                return arrList;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->ModifyOrderStatus-->" + ex.Message, ex);
+            }
+         
+    }
+}
+}

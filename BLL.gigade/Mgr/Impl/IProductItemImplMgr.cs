@@ -1,0 +1,40 @@
+﻿/* 
+ * Copyright (c) 2013，武漢聯綿信息技術有限公司
+ * All rights reserved. 
+ *  
+ * 文件名称：IProductItemImplMgr 
+ * 摘   要： 
+ *  
+ * 当前版本：1.0 
+ * 作   者：lhInc 
+ * 完成日期：2013/8/21 14:00:06 
+ * 
+ */
+
+using BLL.gigade.Model;
+using BLL.gigade.Model.Custom;
+using System.Collections.Generic;
+
+namespace BLL.gigade.Mgr.Impl
+{
+    public interface IProductItemImplMgr
+    {
+        List<BLL.gigade.Model.ProductItem> Query(BLL.gigade.Model.ProductItem query);
+        List<BLL.gigade.Model.ProductItem> QueryPrice(BLL.gigade.Model.ProductItem query);
+        List<Model.ProductItem> Query(Model.Custom.PriceMasterCustom query);
+        string UpdateStock(BLL.gigade.Model.ProductItem item);
+        //更新product_item表export_flag字段 edit by xiangwang0413w 2014/06/30
+        void UpdateExportFlag(Model.ProductItem item);
+        bool Save(List<Model.ProductItem> saveList);
+        string SaveSql(BLL.gigade.Model.ProductItem item);
+        string Update(Model.ProductItem item);
+        string QueryStock(Model.ProductItem pItem);
+        List<Model.Custom.StockDataCustom> QueryItemStock(int product_id, int pile_id);
+        List<Model.Custom.StockDataCustom> VendorQueryItemStock(string product_id, int pile_id);
+        string Delete(Model.ProductItem delModel);
+        string UpdateCopySpecId(Model.ProductItem proItem);
+        List<Model.ProductItem> GetProductNewItem_ID(int product_id); //add by wangwei0216w 2014/9/19
+        List<Model.ProductItem> GetProductItemByID(int productId);//add by wangwei0216w 2014/9/22
+        ProductItemCustom GetProductArriveDay(ProductItem pi,string type);//add by wwei0216w 2015/6/4
+    }
+}

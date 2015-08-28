@@ -1,0 +1,9 @@
+﻿@using BLL.gigade.Model;
+@{
+    ViewBag.Title = "Vendor";
+}
+
+@section Js{
+	<script src="../../Scripts/Views/Home/Main.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+}
+@Html.Hidden("lgnName",(Session["lgnName"]))

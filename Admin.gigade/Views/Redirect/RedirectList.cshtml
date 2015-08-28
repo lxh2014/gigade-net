@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "RedirectList";
+}
+    <input type="hidden" id="group_id" value="@ViewBag.group_id"/>
+    <input type="hidden" id="group_name" value="@ViewBag.group_name"/>
+    <input type="hidden" id="LinkAdress" value="@ViewBag.LinkAdress"/>
+@section Js{
+    <script type="text/javascript" src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/Promotions/PromotionsLang.js?v=@Context.Application["Version"].ToString()"></script>
+    <script type="text/javascript" src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/Redirect/RedirectLang.js?v=@Context.Application["Version"].ToString()"></script>
+    <script type="text/javascript" src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/Element/ElementLang.js?v=@Context.Application["Version"].ToString()"></script>    
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimePicker.js" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimeField.js" type="text/javascript"></script>
+    @*<input type="text" id="group_name" value="@ViewBag.group_name" style="height:30px;margin-left:30px;border-width:0;background:#FFF; color:#FF8402; font-size:18px; font-weight:bold; width:500px;  "/>*@
+    <script src="../../Scripts/Views/Redirect/RedirectList.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Views/Redirect/RedirectEdit.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>   
+@*跳轉廣告鏈接*@   
+    <script src="../../Scripts/Views/Element/DetailEdit.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Views/Element/AllStore.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Views/Element/ElementProduct.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Views/Element/EleImgCateSelect.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Common/ComboTree.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+
+    }
+    <input type="hidden" id="BaseAddress" name="BaseAddress" value="@ViewBag.BaseAddress" />
+    <input type="hidden" id="path" name="path" value="@ViewBag.path" />
+    <input type="hidden"  id="packetId"  value="" />
+@*編輯器所需*@   
+<link href="@Url.Content("~/Content/kendo/2014.2.716/kendo.common.min.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Content/kendo/2014.2.716/kendo.bootstrap.min.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/kendo/2014.2.716/jquery.min.js")"></script>
+<script src="@Url.Content("~/Scripts/kendo/2014.2.716/kendo.all.min.js")"></script>
+<script src="@Url.Content("~/Scripts/kendo/2014.2.716/kendo.aspnetmvc.min.js")"></script>
+<script src="@Url.Content("~/Scripts/kendo/kendo.zh-TW.js")"></script>
+    <style type="text/css">
+        .k-vHtml
+        {
+            background-position: -288px -120px;
+        }
+         .k-cLink
+        {
+            background-position: -288px -48px;
+        }
+        .k-iFile
+        {
+            background-position: -288px -216px;
+        }
+        .k-iImage
+        {
+            background-position: -288px -96px;
+        }
+    </style>

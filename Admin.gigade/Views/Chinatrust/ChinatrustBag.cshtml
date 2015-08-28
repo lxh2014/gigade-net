@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "ChinatrustBag";
+}
+
+@section Js{
+    <input type="hidden" id="eventId" value="@ViewBag.eventId"></input>
+    <script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/Chinatrust/Lang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimePicker.js" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimeField.js" type="text/javascript"></script>
+    <script src="../../Scripts/Views/Chinatrust/ChinatrustBagList.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+   <script src="../../Scripts/Views/Chinatrust/ChinatrustBagEdit.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+
+}

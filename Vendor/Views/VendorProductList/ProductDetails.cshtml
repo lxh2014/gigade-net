@@ -1,0 +1,25 @@
+﻿@{
+    ViewBag.Title = "ProductDetails";
+}
+<script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/ProductList/ProductListLang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Common/ToolAuthority.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/Product/SpecLang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+
+<script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/ProductCombo/combSpecLang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/VendorProductList/specDetails.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/VendorProductList/comboSpecDetails.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/VendorProductList/categoryDetails.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/VendorProductList/productstatusDetails.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/Product/productStock.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/VendorProductList/baseDetails.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/VendorProductList/descriptionDetails.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/VendorProductList/comboPriceDetails.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/VendorProductList/stockDetails.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/VendorProductList/picDetails.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/VendorProductList/CommonDetailsInfo.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/VendorProductList/mainTabPanel.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<img id="imgTip" style="position: absolute; border: solid 1px #ccc; padding: 3px;
+    z-index: 500; width: 400px; height: 400px; background-color: #eee; display: none"
+    class="clsImg" src="" />
+    @Html.Partial("Loading")
+    

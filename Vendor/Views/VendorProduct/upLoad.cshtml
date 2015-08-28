@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "upLoad";
+}
+
+<h2>upLoad</h2>
+<script type="text/javascript">
+    function fileChangeHandel() {
+        $("#form1").attr("action", "/VendorProduct/upLoadImg?nameType=" + $("#nameType").val());
+        $("#form1").submit();
+    }
+</script>
+
+
+    @if (ViewBag.moreFileOneTime!=null && ViewBag.moreFileOneTime)
+    {
+        if (ViewBag.spec_id != -1)
+        {
+            Response.Write("[{fileName:'" + ViewBag.fileName + "'},{spec_id:" + ViewBag.spec_id + "}]");
+        }
+        else
+        {
+            Response.Write("{fileName:'" + ViewBag.fileName + "'}");
+        }
+        Response.End();
+    }
+    else
+    {
+        Response.Write("<script>window.parent.addNewRow('" + ViewBag.fileName + "')</script>");
+    }
+   
+
+<form id="form1"  method="post" enctype="multipart/form-data" target="iframe1">
+    <input type="file" id="Filedata" name="Filedata" onchange="fileChangeHandel();"/>
+    <input id="nameType" type="hidden" />
+</form>
+

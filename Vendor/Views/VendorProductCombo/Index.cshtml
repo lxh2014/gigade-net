@@ -1,0 +1,17 @@
+﻿@using BLL.gigade.Common
+@using BLL.gigade.Model
+@{
+    string productId = ViewBag.ProductId;
+    string oldProductId = ViewBag.OldProductId;
+    string IsEdit = ViewBag.IsEdit;
+    string hfAuth = ViewBag.hfAuth;
+    string hfAspSessID = ViewBag.hfAspSessID;
+}
+<script src="../../Locale/@Html.Raw(Request.Cookies["lang"]==null? "zh-TW":Request.Cookies["lang"].ToString())/Product/ProductLang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/VendorProductCombo/ProductComboSave.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+
+@Html.Hidden("ProductId", productId)
+@Html.Hidden("OldProductId", oldProductId)
+@Html.Hidden("IsEdit", IsEdit)
+@Html.Hidden("hfAuth", hfAuth)
+@Html.Hidden("hfAspSessID", hfAspSessID)

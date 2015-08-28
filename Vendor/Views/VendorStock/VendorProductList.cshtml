@@ -1,0 +1,10 @@
+﻿@{
+    ViewBag.Title = "VendorProductList";
+}
+@section Js{
+    <script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/VendorStock/lang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <input id="vendor_id" type="hidden" value="@ViewBag.vendor_id" />
+    <script src="../../Scripts/jquery-1.4.4.min.js" type="text/javascript"></script>
+	<script src="../../Scripts/Views/VendorStock/VendorProductList.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Views/VendorStock/VendorProductSpecEdit.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+}

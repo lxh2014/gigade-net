@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = "NewPromoQuestionnaireList";
+}
+
+@section Js{
+    <script type="text/javascript" src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/NewPromo/Lang.js?v=@Context.Application["Version"].ToString()"></script>
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimePicker.js" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimeField.js" type="text/javascript"></script>
+        <script src="../../Scripts/Views/NewPromo/AllStore.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Views/NewPromo/NewPromoQuestionnaireList.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Views/NewPromo/NewPromoQuestionnaireEdit.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Views/NewPromo/NewPromoPresentAdd.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+
+
+
+}

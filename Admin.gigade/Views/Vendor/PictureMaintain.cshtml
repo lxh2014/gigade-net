@@ -1,0 +1,18 @@
+﻿@{
+    ViewBag.Title = "PictureMaintain";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+	var brandId = ViewBag.BrandId;
+	var brandName = ViewBag.BrandName;
+}
+
+@section Js{
+	<script type="text/javascript" src="../../Locale/@Html.Raw(Request.Cookies["lang"]==null? "zh-TW":Request.Cookies["lang"].ToString())/Promotions/PromotionsLang.js?v=@Context.Application["Version"].ToString()"></script>
+	<script type="text/javascript" src="../../Scripts/Ext4.0/src/form/field/DateTimePicker.js"></script>
+	<script type="text/javascript" src="../../Scripts/Ext4.0/src/form/field/DateTimeField.js"></script>
+@*	<script type="text/javascript" src="../../Scripts/Views/Promotions/AllStore.js?v=@Context.Application["Version"].ToString()"></script>*@
+	<script type="text/javascript" src="../../Scripts/Views/Vendor/PictureMaintain.js?v=@Context.Application["Version"].ToString()"></script>
+	<script type="text/javascript" src="../../Scripts/Views/Vendor/PictureMaintainEdit.js?v=@Context.Application["Version"].ToString()"></script>
+}
+<input type="hidden" id="brandid" value="@brandId"/>
+<input type="hidden" id="brandname" value="@brandName"/>
+   

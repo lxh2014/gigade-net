@@ -1,0 +1,95 @@
+﻿*
+{
+    margin: 0;
+    padding: 0;
+}
+
+.buyerInfoDiv
+{
+    float: left;
+    width: 450px;
+    height: 200px;
+    padding: 5px;
+    border: 1px solid #BBD1EE;
+}
+
+
+#receiverInfoDiv
+{
+    margin-left: 100px;
+}
+
+.div_title
+{
+    width: 100%;
+    padding: 5px 0px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #BBD1EE;
+}
+
+.sp_receiver
+{
+    font-weight: bold;
+}
+
+#divContent
+{
+    padding-top: 10px;
+}
+
+#tbContent
+{
+    border-bottom: 1px solid #B5B8C8;
+    border-right: 1px solid #B5B8C8;
+}
+.toolImgshow
+{
+    background-image: url("../../img/icons/delete.gif");
+    height: 16px;
+    width: 16px;
+}
+.toolImgAdd
+{
+    background-image: url(../../themes/base/images/ui-icons_2e83ff_256x240.png);
+    background-position: 0 -192px;
+    height: 16px;
+    width: 16px;
+}
+.toolImgMinus
+{
+    background-image: url(../../themes/base/images/ui-icons_2e83ff_256x240.png);
+    background-position: -16px -192px;
+    height: 16px;
+    width: 16px;
+}
+.toolImghide
+{
+}
+
+#tbContent tr td
+{
+    padding: 5px 10px;
+    width: 130px;
+    height: 30px;
+    text-align: center;
+    border-top: 1px solid #B5B8C8;
+    border-left: 1px solid #B5B8C8;
+}
+
+.hide
+{
+    display: none;
+}
+
+.show
+{
+    display: block;
+}
+
+
+
+
+.selSpec
+{
+    width: 120px;
+}

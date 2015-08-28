@@ -1,0 +1,167 @@
+﻿@using BLL.gigade.Model.Query
+@{
+    ViewBag.Title = "OrderDeliverDetail";
+    List<OrderDetailQuery> list = ViewBag.listOrderDetail;
+}
+
+<h2>OrderDeliverDetail</h2>
+
+<div><img src="/Content/img/add_01.gif" width="550" height="106" alt="" /></div>
+<table width="700" border="0" cellpadding="2" cellspacing="0"
+	bordercolor="#666666">
+	<tr>
+
+		<td valign="top">
+		<table width="100%" border="0" cellspacing="0" cellpadding="3">
+			<tr>
+				<td height="3"></td>
+			</tr>
+		</table>
+		<p class="pagenum"></p>
+		<table width="100%" border="0" align="right" cellpadding="0"
+			cellspacing="0">
+			<tr>
+				<td width="13" height="17" background="/Content/img/01.gif"></td>
+				<td background="/Content/img/02.gif"></td>
+				<td width="17" height="17" background="/Content/img/06.gif"></td>
+			</tr>
+			<tr>
+				<td background="/Content/img/03.gif">&nbsp;</td>
+
+				<td>
+				<table width="100%" border="0" align="center" cellpadding="5"
+					cellspacing="0">
+					<tr>
+						<td>
+						<div align="left" class="black12">
+						<div align="center">吉甲地在地好物市集網站訂購明細</div>
+						</div>
+						</td>
+					</tr>
+					<tr>
+						<td>
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+							<tr background="/Content/img/05.gif">
+								<td align="left">付款單號： {{$order_id}}</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr background="/Content/img/05.gif">
+								<td align="left">訂購日期：{{$a_order_master.order_createdate}}</td>
+								<td></td>
+								<td align="left">轉單日期：{{$a_order_master.order_date_pay}}</td>
+							</tr>
+							<tr background="/Content/img/05.gif">
+								<td align="left">訂購人：{{$a_order_master.order_name}}</td>
+								<td></td>
+								<td align="left">收貨人：{{$a_order_master.delivery_name}}</td>
+							</tr>
+							<tr background="/Content/img/05.gif">
+                                <td align="left">到貨時段：{{$a_order_master.estimated_arrival_period}}</td>
+                                <td></td>      
+                                <td></td>           
+                            </tr>
+							<tr background="/Content/img/05.gif">
+								<td align="left">備註：{{$a_order_master.note_order}}</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</table>
+						<div class="line"></div>
+						<table width="100%" border="1"  cellpadding="0"
+							cellspacing="1" class="disc_table">
+							<tr align="center">
+								<th>商品編號</th>
+								<th>廠商自訂編號</th>
+								<th>售價</th>
+								<th>商品名稱</th>
+								<th>數量</th>
+							</tr>
+							@foreach (var item in list)
+                            {
+							    <tr align="center">
+                                    <td>
+                                        @if (item.Combined_Mode>=1 && item.item_mode==1)
+                                        {
+                                            @item.Parent_Id
+                                        }
+                                        else
+                                        {
+                                            @item.Item_Id
+                                        }
+                                    </td>
+								    <td>@item.Item_Code</td>
+								    <td>
+                                        @if (item.item_mode!=1)
+                                        {
+                                            @item.Single_Money
+                                        }
+								    </td>
+								    <td  align="left">
+                                        {{if ($value.combined_mode >= 1 and $value.item_mode == 2)}}&nbsp;&nbsp;&nbsp;&nbsp;＊{{$value.product_name}}{{$value.product_spec_name}}{{else}}{{$value.product_name}}{{$value.product_spec_name}}{{/if}}<!--{{if !empty($value.detail_note)}}<br /><span style="color:#f0f;">&nbsp;&nbsp;{{$value.detail_note}}</span>{{/if}}-->
+
+								    </td>
+								    <td>{{$value.buy_num|number_format}}
+                                        
+								    </td>                               
+							    </tr>
+                            }
+						</table>
+						</td>
+					</tr>
+				</table>
+				</td>
+				<td background="/Content/img/07.gif">&nbsp;</td>
+			</tr>
+			<tr>
+				<td background="/Content/img/04.gif"></td>
+				<td background="/Content/img/05.gif">&nbsp;</td>
+				<td background="/Content/img/08.gif"></td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+
+</table>
+<hr />
+{{if $dispatch == 0}}
+<div align="center">
+
+<table width="550" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td><img src="/Content/img/add_01.gif" width="550" height="106" alt="" /></td>
+	</tr>
+	<tr>
+		<td>
+		<div id="main">
+		<h1>寄件人</h1>
+		<h2>吉甲地在地好物市集 <br>
+		台北市南港區八德路四段768巷7號6樓之1 <br>
+		02-2783-4997</h2>
+		<h3>收件人</h3>
+		<h4>{{$a_order_master.delivery_zip}}{{$a_order_master.delivery_address}}<br>
+		{{$a_order_master.delivery_name}} 收 <br>
+		{{$a_order_master.delivery_mobile}}</h4>
+		<div id="order">
+		</div>
+		</div>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		<p>‧拆閱清點後，若您發現商品有異常，請保持商品原狀與通知客服人員<span class="arial">02-2783-4997</span></p>
+		<p>‧若您訂購生鮮商品，請務必立即冷藏保存，以免產生變質。</p>
+		</td>
+	</tr>
+</table>
+</div>
+{{/if}}
+<div align="center"><input type="button" name="Submit1"
+	class="cssbutton" value="列印" onClick="javascript:print();" /></div>
+<script type="text/JavaScript">
+function printList(){
+	window.print();
+	//window.close();
+}
+</script>

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Config>
+  <PIC_Extension_Filter Value="" DefaultValue="jpg,gif,png,gif,jpeg" Remark="圖片格式限制" />
+  <PIC_Length_Min_Element Value="" DefaultValue="0" Remark="圖檔管理圖片最小限制，单位KB" />
+  <PIC_Length_Min Value="" DefaultValue="10" Remark="圖片最小限制，单位KB" />
+  <PIC_Length_Max Value="" DefaultValue="10240" Remark="圖片最大限制，单位KB" />
+  <PIC_280_Length_Max Value="50" DefaultValue="50" Remark="商品圖主图280x280最大值，单位KB" />
+  <!--add by zhuoqin0830w  2015/03/24 添加手機商品圖的大小限制-->
+  <PIC_640_Length_Max Value="130" DefaultValue="130" Remark="手機商品圖主图640x640最大值，单位KB" />
+  <Excel_Extension_Filter Value="" DefaultValue="xls,xlsx,csv" Remark="EXCEL文件格式限制" />
+  <Excel_Length_Min Value="" DefaultValue="10" Remark="EXCEL最小限制，单位KB" />
+  <Excel_Length_Max Value="" DefaultValue="10240" Remark="EXCEL最大限制，单位KB" />
+  <PDF_Extension_Filter Value="" DefaultValue="pdf" Remark="PDF文件格式限制" />
+  <PDF_Length_Min Value="" DefaultValue="10" Remark="PDF最小限制，单位KB" />
+  <PDF_Length_Max Value="" DefaultValue="10240" Remark="PDF最大限制，单位KB" />
+  <Template_OrderImport_Path Value="" DefaultValue="/Template/OrderImport/t_orders.xlsx" Remark="訂單匯入範本下載路徑" />
+  <PIC_Extention_Format Value="jpg,gif,png" DefaultValue="" Remark="圖檔圖片格式限制" />
+  <PIC_Length_MinValue Value="" DefaultValue="1" Remark="圖檔圖片最小值，单位KB" />
+  <PIC_Length_MaxValue Value="1000" DefaultValue="" Remark="圖檔圖片最大值，单位KB" />
+  <Mail_From Value="gigade@gimg.tw" DefaultValue="" Remark="郵件寄件人" />
+  <Mail_Host Value="192.168.73.1" DefaultValue="" Remark="Host" />
+  <Mail_UserName Value="jialei0706h@gimg.tw" DefaultValue="" Remark="用戶名" />
+  <Mail_UserPasswd Value="qwert789@" DefaultValue="" Remark="密碼" />
+  <Mail_Port Value="25" DefaultValue="" Remark="端口" />
+  <NETDoMain_Name Value="192.168.75.2:81" DefaultValue="" Remark="NET後臺domain_name" />
+  <DoMain_Name Value="www.gigade100.com/newweb" DefaultValue="" Remark="前臺domain_name" />
+  <ADMIN_USERNAME Value="LHW7" DefaultValue="" Remark="服務器本地賬號(可運行本地程序)" />
+  <ADMIN_PASSWD Value="79596648" DefaultValue="" Remark="服務器本地密碼(可運行本地程序)" />
+  <STOCK_PREROGATIVE Value="for stock" DefaultValue="" Remark="庫存編輯的特殊權限組" />
+  <Food_Product_Consult Value="foodProductConsult" DefaultValue="" Remark="食品館商品咨詢郵件群組" />
+  <Use_Product_Consult Value="useProductConsult" DefaultValue="" Remark="用品館商品咨詢郵件群組" />
+  <Other_Product_Consult Value="otherProductConsult" DefaultValue="" Remark="其他商品咨詢類型郵件群組" />
+  
+</Config>

@@ -1,0 +1,7 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+<script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/Compare/CompareLang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/ProductItemMap/SingleCompareAdd.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/ProductItemMap/ComboCompareAdd.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/ProductItemMap/ProductCompare.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
