@@ -9,5 +9,7 @@ namespace BLL.gigade.Dao.Impl
     {
         List<OrderCancelMaster> GetOrderCancelMasterList(OrderCancelMaster ocm, out int totalCount);
         int Update(OrderCancelMaster ocm);
+        int ReturnAllOrder(OrderMaster om);
+        int returnMsg(OrderMaster om);
     }
 }

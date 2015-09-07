@@ -137,7 +137,6 @@ Ext.onReady(function () {
         {
             xtype: 'fieldcontainer',
             layout: 'hbox',
-
             items: [
             {            
                 xtype: 'combobox',
@@ -175,8 +174,7 @@ Ext.onReady(function () {
                 margin: '0 10 0 5',
                 editable: false,
                 displayField: 'parameterName',
-                valueField: 'ParameterCode',
-                
+                valueField: 'ParameterCode',                
                 emptyText: "不分",
                 listeners: {
                     beforerender: function () {
@@ -237,7 +235,7 @@ Ext.onReady(function () {
                 editable: false,
                 allowBlank: false,
                 submitValue: true,
-                value: Tomorrow(),
+                value: new Date(),
                 listeners: {
                     select: function (a, b, c) {
                         var tstart = Ext.getCmp("dateOne");
@@ -265,7 +263,7 @@ Ext.onReady(function () {
                 editable: false,
                 allowBlank: false,
                 submitValue: true,
-                value: setNextMonth(Tomorrow(), 1),
+                value: setNextMonth(new Date(), 1),
                 listeners: {
                     select: function (a, b, c) {
                         var tstart = Ext.getCmp("dateOne");
@@ -313,85 +311,12 @@ Ext.onReady(function () {
                 text: '匯出',
                 margin: '0 10 0 10',
                 iconCls: 'icon-excel',
+                hidden:true,
                 disabled: true,
                 id: 'btnExcel',
                 handler: Export
             }]
         }
-        //{
-        //    xtype: 'fieldcontainer',
-        //    layout: 'hbox',
-        //    items: [
-        //    {
-        //        xtype: 'radiogroup',
-        //        fieldLabel: '訂單狀態',
-        //        id: 'slave_status',
-        //        name: 'slave_status',
-        //        colName: 'slave_status',
-        //        width: 1500,
-        //        defaults: {
-        //                name: 'Slave_Status'
-        //        },
-        //        columns: 17,
-        //        items: [
-        //        { id: 'id1', boxLabel: "所有狀態", inputValue: '-1', checked: true },
-        //        { id: 'id2', boxLabel: "等待付款", inputValue: '0' },
-        //        { id: 'id3', boxLabel: "付款失敗", inputValue: '1' },
-        //        { id: 'id4', boxLabel: "待出貨", inputValue: '2' },
-        //        { id: 'id5', boxLabel: "出貨中", inputValue: '3' },
-        //        { id: 'id6', boxLabel: "已出貨", inputValue: '4' },
-        //        { id: 'id7', boxLabel: "處理中", inputValue: '5' },
-        //        { id: 'id8', boxLabel: "進倉中", inputValue: '6' },
-        //        { id: 'id9', boxLabel: "已進倉", inputValue: '7' },
-        //        { id: 'id10', boxLabel: "已分配", inputValue: '8' },
-        //        { id: 'id11', boxLabel: "等待取消", inputValue: '10' },
-        //        { id: 'id12', boxLabel: "訂單異常", inputValue: '20' },
-        //        { id: 'id13', boxLabel: "單一商品取消", inputValue: '89' },
-        //        { id: 'id14', boxLabel: "訂單取消", inputValue: '90' },
-        //        { id: 'id15', boxLabel: "訂單退貨", inputValue: '91' },
-        //        { id: 'id16', boxLabel: "訂單換貨", inputValue: '92' },
-        //        { id: 'id17', boxLabel: "訂單歸檔", inputValue: '99' }
-        //        ]
-        //    }]            
-        //},
-        //{
-        //    xtype: 'fieldcontainer',
-        //    combineErrors: true,
-        //    margin: '5 0 0 5',
-        //    fieldLabel: '付款方式',
-        //    width: 1500,
-        //    layout: 'hbox',
-        //    items: [
-        //    {
-        //        xtype: 'radiogroup',
-        //        id: 'order_payment',
-        //        name: 'order_payment',
-        //        colName: 'order_payment',
-        //        width: 1500,
-        //        defaults: {
-        //            name: 'Order_Payment'
-        //        },
-        //        columns: 17,
-        //        items: [
-        //        { id: 'OP1', boxLabel: "所有狀態", inputValue: '-1', checked: true, width: 80 },
-        //        { id: 'OP2', boxLabel: "聯合信用卡", inputValue: '1', width: 80 },
-        //        { id: 'OP3', boxLabel: "永豐ATM", inputValue: '2', width: 80 },
-        //        { id: 'OP4', boxLabel: "藍新信用卡  ", inputValue: '3', width: 80 },
-        //        { id: 'OP5', boxLabel: "支付寶", inputValue: '4', width: 80 },
-        //        { id: 'OP6', boxLabel: "銀聯", inputValue: '5', width: 80 },
-        //        { id: 'OP7', boxLabel: "傳真刷卡", inputValue: '6', width: 80 },
-        //        { id: 'OP8', boxLabel: "延遲付款", inputValue: '7', width: 80 },
-        //        { id: 'OP9', boxLabel: "黑貓貨到付款", inputValue: '8', width: 90 },
-        //        { id: 'OP10', boxLabel: "現金", inputValue: '9', width: 70 },
-        //        { id: 'OP11', boxLabel: "中國信託信用卡", inputValue: '10', width: 80 },
-        //        { id: 'OP12', boxLabel: "中國信託信用卡紅利折抵", inputValue: '11', width: 80 },
-        //        { id: 'OP13', boxLabel: "中國信託信用卡紅利折抵(10%)", inputValue: '12', width: 80 },
-        //        { id: 'OP14', boxLabel: "網際威信  HiTRUST 信用卡", inputValue: '13', width: 80 },
-        //        { id: 'OP15', boxLabel: "中國信託信用卡紅利折抵(20%)", inputValue: '14', width: 80 },
-        //        { id: 'OP16', boxLabel: "7-11貨到付款", inputValue: '15', width: 70 }
-        //        ]
-        //    }]            
-        //},
         ]
     });
     var OrderBrandProducesListGrid = Ext.create('Ext.panel.Panel', {

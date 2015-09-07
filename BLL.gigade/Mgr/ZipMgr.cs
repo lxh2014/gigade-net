@@ -135,6 +135,17 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ZipMgr-->Getaddress-->" + ex.Message, ex);
             }
         }
+        public List<Zip> GetZipList()
+        {
+            try
+            {
+                return _zipDao.GetZipList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ZipMgr-->GetZipList-->" + ex.Message, ex);
+            }
+        }
         #endregion
     }
 }

@@ -923,7 +923,7 @@ userEdit = function (o_id) {
                                 user_mobile: Ext.htmlEncode(Ext.getCmp('user_mobile').getValue()),
                                 send_sms_ad: Ext.htmlEncode(Ext.getCmp('send_sms_ad').getValue()),
                                 user_password1: Ext.htmlEncode(Ext.getCmp('user_passwords').getValue()),
-                                adm_note: Ext.htmlEncode(Ext.getCmp('adm_note').getValue()),
+                                admNote: Ext.htmlEncode(Ext.getCmp('adm_note').getValue()),
                                 paper_invoice: Ext.htmlEncode(Ext.getCmp('send_sms_ad').getValue()),
                             },
                             success: function (form, action) {

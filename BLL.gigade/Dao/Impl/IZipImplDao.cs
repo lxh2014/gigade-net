@@ -28,5 +28,6 @@ namespace BLL.gigade.Dao.Impl
         DataTable ZipTable(Zip zip, String appendSql);
         DataTable GetZip();
         string Getaddress(int zipcode);
+        List<Zip> GetZipList();
     }
 }

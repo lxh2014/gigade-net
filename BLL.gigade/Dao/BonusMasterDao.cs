@@ -143,7 +143,7 @@ namespace BLL.gigade.Dao
             sql.Append("insert into bonus_master(`master_id`,`user_id`,`type_id`,`master_total`,`master_balance`,`master_note` ");
             sql.Append(" ,`master_writer`,`master_start`,`master_end`,`master_createdate`,`master_updatedate`,`master_ipfrom`,`bonus_type`)");
             sql.AppendFormat("values({0},{1},{2},{3},{4},'{5}'", store.master_id, store.user_id, store.type_id, store.master_total, store.master_balance, store.master_note);
-            sql.AppendFormat(",'{0}',{1},{2},{3},{4},'{5}',{6});", store.writer, CommonFunction.GetPHPTime(store.smaster_start.ToString()), CommonFunction.GetPHPTime(store.smaster_end.ToString()), CommonFunction.GetPHPTime(store.smaster_createtime.ToString()), CommonFunction.GetPHPTime(store.smaster_updatedate.ToString()), store.master_ipfrom, store.bonus_type);
+            sql.AppendFormat(",'{0}',{1},{2},{3},{4},'{5}',{6});", store.master_writer, CommonFunction.GetPHPTime(store.smaster_start.ToString()), CommonFunction.GetPHPTime(store.smaster_end.ToString()), CommonFunction.GetPHPTime(store.smaster_createtime.ToString()), CommonFunction.GetPHPTime(store.smaster_updatedate.ToString()), store.master_ipfrom, store.bonus_type);
 
             return sql.ToString();
         }
@@ -179,9 +179,17 @@ namespace BLL.gigade.Dao
             try
             {
 
-                sbSql.AppendFormat(@"select	sum(master_balance) as master_balance from bonus_master 
- where user_id={0},master_start<={1},master_end>={1}", user_id, Common.CommonFunction.GetPHPTime());
-                return Convert.ToInt32(_access.getDataTable(sbSql.ToString()).Rows[0][0]);
+                sbSql.AppendFormat(@"select sum(master_balance) as master_balance from bonus_master 
+ where user_id={0} and master_start<={1} and master_end>={1}", user_id, Common.CommonFunction.GetPHPTime());
+                DataTable dt = _access.getDataTable(sbSql.ToString());
+                if (DBNull.Value != dt.Rows[0][0])
+                {
+                    return Convert.ToInt32(dt.Rows[0][0]);
+                }
+                else {
+                    return 0;
+                }
+                //return Convert.ToInt32(_access.getDataTable(sbSql.ToString()).Rows[0][0]);
             }
             catch (Exception ex)
             {
@@ -229,7 +237,7 @@ namespace BLL.gigade.Dao
                 sql.Append(@",bt.type_admin_link,bt.type_description,FROM_UNIXTIME(bm.master_createdate) as smaster_createtime  ");
                 sqlCondi.Append(@" from bonus_master bm ");
                 sqlCondi.Append(@" left join bonus_type bt on bm.type_id=bt.type_id ");
-                sqlCondi.Append(@" where 1=1");
+                sqlCondi.Append(@" where 1=1 and bm.master_balance>0 ");
                 if (user_id != 0)
                 {
                     sqlCondi.AppendFormat(@" and bm.user_id='{0}'", user_id);
@@ -251,11 +259,11 @@ namespace BLL.gigade.Dao
             try
             {
                 sbSql.AppendFormat(@"insert into bonus_record (record_id,master_id,type_id,");
-                sbSql.AppendFormat(@"order_id,record_use,record_note,record_writer");
+                sbSql.AppendFormat(@"order_id,record_use,record_note,record_writer,");
                 sbSql.AppendFormat(@"record_createdate,record_updatedate,record_ipfrom)");
                 sbSql.AppendFormat(@" values({0},{1},{2},{3},", bonusRecord.record_id, bonusRecord.master_id, bonusRecord.type_id, bonusRecord.order_id);
-                sbSql.AppendFormat(@"{0},{1},{2},", bonusRecord.record_use, bonusRecord.record_note, bonusRecord.record_writer);
-                sbSql.AppendFormat(@"{0},{1},{2})", CommonFunction.GetPHPTime(DateTime.Now.ToString()), CommonFunction.GetPHPTime(DateTime.Now.ToString()), bonusRecord.record_ipfrom);
+                sbSql.AppendFormat(@"{0},'{1}','{2}',", bonusRecord.record_use, bonusRecord.record_note, bonusRecord.record_writer);
+                sbSql.AppendFormat(@"{0},{1},'{2}')", CommonFunction.GetPHPTime(DateTime.Now.ToString()), CommonFunction.GetPHPTime(DateTime.Now.ToString()), bonusRecord.record_ipfrom);
 
                 return _access.execCommand(sbSql.ToString()) > 0;
             }
@@ -293,10 +301,6 @@ namespace BLL.gigade.Dao
             try
             {
                 StringBuilder master = new StringBuilder();
-                //獲取 參數裱中 最大的 master_id 并 +1
-                master.Append(@"SELECT MAX(master_id) FROM bonus_master;");
-                uint master_id = Convert.ToUInt32(_access.getDataTable(master.ToString()).Rows[0][0].ToString());
-                master_id++;
                 //獲取使用者電腦IP
                 System.Net.IPAddress[] addlist = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList;
                 string ip = string.Empty;
@@ -305,7 +309,7 @@ namespace BLL.gigade.Dao
                     ip = addlist[0].ToString();
                 }
                 strSql.Append(@"INSERT INTO bonus_master(master_id,user_id,type_id,master_total,master_balance,master_writer,master_start,master_end,master_createdate,master_updatedate,master_ipfrom,bonus_type) VALUES(");
-                strSql.AppendFormat(@"{0},{1},{2},{3},{4},'{5}',", master_id, bm.user_id, bm.type_id, bm.master_total, bm.master_balance, bm.master_writer);
+                strSql.AppendFormat(@"{0},{1},{2},{3},{4},'{5}',", bm.master_id, bm.user_id, bm.type_id, bm.master_total, bm.master_balance, bm.master_writer);
                 strSql.AppendFormat(@"{0},{1},{2},{3},'{4}',{5});", bm.master_start, bm.master_end, bm.master_createdate, bm.master_updatedate, ip, bm.bonus_type);
                 return strSql.ToString();
             }
@@ -327,8 +331,16 @@ namespace BLL.gigade.Dao
             StringBuilder strSql = new StringBuilder();
             try
             {
-                strSql.AppendFormat(@"SELECT SUM(master_balance) AS master_balance FROM bonus_master WHERE user_id = {0};", br.user_id);
-                return Convert.ToInt32(_access.getDataTable(strSql.ToString()).Rows[0][0]);
+                strSql.AppendFormat(@"SELECT SUM(master_balance) FROM bonus_master WHERE user_id = {0} AND master_start <= {1} AND master_end >= {1};", br.user_id, Common.CommonFunction.GetPHPTime());
+                //判斷查詢出來的sum值是否為空  如果為空則表示沒有可用購物金 則賦值為0反之則使用該用戶的購物金  edit by zhuoqin0830w 2015/09/01
+                if (string.IsNullOrEmpty(_access.getDataTable(strSql.ToString()).Rows[0][0].ToString()))
+                {
+                    return 0;
+                }
+                else
+                {
+                    return Convert.ToInt32(_access.getDataTable(strSql.ToString()).Rows[0][0]);
+                }
             }
             catch (Exception ex)
             {
@@ -348,7 +360,7 @@ namespace BLL.gigade.Dao
             StringBuilder strSql = new StringBuilder();
             try
             {
-                strSql.AppendFormat(@"SELECT master_id,user_id,type_id,master_total,master_balance,master_note,master_writer,master_start,master_end FROM bonus_master WHERE user_id = {0} ORDER BY master_end ASC;", br.user_id);
+                strSql.AppendFormat(@"SELECT master_id,user_id,type_id,master_total,master_balance,master_note,master_writer,master_start,master_end FROM bonus_master WHERE user_id = {0} AND master_start <= {1} AND master_end >= {1} ORDER BY master_end ASC;", br.user_id, Common.CommonFunction.GetPHPTime());
                 return _access.getDataTableForObj<BonusMaster>(strSql.ToString());
             }
             catch (Exception ex)
@@ -378,5 +390,120 @@ namespace BLL.gigade.Dao
             }
         }
         #endregion
+
+        //bonus_master  是否發放了購物金
+        public List<BonusMasterQuery> IsExtendBonus(BonusMasterQuery query)
+        {
+            StringBuilder sql=new StringBuilder ();
+            try
+            {
+                sql.AppendFormat("select master_id,master_total,master_balance from bonus_master where master_note='{0}' and bonus_type='{1}';", query.master_note, query.bonus_type);
+                return _access.getDataTableForObj<BonusMasterQuery>(sql.ToString());
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("BonusMasterDao-->IsExtendBonus-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        /// <summary>
+        /// 獲取使用購物金總數(單一商品,組合商品)
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public int BonusAmount(BonusMasterQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("select os.order_id,sum(od.accumulated_bonus) as 'sumBonus' from order_detail od LEFT JOIN order_slave os on os.slave_id=od.slave_id  where os.order_id='{0}' and item_mode in (0,1);",query.master_note);
+                return int.Parse(_access.getDataTable(sql.ToString()).Rows[0]["sumBonus"].ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("BonusMasterDao-->BonusAmount-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        /// <summary>
+        /// 該訂單是否已經發放購物金/該用戶剩餘購物金(除本訂單)
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public List<BonusMaster> GetBonus(BonusMasterQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.Append(@"SELECT master_id,user_id,master_total,master_balance,master_note from bonus_master bm where 1=1 ");
+                if(!string.IsNullOrEmpty(query.master_note))
+                {
+                    sql.AppendFormat(" and bm.master_note='{0}' ",query.master_note);
+                }
+                if(query.bonus_type>0)
+                {
+                    sql.AppendFormat(" and bm.bonus_type='{0}' ",query.bonus_type);
+                }
+                if(query.master_total>0)
+                {
+                    sql.AppendFormat(" and bm.master_total='{0}' ",query.master_total);
+                }
+
+                //排除要扣除的數據
+                if (query.user_id > 0)
+                {
+                    sql.AppendFormat(" and bm.user_id='{0}' ", query.user_id);
+                } 
+                if (!string.IsNullOrEmpty(query.masterid))
+                {
+                    sql.AppendFormat(" and bm.master_id not in ({0})", query.masterid);
+                }
+                if (query.usebonus == "K")
+                {
+                    sql.AppendFormat(" and master_end>'{0}' and master_balance>0", CommonFunction.GetPHPTime());
+                }
+
+                return _access.getDataTableForObj<BonusMaster>(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("BonusMasterDao-->GetBonus-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        /// <summary>
+        /// 更新bonus_master表,收回購物金
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public string UpBonusMaster(BonusMasterQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("update bonus_master set master_balance=master_balance-{3},master_updatedate='{0}',master_ipfrom='{1}',master_writer='{4}' where master_id in ({2});", CommonFunction.GetPHPTime(), query.master_ipfrom, query.master_id, query.master_balance, query.master_writer);
+
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("BonusMasterDao-->UpBonusMaster-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        //bonus_record記錄
+        public string InsertBonusRecord(BonusRecord query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("insert into bonus_record(record_id,master_id,type_id,order_id,");
+                sql.AppendFormat("record_use,record_note,record_writer,record_createdate,record_updatedate,record_ipfrom) values( ");
+                sql.AppendFormat("'{0}','{1}','{2}','{3}',",query.record_id,query.master_id,query.type_id,query.order_id);
+                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}');", query.record_use, query.record_note, query.record_writer, CommonFunction.GetPHPTime(), CommonFunction.GetPHPTime(), query.record_ipfrom);
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("BonusMasterDao-->InsertBonusRecord-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
     }
 }

@@ -115,11 +115,11 @@ function TranToUrl(url, id, history)
 {
     var panel = window.parent.parent.Ext.getCmp('ContentPanel');
     var record = "文字廣告內容列表";
-    var copy = panel.down('#news');
+    var copy = panel.down('#imag');
     if (history == 1)
     {
         record = "歷史文字廣告內容列表";
-        copy = panel.down('#hnews');
+        copy = panel.down('#himag');
     }
     var urlTran = url + '?sid=' + id + '&history=' + history;
     if (copy)
@@ -127,7 +127,7 @@ function TranToUrl(url, id, history)
         copy.close();
     }
     copy = panel.add({
-        id: history == 1 ? 'hnews' : 'news',
+        id: history == 1 ? 'himag' : 'imag',
         title: record,
         html: window.top.rtnFrame(urlTran),
         closable: true

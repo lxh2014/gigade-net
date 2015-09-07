@@ -30,6 +30,7 @@ namespace BLL.gigade.Model
         public int Combo_Type { get; set; }
         public int Temp_Status { get; set; }
         public int Rid { get; set; }
+       
 
         public ProductTemp()
         {

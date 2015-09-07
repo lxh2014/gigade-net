@@ -33,16 +33,6 @@ namespace BLL.gigade.Mgr
                             item.product_name = _pDao.GetNameForID(item.product_id, 0, 0, 1);
                         }
                     }
-                    if (item.gift_type == 2)
-                    {
-                        item.gift_ware = item.bonus;
-                        item.gift_num = item.bonus_multiple;
-                    }
-                    else if (item.gift_type == 3)
-                    {
-                        item.gift_ware = item.welfare;
-                        item.gift_num = item.welfare_multiple;
-                    }
                 }
 
                 return stores;

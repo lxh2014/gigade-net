@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
+using System.Data;
 
 namespace BLL.gigade.Dao.Impl
 {
@@ -40,5 +41,11 @@ namespace BLL.gigade.Dao.Impl
         /// <param name="bm"></param>
         /// <returns></returns>
         string UpdateBonusMasterBalance(BonusMaster bm);
+        List<BonusMasterQuery> IsExtendBonus(BonusMasterQuery query);
+
+        int BonusAmount(BonusMasterQuery query);
+        List<BonusMaster> GetBonus(BonusMasterQuery query);
+        string UpBonusMaster(BonusMasterQuery query);
+        string InsertBonusRecord(BonusRecord query);
     }
 }

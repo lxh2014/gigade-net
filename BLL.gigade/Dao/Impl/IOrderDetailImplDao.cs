@@ -44,7 +44,7 @@ namespace BLL.gigade.Dao.Impl
         List<OrderDetailQuery> OrderDetail(uint return_id);
         string UpdateOrderDetail(OrderDetailQuery query);
         string UpdateOrderDetailSome(OrderDetailQuery query);
-        DataTable OrderDetailTable(uint return_id);
+        DataTable OrderDetailTable(uint return_id, uint item_id);
 
         List<OrderDetailQuery> GetOrderDetailList(OrderDetailQuery query);
         DataTable GetBuyAmountAndTaxType(OrderDetailQuery query);

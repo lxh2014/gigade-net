@@ -7,6 +7,7 @@ using BLL.gigade.Dao;
 using BLL.gigade.Dao.Impl;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
+using System.Data;
 namespace BLL.gigade.Mgr
 {
     public class TabShowMgr : ITabShowImplMgr
@@ -312,17 +313,28 @@ namespace BLL.gigade.Mgr
 
         #region Hitrust-網際威信
         public List<OrderPaymentHitrustQuery> GetOderHitrust(OrderPaymentHitrustQuery store, out int totalCount)
+        {
+            try
             {
-                try
-                {
-                    return _tabshowdao.GetOderHitrust(store, out totalCount);
-                }
-                catch (Exception ex)
-                {
-
-                    throw new Exception("TabShowMgr-->GetOderHitrust-->" + ex.Message, ex);
-                }
+                return _tabshowdao.GetOderHitrust(store, out totalCount);
             }
+            catch (Exception ex)
+            {
+                throw new Exception("TabShowMgr-->GetOderHitrust-->" + ex.Message, ex);
+            }
+        }
+        public DataTable GetOderHitrustDT(int order_id)
+        {
+            try
+            {
+                return _tabshowdao.GetOderHitrustDT(order_id);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("TabShowMgr-->GetOderHitrustDT-->" + ex.Message, ex);
+            }
+        }
         #endregion
     }
 }

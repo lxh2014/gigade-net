@@ -17,6 +17,7 @@ using System.Linq;
 using System.Text;
 using BLL.gigade.Model.Query;
 using System.Data;
+using BLL.gigade.Model;
 
 namespace BLL.gigade.Dao.Impl
 {
@@ -30,5 +31,7 @@ namespace BLL.gigade.Dao.Impl
         List<OrderSlaveQuery> GetVendorWaitDeliver(OrderSlaveQuery store, string str, out int totalCount);
         DataTable GetList(OrderSlaveQuery query, out int totalCount);
         DataTable GetListPrint(OrderSlaveQuery query, string addsql = null);
+        List<OrderSlaveQuery> GetVendor(uint order_id);
+        string UpdOrderSlaveStatus(OrderSlave os);
     }
 }

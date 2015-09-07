@@ -79,17 +79,29 @@ var gxGridStore = Ext.create('Ext.data.Store', {
 });
 
 
+
 var gxGrid = Ext.create('Ext.grid.Panel', {
     title: PRODUCT_SCHEDULE_RELEVANCE_INFO,//商品排程關係表
     id: 'gxGrid',
     hidden: true,
+    frame: false,
     store: gxGridStore,
+    viewConfig: {
+        enableTextSelection: true
+    },
+    plugins: [{ ptype: 'cellediting' }],
     columns: [
          { xtype: 'rownumberer', width: 35, align: 'center', menuDisabled: true, sortable: false },
         //{ header: '序號', dataIndex: 'rowid', menuDisabled: true, sortable: false },
         //{ header: '排程ID', dataIndex: 'schedule_id', menuDisabled: true, sortable: false },
         { header: RELEVANCE_INFO, dataIndex: 'relation_table', width: 200, menuDisabled: true, sortable: false },
-        { header: RELEVANCE_PRODUCT_ID, dataIndex: 'relation_id', menuDisabled: true, sortable: false, flex: 1 }]
+        {
+            header: RELEVANCE_PRODUCT_ID, dataIndex: 'relation_id', menuDisabled: true, sortable: false, flex: 1,
+            editor: {
+                xtype: 'textfield',
+                readOnly: true
+            }
+        }]
 });
 
 
@@ -256,7 +268,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                     change: function () {
                         switch (Ext.getCmp('runwhen').getValue()) {
                             case '2D':
-                                messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('repeatday').getValue() + DAY_REPEAT_EXECUTE+'。';
+                                messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('repeatday').getValue() + DAY_REPEAT_EXECUTE + '。';
                                 Ext.getCmp('ms').setText(messages);
                                 break;
                         }
@@ -291,7 +303,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                         ws = ws.substring(0, ws.length - 1);
                         switch (Ext.getCmp('runwhen').getValue()) {
                             case '2W':
-                                messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('repeatweek').getValue() + WEEK_A + ws + EXECUTE_REPEAT+'。';
+                                messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('repeatweek').getValue() + WEEK_A + ws + EXECUTE_REPEAT + '。';
                                 Ext.getCmp('ms').setText(messages);
                                 break;
                         }
@@ -321,13 +333,13 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                     change: function () {
                         var ws = "";
                         var weeks = Ext.getCmp('weeks').getChecked()
-                        for (var i = 0; i < weeks.length; i++) { 
+                        for (var i = 0; i < weeks.length; i++) {
                             ws += weeks[i].boxLabel + "、";
                         }
                         ws = ws.substring(0, ws.length - 1);
                         switch (Ext.getCmp('runwhen').getValue()) {
                             case '2W':
-                                messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('repeatweek').getValue() + WEEK_A + ws + EXECUTE_REPEAT+'。';
+                                messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('repeatweek').getValue() + WEEK_A + ws + EXECUTE_REPEAT + '。';
                                 Ext.getCmp('ms').setText(messages);
                                 break;
                         }
@@ -390,7 +402,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                         change: function () {
                             switch (Ext.getCmp('runwhen').getValue()) {
                                 case '2M':
-                                    messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('njg').getValue() + MONTH_A + Ext.getCmp('nr').getValue() + DAY_REPEAT_EXECUTE+'。';
+                                    messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('njg').getValue() + MONTH_A + Ext.getCmp('nr').getValue() + DAY_REPEAT_EXECUTE + '。';
                                     Ext.getCmp('ms').setText(messages);
                                     break;
                             }
@@ -417,7 +429,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                         change: function () {
                             switch (Ext.getCmp('runwhen').getValue()) {
                                 case '2M':
-                                    messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('njg').getValue() + MONTH_A + Ext.getCmp('nr').getValue() + DAY_REPEAT_EXECUTE+'。';
+                                    messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('njg').getValue() + MONTH_A + Ext.getCmp('nr').getValue() + DAY_REPEAT_EXECUTE + '。';
                                     Ext.getCmp('ms').setText(messages);
                                     break;
                             }
@@ -456,7 +468,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                         change: function () {
                             switch (Ext.getCmp('runwhen').getValue()) {
                                 case '2M':
-                                    messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('ncfjg').getValue() +MONTH_A + Ext.getCmp('dijizhou').getRawValue() + DE + Ext.getCmp('naxietian').getRawValue() + DAY_REPEAT_EXECUTE+'。';
+                                    messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('ncfjg').getValue() + MONTH_A + Ext.getCmp('dijizhou').getRawValue() + DE + Ext.getCmp('naxietian').getRawValue() + DAY_REPEAT_EXECUTE + '。';
                                     Ext.getCmp('ms').setText(messages);
                                     break;
                             }
@@ -478,7 +490,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                         change: function () {
                             switch (Ext.getCmp('runwhen').getValue()) {
                                 case '2M':
-                                    messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('ncfjg').getValue() + MONTH_A + Ext.getCmp('dijizhou').getRawValue() + DE + Ext.getCmp('naxietian').getRawValue() +DAY_REPEAT_EXECUTE+ '。';
+                                    messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('ncfjg').getValue() + MONTH_A + Ext.getCmp('dijizhou').getRawValue() + DE + Ext.getCmp('naxietian').getRawValue() + DAY_REPEAT_EXECUTE + '。';
                                     Ext.getCmp('ms').setText(messages);
                                     break;
                             }
@@ -502,7 +514,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                         change: function () {
                             switch (Ext.getCmp('runwhen').getValue()) {
                                 case '2M':
-                                    messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('ncfjg').getValue() +MONTH_A + Ext.getCmp('dijizhou').getRawValue() + DE + Ext.getCmp('naxietian').getRawValue() +EXECUTE_REPEAT+ '。';
+                                    messages = SCHEDULE_WILL_IN_EVERY + Ext.getCmp('ncfjg').getValue() + MONTH_A + Ext.getCmp('dijizhou').getRawValue() + DE + Ext.getCmp('naxietian').getRawValue() + EXECUTE_REPEAT + '。';
                                     Ext.getCmp('ms').setText(messages);
                                     break;
                             }
@@ -832,10 +844,10 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                listeners: {
                    change: function () {
                        if (Ext.getCmp('noendtime').checked) {
-                           messagestime = BEGIN_ON+'：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
+                           messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
                            Ext.getCmp('mst').setText(messagestime);
                        } else {
-                           messagestime = EXECUTE_TIME_ON+'：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
+                           messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
                            Ext.getCmp('mst').setText(messagestime);
                        }
                    }
@@ -852,10 +864,10 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                listeners: {
                    change: function () {
                        if (Ext.getCmp('noendtime').checked) {
-                           messagestime = BEGIN_ON+'：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + '。';
+                           messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + '。';
                            Ext.getCmp('mst').setText(messagestime);
                        } else {
-                           messagestime = EXECUTE_TIME_ON+'：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d ') + '。';
+                           messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d ') + '。';
                            Ext.getCmp('mst').setText(messagestime);
                        }
                    }
@@ -871,11 +883,11 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                    change: function (chack) {
                        if (chack.checked) {
                            Ext.getCmp('ce_time').setDisabled(true);
-                           messagestime = BEGIN_ON+'：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
+                           messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
                            Ext.getCmp('mst').setText(messagestime);
                        } else {
                            Ext.getCmp('ce_time').setDisabled(false);
-                           messagestime = EXECUTE_TIME_ON+'：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
+                           messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
                            Ext.getCmp('mst').setText(messagestime);
                        }
                    }
@@ -917,7 +929,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                         if (result.success) {
                             addPc.hide();
                             tierStore.load();
-                            Ext.Msg.alert(INFORMATION,SAVE_SUCCESS);
+                            Ext.Msg.alert(INFORMATION, SAVE_SUCCESS);
                         }
                     },
                     failure: function () {

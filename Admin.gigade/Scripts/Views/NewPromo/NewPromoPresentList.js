@@ -23,8 +23,9 @@ Ext.define('gigade.NewPromoPresent', {
         { name: "group_name", type: "string" },
         { name: 'muser', type: 'int' },
         { name: 'user_username', type: 'string' },
-        { name: 'bonus_expire_day', type: 'int' } //購物金抵用券有效天數
-
+        { name: 'bonus_expire_day', type: 'int' }, //購物金抵用券有效天數
+          { name: 'use_span_day', type: 'int' },
+        
 
     //{ name: "isSame", type: "string" }
     ]
@@ -140,6 +141,8 @@ Ext.onReady(function () {
             //    }
             //},
             { header: '購物金抵用券有效天數', dataIndex: 'bonus_expire_day', width: 150, align: 'center' },
+                 { header: '使用間隔時間', dataIndex: 'use_span_day', width: 80, align: 'center' },
+            
              { header: 'muser', dataIndex: 'muser', hidden: true },
              { header: QuanXianMuser, dataIndex: 'user_username', width: 80, align: 'center' },
             {

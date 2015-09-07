@@ -515,6 +515,24 @@ function Save() {
         }
     }
     var prodNameExtend = JSON.stringify(prodName);
+    //add by wwei0215/8/27
+    /*
+    存在一種情況
+    列表中的站臺里並沒有要修改的站臺的信息
+    eg:
+    要修改中信專區站臺的前後綴
+    該商品並沒有中信專區的相關信息
+
+    通過下面判斷
+    要更新的數據沒有,但做出了列表修改
+    可以預防該情況
+    */
+    if (prodNameExtend == '[]' && upDataStore.length != 0)
+    {
+        Ext.Msg.alert(INFORMATION, NOMESSAGEINFOOFSITE);
+        myMask.hide();
+        return;
+    }
     Ext.Ajax.request({
         url: '/ProductParticulars/SaveProdname',
         params: {

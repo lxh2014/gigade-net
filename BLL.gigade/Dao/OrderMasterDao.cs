@@ -92,27 +92,27 @@ namespace BLL.gigade.Dao
             StringBuilder strSql = new StringBuilder();
             try
             {
-            orderMaster.Replace4MySQL();
+                orderMaster.Replace4MySQL();
                 strSql.Append("insert into order_master(`order_id`,`user_id`,`order_gender`,`delivery_gender`,`bonus_receive`,`deduct_happygo_convert`,`deduct_bonus`,`deduct_welfare`,");
-            strSql.Append("`deduct_account`,`order_freight_normal`,`order_freight_low`,`order_product_subtotal`,`order_amount`,");
-            strSql.Append("`order_status`,`order_payment`,`order_name`,`order_mobile`,`order_phone`,`order_address`,`delivery_name`,`delivery_mobile`,");
-            strSql.Append("`delivery_phone`,`delivery_zip`,`delivery_address`,`estimated_arrival_period`,`company_invoice`,`company_title`,");
-            strSql.Append("`invoice_id`,`order_invoice`,`invoice_status`,`note_order`,`note_admin`,`order_date_pay`,`order_createdate`,`order_updatedate`,");
-            strSql.Append("`order_ipfrom`,`source_trace`,`source_cookie_value`,`source_cookie_name`,`note_order_modifier`,`note_order_modify_time`,`error_check`,`channel`,");
-            strSql.Append("`channel_order_id`,`delivery_store`,`billing_checked`,`order_zip`,`retrieve_mode`,`holiday_deliver`,`import_time`,`export_flag`,`cart_id`)values({0},");
-            strSql.AppendFormat("{0},{1},{2},{3},", orderMaster.User_Id, orderMaster.Order_Gender, orderMaster.Delivery_Gender, orderMaster.Bonus_Receive);//add by wwei0216w 添加訂購人和收件人性別orderMaster.Order_Gender,orderMaster.Delivery_Gender 2015/1/21
-            strSql.AppendFormat("{0},{1},{2},{3},", orderMaster.Deduct_Happygo_Convert, orderMaster.Deduct_Bonus, orderMaster.Deduct_Welfare, orderMaster.Deduct_Account);
-            strSql.AppendFormat("{0},{1},{2},{3},{4},", orderMaster.Order_Freight_Normal, orderMaster.Order_Freight_Low, orderMaster.Order_Product_Subtotal, orderMaster.Order_Amount, orderMaster.Order_Status);
-            strSql.AppendFormat("{0},'{1}','{2}','{3}','{4}',", orderMaster.Order_Payment, orderMaster.Order_Name, orderMaster.Order_Mobile, orderMaster.Order_Phone, orderMaster.Order_Address);
-            strSql.AppendFormat("'{0}','{1}','{2}',{3},'{4}',", orderMaster.Delivery_Name, orderMaster.Delivery_Mobile, orderMaster.Delivery_Phone, orderMaster.Delivery_Zip, orderMaster.Delivery_Address);
-            strSql.AppendFormat("{0},'{1}','{2}',{3},'{4}',", orderMaster.Estimated_Arrival_Period, orderMaster.Company_Invoice, orderMaster.Company_Title, orderMaster.Invoice_Id, orderMaster.Order_Invoice);
-            strSql.AppendFormat("{0},'{1}','{2}',{3},{4},", orderMaster.Invoice_Status, orderMaster.Note_Order, orderMaster.Note_Admin, orderMaster.Order_Date_Pay, orderMaster.Order_Createdate);
-            strSql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',", orderMaster.Order_Updatedate, orderMaster.Order_Ipfrom, orderMaster.Source_Trace, orderMaster.Source_Cookie_Value, orderMaster.Source_Cookie_Name);
-            strSql.AppendFormat("{0},'{1}',{2},'{3}','{4}',", orderMaster.Note_Order_Modifier, orderMaster.Note_Order_Modify_Time, orderMaster.Error_Check, orderMaster.Channel, orderMaster.Channel_Order_Id);
-            strSql.AppendFormat("{0},{1},{2},{3},{4},", orderMaster.Delivery_Store, orderMaster.Billing_Checked, orderMaster.Order_Zip, orderMaster.Retrieve_Mode, orderMaster.Holiday_Deliver);
-            strSql.AppendFormat(orderMaster.Import_Time == DateTime.MinValue ? "null)" : "'" + orderMaster.Import_Time.ToString("yyyy/MM/dd HH:mm:ss") + "',{0},{1})", orderMaster.Export_Flag, orderMaster.Cart_Id);
-            return strSql.ToString();
-        }
+                strSql.Append("`deduct_account`,`order_freight_normal`,`order_freight_low`,`order_product_subtotal`,`order_amount`,");
+                strSql.Append("`order_status`,`order_payment`,`order_name`,`order_mobile`,`order_phone`,`order_address`,`delivery_name`,`delivery_mobile`,");
+                strSql.Append("`delivery_phone`,`delivery_zip`,`delivery_address`,`estimated_arrival_period`,`company_invoice`,`company_title`,");
+                strSql.Append("`invoice_id`,`order_invoice`,`invoice_status`,`note_order`,`note_admin`,`order_date_pay`,`order_createdate`,`order_updatedate`,");
+                strSql.Append("`order_ipfrom`,`source_trace`,`source_cookie_value`,`source_cookie_name`,`note_order_modifier`,`note_order_modify_time`,`error_check`,`channel`,");
+                strSql.Append("`channel_order_id`,`delivery_store`,`billing_checked`,`order_zip`,`retrieve_mode`,`holiday_deliver`,`import_time`,`export_flag`,`cart_id`,`accumulated_bonus`)values({0},");
+                strSql.AppendFormat("{0},{1},{2},{3},", orderMaster.User_Id, orderMaster.Order_Gender, orderMaster.Delivery_Gender, orderMaster.Bonus_Receive);//add by wwei0216w 添加訂購人和收件人性別orderMaster.Order_Gender,orderMaster.Delivery_Gender 2015/1/21
+                strSql.AppendFormat("{0},{1},{2},{3},", orderMaster.Deduct_Happygo_Convert, orderMaster.Deduct_Bonus, orderMaster.Deduct_Welfare, orderMaster.Deduct_Account);
+                strSql.AppendFormat("{0},{1},{2},{3},{4},", orderMaster.Order_Freight_Normal, orderMaster.Order_Freight_Low, orderMaster.Order_Product_Subtotal, orderMaster.Order_Amount, orderMaster.Order_Status);
+                strSql.AppendFormat("{0},'{1}','{2}','{3}','{4}',", orderMaster.Order_Payment, orderMaster.Order_Name, orderMaster.Order_Mobile, orderMaster.Order_Phone, orderMaster.Order_Address);
+                strSql.AppendFormat("'{0}','{1}','{2}',{3},'{4}',", orderMaster.Delivery_Name, orderMaster.Delivery_Mobile, orderMaster.Delivery_Phone, orderMaster.Delivery_Zip, orderMaster.Delivery_Address);
+                strSql.AppendFormat("{0},'{1}','{2}',{3},'{4}',", orderMaster.Estimated_Arrival_Period, orderMaster.Company_Invoice, orderMaster.Company_Title, orderMaster.Invoice_Id, orderMaster.Order_Invoice);
+                strSql.AppendFormat("{0},'{1}','{2}',{3},{4},", orderMaster.Invoice_Status, orderMaster.Note_Order, orderMaster.Note_Admin, orderMaster.Order_Date_Pay, orderMaster.Order_Createdate);
+                strSql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',", orderMaster.Order_Updatedate, orderMaster.Order_Ipfrom, orderMaster.Source_Trace, orderMaster.Source_Cookie_Value, orderMaster.Source_Cookie_Name);
+                strSql.AppendFormat("{0},'{1}',{2},'{3}','{4}',", orderMaster.Note_Order_Modifier, orderMaster.Note_Order_Modify_Time, orderMaster.Error_Check, orderMaster.Channel, orderMaster.Channel_Order_Id);
+                strSql.AppendFormat("{0},{1},{2},{3},{4},", orderMaster.Delivery_Store, orderMaster.Billing_Checked, orderMaster.Order_Zip, orderMaster.Retrieve_Mode, orderMaster.Holiday_Deliver);
+                strSql.AppendFormat(orderMaster.Import_Time == DateTime.MinValue ? "null)" : "'" + orderMaster.Import_Time.ToString("yyyy/MM/dd HH:mm:ss") + "',{0},{1},{2})", orderMaster.Export_Flag, orderMaster.Cart_Id, orderMaster.Accumulated_Bonus);//edit by zhuoqin0830w 2015/09/01 添加 accumulated_bonus 欄位
+                return strSql.ToString();
+            }
             catch (Exception ex)
             {
                 throw new Exception("OrderMasterDao.Save -->" + ex.Message + strSql.ToString(), ex);
@@ -280,7 +280,7 @@ namespace BLL.gigade.Dao
             StringBuilder sqlwhere = new StringBuilder();
             try
             {
-                sqlClm.AppendFormat(@"SELECT DISTINCT om.order_id,channel_name_simple as channel_name_full,om.export_flag,om.order_name,om.delivery_name,om.order_amount,om.order_payment,om.order_status,om.order_createdate,om.channel as channel_id,om.note_admin,om.source_trace,om.deduct_welfare,om.deduct_happygo,om.deduct_bonus,u.user_email,imr.invoice_number,redirect.redirect_name as redirect_name,redirect.redirect_url as redirect_url,u.user_id,user_password,user_name,user_gender,user_mobile,user_phone,user_zip,user_address,user_reg_date , CASE user_type  when '1' THEN '網路會員' else'電話會員' END as mytype ,send_sms_ad,adm_note ,concat(user_birthday_year,'/',user_birthday_month,'/',user_birthday_day) as birthday");
+                sqlClm.AppendFormat(@"SELECT DISTINCT om.order_id,u.user_id,channel_name_simple as channel_name_full,om.export_flag,om.order_name,om.delivery_name,om.order_amount,om.order_payment,om.order_status,om.order_createdate,om.channel as channel_id,om.note_admin,om.source_trace,om.deduct_welfare,om.deduct_happygo,om.deduct_bonus,u.user_email,imr.invoice_number,redirect.redirect_name as redirect_name,redirect.redirect_url as redirect_url,u.user_id,user_password,user_name,user_gender,user_mobile,user_phone,user_zip,user_address,user_reg_date , CASE user_type  when '1' THEN '網路會員' else'電話會員' END as mytype ,send_sms_ad,adm_note ,concat(user_birthday_year,'/',user_birthday_month,'/',user_birthday_day) as birthday");
                 string sqlcount = "select count(DISTINCT om.order_id) AS search_total ";
                 sqljoin.AppendFormat(@" FROM order_master om INNER JOIN users u ON u.user_id = om.user_id LEFT JOIN invoice_master_record imr ON om.order_id =  imr.order_id LEFT  JOIN channel on om.channel=channel.channel_id left join redirect on redirect.redirect_id=om.source_trace");
                 sqljoin.AppendFormat(" LEFT JOIN deliver_master dm ON dm.order_id = om.order_id ");
@@ -398,18 +398,18 @@ namespace BLL.gigade.Dao
                 }
                 #endregion
                 //sqljoin.AppendFormat(sqladdstr);
-            totalCount = 0;
-            if (query.IsPage)
-            {
+                totalCount = 0;
+                if (query.IsPage)
+                {
                     System.Data.DataTable _dt = _dbAccess.getDataTable(sqlcount + sqljoin.ToString() + sqlwhere.ToString());
                     if (Convert.ToInt32(_dt.Rows[0][0]) > 0)
-                {
-                    totalCount = Convert.ToInt32(_dt.Rows[0]["search_total"]);
-                }
+                    {
+                        totalCount = Convert.ToInt32(_dt.Rows[0]["search_total"]);
+                    }
                     sqlwhere.AppendFormat(" GROUP BY om.order_id  ORDER BY om.order_id DESC limit {0},{1}", query.Start, query.Limit);
-            }
+                }
                 return _dbAccess.getDataTableForObj<OrderMasterQuery>(sqlClm.ToString() + sqljoin.ToString() + sqlwhere.ToString());
-        }
+            }
             catch (Exception ex)
             {
                 throw new Exception("OrderMasterDao.getOrderSearch -->" + ex.Message + sqlClm.ToString() + sqljoin.ToString() + sqlwhere.ToString(), ex);
@@ -443,7 +443,7 @@ namespace BLL.gigade.Dao
                     sqlwhere.AppendFormat(" AND vu.group_id = '{0}'", query.group_id);
 
                     sqljoin.Append(" INNER JOIN vip_user vu ON om.user_id =  vu.user_id ");
-        }
+                }
                 if (query.invoice != 0)
                 {
                     sqlwhere.AppendFormat("  and imr.invoice_id IS NULL AND (om.money_cancel + om.money_return) != om.order_amount");
@@ -754,9 +754,9 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-            sql.AppendFormat("update serial set serial_value={0}  where serial_id={1};", serialValue, serialId);
-            return sql.ToString();
-        }
+                sql.AppendFormat("update serial set serial_value={0}  where serial_id={1};", serialValue, serialId);
+                return sql.ToString();
+            }
             catch (Exception ex)
             {
                 throw new Exception("OrderMasterDao-->UpdateSerialVal-->" + sql.ToString() + ex.Message, ex);
@@ -803,12 +803,12 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-            sql.Append("insert  into order_master_status  (serial_id,order_id,order_status,");
-            sql.Append("status_description,status_ipfrom,status_createdate) ");
-            sql.AppendFormat("values({0},{1},{2},", store.serial_id, store.order_id, store.order_status);
-            sql.AppendFormat("'{0}','{1}',{2});", store.status_description, store.status_ipfrom, CommonFunction.GetPHPTime(store.StatusCreateDate.ToString()));
-            return sql.ToString();
-        }
+                sql.Append("insert  into order_master_status  (serial_id,order_id,order_status,");
+                sql.Append("status_description,status_ipfrom,status_createdate) ");
+                sql.AppendFormat("values({0},{1},{2},", store.serial_id, store.order_id, store.order_status);
+                sql.AppendFormat("'{0}','{1}',{2});", store.status_description, store.status_ipfrom, CommonFunction.GetPHPTime(store.StatusCreateDate.ToString()));
+                return sql.ToString();
+            }
             catch (Exception ex)
             {
                 throw new Exception("OrderMasterDao-->InsertOrderMasterStatus-->" + sql.ToString() + ex.Message, ex);
@@ -949,87 +949,70 @@ namespace BLL.gigade.Dao
         public string UpdateOac(DataTable DtTemp, OrderAccountCollection model)
         {
             StringBuilder sql = new StringBuilder();
-            StringBuilder strTemp = new StringBuilder();
             try
             {
                 sql.AppendFormat("set sql_safe_updates = 0;update order_account_collection set ");
 
-
-                strTemp.AppendFormat("  order_id='{0}',  ", model.order_id);
+                sql.AppendFormat("  order_id='{0}'   ", model.order_id);
                 if (string.IsNullOrEmpty(DtTemp.Rows[0]["account_collection_time"].ToString()))
                 {
                     if (model.account_collection_time != DateTime.MinValue && model.account_collection_time != null)
                     {
-                        strTemp.AppendFormat("  account_collection_time='{0}',  ", model.account_collection_time.ToString("yyyy-MM-dd"));
+                        sql.AppendFormat(" , account_collection_time='{0}' ", model.account_collection_time.ToString("yyyy-MM-dd"));
+                        sql.AppendFormat(" ,account_collection_money='{0}' ", model.account_collection_money);
+                        sql.AppendFormat(" , poundage='{0}' ", model.poundage);
                     }
-
-                }
-                if (string.IsNullOrEmpty(DtTemp.Rows[0]["account_collection_money"].ToString()) || DtTemp.Rows[0]["account_collection_money"].ToString() == "0")
-                        {
-                    strTemp.AppendFormat(" account_collection_money='{0}', ", model.account_collection_money);
-                }
-                if (string.IsNullOrEmpty(DtTemp.Rows[0]["poundage"].ToString()) || DtTemp.Rows[0]["poundage"].ToString() == "0")
-                            {
-                    strTemp.AppendFormat(" poundage='{0}',  ", model.poundage);
                 }
                 if (string.IsNullOrEmpty(DtTemp.Rows[0]["return_collection_time"].ToString()))
-                                {
+                {
                     if (model.return_collection_time != DateTime.MinValue && model.return_collection_time != null)
-                                    {
-                        strTemp.AppendFormat("  return_collection_time='{0}',  ", model.return_collection_time.ToString("yyyy-MM-dd"));
-                                    }
-                                }
-                if (string.IsNullOrEmpty(DtTemp.Rows[0]["return_collection_money"].ToString()) || DtTemp.Rows[0]["return_collection_money"].ToString() == "0")
-                                {
-                    strTemp.AppendFormat(" return_collection_money='{0}', ", model.return_collection_money);
-                                }
-                if (string.IsNullOrEmpty(DtTemp.Rows[0]["return_poundage"].ToString()) || DtTemp.Rows[0]["return_poundage"].ToString() == "0")
-                                {
-                    strTemp.AppendFormat(" return_poundage='{0}',  ", model.return_poundage);
-                                }
-                                if (string.IsNullOrEmpty(DtTemp.Rows[0]["remark"].ToString()))
-                                {
-                    strTemp.AppendFormat("  remark='{0}',  ", model.remark);
-                                }
-                sql.AppendFormat(strTemp.ToString().Remove(strTemp.ToString().LastIndexOf(',')));
-                                strTemp.Clear();
+                    {
+                        sql.AppendFormat("  ,return_collection_time='{0}'  ", model.return_collection_time.ToString("yyyy-MM-dd"));
+                        sql.AppendFormat(" ,return_collection_money='{0}' ", model.return_collection_money);
+                        sql.AppendFormat(" ,return_poundage='{0}'  ", model.return_poundage);
+                    }
+                }
+                if (string.IsNullOrEmpty(DtTemp.Rows[0]["remark"].ToString()))
+                {
+                    sql.AppendFormat("  ,remark='{0}'  ", model.remark);
+                }
                 sql.AppendFormat("  where order_id='{0}';set sql_safe_updates = 1;", model.order_id);
                 return sql.ToString();
             }
             catch (Exception ex)
             {
                 throw new Exception("OrderMasterDao-->UpdateOac -->" + ex.Message + sql.ToString(), ex);
-                            }
-                        }
+            }
+        }
         public string InsertOac(OrderAccountCollection model)
         {
-            StringBuilder sql = new StringBuilder();
+            StringBuilder str = new StringBuilder();
             try
-                        {
-                sql.Append(@"insert into order_account_collection(order_id,account_collection_money,poundage,return_collection_money,return_poundage,remark,account_collection_time,return_collection_time) ");
-                sql.AppendFormat(" values('{0}','{1}','{2}','{3}','{4}','{5}'", model.order_id, model.account_collection_money, model.poundage, model.return_collection_money, model.return_poundage, model.remark);
+            {
+                str.Append(@"insert into order_account_collection(order_id,remark,account_collection_time,account_collection_money,poundage,return_collection_time,return_collection_money,return_poundage) ");
+                str.AppendFormat(" values('{0}','{1}'", model.order_id, model.remark);
                 if (model.account_collection_time != null && model.account_collection_time != DateTime.MinValue)
-                            {
-                    sql.AppendFormat(" ,'{0}' ", model.account_collection_time.ToString("yyyy-MM-dd"));
-                            }
-                            else
-                            {
-                    sql.AppendFormat(" ,NULL ");
-                }
-                if (model.return_collection_time != null && model.return_collection_time != DateTime.MinValue)
-                    {
-                    sql.AppendFormat(" ,'{0}' ", model.return_collection_time.ToString("yyyy-MM-dd"));
+                {
+                    str.AppendFormat(" ,'{0}','{1}','{2}'", Common.CommonFunction.DateTimeToString(model.account_collection_time), model.account_collection_money, model.poundage);
                 }
                 else
                 {
-                    sql.AppendFormat(" , NULL ");
+                    str.AppendFormat(" ,NULL ,NULL  ,NULL  ");
                 }
-                sql.AppendFormat(" );");
-                return sql.ToString();
+                if (model.return_collection_time != null && model.return_collection_time != DateTime.MinValue)
+                {
+                    str.AppendFormat(" ,'{0}','{1}','{2}' ", Common.CommonFunction.DateTimeToString(model.return_collection_time), model.return_collection_money, model.return_poundage);
+                }
+                else
+                {
+                    str.AppendFormat(" , NULL  ,NULL  ,NULL ");
+                }
+                str.AppendFormat(" );");
+                return str.ToString();
             }
             catch (Exception ex)
             {
-                throw new Exception("OrderMasterDao-->InsertOac -->" + ex.Message + sql.ToString(), ex);
+                throw new Exception("OrderMasterDao-->InsertOac -->" + ex.Message + str.ToString(), ex);
             }
         }
         /// <summary>
@@ -1096,16 +1079,16 @@ namespace BLL.gigade.Dao
                     }
                 }
                 else if (query.dateType == 3)
+                {
+                    if (query.first_time != 0)
                     {
-                        if (query.first_time != 0)
-                        {
-                            sqlCondition.AppendFormat(" and om.order_createdate>='{0}' ", query.first_time);
-                        }
-                        if (query.last_time != 0)
-                        {
-                            sqlCondition.AppendFormat(" and om.order_createdate<='{0}' ", query.last_time);
-                        }
+                        sqlCondition.AppendFormat(" and om.order_createdate>='{0}' ", query.first_time);
                     }
+                    if (query.last_time != 0)
+                    {
+                        sqlCondition.AppendFormat(" and om.order_createdate<='{0}' ", query.last_time);
+                    }
+                }
                 else if (query.dateType == 4)
                 {
                     if (query.order_date_pay_startTime != DateTime.MinValue)
@@ -1117,24 +1100,32 @@ namespace BLL.gigade.Dao
                         sqlCondition.AppendFormat(" and oac.return_collection_time<='{0}' ", query.order_date_pay_endTime.ToString("yyyy-MM-dd 23:59:59"));
                     }
                 }
-                    else
+                else if (query.dateType == 2)
+                {
+                    if (query.first_time != 0)
                     {
-                        if (query.first_time != 0)
-                        {
-                            sqlCondition.AppendFormat(" and imr.invoice_date>='{0}' ", query.first_time);
-                        }
-                        if (query.last_time != 0)
-                        {
-                            sqlCondition.AppendFormat(" and imr.invoice_date<='{0}' ", query.last_time);
-                        }
+                        sqlCondition.AppendFormat(" and imr.invoice_date>='{0}' ", query.first_time);
+                    }
+                    if (query.last_time != 0)
+                    {
+                        sqlCondition.AppendFormat(" and imr.invoice_date<='{0}' ", query.last_time);
+                    }
                 }
                 if (query.show_type == 1)
                 {
-                    sqlCondition.AppendFormat(" and oac.row_id!=''");
-                    }
+                    sqlCondition.AppendFormat(" and oac.row_id!='' ");
+                }
                 else if (query.show_type == 2)
                 {
                     sqlCondition.AppendFormat(" and   ISNULL(oac.row_id) ");
+                }
+                if (query.invoice_type == 1)
+                {
+                    sqlCondition.AppendFormat(" and imr.invoice_id!='' ");
+                }
+                else if (query.invoice_type == 2)
+                {
+                    sqlCondition.AppendFormat(" and   ISNULL(imr.invoice_id) ");
                 }
 
                 if (query.Order_Id != 0)
@@ -1216,16 +1207,16 @@ namespace BLL.gigade.Dao
                     }
                 }
                 else if (query.dateType == 3)
+                {
+                    if (query.first_time != 0)
                     {
-                        if (query.first_time != 0)
-                        {
-                            sqlCondition.AppendFormat(" and om.order_createdate>='{0}' ", query.first_time);
-                        }
-                        if (query.last_time != 0)
-                        {
-                            sqlCondition.AppendFormat(" and om.order_createdate<='{0}' ", query.last_time);
-                        }
+                        sqlCondition.AppendFormat(" and om.order_createdate>='{0}' ", query.first_time);
                     }
+                    if (query.last_time != 0)
+                    {
+                        sqlCondition.AppendFormat(" and om.order_createdate<='{0}' ", query.last_time);
+                    }
+                }
                 else if (query.dateType == 4)
                 {
                     if (query.order_date_pay_startTime != DateTime.MinValue)
@@ -1237,26 +1228,33 @@ namespace BLL.gigade.Dao
                         sqlCondition.AppendFormat(" and oac.return_collection_time<='{0}' ", query.order_date_pay_endTime.ToString("yyyy-MM-dd 23:59:59"));
                     }
                 }
-                    else
+                else if (query.dateType == 2)
+                {
+                    if (query.first_time != 0)
                     {
-                        if (query.first_time != 0)
-                        {
-                            sqlCondition.AppendFormat(" and imr.invoice_date>='{0}' ", query.first_time);
-                        }
-                        if (query.last_time != 0)
-                        {
-                            sqlCondition.AppendFormat(" and imr.invoice_date<='{0}' ", query.last_time);
-                        }
+                        sqlCondition.AppendFormat(" and imr.invoice_date>='{0}' ", query.first_time);
+                    }
+                    if (query.last_time != 0)
+                    {
+                        sqlCondition.AppendFormat(" and imr.invoice_date<='{0}' ", query.last_time);
+                    }
                 }
                 if (query.show_type == 1)
                 {
-                    sqlCondition.AppendFormat(" and oac.row_id!=''");
-                    }
+                    sqlCondition.AppendFormat(" and oac.row_id!='' ");
+                }
                 else if (query.show_type == 2)
                 {
                     sqlCondition.AppendFormat(" and   ISNULL(oac.row_id) ");
                 }
-
+                if (query.invoice_type == 1)
+                {
+                    sqlCondition.AppendFormat(" and imr.invoice_id!='' ");
+                }
+                else if (query.invoice_type == 2)
+                {
+                    sqlCondition.AppendFormat(" and   ISNULL(imr.invoice_id) ");
+                }
                 if (query.Order_Id != 0)
                 {
                     sqlCondition.AppendFormat(" and om.order_id='{0}' ", query.Order_Id);
@@ -1304,16 +1302,16 @@ namespace BLL.gigade.Dao
                     }
                 }
                 else if (query.dateType == 3)
+                {
+                    if (query.first_time != 0)
                     {
-                        if (query.first_time != 0)
-                        {
-                            sql.AppendFormat(" and om.order_createdate>='{0}' ", query.first_time);
-                        }
-                        if (query.last_time != 0)
-                        {
-                            sql.AppendFormat(" and om.order_createdate<='{0}' ", query.last_time);
-                        }
+                        sql.AppendFormat(" and om.order_createdate>='{0}' ", query.first_time);
                     }
+                    if (query.last_time != 0)
+                    {
+                        sql.AppendFormat(" and om.order_createdate<='{0}' ", query.last_time);
+                    }
+                }
                 else if (query.dateType == 4)
                 {
                     if (query.order_date_pay_startTime != DateTime.MinValue)
@@ -1325,26 +1323,33 @@ namespace BLL.gigade.Dao
                         sql.AppendFormat(" and oac.return_collection_time<='{0}' ", query.order_date_pay_endTime.ToString("yyyy-MM-dd 23:59:59"));
                     }
                 }
-                    else
+                else if (query.dateType == 2)
+                {
+                    if (query.first_time != 0)
                     {
-                        if (query.first_time != 0)
-                        {
-                            sql.AppendFormat(" and imr.invoice_date>='{0}' ", query.first_time);
-                        }
-                        if (query.last_time != 0)
-                        {
-                            sql.AppendFormat(" and imr.invoice_date<='{0}' ", query.last_time);
-                        }
+                        sql.AppendFormat(" and imr.invoice_date>='{0}' ", query.first_time);
+                    }
+                    if (query.last_time != 0)
+                    {
+                        sql.AppendFormat(" and imr.invoice_date<='{0}' ", query.last_time);
+                    }
                 }
                 if (query.show_type == 1)
                 {
-                    sql.AppendFormat(" and oac.row_id!=''");
-                    }
+                    sql.AppendFormat(" and oac.row_id!='' ");
+                }
                 else if (query.show_type == 2)
                 {
                     sql.AppendFormat(" and   ISNULL(oac.row_id) ");
                 }
-
+                if (query.invoice_type == 1)
+                {
+                    sql.AppendFormat(" and imr.invoice_id!='' ");
+                }
+                else if (query.invoice_type == 2)
+                {
+                    sql.AppendFormat(" and   ISNULL(imr.invoice_id) ");
+                }
                 if (query.Order_Id != 0)
                 {
                     sql.AppendFormat(" and om.order_id='{0}' ", query.Order_Id);
@@ -1412,7 +1417,7 @@ namespace BLL.gigade.Dao
                 {
                     System.Data.DataTable _dt = _dbAccess.getDataTable(" select count(a.order_id) as totalCount from ( " + sql.ToString() + ")a");
                     if (_dt.Rows.Count > 0)
-                {
+                    {
                         totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"].ToString());
                     }
 
@@ -1431,13 +1436,13 @@ namespace BLL.gigade.Dao
                         var blist = parameterList.Find(m => m.ParameterType == "Combo_Type" && m.ParameterCode == dr["combined_mode"].ToString());
 
                         if (alist != null)
-                {
+                        {
                             dr["remark"] = alist.remark;
-                }
+                        }
                         if (blist != null)
-                {
+                        {
                             dr["modeName"] = blist.parameterName;
-                }
+                        }
 
                     }
                 }
@@ -1720,7 +1725,7 @@ namespace BLL.gigade.Dao
         public int UpdateOrderToOpenInvoice(int order_id)
         {
             StringBuilder sbSql = new StringBuilder();
-            sbSql.Append("UPDATE order_master as om,order_slave as os SET order_status = 99,order_date_close = now(),slave_status = 99,slave_date_close = now(),slave_date_delivery = now() ");
+            sbSql.Append("UPDATE order_master as om,order_slave as os SET order_status = 99,order_date_close = NOW(),slave_status = 99,slave_date_close = NOW(),slave_date_delivery = NOW() ");
             sbSql.AppendFormat(" WHERE om.order_id = os.order_id AND om.order_id={0} ", order_id);
             try
             {
@@ -1803,7 +1808,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT order_id,user_name FROM order_master LEFT JOIN users ON order_master.user_id=users.user_id WHERE order_id={0}", order_id);
+                sql.AppendFormat(@"SELECT order_id,order_name as user_name,order_phone,order_mobile,order_address,delivery_name,delivery_phone,delivery_mobile,delivery_address,order_zip,delivery_zip FROM order_master LEFT JOIN users ON order_master.user_id=users.user_id WHERE order_id={0}", order_id);
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)
@@ -1812,12 +1817,25 @@ namespace BLL.gigade.Dao
             }
         }
 
-        public string UpDeliveryStore(OrderMasterQuery query)
+        public string UpdateOrderMaster(OrderMasterQuery query, OrderShowMasterQuery osmQuery)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("update order_master set delivery_store='{0}',order_freight_normal='{1}',order_freight_low='{2}', order_amount='{3}',order_payment='12',order_date_pay='{4}'  where order_id='{5}';", query.Delivery_Store,query.Order_Freight_Normal,query.Order_Freight_Low,query.Order_Amount,CommonFunction.GetPHPTime(),query.Order_Id);
+                sql.AppendFormat("update order_master set delivery_store='{0}' ", query.Delivery_Store);
+                if (query.payment == "T_CAT")
+                {
+                    sql.AppendFormat(" ,order_freight_normal='{0}',order_freight_low='{1}',order_payment='{2}',order_date_pay='{3}' ", query.Order_Freight_Normal, query.Order_Freight_Low, query.Order_Payment, CommonFunction.GetPHPTime());
+                    if (query.t_cat_amount != 0)
+                    {
+                        sql.AppendFormat(",order_amount='{0}' ", query.Order_Amount);
+                    }
+                }
+                else if (osmQuery.order_status == 0)
+                {
+                    sql.AppendFormat(" ,order_freight_normal='{0}',order_freight_low='{1}',order_amount='{2}',order_payment='{3}',order_date_pay='{4}' ", query.Order_Freight_Normal, query.Order_Freight_Low, query.Order_Amount, query.Order_Payment, CommonFunction.GetPHPTime());
+                }
+                sql.AppendFormat(" where order_id='{0}';", query.Order_Id);
                 return sql.ToString();
             }
             catch (Exception ex)
@@ -1832,7 +1850,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("update order_master set order_status='2',order_date_pay='{0}',order_date_cancel='{1}',money_cancel=0,export_flag=1 where order_id='{1}';",CommonFunction.GetPHPTime(),query.Order_Id);
+                sql.AppendFormat("update order_master set order_status='2',order_date_pay='{0}',order_date_cancel='{1}',money_cancel=0,export_flag=1 where order_id='{1}';", CommonFunction.GetPHPTime(), query.Order_Id);
                 return sql.ToString();
             }
             catch (Exception ex)
@@ -1873,7 +1891,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("select  om.order_id,os.slave_id,od.detail_id from order_master om LEFT JOIN order_slave os on om.order_id=os.order_id LEFT JOIN order_detail od on os.slave_id=od.slave_id where om.order_id='{0}';",query.Order_Id);
+                sql.AppendFormat("select  om.order_id,os.slave_id,od.detail_id from order_master om LEFT JOIN order_slave os on om.order_id=os.order_id LEFT JOIN order_detail od on os.slave_id=od.slave_id where om.order_id='{0}';", query.Order_Id);
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)
@@ -1886,8 +1904,8 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-              DataTable  _dt= _dbAccess.getDataTable(_serial.Update(serial.Serial_id));
-              return _dt;
+                DataTable _dt = _dbAccess.getDataTable(_serial.Update(serial.Serial_id));
+                return _dt;
             }
             catch (Exception ex)
             {
@@ -1901,7 +1919,7 @@ namespace BLL.gigade.Dao
             try
             {
                 sql.Append("insert into order_master_status(serial_id,order_id,order_status,status_description,status_ipfrom,status_createdate) values( ");
-                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}');",query.serial_id,query.order_id,query.order_status,query.status_description,query.status_ipfrom,CommonFunction.GetPHPTime());
+                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}');", query.serial_id, query.order_id, query.order_status, query.status_description, query.status_ipfrom, CommonFunction.GetPHPTime());
                 return sql.ToString();
             }
             catch (Exception ex)
@@ -1910,17 +1928,94 @@ namespace BLL.gigade.Dao
             }
         }
 
-        public string UpDeliveryMaster(uint order_id)
+        public string UpDeliveryMaster(uint order_id, uint delivery_store)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("update deliver_master set delivery_store=2 where order_id='{0}';",order_id);
+                sql.AppendFormat("update deliver_master set delivery_store='{0}' where order_id='{1}';", delivery_store, order_id);
                 return sql.ToString();
             }
             catch (Exception ex)
             {
                 throw new Exception("OrderMasterDao-->UpDeliveryMaster-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// 更新訂單狀態sql
+        /// </summary>
+        /// <param name="om"></param>
+        /// <returns></returns>
+        public string UpdateOrderMasterStatus(OrderMaster om)
+        {
+            StringBuilder sql = new StringBuilder();
+
+            sql.AppendFormat("set sql_safe_updates = 0; ");
+            sql.AppendFormat("UPDATE order_master SET order_date_pay = 0,order_status='{0}',order_updatedate ='{1}',order_ipfrom='{2}' ", om.Order_Status, CommonFunction.GetPHPTime(DateTime.Now.ToString()), om.Order_Ipfrom);
+            sql.AppendFormat(" WHERE order_id={0} ; ", om.Order_Id);
+            sql.Append(" set sql_safe_updates = 1;");
+            try
+            {
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->UpdateOrderMasterStatus-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+
+        public DataTable IsVendorDeliver(uint order_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("select count(om.order_id) as search_total from order_detail od INNER JOIN order_slave os on od.slave_id=os.slave_id INNER JOIN order_master om on os.order_id=om.order_id where 1=1 and od.product_mode=1  and om.order_id='{0}' ;", order_id);
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->IsVendorDeliver-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public string ModifyOrderStatus(OrderMasterQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("UPDATE order_master om,order_slave os,order_detail od SET om.order_status='2',os.slave_status='2',od.detail_status='2',om.order_date_pay='{0}',om.order_date_cancel=0,om.money_cancel=0,om.export_flag=1 where om.order_id='{1}' AND om.order_id=os.order_id AND os.slave_id=od.slave_id;", CommonFunction.GetPHPTime(), query.Order_Id);
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->ModifyOrderStatus-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        public DataTable IsFirstTime(OrderMasterQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" select user_id from users where user_id='{0}' and first_time=0; ", query.user_id);
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->IsFirstTime-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        public string UpFirstTime(OrderMasterQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("update order_master om,users u set om.priority=1,u.first_time='{0}' where om.order_id='{1}' and om.user_id=u.user_id;", CommonFunction.GetPHPTime(), query.Order_Id);
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->UpFirstTime-->" + sql.ToString() + ex.Message, ex);
             }
         }
     }

@@ -14,6 +14,8 @@
   <PDF_Length_Min Value="" DefaultValue="10" Remark="PDF最小限制，单位KB" />
   <PDF_Length_Max Value="" DefaultValue="10240" Remark="PDF最大限制，单位KB" />
   <Template_OrderImport_Path Value="" DefaultValue="/Template/OrderImport/t_orders.xlsx" Remark="訂單匯入範本下載路徑" />
+  <!--add by mingwei0727w 2015/08/27 添加App功能管理提供的Excel模板下載地址-->>
+  <Template_Appcategory_Path Value="" DefaultValue="/Template/AppcategoryImport/t_category.xls" Remark="手機App分類表管理範本下載路徑" />
   <PIC_Extention_Format Value="jpg,gif,png" DefaultValue="" Remark="圖檔圖片格式限制" />
   <PIC_Length_MinValue Value="" DefaultValue="1" Remark="圖檔圖片最小值，单位KB" />
   <PIC_Length_MaxValue Value="1000" DefaultValue="" Remark="圖檔圖片最大值，单位KB" />

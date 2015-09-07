@@ -329,6 +329,11 @@ namespace Admin.gigade.Controllers
             ViewBag.Ipo_poid = Request.Params["po_id"];
             return View();
         }
+        //採購單驗收
+        public ActionResult Check()
+        {
+            return View();
+        }
         #endregion
 
         #region 料位管理模塊
@@ -5813,7 +5818,7 @@ namespace Admin.gigade.Controllers
                     }
                     else if (dt.Rows[i]["product_freight_set"].ToString() == "2")
                     {
-                        dr[11] = "冷藏";
+                        dr[11] = "冷凍";
                     }
                     else
                     {
@@ -8224,6 +8229,14 @@ namespace Admin.gigade.Controllers
             {
                 ipo.po_type = Request.Params["Potype"];
             }
+            if (!string.IsNullOrEmpty(Request.Params["start_time"]))
+            {
+                ipo.start_time = Convert.ToDateTime(Request.Params["start_time"].ToString());
+            }
+            if (!string.IsNullOrEmpty(Request.Params["end_time"]))
+            {
+                ipo.end_time = Convert.ToDateTime(Request.Params["end_time"].ToString());
+            }
             //變更的時候記得把匯出也修改了獲取條件是同時的
             try
             {
@@ -8231,10 +8244,30 @@ namespace Admin.gigade.Controllers
                 _ipoMgr = new IpoMgr(mySqlConnectionString);
                 int totalCount = 0;
                 store = _ipoMgr.GetIpoList(ipo, out  totalCount);
+                if (!string.IsNullOrEmpty(Request.Params["freight"]))
+                {
+                    if (Request.Params["freight"].ToString() != "0")
+                    {
+                        _ipodMgr = new IpodMgr(mySqlConnectionString);
+                        List<IpoQuery> newstore = new List<IpoQuery>();
+                        foreach (IpoQuery item in store)
+                        {
+                            if (!string.IsNullOrEmpty(item.po_id))
+                            {
+                                if (_ipodMgr.GetIpodfreight(item.po_id, Convert.ToInt32(Request.Params["freight"].ToString())))
+                                {
+                                    newstore.Add(item);
+                                }
+                            }
+                        }
+                        store = newstore;
+                    }
+                }
+                
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式    ,totalCount:" + totalCount + " 
                 timeConverter.DateTimeFormat = "yyyy-MM-dd";
-                json = "{success:true,'msg':'user',totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";//返回json數據
+                json = "{success:true,'msg':'user',data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";//返回json數據
             }
             catch (Exception ex)
             {
@@ -8561,10 +8594,108 @@ namespace Admin.gigade.Controllers
              this.Response.End();
              return this.Response;
          }
+         /// <summary>
+         /// 獲取驗收採購單單身數據
+         /// </summary>
+         /// <returns></returns>
+         public HttpResponseBase GetIpodCheck()
+         {
+             string json = string.Empty;
+             IpodQuery query = new IpodQuery();
+             if (!string.IsNullOrEmpty(Request.Params["ipod"]))
+             {
+                 query.po_id = Request.Params["ipod"];
+             }
+             try
+             {
+                 List<IpodQuery> ipodStore = new List<IpodQuery>();
+                 _ipodMgr = new IpodMgr(mySqlConnectionString);
+                 ipodStore = _ipodMgr.GetIpodListExprot(query);
+                 for (int i = 0; i < ipodStore.Count; i++)//通過運送方式保存到字典里
+                 {
+                     ipodStore[i].spec = GetProductSpec(ipodStore[i].prod_id.ToString());
+                     ipodStore[i].plst_id = ipodStore[i].plst_id.ToString() == "F" ? "已驗收" : "未驗收";
+                 }
+                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                 timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                 json = "{success:true,data:" + JsonConvert.SerializeObject(ipodStore, Formatting.Indented, timeConverter) + "}";//返回json數據
+             }
+             catch (Exception ex)
+             {
+                 Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                 log.Error(logMessage);
+                 json = "{success:false,data:[]}";
+             }
+             this.Response.Clear();
+             this.Response.Write(json);
+             this.Response.End();
+             return this.Response;
+
+         }
         /// <summary>
-        /// 刪除採購單單身
+        /// 驗收採購單單身
         /// </summary>
         /// <returns></returns>
+         public HttpResponseBase UpdateIpodCheck()
+         {
+             IpodQuery query = new IpodQuery();
+             string json = string.Empty;
+             try
+             {
+                 if (!string.IsNullOrEmpty(Request.Params["row_id"]))
+                 {
+                     query.row_id = Convert.ToInt32(Request.Params["row_id"].ToString());
+                     query.change_user = (Session["caller"] as Caller).user_id;
+                     query.change_dtim = DateTime.Now;
+                 }
+                 if (!string.IsNullOrEmpty(Request.Params["qty_damaged"]))
+                 {
+                     query.qty_damaged = Convert.ToInt32(Request.Params["qty_damaged"].ToString());
+                 }
+                 if (!string.IsNullOrEmpty(Request.Params["qty_claimed"]))
+                 {
+                     query.qty_claimed = Convert.ToInt32(Request.Params["qty_claimed"].ToString());
+                 }
+                 if (!string.IsNullOrEmpty(Request.Params["plst_id"]))
+                 {
+                     query.plst_id = Request.Params["plst_id"].ToString();
+                 }
+
+                 
+                 _ipodMgr = new IpodMgr(mySqlConnectionString);
+
+                 int result = _ipodMgr.UpdateIpodCheck(query);
+                 if (result > 0)
+                 {
+
+                     json = "{success:true,msg:\"" + result + "\"}";
+                 }
+                 else
+                 {
+                     json = "{success:false,msg:\"" + result + "\"}";
+                 }
+             }
+             catch (Exception ex)
+             {
+                 Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                 log.Error(logMessage);
+                 json = "{success:false,msg:'0'}";
+             }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+
+        }
+         /// <summary>
+         /// 刪除採購單單身
+         /// </summary>
+         /// <returns></returns>
          public HttpResponseBase DeleteIpod()
          {
              IpodQuery query = new IpodQuery();
@@ -8600,12 +8731,12 @@ namespace Admin.gigade.Controllers
                  log.Error(logMessage);
                  json = "{success:false,msg:'0'}";
              }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
+             this.Response.Clear();
+             this.Response.Write(json);
+             this.Response.End();
+             return this.Response;
 
-        }
+         }
          /// <summary>
          /// 標註品項庫存用途
          /// </summary>
@@ -9694,7 +9825,8 @@ namespace Admin.gigade.Controllers
          {
              PdfHelper pdf = new PdfHelper();
              List<string> pdfList = new List<string>();
-             float[] arrColWidth = new float[] { 120, 80, 60, 60, 60, 60 };
+             //float[] arrColWidth_pftable = new float[] { 30,100, 80, 60, 60, 60, 60 };
+             float[] arrColWidth = new float[] { 30, 100, 80, 60, 60, 60, 60 };
              int index = 0;
              string newFileName = string.Empty;
              string newName = string.Empty;
@@ -9710,12 +9842,39 @@ namespace Admin.gigade.Controllers
              {
                  ipo.po_type = Request.Params["Potype"];
              }
+             if (!string.IsNullOrEmpty(Request.Params["start_time"]))
+             {
+                 ipo.start_time = Convert.ToDateTime(Request.Params["start_time"].ToString());
+             }
+             if (!string.IsNullOrEmpty(Request.Params["end_time"]))
+             {
+                 ipo.end_time = Convert.ToDateTime(Request.Params["end_time"].ToString());
+             }
              List<IpodQuery> ipodStore = new List<IpodQuery>();
              List<IpoQuery> ipoStore = new List<IpoQuery>();
              _ipoMgr = new IpoMgr(mySqlConnectionString);
              int totalCount = 0;
              ipo.IsPage = false;
              ipoStore = _ipoMgr.GetIpoList(ipo, out  totalCount);
+             if (!string.IsNullOrEmpty(Request.Params["freight"]))
+             {
+                 if (Request.Params["freight"].ToString() != "0")
+                 {
+                     _ipodMgr = new IpodMgr(mySqlConnectionString);
+                     List<IpoQuery> newstore = new List<IpoQuery>();
+                     foreach (IpoQuery item in ipoStore)
+                     {
+                         if (!string.IsNullOrEmpty(item.po_id))
+                         {
+                             if (_ipodMgr.GetIpodfreight(item.po_id, Convert.ToInt32(Request.Params["freight"].ToString())))
+                             {
+                                 newstore.Add(item);
+                             }
+                         }
+                     }
+                     ipoStore = newstore;
+                 }
+             }
              try
              {
                  #region 採購單匯出
@@ -9786,7 +9945,7 @@ namespace Admin.gigade.Controllers
                          #endregion
                          #region 採購單標題
 
-                         PdfPTable ptable = new PdfPTable(6);
+                         PdfPTable ptable = new PdfPTable(7);
 
 
                          ptable.WidthPercentage = 100;//表格寬度
@@ -9796,13 +9955,13 @@ namespace Admin.gigade.Controllers
 
                          cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 15)));
                          cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(4);
                          cell.DisableBorderSide(8);
                          ptable.AddCell(cell);
-                         cell = new PdfPCell(new Phrase("     吉甲地好市集股份有限公司", new iTextSharp.text.Font(bf, 15)));
+                         cell = new PdfPCell(new Phrase("      吉甲地好市集股份有限公司", new iTextSharp.text.Font(bf, 15)));
                          cell.VerticalAlignment = Element.ALIGN_CENTER;//字體水平居左
                          cell.Colspan = 5;
                          cell.DisableBorderSide(1);
@@ -9812,13 +9971,13 @@ namespace Admin.gigade.Controllers
                          ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                          cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                         cell.Colspan = 2;
+                         cell.Colspan = 3;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(4);
                          cell.DisableBorderSide(8);
                          ptable.AddCell(cell);
-                         cell = new PdfPCell(new Phrase("  採購單" + "-" + ipoStore[a].po_type_desc, new iTextSharp.text.Font(bf, 12)));
+                         cell = new PdfPCell(new Phrase("    採購單" + "-" + ipoStore[a].po_type_desc, new iTextSharp.text.Font(bf, 12)));
                          cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                          cell.Colspan = 4;
                          cell.DisableBorderSide(1);
@@ -9828,7 +9987,7 @@ namespace Admin.gigade.Controllers
                          ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase("公司電話：", new iTextSharp.text.Font(bf, 8)));
                          cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                         cell.Colspan = 5;
+                         cell.Colspan = 6;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(4);
@@ -9853,7 +10012,7 @@ namespace Admin.gigade.Controllers
 
                          cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 8)));
                          cell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
-                         cell.Colspan = 3;
+                         cell.Colspan = 4;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(4);
@@ -9862,7 +10021,7 @@ namespace Admin.gigade.Controllers
 
                          cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 8)));
                          cell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(4);
@@ -9880,6 +10039,7 @@ namespace Admin.gigade.Controllers
 
 
                          cell = new PdfPCell(new Phrase("採購單別:" + ipoStore[a].po_type, font));
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
                          ptable.AddCell(cell);
@@ -9903,7 +10063,7 @@ namespace Admin.gigade.Controllers
 
 
                          cell = new PdfPCell(new Phrase("商品是新品么？:", font));//新品
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
@@ -9932,7 +10092,7 @@ namespace Admin.gigade.Controllers
 
 
                          cell = new PdfPCell(new Phrase("採購單號:" + ipoStore[a].po_id, font));
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
@@ -9961,7 +10121,7 @@ namespace Admin.gigade.Controllers
 
 
                          cell = new PdfPCell(new Phrase("單據日期:" + DateTime.Now.ToString("yyyy/MM/dd"), font));
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
@@ -9995,7 +10155,7 @@ namespace Admin.gigade.Controllers
 
 
                          cell = new PdfPCell(new Phrase("廠商代號:" + ipoStore[a].vend_id, font));
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
@@ -10022,7 +10182,7 @@ namespace Admin.gigade.Controllers
                          ptable.AddCell(cell);
 
                          cell = new PdfPCell(new Phrase("廠商全名(讀取):", font));
-                         cell.Colspan = 4;
+                         cell.Colspan = 5;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
@@ -10036,21 +10196,21 @@ namespace Admin.gigade.Controllers
 
                          ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase("廠商地址:", font));
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
 
 
                          ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase(" ", font));
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          ptable.AddCell(cell);
 
 
                          cell = new PdfPCell(new Phrase("聯絡人(讀取):", font));
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
 
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
@@ -10071,25 +10231,25 @@ namespace Admin.gigade.Controllers
                          ptable.AddCell(cell);
 
                          cell = new PdfPCell(new Phrase("送貨地址(讀取):", font));
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          ptable.AddCell(cell);
 
                          cell = new PdfPCell(new Phrase(" ", font));
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          ptable.AddCell(cell);
 
                          cell = new PdfPCell(new Phrase("預計送貨日期(讀取):", font));
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          ptable.AddCell(cell);
 
                          cell = new PdfPCell(new Phrase("配送聯絡人(讀取):", font));
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
@@ -10110,19 +10270,19 @@ namespace Admin.gigade.Controllers
                          ptable.AddCell(cell);
 
                          cell = new PdfPCell(new Phrase("處理備註:", font));
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase("運送備註:", font));
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
 
                          ptable.AddCell(cell);
                          #endregion
 
                          cell = new PdfPCell(new Phrase("此採購單商品不存在!", font));
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
 
                          ptable.AddCell(cell);
 
@@ -10162,7 +10322,7 @@ namespace Admin.gigade.Controllers
                          #region 採購單標題
 
 
-                         PdfPTable ptable = new PdfPTable(6);
+                         PdfPTable ptable = new PdfPTable(7);
 
 
                          ptable.WidthPercentage = 100;//表格寬度
@@ -10172,13 +10332,13 @@ namespace Admin.gigade.Controllers
 
                          cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 15)));
                          cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(4);
                          cell.DisableBorderSide(8);
                          ptable.AddCell(cell);
-                         cell = new PdfPCell(new Phrase("     吉甲地好市集股份有限公司", new iTextSharp.text.Font(bf, 15)));
+                         cell = new PdfPCell(new Phrase("      吉甲地好市集股份有限公司", new iTextSharp.text.Font(bf, 15)));
                          cell.VerticalAlignment = Element.ALIGN_CENTER;//字體水平居左
                          cell.Colspan = 5;
                          cell.DisableBorderSide(1);
@@ -10188,13 +10348,13 @@ namespace Admin.gigade.Controllers
                          ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                          cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                         cell.Colspan = 2;
+                         cell.Colspan = 3;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(4);
                          cell.DisableBorderSide(8);
                          ptable.AddCell(cell);
-                         cell = new PdfPCell(new Phrase("  採購單" + "-" + ipoStore[a].po_type_desc, new iTextSharp.text.Font(bf, 12)));
+                         cell = new PdfPCell(new Phrase("    採購單" + "-" + ipoStore[a].po_type_desc, new iTextSharp.text.Font(bf, 12)));
                          cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                          cell.Colspan = 4;
                          cell.DisableBorderSide(1);
@@ -10204,7 +10364,7 @@ namespace Admin.gigade.Controllers
                          ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase("公司電話：", new iTextSharp.text.Font(bf, 8)));
                          cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                         cell.Colspan = 5;
+                         cell.Colspan = 6;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(4);
@@ -10229,7 +10389,7 @@ namespace Admin.gigade.Controllers
 
                          cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 8)));
                          cell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
-                         cell.Colspan = 3;
+                         cell.Colspan = 4;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(4);
@@ -10238,7 +10398,7 @@ namespace Admin.gigade.Controllers
 
                          cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 8)));
                          cell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(4);
@@ -10256,7 +10416,7 @@ namespace Admin.gigade.Controllers
 
 
                          cell = new PdfPCell(new Phrase("採購單別:" + ipoStore[a].po_type, font));
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
                          ptable.AddCell(cell);
@@ -10272,6 +10432,10 @@ namespace Admin.gigade.Controllers
                          cell.DisableBorderSide(4);
                          cell.DisableBorderSide(8);
                          ptable.AddCell(cell);
+                         if (procduct_freight != "常溫" && procduct_freight != "冷凍")
+                         {
+                             ;
+                         }
                          cell = new PdfPCell(new Phrase("運輸方式:" + procduct_freight, font));
                          cell.Colspan = 2;
                          cell.DisableBorderSide(2);
@@ -10280,7 +10444,7 @@ namespace Admin.gigade.Controllers
 
 
                          cell = new PdfPCell(new Phrase("商品是新品么？:", font));//新品
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
@@ -10308,7 +10472,7 @@ namespace Admin.gigade.Controllers
 
 
                          cell = new PdfPCell(new Phrase("採購單號:" + ipoStore[a].po_id, font));
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
@@ -10336,7 +10500,7 @@ namespace Admin.gigade.Controllers
 
 
                          cell = new PdfPCell(new Phrase("單據日期:" + DateTime.Now.ToString("yyyy/MM/dd"), font));
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
@@ -10370,7 +10534,7 @@ namespace Admin.gigade.Controllers
 
 
                          cell = new PdfPCell(new Phrase("廠商代號:" + ipoStore[a].vend_id, font));
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
@@ -10396,7 +10560,7 @@ namespace Admin.gigade.Controllers
                          ptable.AddCell(cell);
 
                          cell = new PdfPCell(new Phrase(vendor == null ? "廠商全名(讀取):暫無此信息" : "廠商全名:" + vendor.vendor_name_full, font));
-                         cell.Colspan = 4;
+                         cell.Colspan = 5;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
@@ -10410,21 +10574,21 @@ namespace Admin.gigade.Controllers
 
                          ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase(vendor == null ? "廠商地址:暫無此信息" : "廠商地址:" + vendor.company_address, font));
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
 
 
                          ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase(" ", font));
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          ptable.AddCell(cell);
 
 
                          cell = new PdfPCell(new Phrase("聯絡人(讀取):", font));
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
 
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
@@ -10445,34 +10609,26 @@ namespace Admin.gigade.Controllers
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(4);
                          ptable.AddCell(cell);
+
                          cell = new PdfPCell(new Phrase("送貨地址(讀取):", font));
-
-
-
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          ptable.AddCell(cell);
+
                          cell = new PdfPCell(new Phrase(" ", font));
-
-
-
-
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          ptable.AddCell(cell);
+
                          cell = new PdfPCell(new Phrase("預計送貨日期(讀取):", font));
-
-
-
-
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase("配送聯絡人(讀取):", font));
-                         cell.Colspan = 1;
+                         cell.Colspan = 2;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          cell.DisableBorderSide(8);
@@ -10495,17 +10651,22 @@ namespace Admin.gigade.Controllers
                          cell = new PdfPCell(new Phrase("處理備註:", font));
 
 
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase("運送備註:", font));
-                         cell.Colspan = 6;
+                         cell.Colspan = 7;
                          cell.DisableBorderSide(1);
 
                          ptable.AddCell(cell);
                          #endregion
                          #region 下面表格頭部
+                         cell = new PdfPCell(new Phrase("序號", font));
+                         cell.VerticalAlignment = Element.ALIGN_MIDDLE;
+                         //cell.DisableBorderSide(2);
+                         cell.Rowspan = 3;
+                         ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase("條碼", font));
                          cell.DisableBorderSide(2);
                          ptable.AddCell(cell);
@@ -10527,7 +10688,10 @@ namespace Admin.gigade.Controllers
 
 
 
-
+                         cell = new PdfPCell(new Phrase("", font));
+                         cell.DisableBorderSide(1);
+                         cell.DisableBorderSide(2);
+                         ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase("品名", font));
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
@@ -10541,6 +10705,10 @@ namespace Admin.gigade.Controllers
                          cell.DisableBorderSide(2);
                          ptable.AddCell(cell);
                          cell = new PdfPCell(new Phrase("有效日期", font));
+                         cell.DisableBorderSide(1);
+                         cell.DisableBorderSide(2);
+                         ptable.AddCell(cell);
+                         cell = new PdfPCell(new Phrase("", font));
                          cell.DisableBorderSide(1);
                          cell.DisableBorderSide(2);
                          ptable.AddCell(cell);
@@ -10565,94 +10733,7 @@ namespace Admin.gigade.Controllers
                          cell = new PdfPCell(new Phrase("", font));
                          cell.DisableBorderSide(1);
                          ptable.AddCell(cell);
-                         cell = new PdfPCell(new Phrase("", font));
-                         cell.DisableBorderSide(1);
-                         ptable.AddCell(cell);
-                         cell = new PdfPCell(new Phrase("", font));
-                         cell.DisableBorderSide(1);
-                         ptable.AddCell(cell);
-                         #endregion
-
-                         #region //下面表格頭部
-
-                         //cell = new PdfPCell(new Phrase("條碼", font));
-                         //cell.Rowspan = 2;
-                         //cell.DisableBorderSide(1);
-                         //cell.DisableBorderSide(2);
-                         //ptable.AddCell(cell);
-                         //cell = new PdfPCell(new Phrase("品號", font));
-                         //cell.DisableBorderSide(1);
-                         //cell.DisableBorderSide(2);
-                         //cell.DisableBorderSide(4);
-                         //ptable.AddCell(cell);
-                         //cell = new PdfPCell(new Phrase("採購數量", font));
-                         //cell.HorizontalAlignment = Element.ALIGN_RIGHT;//.setHorizontalAlignment(Element.ALIGN_CENTER);
-                         //cell.DisableBorderSide(1);
-                         //cell.DisableBorderSide(2);
-                         //cell.DisableBorderSide(4);
-                         //ptable.AddCell(cell);
-                         //cell = new PdfPCell(new Phrase("允收天數", font));
-                         //cell.HorizontalAlignment = Element.ALIGN_RIGHT;
-                         //cell.DisableBorderSide(1);
-                         //cell.DisableBorderSide(2);
-                         //cell.DisableBorderSide(4);
-                         //ptable.AddCell(cell);
-                         //cell = new PdfPCell(new Phrase("製造日期", font));
-                         //cell.DisableBorderSide(1);
-                         //cell.DisableBorderSide(2);
-                         //cell.DisableBorderSide(4);
-                         //ptable.AddCell(cell);
-                         //cell = new PdfPCell(new Phrase("備註", font));
-                         //cell.Rowspan = 3;
-                         //cell.DisableBorderSide(1);
-                         //cell.DisableBorderSide(4);
-                         //ptable.AddCell(cell);
-
-
-
-
-                         //cell = new PdfPCell(new Phrase("品名", font));
-                         //cell.DisableBorderSide(1);
-                         //cell.DisableBorderSide(2);
-                         //cell.DisableBorderSide(4);
-                         //ptable.AddCell(cell);
-                         //cell = new PdfPCell(new Phrase("允收數量", font));
-                         //cell.HorizontalAlignment = Element.ALIGN_RIGHT;//.setHorizontalAlignment(Element.ALIGN_CENTER);
-                         //cell.DisableBorderSide(1);
-                         //cell.DisableBorderSide(2);
-                         //cell.DisableBorderSide(4);
-                         //ptable.AddCell(cell);
-                         //cell = new PdfPCell(new Phrase("允出天數", font));
-                         //cell.HorizontalAlignment = Element.ALIGN_RIGHT;//.setHorizontalAlignment(Element.ALIGN_CENTER);
-                         //cell.DisableBorderSide(1);
-                         //cell.DisableBorderSide(2);
-                         //cell.DisableBorderSide(4);
-                         //ptable.AddCell(cell);
-                         //cell = new PdfPCell(new Phrase("有效日期", font));
-                         //cell.DisableBorderSide(1);
-                         //cell.DisableBorderSide(4);
-                         //cell.Rowspan = 2;
-                         //ptable.AddCell(cell);
-
-
-
-                         //cell = new PdfPCell(new Phrase("料位", font));
-                         //cell.DisableBorderSide(1);
-                         //ptable.AddCell(cell);
-                         //cell = new PdfPCell(new Phrase("規格", font));
-                         //cell.DisableBorderSide(1);
-                         //cell.DisableBorderSide(4);
-                         //ptable.AddCell(cell);
-                         //cell = new PdfPCell(new Phrase("不允收數量", font));
-                         //cell.HorizontalAlignment = Element.ALIGN_RIGHT;
-                         //cell.DisableBorderSide(1);
-                         //cell.DisableBorderSide(4);
-                         //ptable.AddCell(cell);
-                         //cell = new PdfPCell(new Phrase("有效期天數", font));
-                         //cell.HorizontalAlignment = Element.ALIGN_RIGHT;//.setHorizontalAlignment(Element.ALIGN_CENTER);
-                         //cell.DisableBorderSide(1);
-                         //cell.DisableBorderSide(4);
-                         //ptable.AddCell(cell);
+                         
                          #endregion
 
                          _ipodMgr = new IpodMgr(mySqlConnectionString);
@@ -10662,26 +10743,32 @@ namespace Admin.gigade.Controllers
                          ipodStore = new List<IpodQuery>();
                          ipodStore = _ipodMgr.GetIpodList(ipod, out totalCount);
 
-
                          List<IpodQuery> Ipodleibie = new List<IpodQuery>();
                          Ipodleibie.AddRange(product_freight_set_mapping[key]);
 
                          #region 循環讀取數據填入表格
                          DataTable Ipod_dt = new DataTable();
+                         Ipod_dt.Columns.Add("序號", typeof(string));
                          Ipod_dt.Columns.Add("條碼", typeof(string));
                          Ipod_dt.Columns.Add("品號", typeof(string));
                          Ipod_dt.Columns.Add("採購數量", typeof(string));
                          Ipod_dt.Columns.Add("允收天數", typeof(string));
                          Ipod_dt.Columns.Add("製造日期", typeof(string));
                          Ipod_dt.Columns.Add("備註", typeof(string));
+                         Ipod_dt.Columns.Add("Empty_1", typeof(string));
+                         Ipod_dt.Columns.Add("Empty_2", typeof(string));
                          Ipod_dt.Columns.Add("品名", typeof(string));
                          Ipod_dt.Columns.Add("允收數量", typeof(string));
                          Ipod_dt.Columns.Add("允出天數", typeof(string));
                          Ipod_dt.Columns.Add("有效日期", typeof(string));
+                         Ipod_dt.Columns.Add("Empty_3", typeof(string));
+                         Ipod_dt.Columns.Add("Empty_4", typeof(string));
                          Ipod_dt.Columns.Add("料位", typeof(string));
                          Ipod_dt.Columns.Add("規格", typeof(string));
                          Ipod_dt.Columns.Add("不允收數量", typeof(string));
                          Ipod_dt.Columns.Add("有效期天數", typeof(string));
+                         Ipod_dt.Columns.Add("Empty_5", typeof(string));
+                         Ipod_dt.Columns.Add("Empty_6", typeof(string));
                          
                          for (int i = 0; i < Ipodleibie.Count; i++)
                          {
@@ -10692,14 +10779,20 @@ namespace Admin.gigade.Controllers
                              newRow["允收天數"] = Ipodleibie[i].cde_dt_var.ToString();
                              newRow["製造日期"] = "";
                              newRow["備註"] = "";
+                             newRow["Empty_1"] = (i+1).ToString(); //序號
+                             newRow["Empty_2"] = "";
                              newRow["品名"] = Ipodleibie[i].product_name;
                              newRow["允收數量"] = Ipodleibie[i].qty_claimed.ToString();
                              newRow["允出天數"] = Ipodleibie[i].cde_dt_shp.ToString();
                              newRow["有效日期"] = "";
+                             newRow["Empty_3"] = "";
+                             newRow["Empty_4"] = "";
                              newRow["料位"] = Ipodleibie[i].loc_id;
                              newRow["規格"] = Ipodleibie[i].spec;
                              newRow["不允收數量"] = Ipodleibie[i].qty_damaged.ToString();
                              newRow["有效期天數"] = Ipodleibie[i].cde_dt_incr.ToString();
+                             newRow["Empty_5"] = "";
+                             newRow["Empty_6"] = "";
                              Ipod_dt.Rows.Add(newRow);
                          }
 
@@ -10707,7 +10800,7 @@ namespace Admin.gigade.Controllers
                          ////////
                          newFileName = newPDFName + "_part" + index++ + "." + "pdf";
                          
-                         pdf.ExportDataTableToPDF(Ipod_dt,false, newFileName, arrColWidth, ptable, "", "", 6,7);
+                         pdf.ExportDataTableToPDF(Ipod_dt,false, newFileName, arrColWidth, ptable, "", "", 7,7);
                          pdfList.Add(newFileName);
 
                      }
@@ -10728,9 +10821,6 @@ namespace Admin.gigade.Controllers
                  Response.WriteFile(newFileName);
                  //}
                  #endregion
-
-
-                 //}
              }
              catch (Exception ex)
              {

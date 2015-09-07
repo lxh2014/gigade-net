@@ -33,21 +33,32 @@ namespace BLL.gigade.Model.Custom
         public int cost_at { get; set; } //現在成本
         public int cost_discount { get; set; }//成本折扣
         public string prod_sz { get; set; }
-        public string type { get; set; } //參數類型
+        public string type { get; set; } //參數類型 
 
         /*以下為匯出時所需要的列*/
+        //public string product_name { get; set; }
         public uint item_id { get; set; }///其對應的item_id
         public uint item_money { get; set; }///所對應的子項售價
+        public uint item_cost { get; set; }
+        public uint event_money { get; set; }
+        public uint item_event_cost { get; set; }
         //public string site_name { get; set; }///子項所對應的站臺價格
         public string user_level_str { get; set; }///會員信息
         public string price_status_str { get; set; }///價格類型
-        
+        public int product_status { get; set; }                                                    
+        public string product_status_str { get; set; }///商品狀態字符類型
+        public string item_name {get;set;}
 
+        //public int price {get;set;}
+        //public int cost{get;set;}
+        //public int event_price{get;set;}
+        //public int event_cost { get; set; }
         public string vendor_product_id { get; set; }//儲存臨時表的id
         public PriceMasterCustom()
         {
             site_name = string.Empty;
             user_email = string.Empty;
+            //product_name = string.Empty;
             user_level_name = string.Empty;
             status = string.Empty;
             combination = 0;
@@ -63,8 +74,18 @@ namespace BLL.gigade.Model.Custom
             type = string.Empty;
             item_id = 0;
             item_money = 0;
+            item_cost = 0;
+            event_money = 0;
+            item_event_cost = 0;
             user_level_str = string.Empty;
             price_status_str = string.Empty;
+            product_status_str = string.Empty;
+            item_name = string.Empty;
+            product_status = 0;
+            //price = 0;
+            //cost = 0;
+            //event_cost = 0;
+            //event_price = 0;
         }
     }
 }

@@ -138,13 +138,13 @@ namespace BLL.gigade.Mgr
                 }
                 else
                 { //不存在,在edm_email表新增
-                    uint largestID=0;
-                    string empty = string.Empty;
-                    uint id = 0;
-                    _edmemailDao.GetData(empty, out largestID, out id, out empty);
-                    //string sql = _serialDao.Update(51);//51代表edm_email表
-                    //serial = _IEdmGroupEmailMgr.execSql(sql);
-                    emailQuery.email_id = largestID + 1;//Convert.ToUInt32(serial.Serial_Value);
+                    //uint largestID=0;
+                    //string empty = string.Empty;
+                    //uint id = 0;
+                   // _edmemailDao.GetData(empty, out largestID, out id, out empty);
+                    string sql = _serialDao.Update(51);//51代表edm_email表
+                    serial = _IEdmGroupEmailMgr.execSql(sql);
+                    emailQuery.email_id = Convert.ToUInt32(serial.Serial_Value);//largestID + 1;
                     emailQuery.email_createdate = Convert.ToInt32(Common.CommonFunction.GetPHPTime(DateTime.Now.ToString()));
                     emailQuery.email_updatedate = Convert.ToInt32(Common.CommonFunction.GetPHPTime(DateTime.Now.ToString()));
                     emailQuery.email_check = 0;

@@ -192,7 +192,7 @@ Ext.onReady(function () {
         columns: [
         { header: '扣點編號', dataIndex: 'id', align: 'center',flex: 1 },
         { header: 'token', dataIndex: 'token', align: 'center', flex: 1 },
-        { header: '訊息', dataIndex: 'message', width: 300, align: 'center', flex: 1 },
+        { header: '訊息', dataIndex: 'message',align: 'center', flex: 1 },
         //{ header: 'date', dataIndex: 'date', align: 'center' },
         //{ header: 'time', dataIndex: 'time', align: 'center' },
         {

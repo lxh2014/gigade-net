@@ -245,7 +245,193 @@ namespace gigadeExcel.Comment
                 return ms;
             }
         }
+        public static MemoryStream ExportDataTable(DataTable dtSource, string strHeaderText)
+        {
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            HSSFSheet sheet = null;
+            int sheetCount = 0;
+            sheet = workbook.CreateSheet("Sheet" + sheetCount) as HSSFSheet;
+            #region 右击文件 属性信息
 
+            //{
+            //    DocumentSummaryInformation dsi = PropertySetFactory.CreateDocumentSummaryInformation();
+            //    dsi.Company = "http://www.yongfa365.com/";
+            //    workbook.DocumentSummaryInformation = dsi;
+
+            //    SummaryInformation si = PropertySetFactory.CreateSummaryInformation();
+            //    si.Author = "柳永法"; //填加xls文件作者信息
+            //    si.ApplicationName = "NPOI测试程序"; //填加xls文件创建程序信息
+            //    si.LastAuthor = "柳永法2"; //填加xls文件最后保存者信息
+            //    si.Comments = "说明信息"; //填加xls文件作者信息
+            //    si.Title = "NPOI测试"; //填加xls文件标题信息
+            //    si.Subject = "NPOI测试Demo"; //填加文件主题信息
+            //    si.CreateDateTime = DateTime.Now;
+            //    workbook.SummaryInformation = si;
+            //}
+
+            #endregion
+
+            HSSFCellStyle dateStyle = workbook.CreateCellStyle() as HSSFCellStyle;
+            HSSFDataFormat format = workbook.CreateDataFormat() as HSSFDataFormat;
+            dateStyle.DataFormat = format.GetFormat("yyyy-mm-dd");
+
+            //取得列宽
+            int[] arrColWidth = new int[dtSource.Columns.Count];
+            foreach (DataColumn item in dtSource.Columns)
+            {
+                arrColWidth[item.Ordinal] = Encoding.GetEncoding(936).GetBytes(item.ColumnName.ToString()).Length;//獲取要填充到單元格中內容的長度
+            }
+            for (int i = 0; i < dtSource.Rows.Count; i++)
+            {
+                for (int j = 0; j < dtSource.Columns.Count; j++)
+                {
+                    int intTemp = Encoding.GetEncoding(936).GetBytes(dtSource.Rows[i][j].ToString()).Length;
+                    if (intTemp > arrColWidth[j])   //獲取并記錄內容最長的長度
+                    {
+                        arrColWidth[j] = intTemp;
+                    }
+                }
+            }
+            int rowIndex = 0;
+            foreach (DataRow row in dtSource.Rows)
+            {
+                #region 新建表，填充表头，填充列头，样式
+                //分頁
+                if (rowIndex % 65536 == 0 || rowIndex == 0)
+                {
+                    if (rowIndex != 0)
+                    {
+                        sheetCount++;
+                        sheet = workbook.CreateSheet("Sheet" + sheetCount) as HSSFSheet;
+                        rowIndex = 0;
+                    }
+                    #region 表头及样式
+                    if ("" != strHeaderText)
+                    {
+                        HSSFRow headerRow = sheet.CreateRow(0) as HSSFRow;
+                        headerRow.HeightInPoints = 25;
+                        headerRow.CreateCell(0).SetCellValue(strHeaderText);
+                        HSSFCellStyle headStyle = workbook.CreateCellStyle() as HSSFCellStyle;
+                        headStyle.Alignment = NPOI.SS.UserModel.HorizontalAlignment.CENTER;
+                        HSSFFont font = workbook.CreateFont() as HSSFFont;
+                        font.FontHeightInPoints = 20;
+                        font.Boldweight = 700;
+                        headStyle.SetFont(font);
+                        headerRow.GetCell(0).CellStyle = headStyle;
+                        sheet.AddMergedRegion(new Region(0, 0, 0, dtSource.Columns.Count - 1));
+                        //headerRow.Dispose();
+                        rowIndex++;
+                    }
+                    #endregion
+
+                    #region 列头及样式
+                    {
+                        HSSFRow headerRow = sheet.CreateRow(rowIndex) as HSSFRow;
+                        HSSFCellStyle headStyle = workbook.CreateCellStyle() as HSSFCellStyle;
+                        headStyle.Alignment = NPOI.SS.UserModel.HorizontalAlignment.CENTER;
+                        HSSFFont font = workbook.CreateFont() as HSSFFont;
+                        font.FontHeightInPoints = 10;
+                        font.Boldweight = 700;
+                        headStyle.SetFont(font);
+                        foreach (DataColumn column in dtSource.Columns)
+                        {
+                            headerRow.CreateCell(column.Ordinal).SetCellValue(column.ColumnName);
+                            // headerRow.GetCell(column.Ordinal).CellStyle = headStyle;
+                            //设置列宽
+                            //sheet.SetColumnWidth(column.Ordinal, (arrColWidth[column.Ordinal] + 1) * 300);
+                            if (arrColWidth[column.Ordinal] > 100)
+                            {
+                                sheet.SetColumnWidth(column.Ordinal, 100 * 256);
+                            }
+                            else
+                            {
+                                sheet.SetColumnWidth(column.Ordinal, (arrColWidth[column.Ordinal] + 1) * 256);
+                            }
+                        }
+                        //headerRow.Dispose();
+                    }
+                    #endregion
+                    rowIndex++;
+                }
+                #endregion
+
+                #region 填充内容
+                HSSFRow dataRow = sheet.CreateRow(rowIndex) as HSSFRow;
+                foreach (DataColumn column in dtSource.Columns)
+                {
+                    HSSFCell newCell = dataRow.CreateCell(column.Ordinal) as HSSFCell;
+                    string drValue = row[column].ToString();
+                    newCell.SetCellValue(drValue);
+                    switch (column.DataType.ToString()) //根據數據類型填充單元格
+                    {
+                        case "System.String": //字符串类型
+                            double result;
+                            //if (isNumeric(drValue, out result))
+                            //{
+                            //    //double.TryParse(drValue, out result);
+                            //    newCell.SetCellValue(result);
+                            //}
+                            //else
+                            //{
+                            newCell.SetCellValue(drValue);
+                            //}
+                            break;
+                        case "System.DateTime": //日期类型
+                            DateTime dateV;
+                            DateTime.TryParse(drValue, out dateV);
+                            newCell.SetCellValue(dateV);
+                            newCell.CellStyle = dateStyle; //格式化显示
+                            break;
+                        case "System.Boolean": //布尔型
+                            bool boolV = false;
+                            bool.TryParse(drValue, out boolV);
+                            newCell.SetCellValue(boolV);
+                            break;
+                        case "System.Int16": //整型
+                        case "System.Int32":
+                        case "System.Int64":
+                        case "System.Byte":
+                            int intV = 0;
+                            int.TryParse(drValue, out intV);
+                            newCell.SetCellValue(intV);
+                            break;
+                        case "System.Decimal": //浮点型
+                        case "System.Double":
+                            double doubV = 0;
+                            double.TryParse(drValue, out doubV);
+                            newCell.SetCellValue(doubV);
+                            break;
+                        case "System.DBNull": //空值处理
+                            newCell.SetCellValue("");
+                            break;
+                        case "System.UInt16":
+                        case "System.UInt32":
+                        case "System.UInt64":
+                            uint uintV = 0;
+                            uint.TryParse(drValue, out uintV);
+                            newCell.SetCellValue(uintV);
+                            break;
+                        default:
+                            newCell.SetCellValue("");
+                            break;
+                    }
+                }
+
+                #endregion
+                rowIndex++;
+            }
+            using (MemoryStream ms = new MemoryStream())
+            {
+                workbook.Write(ms);
+                ms.Flush();
+                ms.Position = 0;
+
+                //sheet;
+                //workbook.Dispose();
+
+                return ms;
+            }
+        }
         /// <summary>
         /// DataTable导出到Excel的MemoryStream
         /// </summary>
@@ -519,6 +705,18 @@ namespace gigadeExcel.Comment
         public static void ExportDTtoExcel(DataTable dtSource, string strHeaderText, string strFileName)
         {
             using (MemoryStream ms = ExportDT(dtSource, strHeaderText))
+            {
+                using (FileStream fs = new FileStream(strFileName, FileMode.Create, FileAccess.Write))
+                {
+                    byte[] data = ms.ToArray();
+                    fs.Write(data, 0, data.Length);
+                    fs.Flush();
+                }
+            }
+        }
+        public static void ExportDataTabletoExcel(DataTable dtSource, string strHeaderText, string strFileName)
+        {
+            using (MemoryStream ms = ExportDataTable(dtSource, strHeaderText))
             {
                 using (FileStream fs = new FileStream(strFileName, FileMode.Create, FileAccess.Write))
                 {

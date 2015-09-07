@@ -11,6 +11,8 @@ namespace BLL.gigade.Model.Query
         public DateTime endtime { get; set; }
         public DateTime notifytime { get; set; }
         public string isAddOrEidt { get; set; }
+        public int startendtime { get; set; }
+        public int endendtime { get; set; }
 
         public AppNotifyPoolQuery()
         {
@@ -18,6 +20,8 @@ namespace BLL.gigade.Model.Query
             endtime = DateTime.Now;
             notifytime = DateTime.Now;
             isAddOrEidt = string.Empty;
+            startendtime = 0;
+            endendtime = 0;
         }
     }
 }

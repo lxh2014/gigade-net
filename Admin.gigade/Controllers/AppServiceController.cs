@@ -12,6 +12,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using BLL.gigade.Model.Query;
+using System.Text;
 
 namespace Admin.gigade.Controllers
 {
@@ -20,6 +21,8 @@ namespace Admin.gigade.Controllers
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly string mySqlConnectionString = System.Configuration.ConfigurationManager.AppSettings["MySqlConnectionString"].ToString();
         static string excelPath = ConfigurationManager.AppSettings["ImportUserIOExcel"];//關於導入的excel文件的限制
+        static string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];
+        private ISiteConfigImplMgr siteConfigMgr;
         IAppcategoryImplMgr _iappcategoryMgr;
         IAppmessageImplMgr _iappmessageMgr;
         IAppNotifyPoolImplMgr _iappnotifypoolMgr;
@@ -66,14 +69,16 @@ namespace Admin.gigade.Controllers
         public HttpResponseBase GetAppNotifyPoolInfo()
         {
             string json = string.Empty;
-            AppNotifyPool ap = new AppNotifyPool();
+            AppNotifyPoolQuery ap = new AppNotifyPoolQuery();
             try
             {
                 _iappnotifypoolMgr = new AppNotifyPoolMgr(mySqlConnectionString);
                 ap.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
                 ap.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
                 string starttime = Request.Params["timestart"].ToString();
-                string endtime = Request.Params["timeend"].ToString();
+                string startemdtime = Request.Params["timestartend"].ToString();
+                string endtime = Request.Params["timeendstart"].ToString();
+                string endendtime = Request.Params["timeendend"].ToString();
                 if (!string.IsNullOrEmpty(starttime))
                 {
                     ap.valid_start = Convert.ToInt32(CommonFunction.GetPHPTime(starttime));
@@ -81,6 +86,14 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(endtime))
                 {
                     ap.valid_end = Convert.ToInt32(CommonFunction.GetPHPTime(endtime));
+                }
+                if (!string.IsNullOrEmpty(startemdtime))
+                {
+                    ap.startendtime = Convert.ToInt32(CommonFunction.GetPHPTime(startemdtime));
+                }
+                if (!string.IsNullOrEmpty(endendtime))
+                {
+                    ap.endendtime = Convert.ToInt32(CommonFunction.GetPHPTime(endendtime));
                 }
                 //調用查詢事件
                 json = _iappnotifypoolMgr.GetAppnotifypool(ap);
@@ -245,7 +258,11 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        #region 分類表管理
+        #region 分類表管理 (白明威2015.08.27)
+        /// <summary>
+        /// 查詢下拉框的參數數據
+        /// </summary>
+        /// <returns></returns>
         public string QueryPara()
         {
             Appcategory appQuery = new Appcategory();
@@ -272,6 +289,10 @@ namespace Admin.gigade.Controllers
             }
             return json;
         }
+        /// <summary>
+        /// 獲取表單的數據
+        /// </summary>
+        /// <returns></returns>
         public HttpResponseBase GetAppCategoryList()
         {
             List<Appcategory> stores = new List<Appcategory>();
@@ -325,7 +346,10 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
-
+        /// <summary>
+        /// 刪除數據
+        /// </summary>
+        /// <returns></returns>
         public HttpResponseBase AppCategoryDelete()
         {
             string jsonStr = String.Empty;
@@ -359,7 +383,10 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
-
+        /// <summary>
+        /// 導入Excel數據
+        /// </summary>
+        /// <returns></returns>
         public HttpResponseBase AppCategoryUpExcel()
         {
             string json = string.Empty;//json字符串
@@ -372,6 +399,7 @@ namespace Admin.gigade.Controllers
                 {
                     HttpPostedFileBase excelFile = Request.Files["ImportFileMsg"];//獲取文件流
                     FileManagement fileManagement = new FileManagement();//實例化 FileManagement
+                    StringBuilder str = new StringBuilder();
                     string fileLastName = excelFile.FileName;
                     string newExcelName = Server.MapPath(excelPath) + "App功能管理" + fileManagement.NewFileName(excelFile.FileName);//處理文件名，獲取新的文件名
                     excelFile.SaveAs(newExcelName);//上傳文件
@@ -384,44 +412,54 @@ namespace Admin.gigade.Controllers
                     {
                         for (int i = 0; i < dt.Rows.Count; i++)
                         {
-                            Appcategory appCategroy = new Appcategory();
+                            Appcategory appCategory = new Appcategory();
                             try
                             {
-                                appCategroy.brand_id = Convert.ToInt32(dt.Rows[i]["brand_id"]);
-                                appCategroy.brand_name = dt.Rows[i]["brand_name"].ToString();
-                                appCategroy.category = dt.Rows[i]["category"].ToString();
-                                appCategroy.category1 = dt.Rows[i]["category1"].ToString();
-                                appCategroy.category2 = dt.Rows[i]["category2"].ToString();
-                                appCategroy.category3 = dt.Rows[i]["category3"].ToString();
-                                appCategroy.product_id = Convert.ToInt32(dt.Rows[i]["product_id"]);
-                                appCategroy.property = dt.Rows[i]["property"].ToString();
+                                appCategory.brand_id = Convert.ToInt32(dt.Rows[i]["brand_id"]);
+                                appCategory.brand_name = dt.Rows[i]["brand_name"].ToString();
+                                appCategory.category = dt.Rows[i]["category"].ToString();
+                                appCategory.category1 = dt.Rows[i]["category1"].ToString();
+                                appCategory.category2 = dt.Rows[i]["category2"].ToString();
+                                appCategory.category3 = dt.Rows[i]["category3"].ToString();
+                                appCategory.product_id = Convert.ToInt32(dt.Rows[i]["product_id"]);
+                                appCategory.property = dt.Rows[i]["property"].ToString();
                             }
                             catch (Exception ex)
                             {
-                                typeerror++;
+                                str.Append(i + 2 + " ");
+                                failcount++;
                                 continue;
                             }
-                            int results=  _iappcategoryMgr.AppcategorySave(appCategroy);
+                            int results=  _iappcategoryMgr.AppcategorySave(appCategory);
                             if (results > 0)
                             {
                                 successcount++;
                             }
                             else
                             {
+                                str.Append(i + 2 + " ");
                                 failcount++;
                             }
                         }
-                        json = "{success:true,total:"+successcount+",fail:"+failcount+",typeerror:"+typeerror+"}";
+                        if (str.Length > 1)
+                        {
+                            str.Length -= 1;
+                            json = "{success:true,total:" + successcount + ",fail:" + failcount + ",errorRow:\"" + str.ToString() + "\"}";
+                        }
+                        else
+                        {
+                            json = "{success:true,total:" + successcount + ",fail:" + failcount + "}";
+                        }
                     }
                     else
                     {
-                        json = "{success:true,total:0,msg:\"" + "此表內沒有數據或數據有誤,請檢查后再次匯入!" + "\"}";
+                        json = "{success:false,msg:\"" + "此表內沒有數據或數據有誤,請檢查后再次匯入!" + "\"}";
                     }
                   
                 }
                 else
                 {
-                    json = "{success:true,msg:\"" + "請選擇要匯入的Excel表" + "\"}";
+                    json = "{success:false,msg:\"" + "請選擇要匯入的Excel表" + "\"}";
                 }
             }
             catch (Exception ex)
@@ -437,9 +475,37 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+
+        /// <summary>
+        /// 下載Excel模板
+        /// </summary>
+        /// <returns></returns>
+        public HttpResponseBase CategoryTemplate()
+        {
+            
+            siteConfigMgr = new SiteConfigMgr(Server.MapPath(xmlPath));
+            SiteConfig config = siteConfigMgr.GetConfigByName("Template_Appcategory_Path");
+            if (config != null)
+            {
+                string template = Server.MapPath(string.IsNullOrEmpty(config.Value) ? config.DefaultValue : config.Value);
+                if (System.IO.File.Exists(template))
+                {
+                    this.Response.Clear();
+                    this.Response.ContentType = "application/ms-excel";
+                    this.Response.AppendHeader("Content-Disposition", "attachment;filename=t_category.xls");
+                    this.Response.WriteFile(template);
+                    this.Response.End();
+                }
+            }
+            return this.Response;
+        }
         #endregion
 
-        #region 訊息公告
+        #region 訊息公告 (白明威2015.08.27)
+        /// <summary>
+        /// 獲取表單數據
+        /// </summary>
+        /// <returns></returns>
         public HttpResponseBase GetAppMessageList()
         {
             List<AppmessageQuery> stores = new List<AppmessageQuery>();
@@ -450,13 +516,22 @@ namespace Admin.gigade.Controllers
                 AppmessageQuery query = new AppmessageQuery();
                 query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");//用於分頁的變量
-                if (!string.IsNullOrEmpty(Request.Form["msg_start"]))//判斷分類一是否為空
+                if (!string.IsNullOrEmpty(Request.Form["msg_start_first"]))//判斷分類一是否為空
                 {
-                    query.msg_start = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_start"]).ToString());
+                    query.msg_start_first = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_start_first"]).ToString());
                 }
-                if (!string.IsNullOrEmpty(Request.Form["msg_end"]))//判斷分類一是否為空
+                if (!string.IsNullOrEmpty(Request.Form["msg_start_second"]))//判斷分類一是否為空
                 {
-                    query.msg_end = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_end"]).ToString());
+                    query.msg_start_second = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_start_second"]).ToString()) + 86399;
+                    //時間戳，86399表示時間是23時59分59秒，用於比較時間的大小進行查詢
+                }
+                if (!string.IsNullOrEmpty(Request.Form["msg_end_first"]))//判斷分類一是否為空
+                {
+                    query.msg_end_first = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_end_first"]).ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Form["msg_end_second"]))//判斷分類一是否為空
+                {
+                    query.msg_end_second = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_end_second"]).ToString()) + 86399;
                 }
                 _iappmessageMgr = new AppmessageMgr(mySqlConnectionString);
                 int totalCount = 0;
@@ -481,7 +556,10 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
-        //獲取下拉框數據
+        /// <summary>
+        /// 獲取下拉框參數數據
+        /// </summary>
+        /// <returns></returns>
         public HttpResponseBase GetAppMessagePara()
         {
             string json = string.Empty;
@@ -507,7 +585,10 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
-        //新增Message數據
+        /// <summary>
+        /// 新增Message數據
+        /// </summary>
+        /// <returns></returns>
         public HttpResponseBase AppMessageInsert()
         {
             Appmessage query = new Appmessage();

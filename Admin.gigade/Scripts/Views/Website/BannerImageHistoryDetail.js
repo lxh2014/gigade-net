@@ -42,43 +42,6 @@
                 id: 'banner_link_mode',
                 name: 'banner_link_mode'
             },
-             //{
-             //    xtype: 'fieldcontainer',
-             //    combineErrors: true,
-             //    layout: 'hbox',
-             //    //defaults: {
-             //    //    flex: 0.5
-             //    //},
-             //    width: 500,
-             //    items: [
-             //        {
-             //            xtype: 'displayfield',
-             //            value: '開啟模式',
-             //            labelWidth: 100
-             //        },
-             //        {
-             //            xtype: 'radiogroup',
-             //            allowBlank: false,
-             //            width: 200,
-             //            columns: 2,
-             //            margin: '0 0 0 10',
-             //            items: [{
-             //                boxLabel: '母視窗連接',
-             //                name: 'banner_link_mode',
-             //                id: 'oldw',
-             //                checked: true,
-             //                inputValue: 1
-             //            },
-             //            {
-             //                boxLabel: '新視窗開啟',
-             //                name: 'banner_link_mode',
-             //                id: 'neww',
-             //                inputValue: 2
-             //            }]
-             //        }
-
-             //    ]
-             //},
             {
                 xtype: 'displayfield',
                 fieldLabel: '排序',
@@ -172,11 +135,11 @@
                 else if (row.data.banner_link_mode == "2") {
                     Ext.getCmp('banner_link_mode').setValue('新視窗鏈接');
                 }
-                Ext.getCmp('banner_start').setValue(Ext.Date.format(new Date(row.data.banner_start), 'Y-m-d'));
-                Ext.getCmp('banner_end').setValue(Ext.Date.format(new Date(row.data.banner_end), 'Y-m-d'));
+                Ext.getCmp('banner_start').setValue(row.data.banner_start);
+                //Ext.getCmp('banner_end').setValue(Ext.Date.format(new Date(row.data.banner_end), 'Y-m-d'));
+                Ext.getCmp('banner_end').setValue(row.data.banner_end);
                 if (row.data.banner_status == "0") {
                     Ext.getCmp('banner_status').setValue('新建');
-
                 }
                 else if (row.data.banner_status == "1") {
                     Ext.getCmp('banner_status').setValue('顯示');

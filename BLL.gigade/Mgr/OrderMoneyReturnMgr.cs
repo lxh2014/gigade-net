@@ -11,13 +11,12 @@ namespace BLL.gigade.Mgr
 {
     public class OrderMoneyReturnMgr : IOrderMoneyReturnImplMgr
     {
+        private IOrderMoneyReturnImplDao _IOrderMoneyReturnDao;
+        public OrderMoneyReturnMgr(string connectionString)
+        {
+            _IOrderMoneyReturnDao = new OrderMoneyReturnDao(connectionString);
+        }
 
-            private IOrderMoneyReturnImplDao _IOrderMoneyReturnDao;
-
-            public OrderMoneyReturnMgr(string connectionString)
-            {
-                _IOrderMoneyReturnDao = new OrderMoneyReturnDao(connectionString);
-            }
         public List<Model.Query.OrderMoneyReturnQuery> OrderMoneyReturnList(Model.Query.OrderMoneyReturnQuery query, out int totalCount)
         {
             try
@@ -29,8 +28,6 @@ namespace BLL.gigade.Mgr
                 throw new Exception("OrderMoneyReturnMgr-->OrderMoneyReturnList-->"+ex.Message,ex);
             }
         }
-
-
         public DataTable ExportATM(Model.Query.OrderMoneyReturnQuery query)
         {
             try
@@ -42,8 +39,7 @@ namespace BLL.gigade.Mgr
                 throw new Exception("OrderMoneyReturnMgr-->ExportATM-->" + ex.Message, ex);
             }
         }
-
-
+        
         public DataTable ExportCARD(Model.Query.OrderMoneyReturnQuery query)
         {
             try
@@ -55,8 +51,7 @@ namespace BLL.gigade.Mgr
                 throw new Exception("OrderMoneyReturnMgr-->ExportCARD-->" + ex.Message, ex);
             }
         }
-
-
+        
         public int SaveOMReturn(Model.Query.OrderMoneyReturnQuery query)
         {
             try
@@ -68,8 +63,7 @@ namespace BLL.gigade.Mgr
                 throw new Exception("OrderMoneyReturnMgr-->SaveOMReturn-->" + ex.Message, ex);
             }
         }
-
-
+        
         public string SaveCSNote(Model.Query.OrderMoneyReturnQuery query)
         {
             string json = string.Empty;
@@ -91,5 +85,6 @@ namespace BLL.gigade.Mgr
             }
             //throw new NotImplementedException();
         }
+
     }
 }

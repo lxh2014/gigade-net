@@ -211,6 +211,10 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                     if (urlType == "/Manage/ManageUser/changePwd ") {//彈出修改密碼窗口
                         ChangePwdFunction(relatedID);
                     }
+                    if (urlType == "/Member/UsersListIndex/EditEmail")
+                    {
+                        editEmailFunction(relatedID, edit_UserStore);
+                    }
                     else {
                         editFunction(relatedID);
                     }
@@ -230,125 +234,203 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
         labelWidth: 45,
         defaults: { anchor: "95%", msgTarget: "side" },
         items: [
-              {
-                  fieldLabel: '客戶編號',
-                  id: 'user_id',
-                  name: 'user_id',
-                  hidden: true
-              },
-                {
-                    fieldLabel: '客戶名稱',
-                    id: 'user_name',
-                    name: 'user_name',
-                    hidden: true
-                },
-                 {
-                     fieldLabel: '客戶簡稱',
-                     id: 'user_name_simple',
-                     name: 'user_name_simple',
-                     hidden: true
-                 },
-                 {
-                     fieldLabel: '客戶郵箱',
-                     id: 'user_email',
-                     name: 'user_email',
-                     hidden: true
-                 },
-                  {
-                      fieldLabel: '客戶電話',
-                      id: 'user_phone',
-                      name: 'user_phone',
-                      hidden: true
-                  },
-                   {
-                       fieldLabel: '客戶電話',
-                       id: 'user_mobile',
-                       name: 'user_mobile',
-                       hidden: true
-                   },
-                  {
-                      fieldLabel: '客戶地址',
-                      id: 'user_adress',
-                      name: 'user_adress',
-                      hidden: true
-                  },
-        {
-            fieldLabel: '客服代下單',
-            id: 'user_proxy',
-            name: 'user_proxy',
-            hidden: true
-        },
-        {
-            fieldLabel: '付款單號',
-            id: 'u_order',
-            name: 'u_order',
-            hidden: true
-        },
-           {
-               fieldLabel: '被推薦人',
-               id: 'ur_name',
-               name: 'ur_name',
-               hidden: true
-           },
-                 {
-                     fieldLabel: '郵箱',
-                     id: 'ur_mail',
-                     name: 'ur_mail',
-                     hidden: true
-                 },
-                 {
-                     fieldLabel: '推薦人',
-                     id: 'no_name',
-                     name: 'no_name',
-                     hidden: true
-                 },
-                  {
-                      fieldLabel: '發件者設定',
-                      id: 'sender_address',
-                      name: 'sender_address',
-                      hidden: true
-                  },
-           {
-               fieldLabel: '發件者姓名',
-               id: 'sender_name',
-               name: 'sender_name',
-               hidden: true
-           },
-                 {
-                     fieldLabel: '發件類型',
-                     id: 'send_type',
-                     name: 'send_type',
-                     hidden: true
-                 },
-                 {
-                     fieldLabel: '收件者設定',
-                     id: 'recipient',
-                     name: 'recipient',
-                     hidden: true
-                 }, {
-                     fieldLabel: '收件者姓名',
-                     id: 'recipient_name',
-                     name: 'recipient_name',
-                     hidden: true
-                 },
-                 {
-                     fieldLabel: '福委姓名',
-                     id: 'group_committe_chairman',
-                     name: 'group_committe_chairman',
-                     hidden: true
-                 },
-                 {
-                     fieldLabel: '福委電話',
-                     id: 'group_committe_phone',
-                     name: 'group_committe_phone',
-                     hidden: true
-                 },
-                 {
-                     fieldLabel: '福委mail',
-                     id: 'group_committe_mail',
-                     name: 'group_committe_mail',
-                     hidden: true
-                 },
+            {
+                fieldLabel: '客戶編號',
+                id: 'user_id',
+                name: 'user_id',
+                hidden: true
+            },
+            {
+                fieldLabel: '客戶名稱',
+                id: 'user_name',
+                name: 'user_name',
+                hidden: true
+            },
+            {
+                fieldLabel: '客戶簡稱',
+                id: 'user_name_simple',
+                name: 'user_name_simple',
+                hidden: true
+            },
+            {
+                fieldLabel: '客戶郵箱',
+                id: 'user_email',
+                name: 'user_email',
+                hidden: true
+            },
+            {
+                fieldLabel: '客戶電話',
+                id: 'user_phone',
+                name: 'user_phone',
+                hidden: true
+            },
+            {
+                fieldLabel: '客戶電話',
+                id: 'user_mobile',
+                name: 'user_mobile',
+                hidden: true
+            },
+            {
+                fieldLabel: '客戶地址',
+                id: 'user_adress',
+                name: 'user_adress',
+                hidden: true
+            },
+            {
+                fieldLabel: '客服代下單',
+                id: 'user_proxy',
+                name: 'user_proxy',
+                hidden: true
+            },
+            {
+                fieldLabel: '付款單號',
+                id: 'u_order',
+                name: 'u_order',
+                hidden: true
+            },
+            {
+                fieldLabel: '被推薦人',
+                id: 'ur_name',
+                name: 'ur_name',
+                hidden: true
+            },
+            {
+                fieldLabel: '郵箱',
+                id: 'ur_mail',
+                name: 'ur_mail',
+                hidden: true
+            },
+            {
+                fieldLabel: '推薦人',
+                id: 'no_name',
+                name: 'no_name',
+                hidden: true
+            },
+            {
+                fieldLabel: '發件者設定',
+                id: 'sender_address',
+                name: 'sender_address',
+                hidden: true
+            },
+            {
+                fieldLabel: '發件者姓名',
+                id: 'sender_name',
+                name: 'sender_name',
+                hidden: true
+            },
+            {
+                fieldLabel: '發件類型',
+                id: 'send_type',
+                name: 'send_type',
+                hidden: true
+            },
+            {
+                fieldLabel: '收件者設定',
+                id: 'recipient',
+                name: 'recipient',
+                hidden: true
+            }, {
+                fieldLabel: '收件者姓名',
+                id: 'recipient_name',
+                name: 'recipient_name',
+                hidden: true
+            },
+            {
+                fieldLabel: '福委姓名',
+                id: 'group_committe_chairman',
+                name: 'group_committe_chairman',
+                hidden: true
+            },
+            {
+                fieldLabel: '福委電話',
+                id: 'group_committe_phone',
+                name: 'group_committe_phone',
+                hidden: true
+            },
+            {
+                fieldLabel: '福委mail',
+                id: 'group_committe_mail',
+                name: 'group_committe_mail',
+                hidden: true
+            },
+            {
+                fieldLabel: '查詢ID',
+                id: 'order_id',
+                name: 'order_id',
+                hidden: true
+            },
+            {
+                fieldLabel: '訂購姓名',
+                id: 'order_name',
+                name: 'order_name',
+                hidden: true
+            },
+            {
+                fieldLabel: '購買人姓名',
+                id: 'order_name',
+                name: 'order_name',
+                hidden: true
+            },
+            {
+                fieldLabel: '收貨人姓名',
+                id: 'delivery_name',
+                name: 'delivery_name',
+                hidden: true
+            },
+            {
+                fieldLabel: '購買人市內電話',
+                id: 'order_phone',
+                name: 'order_phone',
+                hidden: true
+            },
+            {
+                fieldLabel: '收貨人市內電話',
+                id: 'delivery_phone',
+                name: 'delivery_phone',
+                hidden: true
+            },
+            {
+                fieldLabel: '購買人手機',
+                id: 'order_mobile',
+                name: 'order_mobile',
+                hidden: true
+            },
+            {
+                fieldLabel: '收貨人手機',
+                id: 'delivery_mobile',
+                name: 'delivery_mobile',
+                hidden: true
+            },
+            {
+                fieldLabel: '帳單地址',
+                id: 'order_address',
+                name: 'order_address',
+                hidden: true
+            },
+            {
+                fieldLabel: '收貨地址',
+                id: 'delivery_address',
+                name: 'delivery_address',
+                hidden: true
+            },
+            {
+                fieldLabel: '查詢ID',
+                id: 'id',
+                name: 'id',
+                hidden: true
+            },
+            {
+                fieldLabel: '交易卡號',
+                id: 'pan',
+                name: 'pan',
+                hidden: true
+            },
+            {
+                fieldLabel: '髮卡銀行',
+                id: 'bankname',
+                name: 'bankname',
+                hidden: true
+            }
         ]
 
     });
@@ -494,7 +576,9 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                                 }
                             }
 
-
+                            if (result.order_id != undefined) {//供應商簡稱
+                                 Ext.getCmp('order_name').setValue(result.order_name).show();                              
+                            }
 
                             //if (infoarr.indexOf("group_committe_chairman") >= 0 || infoarr == "") {
                             //    if (result.group_committe_chairman != "" && result.group_committe_chairman != "0" && result.group_committe_chairman != undefined) {
@@ -511,7 +595,36 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                             //        Ext.getCmp('group_committe_mail').setValue(result.group_committe_mail).show();
                             //    }
                             //}
-
+                            if (result.order_phone != undefined) {//
+                                Ext.getCmp('order_phone').setValue(result.order_phone).show();
+                            }
+                            if (result.order_mobile != undefined) {//;
+                                Ext.getCmp('order_mobile').setValue(result.order_mobile).show();
+                            }
+                            if (result.order_address != undefined) {//;
+                                Ext.getCmp('order_address').setValue(result.order_address).show();
+                            }
+                            if (result.delivery_name != undefined) {//;
+                                Ext.getCmp('delivery_name').setValue(result.delivery_name).show();
+                            }
+                            if (result.delivery_phone != undefined) {//;
+                                Ext.getCmp('delivery_phone').setValue(result.delivery_phone).show();
+                            }
+                            if (result.delivery_mobile != undefined) {//;
+                                Ext.getCmp('delivery_mobile').setValue(result.delivery_mobile).show();
+                            }
+                            if (result.delivery_address != undefined) {//
+                                Ext.getCmp('delivery_address').setValue(result.delivery_address).show();
+                            }
+                            if (result.id != undefined) {//
+                                Ext.getCmp('id').setValue(result.id).show();
+                            }
+                            if (result.pan != undefined) {//
+                                Ext.getCmp('pan').setValue(result.pan).show();
+                            }
+                            if (result.bankname != undefined) {//
+                                Ext.getCmp('bankname').setValue(result.bankname).show();
+                            }
 
 
 
@@ -537,7 +650,7 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                             if (no_ur_name != "") {
                                 Ext.getCmp('no_name').setValue(no_ur_name).show();
                             }
-                        }
+                        }                      
                         else {
                             if (urlType == "/Member/UsersListIndex") {
                                 Ext.getCmp('user_email').setValue(Ext.String.format("<a id='u_mail'  onclick='SaveRecord({0},2)' href='' target='_blank'>{1}</a>", relatedID, mail)).show();//
@@ -547,6 +660,24 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                                 if (mail != "") {
                                     Ext.getCmp('user_email').setValue(mail).show();
                                 }
+                            }
+                            if (name != "") {
+                                Ext.getCmp('user_name').setValue(name).show();
+                            }
+                        }
+                        break;
+                    case "2":
+                        if (urlType == "/OrderManage/BrandProductIndex") {
+                            if (result.order_id != "") {
+                                Ext.getCmp('u_order').setValue(result.order_id).show();
+                            }
+                            if (result.order_name != "") {
+                                Ext.getCmp('order_name').setValue(result.order_name).show();
+                            }
+                        }
+                        else {
+                            if (mail != "") {
+                                Ext.getCmp('user_email').setValue(mail).show();
                             }
                             if (name != "") {
                                 Ext.getCmp('user_name').setValue(name).show();
@@ -595,7 +726,7 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                                 Ext.getCmp('user_name').setValue(name).show();
                             }
                         }
-                        break;
+                        break;                   
                     default:
                         if (mail != "") {
                             Ext.getCmp('user_email').setValue(mail).show();

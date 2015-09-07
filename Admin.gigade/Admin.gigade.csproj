@@ -648,6 +648,8 @@
     <Content Include="ImportUserIOExcel\ContactUsQuestionResponse.html" />
     <Content Include="ImportUserIOExcel\productConsultAnwser.html" />
     <Content Include="ImportUserIOExcel\productConsultKeFu.html" />
+    <Content Include="Locale\zh-TW\AppService\AppcategoryLang.js" />
+    <Content Include="Locale\zh-TW\AppService\AppMessageLang.js" />
     <Content Include="Locale\zh-TW\AppService\AppNotifyPoolLang.js" />
     <Content Include="Locale\zh-TW\AppService\AppversionsLang.js" />
     <Content Include="Locale\zh-TW\AppService\lang.js" />
@@ -1830,7 +1832,11 @@
     <Content Include="Scripts\kendo\2014.2.716\angular.min.js" />
     <Content Include="Scripts\kendo\2014.2.716\jquery-1.9.1.js" />
     <Content Include="Scripts\kendo\2014.2.716\jquery.min.js" />
+    <Content Include="Scripts\Views\AppService\AppCategoryEdit.js" />
+    <Content Include="Scripts\Views\AppService\AppCategoryList.js" />
     <Content Include="Scripts\Views\ConsumeStatistic\List.js" />
+    <Content Include="Scripts\Views\DeliveryStore\DeliveryStorePlace.js" />
+    <Content Include="Scripts\Views\DeliveryStore\DeliveryStorePlaceEdit.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DesignRequestEdit.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DesignRequestList.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsEdit.js" />
@@ -1867,8 +1873,6 @@
     <Content Include="Scripts\Views\InspectionReport\InspectionReportImport.js" />
     <Content Include="Scripts\Views\InspectionReport\InspectionReportList.js" />
     <Content Include="Scripts\Views\MailSend\list.js" />
-    <Content Include="Scripts\Views\AppService\AppCategroyEdit.js" />
-    <Content Include="Scripts\Views\AppService\AppCategroyList.js" />
     <Content Include="Scripts\Views\AppService\AppMessageEdit.js" />
     <Content Include="Scripts\Views\AppService\AppMessageList.js" />
     <Content Include="Scripts\Views\AppService\AppNotifyPoolEdit.js" />
@@ -1888,6 +1892,7 @@
     <Content Include="Scripts\Views\OrderManage\Logistics.js" />
     <Content Include="Scripts\Views\OrderManage\OrderReturn.js" />
     <Content Include="Scripts\Views\OrderManage\OrderReturnList.js" />
+    <Content Include="Scripts\Views\OrderManage\ReturnAllOrder.js" />
     <Content Include="Scripts\Views\Order\OrderStatusModify.js" />
     <Content Include="Scripts\Views\PageErrorLog\list.js" />
     <Content Include="Scripts\Views\ProductCategory\CateBrandEdit.js" />
@@ -1896,6 +1901,8 @@
     <Content Include="Scripts\Views\ProductClick\ProductClickList.js" />
     <Content Include="Scripts\Views\ProductComment\ChangeLog.js" />
     <Content Include="Scripts\Views\ProductHistory\ParticularsHistory.js" />
+    <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeEdit.js" />
+    <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeList.js" />
     <Content Include="Scripts\Views\ProductPurchase\SuggestPurchaseList.js" />
     <Content Include="Scripts\Views\ProductSearch\ProductSearchList.js" />
     <Content Include="Scripts\Views\Product\ProductDetailEdit.js" />
@@ -1928,6 +1935,7 @@
     <Content Include="Scripts\Views\VipUserGroup\edit.js" />
     <Content Include="Scripts\Views\VipUserGroup\GCCInfo.js" />
     <Content Include="Scripts\Views\VipUserGroup\list.js" />
+    <Content Include="Scripts\Views\WareHouse\Check.js" />
     <Content Include="Scripts\Views\WareHouse\Idiff_count_book.js" />
     <Content Include="Scripts\Views\WareHouse\IialgList.js" />
     <Content Include="Scripts\Views\WareHouse\IlocChangeDetailEdit.js" />
@@ -4360,6 +4368,10 @@
     <Content Include="Views\AppService\AppMessageIndex.cshtml" />
     <Content Include="Views\AppService\AppversionsIndex.cshtml" />
     <Content Include="Views\AppService\AppNotifyPoolIndex.cshtml" />
+    <Content Include="Views\DeliveryStore\DeliveryStorePlace.cshtml" />
+    <Content Include="Template\AppcategoryImport\t_category.xls" />
+    <Content Include="Views\ProductPurchase\RIS.cshtml" />
+    <Content Include="Views\WareHouse\Check.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="aimg.gigade100.com\product\150x150\" />

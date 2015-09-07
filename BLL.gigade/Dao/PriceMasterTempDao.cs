@@ -193,10 +193,17 @@ namespace BLL.gigade.Dao
             {
                 StringBuilder strSql = new StringBuilder("insert into price_master_temp(`writer_id`,`product_id`,`site_id`,`user_level`,`user_id`,`product_name`,`accumulated_bonus`");
                 strSql.Append(",`bonus_percent`,`default_bonus_percent`,`same_price`,`event_start`,`event_end`,`price_status`,`price`,`event_price`,`child_id`,`combo_type`,`cost`,`event_cost`,`bonus_percent_start`,`bonus_percent_end`,`max_price`,`max_event_price`,valid_start,valid_end) select ");
-                strSql.AppendFormat("{0} as writer_id,product_id,site_id,user_level,user_id,product_name,accumulated_bonus", priceMasterTemp.writer_Id);
+                strSql.AppendFormat("{0} as writer_id,product_id,site_id,user_level,user_id,'' AS product_name,accumulated_bonus", priceMasterTemp.writer_Id);
                 strSql.AppendFormat(",bonus_percent,default_bonus_percent,same_price,event_start,event_end,{0} as price_status,price,event_price,child_id", priceMasterTemp.price_status);
                 strSql.AppendFormat(",{0} as combo_type,cost,event_cost,bonus_percent_start,bonus_percent_end,max_price,max_event_price,valid_start,valid_end from price_master where product_id='{1}' and site_id=1 and user_level=1 and user_id=0", priceMasterTemp.combo_type, priceMasterTemp.product_id);
                 return strSql.ToString();
+                ///ediy by wwei0216w  2015/8/27
+                /*
+                 修改代碼 '' AS product_name
+                 * 修改原因:
+                 * 商品名稱添加前後綴后,複製商品時,價格名稱部份會連前後綴一起複製,導致商品沒有前後綴的添加記錄,為避免該問題
+                 * 複製商品時,價格名稱部份將不會再進行複製
+                 */
             }
             catch (Exception ex)
             {
@@ -211,9 +218,16 @@ namespace BLL.gigade.Dao
                 StringBuilder stb = new StringBuilder("insert into price_master_temp(`writer_id`,`combo_type`,`product_id`,`site_id`,`user_level`,`user_id`,`product_name`,`accumulated_bonus`");
                 stb.Append(",`bonus_percent`,`default_bonus_percent`,`same_price`,`event_start`,`event_end`,`price_status`,`price`,`event_price`,`child_id`,`cost`,`event_cost`,`bonus_percent_start`,`bonus_percent_end`,`max_price`,`max_event_price`) ");
                 stb.AppendFormat("select {0} as writer_id,{1} as combo_type, product_id,", priceMasterTemp.writer_Id, priceMasterTemp.combo_type);
-                stb.Append("site_id,user_level,user_id,product_name,accumulated_bonus,bonus_percent,default_bonus_percent,same_price,event_start,event_end,price_status,price,event_price,child_id,cost,event_cost,bonus_percent_start,bonus_percent_end,max_price,max_event_price");
+                stb.Append("site_id,user_level,user_id,'' AS product_name,accumulated_bonus,bonus_percent,default_bonus_percent,same_price,event_start,event_end,price_status,price,event_price,child_id,cost,event_cost,bonus_percent_start,bonus_percent_end,max_price,max_event_price");
                 stb.Append(" from price_master where price_master_id = {0};select @@identity;");
                 return stb.ToString();
+                ///ediy by wwei0216w  2015/8/27
+                /*
+                 修改代碼 '' AS product_name
+                 * 修改原因:
+                 * 商品名稱添加前後綴后,複製商品時,價格名稱部份會連前後綴一起複製,導致商品沒有前後綴的添加記錄,為避免該問題
+                 * 複製商品時,價格名稱部份將不會再進行複製
+                 */
             }
             catch (Exception ex)
             {

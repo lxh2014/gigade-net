@@ -424,7 +424,8 @@ namespace BLL.gigade.Dao
                 VendorQuery VQuery = new VendorQuery();
                 VQuery.vendor_id = query.vendor_id;
                 VendorQuery vendorTemp = GetVendorInfoByCon(VQuery);
-                sql.AppendFormat("select * , sum(normal_subtotal) as gnormal_subtotal , sum(hypothermia_subtotal) as ghypothermia_subtotal from order_slave_master where 1=1 and deliver_time>={0} and deliver_time<={1} and creator = {2} group by deliver_time ", query.search_start_time, query.search_end_time, query.vendor_id);
+                sql.AppendFormat("select * , sum(normal_subtotal) as gnormal_subtotal , sum(hypothermia_subtotal) as ghypothermia_subtotal from order_slave_master where 1=1 ");
+                sql.AppendFormat(" and deliver_time  + (86400 * 10)  >={0} and deliver_time  + (86400 * 10) <={1} and creator = {2} group by deliver_time ", query.search_start_time, query.search_end_time, query.vendor_id);
                 DataTable temp = _access.getDataTable(sql.ToString());
                 for (int i = 0; i < temp.Rows.Count; i++)
                 {

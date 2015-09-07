@@ -1369,7 +1369,7 @@ namespace Admin.gigade.Controllers
                 DataTable _dt = _edmGroup.Export(query);
                 string fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "." + "csv";
                 string newFileName = Server.MapPath(excelPath_export + fileName);
-                string[] colName = { "電子信箱", "訂閱狀態", "名稱" };
+                string[] colName = { "電子信箱", "訂閱狀態", "姓名" };
                          
                 DataTable _newdt = new DataTable();
                 DataRow dr;
@@ -1742,7 +1742,7 @@ namespace Admin.gigade.Controllers
                 DataTable _dt = _edmSendMgr.EdmSendExportCSV(query);
                 string fileName = "edm_status_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "." + "csv";
                 string newFileName = Server.MapPath(excelPath_export + fileName);  //"電子信箱"
-                string[] colName = { "發信狀態", "郵件編號", "名稱", "開信次數", "寄信時間", "首次開信時間", "最近開信時間" };
+                string[] colName = { "發信狀態", "郵件編號", "姓名", "開信次數", "寄信時間", "首次開信時間", "最近開信時間" };
                 DataTable _newdt = new DataTable();
                 foreach (string item in colName)
                 {
@@ -2041,6 +2041,10 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["email"]))
                 {
                     query.email_address = Request.Params["email"].ToString().Replace("\\", "\\\\");
+                }
+                if (!string.IsNullOrEmpty(Request.Params["search_id"]))
+                {
+                    query.email_id = Convert.ToUInt32(Request.Params["search_id"].ToString());
                 }
                 query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");

@@ -43,6 +43,9 @@ namespace BLL.gigade.Model.Query
         public int ormpackage { get; set; }
 
         public int orc_send { get; set; }
+        public string data { get; set; }
+        public bool nonSelected { get; set; }
+        public string itemStr { get; set; }
         public OrderReturnStatusQuery()
         {
             orc_id = 0;
@@ -71,6 +74,9 @@ namespace BLL.gigade.Model.Query
             return_id = 0;
             ormpackage = 0;
             orc_send = 0;
+            data = string.Empty;
+            nonSelected = false;
+            itemStr = string.Empty;
         }
     }
 }

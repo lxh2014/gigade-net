@@ -28,44 +28,47 @@ namespace BLL.gigade.Dao
         /// <param name="valid_end">結束時間</param>
         /// <param name="totalCount">總頁數</param>
         /// <returns></returns>
-        public List<AppNotifyPoolQuery> GetAppnotifypool(AppNotifyPool ap, out int totalCount)
+        public List<AppNotifyPoolQuery> GetAppnotifypool(AppNotifyPoolQuery ap, out int totalCount)
         {
-            StringBuilder sqlfield = new StringBuilder();
-            StringBuilder sqlfrom = new StringBuilder();
-            StringBuilder sqlwhere = new StringBuilder();
             StringBuilder sql = new StringBuilder();
             StringBuilder sqlcount = new StringBuilder();
-            sqlfield.AppendLine(@"select apl.id,apl.title,apl.alert, apl.url,apl.to,FROM_UNIXTIME(apl.valid_start) as starttime");
-            sqlfield.AppendLine(@",FROM_UNIXTIME(apl.valid_end) as endtime,apl.notified,FROM_UNIXTIME(apl.notify_time) as  notifytime");
-            sql.Append(sqlfield);
-            sqlfrom.AppendFormat(@"  from app_notify_pool as apl ");
-            sqlcount.Append(" select count(apl.id) as totalCount ");
-            sql.Append(sqlfrom);
-            sqlwhere.Append(" where 1=1");
-            if (ap.valid_start != 0)
-            {
-                sqlwhere.AppendFormat(@" AND   apl.valid_start>={0} ", ap.valid_start);
-            }
-            if (ap.valid_end != 0)
-            {
-                sqlwhere.AppendFormat(@" AND apl.valid_end<={0}", ap.valid_end);
-            }
-            sql.Append(sqlwhere);
-            sql.AppendFormat(" order by  apl.valid_end DESC ");
-            totalCount = 0;
-            if (ap.IsPage)
-            {
-                sqlcount.Append(sqlfrom.ToString() + sqlwhere.ToString());
-                sql.AppendFormat(@" limit {0},{1} ", ap.Start, ap.Limit);
-                DataTable dt = _access.getDataTable(sqlcount.ToString());
-                if (dt != null && dt.Rows.Count > 0)
-                {
-                    totalCount = Convert.ToInt32(dt.Rows[0]["totalCount"]);
-                }
-
-            }
+            StringBuilder sqlwhere = new StringBuilder();
             try
             {
+                sql.AppendFormat(@"select apl.id,apl.title,apl.alert, apl.url,apl.to,FROM_UNIXTIME(apl.valid_start) as starttime 
+                    ,FROM_UNIXTIME(apl.valid_end) as endtime,apl.notified,FROM_UNIXTIME(apl.notify_time) as  notifytime
+                    from app_notify_pool as apl ");
+                sqlcount.AppendFormat(" select count(apl.id) as totalCount   from app_notify_pool as apl ");
+                sqlwhere.Append(" where 1=1");
+                if (ap.valid_start != 0)
+                {
+                    sqlwhere.AppendFormat(@" AND   apl.valid_start>={0} ", ap.valid_start);
+                }
+                if (ap.startendtime != 0) 
+                {
+                    sqlwhere.AppendFormat(@" AND   apl.valid_start<={0} ", ap.startendtime);
+                }
+                if (ap.valid_end != 0)
+                {
+                    sqlwhere.AppendFormat(@" AND apl.valid_end>={0}", ap.valid_end);
+                }
+                if (ap.endendtime != 0)
+                {
+                    sqlwhere.AppendFormat(@" AND apl.valid_end<={0}", ap.endendtime);
+                }
+                sql.Append(sqlwhere);
+                sql.AppendFormat(" order by  apl.valid_end DESC ");
+                totalCount = 0;
+                if (ap.IsPage)
+                {
+                    sqlcount.Append(sqlwhere.ToString());
+                    sql.AppendFormat(@" limit {0},{1} ", ap.Start, ap.Limit);
+                    DataTable dt = _access.getDataTable(sqlcount.ToString());
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        totalCount = Convert.ToInt32(dt.Rows[0]["totalCount"]);
+                    }
+                }
                 return _access.getDataTableForObj<AppNotifyPoolQuery>(sql.ToString());
             }
             catch (Exception ex)
@@ -87,7 +90,7 @@ namespace BLL.gigade.Dao
                                                 values('{0}','{1}','{2}','{3}',{4},{5},{6});select @@identity",
                         anpq.title, anpq.alert, anpq.url, anpq.to, anpq.valid_start, anpq.valid_end, anpq.notified
                 );
-                return Int32.Parse(_access.getDataTable(strSql).Rows[0][0].ToString());
+                return _access.execCommand(strSql);
             }
             catch (Exception ex)
             {

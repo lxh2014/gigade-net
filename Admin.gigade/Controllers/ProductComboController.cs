@@ -1170,6 +1170,9 @@ namespace Admin.gigade.Controllers
         public HttpResponseBase SaveBaseInfo()
         {
             string json = "{success:true}";
+            int transportDays = -1;///初始化
+            uint product_mode = 0;
+            uint brand_id = 0;
             try
             {
                 string prod_name = (Request.Form["prod_name"] ?? "").Trim();
@@ -1187,6 +1190,44 @@ namespace Admin.gigade.Controllers
                 _productMgr = new ProductMgr(connectionString);
                 Caller _caller = (Session["caller"] as Caller);
                 Product p = new Product();
+             
+
+                ///add by wwei0216w 2015/8/24
+                ///根據product_mode查找供應商對應的自出,寄倉,調度欄位,如果為0則不予保存
+                 brand_id = uint.Parse(Request.Form["brand_id"]?? "0");
+                 product_mode = uint.Parse(Request.Form["product_mode"]??"0");///獲得product_mode
+                 string msg = "寄倉";
+                IVendorImplMgr _vendorMgr = new VendorMgr(connectionString);
+                List<Vendor> vendorList = _vendorMgr.GetArrayDaysInfo(brand_id);
+                if (vendorList.Count > 0)
+                {
+                    switch (product_mode)
+                    {
+                        case 1:
+                            transportDays = vendorList.FirstOrDefault<Vendor>().self_send_days;
+                            msg = "自出";
+                            break;
+                        case 2:
+                            transportDays = vendorList.FirstOrDefault<Vendor>().stuff_ware_days;
+                            msg = "寄倉";
+                            break;
+                        case 3:
+                            msg = "調度";
+                            transportDays = vendorList.FirstOrDefault<Vendor>().dispatch_days;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (transportDays == 0)
+                {
+                    json = "{success:false,msg:'" + msg + Resources.Product.TRANSPORT_DAYS + "'}";
+                    this.Response.Clear();
+                    this.Response.Write(json);
+                    this.Response.End();
+                    return this.Response;
+                }
 
                 //查詢product表。
                 if (Request.Params["product_id"] != "")
@@ -1195,7 +1236,7 @@ namespace Admin.gigade.Controllers
                     p = _productMgr.Query(p)[0];
                 }
 
-                uint brand_id = 0;
+
                 uint product_sort = 0;
                 string product_vendor_code = "";
                 uint product_start = 0;
@@ -1204,12 +1245,16 @@ namespace Admin.gigade.Controllers
                 uint product_freight_set = 0;
                 int tax_type = 0;
                 uint combination = 0;
-                uint product_mode = 0;
                 string expect_msg = string.Empty;
                 int show_in_deliver = 0;
                 int process_type = 0;
                 int product_type = 0;
-
+                uint recommedde_jundge = 0;
+                uint recommedde_expend_day = 0;
+                string recommededcheckall = string.Empty;
+                int purchase_in_advance = 0;
+                uint purchase_in_advance_start = 0;
+                uint purchase_in_advance_end = 0;
                 //庫存
                 if (!string.IsNullOrEmpty(Request.Params["ig_sh_InsertValue"]))
                 {
@@ -1227,7 +1272,7 @@ namespace Admin.gigade.Controllers
                 }
                 else
                 {
-                    brand_id = uint.Parse(Request.Form["brand_id"]);
+                    //brand_id = uint.Parse(Request.Form["brand_id"]);
                     product_sort = uint.Parse(Request.Form["product_sort"]);
                     product_vendor_code = Request.Form["product_vendor_code"];
                     product_start = uint.Parse(CommonFunction.GetPHPTime(Request.Form["product_start"]).ToString());
@@ -1236,15 +1281,30 @@ namespace Admin.gigade.Controllers
                     product_freight_set = uint.Parse(Request.Form["product_freight_set"]);
                     tax_type = int.Parse(Request.Form["tax_type"]);
                     combination = uint.Parse(Request.Form["combination"]);
-                    product_mode = uint.Parse(Request.Params["product_mode"]);
+                    //product_mode = uint.Parse(Request.Params["product_mode"]);
                     expect_msg = Request.Form["expect_msg"] ?? "";
                     //商品新增欄位 add by  xiangwang0413w 2014/09/15
                     show_in_deliver = int.Parse(Request.Form["show_in_deliver"]);
                     process_type = int.Parse(Request.Form["process_type"]);
                     product_type = int.Parse(Request.Form["product_type"]);
+                    //add by dongya 2015/08/26 
+                    recommedde_jundge = uint.Parse(Request.Form["recommedde_jundge"]);//是否選擇了推薦商品屬性 1 表示推薦
+                    recommedde_expend_day = 0;
+                    if (recommedde_jundge == 1)
+                    {
+                        if (!string.IsNullOrEmpty(Request.Params["recommededcheckall"]))
+                        {
+                            recommededcheckall = Request.Params["recommededcheckall"].ToString().TrimEnd(',');//選擇的所有的月數
+                        }
+                        recommedde_expend_day = uint.Parse(Request.Form["recommedde_expend_day"]);
+                    }
+                    //add by dongya 2015/09/02 
+                    purchase_in_advance = Convert.ToInt32(Request.Form["purchase_in_advance"]);
+                    purchase_in_advance_start = uint.Parse(Request.Form["purchase_in_advance_start"]);
+                    purchase_in_advance_end = uint.Parse(Request.Form["purchase_in_advance_end"]);
                 }
 
-
+             
 
                 if (string.IsNullOrEmpty(Request.Params["product_id"]))
                 {
@@ -1275,6 +1335,14 @@ namespace Admin.gigade.Controllers
                     pTemp.Min_Purchase_Amount = 1;
                     pTemp.Safe_Stock_Amount = 1;
                     pTemp.Extra_Days = 0;
+                    //add by dongya
+                    pTemp.recommedde_jundge = recommedde_jundge;//推薦商品 1表示推薦 0表示不推薦
+                    pTemp.months = recommededcheckall;//以1,3,這樣的形式顯示
+                    pTemp.expend_day = recommedde_expend_day;
+                    //add by dongya 2015/09/02 
+                    pTemp.purchase_in_advance = purchase_in_advance;
+                    pTemp.purchase_in_advance_start = purchase_in_advance_start;
+                    pTemp.purchase_in_advance_end = purchase_in_advance_end;
 
                     if (!string.IsNullOrEmpty(Request.Form["OldProductId"]))
                     {
@@ -1288,6 +1356,9 @@ namespace Admin.gigade.Controllers
                     {
                         pTemp.Product_Id = Request.Form["OldProductId"];
                     }
+
+                   
+
                     ProductTemp query = new ProductTemp { Writer_Id = pTemp.Writer_Id, Combo_Type = COMBO_TYPE, Product_Id = pTemp.Product_Id };
                     ProductTemp pTempList = _productTempMgr.GetProTemp(query);
                     if (pTempList == null)
@@ -1295,7 +1366,7 @@ namespace Admin.gigade.Controllers
                         //插入
                         int result = 0;
                         result = _productTempMgr.baseInfoSave(pTemp);
-                        if (result == 1)
+                        if (result >0)
                         {
                             json = "{success:true}";
                         }
@@ -1308,7 +1379,6 @@ namespace Admin.gigade.Controllers
                     {
 
                         //更新
-
                         if (!string.IsNullOrEmpty(Request.Params["ig_sh_InsertValue"]))
                         {
                             _productTempMgr.ProductTempUpdate(pTemp, "stock");
@@ -1330,10 +1400,9 @@ namespace Admin.gigade.Controllers
                 }
                 else
                 {
+                   
                     if (string.IsNullOrEmpty(Request.Params["ig_sh_InsertValue"]))
                     {
-
-
                         p.Brand_Id = brand_id;
                         p.Prod_Name = prod_name;
                         p.Prod_Sz = prod_sz;
@@ -1360,6 +1429,14 @@ namespace Admin.gigade.Controllers
                         p.Safe_Stock_Amount = 1;
                         p.Extra_Days = 0;
                         p.off_grade = int.Parse(Request.Form["off-grade"]);
+                        //add by dongya
+                        p.recommedde_jundge = recommedde_jundge;//推薦商品 1表示推薦 0表示不推薦
+                        p.months = recommededcheckall;//以1,3,這樣的形式顯示
+                        p.expend_day = recommedde_expend_day;
+                        //add by dongya 0410j
+                        p.purchase_in_advance = purchase_in_advance;
+                        p.purchase_in_advance_start = purchase_in_advance_start;
+                        p.purchase_in_advance_end = purchase_in_advance_end;
                         //更新正式表
                         p.Product_Id = uint.Parse(Request.Params["product_id"]);
                         if (p.Product_Mode != 2)
@@ -1404,6 +1481,37 @@ namespace Admin.gigade.Controllers
                             _productDeliverySetMgr.Delete(
                                 new ProductDeliverySet { Freight_big_area = 1, Freight_type = 12 }, p.Product_Id);
                         }
+
+                        #region 推薦商品屬性插入/修改recommended_product_attribute表中做記錄 add by dongya 2015/09/30 ----目前只針對單一商品
+                        RecommendedProductAttributeMgr rProductAttributeMgr = new RecommendedProductAttributeMgr(connectionString);
+                        RecommendedProductAttribute rPA = new RecommendedProductAttribute();
+                        rPA.product_id = Convert.ToUInt32(p.Product_Id);
+                        rPA.time_start = pTemp.Recommended_time_start;
+                        rPA.time_end = pTemp.Recommended_time_end;
+                        rPA.expend_day = pTemp.expend_day;
+                        rPA.months = pTemp.months;
+                        rPA.combo_type = 2;//組合商品
+                        //首先判斷表中是否對該product_id設置為推薦
+                        int productId = Convert.ToInt32(rPA.product_id);
+                        if (rProductAttributeMgr.GetMsgByProductId(productId) > 0)//如果大於0,表示推薦表中存在數據
+                        {
+                            if (pTemp.recommedde_jundge == 1)//==1表示推薦 
+                            {
+                                rProductAttributeMgr.Update(rPA);
+                            }
+                            else if (pTemp.recommedde_jundge == 0)//==0表示不推薦 
+                            {
+                                rProductAttributeMgr.Delete(productId);
+                            }
+                        }
+                        else
+                        {
+                            if (pTemp.recommedde_jundge == 1)//==1表示推薦 
+                            {
+                                rProductAttributeMgr.Save(rPA);
+                            }
+                        }
+                        #endregion
                         json = "{success:true,msg:'" + Resources.Product.SAVE_SUCCESS + "'}";
                     }
                     else

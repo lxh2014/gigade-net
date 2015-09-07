@@ -89,13 +89,18 @@ namespace BLL.gigade.Dao.Impl
         string UpdateOac(DataTable DtTemp, OrderAccountCollection model);
         string InsertOac(OrderAccountCollection model);
         DataTable GetOrderidAndName(int order_id);
-        string UpDeliveryStore(OrderMasterQuery query);
+        string UpdateOrderMaster(OrderMasterQuery query, OrderShowMasterQuery osmQuery);
         string UpOrderMaster(OrderMasterQuery query);
         string UpOrderSlave(OrderSlaveQuery query);
         string UpOrderDetail(OrderDetailQuery query);
         DataTable GetInfo(OrderMasterQuery query);
         DataTable GetNextSerial(Serial serial);
         string OMSRecord(OrderMasterStatusQuery query);
-        string UpDeliveryMaster(uint order_id);
+        string UpDeliveryMaster(uint order_id, uint Delivery_Store);
+        string UpdateOrderMasterStatus(OrderMaster om);
+        DataTable IsVendorDeliver(uint order_id);
+        string ModifyOrderStatus(OrderMasterQuery query);
+        DataTable IsFirstTime(OrderMasterQuery query);
+        string UpFirstTime(OrderMasterQuery query);
     }
 }

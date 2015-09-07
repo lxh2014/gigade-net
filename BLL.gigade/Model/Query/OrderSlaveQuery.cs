@@ -27,11 +27,10 @@ namespace BLL.gigade.Model.Query
         public uint delivery_zip { set; get; }
         public string delivery_address { set; get; }
         public string delivery { set; get; }
-
         public int delivery_store { set; get; }
         public int estimated_arrival_period { set; get; }
         public uint holiday_deliver { set; get; }
-
+        public string slave_status_in { get; set; }
 
         /// <summary>
         /// 從吉甲地後臺登錄到供應商後臺所需的加密字符串
@@ -60,7 +59,7 @@ namespace BLL.gigade.Model.Query
             estimated_arrival_period = 0;
             holiday_deliver = 0;
             delivery = string.Empty;
+            slave_status_in = string.Empty;
         }
-
     }
 }

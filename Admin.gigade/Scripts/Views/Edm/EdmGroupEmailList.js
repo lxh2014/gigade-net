@@ -15,7 +15,7 @@ var EdmSearchStore = Ext.create('Ext.data.Store', {
     fields: ["txt", "value"],
     data: [
     { "txt": "電子郵件", "value": "0" },
-    { "txt": "名稱", "value": "1" },
+    { "txt": "姓名", "value": "1" },
     ]
 });
 Ext.define('gigade.EdmGroupEmail', {
@@ -154,7 +154,7 @@ Ext.onReady(function () {
             }
         },
         {
-            header: "名稱", dataIndex: 'email_name', width: 150, align: 'center',
+            header: "姓名", dataIndex: 'email_name', width: 150, align: 'center',
             renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {//secretcopy
                 return "<span onclick='SecretLogin(" + record.data.email_id + "," + record.data.group_id + ",\"" + info_type + "\")'  >" + value + "</span>";
             }

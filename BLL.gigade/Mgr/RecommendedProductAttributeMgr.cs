@@ -62,5 +62,29 @@ namespace BLL.gigade.Mgr
                 throw new Exception("RecommendedProductAttributeDao-->Delete-->" + ex.Message, ex);
             }
         }
+
+        public string TempDelete(int userId,int productId,int comboType)
+        {
+            try
+            {
+                return _rProductAttribute.TempDelete(userId, productId, comboType);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("RecommendedProductAttributeMgr-->DeleteTemp-->" + ex.Message, ex);
+            }
+        }
+
+        public string SaveRecommendedProductAttributSet(RecommendedRroductAttributeTemp recommendBute)
+        {
+            try
+            {
+                return _rProductAttribute.SaveRecommendedProductAttributSet(recommendBute);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("RecommendedProductAttributeMgr-->SaveRecommendedProductAttributSet-->" + ex.Message, ex);
+            }
+        }
     }
 }

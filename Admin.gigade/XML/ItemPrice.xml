@@ -1,9 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <root>
-	<column key="product_id">商品Id(5碼)</column>
-	<column key="item_id">子商品Id(6碼)</column>
-	<column key="item_money">商品價格</column>
-	<column key="site_name">站臺</column>
-	<column key="user_level_str">等級</column>
+	<!--<column key="product_id">商品Id(5碼)</column>
+	<column key="item_id">子商品Id(6碼)</column>-->
+	<column key="site_name">站臺名稱</column>
+	<column key="product_id">商品編號</column>
+	<column key="product_name">商品名稱</column>
+	<column key="item_id">商品細項編號</column>
+	<column key="item_name">商品細項名稱</column>
+	<column key="product_status_str">商品狀態</column>
 	<column key="price_status_str">價格狀態</column>
+	<column key="item_money">售價</column>
+	<column key="item_cost">成本</column>
+	<column key="event_money">活動售價</column>
+	<column key="item_event_cost">活動成本</column>
 </root>

@@ -44,6 +44,6 @@ namespace BLL.gigade.Mgr.Impl
         List<OrderDetailQuery> GetOrderDetailList(OrderDetailQuery query);
         DataTable GetBuyAmountAndTaxType(OrderDetailQuery query);
         List<Vendor> GetVendor(Vendor query);
-
+        string OrderWaitClick(OrderMasterStatusQuery query);
     }
 }

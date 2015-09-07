@@ -1,7 +1,7 @@
 ﻿//品牌訂單查詢
 Ext.Loader.setConfig({ enabled: true });
-var info_type = "users";
-var secret_info = "";
+var info_type = "order_master1";
+var secret_info = "order_id;order_name";
 Ext.Loader.setPath('Ext.ux', '/Scripts/Ext4.0/ux');
 Ext.require([
     'Ext.form.Panel',
@@ -94,21 +94,6 @@ Ext.define('gigade.Users', {
         { name: "paper_invoice", type: "bool" }
     ]
 });
-secret_info = "user_id;user_email;user_name;user_mobile";
-var edit_UserStore = Ext.create('Ext.data.Store', {
-    //  autoDestroy: true,
-    pageSize: pageSize,
-    model: 'gigade.Users',
-    proxy: {
-        type: 'ajax',
-        url: '/Member/UsersList',
-        reader: {
-            type: 'json',
-            root: 'data',//在執行成功后。顯示數據。所以record.data.用戶字段可以直接讀取
-            totalProperty: 'totalCount'
-        }
-    }
-});
 
 var searchStatusrStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
@@ -158,8 +143,7 @@ Ext.onReady(function () {
                 xtype: 'fieldcontainer',
                 combineErrors: true,
                 layout: 'hbox',
-                margin: '5 0 0 5',
-               
+                margin: '5 0 0 5',               
                 items: [
                     {
                         xtype: 'combobox',
@@ -275,7 +259,7 @@ Ext.onReady(function () {
                         allowBlank: false,
                         editable: false,
                         submitValue: true,
-                        value: new Date(Today().setMonth(Today().getMonth() - 1)),
+                        value: new Date(new Date().setMonth(new Date().getMonth() - 1)),
                         listeners: {
                             select: function (a, b, c) {
                                 var Month = new Date(this.getValue()).getMonth() + 1;
@@ -283,11 +267,7 @@ Ext.onReady(function () {
                             }
                         }
                     },
-                    {
-                        xtype: 'displayfield',
-                        margin: '0 0 0 0',
-                        value: "~"
-                    },
+                    { xtype: 'displayfield',margin: '0 0 0 0',value: "~" },
                     {
                         xtype: "datefield",
                         format: 'Y-m-d',
@@ -297,7 +277,7 @@ Ext.onReady(function () {
                         allowBlank: false,
                         editable: false,
                         submitValue: true,
-                        value: Today(),
+                        value: new Date(),
                         listeners: {
                             select: function (a, b, c) {
                                 var start = Ext.getCmp("dateOne");
@@ -349,6 +329,7 @@ Ext.onReady(function () {
                         margin: '0 0 0 5',
                         iconCls: 'icon-excel',
                         id: 'btnExcel',
+                        hidden:true,//添加權限
                         handler: Export
                     }
                 ]
@@ -527,22 +508,16 @@ function TransToOrder(orderId) {
 }
 function onUserEditClick() {
     var row = Ext.getCmp("OrderBrandProducesListGrid").getSelectionModel().getSelection();
-    edit_UserStore.load({
-        params: { relation_id: row[0].data.user_id }
-    });
-    var secret_type = "1";//參數表中的"會員查詢列表"
-    var url = "/Member/UsersListIndex/Edit ";
-    var ralated_id = row[0].data.user_id;
-    var info_id = row[0].data.user_id;
+    var secret_type = "20";//參數表中的"訂單"
+    var url = "/OrderManage/BrandProductIndex";
+    var ralated_id = row[0].data.order_id;
+    var info_id = row[0].data.order_id;
     boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
-    secret_info = "user_id;";
     if (boolPassword != "-1") {
         if (boolPassword) {//驗證
-
-            SecretLoginFun(secret_type, ralated_id, true, false, true, url, info_type, info_id, secret_info);//先彈出驗證框，關閉時在彈出顯示框
+            SecretLoginFun(secret_type, ralated_id, true, true, false, url, info_type, info_id, secret_info);//先彈出驗證框，關閉時在彈出顯示框
         } else {
-            Ext.Msg.alert("", "查詢ID：" + row[0].data.order_id + "</br>訂購姓名:" + row[0].data.order_name);
-            // editFunction(ralated_id);
+            SecretLoginFun(secret_type, ralated_id, false, true, false, url, info_type, info_id, secret_info);//直接彈出顯示框
         }
     }
 

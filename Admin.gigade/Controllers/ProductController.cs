@@ -222,6 +222,7 @@ namespace Admin.gigade.Controllers
         public HttpResponseBase SaveBaseInfo(int course_id = 0)
         {
             string json = "{success:true}";
+            int transportDays = -1;
             try
             {
                 string prod_name = Request.Form["prod_name"] ?? "";
@@ -234,6 +235,44 @@ namespace Admin.gigade.Controllers
                     this.Response.End();
                     return this.Response;
                 }
+
+                ///add by wwei0216w 2015/8/24
+                ///根據product_mode查找供應商對應的自出,寄倉,調度欄位,如果為0則不予保存
+                uint brand_id = uint.Parse(Request.Form["brand_id"]??"0");
+                uint product_mode = uint.Parse(Request.Form["product_mode"]??"0");///獲得product_mode
+                string msg = "寄倉";
+                IVendorImplMgr _vendorMgr = new VendorMgr(connectionString);
+                List<Vendor> vendorList = _vendorMgr.GetArrayDaysInfo(brand_id);
+                if(vendorList.Count > 0)
+                {
+                    switch (product_mode)
+                    { 
+                        case 1:
+                            transportDays = vendorList.FirstOrDefault<Vendor>().self_send_days;
+                            msg = "自出";
+                            break;
+                        case 2:
+                            transportDays = vendorList.FirstOrDefault<Vendor>().stuff_ware_days;
+                            msg = "寄倉";
+                            break;
+                        case 3:
+                            msg = "調度";
+                            transportDays = vendorList.FirstOrDefault<Vendor>().dispatch_days;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (transportDays==0)
+                {
+                    json = "{success:false,msg:'" + msg + Resources.Product.TRANSPORT_DAYS + "'}";
+                    this.Response.Clear();
+                    this.Response.Write(json);
+                    this.Response.End();
+                    return this.Response;
+                }
+
 
                 ProductTemp pTemp = new ProductTemp();
                 _productTempMgr = new ProductTempMgr(connectionString);
@@ -249,13 +288,13 @@ namespace Admin.gigade.Controllers
                     p = _productMgr.Query(Query)[0];
                 }
 
-                uint brand_id = uint.Parse(Request.Form["brand_id"]);
+                
                 uint product_sort = uint.Parse(Request.Form["product_sort"]);
                 uint product_start = uint.Parse(CommonFunction.GetPHPTime(Request.Form["product_start"]).ToString());
                 uint product_end = uint.Parse(CommonFunction.GetPHPTime(Request.Form["product_end"]).ToString());
                 uint expect_time = uint.Parse(CommonFunction.GetPHPTime(Request.Form["expect_time"]).ToString());
                 uint product_freight_set = uint.Parse(Request.Form["product_freight_set"]);
-                uint product_mode = uint.Parse(Request.Form["product_mode"]);
+
 
                 string product_vendor_code = Request.Form["product_vendor_code"];
                 int tax_type = int.Parse(Request.Form["tax_type"]);
@@ -276,11 +315,17 @@ namespace Admin.gigade.Controllers
                 uint purchase_in_advance_start = uint.Parse(Request.Form["purchase_in_advance_start"]);
                 uint purchase_in_advance_end = uint.Parse(Request.Form["purchase_in_advance_end"]);
 
-                uint recommedde_jundge = uint.Parse(Request.Form["recommedde_jundge"]);
-                uint recommedde_time_start = uint.Parse(Request.Form["recommedde_time_start"]);
-                uint recommedde_time_end = uint.Parse(Request.Form["recommedde_time_end"]);
-                uint recommedde_expend_day = uint.Parse(Request.Form["recommedde_expend_day"]);
-
+                uint recommedde_jundge = uint.Parse(Request.Form["recommedde_jundge"]);//是否選擇了推薦商品屬性 1 表示推薦
+                string recommededcheckall = string.Empty;
+                uint recommedde_expend_day = 0;
+                if (recommedde_jundge == 1)
+                {
+                    if (!string.IsNullOrEmpty(Request.Params["recommededcheckall"]))
+                    {
+                        recommededcheckall = Request.Params["recommededcheckall"].ToString().TrimEnd(',');//選擇的所有的月數
+                    }
+                    recommedde_expend_day = uint.Parse(Request.Form["recommedde_expend_day"]);
+                }
                 pTemp.Brand_Id = brand_id;
                 pTemp.Prod_Name = prod_name;
                 pTemp.Prod_Sz = prod_sz;
@@ -317,10 +362,9 @@ namespace Admin.gigade.Controllers
 
                 //add dongya 2015/08/17
                 pTemp.recommedde_jundge = recommedde_jundge;//推薦商品 1表示推薦 0表示不推薦
-                pTemp.Recommended_time_start = recommedde_time_start;
-                pTemp.Recommended_time_end = recommedde_time_end;
+                pTemp.months = recommededcheckall;//以1,3,這樣的形式顯示
                 pTemp.expend_day = recommedde_expend_day;
-
+                
                 if (Request.Params["product_id"] != "")
                 {
                     p.Brand_Id = brand_id;
@@ -351,6 +395,9 @@ namespace Admin.gigade.Controllers
                     p.purchase_in_advance = purchase_in_advance;
                     p.purchase_in_advance_start = purchase_in_advance_start;
                     p.purchase_in_advance_end = purchase_in_advance_end;
+                    p.recommedde_jundge = recommedde_jundge;//表示是否推薦
+                    p.months = recommededcheckall;
+                    p.expend_day = recommedde_expend_day;
                 }
 
                 if (string.IsNullOrEmpty(Request.Params["product_id"]))
@@ -370,7 +417,7 @@ namespace Admin.gigade.Controllers
                         //插入
                         int result = 0;
                         result = _productTempMgr.baseInfoSave(pTemp);
-                        if (result == 1)
+                        if (result >0)//裡面加入一個新的sql
                         {
                             json = "{success:true}";
                         }
@@ -472,13 +519,15 @@ namespace Admin.gigade.Controllers
                         }
                         #endregion
 
-                        #region 推薦商品屬性插入recommended_product_attribute表中做記錄
+                        #region 推薦商品屬性插入/修改recommended_product_attribute表中做記錄 add by dongya 2015/09/30 ----目前只針對單一商品
                         RecommendedProductAttributeMgr rProductAttributeMgr = new RecommendedProductAttributeMgr(connectionString);
                         RecommendedProductAttribute rPA = new RecommendedProductAttribute();
                         rPA.product_id = Convert.ToUInt32(Query.Product_Id);
                         rPA.time_start = pTemp.Recommended_time_start;
                         rPA.time_end = pTemp.Recommended_time_end;
                         rPA.expend_day = pTemp.expend_day;
+                        rPA.months = pTemp.months;
+                        rPA.combo_type = 1;
                         //首先判斷表中是否對該product_id設置為推薦
                         int productId = Convert.ToInt32(rPA.product_id);
                         if (rProductAttributeMgr.GetMsgByProductId(productId) > 0)//如果大於0,表示推薦表中存在數據

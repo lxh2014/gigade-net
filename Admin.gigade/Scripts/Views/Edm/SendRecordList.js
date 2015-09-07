@@ -61,7 +61,7 @@ Ext.onReady(function () {
             
             xtype: 'fieldcontainer',
             layout: 'hbox',
-            fieldLabel: '名稱',
+            fieldLabel: '姓名',
             items: [
                 {
                     xtype: 'displayfield',

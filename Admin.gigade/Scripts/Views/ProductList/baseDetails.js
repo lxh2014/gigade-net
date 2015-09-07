@@ -132,6 +132,7 @@
         }, {
             xtype: 'displayfield',
             width: 400,
+            labelWidth: 110,
             id: 'expect_msg',
             fieldLabel: EXPECT_MSG,//預計出貨信息
             //hidden: true,
@@ -265,7 +266,7 @@
             width: 400,
             id: 'sale_name',//販售狀態
             fieldLabel: TRAFFIC_TYPE,
-            name: 'sale_name',
+            name: 'sale_name'
             //style: { borderBottom: '1px solid #ced9e7' }
             //hidden: true,
             //colName: 'product_kind',

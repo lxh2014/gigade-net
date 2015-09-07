@@ -9,7 +9,8 @@ var pageSize = 50;
 var winDetail;
 var productId;
 var statusname;
-
+var info_type = "order_master";
+var secret_info = "order_id;order_name;order_phone;order_mobile;order_address;delivery_name;delivery_phone;delivery_mobile;delivery_address";
 //地址Mode
 Ext.define("gigade.user_zip", {
     extend: 'Ext.data.Model',
@@ -32,6 +33,120 @@ var user_zip_source = Ext.create('Ext.data.Store', {
         }
     }
 });
+//自取狀態
+Ext.define('gigade.PaymentZQ', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: "parameterCode", type: "string" },
+        { name: "ParameterName", type: "string" }
+    ]
+});
+var ZQStore = Ext.create('Ext.data.Store', {
+    autoLoad: true,
+    model: 'gigade.PaymentZQ',
+    proxy: {
+        type: 'ajax',
+        url: '/OrderManage/GetZQ',
+        actionMethods: 'post',
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
+//用作編輯時獲得數據包含機敏信息
+Ext.define('gigade.Users', {
+    extend: 'Ext.data.Model',
+    fields: [
+    { name: "user_id", type: "int" }, //用戶編號     上面的是編輯的時候關係到的
+    { name: "user_email", type: "string" }, //用戶郵箱
+    { name: "user_name", type: "string" }, //用戶名
+    { name: "user_password", type: "string" }, //密碼
+    { name: "user_gender", type: "string" }, //性別
+    { name: "user_birthday_year", type: "string" }, //年
+    { name: "user_birthday_month", type: "string" }, //月
+    { name: "user_birthday_day", type: "string" }, //日
+    { name: "birthday", type: "string" }, //生日 
+    { name: "user_zip", type: "string" }, //用戶地址
+    { name: "user_address", type: "string" }, //用戶地址
+    { name: "user_actkey", type: "string" },
+    { name: "user_mobile", type: "string" },
+    { name: "user_phone", type: "string" }, //行動電話
+    { name: "reg_date", type: "string" }, //註冊日期 
+    { name: "mytype", type: "string" },//會員類別
+    { name: "send_sms_ad", type: "bool" }, //是否接收簡訊廣告 
+    { name: "adm_note", type: "string" }, //管理員備註   上面這些編輯時要帶入的值
+    { name: "user_type", type: "string" }, //用戶類別   下面的這些結合上面的會顯示在列表頁
+    { name: "user_status", type: "string" }, //用戶狀態
+    { name: "user_level", type: "int" }, //會員等級
+    { name: "userLevel", type: "string" }, //會員等級
+    { name: "sfirst_time", type: "string" }, //首次註冊時間
+    { name: "slast_time", type: "string" }, //下次時間
+    { name: "sbe4_last_time", type: "string" }, //下下次時間
+    { name: "user_company_id", type: "string" },
+    { name: "user_source", type: "string" },
+    { name: "source_trace", type: "string" },
+    { name: "s_id", type: "string" },
+    { name: "source_trace_url", type: "string" },
+    { name: "redirect_name", type: "string" },
+    { name: "redirect_url", type: "string" },
+    { name: "paper_invoice", type: "bool" },
+    { name: "ml_code", type: "string" }
+    ]
+});
+var edit_UserStore = Ext.create('Ext.data.Store', {
+    pageSize: pageSize,
+    model: 'gigade.Users',
+    proxy: {
+        type: 'ajax',
+        url: '/Member/UsersList',
+        reader: {
+            type: 'json',
+            root: 'data',//在執行成功后。顯示數據。所以record.data.用戶字段可以直接讀取
+            totalProperty: 'totalCount'
+        }
+    }
+});
+Ext.define('gigade.UserLife', {
+    extend: 'Ext.data.Model',
+    fields: [
+    { name: "user_id", type: "int" },
+    { name: "user_marriage", type: "int" },
+    { name: "child_num", type: "int" },
+    { name: "vegetarian_type", type: "int" },
+    { name: "like_fivespice", type: "int" },
+    { name: "like_contact", type: "string" },
+    { name: "like_time", type: "int" },
+    { name: "work_type", type: "int" },
+    { name: "cancel_edm_date", type: "string" },
+    { name: "disable_date", type: "string" },
+    { name: "cancel_info_date", type: "string" },
+    { name: "user_educated", type: "int" },
+    { name: "user_salary", type: "int" },
+    { name: "user_religion", type: "int" },
+    { name: "user_constellation", type: "int" }
+
+    ]
+});
+var UserLifeStore = Ext.create('Ext.data.Store', {
+    model: 'gigade.UserLife',
+    proxy: {
+        type: 'ajax',
+        url: '/Member/GetUserLife',
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
+edit_UserStore.on('beforeload', function () {
+    Ext.apply(edit_UserStore.proxy.extraParams, {
+        relation_id: "",
+        isSecret: false
+    });
+});
+
+
 Ext.define("t_zip", {
     extend: 'Ext.data.Model',
     fields: [
@@ -427,7 +542,6 @@ Ext.onReady(function () {
         { xtype: 'button', text: "等待付款", id: 'wait', disabled: true, handler: onWaitClick },
         { xtype: 'button', text: "轉自取", id: 'change', disabled: true, handler: onChangePayment_cash },
         { xtype: 'button', text: "轉黑貓貨到付款", id: 't_cat', disabled: true, handler: onChangePayment_cat }
-
         ],
         //bbar: Ext.create('Ext.PagingToolbar', {
         //    store: orderListStore,
@@ -817,13 +931,15 @@ Ext.onReady(function () {
                     xtype: 'displayfield',
                     fieldLabel: '市內電話',
                     id: 'order_phone',
-                    name: 'order_phone'
+                    name: 'order_phone',
+                    width: 350
                 },
                 {
                     xtype: 'displayfield',
                     fieldLabel: '手機',
                     id: 'order_mobile',
-                    name: 'order_mobile'
+                    name: 'order_mobile',
+                    width: 350
                 },
                 {
                     xtype: 'fieldcontainer',
@@ -860,35 +976,39 @@ Ext.onReady(function () {
                 fieldLabel: '姓名',
                 id: 'delivery_name',
                 name: 'delivery_name',
-                listeners: {
-                    'beforerender': function () {
-                        //if (document.getElementById('c_delivery_same').value == "1") {
-                        //    Ext.getCmp('delivery_phone').hidden = true;
-                        //    Ext.getCmp('delivery_mobile').hidden = true;
-                        //    //Ext.getCmp('delivery_zip').hidden = true;
-                        //    Ext.getCmp('delivery_address').hidden = true;
-                        //    Ext.getCmp('address').hidden = true;
-                        //    Ext.getCmp('delivery_name').setValue("《同購買人》");
-                        //}
-                        //else {
-                            var name = document.getElementById('c_delivery_name').value;
-                            var gender = document.getElementById('c_delivery_gender').value == "0" ? "小姐" : "先生";
-                            Ext.getCmp('delivery_name').setValue(name + "/ " + gender);
-                        }
-                    //}
-                }
+                width: 350
+                //listeners: {
+                //    'beforerender': function () {
+                //        //if (document.getElementById('c_delivery_same').value == "1") {
+                //        //    Ext.getCmp('delivery_phone').hidden = true;
+                //        //    Ext.getCmp('delivery_mobile').hidden = true;
+                //        //    //Ext.getCmp('delivery_zip').hidden = true;
+                //        //    Ext.getCmp('delivery_address').hidden = true;
+                //        //    Ext.getCmp('address').hidden = true;
+                //        //    Ext.getCmp('delivery_name').setValue("《同購買人》");
+                //        //}
+                //        //else {
+                //            var name = document.getElementById('c_delivery_name').value;
+                //            var gender = document.getElementById('c_delivery_gender').value == "0" ? "小姐" : "先生";
+                //            //Ext.getCmp('delivery_name').setValue(name + "/ " + gender);
+                //            Ext.getCmp('delivery_name').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + name + "|" + gender + "</a>");
+                //        }
+                //    //}
+                //}
             },
             {
                 xtype: 'displayfield',
                 fieldLabel: '市內電話',
                 id: 'delivery_phone',
-                name: 'delivery_phone'
+                name: 'delivery_phone',
+                width: 350
             },
             {
                 xtype: 'displayfield',
                 fieldLabel: '手機',
                 id: 'delivery_mobile',
-                name: 'delivery_mobile'
+                name: 'delivery_mobile',
+                width: 350
             },
             {
                 xtype: 'fieldcontainer',
@@ -1043,18 +1163,27 @@ Ext.onReady(function () {
                             else {
                                 Ext.getCmp('money_return').setValue(result.data.money_return + " 元");
                             }
-                            var orderGender = result.data.order_gender == "0" ? "小姐" : "先生";
-                            Ext.getCmp('order_name').setValue("<a href='javascript:void(0);' onclick='oneditUser()'>" + result.data.order_name + "</a>" + " / " + orderGender);
-                            Ext.getCmp('order_phone').setValue(result.data.order_phone);
-                            Ext.getCmp('order_mobile').setValue(result.data.order_mobile);
-                            //Ext.getCmp('order_zip').setValue(result.data.order_zip);
-                            Ext.getCmp('order_address').setValue(result.data.order_address);
-                            Ext.getCmp('delivery_phone').setValue(result.data.delivery_phone);
-                            Ext.getCmp('delivery_mobile').setValue(result.data.delivery_mobile);
                             Ext.getCmp('note_order').setValue("<span style='color:red'>" + result.data.note_order + "</span>");
-                            //Ext.getCmp('delivery_zip').setValue(result.data.delivery_zip);
-                            Ext.getCmp('delivery_address').setValue(result.data.delivery_address);
                             Ext.getCmp('note_admin').setValue(result.data.note_admin);
+
+                            var orderGender = result.data.order_gender == "0" ? "小姐" : "先生";
+                            //購買人添加資安
+                            Ext.getCmp('order_name').setValue("<a href='javascript:void(0);' onclick='oneditUser(" + result.data.user_id + ")'>" + result.data.order_name + "</a>" + " / " + orderGender);
+                            //Ext.getCmp('order_phone').setValue(result.data.order_phone);
+                            Ext.getCmp('order_phone').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.order_phone + "</a>");
+                            //Ext.getCmp('order_mobile').setValue(result.data.order_mobile);
+                            Ext.getCmp('order_mobile').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.order_mobile + "</a>");
+                            //Ext.getCmp('order_zip').setValue(result.data.order_zip);
+                            //Ext.getCmp('order_address').setValue(result.data.order_address);
+                            Ext.getCmp('order_address').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.order_address + "</a>");
+                            //Ext.getCmp('delivery_phone').setValue(result.data.delivery_phone);
+                            Ext.getCmp('delivery_phone').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.delivery_phone + "</a>");
+                            //Ext.getCmp('delivery_mobile').setValue(result.data.delivery_mobile);
+                            Ext.getCmp('delivery_mobile').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.delivery_mobile + "</a>");
+                            //Ext.getCmp('delivery_zip').setValue(result.data.delivery_zip);
+                            //Ext.getCmp('delivery_address').setValue(result.data.delivery_address);
+                            Ext.getCmp('delivery_address').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.delivery_address + "</a>");
+                            Ext.getCmp('delivery_name').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.delivery_name + "</a>" + "/" + orderGender);
                             //等待付款加驗證
                             if (result.data.order_status == 1 || result.data.order_status == 2 || result.data.order_status == 10 || result.data.order_status == 20) {
                                 Ext.getCmp('wait').setDisabled(false);
@@ -1080,6 +1209,8 @@ Ext.onReady(function () {
                                 Ext.getCmp('change').setDisabled(true);
                                 Ext.getCmp('t_cat').setDisabled(true);
                             }
+
+                            //購買人
                         }
                     }
                 });
@@ -1129,7 +1260,7 @@ Ext.onReady(function () {
 onReturnALLOrderClick = function () {
     var order_id = Ext.getCmp('order_id').getValue();
    // alert(order_id + statusname);
-    editFunction(order_id, statusname);
+    ReturnALLOrderFunction(order_id, statusname);
 }
 
 //獲取要顯示的付款單號
@@ -1301,9 +1432,9 @@ onEditNoteAdmin = function () {
 onAddStatus = function () {
     addStatus();
 }
-oneditUser = function () {
-    userEdit(document.getElementById('OrderId').value);
-}
+//oneditUser = function () {
+//    userEdit(document.getElementById('OrderId').value);
+//}
 //訂單退貨功能
 onReturnClick = function () {
     var row = Ext.getCmp("orderListGrid").getSelectionModel().getSelection();
@@ -1485,40 +1616,107 @@ onWaitClick = function () {
     WaitWin.show();
 }
 onChangePayment_cash = function () {
-    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
-    myMask.show();
-    Ext.Ajax.request({
-        url: '/OrderManage/ChangePayment',
-        method: 'post',
-        reader: {
-            type: 'json',
-            root: 'data'
-        },
-        params: {
-            payment: "PAYMENT_CASH",
-            delivery: '12',
-            order_id: document.getElementById('OrderId').value,
-        },
-        success: function (form, action) {
-            myMask.hide();
-            var result = Ext.decode(form.responseText);
-            myMask.hide();
-            if (result.msg == 1) {
-                Ext.Msg.alert("提示", "con報錯！");
-            } else if (result.msg == 2) {
-                Ext.Msg.alert("錯誤提示", "sql執行錯！");
-            } else if (result.msg == 3) {
-                Ext.Msg.alert("錯誤提示", "slave沒數據！");
-            } else {
-                Ext.Msg.alert("提示", "轉自取成功!");
-                TranToDetial(document.getElementById('OrderId').value);
-            }
-        },
-        failure: function () {
-            myMask.hide();
-            Ext.Msg.alert("提示", "出現異常!");
-        }
-    })
+        var cashFrm = Ext.create('Ext.form.Panel', {
+            id: 'cashFrm',
+            frame: true,
+            plain: true,
+            defaultType: 'textfield',
+            layout: 'anchor',
+            autoScroll: true,
+            labelWidth: 45,
+            url: '/OrderManage/ChangePayment',
+            defaults: { anchor: "95%", msgTarget: "side", labelWidth: 120 },
+            items: [
+                {
+                    xtype: 'combobox',
+                    allowBlank: true,
+                    fieldLabel: '轉自取地址',
+                    hidden: false,
+                    id: 'deliver_store',
+                    name: 'deliver_store',
+                    store: ZQStore,
+                    margin: '0 10 0 5',
+                    displayField: 'ParameterName',
+                    valueField: 'parameterCode',
+                    typeAhead: true,
+                    allowBlank:false,
+                    forceSelection: false,
+                    editable: false
+                }
+            ],
+            buttons: [{
+                text: SAVE,
+                formBind: true,
+                disabled: true,
+                handler: function () {
+                    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                    myMask.show();
+                    var form = this.up('form').getForm();
+                    if (form.isValid()) {
+                        form.submit({
+                            params: {
+                                payment: "PAYMENT_CASH",
+                                delivery: '12',
+                                order_id: document.getElementById('OrderId').value,
+                                delivery_store: Ext.getCmp("deliver_store").getValue()
+                            },
+                            success: function (form, action) {
+                                var result = Ext.decode(action.response.responseText);
+                                myMask.hide();
+                                if (result.msg == 1) {
+                                    Ext.Msg.alert("提示", "con報錯！");
+                                } else if (result.msg == 2) {
+                                    Ext.Msg.alert("錯誤提示", "sql執行錯！");
+                                } else if (result.msg == 3) {
+                                    Ext.Msg.alert("錯誤提示", "slave沒數據！");
+                                } else {
+                                    Ext.Msg.alert("提示", "轉自取成功!");
+                                    TranToDetial(document.getElementById('OrderId').value);
+                                }
+                            },
+                            failure: function () {
+                                Ext.Msg.alert("提示", "出現異常!");
+                                myMask.hide();
+                            }
+                        });
+                    }
+                }
+            }]
+        });
+        var cashWin = Ext.create('Ext.window.Window', {
+            title: '轉自取詳情',
+            id: 'cashWin',
+            iconCls: 'icon-user-edit',
+            width: 400,
+            height: 150,
+            layout: 'fit',
+            items: [cashFrm],
+            closeAction: 'destroy',
+            modal: true,
+            resizable: false,
+            constrain: true,
+            labelWidth: 60,
+            bodyStyle: 'padding:5px 5px 5px 5px',
+            margin: '5px 0px 0px 0px',
+            closable: false,
+            tools: [
+                {
+                    type: 'close',
+                    qtip: "關閉",
+                    handler: function (event, toolEl, panel) {
+                        Ext.MessageBox.confirm(CONFIRM, IS_CLOSEFORM, function (btn) {
+                            if (btn == "yes") {
+                                Ext.getCmp('cashWin').destroy();
+                            }
+                            else {
+                                return false;
+                            }
+                        });
+                    }
+                }
+            ]
+        });
+        cashWin.show();
 }
     
 onChangePayment_cat = function () {
@@ -1575,6 +1773,42 @@ function TranToDetial(orderId) {
     panel.setActiveTab(copy);
     panel.doLayout();
     old.close();
+}
+
+//資安
+function SecretLogin(rid, info_id, info_type) {//secretcopy
+    var secret_type = "20";//參數表中的"訊息管理"可根據需要修改
+    var url = "/OrderManage/GetData";//這個可能在後面的SecretController中用到
+    var ralated_id = rid;
+    //點擊機敏信息先保存記錄在驗證密碼是否需要輸入
+    boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+    if (boolPassword != "-1") {//不准查看
+        if (boolPassword) {//超過5分鐘沒有輸入密碼      
+            SecretLoginFun(secret_type, ralated_id, true, true, false, url, info_type, info_id, secret_info);//先彈出驗證框，關閉時在彈出顯示框
+
+        } else {
+            SecretLoginFun(secret_type, ralated_id, false, true, false, url, info_type, info_id, secret_info);//直接彈出顯示框
+        }
+    }
+}
+oneditUser = function (user_id) {
+  //  alert(user_id);
+   // var row = Ext.getCmp('OrderBrandProducesListGrid').getSelectionModel().getSelection();
+    // alert(row[0].data.user_id);
+    //editFunction(user_id);
+    var secret_type = '20';
+    var url = "/Member/UsersListIndex/Edit ";
+    var ralated_id = user_id;
+    var info_id = user_id;
+    boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+    if (boolPassword != "-1") {
+        if (boolPassword) {
+            SecretLoginFun(secret_type, ralated_id, true, false, true, url, "", info_id, "");//先彈出驗證框，關閉時在彈出顯示框
+        }
+        else {
+            editFunction(ralated_id);
+        }
+    }
 }
 //訂單退貨詳情
 //DesigneeFunction = function (rowIDs) {

@@ -1,7 +1,7 @@
 ﻿//供應商訂單查詢
 Ext.Loader.setConfig({ enabled: true });
-var info_type = "users";
-var secret_info = "";
+var info_type = "order_master1";
+var secret_info = "order_id;order_name";
 Ext.Loader.setPath('Ext.ux', '/Scripts/Ext4.0/ux');
 Ext.require([
     'Ext.form.Panel',
@@ -137,8 +137,7 @@ var dateStore = Ext.create('Ext.data.Store', {
         { "txt": FDATE, "value": "5" },
     ]
 });
-OrderBrandProducesListStore.on('beforeload', function () {
-  
+OrderBrandProducesListStore.on('beforeload', function () {  
     Ext.apply(OrderBrandProducesListStore.proxy.extraParams, {
         selecttype: Ext.getCmp('select_type').getValue(), //選擇查詢種類
         searchcon: Ext.getCmp('search_con').getValue(),
@@ -157,7 +156,7 @@ Ext.onReady(function () {
     var frm = Ext.create('Ext.form.Panel', {
         id: 'frm',
         layout: 'anchor',
-        height: 120,
+        height: 140,
         border: 0,
         width: document.documentElement.clientWidth,
         items: [
@@ -339,79 +338,89 @@ Ext.onReady(function () {
                 margin: '0 0 0 5',
                 fieldLabel: DELIVERYTYPE,
                 items: [
-                {
-                    xtype: 'combobox',
-                    hidden: false,
-                    id: 'product_freight_set',
-                    name: 'product_freight_set',
-                    store: FreightSetStore,
-                    queryMode: 'local',
-                    labelWidth: 80,
-                    displayField: 'parameterName',
-                    valueField: 'ParameterCode',
-                    typeAhead: true,
-                    multiSelect: true, //多選
-                    forceSelection: false,
-                    editable: false,
-                    emptyText: "請選擇",
-                    listeners: {
-                        beforerender: function () {
-                            FreightSetStore.load();
+                    {
+                        xtype: 'combobox',
+                        hidden: false,
+                        id: 'product_freight_set',
+                        name: 'product_freight_set',
+                        store: FreightSetStore,
+                        queryMode: 'local',
+                        labelWidth: 80,
+                        displayField: 'parameterName',
+                        valueField: 'ParameterCode',
+                        typeAhead: true,
+                        multiSelect: true, //多選
+                        forceSelection: false,
+                        editable: false,
+                        emptyText: "請選擇",
+                        listeners: {
+                            beforerender: function () {
+                                FreightSetStore.load();
+                            }
                         }
+                    },
+                    {
+                        xtype: 'combobox',
+                        allowBlank: true,
+                        fieldLabel: VMANAGE,
+                        hidden: false,
+                        id: 'product_manage',
+                        name: 'product_manage',
+                        store: ProductManageStore,
+                        labelWidth: 100,
+                        margin: '0 10 0 5',
+                        displayField: 'userName',
+                        valueField: 'userId',
+                        typeAhead: true,
+                        forceSelection: false,
+                        editable: false,
+                        emptyText: ALLMANAGE
                     }
-                },
-                {
-                    xtype: 'combobox',
-                    allowBlank: true,
-                    fieldLabel: VMANAGE,
-                    hidden: false,
-                    id: 'product_manage',
-                    name: 'product_manage',
-                    store: ProductManageStore,
-                    labelWidth: 100,
-                    margin: '0 10 0 5',
-                    displayField: 'userName',
-                    valueField: 'userId',
-                    typeAhead: true,
-                    forceSelection: false,
-                    editable: false,
-                    emptyText: ALLMANAGE
-                },
-                {
-                    xtype: 'button',
-                    text: SEARCH,
-                    iconCls: 'icon-search',
-                    margin: '0 0 0 5',
-                    id: 'btnQuery',
-                    handler: Query
-                },
-                {
-                    xtype: 'button',
-                    text: "重置",
-                    iconCls: 'ui-icon ui-icon-reset',
-                    margin: '0 0 0 5',
-                    id: 'btnresert',
-                    listeners: {
-                        click: function () {
-                            Ext.getCmp("datetype").setValue(1);
-                            Ext.getCmp("Vendor").setValue(0);
-                            Ext.getCmp("select_type").setValue(0);
-                            Ext.getCmp("order_status").setValue(-1);
-                            Ext.getCmp("order_payment").setValue(0);
-                            Ext.getCmp("search_con").setValue("");
-                            Ext.getCmp("product_freight_set").setValue("");
-                            Ext.getCmp("product_manage").setValue("");
-                            Ext.getCmp('dateStart').setValue(new Date(Today().setMonth(Today().getMonth() - 1)));
-                            Ext.getCmp('dateEnd').setValue(Today());
-                        }
-                    }
-                },
+                ]
+            },
+            {
+                xtype: 'fieldcontainer',
+                combineErrors: true,
+                layout: 'hbox',
+                margin: '0 0 0 5',
+                items: [
                     {
                         xtype: 'button',
-                        id: 'Export',
+                        text: "查詢",
+                        iconCls: 'icon-search',
                         margin: '0 0 0 5',
-                        text: EXPORT,
+                        id: 'btnQuery',
+                        hidden: true,
+                        handler: Query
+                    },
+                    {
+                        xtype: 'button',
+                        text: "重置",
+                        iconCls: 'ui-icon ui-icon-reset',
+                        margin: '0 0 0 5',
+                        id: 'btnresert',
+                        listeners: {
+                            click: function () {
+                                Ext.getCmp("datetype").setValue(1);
+                                Ext.getCmp("Vendor").setValue(0);
+                                Ext.getCmp("select_type").setValue(0);
+                                Ext.getCmp("order_status").setValue(-1);
+                                Ext.getCmp("order_payment").setValue(0);
+                                Ext.getCmp("search_con").setValue("");
+                                Ext.getCmp("product_freight_set").setValue("");
+                                Ext.getCmp("product_manage").setValue("");
+                                Ext.getCmp('dateStart').setValue(new Date(Today().setMonth(Today().getMonth() - 1)));
+                                Ext.getCmp('dateEnd').setValue(Today());
+                            }
+                        }
+                    },                    
+                    {
+                        xtype: 'button',
+                        text: '匯出Excel',
+                        margin: '0 0 0 5',
                         iconCls: 'icon-excel',
+                        id: 'btnExcel',
+                        hidden:true,
                         handler: Export
                     }
                 ]
@@ -553,7 +562,7 @@ Ext.onReady(function () {
             }
         }
     });
-    // ToolAuthority();
+    ToolAuthority();
     // OrderBrandProducesListStore.load({ params: { start: 0, limit: 22 } });
 })
 onEditClick = function () {
@@ -616,27 +625,18 @@ function TransToOrder(orderId) {
     panel.setActiveTab(copy);
     panel.doLayout();
 }
-//function onUserEditClick() {
-//    var row = Ext.getCmp("OrderBrandProducesListGrid").getSelectionModel().getSelection();
-//    edit_UserStore.load({
-//        params: { relation_id: row[0].data.user_id }
-//    });
-//    var secret_type = "1";//參數表中的"會員查詢列表"
-//    var url = "/Member/UsersListIndex/Edit ";
-//    var ralated_id = row[0].data.user_id;
-//    var info_id = row[0].data.user_id;
-//    boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
-//    secret_info = "user_id;";
-//    if (boolPassword != "-1") {
-//        if (boolPassword) {//驗證
-           
-//            SecretLoginFun(secret_type, ralated_id, true, false, true, url, info_type, info_id, secret_info);//先彈出驗證框，關閉時在彈出顯示框
-//        } else {
-//            Ext.Msg.alert("", "查詢ID：" + row[0].data.order_id + "</br>訂購姓名:" + row[0].data.order_name);
-//           // editFunction(ralated_id);
-//        }
-//    }
-
-//    //editFunction(row[0], OrderUserReduceListStore);//user_id
-//    // editFunction(row[0].data.user_id);
-//}
+function onUserEditClick() {
+    var row = Ext.getCmp("OrderBrandProducesListGrid").getSelectionModel().getSelection();
+    var secret_type = "20";//參數表中的"訂單"
+    var url = "/OrderManage/BrandProductIndex";
+    var ralated_id = row[0].data.order_id;
+    var info_id = row[0].data.order_id;
+    boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+    if (boolPassword != "-1") {
+        if (boolPassword) {//驗證
+            SecretLoginFun(secret_type, ralated_id, true, true, false, url, info_type, info_id, secret_info);//先彈出驗證框，關閉時在彈出顯示框
+        } else {
+            SecretLoginFun(secret_type, ralated_id, false, true, false, url, info_type, info_id, secret_info);//直接彈出顯示框
+        }
+    }
+}

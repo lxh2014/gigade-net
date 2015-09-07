@@ -14,7 +14,7 @@ namespace BLL.gigade.Dao.Impl
         /// </summary>
         /// <param name="totalCount">總頁數</param>
         /// <returns></returns>
-        List<AppNotifyPoolQuery> GetAppnotifypool(AppNotifyPool ap, out int totalCount);
+        List<AppNotifyPoolQuery> GetAppnotifypool(AppNotifyPoolQuery ap, out int totalCount);
             /// <summary>
         /// Appnotifypool表增加方法
         /// </summary>

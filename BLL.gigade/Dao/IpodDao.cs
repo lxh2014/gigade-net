@@ -71,17 +71,19 @@ namespace BLL.gigade.Dao
             StringBuilder sqlCondi = new StringBuilder();
             try
             {
-                sql.Append(@" select ipl.loc_id,pi.item_id,p.product_freight_set,pi.erp_id,p.product_name,p.spec_title_1,p.spec_title_2,pi.spec_id_1,pi.spec_id_2,i.row_id,i.po_id,i.pod_id,i.plst_id,i.bkord_allow,i.cde_dt_incr,i.cde_dt_var,i.cde_dt_shp,i.pwy_dte_ctl,i.qty_ord,i.qty_damaged,i.qty_claimed,i.promo_invs_flg,i.req_cost, ");
-                sql.Append(" i.off_invoice,i.new_cost,i.freight_price,i.prod_id,i.create_user,i.create_dtim ");
+                sql.Append(@" select ipl.loc_id,p.product_id,p.product_name,dfsm.delivery_freight_set as product_freight_set,pi.erp_id,p.product_name,p.spec_title_1,p.spec_title_2,pi.spec_id_1,pi.spec_id_2,i.row_id,i.po_id,i.pod_id,i.plst_id,i.bkord_allow,i.cde_dt_incr,i.cde_dt_var,i.cde_dt_shp,i.pwy_dte_ctl,i.qty_ord,i.qty_damaged,i.qty_claimed,i.promo_invs_flg,i.req_cost, ");
+                sql.Append(" i.off_invoice,i.new_cost,i.freight_price,i.prod_id,i.create_user,i.create_dtim,mu.user_username,i.change_user,i.change_dtim ");
                 sqlCondi.Append(" from ipod i ");
                 sqlCondi.Append(" left join product_item pi on pi.item_id=i.prod_id ");
                 sqlCondi.Append(" inner join product p on pi.product_id=p.product_id ");
+                sqlCondi.Append(" left join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set ");
                 sqlCondi.Append(" left join iplas ipl on ipl.item_id=i.prod_id ");
+                sqlCondi.Append("LEFT JOIN manage_user mu on mu.user_id=i.change_user "); 
                 sqlCondi.Append(" where 1=1 ");
                 if (!string.IsNullOrEmpty(query.po_id))
                 {
                     sqlCondi.AppendFormat(" and i.po_id='{0}' ", query.po_id);
-                }
+                } 
 
                 sqlCondi.Append(" order by ipl.loc_id desc; ");
                 
@@ -144,6 +146,27 @@ namespace BLL.gigade.Dao
             }
         }
         /// <summary>
+        /// 採購單驗收
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public int UpdateIpodCheck(IpodQuery query)
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                sb.AppendFormat("set sql_safe_updates=0;");
+                sb.AppendFormat(" update ipod set qty_damaged='{0}',qty_claimed='{1}',plst_id='{2}' ", query.qty_damaged, query.qty_claimed,query.plst_id);
+                sb.AppendFormat(" ,change_user='{0}',change_dtim='{1}' where row_id='{2}'; ", query.change_user, Common.CommonFunction.DateTimeToString(query.change_dtim), query.row_id);
+                sb.AppendFormat("set sql_safe_updates=0;");
+                return _access.execCommand(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IpodDao.UpdateIpodCheck-->" + ex.Message + sb.ToString(), ex);
+            }
+        }
+        /// <summary>
         /// 採購單單身的序號-->通過採購單單號來算出序號
         /// </summary>
         /// <param name="query"></param>
@@ -191,6 +214,45 @@ namespace BLL.gigade.Dao
                 throw new Exception("IpodDao.GetPodID-->" + ex.Message + sb.ToString(), ex);
             }
         }
+        public bool GetIpodfreight(string po_id, int freight)
+       {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sqlCondi = new StringBuilder();
+            bool result=false;
+            try
+            {
+                sql.Append(@" select dfsm.delivery_freight_set as product_freight_set");
+                sqlCondi.Append(" from ipod i ");
+                sqlCondi.Append(" left join product_item pi on pi.item_id=i.prod_id ");
+                sqlCondi.Append(" inner join product p on pi.product_id=p.product_id ");
+                sqlCondi.Append(" left join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set ");
+                sqlCondi.Append(" left join iplas ipl on ipl.item_id=i.prod_id ");
+                sqlCondi.Append(" LEFT JOIN manage_user mu on mu.user_id=i.change_user ");
+                sqlCondi.Append(" where 1=1 ");
+                if (!string.IsNullOrEmpty(po_id))
+                {
+                    sqlCondi.AppendFormat(" and i.po_id='{0}' ", po_id);
+                }
+                sqlCondi.AppendFormat(" and dfsm.delivery_freight_set='{0}' ", freight);
+               
+                sql.Append(sqlCondi.ToString());
+                DataTable _dt = _access.getDataTable(sql.ToString());
+                if (_dt.Rows.Count > 0)
+                {
+                    result = true;
+                }
+                else
+                {
+                    result = false;
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("IpodDao-->GetIpodfreight-->" + ex.Message, ex);
+            }
+       }
 
     }
 }

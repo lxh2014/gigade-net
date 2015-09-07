@@ -138,6 +138,20 @@ namespace BLL.gigade.Dao
                 throw new Exception("ZipDao-->Getaddress-->" + ex.Message + strSql.ToString(), ex);
             }
         }
+
+        public List<Zip> GetZipList()
+        {
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+                strSql.AppendFormat("SELECT big,bigcode FROM t_zip_code GROUP BY bigcode; ");
+                return _accessMySql.getDataTableForObj<Zip>(strSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ZipDao-->GetZipList-->" + ex.Message + strSql.ToString(), ex);
+            }
+        }
         #endregion
     }
 }

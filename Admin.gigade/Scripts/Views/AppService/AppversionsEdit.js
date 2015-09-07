@@ -15,12 +15,6 @@
 /****************  驗證（Vtype）開始  *******************/
 //版本ID驗證
 var Versions_idRegstr = /^\d*$/;
-Ext.apply(Ext.form.field.VTypes, {
-    regxVersions_id: function (val, field) {
-        return Versions_idRegstr.test(val)
-    },
-    regxVersions_idText: REGXVERSIONS_ID
-});
 /****************  驗證（Vtype）結束  *******************/
 
 
@@ -38,10 +32,11 @@ function SaveReport(row) {
         triggerAction: 'all',
         queryMode: 'local',
         selectOnFocus: true,
+        allowBlank: false,
         forceSelection: true,
         editable: false,
-        emptyText: SHULDCHECK + DRIVERTEXT,
-        blankText: SHULDCHECK + DRIVERTEXT,
+        emptyText: SHULDWRITEDRIVERTEXT,
+        blankText: SHULDWRITEDRIVERTEXT,
         labelWidth: 90,
         width: 300
     });
@@ -66,32 +61,34 @@ function SaveReport(row) {
             fieldLabel:VERSIONS_ID,
             name: 'txtversions_id',
             id: 'txtversions_id',
-            emptyText: SHULDWRITE + VERSIONS_ID,
+            emptyText: SHULDWRITEVERSIONS_ID,
             allowBlank: false,
             labelWidth: 90,
             width: 300,
             maxLength: '10',
             enforceMaxLength: true,
-            vtype: 'regxVersions_id'
+            regex: Versions_idRegstr,
+            regexText:RGTXTINT
         }, {
             xtype: 'textfield',
             fieldLabel: VERSIONS_CODE,
             name: 'txtversions_code',
             id: 'txtversions_code',
-            emptyText: SHULDWRITE + VERSIONS_CODE,
+            emptyText: SHULDWRITEVERSIONS_CODE,
             allowBlank: false,
             labelWidth: 90,
             width: 300,
             maxLength: '10',
             enforceMaxLength: true,
-            vtype: 'regxVersions_id'
+            regex: Versions_idRegstr,
+            regexText: RGTXTINT
         }, {
             xtype: 'textfield',
             fieldLabel:  VERSIONS_NAME,
             name: 'txtversions_name',
             id: 'txtversions_name',
             allowBlank: false,
-            emptyText: SHULDWRITE + VERSIONS_NAME,
+            emptyText: SHULDWRITEVERSIONS_NAME,
             labelWidth: 90,
             width: 300,
             maxLength: '200',
@@ -102,7 +99,7 @@ function SaveReport(row) {
             name: 'txtversions_desc',
             id: 'txtversions_desc',
             allowBlank: false,
-            emptyText: SHULDWRITE + VERSIONS_DESC,
+            emptyText: SHULDWRITEVERSIONS_DESC,
             labelWidth: 90,
             width: 300,
             maxLength: '255',
@@ -114,8 +111,6 @@ function SaveReport(row) {
             name: 'daterelease_date',
             id: 'daterelease_date',
             format: 'Y-m-d',
-            emptyText: RELEASE_DATE,
-            allowBlank: false,
             editable: false,
             labelWidth: 90,
             width: 300
@@ -124,12 +119,14 @@ function SaveReport(row) {
         buttonAlign: 'center',
         buttons: [{
             text: SAVETEXT,
+            id: 'btnSave',
             formBind: true,
             disabled: true,
             handler: function () {
                 var form = this.up('form').getForm();
                 //驗證表單
                 if (form.isValid()) {
+                    Ext.getCmp('btnSave').setDisabled(true);
                     //提交表單
                     form.submit({
                         params: {
@@ -147,12 +144,12 @@ function SaveReport(row) {
                             Ext.MessageBox.alert(MESSAGEINFO, result,
                                             function () {
                                                 ReportWin.close();
-                                                AppVersionsStore.load();
                                             });
                         },
                         failure: function (response) {
                             var resText = eval("(" + response.responseText + ")");
-                            Ext.Msg.alert(resText.msg);
+                            Ext.Msg.alert(MESSAGEINFO, resText.msg);
+                            Ext.getCmp('btnSave').setDisabled(false);
                         }
                     })
                 }

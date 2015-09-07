@@ -66,6 +66,18 @@ namespace BLL.gigade.Mgr
                throw new Exception("IpoMgr-->UpdateIpod-->" + ex.Message, ex);
            }
        }
+       public int UpdateIpodCheck(IpodQuery query)
+       {
+           try
+           {
+               return _IpodDao.UpdateIpodCheck(query);
+           }
+           catch (Exception ex)
+           {
+
+               throw new Exception("IpoMgr-->UpdateIpodCheck-->" + ex.Message, ex);
+           }
+       }
        public int DeletIpod(IpodQuery query)
        {
            try
@@ -88,6 +100,18 @@ namespace BLL.gigade.Mgr
            {
 
                throw new Exception("IpoMgr-->GetIpodListExprot-->" + ex.Message, ex);
+           }
+       }
+       public bool GetIpodfreight(string po_id, int freight)
+       {
+           try
+           {
+               return _IpodDao.GetIpodfreight(po_id, freight);
+           }
+           catch (Exception ex)
+           {
+
+               throw new Exception("IpoMgr-->GetIpodfreight-->" + ex.Message, ex);
            }
        }
     }

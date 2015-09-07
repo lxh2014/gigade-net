@@ -37,10 +37,13 @@ namespace BLL.gigade.Dao
     {
         private IDBAccess _dbAccess;
         private string strConn;
+        private RecommendedProductAttributeDao reProductDao;
         public ProductTempDao(string connectStr)
         {
             _dbAccess = DBFactory.getDBAccess(DBType.MySql, connectStr);
+
             this.strConn = connectStr;
+            reProductDao = new RecommendedProductAttributeDao(connectStr);
         }
 
         public ProductTemp GetProTemp(ProductTemp proTemp)
@@ -52,13 +55,15 @@ namespace BLL.gigade.Dao
                 strSql.Append("page_content_3,product_keywords,product_recommend,product_password,product_total_click,expect_time,product_image,product_createdate,product_updatedate,");
                 strSql.Append("product_ipfrom,goods_area,goods_image1,goods_image2,city,bag_check_money,combination,bonus_percent,default_bonus_percent,bonus_percent_start,");
                 strSql.Append("bonus_percent_end,tax_type,cate_id,fortune_quota,fortune_freight,product_media,ignore_stock,shortage,stock_alarm,show_listprice,expect_msg,");
-                strSql.Append("show_in_deliver,prepaid,process_type,product_type,vb.vendor_id,p.prod_classify,cp.course_id,p.safe_stock_amount,p.deliver_days,p.min_purchase_amount,p.extra_days, p.mobile_image,p.product_alt,purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end from product_temp p ");  // edit by zhuoqin0830w 增加5個欄位  ,p.safe_stock_amount,p.deliver_days,p.min_purchase_amount,p.extra_days
+                strSql.Append("show_in_deliver,prepaid,process_type,product_type,vb.vendor_id,p.prod_classify,cp.course_id,p.safe_stock_amount,p.deliver_days,p.min_purchase_amount,p.extra_days, p.mobile_image,p.product_alt,purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end,rpat.expend_day,rpat.months from product_temp p ");  // edit by zhuoqin0830w 增加5個欄位  ,p.safe_stock_amount,p.deliver_days,p.min_purchase_amount,p.extra_days 
 
                 //edit by wwei0216w 2015/3/18 查詢屬性多了一個mobile_image列
                 strSql.Append("left join vendor_brand vb ON p.brand_id = vb.brand_id ");
 
                 strSql.Append("left join course_product_temp cp on p.product_id=cp.product_id and p.writer_id=cp.writer_id ");
-                strSql.AppendFormat("where p.writer_id={0} and combo_type={1}", proTemp.Writer_Id, proTemp.Combo_Type);
+                //edit by dongya0410j 2015/8/24 商品推薦屬性
+                strSql.Append(" left join recommended_product_attribute_temp rpat on p.product_id=rpat.product_id and p.writer_id=rpat.write_id and p.combo_type=rpat.combo_type ");
+                strSql.AppendFormat("where p.writer_id={0} and p.combo_type={1}", proTemp.Writer_Id, proTemp.Combo_Type);
                 strSql.AppendFormat(" and p.product_id='{0}'", proTemp.Product_Id);
                 return _dbAccess.getSinggleObj<ProductTemp>(strSql.ToString()); //add by wangwei0216w 查詢時添加product_status字段 2014/9/30
             }
@@ -99,7 +104,12 @@ namespace BLL.gigade.Dao
                 strSql.AppendFormat(" '{0}','{1}','{2}','{3}','{4}','{5}',", p.Bonus_Percent_End, p.Tax_Type, p.Cate_Id, p.Fortune_Quota, p.Fortune_Freight, p.Combo_Type);
                 strSql.AppendFormat(" '{0}','{1}','{2}','{3}','{4}',", p.product_media, p.Ignore_Stock, p.Shortage, p.stock_alarm, p.Price_type);
                 strSql.AppendFormat(" '{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}',{9},", p.show_listprice, p.expect_msg, p.Create_Channel, p.Show_In_Deliver, p.Prepaid, p.Process_Type, p.Product_Type, p.Prod_Name, p.Prod_Sz, p.Prod_Classify);
-                strSql.AppendFormat(" {0},{1},{2},{3},'{4}','{5}','{6}','{7}')", p.Deliver_Days, p.Min_Purchase_Amount, p.Safe_Stock_Amount, p.Extra_Days,p.Product_alt,p.purchase_in_advance,p.purchase_in_advance_start,p.purchase_in_advance_end);
+                strSql.AppendFormat(" {0},{1},{2},{3},'{4}','{5}','{6}','{7}');", p.Deliver_Days, p.Min_Purchase_Amount, p.Safe_Stock_Amount, p.Extra_Days, p.Product_alt, p.purchase_in_advance, p.purchase_in_advance_start, p.purchase_in_advance_end);
+     
+                if (p.expend_day>0&&p.months!="")//新增單一商品或者組合商品商品推薦臨時表
+                {
+                    strSql.AppendFormat("insert into recommended_product_attribute_temp(`product_id`,`write_id`,`time_start`,`time_end`,`expend_day`,`months`,`combo_type`)values('{0}','{1}','{2}','{3}','{4}','{5}','{6}');", p.Product_Id, p.Writer_Id, 0, 0, p.expend_day, p.months,p.Combo_Type);
+                }
                 return _dbAccess.execCommand(strSql.ToString());
                 ///add by wwei0216w 2015/7/30 添加預購3欄位
             }
@@ -126,10 +136,44 @@ namespace BLL.gigade.Dao
                 {
                     stb.AppendFormat(" ,combination = {0}", pTemp.Combination);
                 }
-                stb.AppendFormat(",show_in_deliver={0},prepaid={1},process_type={2},product_type={3},prod_name='{4}',prod_sz='{5}',", pTemp.Show_In_Deliver, pTemp.Prepaid, pTemp.Process_Type, pTemp.Product_Type,pTemp.Prod_Name, pTemp.Prod_Sz);
-                stb.AppendFormat("deliver_days={0},min_purchase_amount={1},safe_stock_amount={2},extra_days={3},purchase_in_advance={4},purchase_in_advance_start = {5},purchase_in_advance_end={6} ", pTemp.Deliver_Days, pTemp.Min_Purchase_Amount, pTemp.Safe_Stock_Amount, pTemp.Extra_Days,pTemp.purchase_in_advance,pTemp.purchase_in_advance_start,pTemp.purchase_in_advance_end);  // add by zhuoqin0830w 新增5個修改欄位  2015/03/17
+                stb.AppendFormat(",show_in_deliver={0},prepaid={1},process_type={2},product_type={3},prod_name='{4}',prod_sz='{5}',", pTemp.Show_In_Deliver, pTemp.Prepaid, pTemp.Process_Type, pTemp.Product_Type, pTemp.Prod_Name, pTemp.Prod_Sz);
+                stb.AppendFormat("deliver_days={0},min_purchase_amount={1},safe_stock_amount={2},extra_days={3},purchase_in_advance={4},purchase_in_advance_start = {5},purchase_in_advance_end={6} ", pTemp.Deliver_Days, pTemp.Min_Purchase_Amount, pTemp.Safe_Stock_Amount, pTemp.Extra_Days, pTemp.purchase_in_advance, pTemp.purchase_in_advance_start, pTemp.purchase_in_advance_end);  // add by zhuoqin0830w 新增5個修改欄位  2015/03/17
                 stb.AppendFormat("  where writer_id = {0} and combo_type={1}", pTemp.Writer_Id, pTemp.Combo_Type);
-                stb.AppendFormat(" and product_id='{0}';", pTemp.Product_Id );
+                stb.AppendFormat(" and product_id='{0}';", pTemp.Product_Id);
+
+                //如果存在更新或者刪除  如果是是否推薦點擊了否,則刪除
+                if (pTemp.Combo_Type == 1 && pTemp.expend_day > 0)//如果是單一商品
+                {
+                    if (reProductDao.ExsitInTemp(Convert.ToInt32(pTemp.Writer_Id), Convert.ToInt32(pTemp.Product_Id), pTemp.Combo_Type) > 0)
+                    {
+                        stb.AppendFormat("update recommended_product_attribute_temp set expend_day='{0}',months='{1}' where product_id='{2}'and write_id='{3}' and combo_type='{4}'; ", pTemp.expend_day, pTemp.months, pTemp.Product_Id, pTemp.Writer_Id, pTemp.Combo_Type);
+                    }
+                    else
+                    {
+                        stb.AppendFormat("insert into recommended_product_attribute_temp(`product_id`,`write_id`,`time_start`,`time_end`,`expend_day`,`months`,`combo_type`)values('{0}','{1}','{2}','{3}','{4}','{5}','{6}');", pTemp.Product_Id, pTemp.Writer_Id, 0, 0, pTemp.expend_day, pTemp.months, pTemp.Combo_Type);
+                    }
+                }
+                else if (pTemp.Combo_Type == 1 && pTemp.expend_day == 0 && pTemp.months == "")//如果expend_day==0,並且months等於"",則說明選擇了否
+                {
+                    stb.AppendFormat("delete from recommended_product_attribute_temp where product_id='{0}'and write_id='{1}' and combo_type='{2}'; ", pTemp.Product_Id, pTemp.Writer_Id, pTemp.Combo_Type);
+                }
+                
+                if (pTemp.Combo_Type == 2 && pTemp.expend_day > 0)//如果是組合商品
+                {
+                    if (reProductDao.ExsitInTemp(Convert.ToInt32(pTemp.Writer_Id), Convert.ToInt32(pTemp.Product_Id), pTemp.Combo_Type) > 0)
+                    {
+                        stb.AppendFormat("update recommended_product_attribute_temp set expend_day='{0}',months='{1}' where product_id='{2}'and write_id='{3}' and combo_type='{4}'; ", pTemp.expend_day, pTemp.months, pTemp.Product_Id, pTemp.Writer_Id, pTemp.Combo_Type);
+                    }
+                    else
+                    {
+                        stb.AppendFormat("insert into recommended_product_attribute_temp(`product_id`,`write_id`,`time_start`,`time_end`,`expend_day`,`months`,`combo_type`)values('{0}','{1}','{2}','{3}','{4}','{5}','{6}');", pTemp.Product_Id, pTemp.Writer_Id, 0, 0, pTemp.expend_day, pTemp.months, pTemp.Combo_Type);
+                    }
+                }
+                else if (pTemp.Combo_Type == 2 && pTemp.expend_day == 0 && pTemp.months == "")//如果expend_day==0,並且months等於"",則說明選擇了否
+                {
+                    stb.AppendFormat("delete from recommended_product_attribute_temp where product_id='{0}'and write_id='{1}' and combo_type='{2}'; ", pTemp.Product_Id, pTemp.Writer_Id,pTemp.Combo_Type);
+                }
+
                 stb.Append("set sql_safe_updates=1;");
                 return _dbAccess.execCommand(stb.ToString());
             }
@@ -191,9 +235,9 @@ namespace BLL.gigade.Dao
                 }
                 if (page == "pic")
                 {
-                   //if (proTemp.Product_Image != "")
-                   //{
-                        strSql.AppendFormat(" ,product_image='{0}'", proTemp.Product_Image);
+                    //if (proTemp.Product_Image != "")
+                    //{
+                    strSql.AppendFormat(" ,product_image='{0}'", proTemp.Product_Image);
                     //}
                     if (!string.IsNullOrEmpty(proTemp.product_media))
                     {
@@ -201,9 +245,9 @@ namespace BLL.gigade.Dao
                     }
                     //if(proTemp.Mobile_Image !="")//edit by wwei0216w 2015/3/18 更新手機說明圖的列
                     //{
-                        strSql.AppendFormat(" ,mobile_image ='{0}'", proTemp.Mobile_Image);
+                    strSql.AppendFormat(" ,mobile_image ='{0}'", proTemp.Mobile_Image);
                     //}
-                    if(proTemp.Product_alt!="")// add by wwei0216w 2015/4/10 添加商品圖片說明
+                    if (proTemp.Product_alt != "")// add by wwei0216w 2015/4/10 添加商品圖片說明
                     {
                         strSql.AppendFormat(" ,product_alt ='{0}'", proTemp.Product_alt);
                     }
@@ -224,7 +268,7 @@ namespace BLL.gigade.Dao
             {
                 proTemp.Replace4MySQL();
                 StringBuilder strSql = new StringBuilder("set sql_safe_updates = 0;update product_temp set ");
-                strSql.AppendFormat(" cate_id='{0}',prod_classify={1} ", proTemp.Cate_Id,proTemp.Prod_Classify);
+                strSql.AppendFormat(" cate_id='{0}',prod_classify={1} ", proTemp.Cate_Id, proTemp.Prod_Classify);
                 strSql.AppendFormat(" where writer_id={0} and combo_type={1} and product_id='{2}';set sql_safe_updates=1;", proTemp.Writer_Id, proTemp.Combo_Type, proTemp.Product_Id);
                 return _dbAccess.execCommand(strSql.ToString());
             }
@@ -734,7 +778,7 @@ namespace BLL.gigade.Dao
                 strSql.AppendFormat(" '{0}','{1}','{2}','{3}','{4}',", p.Bag_Check_Money, p.Combination, p.Bonus_Percent, p.Default_Bonus_Percent, p.Bonus_Percent_Start);
                 strSql.AppendFormat(" '{0}','{1}','{2}','{3}','{4}','{5}',", p.Bonus_Percent_End, p.Tax_Type, p.Cate_Id, p.Fortune_Quota, p.Fortune_Freight, p.Combo_Type);
                 strSql.AppendFormat(" '{0}','{1}','{2}','{3}','{4}',", p.product_media, p.Ignore_Stock, p.Shortage, p.stock_alarm, p.Price_type);
-                strSql.AppendFormat(" '{0}','{1}','{2}','{3}','{4}');select @@identity;", p.show_listprice, p.expect_msg, p.Temp_Status, p.Create_Channel,p.Prod_Classify);
+                strSql.AppendFormat(" '{0}','{1}','{2}','{3}','{4}');select @@identity;", p.show_listprice, p.expect_msg, p.Temp_Status, p.Create_Channel, p.Prod_Classify);
                 string rid = _dbAccess.getDataTable(strSql.ToString()).Rows[0][0].ToString();
                 strSql.Clear();//product_id=“T”+rid
                 string product_id = "T" + rid;

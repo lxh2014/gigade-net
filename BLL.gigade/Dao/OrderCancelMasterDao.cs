@@ -12,11 +12,14 @@ using BLL.gigade.Common;
 using System.Net;
 using System.Xml;
 using System.Configuration;
+using BLL.gigade.Model.Query;
 namespace BLL.gigade.Dao
 {
     public class OrderCancelMasterDao : IOrderCancelMasterImplDao
     {
         private IDBAccess _accessMySql;
+        private IBonusMasterImplDao _bonus;
+        private ISerialImplDao _serial;
         private string connString;
         SerialDao _serialDao = new SerialDao("");
         public OrderCancelMasterDao(string connectionString)
@@ -396,6 +399,292 @@ namespace BLL.gigade.Dao
             }
 
         }
+/**
+ *Add by chaojie1124j 2015/08/20
+ *實現訂單內容裡面的<取消整筆訂單>
+ */
+        public int ReturnAllOrder(OrderMaster om)
+        {
+            _serialDao = new SerialDao(connString);
+            DataTable ordermaster = GetOrderMaster(om.Order_Id);
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sqlstr = new StringBuilder();
+            MySqlCommand mySqlCmd = new MySqlCommand();
+            MySqlConnection mySqlConn = new MySqlConnection(connString);
+            om.Replace4MySQL();
+            int result = 0;
+            int accumulated_bonus = 0;
+            int accumulated_happygo = 0;
+            int deduct_happygo  = 0 ;
+            if (ordermaster.Rows.Count<=0)
+            {
+                return 0;//Order error;
+            }
+            try
+            {
+                if (mySqlConn != null && mySqlConn.State == System.Data.ConnectionState.Closed)
+                {
+                    mySqlConn.Open();
+                }
+                mySqlCmd.Connection = mySqlConn;
+                mySqlCmd.Transaction = mySqlConn.BeginTransaction();
+                mySqlCmd.CommandType = System.Data.CommandType.Text;
+                List<OrderSlave> orderSlaveList = new List<OrderSlave>();
+                sql.AppendFormat("select slave_id,slave_status from order_slave where order_id='{0}';", om.Order_Id);
+               
+                Dictionary<uint, string> SendMail = new Dictionary<uint, string>();
+                orderSlaveList = _accessMySql.getDataTableForObj<OrderSlave>(sql.ToString());
+                sql.Clear();
+               
+                List<OrderDetail> orderDetailList = new List<OrderDetail>();
+                sql.Append("select od.detail_id,od.item_id,od.buy_num,od.parent_num,od.item_mode,od.accumulated_bonus,od.accumulated_happygo,od.deduct_happygo");
+                sql.AppendFormat("  FROM order_detail od,order_slave os WHERE os.order_id ='{0}' AND os.slave_id = od.slave_id ;",om.Order_Id);
+                orderDetailList = _accessMySql.getDataTableForObj<OrderDetail>(sql.ToString());
+                sql.Clear();
+               
+                for (int i = 0; i < orderDetailList.Count; i++)
+                {
+                    if (orderDetailList[i].item_mode == 2)
+                        continue;
+                    accumulated_bonus += orderDetailList[i].Accumulated_Bonus;
+                    accumulated_happygo += orderDetailList[i].Accumulated_Happygo;
+                    deduct_happygo += orderDetailList[i].Deduct_Happygo;
+                }
+              
+                //int user_bonus = GetUserBonus( ordermaster.Rows[0]["user_id"].ToString(), 1);
+                //if (accumulated_bonus > user_bonus)
+                //{
+                //    return 1;//消費者購物金餘額不足，無法扣除給予購物金。
+                //}
+                if (!check_order_process(Convert.ToInt32(ordermaster.Rows[0]["order_status"]), 90) && Convert.ToInt32(ordermaster.Rows[0]["deduct_card_bonus"]) == 0)
+                {
+                    return 2;//error master
+                }
+                for (int i = 0; i < orderSlaveList.Count; i++)
+                {
+                    if (!check_order_process(Convert.ToInt32(orderSlaveList[i].Slave_Status), 90) && Convert.ToInt32(ordermaster.Rows[0]["deduct_card_bonus"]) == 0)
+                    {
+                        return 3;//error slave
+                    }
+                }
+                sqlstr.Append(modify_order_master_status(om.Order_Id.ToString(),90,om.Order_Ipfrom));
+                mySqlCmd.CommandText = sqlstr.ToString();
+                result = mySqlCmd.ExecuteNonQuery();
+                //'Writer : (' . $aUser_Data['user_id'] . ')' . $aUser_Data['user_username'] . "\r\n" . $sDescription;
+                om.Note_Order = "Writer : " + om.User_Id + " " + om.user_name + "\r\n" + om.Note_Order;
+                sqlstr.Clear();
+                sqlstr.Append(order_master_status_record(int.Parse(om.Order_Id.ToString()), 90, om.Note_Order,om.Order_Ipfrom));
+                mySqlCmd.CommandText = sqlstr.ToString();
+                result = mySqlCmd.ExecuteNonQuery();
+                sqlstr.Clear();
+
+                for (int i = 0; i < orderSlaveList.Count; i++)
+                {
+                    sqlstr.Append(modify_order_slave_status(orderSlaveList[i].Slave_Id, 90, om.Order_Ipfrom));
+                    sqlstr.Append(order_slave_status_record(orderSlaveList[i].Slave_Id, 90, om.Order_Ipfrom, om.Note_Order));
+
+                    if (Convert.ToInt32(ordermaster.Rows[0]["order_date_pay"]) > 0 )//只要付款了就發郵件&& Convert.ToInt32(ordermaster.Rows[0]["order_amount"]) > 0
+                    {
+                        if (!SendMail.Keys.Contains(orderSlaveList[i].Slave_Id))
+                        {
+                            SendMail.Add(orderSlaveList[i].Slave_Id," ");//發郵件給供應商
+                        }
+                    }
+
+                }
+                if (!string.IsNullOrEmpty(sqlstr.ToString()))
+                {
+                    mySqlCmd.CommandText = sqlstr.ToString();
+                    result = mySqlCmd.ExecuteNonQuery();
+                    sqlstr.Clear();
+                }
+                if (orderDetailList.Count>0)
+                {
+                    for (int i = 0; i < orderDetailList.Count; i++)
+			        {
+                        sqlstr.AppendFormat(" update order_detail SET detail_status ='{0}' WHERE detail_id ='{1}'; ", 90, orderDetailList[i].Detail_Id);
+			        }
+                    mySqlCmd.CommandText = sqlstr.ToString();
+                    result = mySqlCmd.ExecuteNonQuery();
+                    sqlstr.Clear();
+                }
+               
+                // 回存庫存量
+                for (int i = 0; i<orderDetailList.Count; i++)
+                {
+                    if (orderDetailList[i].item_mode == 1)
+                        continue;
+                    uint Buy_Num = orderDetailList[i].Buy_Num;
+                    if (orderDetailList[i].item_mode == 2)
+                    {
+                        Buy_Num = orderDetailList[i].Buy_Num * orderDetailList[i].parent_num;
+                    }
+                    sqlstr.AppendFormat(" UPDATE product_item SET	item_stock = item_stock +'{0}' WHERE	item_id ='{1}';", Buy_Num, orderDetailList[i].Item_Id);
+
+                }
+                if (!string.IsNullOrEmpty(sqlstr.ToString()))
+                {
+                    mySqlCmd.CommandText = sqlstr.ToString();
+                    result = mySqlCmd.ExecuteNonQuery();
+                    sqlstr.Clear();
+                }  
+                //取回減免數量
+
+                int[] nums = new int[] {3,4,5,99 };
+                bool or_status = nums.Contains(Convert.ToInt32(ordermaster.Rows[0]["order_status"]));
+                if (!or_status) 
+                {
+                    sqlstr.AppendFormat(" UPDATE promotions_amount_reduce_member SET order_status = 0 where order_id ='{0}' ;", om.Order_Id); 
+                    mySqlCmd.CommandText = sqlstr.ToString();
+                    result = mySqlCmd.ExecuteNonQuery();
+                    sqlstr.Clear();
+                }
+               
+                if (Convert.ToInt32(ordermaster.Rows[0]["money_collect_date"]) > 0 &&(Convert.ToInt32(ordermaster.Rows[0]["order_amount"]) > 0 || Convert.ToInt32(ordermaster.Rows[0]["deduct_card_bonus"]) > 0))
+                {
+                    int Money_Type = 0;
+                    if (Convert.ToInt32(ordermaster.Rows[0]["order_amount"]) == 0)
+                    {
+                        ordermaster.Rows[0]["order_amount"] = ordermaster.Rows[0]["deduct_card_bonus"];
+                    }
+                    Money_Type = Convert.ToInt32(ordermaster.Rows[0]["order_payment"]);
+                    sqlstr.Append(_serialDao.Update(46));
+                    sqlstr.Append(" select serial_value from serial where serial_id=31;");
+                    sqlstr.Append(" insert into order_money_return(money_id,order_id,money_type,money_total,money_status,money_note,money_source,money_createdate,money_updatedate,money_ipfrom)value( ");
+                    sqlstr.AppendFormat("(select serial_value from serial where serial_id=31),'{0}','{1}', ", om.Order_Id, Money_Type);
+                    sqlstr.AppendFormat("'{0}','{1}','{2}', ", Convert.ToInt32(ordermaster.Rows[0]["order_amount"]), 0,"");
+                    sqlstr.AppendFormat("'{0}','{1}','{2}', ", "order master cancel",CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")), CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")));
+                    sqlstr.AppendFormat("'{0}'); ", om.Order_Ipfrom);
+                    mySqlCmd.CommandText = sqlstr.ToString();
+                    result = mySqlCmd.ExecuteNonQuery();
+                    sqlstr.Clear();
+                    if (accumulated_happygo > 0)
+                    {
+                        sql.AppendFormat(" select status,order_id from hg_accumulate where order_id='{0}';", om.Order_Id);
+                        DataTable _dtHG = _accessMySql.getDataTable(sql.ToString());
+                        sql.Clear();
+                        if (_dtHG.Rows.Count > 0 && Convert.ToInt32(_dtHG.Rows[0]["status"]) == 0)
+                        {
+                            sqlstr.AppendFormat(" update hg_accumulate set error_type='{0}',status='{1}' where order_id='{2}';", "", 2, om.Order_Id);
+                        }
+                        else 
+                        {
+                            sql.AppendFormat(@"select * from hg_deduct where order_id={0} limit 0,1", om.Order_Id);
+                            DataTable hg_deduct = _accessMySql.getDataTable(sql.ToString());
+                            sql.Clear();
+                            if (hg_deduct.Rows.Count > 0)
+                            {
+                                sqlstr.Append(Deduct_User_Happy_Go(accumulated_happygo, om.Order_Id.ToString(), hg_deduct));
+                                mySqlCmd.CommandText = sqlstr.ToString();
+                                result = mySqlCmd.ExecuteNonQuery();
+                                sqlstr.Clear();
+                            }
+                            else 
+                            {
+                                return 4;//取得身分證字號失敗
+                            }
+                        }
+                    }
+                }
+                //回收購物金在外判斷
+                if (accumulated_bonus > 0)
+                {
+                    sqlstr.Append(Deduct_User_Bonus(accumulated_bonus, om.Order_Id.ToString(), ordermaster.Rows[0]["user_id"].ToString()));
+                    mySqlCmd.CommandText = sqlstr.ToString();
+                    result = mySqlCmd.ExecuteNonQuery();
+                    sqlstr.Clear();
+                }
+                //if (Convert.ToInt32(ordermaster.Rows[0]["order_payment"]) == 8 && Convert.ToInt32(ordermaster.Rows[0]["money_collect_date"]) == 0)
+                //{
+                //    if(accumulated_bonus > 0)
+                //    {
+                //        sqlstr.Append(Deduct_User_Bonus(accumulated_bonus, om.Order_Id.ToString(), ordermaster.Rows[0]["user_id"].ToString()));
+                //        mySqlCmd.CommandText = sqlstr.ToString();
+                //        result = mySqlCmd.ExecuteNonQuery();
+                //        sqlstr.Clear();
+                //    }
+                //}
+                if (Convert.ToInt32(ordermaster.Rows[0]["order_amount"]) > 0)
+                {
+                    sqlstr.AppendFormat(" UPDATE order_master SET money_cancel = '{0}' where order_id = '{1}';", Convert.ToInt32(ordermaster.Rows[0]["order_amount"]), om.Order_Id);
+                    mySqlCmd.CommandText = sqlstr.ToString();
+                    result = mySqlCmd.ExecuteNonQuery();
+                    sqlstr.Clear();
+                }
+                if (Convert.ToInt32(ordermaster.Rows[0]["priority"])==1)
+                {
+                    sqlstr.AppendFormat(" UPDATE order_master SET priority = 0 WHERE	order_id ='{0}';",om.Order_Id);
+                    sqlstr.AppendFormat(" UPDATE users SET first_time = 0 WHERE	user_id ='{0}';",Convert.ToInt32(ordermaster.Rows[0]["user_id"]));
+                    mySqlCmd.CommandText = sqlstr.ToString();
+                    result = mySqlCmd.ExecuteNonQuery();
+                    sqlstr.Clear();
+                }
+                sql.AppendFormat(" select *from user_recommend  where order_id='{0}';", om.Order_Id);
+                DataTable _dtrecom = _accessMySql.getDataTable(sql.ToString());
+                sql.Clear();
+                if (_dtrecom.Rows.Count > 0)
+                {
+                    sqlstr.AppendFormat(" UPDATE user_recommend SET is_recommend = 0 WHERE	id ='{0}';",Convert.ToInt32( _dtrecom.Rows[0]["id"]));
+                    mySqlCmd.CommandText = sqlstr.ToString();
+                    result = mySqlCmd.ExecuteNonQuery();
+                    sqlstr.Clear();                
+                }
+                if (deduct_happygo > 0)
+                {
+                    sqlstr.Append(Deduct_Refund(om.Order_Id, 0, 0, deduct_happygo, om.Order_Ipfrom));
+                    mySqlCmd.CommandText = sqlstr.ToString();
+                    result = mySqlCmd.ExecuteNonQuery();
+                    sqlstr.Clear();
+                }
+                if (Convert.ToInt32(ordermaster.Rows[0]["deduct_bonus"]) > 0)
+                {
+                    sqlstr.Append(Deduct_Refund(om.Order_Id, Convert.ToInt32(ordermaster.Rows[0]["deduct_bonus"]), 0, 0, om.Order_Ipfrom));
+                    mySqlCmd.CommandText = sqlstr.ToString();
+                    result = mySqlCmd.ExecuteNonQuery();
+                    sqlstr.Clear();
+                }
+                if (Convert.ToInt32(ordermaster.Rows[0]["deduct_welfare"]) > 0)
+                {
+                    sqlstr.Append(Deduct_Refund(om.Order_Id, 0, Convert.ToInt32(ordermaster.Rows[0]["deduct_welfare"]), 0, om.Order_Ipfrom));
+                    mySqlCmd.CommandText = sqlstr.ToString();
+                    result = mySqlCmd.ExecuteNonQuery();
+                    sqlstr.Clear();
+                }
+                sqlstr.AppendFormat(" UPDATE deliver_master SET delivery_status = 6 WHERE	order_id = '{0}' AND type in (1 , 2);", om.Order_Id);
+                if (Convert.ToInt32(ordermaster.Rows[0]["deduct_card_bonus"]) > 0)
+                {
+                    sqlstr.AppendFormat(" UPDATE order_slave set slave_status=90,slave_date_delivery = 0 where order_id = '{0}';", om.Order_Id);
+                }
+                mySqlCmd.CommandText = sqlstr.ToString();
+                result = mySqlCmd.ExecuteNonQuery();
+                sqlstr.Clear();
+                sqlstr.Append(check_and_modify_flag(om.Order_Id,3,om.Order_Ipfrom));
+                if (!string.IsNullOrEmpty(sqlstr.ToString()))
+                {
+                    mySqlCmd.CommandText = sqlstr.ToString();
+                    result = mySqlCmd.ExecuteNonQuery();
+                    sqlstr.Clear();
+                }
+                //mySqlCmd.Transaction.Commit();
+                mySqlCmd.Transaction.Rollback();
+                
+                send_cancel_mail_for_vendor(SendMail);
+                return 100;//完成
+            }
+            catch (Exception ex)
+            {
+                mySqlCmd.Transaction.Rollback();
+                throw new Exception("OrderCancelMasterDao-->ReturnAllOrder-->" + ex.Message, ex);
+            }
+            finally
+            {
+                if (mySqlConn != null && mySqlConn.State == System.Data.ConnectionState.Open)
+                {
+                    mySqlConn.Close();
+                }
+            }
+        
+        }
         #endregion
 
         public DataTable GetOrderMaster(uint order_id)
@@ -421,11 +710,12 @@ namespace BLL.gigade.Dao
             string sql = string.Format("select sum(master_balance) as master_balance from bonus_master where user_id='{0}' and master_start<='{1}' and master_end>='{2}' and master_balance>0 and bonus_type='{3}'", user_id, CommonFunction.GetPHPTime(DateTime.Now.ToString()), CommonFunction.GetPHPTime(DateTime.Now.ToString()), bonus_type);
             try
             {
-                if (_accessMySql.getDataTable(sql).Rows.Count > 0)
+                DataTable _dtUserBonus=_accessMySql.getDataTable(sql);
+                if (_dtUserBonus.Rows.Count > 0)
                 {
-                    if (!string.IsNullOrEmpty(_accessMySql.getDataTable(sql).Rows[0]["master_balance"].ToString()))
+                    if (!string.IsNullOrEmpty(_dtUserBonus.Rows[0]["master_balance"].ToString()))
                     {
-                        master_balance = Convert.ToInt32(_accessMySql.getDataTable(sql).Rows[0]["master_balance"]);
+                        master_balance = Convert.ToInt32(_dtUserBonus.Rows[0]["master_balance"]);
                     }
                 }
 
@@ -439,77 +729,115 @@ namespace BLL.gigade.Dao
 
         public string Deduct_User_Bonus(int deduct_bonus, string order_id, string user_id)
         {
-            int user_bonus = GetUserBonus(user_id, 1);
-            int bonus_num = deduct_bonus;
-            string return_ipfrom = string.Empty;
+            BonusMasterQuery b = new BonusMasterQuery();
+            BonusRecord br = new BonusRecord();
+            Serial s = new Serial();
+            _serial = new SerialDao(connString);
+            _bonus = new BonusMasterDao(connString);
+            List<BonusMaster> store = new List<BonusMaster>();
+            List<BonusMaster> store2 = new List<BonusMaster>();
             System.Net.IPAddress[] ips = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList;
             if (ips.Count() > 0)
             {
-                return_ipfrom = ips[0].ToString();
+                b.master_ipfrom = ips[0].ToString();
             }
             StringBuilder sql = new StringBuilder();
             StringBuilder sqlstr = new StringBuilder();
-
             try
             {
-
-                if (user_bonus >= deduct_bonus)
+                int bonus_num = deduct_bonus;
+                //是否發放購物金 
+                b.master_note = order_id;
+                b.master_total = uint.Parse(deduct_bonus.ToString());
+                b.bonus_type = 1;
+                store = _bonus.GetBonus(b);
+                if (store.Count == 1)
                 {
-
-                    if (bonus_num < 0)
+                    bool user = false;
+                    foreach (var item in store)
                     {
-                        bonus_num = bonus_num * -1;
+                        if (item.master_total == item.master_balance)
+                        {//判斷發放的購物金是否使用 
+                            user = true;
+                        }
+                        b.master_id = item.master_id;
+                        b.masterid = item.master_id.ToString()+",";
                     }
-                    sql.AppendFormat(@"select * from bonus_master where user_id='{0}'", user_id);
-                    sql.AppendFormat(@" and master_start<='{0}' and master_end>='{1}'", CommonFunction.GetPHPTime(DateTime.Now.ToString()), CommonFunction.GetPHPTime(DateTime.Now.ToString()));
-                    sql.AppendFormat(@" and master_balance > 0 and bonus_type = 1 order by master_end asc;");
-
-                    DataTable bonus_master = _accessMySql.getDataTable(sql.ToString());
-                    sql.Clear();
-                    int temp_num = 0;
-                    if (bonus_master.Rows.Count > 0)
-                    {
-                        foreach (DataRow dr in bonus_master.Rows)
+                    #region 發放購物金扣除
+                    s = _serial.GetSerialById(28);
+                    if (user)
+                    {//發放給顧客的購物金沒有被使用
+                        //變更bonus_master表裏面的發放的購物金
+                        b.master_balance = deduct_bonus;
+                        sqlstr.Append(_bonus.UpBonusMaster(b));
+                        //記錄到購物金記錄表中
+                        br.record_id = uint.Parse(s.Serial_Value.ToString());
+                        br.master_id = b.master_id;
+                        br.type_id = 32;
+                        br.order_id =uint.Parse(b.master_note);
+                        br.record_use = uint.Parse(deduct_bonus.ToString());
+                        br.record_note = "訂單整筆取消";
+                        br.record_ipfrom = b.master_ipfrom;
+                        sqlstr.Append(_bonus.InsertBonusRecord(br));
+                        sqlstr.Append(_serial.Update(28));
+                        bonus_num = 0;
+                    }
+                    else
+                    {//發放購物金被使用 
+                        b.user_id = uint.Parse(user_id.ToString());
+                        b.masterid = b.masterid.TrimEnd(',');
+                        uint order =uint.Parse(b.master_note.ToString());
+                        b.master_note = null;
+                        b.master_total = 0;
+                        //該用戶剩餘可用購物金 
+                        store2 = _bonus.GetBonus(b);
+                        foreach (var item in store2)
                         {
-                            if (bonus_num > 0)
+                            while (bonus_num > 0)
                             {
-                                temp_num = bonus_num > Convert.ToInt32(dr["master_balance"]) ? Convert.ToInt32(dr["master_balance"]) : bonus_num;
-                                sqlstr.Append(_serialDao.Update(28));
-                                sqlstr.AppendFormat(@" insert into bonus_record (record_id,master_id,type_id,order_id,record_use,record_note,record_writer,record_createdate,record_updatedate,record_ipfrom)");
-                                sqlstr.AppendFormat("  values((select serial_value from serial where serial_id=28),'{0}','{1}','{2}',", dr["master_id"], 32, order_id);
-                                sqlstr.AppendFormat(@" '{0}','{1}','{2}',", temp_num, "訂單取消", "");
-                                sqlstr.AppendFormat(@"'{0}','{1}','{2}');", CommonFunction.GetPHPTime(DateTime.Now.ToString()), CommonFunction.GetPHPTime(DateTime.Now.ToString()), return_ipfrom);
-                                sqlstr.AppendFormat(@"update bonus_master set master_balance=master_balance-{0},master_updatedate='{1}'", temp_num, CommonFunction.GetPHPTime(DateTime.Now.ToString()));
-                                sqlstr.AppendFormat(@" where master_id='{0}';", dr["master_id"].ToString());
-                                bonus_num -= temp_num;
-                            }
-                            else
-                            {
-                                break;
+                                if (bonus_num > item.master_balance)
+                                {
+                                    b.master_balance = item.master_balance;
+                                    bonus_num = bonus_num - item.master_balance;
+                                }
+                                else
+                                {
+                                    b.master_balance = bonus_num;
+                                    bonus_num = 0;
+                                }
+                                //變更bonus_master表裏面的發放的購物金
+                                sqlstr.Append(_bonus.UpBonusMaster(b));
+                                //記錄到購物金記錄表中
+                                br.record_id = uint.Parse(s.Serial_Value.ToString());
+                                br.master_id = b.master_id;
+                                br.type_id = 32;
+                                br.order_id = order;
+                                br.record_use = uint.Parse(deduct_bonus.ToString());
+                                br.record_note = "訂單整筆取消";
+                                br.record_ipfrom = b.master_ipfrom;
+                                sqlstr.Append(_bonus.InsertBonusRecord(br));
+                                sqlstr.Append(_serial.Update(28));                                
                             }
                         }
+                        if (bonus_num > 0)
+                        {//該用戶剩餘的購物金不夠扣剩下記錄到表中
+                            sqlstr.AppendFormat(@"insert into users_deduct_bonus (deduct_bonus,user_id,createdate,order_id)");
+                            sqlstr.AppendFormat(@" values('{0}','{1}','{2}','{3}');", bonus_num, user_id, CommonFunction.GetPHPTime(DateTime.Now.ToString()), order_id);                         
+                        }
                     }
+                    #endregion
                 }
-                else
-                {
-                    sqlstr.AppendFormat(@"insert into users_deduct_bonus (deduct_bonus,user_id,createdate,order_id,status)");
-                    sqlstr.AppendFormat(@" values('{0}','{1}','{2}','{3}','{4}');", deduct_bonus, user_id, CommonFunction.GetPHPTime(DateTime.Now.ToString()), order_id, 1);
-
-                }
-                return sqlstr.ToString();
+                return sqlstr.ToString();                
             }
             catch (Exception ex)
             {
-
                 throw new Exception("OrderReturnlMasterDao-->Deduct_User_Bonus-->" + ex.Message, ex);
             }
-        }
+        }        
 
         public string Deduct_User_Happy_Go(int accumulated_happygo, string order_id, DataTable hg_deduct)
         {
             StringBuilder sql = new StringBuilder();
-
-
             try
             {
                 if (hg_deduct.Rows.Count > 0)
@@ -703,6 +1031,390 @@ namespace BLL.gigade.Dao
             catch (Exception ex)
             {
                 throw new Exception("OrderCancelMasterDao-->Get_Combined_Product" + ex.Message + sql.ToString(), ex);
+            }
+        }
+        public bool check_order_process(int Order_status, int status)
+        {
+            bool result = false;
+            try
+            {
+                if (Order_status==90)
+                {
+                    result = false;
+                }
+                if (Order_status == 91)
+                {
+                    result = false;
+                }
+                if (Order_status == 99)
+                {
+                    result = false;
+                }
+                if (Order_status == 0)
+                {
+                    if (status==1||status==2||status==10||status==90)
+                    {
+                        result = true;
+                    }
+                }
+                else if (Order_status == 1)
+                {
+                    if (status == 0 || status == 10 || status == 90)
+                    {
+                        result = true;
+                    }
+                }
+                else if (Order_status == 2)
+                {
+                    if (status == 0 || status == 3 || status == 4 || status == 90 || status == 89)
+                    {
+                        result = true;
+                    }
+                }
+                else if (Order_status == 3)
+                {
+                    if (status == 4 || status == 91 || status == 99 || status == 89)
+                    {
+                        result = true;
+                    }
+                }
+                else if (Order_status == 4)
+                {
+                    if (status == 2 || status == 91 || status == 92 || status == 99)
+                    {
+                        result = true;
+                    }
+                }
+                else if (Order_status == 5)
+                {
+                    if (status == 91 || status == 99 || status == 89)
+                    {
+                        result = true;
+                    }
+                }
+                else if (Order_status == 10)
+                {
+                    if (status == 0 || status == 90)
+                    {
+                        result = true;
+                    }
+                }
+                else if (Order_status == 20)
+                {
+                    if (status == 0 || status == 2|| status == 90)
+                    {
+                        result = true;
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderCancelMasterDao-->check_order_process" + ex.Message , ex);
+            }
+        }
+
+        public string modify_order_master_status(string order_id,int order_status,string ip)
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                OrderMaster om = new OrderMaster();
+                om.Order_Status = uint.Parse(order_status.ToString());
+                om.Order_Updatedate = uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).ToString());
+                om.Order_Ipfrom = ip;
+                om.Order_Date_Cancel = 0;
+                om.Order_Date_Close = 0;
+                if (order_status==90)
+                {
+                    om.Order_Date_Cancel = uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).ToString());
+                }
+                else if (order_status == 99)
+                {
+                    om.Order_Date_Close = uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).ToString());
+                }
+                sb.AppendFormat(" update order_master set order_status='{0}',order_updatedate='{1}',order_ipfrom='{2}' ", om.Order_Status, om.Order_Updatedate, om.Order_Ipfrom);
+                if (om.Order_Date_Cancel != 0)
+                {
+                    sb.AppendFormat(" ,order_date_cancel='{0}' ", om.Order_Date_Cancel);
+                }
+                if (om.Order_Date_Close != 0)
+                {
+                    sb.AppendFormat(" ,order_date_close='{0}' ", om.Order_Date_Close);
+                }
+                sb.AppendFormat(" where order_id='{0}'; ", order_id);
+                return sb.ToString();
+
+            }
+            catch (Exception ex)
+            {
+                
+               throw new Exception("OrderCancelMasterDao-->check_order_process" + ex.Message +sb.ToString(), ex);
+            }
+        }
+
+        public string order_master_status_record(int order_id, int Order_Status,string order_note,string ip)
+        { 
+         StringBuilder sb = new StringBuilder();
+         try
+         {
+             sb.Append(_serialDao.Update(29));
+             sb.Append("select serial_value from serial where serial_id=29;insert into order_master_status(serial_id,order_id,order_status,status_description,status_ipfrom,status_createdate)value(");
+             sb.AppendFormat(" (select serial_value from serial where serial_id=29),'{0}','{1}','{2}','{3}','{4}'); ", order_id, Order_Status, order_note,ip,CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")));
+             return sb.ToString();
+         }
+         catch (Exception ex)
+         {
+
+             throw new Exception("OrderCancelMasterDao-->order_master_status_record" + ex.Message + sb.ToString(), ex);
+         }
+
+        }
+        
+        public string modify_order_slave_status(uint stave_id, int order_status,string ip, long Deliver_Time = 0)
+        {
+            StringBuilder sb = new StringBuilder();
+            long slave_date_delivery = 0;
+            long slave_date_cancel = 0;
+            long slave_date_return = 0;
+            long slave_date_close = 0;
+            long times= CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+            try
+            {
+                if (Deliver_Time == 0)
+                {
+                    Deliver_Time =times;
+                }
+                if (order_status == 4)
+                {
+                    slave_date_delivery = Deliver_Time;
+                }
+                if (order_status == 90)
+                {
+                    slave_date_cancel =  times;
+                    sb.AppendFormat(" update order_detail SET detail_status='{0}'where slave_id='{1}';", order_status, stave_id);
+                }
+                if (order_status == 2)
+                {
+                    sb.AppendFormat(" update order_detail SET detail_status='{0}'where slave_id='{1}';", order_status, stave_id);
+                }
+               
+                if (order_status == 6)
+                {
+                    sb.AppendFormat(" update order_detail SET detail_status='{0}'where slave_id='{1}' AND detail_status = '{2}';", order_status, stave_id, 2);
+                    slave_date_delivery =times;
+                }
+                if (order_status == 7)
+                {
+                    sb.AppendFormat(" update order_detail SET detail_status='{0}'where slave_id='{1}' AND detail_status = '{2}';", order_status, stave_id, 6);
+                }
+                if (order_status == 91)
+                {
+                    slave_date_return = times;
+                }
+                if (order_status == 99)
+                {
+                    slave_date_close = times;
+                }
+                sb.AppendFormat(" update order_slave set slave_status='{0}',slave_updatedate='{1}',slave_ipfrom='{2}' ", order_status, times,ip);
+                if (slave_date_delivery!=0)
+                {
+                    sb.AppendFormat(" ,slave_date_delivery ='{0}' ", slave_date_delivery);
+                }
+                if (slave_date_cancel != 0)
+                {
+                    sb.AppendFormat(" ,slave_date_cancel ='{0}' ", slave_date_cancel);
+                }
+                if (slave_date_return != 0)
+                {
+                    sb.AppendFormat(" ,slave_date_return ='{0}' ", slave_date_cancel);
+                }
+                if (slave_date_close != 0)
+                {
+                    sb.AppendFormat(" ,slave_date_close ='{0}' ", slave_date_cancel);
+                }
+                sb.AppendFormat(" where slave_id = '{0}' ;", stave_id);
+
+                return sb.ToString();
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("OrderCancelMasterDao-->modify_order_slave_status" + ex.Message + sb.ToString(), ex);
+            }
+        }
+
+        public string order_slave_status_record(uint slave_id,int order_status,string ip,string order_note)
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                sb.Append(_serialDao.Update(31));
+                sb.Append("select serial_value from serial where serial_id=31;insert into order_slave_status(serial_id,slave_id,order_status,status_description,status_ipfrom,status_createdate)value(");
+                sb.AppendFormat(" (select serial_value from serial where serial_id=31),'{0}','{1}','{2}','{3}','{4}'); ", slave_id, order_status, order_note, ip,CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")));
+                return sb.ToString();
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("OrderCancelMasterDao-->order_slave_status_record" + ex.Message + sb.ToString(), ex);
+            }
+        }
+
+        public string check_and_modify_flag(uint order_id, int Flag,string ip)
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                DataTable ordermaster = GetOrderMaster(order_id);
+                if (Convert.ToInt32(ordermaster.Rows[0]["export_flag"]) > 10000)
+                {
+                    sb.Append("select  parameterCode,parameterName from   t_parametersrc where parameterType='cosmos_status';");
+                    DataTable _dtCoustomer = _accessMySql.getDataTable(sb.ToString());
+                    sb.Clear();
+                    sb.AppendFormat(" UPDATE order_master set export_flag='{0}' where order_id='{1}';", Flag, order_id);
+                    int export_flag = Convert.ToInt32(ordermaster.Rows[0]["export_flag"]);
+                    string status_str_old = "";
+                    string status_str_new = "";
+                    foreach (DataRow item in _dtCoustomer.Rows)
+                    {
+                        if (Convert.ToInt32(item["parameterCode"]) == export_flag)
+                        {
+                            status_str_old = item["parameterName"].ToString();
+                        }
+                        if (Convert.ToInt32(item["parameterCode"]) == Flag)
+                        {
+                            status_str_new = item["parameterName"].ToString();
+                        }
+                    }
+                    if (string.IsNullOrEmpty(status_str_old))
+                    {
+                        status_str_old = "已拋轉";
+                    }
+                    if (string.IsNullOrEmpty(status_str_new))
+                    {
+                        status_str_new = "已拋轉";
+                    }
+                    sb.Append(order_master_status_record(Convert.ToInt32(order_id),90, "ERP拋轉狀態:" + status_str_old + "->" + status_str_new, ip));//90->Convert.ToInt32(ordermaster.Rows[0]["order_status"]),邏輯的更改
+                }
+                return sb.ToString();
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("OrderCancelMasterDao-->check_and_modify_flag" + ex.Message + sb.ToString(), ex);
+            }
+        }
+        public bool send_cancel_mail_for_vendor(Dictionary<uint, string> SendMail)
+        {
+            MailHelper mail = new MailHelper();
+            bool result = false;
+            try
+            {
+                DataTable _dtVendor = new DataTable();
+                StringBuilder sb = new StringBuilder();
+                sb.Append(" select parameterCode from t_parametersrc where parameterType ='develop';");
+                DataTable _dtDEV = _accessMySql.getDataTable(sb.ToString());
+                sb.Clear();
+                DataTable _dtTest = new DataTable();
+                sb.Append(" select remark from t_parametersrc where parameterType ='TestMail';");
+                _dtTest = _accessMySql.getDataTable(sb.ToString());
+                sb.Clear();
+                string TestMail = "";
+                if (_dtTest.Rows.Count > 0) 
+                {
+                    TestMail = _dtTest.Rows[0]["remark"].ToString();
+                }
+                string DEV = "false";
+                if (_dtDEV.Rows.Count > 0)
+                {
+                    DEV = _dtDEV.Rows[0]["parameterCode"].ToString();
+                }
+                foreach (uint item in SendMail.Keys)
+                {
+
+                    sb.AppendFormat(" select os.order_id,v.vendor_email,v.vendor_name_full from order_slave os left join vendor v on v.vendor_id=os.vendor_id  where slave_id='{0}';", item);
+                    _dtVendor = _accessMySql.getDataTable(sb.ToString());
+                    sb.Clear();
+                    if (_dtVendor.Rows.Count > 0)
+                    {
+                        string MailTitle = "取消出貨通知";
+                        string MailBody = _dtVendor.Rows[0]["vendor_name_full"].ToString() + "公司您好,<br/>吉甲地市集平台訂單, 付款單號 :" + _dtVendor.Rows[0]["order_id"].ToString();
+                        MailBody += "客戶因故取消部分商品, 請協助再次確認出貨品項無誤,以免衍生後續不便,<br/>感謝您。吉甲地在地好物市集敬上 ";
+                        if (DEV == "true")
+                        {
+                            result = mail.SendMailAction(TestMail, MailTitle, MailBody);
+                        }
+                        else
+                        {
+                            result = mail.SendMailAction(_dtVendor.Rows[0]["vendor_email"].ToString(), MailTitle, MailBody);
+                        }
+                    }
+
+                }
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderCancelMasterDao-->send_cancel_mail_for_vendor" + ex.Message, ex);
+            }
+
+        }
+
+        /***判斷用戶的購物金是否夠扣除*/
+        public int returnMsg(OrderMaster om)
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                _bonus=new BonusMasterDao(connString);
+                BonusMasterQuery query =new BonusMasterQuery();
+                query.master_note=om.Order_Id.ToString();
+                query.bonus_type = 1;
+                 List<BonusMasterQuery>bonusMasterStore=new List<BonusMasterQuery>();
+                 bonusMasterStore = _bonus.IsExtendBonus(query);
+
+                 if (bonusMasterStore.Count > 0)
+                {
+                    ///用戶購物金
+                    sb.AppendFormat("SELECT sum(od.accumulated_bonus) as accumulated_bonus FROM order_detail od,order_slave os WHERE	os.order_id = '{0}'AND	os.slave_id = od.slave_id and od.item_mode<>2; ", om.Order_Id);
+                    DataTable _dtbonus = _accessMySql.getDataTable(sb.ToString());
+                    sb.Clear();
+                    //訂單購物金
+                    sb.AppendFormat("select user_id from order_master where order_id='{0}';", om.Order_Id);
+                    DataTable _dtUser = _accessMySql.getDataTable(sb.ToString());
+                    int deductuser = 0;
+                    if (!string.IsNullOrEmpty(_dtUser.Rows[0]["user_id"].ToString()))
+                    {
+                        deductuser = GetUserBonus(_dtUser.Rows[0]["user_id"].ToString(), 1);
+                    }
+                    else
+                    {
+                        return 1;//訂單錯誤！
+                    }
+                    int orderbonus = string.IsNullOrEmpty(_dtbonus.Rows[0]["accumulated_bonus"].ToString()) ? 0 : Convert.ToInt32(_dtbonus.Rows[0]["accumulated_bonus"]);
+                    if (orderbonus > deductuser)
+                    {
+                        return 99;//消費者購物金餘額不足，無法扣除給予購物金
+                    }
+                    else
+                    {
+                        return 100;//不顯示那個信息
+                    }
+                }
+                else 
+                {
+                    return 100;//不顯示那個信息
+                }
+		
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderCancelMasterDao-->returnMsg" + ex.Message, ex);
             }
         }
     }

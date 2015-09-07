@@ -892,14 +892,14 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1  "
                 {
                     strcondition.AppendFormat(" where overdue_day>='{0}' ", deliver.t_days);
                 }
-                str.AppendFormat(@"SELECT delivery_code,deliver_id,delivery_date,order_id,order_date,order_status,order_payment,delivery_store,
+                str.AppendFormat(@"SELECT delivery_code,deliver_id,delivery_date,created,order_id,order_date,order_status,order_payment,delivery_store,
 logisticsTypes,delivery_status,dvendor_name_simple,vendor_name_simple,freight_set,delivery_freight_cost,
 overdue_day,
 arrival_date,estimated_delivery_date 
 ,estimated_arrival_date,estimated_arrival_period,delivery_name,product_name,note_order,note_admin,
 buy_num,item_id,product_mode,deliver_master_date,slave_status,detail_status,product_id,detail_id 
 FROM (
-SELECT dm.delivery_code,dm.deliver_id,om.order_id,DATE(FROM_UNIXTIME(om.order_createdate)) as order_date,dd.detail_id ,pt.product_id,om.order_status,om.order_payment,dm.delivery_store,
+SELECT dm.delivery_code,dm.deliver_id,dm.created,om.order_id,DATE(FROM_UNIXTIME(om.order_createdate)) as order_date,dd.detail_id ,pt.product_id,om.order_status,om.order_payment,dm.delivery_store,
 ld.logisticsTypes,dm.delivery_status,vds.vendor_name_simple as dvendor_name_simple,vd.vendor_name_simple,dm.freight_set,dm.delivery_freight_cost,
 case ISNULL(dm.delivery_date) when TRUE then DATEDIFF(NOW(),DATE(FROM_UNIXTIME(om.order_date_pay)))  ELSE datediff(dm.delivery_date,DATE(FROM_UNIXTIME(om.order_date_pay))) end as overdue_day,
 dm.arrival_date,dm.estimated_delivery_date 

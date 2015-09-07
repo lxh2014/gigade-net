@@ -55,6 +55,16 @@ var ActivityQueryStore = Ext.create('Ext.data.Store', {
     ]
 });
 
+var idStore = Ext.create('Ext.data.Store', {
+    fields: ['txtid', 'valueid'],
+    data: [      
+        { "txtid": '會員ID', "valueid": "1" },
+        { "txtid": '商品ID', "valueid": "2" },
+        { "txtid": '會員姓名', "valueid": "3" },
+        { "txtid": '商品名稱', "valueid": "4" }
+    ]
+});
+
 Ext.onReady(function () {
     var frm = Ext.create('Ext.form.Panel', {
         id: 'frm',
@@ -72,10 +82,10 @@ Ext.onReady(function () {
                         xtype: 'combobox',
                         id: 'activityQuery',
                         margin: '5,0,0,0',
-                        fieldLabel: '活動',
+                        fieldLabel: '類型',
                         queryMode: 'local',
                         editable: false,
-                        labelWidth: 50,
+                        labelWidth: 80,
                         store: ActivityQueryStore,
                         displayField: 'txt',
                         valueField: 'value',
@@ -89,9 +99,21 @@ Ext.onReady(function () {
                 layout: 'hbox',
                 items: [
                     {
+                        xtype: 'combobox',
+                        id: 'idQuery',
+                        margin: '5,0,0,0',
+                        fieldLabel: '搜尋類型',
+                        queryMode: 'local',
+                        editable: false,
+                        labelWidth: 80,
+                        store: idStore,
+                        displayField: 'txtid',
+                        valueField: 'valueid',
+                        emptyText:'請選擇'
+                    },
+                    {
                         id: 'searchContent',
-                        xtype: 'textfield',
-                        fieldLabel: "搜尋",
+                        xtype: 'textfield',                    
                         width: 250,
                         margin: '5,0,0,0',
                         labelWidth: 50,
@@ -124,7 +146,8 @@ Ext.onReady(function () {
                            text: "重置",
                            handler: function () {
                                Ext.getCmp('activityQuery').setValue(0);
-                               Ext.getCmp('searchContent').setValue("")
+                               Ext.getCmp('searchContent').setValue("");
+                               Ext.getCmp('idQuery').reset();
                            }
                        }
                 ]
@@ -210,10 +233,16 @@ Ext.onReady(function () {
 
 //查询
 Query = function () {
-
-    if (Ext.getCmp('activityQuery').getValue() == 0 && Ext.getCmp('searchContent').getValue() == "")
+    var activityQuery = Ext.getCmp('activityQuery').getValue();
+    var searchContent = Ext.getCmp('searchContent').getValue();
+    var idQuery = Ext.getCmp('idQuery').getValue();
+    if (activityQuery == 0 &&searchContent == "")
     {
         Ext.Msg.alert("提示信息", "請輸入查詢條件！");
+        return;
+    }
+    if ((idQuery == "" || idQuery == null) && searchContent != "") {
+        Ext.Msg.alert("提示信息", "請選擇查詢類型！");
         return;
     }
     BrowseDataStore.removeAll();
@@ -222,6 +251,7 @@ Query = function () {
             type: Ext.getCmp("activityQuery").getValue(),
             searchContent: Ext.getCmp("searchContent").getValue(),
             isSecret: true,
+            searchType: idQuery
         }
     });
 }

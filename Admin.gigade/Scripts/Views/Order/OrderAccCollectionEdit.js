@@ -27,7 +27,7 @@
                 regex: /^[-+]?([1-9]\d*|0)$/,
                 regexText: '請輸入數字',
                 listeners: {
-                    blur: function () {
+                    change: function () {
                         var id = Ext.getCmp('order_id').getValue();
                         Ext.Ajax.request({
                             url: "/OrderAccountCollection/YesOrNoOrderId",
@@ -72,18 +72,38 @@
             xtype: 'datetimefield',
             name: 'account_collection_time',
             id: 'account_collection_time',
-            allowBlank: false,
             format: 'Y-m-d',
             maxLength: 25,
             value: new Date(),
-            fieldLabel: '入賬時間'
+            fieldLabel: '入賬時間',
+            listeners: {
+                change: function (a, b, c) {
+                    var collM = Ext.getCmp("account_collection_money");
+                    var collP = Ext.getCmp("poundage");
+                    if (Ext.getCmp("account_collection_time").getValue() != null) {
+                        collM.allowBlank = false;
+                        collP.allowBlank = false;
+                        collM.setDisabled(false);
+                        collP.setDisabled(false);
+                    } else {
+                        collM.setValue(0);
+                        collP.setValue(0);
+                        collM.allowBlank = true;
+                        collP.allowBlank = true;
+                        collM.setValue("");
+                        collP.setValue("");
+                        collM.setDisabled(true);
+                        collP.setDisabled(true);
+                    }
+                }
+            }
         },
         {
             xtype: 'numberfield',
             name: 'account_collection_money',
             id: 'account_collection_money',
             allowDecimals: false,
-            allowBlank: false,
+            disabled: true,
             value: 0,
             fieldLabel: '入賬金額'
         },
@@ -109,9 +129,8 @@
             xtype: 'numberfield',
             name: 'poundage',
             id: 'poundage',
-            allowDecimals: false,
-            allowBlank: false,
             value: 0,
+            disabled: true,
             fieldLabel: '手續費'
         },
 
@@ -122,14 +141,36 @@
              id: 'return_collection_time',
              format: 'Y-m-d',
              maxLength: 25,
-             fieldLabel: '退貨時間'
+             // value: new Date(),
+             fieldLabel: '退貨時間',
+             listeners: {
+                 change: function (a, b, c) {
+                     var RcollM = Ext.getCmp("return_collection_money");
+                     var RcollP = Ext.getCmp("return_poundage");
+                     if (Ext.getCmp("return_collection_time").getValue() != null) {
+                         RcollM.allowBlank = false;
+                         RcollP.allowBlank = false;
+                         RcollM.setDisabled(false);
+                         RcollP.setDisabled(false);
+                     } else {
+                         RcollM.setValue(0);
+                         RcollP.setValue(0);
+                         RcollM.allowBlank = true;
+                         RcollP.allowBlank = true;
+                         RcollM.setValue("");
+                         RcollP.setValue("");
+                         RcollM.setDisabled(true);
+                         RcollP.setDisabled(true);
+                     }
+                 }
+             }
          },
         {
             xtype: 'numberfield',
             name: 'return_collection_money',
             id: 'return_collection_money',
             allowDecimals: false,
-            value: 0,
+            disabled: true,
             fieldLabel: '退貨金額'
         },
          {
@@ -137,7 +178,7 @@
              name: 'return_poundage',
              id: 'return_poundage',
              allowDecimals: false,
-             value: 0,
+             disabled: true,
              fieldLabel: '退貨手續費'
          },
         {
@@ -154,6 +195,10 @@
             text: '保存',
             handler: function () {
                 var form = this.up('form').getForm();
+                if (Ext.getCmp("account_collection_time").getValue() == null && Ext.getCmp("return_collection_time").getValue() == null) {
+                    Ext.Msg.alert(INFORMATION, "必須寫入入賬信息或退貨入賬信息！");
+                    return;
+                }
                 if (row == null)//空表示新增
                 {
                     if (Ext.getCmp('order_status').getValue() == "訂單存在") {
@@ -200,6 +245,7 @@
                 else {//如果是編輯
                     if (Ext.getCmp('order_id').getValue() == row.data.order_id) {
                         if (form.isValid()) {
+                           
                             form.submit({
                                 params: {
                                     row_id: Ext.htmlEncode(Ext.getCmp('row_id').getValue()),
@@ -238,6 +284,10 @@
                     else {
                         if (Ext.getCmp('order_status').getValue() == "訂單存在") {
                             if (form.isValid()) {
+                                if (Ext.getCmp("account_collection_time").getValue() == null && Ext.getCmp("return_collection_time").getValue() == null) {
+                                    alert("必須寫入入賬信息或退貨入賬信息！");
+                                    return;
+                                }
                                 form.submit({
                                     params: {
                                         row_id: Ext.htmlEncode(Ext.getCmp('row_id').getValue()),
@@ -280,7 +330,7 @@
         }]
     });
     var editWin = Ext.create('Ext.window.Window', {
-        title: '新增/修改',
+        title: '編輯',
         iconCls: 'icon-user-edit',
         id: 'editWin',
         width: 400,
@@ -313,6 +363,14 @@
             'show': function () {
                 if (row != null) {
                     editFrm.getForm().loadRecord(row);
+                    if (row.data.account_collection_time != "" && row.data.account_collection_time != null && row.data.account_collection_time != '0001/01/01') {
+                        var collecTime = new Date(row.data.account_collection_time);
+                        Ext.getCmp('account_collection_time').setValue(collecTime);
+                    }
+                    if (row.data.return_collection_time != "" && row.data.return_collection_time != null && row.data.return_collection_time != '0001/01/01') {
+                        var RcollecTime = new Date(row.data.return_collection_time);
+                        Ext.getCmp('return_collection_time').setValue(RcollecTime);
+                    }
                 }
 
             }

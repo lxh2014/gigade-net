@@ -26,7 +26,7 @@ namespace BLL.gigade.Mgr
         /// <param name="valid_start"></param>
         /// <param name="valid_end"></param>
         /// <returns></returns>
-        public string GetAppnotifypool(AppNotifyPool ap)
+        public string GetAppnotifypool(AppNotifyPoolQuery ap)
         {
             try
             {

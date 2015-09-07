@@ -19,7 +19,12 @@ namespace BLL.gigade.Dao
             _access = DBFactory.getDBAccess(DBType.MySql, connectionString);
             this.connStr = connectionString;
         }
-
+        /// <summary>
+        /// 查找列表數據
+        /// </summary>
+        /// <param name="appmsg"></param>
+        /// <param name="totalCount"></param>
+        /// <returns></returns>
         public List<AppmessageQuery> GetAppmessageList(AppmessageQuery appmsg, out int totalCount)
         {
             StringBuilder sql = new StringBuilder();
@@ -28,13 +33,21 @@ namespace BLL.gigade.Dao
             CommonFunction.GetPHPTime();
             sql.AppendFormat("SELECT message_id,`type`,title,content,FROM_UNIXTIME(messagedate) as messagedate_time,`group`,linkurl,display_type,FROM_UNIXTIME(msg_start) as msg_start_time,FROM_UNIXTIME(msg_end) as msg_end_time,fit_os,appellation,need_login FROM appmessage where 1=1 ");
             sqlcount.AppendFormat("SELECT message_id FROM appmessage where 1=1 ");
-            if (appmsg.msg_start != 0)
+            if (appmsg.msg_start_first != 0)
             {
-                sqlwhere.AppendFormat(" and msg_start >= {0}", appmsg.msg_start);
+                sqlwhere.AppendFormat(" and msg_start >= {0}", appmsg.msg_start_first);
             }
-            if (appmsg.msg_end != 0)
+            if (appmsg.msg_start_second != 0)
             {
-                sqlwhere.AppendFormat(" and msg_end <= {0} ", appmsg.msg_end);
+                sqlwhere.AppendFormat(" and msg_start <= {0}", appmsg.msg_start_second);
+            }
+            if (appmsg.msg_end_first != 0)
+            {
+                sqlwhere.AppendFormat(" and msg_end >= {0} ", appmsg.msg_end_first);
+            }
+            if (appmsg.msg_end_second != 0)
+            {
+                sqlwhere.AppendFormat(" and msg_end <= {0} ", appmsg.msg_end_second);
             }
             totalCount = 0;
             try
@@ -58,6 +71,11 @@ namespace BLL.gigade.Dao
                 throw new Exception("AppmessageDao.GetAppmessageList-->" + ex.Message + sql.ToString(), ex);
             }
         }
+        /// <summary>
+        /// 獲取參數
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
         public List<Appmessage> GetParaList(string sql)
         {
             try
@@ -69,6 +87,11 @@ namespace BLL.gigade.Dao
                 throw new Exception("AppmessageDao.GetParaList-->" + ex.Message + sql.ToString(), ex);
             }
         }
+        /// <summary>
+        /// 插入新數據
+        /// </summary>
+        /// <param name="appmsg"></param>
+        /// <returns></returns>
         public int AppMessageInsert(Appmessage appmsg)
         {
             StringBuilder sql = new StringBuilder();

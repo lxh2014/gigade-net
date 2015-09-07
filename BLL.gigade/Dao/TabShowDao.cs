@@ -6,6 +6,7 @@ using BLL.gigade.Dao.Impl;
 using DBAccess;
 using BLL.gigade.Model.Query;
 using BLL.gigade.Model;
+using System.Data;
 namespace BLL.gigade.Dao
 {
     public class TabShowDao : ITabShowImplDao
@@ -783,6 +784,22 @@ namespace BLL.gigade.Dao
                 throw new Exception("TabShowDao-->GetOderHitrust " + ex.Message + sb.ToString(), ex);
             }
         }
+        public DataTable GetOderHitrustDT(int order_id)
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                sb.Append(@"select id,order_id,pan,bankname ");
+                sb.AppendFormat(" from order_payment_hitrust ");
+                sb.AppendFormat(" where order_id ='{0}' ", order_id);
+                return _access.getDataTable(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("TabShowDao-->GetOderHitrustDT " + ex.Message + sb.ToString(), ex);
+            }
+        }
+
         #endregion
     }
 

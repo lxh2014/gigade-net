@@ -183,6 +183,10 @@ namespace BLL.gigade.Dao
                 sqlFrom.Append(" LEFT JOIN (select parameterCode,parameterName,remark from t_parametersrc where parametertype='product_mode') para on od.product_mode=para.parameterCode  ");
                 sqlFrom.Append(" LEFT JOIN order_master om on om.order_id = orm.order_id ");
                 sqlWhere.AppendFormat(" where orm.return_id='{0}'  ", query.return_id);
+                if (query.itemStr!="")
+                {
+                    sqlWhere.AppendFormat(" and od.item_id not in({0}) ",query.itemStr);
+                }
                 if (query.IsPage)
                 {
                     DataTable _dt = _access.getDataTable("select count(orm.order_id) as 'totalCount'  " + sqlFrom.ToString() + sqlWhere.ToString());
@@ -253,32 +257,58 @@ namespace BLL.gigade.Dao
         //更新庫存的操作
         public bool PlaceOnFile(OrderReturnStatusQuery query)
         {
+            //選中要退的商品進行入庫，未選中的則不入庫，將未選中的記錄到order_return_status里
             try
             {
                 bool b = true;
                 ArrayList arrList = new ArrayList();
-                arrList.Add(CouldReturn(query));
+              
                 if (query.ors_status == 3)
                 {
-                    OrderMaster om = _ordermasterdao.GetOrderMasterByOrderId4Change(Convert.ToInt32(query.ors_order_id));
-                    //DataTable _returnDt = GetReturnId(query);
-                    //uint return_id = Convert.ToUInt32(_returnDt.Rows[0]["return_id"]);
-                    DataTable odli = _orderDetailDao.OrderDetailTable( Convert.ToUInt32(query.return_id));
-                    foreach (DataRow dr in odli.Rows)
+                    List<OrderReturnStatusQuery> ORStore = new List<OrderReturnStatusQuery>();
+
+                    if (query.data != "")
                     {
-                        if (Convert.ToInt32(dr["item_mode"]) == 1)//组合商品
+                        string[] dataSplit = query.data.Split(';');
+                        for (int i = 0; i < dataSplit.Length; i++)
                         {
-                            List<OrderDetail> childDetail = Get_Combined_Product(Convert.ToUInt32(query.ors_order_id), Convert.ToUInt32(dr["Parent_Id"]), Convert.ToUInt32(dr["pack_id"]));
-                            foreach (var child in childDetail)
+                            if (dataSplit[i] != "")
                             {
-                                arrList.Add(_itemDao.UpdateItemStock(child.Item_Id, child.Buy_Num * child.parent_num));//更新庫存
+                                string[] newData = dataSplit[i].Split('*');
+                                query.item_id = Convert.ToUInt32(newData[0]);
+                                query.itemStr += query.item_id + ",";
+                                query.buy_num = Convert.ToUInt32(newData[1]);
+                                DataTable odli = _orderDetailDao.OrderDetailTable(Convert.ToUInt32(query.return_id), query.item_id);
+                                if (Convert.ToInt32(odli.Rows[0]["item_mode"]) == 1)//组合商品
+                                {
+                                    List<OrderDetail> childDetail = Get_Combined_Product(Convert.ToUInt32(query.ors_order_id), Convert.ToUInt32(odli.Rows[0]["Parent_Id"]), Convert.ToUInt32(odli.Rows[0]["pack_id"]));
+                                    foreach (var child in childDetail)
+                                    {
+                                        arrList.Add(_itemDao.UpdateItemStock(child.Item_Id, child.Buy_Num * child.parent_num));//更新庫存
+                                    }
+                                }
+                                else
+                                {
+                                    arrList.Add(_itemDao.UpdateItemStock(query.item_id, query.buy_num));//更新庫存
+                                }
                             }
                         }
-                        else
-                        {
-                            arrList.Add(_itemDao.UpdateItemStock(Convert.ToUInt32(dr["Item_Id"]), Convert.ToUInt32(dr["Buy_Num"])));//更新庫存
-                        }
                     }
+                        int totalCount = 0;
+                        query.IsPage = false;
+                        query.itemStr = query.itemStr.TrimEnd(',');
+                       // query.nonSelected = true;
+                        ORStore = CouldGridList(query, out totalCount);
+                        query.itemStr = string.Empty;
+                        foreach (var item in ORStore)
+                        {
+                            query.itemStr += item.item_id + ",";
+                        }
+                        if (query.itemStr != "")
+                        {
+                            query.ors_remark = "未入庫的商品細項編號為:" + query.itemStr.TrimEnd(',');
+                        }
+                    arrList.Add(CouldReturn(query));
                 }
                 if (_mySqlDao.ExcuteSqlsThrowException(arrList))
                 {
@@ -308,7 +338,7 @@ namespace BLL.gigade.Dao
                 arrList.Add(UpOrderReturnMaster(query));
                 OrderMaster om = _ordermasterdao.GetOrderMasterByOrderId4Change(Convert.ToInt32(query.ors_order_id));
                 DataTable _returnDt = GetReturnId(query);
-                DataTable odli = _orderDetailDao.OrderDetailTable(Convert.ToUInt32(query.return_id));
+                DataTable odli = _orderDetailDao.OrderDetailTable(Convert.ToUInt32(query.return_id),0);
                 OrderReturnMasterQuery omQuery = new OrderReturnMasterQuery();
                 SerialDao serialDao = new SerialDao(connStr);
                 MySqlCommand mySqlCmd = new MySqlCommand();
@@ -340,35 +370,13 @@ namespace BLL.gigade.Dao
                     #region   // 判斷是否有付款
                     if (om.Money_Collect_Date > 0 && om.Order_Amount > 0 && returnmoney > 0)
                     {
-                        uint moneytype = 0;
-                        if (om.Order_Payment == 1 || om.Order_Payment == 22)
-                        {
-                            moneytype = 1;
-                        }
-                        else if (om.Order_Payment == 2)
-                        {
-                            moneytype = 2;
-                        }
-                        else if (om.Order_Payment == 13 || om.Order_Payment == 21)
-                        {
-                            moneytype = 13;
-                        }
-                        else if (om.Order_Payment == 16)
-                        {
-                            moneytype = 16;
-                        }
-
                         #region 新增退款單
-
                         string serial_sql = serialDao.Update(46);//46 退款單流水號
-                        //   mySqlCmd.Connection = mySqlConn;
                         DataTable _moneyDt = GetMoneyIDBySerial(serial_sql);
                         uint moneyId = Convert.ToUInt32(_moneyDt.Rows[0][0]);
-                        //uint moneyId = Convert.ToUInt32(mySqlCmd.ExecuteScalar());
                         OrderMoneyReturn omr = new OrderMoneyReturn();
-                        // omr.money_id = moneyId;
                         omQuery.order_id = Convert.ToUInt32(query.ors_order_id);
-                        omr.money_type = moneytype;
+                        omr.money_type = om.Order_Payment;
                         omr.money_total = Convert.ToUInt32(returnmoney);
                         omr.money_status = 0;
                         omr.money_source = "return_id:" + query.return_id;

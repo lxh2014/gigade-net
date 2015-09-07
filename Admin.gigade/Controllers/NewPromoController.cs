@@ -924,6 +924,10 @@ namespace Admin.gigade.Controllers
                     newPresentQuery.start = Convert.ToDateTime(Request.Params["valid_start"]);
                     newPresentQuery.end = Convert.ToDateTime(Request.Params["valid_end"]);
                     newPresentQuery.bonus_expire_day = Convert.ToInt32(Request.Params["bonus_expire_day"]);
+                    if (!string.IsNullOrEmpty(Request.Params["use_span_day"]))
+                    {
+                        newPresentQuery.use_span_day = Convert.ToInt32(Request.Params["use_span_day"]);
+                    }
                     if (!string.IsNullOrEmpty(Request.Params["group_id"]))
                     {
                         newPresentQuery.group_id = int.Parse(Request.Params["group_id"]);
@@ -974,6 +978,10 @@ namespace Admin.gigade.Controllers
                     newPresentQuery.event_id = Request.Params["this_event_id"];
                     newPresentQuery.muser = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                     newPresentQuery.modified = DateTime.Now;
+                    if (!string.IsNullOrEmpty(Request.Params["use_span_day"]))
+                    {
+                        newPresentQuery.use_span_day = Convert.ToInt32(Request.Params["use_span_day"]);
+                    }
                     if (!string.IsNullOrEmpty(Request.Params["group_id"]))
                     {
                         newPresentQuery.group_id = int.Parse(Request.Params["group_id"]);

@@ -441,6 +441,10 @@ namespace Admin.gigade.Controllers
                     query.isSecret = false;
                 }
             }
+            if (!string.IsNullOrEmpty(Request.Params["searchType"]))
+            {
+                query.SearchType = Convert.ToInt32(Request.Params["searchType"]);
+            }
             query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
             query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
 

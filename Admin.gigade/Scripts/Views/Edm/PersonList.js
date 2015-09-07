@@ -60,7 +60,7 @@ Ext.onReady(function () {
             }
         },
         {
-            header: "人員名稱", dataIndex: 'email_name', flex: 1, align: 'center',
+            header: "姓名", dataIndex: 'email_name', flex: 1, align: 'center',
             renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {//secretcopy
                 return "<span onclick='SecretLogin(" + document.getElementById('email_id').value + "," + 0 + ",\"" + info_type + "\")'  >" + value + "</span>";
             }

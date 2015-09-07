@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using BLL.gigade.Common;
 using BLL.gigade.Model.Custom;
 using System.IO;
+using Newtonsoft.Json.Converters;
 
 namespace Admin.gigade.Controllers
 {
@@ -29,8 +30,8 @@ namespace Admin.gigade.Controllers
         private ISiteConfigImplMgr siteConfigMgr;
         private IShippingCarriorImplMgr _shippingCarriorMgr;
         private IProductDeliverySetImplMgr _prodDeliSetMgr;
-
-
+        private DeliveryStorePlaceMgr DSPMgr;
+        private IZipImplMgr IZImplMgr;
         /// <summary>
         /// 物流設定
         /// </summary>
@@ -558,6 +559,216 @@ namespace Admin.gigade.Controllers
                 log.Error(logMessage);
             }
             return result;
+        }
+        #endregion
+
+        #region 物流營業所列表 add by yafeng0715j 20150825PM
+        public ActionResult DeliveryStorePlace()
+        {
+            return View();
+        }
+
+        public HttpResponseBase GetDeliveryStorePlaceList()
+        {
+            List<DeliveryStorePlaceQuery> stores = new List<DeliveryStorePlaceQuery>();
+            string json = string.Empty;
+            try
+            {
+                DeliveryStorePlace model = new DeliveryStorePlace();
+                model.Start = Convert.ToInt32(Request.Form["start"] ?? "0");
+                model.Limit = Convert.ToInt32(Request.Form["limit"] ?? "25");
+                if (!string.IsNullOrEmpty(Request.Form["dsp_name"]))
+                {
+                    model.dsp_name = Request.Form["dsp_name"];
+                }
+                if (!string.IsNullOrEmpty(Request.Form["dsp_big_code"]))
+                {
+                    model.dsp_big_code = Request.Form["dsp_big_code"];
+                }
+                if (!string.IsNullOrEmpty(Request.Form["dsp_deliver_store"]))
+                {
+                    model.dsp_deliver_store = Request.Form["dsp_deliver_store"];
+                }
+                DSPMgr = new DeliveryStorePlaceMgr(connectionString);
+                int totalCount = 0;
+                stores = DSPMgr.GetDeliveryStorePlaceList(model, out totalCount);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(stores, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        public HttpResponseBase GetTZipCodeList()
+        {
+            List<Zip> stores = new List<Zip>();
+            string json = string.Empty;
+            try
+            {
+                Zip zip = new Zip();
+                zip.bigcode = "0";
+                zip.big = "不分";
+                IZImplMgr = new ZipMgr(connectionString);
+                stores = IZImplMgr.GetZipList();
+                if (string.IsNullOrEmpty(Request.Params["type"]))
+                {
+                    stores.Insert(0, zip);
+                }
+                json = "{success:true,data:" + JsonConvert.SerializeObject(stores) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        public HttpResponseBase GetDspDeliverStoreList()
+        {
+            List<Parametersrc> stores = new List<Parametersrc>();
+            string json = string.Empty;
+            try
+            {
+                Parametersrc p = new Parametersrc();
+                p.parameterName = "不分";
+                p.ParameterCode = "0";
+                IParametersrcImplMgr IPImplMgr = new ParameterMgr(connectionString);
+                stores = IPImplMgr.ReturnParametersrcList();
+                if (string.IsNullOrEmpty(Request.Params["type"]))
+                {
+                    stores.Insert(0, p);
+                }
+                json = "{success:true,data:" + JsonConvert.SerializeObject(stores) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        public JsonResult DeliveryStorePlaceSave()
+        {
+            string json = string.Empty;
+            try
+            {
+                DeliveryStorePlace model = new DeliveryStorePlace();
+                DSPMgr = new DeliveryStorePlaceMgr(connectionString);
+                if (!string.IsNullOrEmpty(Request.Form["dsp_name"]))
+                {
+                    model.dsp_name = Request.Form["dsp_name"];
+                }
+                model.modify_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+                model.modify_time = DateTime.Now;
+                model.dsp_status = 1;
+
+                if (!string.IsNullOrEmpty(Request.Form["dsp_big_code"]))
+                {
+                    model.dsp_big_code = Request.Form["dsp_big_code"];
+                }
+                if (!string.IsNullOrEmpty(Request.Form["dsp_deliver_store"]))
+                {
+                    model.dsp_deliver_store = Request.Form["dsp_deliver_store"];
+                }
+                if (!string.IsNullOrEmpty(Request.Form["dsp_address"]))
+                {
+                    model.dsp_address = Request.Form["dsp_address"];
+                }
+                if (!string.IsNullOrEmpty(Request.Form["dsp_telephone"]))
+                {
+                    model.dsp_telephone = Request.Form["dsp_telephone"];
+                }
+                if (!string.IsNullOrEmpty(Request.Form["dsp_note"]))
+                {
+                    model.dsp_note = Request.Form["dsp_note"];
+                }
+                if (!string.IsNullOrEmpty(Request.Form["dsp_id"]))
+                {
+                    model.dsp_id = int.Parse(Request.Form["dsp_id"]);
+                    if (DSPMgr.UpdateDeliveryStorePlace(model) > 0)
+                    {
+                        return Json(new { success = "true" });
+                    }
+                }
+                else
+                {
+                    //if (DSPMgr.SelectDspName(model) != 0)
+                    //{
+                    //    return Json(new { success = "-1" });
+                    //}
+                    model.create_user = model.modify_user;
+                    model.create_time = model.modify_time;
+                    if (DSPMgr.InsertDeliveryStorePlace(model) > 0)
+                    {
+                        return Json(new { success = "true" });
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            return Json(new { success = "false" });
+        }
+
+        public JsonResult DeleteDeliveryStorePlaceByIds()
+        {
+            string json = string.Empty;
+            try
+            {
+                DeliveryStorePlaceQuery query = new DeliveryStorePlaceQuery();
+                DSPMgr = new DeliveryStorePlaceMgr(connectionString);
+                if (!string.IsNullOrEmpty(Request.Form["rid"]))
+                {
+                    query.dsp_ids = Request.Form["rid"].TrimEnd(',');
+                    if (DSPMgr.DeleteDeliveryStorePlace(query) > 0)
+                    {
+                        return Json(new { success = "true" });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            return Json(new { success = "false" });
         }
         #endregion
     }

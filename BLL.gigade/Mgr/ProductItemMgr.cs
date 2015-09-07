@@ -202,5 +202,16 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductItemMgr-->GetProductArriveDay" + ex.Message, ex);
             }
         }
+        public List<ProductItemQuery> GetProductItemByID(ProductItemQuery query)
+        {
+            try
+            {
+                return productItemDao.GetProductItemByID(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemMgr-->GetProductItemByID" + ex.Message, ex);
+            }
+        }
     }
 }

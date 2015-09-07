@@ -19,6 +19,8 @@ using BLL.gigade.Dao.Impl;
 using DBAccess;
 using System.Data;
 using BLL.gigade.Model.Query;
+using BLL.gigade.Model;
+using BLL.gigade.Common;
 
 namespace BLL.gigade.Dao
 {
@@ -254,6 +256,10 @@ namespace BLL.gigade.Dao
                 {
                     sqlCondition.AppendFormat(" and os.slave_status='{0}'", query.Slave_Status);
                 }
+                if (!string.IsNullOrEmpty(query.slave_status_in))
+                {
+                    sqlCondition.AppendFormat(" and os.slave_status in({0}) ", query.slave_status_in);
+                }
                 if (query.IsPage)
                 {
                     string sql = "select count(os.order_id) as total_count " + sbSqlTable.ToString() + sqlCondition.ToString();
@@ -316,6 +322,48 @@ namespace BLL.gigade.Dao
             }
         }
 
+        /// <summary>
+        /// 獲取供應商信息
+        /// </summary>
+        /// <param name="order_id"></param>
+        /// <returns></returns>
+        public List<OrderSlaveQuery> GetVendor(uint order_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.Append("SELECT os.order_id,os.slave_id,v.vendor_email,v.vendor_name_full,v.vendor_name_simple from order_slave os LEFT JOIN vendor v ON os.vendor_id=v.vendor_id ");
+                if (order_id > 0)
+                {
+                    sql.AppendFormat(" where os.order_id='{0}'; ",order_id);
+                }
+                return _dbAccess.getDataTableForObj<OrderSlaveQuery>(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderSlaveDao.GetVendor -->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+
+        public string UpdOrderSlaveStatus(OrderSlave os)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("set sql_safe_updates = 0; ");
+                sql.AppendFormat("UPDATE order_slave SET slave_status='{0}',slave_updatedate = '{1}',slave_ipfrom='{2}' ", os.Slave_Status,CommonFunction.GetPHPTime(DateTime.Now.ToString()), os.Slave_Ipfrom);
+                if (os.Slave_Id > 0)
+                {
+                    sql.AppendFormat(" where slave_id='{0}'; ", os.Slave_Id);
+                }
+                sql.Append(" set sql_safe_updates = 1;");
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderSlaveDao.UpdOrderSlaveStatus -->" + ex.Message + sql.ToString(), ex);
+            }
+        }
      
     }
 }

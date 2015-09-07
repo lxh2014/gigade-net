@@ -418,7 +418,7 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
             editor: {
                 xtype: 'combobox',
                 queryMode: 'local',
-                editable: true,
+                editable: false,
                 store: typeStore,
                 displayField: 'parameterName',
                 valueField: 'ParameterCode'
@@ -436,7 +436,7 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
             editor: {
                 xtype: 'combobox',
                 queryMode: 'local',
-                editable: true,
+                editable: false,
                 store: keyStore,
                 displayField: 'parameterName',
                 valueField: 'ParameterCode'

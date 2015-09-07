@@ -36,22 +36,22 @@ namespace BLL.gigade.Mgr
             try
             {
                 //獲取 前一天 時間的時間戳  edit by zhuoqin0830w  2015/05/08
-                long time = BLL.gigade.Common.CommonFunction.GetPHPTime(Convert.ToString(DateTime.Now)) - 86400;
+                long time = BLL.gigade.Common.CommonFunction.GetPHPTime(Convert.ToString(DateTime.Now)) - 86400;///將當前時間-24小時(既時間戳中86400)
                 //var prodExts = list.FindAll(p => p.Flag == 1);
                 //foreach (var item in prodExts) edit by wwei0216w 2015/6/30 將只判斷審核狀態改為所有狀態都判斷,防止其它操作造成的flag狀態錯誤
                 foreach (var item in list)
                 {
-                    if ((item.Event_End > time) && (item.Product_Name.Contains(item.Product_Prefix) && item.Product_Prefix.Length > 0) || (item.Product_Name.Contains(item.Product_Suffix) && item.Product_Suffix.Length > 0)) //擁有前後綴的情況
+                    if ((item.Event_End > time) && ((item.Product_Name.Contains(item.Product_Prefix) && item.Product_Prefix.Length > 0) || (item.Product_Name.Contains(item.Product_Suffix) && item.Product_Suffix.Length > 0))) //擁有前後綴的情況
                     {
-                        item.Flag = 2;
+                        item.Flag = 2;  ///Flag==2 為商品作用中
                     }
-                    else if (item.Type == 3)
+                    else if (item.Type == 3)///Type為3表示申請被駁回///駁回后商品應該顯示可編輯,所以將flag設置為0
                     {
-                        item.Flag = 0;
-                    }
-                    else if (item.Event_End <= time)
+                         item.Flag = 0;///Flag ==0 表示商品可編輯
+                    }   
+                    else if (item.Event_End <= time && item.Event_End!=0) ///add by wwei0215/8/25 添加item.Event_End!=0
                     {
-                        item.Flag = 3;
+                        item.Flag = 3;///Flag ==3 表示過期
                     }
                 }
 

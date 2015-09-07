@@ -29,25 +29,6 @@ namespace BLL.gigade.Mgr
             _bonusRecordDao = new BonusRecordDao(connectionStr);
         }
 
-        #region 得到 bonus_record 裱中 最大的 主鍵  add by zhuoqin0830w 2015/08/25
-        /// <summary>
-        /// 得到 bonus_record 裱中 最大的 主鍵
-        /// </summary>
-        /// <param name="br"></param>
-        /// <returns></returns>
-        public uint GetRecordID()
-        {
-            try
-            {
-                return _bonusRecordDao.GetRecordID();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("BonusRecordMgr-->GetRecordID()-->" + ex.Message, ex);
-            }
-        }
-        #endregion
-
         #region 向 bonus_record 裱中添加 數據  add by zhuoqin0830w 2015/08/25
         /// <summary>
         /// 向 bonus_record 裱中添加 數據

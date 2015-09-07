@@ -1,11 +1,14 @@
 ﻿
 var pageSize = 25;
-/**********************************************************************站臺管理主頁面**************************************************************************************/
+var info_type = "order_payment_hitrust";
+var secret_info = "id;pan;bankname";
+/**********************************************************************網際威信銀行使用信息**************************************************************************************/
 //站臺管理Model
 Ext.define('gigade.Status', {
     extend: 'Ext.data.Model',
     fields: [
                 { name: "id", type: "int" },//流水號
+                { name: "order_id", type: "string" },
                 { name: "retcode", type: "string" },
                 { name: "retcodename", type: "string" },//刷卡狀態
                 { name: "rettype", type: "string" },//交易類別
@@ -54,7 +57,9 @@ Ext.onReady(function () {
         columns: [
             { header: "流水號", dataIndex: 'id', width: 60, align: 'center' },
             { header: "號碼", dataIndex: 'retcode', width: 100, align: 'center', hidden: true },
-            {header: "刷卡狀態", dataIndex: 'retcodename', width: 150, align: 'center',renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+            {
+                header: "刷卡狀態", dataIndex: 'retcodename', width: 150, align: 'center', renderer:
+                  function (value, cellmeta, record, rowIndex, columnIndex, store) {
                 return '<font color="red">' + record.data.retcodename+ '(' + record.data.retcode + ')</font>';
                 }
             },
@@ -103,7 +108,7 @@ Ext.onReady(function () {
             {
                 header: '卡號', dataIndex: 'card_number', width: 100, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    return '<a href="#"  onclick="Bank(' + record.data.id + ',' + value + ')">***(***)</a>';
+                    return '<a href="#"  onclick="SecretLogin(' + record.data.order_id + ',' + 0 + ',\'' + info_type + '\')" >***(***)</a>';
                 }
             },
             { header: "建立時間", dataIndex: 'createdate', width: 150, align: 'center' }
@@ -125,7 +130,6 @@ Ext.onReady(function () {
                 }
             }
         }
-
     });
 
     Ext.create('Ext.container.Viewport', {
@@ -222,4 +226,19 @@ Bank = function Bank(a, b, c) {
         ]
     });
     BankWin.show();
+}
+function SecretLogin(rid, info_id, info_type) {//secretcopy
+    var secret_type = "21";//參數表中的"訊息管理"可根據需要修改
+    var url = "/OrderManage/GetOrderHitrustList";//這個可能在後面的SecretController中用到
+    var ralated_id = rid;
+    //點擊機敏信息先保存記錄在驗證密碼是否需要輸入
+    boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+    if (boolPassword != "-1") {//不准查看
+        if (boolPassword) {//超過5分鐘沒有輸入密碼      
+            SecretLoginFun(secret_type, ralated_id, true, true, false, url, info_type, info_id, secret_info);//先彈出驗證框，關閉時在彈出顯示框
+
+        } else {
+            SecretLoginFun(secret_type, ralated_id, false, true, false, url, info_type, info_id, secret_info);//直接彈出顯示框
+        }
+    }
 }

@@ -839,14 +839,19 @@ od.single_cost,od.event_cost,od.single_price,od.single_money,od.deduct_bonus,od.
             }
         }
 
-        public DataTable OrderDetailTable(uint return_id)
+        public DataTable OrderDetailTable(uint return_id,uint item_id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
                 sql.Append(" select 	od.detail_id,	od.single_money,od.deduct_bonus,od.buy_num,od.deduct_welfare,od.accumulated_bonus,od.accumulated_happygo,od.deduct_happygo,od.deduct_happygo_money,od.item_id,od.item_mode,od.parent_id,od.pack_id ");
                 sql.Append("from	order_detail od left join 	order_return_detail ord on od.detail_id=ord.detail_id ");
-                sql.AppendFormat(" where ord.return_id='{0}';", return_id);
+                sql.AppendFormat(" where ord.return_id='{0}' ", return_id);
+                if (item_id!=0)
+                {
+                    sql.AppendFormat("and od.item_id='{0}';", item_id);
+                }
+
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)

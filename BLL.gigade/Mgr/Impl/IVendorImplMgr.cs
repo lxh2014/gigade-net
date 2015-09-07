@@ -19,14 +19,14 @@ using BLL.gigade.Model;
 using System.Data;
 using BLL.gigade.Model.Query;
 namespace BLL.gigade.Mgr.Impl
-{ 
+{
     public interface IVendorImplMgr
     {
         Vendor GetSingle(Vendor query);
         string GetLoginId(int vendorid);
         List<BLL.gigade.Model.Query.VendorQuery> Query(BLL.gigade.Model.Query.VendorQuery query, ref int totalCount);
         DataTable GetVendorDetail(string sqlwhere);
-       
+
         List<Vendor> VendorQueryAll(Vendor query);
         List<Vendor> VendorQueryList(Vendor query);
 
@@ -43,5 +43,6 @@ namespace BLL.gigade.Mgr.Impl
         List<ManageUser> GetVendorPM();
         int GetOffGradeCount(string vendorId);
         int UnGrade(string vendorId, string active, List<TableChangeLog> list);
+        List<Vendor> GetArrayDaysInfo(uint brand_id);
     }
 }

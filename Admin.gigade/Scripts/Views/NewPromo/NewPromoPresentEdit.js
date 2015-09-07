@@ -124,6 +124,7 @@ editPresentFunction = function (row, store, o_event_id) {
                    id: 'gift_id',
                    name: 'gift_id',
                    submitValue: true,
+                   allowDecimals: false,
                    listeners: {
                        change: function () {
                            var id = Ext.getCmp('gift_id').getValue();
@@ -161,6 +162,7 @@ editPresentFunction = function (row, store, o_event_id) {
                    id: 'gift_amount',
                    name: 'gift_amount',
                    allowBlank: false,
+                   allowDecimals: false,
                    submitValue: true,
                    value: 1,
                    minValue: 1
@@ -180,6 +182,7 @@ editPresentFunction = function (row, store, o_event_id) {
                    id: 'deduct_welfare',
                    name: 'deduct_welfare',
                    allowBlank: false,
+                   allowDecimals:false,
                    submitValue: true,
                    minValue: 0,
                    hidden: true,
@@ -191,6 +194,7 @@ editPresentFunction = function (row, store, o_event_id) {
                      id: 'welfare_mulriple',
                      name: 'welfare_mulriple',
                      allowBlank: false,
+                     allowDecimals: false,
                      submitValue: true,
                      minValue: 1,
                      hidden: true,
@@ -204,6 +208,7 @@ editPresentFunction = function (row, store, o_event_id) {
                    name: 'freight_price',
                    allowBlank: false,
                    submitValue: true,
+                   allowDecimals: false,
                    minValue: 0,
                    value: 0
                },
@@ -214,11 +219,22 @@ editPresentFunction = function (row, store, o_event_id) {
                     name: 'bonus_expire_day',
                     allowBlank: false,
                     submitValue: true,
+                    allowDecimals: false,
                     hidden: true,
                     minValue: 0,
                     value: 30
                }
                ,
+               {
+                   xtype: 'numberfield',
+                   fieldLabel: '使用間隔時間',
+                   id: 'use_span_day',
+                   name: 'use_span_day',
+                   allowDecimals: false,
+                   minValue: 0,
+                   value: 15,
+                   maxValue:9999999
+               },
                {
                    xtype: "datetimefield",
                    fieldLabel: DATESTART,
@@ -290,7 +306,8 @@ editPresentFunction = function (row, store, o_event_id) {
                                     bonus_expire_day: Ext.htmlEncode(Ext.getCmp('bonus_expire_day').getValue()),
                                     valid_end: Ext.getCmp('tend').getValue(),
                                     valid_start: Ext.getCmp('tstart').getValue(),
-                                    gift_amount: Ext.getCmp('gift_amount').getValue()
+                                    gift_amount: Ext.getCmp('gift_amount').getValue(),
+                                    use_span_day: Ext.getCmp('use_span_day').getValue(),
                                 },
                                 success: function (form, action) {
                                     var result = Ext.decode(action.response.responseText);

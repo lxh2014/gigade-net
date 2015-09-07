@@ -172,7 +172,8 @@ namespace BLL.gigade.Model
         public uint Recommended_time_end { get; set; }
         public uint Recommended_time_start { get; set; }
         public uint expend_day { get; set; }
-
+        public string months { get; set; }
+        public int combotype { get; set; }
         public Product()
         {
             Product_Id = 0;
@@ -263,6 +264,8 @@ namespace BLL.gigade.Model
             Recommended_time_end = 0;
             Recommended_time_start = 0;
             expend_day = 0;
+            months = string.Empty;
+            combotype = 0;
         }
 
         /// <summary>

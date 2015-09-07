@@ -23,6 +23,7 @@ using BLL.gigade.Model.Query;
 using BLL.gigade.Model.Custom;
 using BLL.gigade.Mgr.Impl;
 using System.Web;
+using BLL.gigade.Dao;
 namespace BLL.gigade.Mgr
 {
     public class OrderImportMgr
@@ -1472,7 +1473,16 @@ namespace BLL.gigade.Mgr
                 }
 
                 //添加 bonus_master 的數據新增  add by zhuoqin0830w 2015/08/24
+                SerialDao _serialDao = new SerialDao(MySqlConnStr);
                 _bonusMasterMgr = new BonusMasterMgr(MySqlConnStr);
+                //使用 Serial 表中的 流水賬號
+                if (bm != null)
+                {
+                    Serial ser = _serialDao.GetSerialById(27);
+                    ser.Serial_Value = ser.Serial_Value + 1;
+                    _serialDao.Update(ser);
+                    bm.master_id = Convert.ToUInt32(ser.Serial_Value);
+                }
                 string bonusMaster = bm == null ? string.Empty : _bonusMasterMgr.AddBonusMaster(bm);
 
                 //對 bonus_record 的數據新增  和 對 bonus_master 數據 修改  add by zhuoqin0830w 2015/08/25
@@ -1481,9 +1491,6 @@ namespace BLL.gigade.Mgr
                 if (br != null)
                 {
                     List<BonusMaster> queryBonusMaster = _bonusMasterMgr.GetBonusMasterByEndTime(br);
-                    //得到 主鍵最大的值 并 +1
-                    uint recordID = _bonusRecordMgr.GetRecordID();
-                    recordID++;
                     //將前臺的到的購物金額存儲
                     int useBonus = (int)br.record_use;
                     foreach (BonusMaster bonus in queryBonusMaster)
@@ -1492,7 +1499,11 @@ namespace BLL.gigade.Mgr
                         int decuteBonusNum = bonus.master_balance > useBonus ? useBonus : bonus.master_balance;
                         if (decuteBonusNum > 0)
                         {
-                            br.record_id = recordID;
+                            //使用 Serial 表中的 流水賬號
+                            Serial ser = _serialDao.GetSerialById(28);
+                            ser.Serial_Value = ser.Serial_Value + 1;
+                            _serialDao.Update(ser);
+                            br.record_id = Convert.ToUInt32(ser.Serial_Value);
                             br.master_id = bonus.master_id;
                             br.type_id = bonus.type_id;
                             br.record_use = Convert.ToUInt32(decuteBonusNum);
@@ -1507,7 +1518,6 @@ namespace BLL.gigade.Mgr
                             useBonus -= decuteBonusNum;
                             //如果useBonus == 0 為 true  則表示 使用金已經用完 可以不用在循環到下一步
                             if (useBonus == 0) { break; }
-                            recordID++;  //每進行一次 循環  就 +1
                         }
                     }
                 }

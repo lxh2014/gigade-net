@@ -26,7 +26,7 @@
     PRODUCT_START_LIMIT = "上架時間只能選擇未來時間",
     PRODUCT_END_LIMIT = "下架時間只能選擇未來時間",
     EXPECT_TIME_LIMIT = "預計出貨時間只能選擇未來時間",
-    EXPECT_MSG = "預計出貨信息";
+    EXPECT_MSG = "預計出貨/輔助信息";
     BAG_CHECK_INFORMATION = "自出及調度無法設定寄倉費";
 
 
@@ -65,9 +65,13 @@
     PURCHASE_IN_ADVANCE = "是否預購";
     PURCHASE_IN_ADVANCE_TIME = "預購時間起訖";
     START_END_LIMIT_INADVANCE = "預購結束時間必須大於開始時間，請重新選擇"
-
+    //add by dongya 2015 08 26
     RECOMMENDED_JUDGE_PRODUCT = "是否推薦商品";
     RECOMMENDED_JUDGE_PRODUCT_TIME = "推薦時間起訖";
     START_END_LIMIT_RECOMMENDED = "推薦結束時間必須大於開始時間，請重新選擇";
-    USED_TIME = "預計消耗時間";
+    USED_TIME = "預計消耗時間(天)";
+
+    MONTH_SET_NOEMPTY = "推薦月份不能為空";
+
+    MONTH_SET_USED_TIME_NOEMPTY = "推薦月份設定為必填項，且預計消耗時間必須大於0";
 });

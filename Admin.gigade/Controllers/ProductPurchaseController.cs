@@ -1,4 +1,5 @@
-﻿using BLL.gigade.Mgr;
+﻿using BLL.gigade.Common;
+using BLL.gigade.Mgr;
 using BLL.gigade.Mgr.Impl;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
@@ -23,15 +24,24 @@ namespace Admin.gigade.Controllers
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly string mySqlConnectionString = System.Configuration.ConfigurationManager.AppSettings["MySqlConnectionString"].ToString();
 
+        public ArrivalNoticeMgr arrivalnoticemgr;
+
         //BLL.gigade.Mgr.OrderDetailMgr orderDetailMgr = new BLL.gigade.Mgr.OrderDetailMgr(mySqlConnectionString);
         BLL.gigade.Mgr.ProductItemMgr productItemMgr = new BLL.gigade.Mgr.ProductItemMgr(mySqlConnectionString);
         private IItemIpoCreateLogImplMgr _ItemIpoMgr;// ItemIpoMgr = new BLL.gigade.Mgr.ProductItemMgr(mySqlConnectionString);
         IParametersrcImplMgr _paraMgr;
+        IArrivalNoticeImplMgr _arrivalMgr;
+       
+        IUsersImplMgr _usersMgr;
         #region 視圖
         //
         // GET: /ProductPurchase/
 
         public ActionResult Index()
+        {
+            return View();
+        }
+        public ActionResult RIS()//補貨通知
         {
             return View();
         }
@@ -391,8 +401,6 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        
-
         public HttpResponseBase AddItemIpo()
         {
            
@@ -436,5 +444,304 @@ namespace Admin.gigade.Controllers
             return this.Response;
 
         }
+        #region 補貨通知人數統計
+        public HttpResponseBase GetArrNoticeList()// createTime 2015/8/25 by yachao1120j
+        {
+            string json = string.Empty;
+            int totalcount = 0;
+            ArrivalNoticeQuery query = new ArrivalNoticeQuery();
+            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+            arrivalnoticemgr = new ArrivalNoticeMgr(mySqlConnectionString);
+
+            if (!string.IsNullOrEmpty(Request.Params["vendor_name_full_OR_vendor_id"]))
+            {
+                query.vendor_name_full_OR_vendor_id = Request.Params["vendor_name_full_OR_vendor_id"];//供應商名稱/供應商編號
+            }
+            if (!string.IsNullOrEmpty(Request.Params["product_id"]))//商品編號
+            {
+                query.product_id = Convert.ToUInt32(Request.Params["product_id"]);
+            }
+            if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
+            {
+                query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
+            }
+            if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
+            {
+                query.end_time = Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59");
+            }
+            List<ArrivalNoticeQuery> list = arrivalnoticemgr.GetArrNoticeList(query, out totalcount);
+            IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+            timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            timeConverter.DateTimeFormat = "yyyy-MM-dd";
+            json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return Response;
+
+        }
+        #endregion
+
+        #region 顯示補貨通知詳情 
+        public HttpResponseBase ShowArrByUserList()
+        {
+            string json = string.Empty;
+            int totalcount = 0;
+            ArrivalNoticeQuery query = new ArrivalNoticeQuery();
+
+            //Ris.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+            //Ris.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+
+            query.item_id = Convert.ToUInt32( Request.Params["item_id"]);
+            arrivalnoticemgr = new ArrivalNoticeMgr(mySqlConnectionString);
+            
+            if (!string.IsNullOrEmpty(Request.Params["item_id"]))
+            {
+                string item_id = Request.Params["item_id"];
+            }
+            if (!string.IsNullOrEmpty(Request.Params["startTime"]))
+            {
+                query.start_time = Convert.ToDateTime(Request.Params["startTime"]).ToString("yyyy-MM-dd 00:00:00");
+            }
+            if (!string.IsNullOrEmpty(Request.Params["endTime"]))
+            {
+                query.end_time = Convert.ToDateTime(Request.Params["endTime"]).ToString("yyyy-MM-dd 23:59:59");
+            }
+            List<ArrivalNoticeQuery> List = arrivalnoticemgr.ShowArrByUserList(query, out totalcount);
+            IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+            timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            timeConverter.DateTimeFormat = "yyyy-MM-dd";
+            json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(List, Formatting.Indented,timeConverter) + "}";
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return Response;
+        }
+        #endregion
+
+        #region 補貨通知人數新增
+        public HttpResponseBase SaveArrivaleNotice()
+        {
+            ArrivalNotice arr = new ArrivalNotice();
+           
+             string jsonStr = String.Empty;
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["id"]))
+                { 
+                    arr.id=uint.Parse(Request.Params["id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["product_id"]))
+                {
+                    arr.product_id = uint.Parse(Request.Params["product_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["item_id"]))
+                {
+                    arr.item_id = uint.Parse(Request.Params["item_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_id"]))
+                {
+                    arr.user_id = uint.Parse(Request.Params["user_id"]);
+                }
+                arr.source_type = 2;
+                arr.status = 0;
+                arr.send_notice_time = 0;
+                arr.create_time = uint.Parse(CommonFunction.GetPHPTime().ToString());
+                arr.muser_id = (Session["caller"] as Caller).user_id;
+                _arrivalMgr = new ArrivalNoticeMgr(mySqlConnectionString);
+                if (arr.id == 0)//新增
+                {
+                    int result=_arrivalMgr.SaveArrivaleNotice(arr);
+                    if (result == 1)
+                    {
+                        jsonStr = "{success:true,msg:\"" + 1 + "\"}";
+                    }
+                    if (result == 98)
+                    {
+                        jsonStr = "{success:true,msg:\"" + 98 + "\"}";//此人員已在未通知列表中
+                    }
+                    else 
+                    {
+                        jsonStr = "{success:true,msg:\"" + 99 + "\"}";
+                    }
+                   
+                }
+                else //修改
+                {
+                    int result = _arrivalMgr.UpArrivaleNoticeStatus(arr);
+                    if (result==100)
+                    {
+                        jsonStr = "{success:true,msg:\"" + 100 + "\"}";
+                        //jsonStr = "{success:true,msg:\"此此人不在補貨通知以內貨已取消通知！\"}";
+                    }
+                    else
+                    {
+                        jsonStr = "{success:true,msg:\"" + 99 + "\"}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                jsonStr = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(jsonStr.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+
+        public HttpResponseBase GetUserName()
+        {
+             Users user = new Users();
+            if (!string.IsNullOrEmpty(Request.Params["user_id"]))
+            {
+                user.user_id = ulong.Parse(Request.Params["user_id"]);
+            }
+           
+          
+            _usersMgr = new UsersMgr(mySqlConnectionString);
+            string jsonStr =string.Empty;
+            try
+            {
+                List<Users> userList = new List<Users>();
+                userList = _usersMgr.GetUser(user);
+                if (userList.Count > 0)
+                {
+                    jsonStr = "{success:true,msg:\"" + userList[0].user_name + "\"}";
+                }
+                else 
+                {
+                    jsonStr = "{success:true,msg:\"" +100+ "\"}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                jsonStr = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(jsonStr);
+            this.Response.End();
+            return this.Response;
+        }
+
+        public HttpResponseBase GetProductName()
+        {
+            ProductItemQuery pItem = new ProductItemQuery();
+            if (!string.IsNullOrEmpty(Request.Params["item_id"]))
+            {
+                pItem.Item_Id = uint.Parse(Request.Params["item_id"]);
+            }
+
+
+            productItemMgr = new ProductItemMgr(mySqlConnectionString);
+            string jsonStr = string.Empty;
+
+            try
+            {
+                List<ProductItemQuery> ItemList = new List<ProductItemQuery>();
+                ItemList = productItemMgr.GetProductItemByID(pItem);
+                if (ItemList.Count > 0)
+                {
+                    jsonStr = "{success:true,msg:\"[" + ItemList[0].Product_Id + "]" + ItemList[0].Remark +" "+ ItemList[0].Spec_Name_1 + ItemList[0].Spec_Name_2 + "\",product_id:\"" + ItemList[0].Product_Id + "\"}";
+                }
+                else
+                {
+                    jsonStr = "{success:true,msg:\"" + 100 + "\"}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                jsonStr = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(jsonStr);
+            this.Response.End();
+            return this.Response;
+        }
+        public void ExportCSV()
+        {
+            ArrivalNoticeQuery query = new ArrivalNoticeQuery();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["vendor_name_full_OR_vendor_id"]))
+                {
+                    query.vendor_name_full_OR_vendor_id = Request.Params["vendor_name_full_OR_vendor_id"];//供應商名稱/供應商編號
+                }
+                if (!string.IsNullOrEmpty(Request.Params["product_id"]))//商品編號
+                {
+                    query.product_id = Convert.ToUInt32(Request.Params["product_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
+                {
+                    query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
+                }
+                if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
+                {
+                    query.end_time = Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59");
+                }
+                DataTable dtHZ = new DataTable();
+                int totalcount = 0;
+                query.IsPage = false;
+                string newExcelName = string.Empty;
+                dtHZ.Columns.Add("商品編號", typeof(String));
+                dtHZ.Columns.Add("商品名稱", typeof(String));
+                dtHZ.Columns.Add("商品細項編號", typeof(String));
+                dtHZ.Columns.Add("商品規格", typeof(String));
+                dtHZ.Columns.Add("供應商編號", typeof(String));
+                dtHZ.Columns.Add("供應商名稱", typeof(String));
+                dtHZ.Columns.Add("補貨通知人數", typeof(String));
+                List<ArrivalNoticeQuery> list = new List<ArrivalNoticeQuery>();
+                arrivalnoticemgr = new ArrivalNoticeMgr(mySqlConnectionString);
+                list = arrivalnoticemgr.GetArrNoticeList(query, out totalcount);
+
+                if (list.Count > 0)
+                {
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        DataRow dr = dtHZ.NewRow();
+                        dr[0] = list[i].product_id;
+                        dr[1] = list[i].product_name;
+                        dr[2] = list[i].item_id;
+                        dr[3] = list[i].product_spec;
+                        dr[4] = list[i].vendor_id;
+                        dr[5] = list[i].vendor_name_full;
+                        dr[6] = list[i].ri_nums;
+                        dtHZ.Rows.Add(dr);
+                    }
+                    string fileName = "補貨通知統計匯出_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                    MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "");
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                    Response.BinaryWrite(ms.ToArray());
+                }
+                else
+                {
+                    Response.Clear();
+                    this.Response.Write("無數據存在<br/>");
+                }
+               
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+             
+            }
+        }
+        #endregion
     }
 }

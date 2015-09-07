@@ -49,7 +49,7 @@ Ext.onReady(function () {
              { header: "編號", dataIndex: 'log_id', width: 60, align: 'center' },
              { header: '活動編號', dataIndex: 'epaper_id', width: 100, align: 'center' },
              { header: '使用者編號', dataIndex: 'user_id', width: 100, align: 'center' },
-             { header: "使用者名稱", dataIndex: 'user_name', width: 100, align: 'center' },
+             { header: "使用者姓名", dataIndex: 'user_name', width: 100, align: 'center' },
              { header: "說明", dataIndex: 'log_description', width: 300, align: 'center' },
             { header: "來源", dataIndex: 'log_ipfrom', width: 100, align: 'center' },
             {

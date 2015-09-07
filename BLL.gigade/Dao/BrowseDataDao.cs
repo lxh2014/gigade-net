@@ -51,14 +51,31 @@ namespace BLL.gigade.Dao
                 //sqlCondition.AppendFormat(" AND db.type IN({0}) ", query.type);
                 sqlCondition.AppendFormat(" AND bd.type ='{0}' ",query.type);
             }
-
-            if (!string.IsNullOrEmpty(query.SearchCondition))
+            if (query.SearchType != 0)
             {
-                sqlCondition.AppendFormat(" and  (bd.user_id='{0}' or bd.product_id='{0}' or u.user_name LIKE '%{0}%' or  p.product_name LIKE '%{0}%'  ) ",query.SearchCondition);
-                //sqlCondition.AppendFormat(" OR bd.user_id={0} ", query.SearchCondition);
-                //sqlCondition.AppendFormat(" OR bd.product_id={0} ", query.SearchCondition);
-                //sqlCondition.AppendFormat(" OR u.user_name LIKE '%{0}%' ", query.SearchCondition);
-                //sqlCondition.AppendFormat(" OR p.product_name LIKE '%{0}%' ", query.SearchCondition);
+                if (!string.IsNullOrEmpty(query.SearchCondition))
+                {
+                    switch (query.SearchType) 
+                    {
+                        case 1:
+                            sqlCondition.AppendFormat(" AND bd.user_id={0} ", query.SearchCondition);
+                            break;
+                        case 2:
+                            sqlCondition.AppendFormat(" AND bd.product_id={0} ", query.SearchCondition);
+                            break;
+                        case 3:
+                            sqlCondition.AppendFormat(" AND u.user_name LIKE '%{0}%' ", query.SearchCondition);
+                            break;
+                        case 4:
+                            sqlCondition.AppendFormat(" AND p.product_name LIKE '%{0}%' ", query.SearchCondition);
+                            break;
+                    }
+                    //sqlCondition.AppendFormat(" and  (bd.user_id='{0}' or bd.product_id='{0}' or u.user_name LIKE '%{0}%' or  p.product_name LIKE '%{0}%'  ) ", query.SearchCondition);
+                    //sqlCondition.AppendFormat(" OR bd.user_id={0} ", query.SearchCondition);
+                    //sqlCondition.AppendFormat(" OR bd.product_id={0} ", query.SearchCondition);
+                    //sqlCondition.AppendFormat(" OR u.user_name LIKE '%{0}%' ", query.SearchCondition);
+                    //sqlCondition.AppendFormat(" OR p.product_name LIKE '%{0}%' ", query.SearchCondition);
+                }
             }
             sqlCondition.Append(" ORDER BY bd.count DESC ");
             totalCount = 0;

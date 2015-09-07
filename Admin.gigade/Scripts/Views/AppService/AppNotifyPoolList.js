@@ -28,6 +28,8 @@ Ext.define('gigade.AppNotifyPoolModel', {
 });
 
 
+
+
 //加載Grid數據源
 var gridShow = Ext.create('Ext.data.Store', {
     model: 'gigade.AppNotifyPoolModel',
@@ -42,26 +44,139 @@ var gridShow = Ext.create('Ext.data.Store', {
 });
 //數據源BeforeLoad
 gridShow.on("beforeload", function () {
+    gridShow.removeAll();
+    //驗證查詢條件
+    var timestartvalue = Ext.getCmp('dfstart').getValue();
+    var timestartendvalue = Ext.getCmp('dfstartend').getValue();
+    var timeendstartvalue = Ext.getCmp('dfendstart').getValue();
+    var timeendendvalue = Ext.getCmp('dfendend').getValue();
+    if (timestartvalue == null && timestartendvalue == null && timeendstartvalue == null && timeendendvalue == null) {
+        Ext.Msg.alert(INFORMATION, SEARCHNULLTEXT);
+        return false;
+    }
     Ext.apply(gridShow.proxy.extraParams,
              {
-                 timestart: Ext.getCmp('dfstart').getValue(),
-                 timeend: Ext.getCmp('dfend').getValue()
+                 timestart: timestartvalue,
+                 timestartend: timestartendvalue,
+                 timeendstart: timeendstartvalue,
+                 timeendend: timeendendvalue
              });
 });
 
 //查詢按鈕事件
 function btnSearchFn() {
     gridShow.removeAll();
+    //驗證查詢條件
+    var timestartvalue = Ext.getCmp('dfstart').getValue();
+    var timestartendvalue = Ext.getCmp('dfstartend').getValue();
+    var timeendstartvalue = Ext.getCmp('dfendstart').getValue();
+    var timeendendvalue = Ext.getCmp('dfendend').getValue();
+    if (timestartvalue == null && timestartendvalue == null && timeendstartvalue == null && timeendendvalue == null) {
+        Ext.Msg.alert(INFORMATION, SEARCHNULLTEXT);
+        return false;
+    }
     //為Store數據集傳遞AJax參數
     Ext.getCmp("ShowGrid").store.loadPage(1, {
         params: {
-            timestart: Ext.getCmp('dfstart').getValue(),
-            timeend: Ext.getCmp('dfend').getValue()
+            timestart: timestartvalue,
+            timestartend: timestartendvalue,
+            timeendstart: timeendstartvalue,
+            timeendend: timeendendvalue
         }
     });
 }
+//定義開始時間container
+var starttimecon = Ext.create('Ext.container.Container', {
+    layout: {
+        type: 'hbox',
+        padding: '5 0 0 0'
+    },
+    width: 350,
+    items: [{
+        xtype: 'datefield',
+        fieldLabel: VALID_START,
+        name: 'dfstart',
+        id: 'dfstart',
+        format: 'Y-m-d',
+        labelWidth: 90,
+        width: 200,
+        editable: false,
+        listeners: {
+            change: function () {
+                Ext.getCmp("dfstartend").setMinValue(this.getValue());
+                Ext.getCmp("dfendend").setMinValue(this.getValue());
+                Ext.getCmp("dfendstart").setMinValue(this.getValue());
+            }
+        }
+    }, {
+        xtype: 'displayfield',
+        value: '~ ',
+        id: 'blp',
+        disabled: true
+    }, {
+        xtype: 'datefield',
+        name: 'dfstartend',
+        id: 'dfstartend',
+        format: 'Y-m-d',
+        width: 120,
+        editable: false,
+        listeners: {
+            change: function () {
+                Ext.getCmp("dfstart").setMaxValue(this.getValue());
+            }
+        }
+    }]
+});
+//定義結束時間container
+var endtimecon = Ext.create('Ext.container.Container', {
+    layout: {
+        type: 'hbox',
+        padding: '5 0 0 0'
+    },
+    width: 350,
+    items: [{
+        xtype: 'datefield',
+        fieldLabel: VALID_END,
+        name: 'dfendstart',
+        id: 'dfendstart',
+        format: 'Y-m-d',
+        labelWidth: 90,
+        width: 200,
+        editable: false,
+        listeners: {
+            change: function () {
+                Ext.getCmp("dfendend").setMinValue(this.getValue());
+            }
+        }
+    }, {
+        xtype: 'displayfield',
+        value: '~ ',
+        id: 'blp',
+        disabled: true
+    }, {
+        xtype: 'datefield',
+        name: 'dfendend',
+        id: 'dfendend',
+        format: 'Y-m-d',
+        width: 120,
+        editable: false,
+        listeners: {
+            change: function () {
+                Ext.getCmp("dfstart").setMaxValue(this.getValue());
+                Ext.getCmp("dfstartend").setMaxValue(this.getValue());
+                Ext.getCmp("dfendstart").setMaxValue(this.getValue());
+            }
+        }
+    }]
+});
 //加載到頁面上面
 Ext.onReady(function () {
+    //回撤鍵查詢
+    document.body.onkeydown = function () {
+        if (event.keyCode == 13) {
+            $("#btnSearch").click();
+        }
+    };
     //創建人員查詢列表
     var GShow = Ext.create('Ext.grid.Panel', {
         id: 'ShowGrid',
@@ -71,10 +186,10 @@ Ext.onReady(function () {
         frame: true,
         columns: [{ header: RID, dataIndex: 'id', width: 100, align: 'center', hidden: true },
              { text: XID, xtype: 'rownumberer', width: 40, align: 'center', menuDisabled: true, sortable: false },
-            { text: TITLE, dataIndex: 'title', width: 100, align: 'center', menuDisabled: true, sortable: false },
-            { text: ALERTTXT, dataIndex: 'alert', width: 100, align: 'center', menuDisabled: true, sortable: false },
-            { text: URLTEXT, dataIndex: 'url', width: 100, align: 'center', menuDisabled: true, sortable: false },
-            { text: TOTEXT, dataIndex: 'to', width: 100, align: 'center', menuDisabled: true, sortable: false },
+            { text: TITLE, dataIndex: 'title', width: 150, align: 'center', menuDisabled: true, sortable: false },
+            { text: ALERTTXT, dataIndex: 'alert', width: 150, align: 'center', menuDisabled: true, sortable: false },
+            { text: URLTEXT, dataIndex: 'url', width: 150, align: 'center', menuDisabled: true, sortable: false },
+            { text: TOTEXT, dataIndex: 'to', width: 150, align: 'center', menuDisabled: true, sortable: false },
             {
                 text: VALID_START, dataIndex: 'starttime', width: 100, align: 'center', menuDisabled: true, sortable: false
             },
@@ -89,7 +204,36 @@ Ext.onReady(function () {
                   text: NOTIFY_TIME, dataIndex: 'notifytime', width: 100, align: 'center', menuDisabled: true, sortable: false,
                   renderer: function (val) { return val == '1970-01-01' ? "" : val; }
               }
-        ],
+        ], dockedItems: [{
+            dock: 'top',
+            xtype: 'toolbar',
+            items: [
+              starttimecon,
+              endtimecon,
+             {
+                 xtype: "button",
+                 id: "btnSearch",
+                 margin: "0 0 0 0",
+                 width: 50,
+                 text: SEARCHBTN,
+                 iconCls: 'ui-icon ui-icon-search-2',
+                 handler: btnSearchFn
+             }, {
+                 xtype: 'button',
+                 text: REPEATBTN,
+                 id: 'btn_reset',
+                 iconCls: 'ui-icon ui-icon-reset',
+                 listeners: {
+                     click: function () {
+                         Ext.getCmp('dfstart').reset(),
+                          Ext.getCmp('dfstartend').reset(),
+                          Ext.getCmp('dfendstart').reset(),
+                         Ext.getCmp('dfendend').reset()
+                     }
+                 }
+             }
+            ]
+        }],
         bbar: {
             dock: 'bottom',
             xtype: 'pagingtoolbar',
@@ -107,56 +251,8 @@ Ext.onReady(function () {
                iconCls: 'ui-icon ui-icon-user-add',
                xtype: 'button',
                handler: btnAdd
-           },
-           '->',
-       {
-           xtype: 'datefield',
-           fieldLabel: '&nbsp;&nbsp;' + VALID_START,
-           name: 'dfstart',
-           id: 'dfstart',
-           format: 'Y-m-d',
-           labelWidth: 90,
-           width: 200,
-           editable: false,
-           dateRange: { begin: 'dfstart', end: 'dfend' },
-           vtype: 'dateRange'
-       }, {
-           xtype: 'displayfield',
-           value: '~ ',
-           id: 'blp',
-           disabled: true,
-           margin: '0 0 0 5'
-       }, {
-           xtype: 'datefield',
-           fieldLabel: '&nbsp;&nbsp;' + VALID_END,
-           name: 'dfend',
-           id: 'dfend',
-           format: 'Y-m-d',
-           labelWidth: 90,
-           width: 200,
-           editable: false,
-           dateRange: { begin: 'dfstart', end: 'dfend' },
-           vtype: 'dateRange'
-       }, {
-           xtype: "button",
-           id: "btnSearch",
-           margin: "0 0 0 5",
-           width: 50,
-           text: SEARCHBTN,
-           iconCls: 'icon-search',
-           handler: btnSearchFn
-       }, {
-           xtype: 'button',
-           text: REPEATBTN,
-           id: 'btn_reset',
-           iconCls: 'ui-icon ui-icon-reset',
-           listeners: {
-               click: function () {
-                   Ext.getCmp('dfstart').reset(),
-                   Ext.getCmp('dfend').reset()
-               }
            }
-       }],
+        ],
         listeners: {
             scrollershow: function (scroller) {
                 if (scroller && scroller.scrollEl) {
@@ -179,31 +275,6 @@ Ext.onReady(function () {
         }
     });
     ToolAuthority();
-});
-//自定义VTypes类型，验证日期范围  
-Ext.apply(Ext.form.VTypes, {
-    dateRange: function (val, field) {
-        if (field.dateRange) {
-            var beginId = field.dateRange.begin;
-            this.beginField = Ext.getCmp(beginId);
-            var endId = field.dateRange.end;
-            this.endField = Ext.getCmp(endId);
-            var beginDate = this.beginField.getValue();
-            var endDate = this.endField.getValue();
-        }
-        if (beginDate != null && endDate != null) {
-            if (beginDate <= endDate) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        else {
-            return true;
-        }
-    },
-    //验证失败信息  
-    dateRangeText: REGXVALID_END
 });
 //添加信息
 function btnAdd() {

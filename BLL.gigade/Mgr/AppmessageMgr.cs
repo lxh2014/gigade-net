@@ -17,7 +17,12 @@ namespace BLL.gigade.Mgr
         {
             _iappmessageImplDao = new AppmessageDao(connectionStr);
         }
-
+        /// <summary>
+        /// 獲取列表
+        /// </summary>
+        /// <param name="appmsg"></param>
+        /// <param name="totalCount"></param>
+        /// <returns></returns>
         public List<AppmessageQuery> GetAppmessageList(AppmessageQuery appmsg, out int totalCount)
         {
             try
@@ -29,6 +34,11 @@ namespace BLL.gigade.Mgr
                 throw new Exception("AppmessageMgr-->GetAppmessageList-->" + ex.Message, ex);
             }
         }
+        /// <summary>
+        /// 獲取參數
+        /// </summary>
+        /// <param name="para"></param>
+        /// <returns></returns>
         public string GetParaList(string para)
         {
             try
@@ -58,6 +68,11 @@ namespace BLL.gigade.Mgr
                 throw new Exception("AppmessageMgr-->GetParaList-->" + ex.Message, ex);
             }
         }
+        /// <summary>
+        /// 插入數據
+        /// </summary>
+        /// <param name="appmsg"></param>
+        /// <returns></returns>
         public int AppMessageInsert(Appmessage appmsg)
         {
             try

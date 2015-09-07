@@ -270,7 +270,7 @@ Ext.onReady(function () {
             name: 'content_from_name',
             id: 'content_from_name',
             submitValue: true,
-            fieldLabel: '寄件者名稱',
+            fieldLabel: '寄件者姓名',
             allowBlank: false,
             value: '吉甲地市集電子報'
         },

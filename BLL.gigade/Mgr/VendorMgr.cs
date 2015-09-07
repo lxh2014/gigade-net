@@ -15,7 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BLL.gigade.Mgr.Impl; 
+using BLL.gigade.Mgr.Impl;
 using BLL.gigade.Model;
 using BLL.gigade.Dao.Impl;
 using BLL.gigade.Dao;
@@ -25,7 +25,7 @@ using System.Collections;
 namespace BLL.gigade.Mgr
 {
     public class VendorMgr : IVendorImplMgr
-    {      
+    {
         private IVendorImplDao _vendorDao;
         private string connStr;
         private MySqlDao _mysqlDao;
@@ -383,6 +383,18 @@ namespace BLL.gigade.Mgr
             catch (Exception ex)
             {
                 throw new Exception("VendorMgr-->GetOffGradeCount-->" + ex.Message, ex);
+            }
+        }
+
+        public List<Vendor> GetArrayDaysInfo(uint brand_id)
+        {
+            try
+            {
+                return _vendorDao.GetArrayDaysInfo(brand_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("VendorMgr-->GetArrayDaysInfo"+ex.Message,ex);
             }
         }
     }

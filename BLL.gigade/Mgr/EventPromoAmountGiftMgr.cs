@@ -83,16 +83,11 @@ namespace BLL.gigade.Mgr
                     EventPromoGiftDao _epgDao = new EventPromoGiftDao(conn);
                     foreach (EventPromoGiftQuery item in epGiftDetail)
                     {
-                        if (item.gift_type == 2)//購物金
-                        {
-                            item.bonus = item.gift_ware;
-                            item.bonus_multiple = item.gift_num;
-                        }
-                        else if (item.gift_type == 3)//抵用券
-                        {
-                            item.welfare = item.gift_ware;
-                            item.welfare_multiple = item.gift_num;
-                        }
+
+                        item.bonus = item.bonus;
+                        item.bonus_multiple = item.bonus_multiple;
+                        item.welfare = item.welfare;
+                        item.welfare_multiple = item.welfare_multiple;
                         item.event_id = epaGift.event_id;
                         item.create_user = epaGift.create_user;
                         item.create_time = epaGift.create_time;
@@ -120,19 +115,17 @@ namespace BLL.gigade.Mgr
                     string gift_ids = "";
                     foreach (EventPromoGiftQuery item in epGiftDetail)
                     {
-                        if (item.gift_type == 2)//購物金
-                        {
-                            item.bonus = item.gift_ware;
-                            item.bonus_multiple = item.gift_num;
-                        }
-                        else if (item.gift_type == 3)//抵用券
-                        {
-                            item.welfare = item.gift_ware;
-                            item.welfare_multiple = item.gift_num;
-                        }
+
+                        item.bonus = item.bonus;
+                        item.bonus_multiple = item.bonus_multiple;
+                        item.welfare = item.welfare;
+                        item.welfare_multiple = item.welfare_multiple;
                         item.event_id = epaGift.event_id;
                         item.modify_user = epaGift.modify_user;
                         item.modify_time = epaGift.modify_time;
+
+                        item.create_user = epaGift.modify_user;
+                        item.create_time = epaGift.modify_time;
 
                         _list.Add(_epgDao.AddOrUpdate(item));
                         if (item.gift_id != 0)

@@ -55,7 +55,6 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
                     }
                 }
             }
-
         }
     }
 });
@@ -73,9 +72,9 @@ var DDLStore = Ext.create('Ext.data.Store', {
 var DateStore = Ext.create("Ext.data.Store", {
     fields: ["name", "value"],
     data: [
-       { "name": "所有日期", "value": "0" },
-       { "name": "建立日期", "value": "1" },
-         { "name": "出貨日期", "value": "2" }
+        { "name": "所有日期", "value": "0" },
+        { "name": "建立日期", "value": "1" },
+        { "name": "出貨日期", "value": "2" }
     ]
 });
 
@@ -226,11 +225,7 @@ var frm = Ext.create('Ext.form.Panel', {
                         }
                     }
                 },
-                {
-                    xtype: 'displayfield',
-                    margin: '5 10 0 0',
-                    value: '~'
-                },
+                { xtype: 'displayfield', margin: '5 10 0 0', value: '~'},
                 {
                     xtype: 'datefield',
                     id: 'time_end',
@@ -422,7 +417,6 @@ onCancelClick = function () {
     }
 }
 function TransToOrder(orderId) {
-
     var url = '/OrderManage/OrderDetialList?Order_Id=' + orderId;
     var panel = window.parent.parent.Ext.getCmp('ContentPanel');
     var copy = panel.down('#ReturnMasterList');

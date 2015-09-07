@@ -169,5 +169,35 @@ namespace BLL.gigade.Mgr
             }
         }
         #endregion
+
+
+
+        //是否有發放購物金  write for cj
+        public List<BonusMasterQuery>  IsExtendBonus(BonusMasterQuery query)
+        {
+            try
+            {
+                return _IBonusMasterDao.IsExtendBonus(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("BonusMasterMgr-->UpdateBonusMasterBalance(BonusMaster bm)-->" + ex.Message, ex);
+            }
+        }
+
+        public ArrayList regainBonus(BonusMasterQuery bm, BonusRecord br)
+        {
+            ArrayList arrList = new ArrayList();
+            try
+            {
+                arrList.Add(_IBonusMasterDao.UpdateBonusMaster(bm));
+                arrList.Add(_IBonusMasterDao.InsertBonusRecord(br));
+                return arrList;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("BonusMasterMgr-->regainBonus-->" + ex.Message, ex);
+            }
+        }
     }
 }

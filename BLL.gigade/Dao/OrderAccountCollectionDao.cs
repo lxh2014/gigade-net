@@ -57,21 +57,57 @@ namespace BLL.gigade.Dao
         }
 
 
-        public int SaveOrEdit(OrderAccountCollection query)
+        public int SaveOrEdit(OrderAccountCollection model)
         {
             StringBuilder str = new StringBuilder();
-            query.Replace4MySQL();
+            model.Replace4MySQL();
             try
             {
-                if (query.row_id == 0)
+                if (model.row_id == 0)
                 {
-                    str.Append(@"insert into order_account_collection(order_id,account_collection_time,account_collection_money,poundage,return_collection_time,return_collection_money,return_poundage,remark) ");
-                    str.AppendFormat(" values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}')", query.order_id, Common.CommonFunction.DateTimeToString(query.account_collection_time), query.account_collection_money, query.poundage, Common.CommonFunction.DateTimeToString(query.return_collection_time), query.return_collection_money, query.return_poundage, query.remark);
+                    str.Append(@"insert into order_account_collection(order_id,remark,account_collection_time,account_collection_money,poundage,return_collection_time,return_collection_money,return_poundage) ");
+                    str.AppendFormat(" values('{0}','{1}'", model.order_id, model.remark);
+                    if (model.account_collection_time != null && model.account_collection_time != DateTime.MinValue)
+                    {
+                        str.AppendFormat(" ,'{0}','{1}','{2}'", Common.CommonFunction.DateTimeToString(model.account_collection_time), model.account_collection_money, model.poundage);
+                    }
+                    else
+                    {
+                        str.AppendFormat(" ,NULL ,NULL  ,NULL  ");
+                    }
+                    if (model.return_collection_time != null && model.return_collection_time != DateTime.MinValue)
+                    {
+                        str.AppendFormat(" ,'{0}','{1}','{2}' ", Common.CommonFunction.DateTimeToString(model.return_collection_time), model.return_collection_money, model.return_poundage);
+                    }
+                    else
+                    {
+                        str.AppendFormat(" , NULL  ,NULL  ,NULL ");
+                    }
+                    str.AppendFormat(" );");
                 }
                 else
                 {
-                    str.AppendFormat(@"update order_account_collection set order_id='{0}',account_collection_time='{1}',account_collection_money='{2}',poundage='{3}',", query.order_id, Common.CommonFunction.DateTimeToString(query.account_collection_time), query.account_collection_money, query.poundage);
-                    str.AppendFormat(@"  return_collection_time='{0}',return_collection_money='{1}',return_poundage='{2}',remark='{3}' where row_id='{4}' ", Common.CommonFunction.DateTimeToString(query.return_collection_time), query.return_collection_money, query.return_poundage, query.remark, query.row_id);
+                    str.AppendFormat(@"update order_account_collection set order_id='{0}',", model.order_id);
+
+                    if (model.account_collection_time != null && model.account_collection_time != DateTime.MinValue)
+                    {
+                        str.AppendFormat("account_collection_time='{0}', account_collection_money='{1}',poundage='{2}',", Common.CommonFunction.DateTimeToString(model.account_collection_time), model.account_collection_money, model.poundage);
+                    }
+                    else
+                    {
+                        str.AppendFormat("account_collection_time={0}, account_collection_money={1},poundage={2},", "NULL", "NULL", "NULL");
+                    }
+
+                    if (model.return_collection_time != null && model.return_collection_time != DateTime.MinValue)
+                    {
+                        str.AppendFormat("  return_collection_time='{0}',return_collection_money='{1}',return_poundage='{2}', ", Common.CommonFunction.DateTimeToString(model.return_collection_time), model.return_collection_money, model.return_poundage);
+                    }
+                    else
+                    {
+                        str.AppendFormat("  return_collection_time={0},return_collection_money={1},return_poundage={2}, ", "NULL", "NULL", "NULL");
+                    }
+                    str.AppendFormat(@" remark='{0}' ", model.remark);
+                    str.AppendFormat(" where row_id='{0}' ", model.row_id);
                 }
                 return _access.execCommand(str.ToString());
             }

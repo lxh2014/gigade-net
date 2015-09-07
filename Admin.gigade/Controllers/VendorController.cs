@@ -2424,18 +2424,85 @@ namespace Admin.gigade.Controllers
             }
             DataTable dt = new DataTable();
             dt = _vendorMgr.GetVendorDetail(sqlwhere);
+            
+            DataTable dtHZ = new DataTable();
+            dtHZ.Columns.Add("供應商編號", typeof(String));
+            dtHZ.Columns.Add("供應商編碼", typeof(String));
+            dtHZ.Columns.Add("狀態", typeof(String));
+            dtHZ.Columns.Add("供應商名稱", typeof(String));
+            dtHZ.Columns.Add("供應商簡稱", typeof(String));
+            dtHZ.Columns.Add("統一編號", typeof(String));
+            dtHZ.Columns.Add("傳真", typeof(String));
+            dtHZ.Columns.Add("負責人", typeof(String));
+            dtHZ.Columns.Add("公司地址", typeof(String));
+            dtHZ.Columns.Add("發票地址", typeof(String));
+            dtHZ.Columns.Add("成本百分比", typeof(String));
+            dtHZ.Columns.Add("信用卡一期百分比", typeof(String));
+            dtHZ.Columns.Add("信用卡三期百分比", typeof(String));
+            dtHZ.Columns.Add("合約簽定日", typeof(String));
+            dtHZ.Columns.Add("合約期間", typeof(String));
+            dtHZ.Columns.Add("結帳方式", typeof(String));
+            dtHZ.Columns.Add("銀行代碼", typeof(String));
+            dtHZ.Columns.Add("銀行名稱", typeof(String));
+            dtHZ.Columns.Add("銀行帳號", typeof(String));
+            dtHZ.Columns.Add("銀行戶名", typeof(String));
+            dtHZ.Columns.Add("常溫運費", typeof(String));
+            dtHZ.Columns.Add("常溫運費門檻", typeof(String));
+            dtHZ.Columns.Add("常溫逆物流費", typeof(String));
+            dtHZ.Columns.Add("低溫運費", typeof(String));
+            dtHZ.Columns.Add("低溫運費門檻", typeof(String));
+            dtHZ.Columns.Add("低溫逆物流費", typeof(String));
+            dtHZ.Columns.Add("負責PM", typeof(String));
+
+            dtHZ.Columns.Add("出貨窗口聯絡人", typeof(String));
+            dtHZ.Columns.Add("連絡電話", typeof(String));
+            dtHZ.Columns.Add("聯絡手機", typeof(String));
+            dtHZ.Columns.Add("聯絡Mail", typeof(String));
+
+            dtHZ.Columns.Add("第二聯絡人類型", typeof(String));
+            dtHZ.Columns.Add("第二聯絡人姓名", typeof(String));
+            dtHZ.Columns.Add("第二連絡電話", typeof(String));
+            dtHZ.Columns.Add("第二聯絡手機", typeof(String));
+            dtHZ.Columns.Add("第二聯絡Mail", typeof(String));
+
+            dtHZ.Columns.Add("第三聯絡人類型", typeof(String));
+            dtHZ.Columns.Add("第三聯絡人姓名", typeof(String));
+            dtHZ.Columns.Add("第三連絡電話", typeof(String));
+            dtHZ.Columns.Add("第三聯絡手機", typeof(String));
+            dtHZ.Columns.Add("第三聯絡Mail", typeof(String));
+
+            dtHZ.Columns.Add("第四聯絡人類型", typeof(String));
+            dtHZ.Columns.Add("第四聯絡人姓名", typeof(String));
+            dtHZ.Columns.Add("第四連絡電話", typeof(String));
+            dtHZ.Columns.Add("第四聯絡手機", typeof(String));
+            dtHZ.Columns.Add("第四聯絡Mail", typeof(String));
+
+            dtHZ.Columns.Add("第五聯絡人類型", typeof(String));
+            dtHZ.Columns.Add("第五聯絡人姓名", typeof(String));
+            dtHZ.Columns.Add("第五連絡電話", typeof(String));
+            dtHZ.Columns.Add("第五聯絡手機", typeof(String));
+            dtHZ.Columns.Add("第五聯絡Mail", typeof(String));
+
+            dtHZ.Columns.Add("業績獎金門檻", typeof(String));
+            dtHZ.Columns.Add("獎金百分比", typeof(String));
+            dtHZ.Columns.Add("採購天數", typeof(String));
+            dtHZ.Columns.Add("自出出貨天數", typeof(String));
+            dtHZ.Columns.Add("寄倉出貨天數", typeof(String));
+            dtHZ.Columns.Add("調度出貨天數", typeof(String));
+            dtHZ.Columns.Add("調度倉模式", typeof(String));
+            dtHZ.Columns.Add("備註", typeof(String));
             try
             {
                 //"電話"   "電子信箱",
-                string[] colname ={"供應商編號","供應商編碼","狀態","供應商名稱","供應商簡稱","統一編號","傳真","負責人",
-                               "公司地址","發票地址","成本百分比","信用卡一期百分比","信用卡三期百分比",
-                               "合約簽定日","合約期間","結帳方式","銀行代碼","銀行名稱","銀行帳號","銀行戶名",
-                               "常溫運費","常溫運費門檻","常溫逆物流費","低溫運費","低溫運費門檻","低溫逆物流費",
-	                           "負責PM","出貨窗口聯絡人","連絡電話","聯絡手機","聯絡Mail","業績獎金門檻","獎金百分比","採購天數"
-                               ,"自出出貨天數","寄倉出貨天數","調度出貨天數","調度倉模式","備註"
-                              };
-                string filename = "供應商列表_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
-                newCsvName = Server.MapPath(excelPath) + filename;
+                //string[] colname ={"供應商編號","供應商編碼","狀態","供應商名稱","供應商簡稱","統一編號","傳真","負責人",
+                //               "公司地址","發票地址","成本百分比","信用卡一期百分比","信用卡三期百分比",
+                //               "合約簽定日","合約期間","結帳方式","銀行代碼","銀行名稱","銀行帳號","銀行戶名",
+                //               "常溫運費","常溫運費門檻","常溫逆物流費","低溫運費","低溫運費門檻","低溫逆物流費",
+                //               "負責PM","出貨窗口聯絡人","連絡電話","聯絡手機","聯絡Mail","業績獎金門檻","獎金百分比","採購天數"
+                //               ,"自出出貨天數","寄倉出貨天數","調度出貨天數","調度倉模式","備註"
+                //              };                                      
+                string filename = "供應商列表_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                newCsvName = Server.MapPath(excelPath) + filename;               
                 foreach (DataRow dr in dt.Rows)
                 {
                     dr["company_address"] = CommonFunction.ZipAddress(dr["company_zip"].ToString()) + " " + dr["company_address"].ToString();
@@ -2499,6 +2566,161 @@ namespace Admin.gigade.Controllers
 
                     dr["vendor_note"] = dr["vendor_note"].ToString().Replace(',', '，').Replace("\r", "").Replace("\n", "");
                 }
+                foreach (DataRow dr_v in dt.Rows)
+                {
+                    DataRow dr = dtHZ.NewRow();
+                    dr[0] = dr_v["vendor_id"].ToString();
+                    dr[1] = dr_v["vendor_code"].ToString();
+                    dr[2] = dr_v["case vendor_status when 1 then '啟用' when 2 then '停用' when 3 then '失格' end"].ToString();
+                    dr[3] = dr_v["vendor_name_full"].ToString();
+                    dr[4] = dr_v["vendor_name_simple"].ToString();
+                    dr[5] = dr_v["vendor_invoice"].ToString();
+                    dr[6] = dr_v["company_fax"].ToString();
+                    dr[7] = dr_v["company_person"].ToString();
+                    dr[8] = dr_v["company_address"].ToString();
+                    dr[9] = dr_v["invoice_address"].ToString();
+                    dr[10] = dr_v["cost_percent"].ToString();
+                    dr[11] = dr_v["creditcard_1_percent"].ToString();
+                    dr[12] = dr_v["creditcard_3_percent"].ToString();
+                    dr[13] = dr_v["FROM_UNIXTIME(agreement_createdate,'%Y/%m/%d')"].ToString();
+                    dr[14] = dr_v["agreement_duration"].ToString();
+                    dr[15] = dr_v["checkout_type"].ToString();
+                    dr[16] = dr_v["bank_code"].ToString();
+                    dr[17] = dr_v["bank_name"].ToString();
+                    dr[18] = dr_v["bank_number"].ToString();
+                    dr[19] = dr_v["bank_account"].ToString();
+                    dr[20] = dr_v["freight_normal_money"].ToString();
+                    dr[21] = dr_v["freight_normal_limit"].ToString();
+                    dr[22] = dr_v["freight_return_normal_money"].ToString();
+                    dr[23] = dr_v["freight_low_money"].ToString();
+                    dr[24] = dr_v["freight_low_limit"].ToString();
+                    dr[25] = dr_v["freight_return_low_money"].ToString();
+                    dr[26] = dr_v["user_username"].ToString();
+                    dr[27] = dr_v["contact_name_1"].ToString();
+                    dr[28] = dr_v["contact_phone_1_1"].ToString();
+                    dr[29] = dr_v["contact_mobile_1"].ToString();
+                    dr[30] = dr_v["contact_email_1"].ToString();
+
+                    //dr[31] = dr_v["contact_type_2"].ToString();
+                    switch (dr_v["contact_type_2"].ToString())
+                    { 
+                        case "1":
+                            dr[31] = "負責人";
+                            break;
+                        case "2":
+                            dr[31] = "業務窗口";
+                            break;
+                        case "3":
+                            dr[31] = "圖/文窗口";
+                            break;
+                        case "4":
+                            dr[31] = "出貨負責窗口";
+                            break;
+                        case "5":
+                            dr[31] = "帳務連絡窗口";
+                            break;
+                        case "6":
+                            dr[31] = "客服窗口";
+                            break;
+                    }
+                    dr[32] = dr_v["contact_name_2"].ToString();
+                    dr[33] = dr_v["contact_phone_1_2"].ToString();
+                    dr[34] = dr_v["contact_mobile_2"].ToString();
+                    dr[35] = dr_v["contact_email_2"].ToString();
+
+                    //dr[36] = dr_v["contact_type_3"].ToString();
+                    switch (dr_v["contact_type_3"].ToString())
+                    {
+                        case "1":
+                            dr[36] = "負責人";
+                            break;
+                        case "2":
+                            dr[36] = "業務窗口";
+                            break;
+                        case "3":
+                            dr[36] = "圖/文窗口";
+                            break;
+                        case "4":
+                            dr[36] = "出貨負責窗口";
+                            break;
+                        case "5":
+                            dr[36] = "帳務連絡窗口";
+                            break;
+                        case "6":
+                            dr[36] = "客服窗口";
+                            break;
+                    }
+                    dr[37] = dr_v["contact_name_3"].ToString();
+                    dr[38] = dr_v["contact_phone_1_3"].ToString();
+                    dr[39] = dr_v["contact_mobile_3"].ToString();
+                    dr[40] = dr_v["contact_email_3"].ToString();
+
+                    //dr[41] = dr_v["contact_type_4"].ToString();
+                    switch (dr_v["contact_type_4"].ToString())
+                    {
+                        case "1":
+                            dr[41] = "負責人";
+                            break;
+                        case "2":
+                            dr[41] = "業務窗口";
+                            break;
+                        case "3":
+                            dr[41] = "圖/文窗口";
+                            break;
+                        case "4":
+                            dr[41] = "出貨負責窗口";
+                            break;
+                        case "5":
+                            dr[41] = "帳務連絡窗口";
+                            break;
+                        case "6":
+                            dr[41] = "客服窗口";
+                            break;
+                    }
+                    dr[42] = dr_v["contact_name_4"].ToString();
+                    dr[43] = dr_v["contact_phone_1_4"].ToString();
+                    dr[44] = dr_v["contact_mobile_4"].ToString();
+                    dr[45] = dr_v["contact_email_4"].ToString();
+
+                    //dr[46] = dr_v["contact_type_5"].ToString();
+                    switch (dr_v["contact_type_5"].ToString())
+                    {
+                        case "1":
+                            dr[46] = "負責人";
+                            break;
+                        case "2":
+                            dr[46] = "業務窗口";
+                            break;
+                        case "3":
+                            dr[46] = "圖/文窗口";
+                            break;
+                        case "4":
+                            dr[46] = "出貨負責窗口";
+                            break;
+                        case "5":
+                            dr[46] = "帳務連絡窗口";
+                            break;
+                        case "6":
+                            dr[46] = "客服窗口";
+                            break;
+                    }
+                    dr[47] = dr_v["contact_name_5"].ToString();
+                    dr[48] = dr_v["contact_phone_1_5"].ToString();
+                    dr[49] = dr_v["contact_mobile_5"].ToString();
+                    dr[50] = dr_v["contact_email_5"].ToString();
+
+                    dr[51] = dr_v["gigade_bunus_threshold"].ToString();
+                    dr[52] = dr_v["gigade_bunus_percent"].ToString();
+                    dr[53] = dr_v["procurement_days"].ToString();
+                    dr[54] = dr_v["self_send_days"].ToString();
+                    dr[55] = dr_v["stuff_ware_days"].ToString();
+                    dr[56] = dr_v["dispatch_days"].ToString();
+                    dr[57] = dr_v["vendor_mode"].ToString();
+                    dr[58] = dr_v["vendor_note"].ToString();
+                    dtHZ.Rows.Add(dr);
+                }
+               
+
                 dt.Columns.Remove("company_zip");
                 dt.Columns.Remove("invoice_zip");
                 dt.Columns.Remove("product_manage");
@@ -2510,7 +2732,7 @@ namespace Admin.gigade.Controllers
                     System.IO.File.SetAttributes(newCsvName, FileAttributes.Normal);
                     System.IO.File.Delete(newCsvName);
                 }
-                CsvHelper.ExportDataTableToCsv(dt, newCsvName, colname, true);
+                ExcelHelperXhf.ExportDataTabletoExcel(dtHZ, "", newCsvName);
                 json = "true," + filename;
                 //if (System.IO.File.Exists(newCsvName))
                 //{

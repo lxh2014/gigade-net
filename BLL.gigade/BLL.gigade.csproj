@@ -141,6 +141,7 @@
     <Compile Include="Dao\CousePictureDao.cs" />
     <Compile Include="Dao\DeliverDetailDao.cs" />
     <Compile Include="Dao\DeliverMasterDao.cs" />
+    <Compile Include="Dao\DeliveryStorePlaceDao.cs" />
     <Compile Include="Dao\DesignRequestDao.cs" />
     <Compile Include="Dao\DisableKeywordsDao.cs" />
     <Compile Include="Dao\EdmContentDao.cs" />
@@ -230,6 +231,7 @@
     <Compile Include="Dao\MemberLevelDao.cs" />
     <Compile Include="Dao\OrderAccumAmountDao.cs" />
     <Compile Include="Dao\OrderMasterShopCom.cs" />
+    <Compile Include="Dao\OrderMasterStatusDao.cs" />
     <Compile Include="Dao\OrderReturnStatusDao.cs" />
     <Compile Include="Dao\PageErrorLogDao.cs" />
     <Compile Include="Dao\PageMetaDataDao.cs" />
@@ -680,6 +682,7 @@
     <Compile Include="Mgr\CourseDetailMgr.cs" />
     <Compile Include="Mgr\CourseMgr.cs" />
     <Compile Include="Mgr\CourseTicketMgr.cs" />
+    <Compile Include="Mgr\DeliveryStorePlaceMgr.cs" />
     <Compile Include="Mgr\DesignRequestMgr.cs" />
     <Compile Include="Mgr\DisableKeywordsMgr.cs" />
     <Compile Include="Mgr\EdmContentMgr.cs" />
@@ -1251,6 +1254,7 @@
     <Compile Include="Model\Delivery.cs" />
     <Compile Include="Model\DeliverStatus.cs" />
     <Compile Include="Model\DeliveryAddress.cs" />
+    <Compile Include="Model\DeliveryStorePlace.cs" />
     <Compile Include="Model\DesignRequest.cs" />
     <Compile Include="Model\DisableKeywords.cs" />
     <Compile Include="Model\EdmContent.cs" />
@@ -1315,6 +1319,7 @@
     <Compile Include="Model\Query\BrowseDataQuery.cs" />
     <Compile Include="Model\Query\CertificateCategoryQuery.cs" />
     <Compile Include="Model\Query\CourseQuery.cs" />
+    <Compile Include="Model\Query\DeliveryStorePlaceQuery.cs" />
     <Compile Include="Model\Query\DesignRequestQuery.cs" />
     <Compile Include="Model\Query\DisableKeywordsQuery.cs" />
     <Compile Include="Model\Query\EdmEmailQuery.cs" />

@@ -180,6 +180,9 @@
   <data name="SPEC_NOT_FIND" xml:space="preserve">
     <value>找不到對應之規格一內容</value>
   </data>
+  <data name="TRANSPORT_DAYS" xml:space="preserve">
+    <value>所對應出貨天數不能為0</value>
+  </data>
   <data name="UNIT" xml:space="preserve">
     <value>KB</value>
   </data>

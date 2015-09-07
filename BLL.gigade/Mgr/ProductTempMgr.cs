@@ -175,7 +175,9 @@ namespace BLL.gigade.Mgr
 
                 ProductComboTempMgr proComboTempMgr = new ProductComboTempMgr("");
                 sqls.Add(proComboTempMgr.TempDelete(new ProductComboTemp { Writer_Id = writerId, Parent_Id = product_Id }));
-
+                //add by dongya 2015/08/25 14:03 根據writeid和productId刪除商品推薦屬性臨時表中信息  複製的邏輯:首先是刪除臨時表中的數據,然後把數據插入到臨時表;
+                RecommendedProductAttributeMgr rmendeAttribute =new RecommendedProductAttributeMgr("");
+                sqls.Add(rmendeAttribute.TempDelete(writerId,Convert.ToInt32(product_Id),combo_type));
                 MySqlDao mySqlDao = new MySqlDao(connStr);
                 return mySqlDao.ExcuteSqls(sqls);
             }
@@ -223,7 +225,9 @@ namespace BLL.gigade.Mgr
                     if (combo_type == 1)//單一商品
                     {
                         sqls.Add(priceMasterTempMgr.SaveFromPriceMaster(new PriceMasterTemp { writer_Id = writerId, product_id = product_Id, combo_type = combo_type }));
-
+                        //add by dongya 2015/08/25 添加信息到商品推薦臨時表  用來複製商品 
+                        RecommendedProductAttributeMgr recommendAttributeMgr = new RecommendedProductAttributeMgr("");
+                        sqls.Add(recommendAttributeMgr.SaveRecommendedProductAttributSet(new RecommendedRroductAttributeTemp{write_id = writerId, product_id = UInt32.Parse(product_Id),combo_type=combo_type}));
                         ProductItemTempMgr proItemTempMgr = new ProductItemTempMgr("");
                         var prodItemTemp = new ProductItemTemp { Writer_Id = writerId, Product_Id = product_Id };
 
@@ -257,6 +261,9 @@ namespace BLL.gigade.Mgr
                         ItemPriceTempMgr itemPriceTempMgr = new ItemPriceTempMgr("");
                         string movePrice = itemPriceTempMgr.SaveFromItemPriceByMasterId();
 
+                        //add by dongya 2015/08/25 添加信息到商品推薦臨時表  用來複製商品 
+                        RecommendedProductAttributeMgr recommendAttributeMgr = new RecommendedProductAttributeMgr("");
+                        sqls.Add(recommendAttributeMgr.SaveRecommendedProductAttributSet(new RecommendedRroductAttributeTemp { write_id = writerId, product_id = UInt32.Parse(product_Id),combo_type=combo_type }));
                         ProductComboTempMgr proComboTempMgr = new ProductComboTempMgr("");
                         sqls.Add(proComboTempMgr.SaveFromCombo(new ProductComboTemp { Writer_Id = writerId, Parent_Id = product_Id }));
 

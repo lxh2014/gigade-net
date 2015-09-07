@@ -10,7 +10,7 @@ namespace BLL.gigade.Mgr.Impl
     public interface IAppNotifyPoolImplMgr
     {
         //查詢事件
-        string GetAppnotifypool(AppNotifyPool ap);
+        string GetAppnotifypool(AppNotifyPoolQuery ap);
         //編輯事件
         string EditAppNotifyPoolInfo(AppNotifyPoolQuery anpq);
     }

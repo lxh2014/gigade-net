@@ -61,6 +61,23 @@ Ext.onReady(function () {
         },
         ],
         tbar: ['->',
+               {
+                   xtype: 'textfield',
+                   id: 'search_id',
+                   name: 'search_id',
+                   value: '',
+                   labelWidth: 60,
+                   fieldLabel: '郵箱編號',
+                   value: '',
+                   editable: false,
+                   listeners: {
+                       specialkey: function (field, e) {
+                           if (e.getKey() == e.ENTER) {
+                               Query(1);
+                           }
+                       }
+                   }
+               },
         {
             xtype: 'textfield',
             id: 'name',
@@ -111,6 +128,7 @@ Ext.onReady(function () {
                 click: function () {
                     Ext.getCmp('email').setValue('');
                     Ext.getCmp('name').setValue('');
+                    Ext.getCmp('search_id').reset();
                 }
             }
         }
@@ -150,10 +168,12 @@ function Query() {
     PersonListStore.removeAll();
     var name = Ext.getCmp('name').getValue();
     var email = Ext.getCmp('email').getValue();
+    var search_id = Ext.getCmp("search_id").getValue();
     Ext.getCmp("gdList").store.loadPage(1, {
         params: {
             name: name,
             email: email,
+            search_id: search_id
         }
     });
 }

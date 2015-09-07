@@ -104,7 +104,7 @@ PRODUCT_MODE = "出貨方式";
 TAX_TYPE = "營業稅";
 SILGLE_PROD = "單一商品";
 COMBINATION = "商品組合類型";
-EXPECT_MSG = "預計出貨信息";
+EXPECT_MSG = "預計出貨/輔助信息";
 PRODUCT_TYPES = "商品型態";
 
 /*描述*/

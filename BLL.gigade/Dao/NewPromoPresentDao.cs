@@ -25,7 +25,7 @@ namespace BLL.gigade.Dao
             StringBuilder sqlCondition = new StringBuilder();
             try
             {//from new_promo_present npp LEFT JOIN product pt on pt.product_id=npp.gift_id  LEFT JOIN vip_user_group vug on npp.group_id=vug.group_id 
-                sql.Append(@" select  npp.row_id as trow_id,npp.event_id,npp.welfare_mulriple,npp.gift_type,npp.ticket_name,npp.ticket_serial,npp.gift_id,npp.deduct_welfare,npp.gift_amount ,npp.gift_amount_over,npp.`status`,npp.freight_price,pt.product_name,npp.start as tstart,npp.end as tend,npp.group_id as tgroup_id ,npp.bonus_expire_day,vug.group_name,npp.muser,mu.user_username ");
+                sql.Append(@" select  npp.row_id as trow_id,npp.event_id,npp.welfare_mulriple,npp.gift_type,npp.ticket_name,npp.ticket_serial,npp.gift_id,npp.deduct_welfare,npp.gift_amount ,npp.gift_amount_over,npp.`status`,npp.freight_price,pt.product_name,npp.start as tstart,npp.end as tend,npp.group_id as tgroup_id ,npp.bonus_expire_day,npp.use_span_day,vug.group_name,npp.muser,mu.user_username ");
                 sqlCondition.Append(" from new_promo_present npp ");
                 sqlCondition.Append(" LEFT JOIN product pt on pt.product_id=npp.gift_id ");
                 sqlCondition.Append(" LEFT JOIN vip_user_group vug on npp.group_id=vug.group_id ");
@@ -68,11 +68,11 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.Append(@"insert into new_promo_present (event_id,gift_type,group_id,start,end,ticket_name,ticket_serial,gift_id,deduct_welfare,row_id,gift_amount ,gift_amount_over,status,freight_price,bonus_expire_day,welfare_mulriple,created,modified,kuser,muser)");
+                sql.Append(@"insert into new_promo_present (event_id,gift_type,group_id,start,end,ticket_name,ticket_serial,gift_id,deduct_welfare,row_id,gift_amount ,gift_amount_over,status,freight_price,bonus_expire_day,welfare_mulriple,created,modified,kuser,muser,use_span_day)");
                 sql.AppendFormat(@" values('{0}','{1}','{2}','{3}','{4}' ", store.event_id, store.gift_type, store.group_id, CommonFunction.DateTimeToString(store.start), CommonFunction.DateTimeToString(store.end));
                 sql.AppendFormat(@",'{0}','{1}','{2}','{3}','{4}'", store.ticket_name, store.ticket_serial, store.gift_id, store.deduct_welfare, store.row_id);
                 sql.AppendFormat(@",'{0}','{1}','{2}','{3}','{4}','{5}'", store.gift_amount, store.gift_amount_over, 1, store.freight_price, store.bonus_expire_day, store.welfare_mulriple);
-                sql.AppendFormat(@",'{0}','{1}',{2},{3});",CommonFunction.DateTimeToString( store.created),CommonFunction.DateTimeToString(store.modified),store.kuser,store.muser);
+                sql.AppendFormat(@",'{0}','{1}',{2},{3},{4});",CommonFunction.DateTimeToString( store.created),CommonFunction.DateTimeToString(store.modified),store.kuser,store.muser,store.use_span_day);
                 return sql.ToString();
             }
             catch (Exception ex)
@@ -88,7 +88,7 @@ namespace BLL.gigade.Dao
             {
                 sql.AppendFormat(@"update   new_promo_present set event_id='{0}',gift_type='{1}',group_id='{2}',start='{3}',end='{4}' ", store.event_id, store.gift_type, store.group_id, CommonFunction.DateTimeToString(store.start), CommonFunction.DateTimeToString(store.end));
                 sql.AppendFormat(@",ticket_name='{0}',ticket_serial='{1}',gift_id='{2}',deduct_welfare='{3}',welfare_mulriple='{4}'", store.ticket_name, store.ticket_serial, store.gift_id, store.deduct_welfare, store.welfare_mulriple);
-                sql.AppendFormat(@",gift_amount='{0}',gift_amount_over='{1}',freight_price='{2}',bonus_expire_day='{6}',muser={4},modified='{5}' where row_id='{3}'", store.gift_amount, store.gift_amount_over, store.freight_price, store.row_id, store.muser, CommonFunction.DateTimeToString(store.modified), store.bonus_expire_day);
+                sql.AppendFormat(@",gift_amount='{0}',gift_amount_over='{1}',freight_price='{2}',bonus_expire_day='{6}',muser={4},modified='{5}',use_span_day='{7}' where row_id='{3}'", store.gift_amount, store.gift_amount_over, store.freight_price, store.row_id, store.muser, CommonFunction.DateTimeToString(store.modified), store.bonus_expire_day,store.use_span_day);
                 return sql.ToString();
             }
             catch (Exception ex)

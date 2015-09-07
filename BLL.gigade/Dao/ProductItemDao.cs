@@ -563,5 +563,26 @@ namespace BLL.gigade.Dao
                 throw new Exception("ProductItemDao-->GetNoticeGoods" + ex.Message, ex);
             }
         }
+
+        public List<ProductItemQuery> GetProductItemByID(ProductItemQuery query)
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                sb.Append("SELECT p.product_id,p.product_name as Remark,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1,CONCAT(p.spec_title_2,' ',ps2.spec_name) as Spec_Name_2 ");
+                sb.Append(" from product_item pi left join product p on p.product_id =pi.product_id left join product_spec ps1 on ps1.spec_id=pi.spec_id_1 left join product_spec ps2 on ps2.spec_id=pi.spec_id_2");
+                sb.AppendFormat(" where 1=1 ");
+                if (query.Item_Id != 0)
+                {
+                    sb.AppendFormat(" and pi.item_id ='{0}'", query.Item_Id);
+                }
+                return _dbAccess.getDataTableForObj<ProductItemQuery>(sb.ToString());
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->GetProductItemByID" + ex.Message, ex);
+            }
+        }
     }
 }

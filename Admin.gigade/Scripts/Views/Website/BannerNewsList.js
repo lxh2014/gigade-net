@@ -141,20 +141,21 @@ Ext.onReady(function ()
             }
         ],
         tbar: [
-              { xtype: 'button', text: "新增", id: 'add', hidden: false, iconCls: 'icon-user-add', handler: onAddClick }
-         ,{ xtype: 'button', text: "編輯", id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick }
-         ,{
-        xtype: 'button', text: "回上頁", id: 'back', hidden: false, handler: function ()
-        {
-            var tab;
-            var panel = window.parent.parent.Ext.getCmp('ContentPanel');
-            var imag = panel.down('#hnews');
-            var himag = panel.down('#news');
-            if (imag) { tab = imag; }
-            if (himag) { tab = himag;}
-            tab.close();
-        }
-    }
+            { xtype: 'button', text: "新增", id: 'add', hidden: false, iconCls: 'icon-user-add', handler: onAddClick },
+            { xtype: 'button', text: "編輯", id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
+            {
+                xtype: 'button', text: "回上頁", id: 'back', hidden: false, handler: function () {                   
+                    var tab;
+                    var panel = window.parent.parent.Ext.getCmp('ContentPanel');
+                    var imag = panel.down('#imag');
+                    var himag = panel.down('#himag');
+                    //var imag = panel.down('#imag');
+                    //var himag = panel.down('#himag');
+                    if (imag) { tab = imag; }
+                    if (himag) { tab = himag;}
+                    tab.close();
+                }
+            }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: BannerNewsContentStore,

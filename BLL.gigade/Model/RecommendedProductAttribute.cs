@@ -11,6 +11,8 @@ namespace BLL.gigade.Model
         public uint time_start { get; set; }
         public uint time_end { get; set; }
         public uint expend_day { get; set; }
+        public string months { get; set; }
+        public int combo_type { get; set; }
 
         public RecommendedProductAttribute()
         {
@@ -18,6 +20,8 @@ namespace BLL.gigade.Model
             time_start = 0;
             time_end = 0;
             expend_day = 0;
+            months = string.Empty;
+            combo_type = 0;
         }
     }
 }

@@ -86,10 +86,11 @@ namespace BLL.gigade.Model.Query
         public string export_flag_str { set; get; }
         //public string amount { set; get; }
         public int show_type { set; get; }
+        public int invoice_type { set; get; }
 
-    
         public int delivery { get; set; }
         public string username { get; set; }
+        public uint t_cat_amount { get; set; }
         public OrderMasterQuery()
         {
             KeyWords = string.Empty;
@@ -141,8 +142,11 @@ namespace BLL.gigade.Model.Query
             dateend = DateTime.MinValue;
             export_flag_str = string.Empty;
             show_type = 0;
+            invoice_type = 0;
             delivery = 0;
             username = string.Empty;
+            t_cat_amount = 0;
+
         }
     }
 }

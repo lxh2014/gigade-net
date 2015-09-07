@@ -23,8 +23,7 @@ Ext.apply(Ext.form.field.VTypes, {
             if (startDate > endDate) {
                 return false;
             }
-            else
-            {
+            else {
                 return true;
             }
         }
@@ -56,7 +55,7 @@ function SaveReport(row) {
             fieldLabel: TITLE,
             name: 'txttitle',
             id: 'txttitle',
-            emptyText: SHULDWRITE + TITLE,
+            emptyText: SHULDWRITETITLE,
             allowBlank: false,
             submitValue: true,
             labelWidth: 90,
@@ -68,7 +67,7 @@ function SaveReport(row) {
             fieldLabel: ALERTTXT,
             name: 'txtafalert',
             id: 'txtafalert',
-            emptyText: SHULDWRITE + ALERTTXT,
+            emptyText: SHULDWRITEALERTTXT,
             allowBlank: false,
             submitValue: true,
             labelWidth: 90,
@@ -80,21 +79,21 @@ function SaveReport(row) {
             fieldLabel: URLTEXT,
             name: 'txturl',
             id: 'txturl',
-            allowBlank: false,
-            emptyText: SHULDWRITE + URLTEXT,
             labelWidth: 90,
             submitValue: true,
             width: 300,
             maxLength: '1000',
-            enforceMaxLength: true
-        }, {
+            enforceMaxLength: true,
+            vtype: 'url'
+        },
+        {
             xtype: 'textfield',
             fieldLabel: TOTEXT,
             name: 'txtto',
             id: 'txtto',
             allowBlank: false,
             submitValue: true,
-            emptyText: SHULDWRITE + TOTEXT,
+            emptyText: SHULDWRITETOTEXT,
             labelWidth: 90,
             width: 300
         }, {
@@ -103,7 +102,7 @@ function SaveReport(row) {
             name: 'datevalid_start',
             id: 'datevalid_start',
             format: 'Y-m-d',
-            emptyText: SHULDWRITE + VALID_START,
+            emptyText: SHULDWRITEVALID_START,
             allowBlank: false,
             editable: false,
             submitValue: true,
@@ -115,7 +114,7 @@ function SaveReport(row) {
             name: 'datevalid_end',
             id: 'datevalid_end',
             format: 'Y-m-d',
-            emptyText: SHULDWRITE + VALID_END,
+            emptyText: SHULDWRITEVALID_END,
             allowBlank: false,
             submitValue: true,
             editable: false,
@@ -131,7 +130,7 @@ function SaveReport(row) {
             allowBlank: false,
             submitValue: true,
             disabled: row != null ? false : true,
-            hidden:true,
+            hidden: true,
             defaults: {
                 name: 'state'
             },
@@ -144,11 +143,13 @@ function SaveReport(row) {
         buttons: [{
             formBind: true,
             disabled: true,
+            id: 'btnSave',
             text: SAVETEXT,
             handler: function () {
                 var form = this.up('form').getForm();
                 //驗證表單
                 if (form.isValid()) {
+                    Ext.getCmp('btnSave').setDisabled(true);
                     //提交表單
                     form.submit({
                         params: {
@@ -167,12 +168,12 @@ function SaveReport(row) {
                             Ext.MessageBox.alert(MESSAGEINFO, result,
                                             function () {
                                                 ReportWin.close();
-                                                gridShow.load();
                                             });
                         },
                         failure: function (response) {
                             var resText = eval("(" + response.responseText + ")");
                             Ext.Msg.alert(resText.msg);
+                            Ext.getCmp('btnSave').setDisabled(false);
                         }
                     })
                 }

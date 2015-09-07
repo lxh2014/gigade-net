@@ -17,6 +17,12 @@ namespace BLL.gigade.Dao
             _access = DBFactory.getDBAccess(DBType.MySql, connectionString);
             this.connStr = connectionString;
         }
+        /// <summary>
+        /// 查找列表
+        /// </summary>
+        /// <param name="appgory"></param>
+        /// <param name="totalCount"></param>
+        /// <returns></returns>
         public List<Appcategory> GetAppcategoryList(Appcategory appgory, out int totalCount)
         {
             StringBuilder sql = new StringBuilder();
@@ -65,7 +71,11 @@ namespace BLL.gigade.Dao
                 throw new Exception("AppcategoryDao.GetAppcategoryList-->" + ex.Message + sql.ToString(), ex);
             }
         }
-
+        /// <summary>
+        /// 查找參數
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
         public List<Appcategory> GetParaList(string sql)
         {
             try
@@ -77,13 +87,17 @@ namespace BLL.gigade.Dao
                 throw new Exception("AppcategoryDao.GetParaList-->" + ex.Message + sql.ToString(), ex);
             }
         }
-
+        /// <summary>
+        /// 刪除數據
+        /// </summary>
+        /// <param name="appgory"></param>
+        /// <returns></returns>
         public int AppcategoryDelete(Appcategory appgory)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("delete from appcategory where category_id ='{0}'", 0,appgory.category_id);
+                sql.AppendFormat("delete from appcategory where category_id ='{0}'", appgory.category_id);
                 return _access.execCommand(sql.ToString());
             }
             catch (Exception ex)
@@ -92,13 +106,17 @@ namespace BLL.gigade.Dao
             }
         }
 
-
+        /// <summary>
+        /// 保存數據
+        /// </summary>
+        /// <param name="appgory"></param>
+        /// <returns></returns>
         public int AppcategorySave(Appcategory appgory)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("insert into appcategory (category,brand_id,brand_id,brand_name,category1,category2,category3,product_id,property)values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}')",appgory.category,appgory.brand_id,appgory.brand_name,appgory.category1,appgory.category2,appgory.category3,appgory.product_id,appgory.property);
+                sql.AppendFormat("insert into appcategory (category,brand_id,brand_name,category1,category2,category3,product_id,property)values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}')",appgory.category,appgory.brand_id,appgory.brand_name,appgory.category1,appgory.category2,appgory.category3,appgory.product_id,appgory.property);
                 return _access.execCommand(sql.ToString());
             }
             catch (Exception ex)

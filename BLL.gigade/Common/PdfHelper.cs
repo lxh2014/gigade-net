@@ -161,6 +161,7 @@ namespace BLL.gigade.Common
                 writer.PageEvent = new HeaderAndFooterEvent();
                 HeaderAndFooterEvent.basefont = basefont;
                 HeaderAndFooterEvent.PAGE_NUMBER = true;
+                HeaderAndFooterEvent.tpl = writer.DirectContent.CreateTemplate(100, 100);
                 if (!string.IsNullOrEmpty(title))
                 {
                     document.Add(HeaderAndFooterEvent.InsertTitleContent(title));
@@ -223,6 +224,7 @@ namespace BLL.gigade.Common
                 HeaderAndFooterEvent.basefont = basefont;
                 HeaderAndFooterEvent.header = header;
                 HeaderAndFooterEvent.PAGE_NUMBER = true;
+                HeaderAndFooterEvent.tpl = writer.DirectContent.CreateTemplate(100, 100);
                 if (!string.IsNullOrEmpty(title))
                 {
                     document.Add(HeaderAndFooterEvent.InsertTitleContent(title));
@@ -285,6 +287,7 @@ namespace BLL.gigade.Common
                 HeaderAndFooterEvent.basefont = basefont;
                 HeaderAndFooterEvent.header = header;
                 HeaderAndFooterEvent.PAGE_NUMBER = true;
+                HeaderAndFooterEvent.tpl = writer.DirectContent.CreateTemplate(100, 100);
                 if (!string.IsNullOrEmpty(title))
                 {
                     document.Add(HeaderAndFooterEvent.InsertTitleContent(title));
@@ -349,6 +352,7 @@ namespace BLL.gigade.Common
                 HeaderAndFooterEvent.basefont = basefont;
                 HeaderAndFooterEvent.header = header;
                 HeaderAndFooterEvent.PAGE_NUMBER = true;
+                HeaderAndFooterEvent.tpl = writer.DirectContent.CreateTemplate(100, 100);
                 if (!string.IsNullOrEmpty(title))
                 {
                     document.Add(HeaderAndFooterEvent.InsertTitleContent(title));
@@ -486,6 +490,7 @@ namespace BLL.gigade.Common
                 HeaderAndFooterEvent.isPdfTable = true;
                 HeaderAndFooterEvent.pdftable = pdftable;
                 HeaderAndFooterEvent.PAGE_NUMBER = true;
+                HeaderAndFooterEvent.tpl = writer.DirectContent.CreateTemplate(100, 100);
                 if (!string.IsNullOrEmpty(title))
                 {
                     document.Add(HeaderAndFooterEvent.InsertTitleContent(title));
@@ -628,6 +633,7 @@ namespace BLL.gigade.Common
                 HeaderAndFooterEvent.isPdfTable = true;
                 HeaderAndFooterEvent.pdftable = pdftable;
                 HeaderAndFooterEvent.PAGE_NUMBER = true;
+                HeaderAndFooterEvent.tpl = writer.DirectContent.CreateTemplate(100, 100);
                 if (!string.IsNullOrEmpty(title))
                 {
                     document.Add(HeaderAndFooterEvent.InsertTitleContent(title));
@@ -727,6 +733,17 @@ namespace BLL.gigade.Common
 
                         table.AddCell(cell);
                     }
+                    if (dtSource.Columns.Count == cols * rows)
+                    {
+                        if ((i + 1) % count == 0 && i != dtSource.Rows.Count - 1 )
+                        {
+                            pdftable_flag = true;
+                            document.Add(pdftable);
+                            document.Add(table);
+                            table.Rows.Clear();
+                            document.NewPage();
+                        }
+                    }
                     for (int j = dtSource.Columns.Count; j < cols * rows; j++)
                     {
                         PdfPCell cell = new PdfPCell(new Phrase("", font));
@@ -746,7 +763,7 @@ namespace BLL.gigade.Common
                             cell.DisableBorderSide(2);
                         }
                         table.AddCell(cell);
-                        if ((i + 1) % count == 0 && j == cols * rows - 1)
+                        if ((i + 1) % count == 0 && i != dtSource.Rows.Count-1 && j == cols * rows - 1)
                         {
                             pdftable_flag = true;
                             document.Add(pdftable);
@@ -797,6 +814,7 @@ namespace BLL.gigade.Common
                 HeaderAndFooterEvent.isPdfTable = true;
                 HeaderAndFooterEvent.pdftable = pdftable;
                 HeaderAndFooterEvent.PAGE_NUMBER = true;
+                HeaderAndFooterEvent.tpl = writer.DirectContent.CreateTemplate(100, 100);
                 if (!string.IsNullOrEmpty(title))
                 {
                     document.Add(HeaderAndFooterEvent.InsertTitleContent(title));
@@ -834,6 +852,7 @@ namespace BLL.gigade.Common
                 HeaderAndFooterEvent.header = "";
                 HeaderAndFooterEvent.isPdfTable = false;
                 HeaderAndFooterEvent.PAGE_NUMBER = false;
+                HeaderAndFooterEvent.tpl = writer.DirectContent.CreateTemplate(100, 100);
                 PdfReader reader;
                 PdfContentByte cb = writer.DirectContent;
                 PdfImportedPage newPage;

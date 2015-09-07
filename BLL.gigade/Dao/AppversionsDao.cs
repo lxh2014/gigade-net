@@ -89,7 +89,7 @@ namespace BLL.gigade.Dao
                                                     values({0},{1},'{2}','{3}',{4},{5});select @@identity",
                         anpq.versions_id, anpq.versions_code,anpq.versions_name, anpq.versions_desc, anpq.drive, anpq.release_date
                 );
-                return Int32.Parse(_access.getDataTable(strSql).Rows[0][0].ToString());
+                return _access.execCommand(strSql);
             }
             catch (Exception ex)
             {

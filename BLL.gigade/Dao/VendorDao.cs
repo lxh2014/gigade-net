@@ -155,6 +155,10 @@ namespace BLL.gigade.Dao
             sql.AppendFormat(@"freight_return_normal_money,freight_low_money,freight_low_limit,");
             sql.AppendFormat(@"freight_return_low_money,product_manage,user_username,");
             sql.AppendFormat(@"contact_name_1,contact_phone_1_1,contact_mobile_1,contact_email_1,");
+            sql.AppendFormat(@"contact_type_2,contact_name_2,contact_phone_1_2,contact_mobile_2,contact_email_2,");
+            sql.AppendFormat(@"contact_type_3,contact_name_3,contact_phone_1_3,contact_mobile_3,contact_email_3,");
+            sql.AppendFormat(@"contact_type_4,contact_name_4,contact_phone_1_4,contact_mobile_4,contact_email_4,");
+            sql.AppendFormat(@"contact_type_5,contact_name_5,contact_phone_1_5,contact_mobile_5,contact_email_5,");
             sql.AppendFormat(@"gigade_bunus_threshold,CONCAT(gigade_bunus_percent,'%') as gigade_bunus_percent ,procurement_days,self_send_days,stuff_ware_days,dispatch_days,CASE self_send_days WHEN 0 THEN '自出' ELSE '' end as vendor_mode,vendor_note ");
             sql.AppendFormat(@" from vendor LEFT JOIN manage_user on product_manage=user_id where 1=1  ");
             sql.AppendFormat(sqlwhere);
@@ -722,7 +726,24 @@ where p.off_grade<> 1 or p.product_status not in(6,99);", vendorId);
             {
                 throw new Exception(" vendorDao-->UnGrade-->" + ex.Message + sql.ToString(), ex);
             }
-
         }
+
+        public List<Vendor> GetArrayDaysInfo(uint brand_id)
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                sb.AppendFormat(@"SELECT v.self_send_days,v.stuff_ware_days,v.dispatch_days 
+                                      FROM vendor v
+                                  INNER JOIN vendor_brand vb ON vb.vendor_id = v.vendor_id
+                                  WHERE vb.brand_id = {0}", brand_id);
+                return _dbAccess.getDataTableForObj<Vendor>(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("vendorDao.GetArrayDaysInfo" + ex.Message, ex);
+            }
+        }
+
     }
 }

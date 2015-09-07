@@ -56,12 +56,14 @@ OrderMasterExportStore.on('beforeload', function () {
     var orderTimeEnd = dateFormat(Ext.getCmp('orderTimeEnd').getValue());
     var t_order_id = Ext.getCmp('t_order_id').getValue();
     var show_type = Ext.htmlEncode(Ext.getCmp("show_type").getValue().show_type);
+    var invoice_type = Ext.htmlEncode(Ext.getCmp("invoice_type").getValue().invoice_type);
     Ext.apply(OrderMasterExportStore.proxy.extraParams, {
         orderTimeStart: orderTimeStart,
         orderTimeEnd: orderTimeEnd,
         order_id: t_order_id,
         dateType: Ext.getCmp('date_type').getValue(),
-        show_type: show_type
+        show_type: show_type,
+        invoice_type: invoice_type
     });
     Ext.Ajax.request({
         url: '/Order/OrderMasterHuiZong',
@@ -71,7 +73,8 @@ OrderMasterExportStore.on('beforeload', function () {
             orderTimeEnd: orderTimeEnd,
             order_id: t_order_id,
             dateType: Ext.getCmp('date_type').getValue(),
-            show_type: show_type
+            show_type: show_type,
+            invoice_type: invoice_type
         },
         success: function (form, action) {
             var result = Ext.decode(form.responseText);
@@ -95,15 +98,28 @@ OrderMasterExportStore.on('beforeload', function () {
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
+            if (selections.length == 0 || (selections.length != 0 && selections[0].data.account_collection_time == "" && selections[0].data.return_collection_time == "")) {
+              //  Ext.getCmp("pcGift").down('#edit').setDisabled(true);
+                Ext.getCmp("pcGift").down('#delete').setDisabled(true);
+            } else {
+               // Ext.getCmp("pcGift").down('#edit').setDisabled(false);
+                Ext.getCmp("pcGift").down('#delete').setDisabled(false);
+            }
+
             Ext.getCmp("pcGift").down('#edit').setDisabled(selections.length == 0);
-            Ext.getCmp("pcGift").down('#delete').setDisabled(selections.length == 0);
+            //Ext.getCmp("pcGift").down('#delete').setDisabled(selections.length == 0);
+        
         }
     }
 });
 function Query(x) {
     Ext.getCmp("pcGift").show();
-    OrderMasterExportStore.removeAll();
-    Ext.getCmp("pcGift").store.loadPage(1)
+    if (Ext.getCmp('date_type').getValue() == 0 && Ext.getCmp('t_order_id').getValue() == "") {
+        Ext.Msg.alert(INFORMATION, "請輸入付款單號或選擇日期條件查詢！");
+    } else {
+        OrderMasterExportStore.removeAll();
+        Ext.getCmp("pcGift").store.loadPage(1)
+    }
 }
 Ext.onReady(function () {
     var exportTab = Ext.create('Ext.form.Panel', {
@@ -115,7 +131,7 @@ Ext.onReady(function () {
         defaults: {
             labelWidth: 150,
             width: 400,
-            margin: '20 10 0 20'
+            margin: '10 10 0 0'
         },
         border: false,
         plain: true,
@@ -125,7 +141,7 @@ Ext.onReady(function () {
             xtype: 'panel',
             bodyStyle: "padding:5px;background:#87CEEB",
             border: false,
-            html: "注意事項：<br/>1.檔案為.xls<br/>2.欄位：付款單號、銀行入帳日期、入賬金額、手續費、退貨入帳日期、退貨入賬金額、退貨手續費、備註。<br/>3.當檔案中存在異常時,將不會處理異常數據,且其它數據會繼續匯入.<br/>4.<a href='javascript:void(0);' onclick='ShowMuBan()'>點擊下載匯入模板</a>"
+            html: "注意事項：<br/>1.檔案為.xls<br/>2.欄位：付款單號、銀行入帳日期、入賬金額、手續費、退貨入帳日期、退貨入賬金額、退貨入帳手續費、備註。<br/>3.當檔案中存在異常時,將不會處理異常數據,且其它數據會繼續匯入.<br/>4.<a href='javascript:void(0);' onclick='ShowMuBan()'>點擊下載匯入模板</a>"
         },
         {
             xtype: 'filefield',
@@ -185,7 +201,7 @@ Ext.onReady(function () {
             xtype: 'panel',
             bodyStyle: "padding:5px;background:#87CEEB",
             border: false,
-            html: "注意事項：<br/>查詢條件：銀行入賬日期、開立發票日期，訂單日期，只能選其一查詢；默認會按照開立發票日期查詢。"
+            html: "注意事項：<br/>查詢條件：銀行入賬日期、退貨入賬日期、開立發票日期，訂單日期，只能選其一查詢；若不選擇日期條件，請輸入訂單編號查詢。"
         },
         {
             xtype: 'fieldcontainer',
@@ -296,9 +312,6 @@ Ext.onReady(function () {
                 fieldLabel: '付款單號',
                 labelWidth: 100,
                 listeners: {
-                    change: function () {
-                        Ext.getCmp('searchcontent').setValue(Ext.getCmp('t_order_id').getValue());
-                    },
                     specialkey: function (field, e) {
                         if (e.getKey() == e.ENTER) {
                             Query();
@@ -312,7 +325,7 @@ Ext.onReady(function () {
                 name: 'show_type',
                 margin: "0 5 0 0",
                 width: 380,
-                fieldLabel: "狀態",
+                fieldLabel: "入賬狀態",
                 colName: 'show_type',
                 defaults: {
                     name: 'show_type'
@@ -324,6 +337,24 @@ Ext.onReady(function () {
                 { id: 'stateid3', boxLabel: "未入賬", inputValue: '2' }
                 ]
             }
+            ]
+        },
+        {
+            xtype: 'radiogroup',
+            id: 'invoice_type',
+            name: 'invoice_type',
+            margin: "0 5 0 0",
+            width: 380,
+            fieldLabel: "發票狀態",
+            colName: 'invoice_type',
+            defaults: {
+                name: 'invoice_type'
+            },
+            columns: 3,
+            items: [
+            { id: 'invo_1', boxLabel: "全部", inputValue: '0', checked: true },
+            { id: 'invo_2', boxLabel: "已開", inputValue: '1' },
+            { id: 'invo_3', boxLabel: "未開", inputValue: '2' }
             ]
         }
         ],
@@ -356,6 +387,7 @@ Ext.onReady(function () {
                     Ext.getCmp('t_order_id').setValue("");
                     Ext.getCmp('date_type').setValue(0);
                     Ext.getCmp('show_type').reset();
+                    Ext.getCmp('invoice_type').reset();
                 }
             }
         }
@@ -417,7 +449,7 @@ Ext.onReady(function () {
         ],
         tbar: [
 
-        { xtype: 'button', text: "新增單筆記錄", id: 'add', hidden: false, iconCls: 'icon-user-add', handler: onAddClick },
+        { xtype: 'button', text: "新增單筆記錄", id: 'add', hidden: true, iconCls: 'icon-user-add', handler: onAddClick },
         { xtype: 'button', text: EDIT, id: 'edit', iconCls: 'icon-user-edit', disabled: true, hidden: true, handler: onEditClick },
         { xtype: 'button', text: "刪除", id: 'delete', iconCls: 'icon-user-edit', disabled: true, hidden: true, handler: onDeleteClick },
         '->',
@@ -431,7 +463,11 @@ Ext.onReady(function () {
                 //var timeend = dateFormat(Ext.getCmp('timeend').getValue());
                 var orderTimeStart = dateFormat(Ext.getCmp('orderTimeStart').getValue());
                 var orderTimeEnd = dateFormat(Ext.getCmp('orderTimeEnd').getValue());
-                window.open("/Order/OrderMasterExport?orderTimeStart=" + orderTimeStart + "&orderTimeEnd=" + orderTimeEnd + "&dateType=" + Ext.getCmp('date_type').getValue() + "&order_id=" + Ext.getCmp('t_order_id').getValue() + "&show_type=" + Ext.htmlEncode(Ext.getCmp("show_type").getValue().show_type));
+                if (Ext.getCmp('date_type').getValue() == 0 && Ext.getCmp('t_order_id').getValue() == "") {
+                    Ext.Msg.alert(INFORMATION, "請輸入查詢條件匯出！");
+                } else {
+                    window.open("/Order/OrderMasterExport?orderTimeStart=" + orderTimeStart + "&orderTimeEnd=" + orderTimeEnd + "&dateType=" + Ext.getCmp('date_type').getValue() + "&order_id=" + Ext.getCmp('t_order_id').getValue() + "&show_type=" + Ext.htmlEncode(Ext.getCmp("show_type").getValue().show_type) + "&invoice_type=" + Ext.htmlEncode(Ext.getCmp("invoice_type").getValue().invoice_type));
+                }
             }
         }
 
@@ -516,7 +552,7 @@ Ext.onReady(function () {
         }
     });
     ToolAuthority();
-    OrderMasterExportStore.load({ params: { start: 0, limit: 20 } });
+    //  OrderMasterExportStore.load({ params: { start: 0, limit: 20 } });
 });
 function dateFormat(value) {
     if (null != value) {

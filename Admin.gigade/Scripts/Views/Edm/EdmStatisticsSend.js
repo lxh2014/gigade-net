@@ -203,7 +203,7 @@ Ext.onReady(function ()
                     header: "發信狀態", dataIndex: 's_send_status', width: 150, align: 'center'
                 },
                 {
-                    header: "名稱", dataIndex: 'email_name', width: 200, align: 'center',
+                    header: "姓名", dataIndex: 'email_name', width: 200, align: 'center',
                     renderer: function (value, cellmeta, record, rowIndex, columnIndex, store)
                     {                       
                        return "<span onclick='SecretLogin(" + record.data.email_id + "," + 0 + ",\"" + info_type + "\")'  >" + value + "</span>";
@@ -246,7 +246,7 @@ Ext.onReady(function ()
                     {
                         xtype: 'textfield',
                         id: 'email_name',
-                        fieldLabel: '名稱',
+                        fieldLabel: '姓名',
                         labelWidth: 45,
                         width: 160,
                         listeners: {

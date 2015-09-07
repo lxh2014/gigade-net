@@ -41,9 +41,6 @@
         }
     });
 
-
-
-
     Ext.define('gigade.InvoiceDeal', {
         extend: 'Ext.data.Model',
         fields: [
@@ -86,7 +83,6 @@
         }
     });
 
-
     var DateStore = Ext.create('Ext.data.Store', {
         fields: ['txt', 'value'],
         data: [
@@ -94,16 +90,6 @@
             { "txt": "下午", "value": "1" },
             { "txt": "晚上", "value": "2" },
             { "txt": "隨時", "value": "3" }
-        ]
-    });
-
-    var OrcTypeStore = Ext.create('Ext.data.Store', {
-        fields: ['txt', 'value'],
-        data: [       
-            { "txt": "包裝破損", "value": "1" },
-            { "txt": "商品瑕疵", "value": "2" },
-            { "txt": "商品不符", "value": "3" },
-            { "txt": "其他", "value": "0" },
         ]
     });
 
@@ -184,6 +170,8 @@
                                             orderReturnForm.getForm().reset();
                                             orderDeliverForm.getForm().reset();
                                             CouldReturnGrid.hide();
+                                            transportBtn
+                                            Ext.getCmp('transportBtn').setDisabled(true);
                                             Ext.getCmp('couldReturnBtn').setDisabled(true);
                                             Ext.getCmp('package').hide();
                                             Ext.getCmp('wareHouseBtn').setDisabled(true);
@@ -198,6 +186,7 @@
                                                 Ext.getCmp('isZIChu').setValue(result.isZIChu);
                                             }
                                             transport.getForm().reset();
+                                            Ext.getCmp('transportBtn').setDisabled(true);
                                             Ext.getCmp('wareHouseBtn').setDisabled(true);
                                             Ext.getCmp('couldReturnBtn').setDisabled(true);
                                             Ext.getCmp('returnMoney').setDisabled(true);
@@ -222,6 +211,7 @@
                                             orderDeliverForm.hide();
                                             CouldReturnGrid.hide();
                                             transport.show();
+                                            Ext.getCmp('transportBtn').setDisabled(false);
                                             Ext.getCmp('wareHouseBtn').setDisabled(true);
                                             Ext.getCmp('couldReturnBtn').setDisabled(true);
                                             Ext.getCmp('returnMoney').setDisabled(true);
@@ -235,6 +225,7 @@
                                             orderDeliverForm.hide();
                                             CouldReturnGrid.show();
                                             transport.getForm().reset();
+                                            Ext.getCmp('transportBtn').setDisabled(true);
                                             Ext.getCmp('couldReturnBtn').setDisabled(false);
                                             Ext.getCmp('package').show();
                                             Ext.getCmp('wareHouseBtn').setDisabled(true);
@@ -250,6 +241,7 @@
                                             orderDeliverForm.hide();
                                             transport.getForm().reset();
                                             CouldReturnGrid.show();
+                                            Ext.getCmp('transportBtn').setDisabled(true);
                                             Ext.getCmp('couldReturnBtn').setDisabled(true);
                                             Ext.getCmp('package').hide();
                                             Ext.getCmp('wareHouseBtn').setDisabled(false);
@@ -273,6 +265,7 @@
                                                 Ext.getCmp("account_name").show();
                                             }
                                             transport.getForm().reset();
+                                            Ext.getCmp('transportBtn').setDisabled(true);
                                             Ext.getCmp('couldReturnBtn').setDisabled(true);
                                             Ext.getCmp('package').hide();
                                             Ext.getCmp('wareHouseBtn').setDisabled(true);
@@ -285,6 +278,7 @@
                                         }
                                         else if (result.status == 4) {
                                             transport.getForm().reset();
+                                            Ext.getCmp('transportBtn').setDisabled(true);
                                             Ext.getCmp('couldReturnBtn').setDisabled(true);
                                             Ext.getCmp('package').hide();
                                             Ext.getCmp('wareHouseBtn').setDisabled(true);
@@ -342,12 +336,13 @@
                                     if (result.status == -1) {
                                         orderDeliverForm.hide();
                                         transport.hide();
+                                        transport.getForm().reset();
                                         Ext.Msg.alert("提示信息", "無此退款單號或已歸檔！");
                                         orderReturnForm.getForm().reset();
                                         orderDeliverForm.getForm().reset();
-                                        transport.getForm().reset();
                                         CouldReturnGrid.hide();
-                                        transport.hide();
+                                        transportBtn
+                                        Ext.getCmp('transportBtn').setDisabled(true);
                                         Ext.getCmp('couldReturnBtn').setDisabled(true);
                                         Ext.getCmp('package').hide();
                                         Ext.getCmp('wareHouseBtn').setDisabled(true);
@@ -362,6 +357,7 @@
                                             Ext.getCmp('isZIChu').setValue(result.isZIChu);
                                         }
                                         transport.getForm().reset();
+                                        Ext.getCmp('transportBtn').setDisabled(true);
                                         Ext.getCmp('wareHouseBtn').setDisabled(true);
                                         Ext.getCmp('couldReturnBtn').setDisabled(true);
                                         Ext.getCmp('returnMoney').setDisabled(true);
@@ -386,6 +382,7 @@
                                         orderDeliverForm.hide();
                                         CouldReturnGrid.hide();
                                         transport.show();
+                                        Ext.getCmp('transportBtn').setDisabled(false);
                                         Ext.getCmp('wareHouseBtn').setDisabled(true);
                                         Ext.getCmp('couldReturnBtn').setDisabled(true);
                                         Ext.getCmp('returnMoney').setDisabled(true);
@@ -397,8 +394,9 @@
                                     }
                                     else if (result.status == 1) {
                                         orderDeliverForm.hide();
-                                        transport.getForm().reset();
                                         CouldReturnGrid.show();
+                                        transport.getForm().reset();
+                                        Ext.getCmp('transportBtn').setDisabled(true);
                                         Ext.getCmp('couldReturnBtn').setDisabled(false);
                                         Ext.getCmp('package').show();
                                         Ext.getCmp('wareHouseBtn').setDisabled(true);
@@ -412,8 +410,9 @@
                                     }
                                     else if (result.status == 2) {
                                         orderDeliverForm.hide();
-                                        CouldReturnGrid.show();
                                         transport.getForm().reset();
+                                        CouldReturnGrid.show();
+                                        Ext.getCmp('transportBtn').setDisabled(true);
                                         Ext.getCmp('couldReturnBtn').setDisabled(true);
                                         Ext.getCmp('package').hide();
                                         Ext.getCmp('wareHouseBtn').setDisabled(false);
@@ -437,6 +436,7 @@
                                             Ext.getCmp("account_name").show();
                                         }
                                         transport.getForm().reset();
+                                        Ext.getCmp('transportBtn').setDisabled(true);
                                         Ext.getCmp('couldReturnBtn').setDisabled(true);
                                         Ext.getCmp('package').hide();
                                         Ext.getCmp('wareHouseBtn').setDisabled(true);
@@ -449,6 +449,7 @@
                                     }
                                     else if (result.status == 4) {
                                         transport.getForm().reset();
+                                        Ext.getCmp('transportBtn').setDisabled(true);
                                         Ext.getCmp('couldReturnBtn').setDisabled(true);
                                         Ext.getCmp('package').hide();
                                         Ext.getCmp('wareHouseBtn').setDisabled(true);
@@ -460,6 +461,7 @@
                                         orderDeliverForm.hide();
                                         CouldReturnGrid.hide();
                                         transport.hide();
+
                                         Ext.Msg.alert("提示信息", "已確認退款");
                                     }
                                 }
@@ -503,7 +505,51 @@
                            hidden:true,
                            editable: false,
                        },
-       //這個是收到商品可退button
+                       //這個是確認物流單的button
+                       {
+                           xtype: 'button',
+                           text:'確認物流單',
+                           id: 'transportBtn',
+                           hidden: true,
+                           disabled: true,
+                           handler: function () {
+                               var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                               myMask.show();
+                               var return_id = Ext.getCmp('return_id').getValue();
+                               var orc_deliver_code = Ext.getCmp('orc_deliver_code').getValue();
+                               var orc_deliver_date = Ext.getCmp('orc_deliver_date').getValue();
+                               var orc_deliver_time = Ext.getCmp('orc_deliver_time').getValue();
+                               if (orc_deliver_code != "" && orc_deliver_date != null) {
+                                   Ext.Ajax.request({
+                                       url: '/OrderManage/InsertTransport',
+                                       params: {
+                                           return_id: return_id,
+                                           orc_deliver_code: orc_deliver_code,
+                                           orc_deliver_date: orc_deliver_date,
+                                           orc_deliver_time: orc_deliver_time,
+                                       },
+                                       success:function(form,action) {
+                                           myMask.hide();
+                                           var result = Ext.decode(form.responseText);
+                                           if (result.success) {
+                                               myMask.hide();
+                                               Ext.Msg.alert("提示信息", "物流信息新增成功！");
+                                              orderReturnForm.getForm().reset();
+                                              transport.hide();
+                                              Ext.getCmp('transportBtn').setDisabled(true);
+                                           }
+                                       }
+                                   });
+                               }
+                               else {
+                                   myMask.hide();
+                                   Ext.Msg.alert("提示信息", "請填寫完成物流信息！");
+                                 
+                               }
+                           }
+
+                       },
+                       //這個是收到商品可退button
             {
                 xtype: 'button',
                 text: '收到商品可退',
@@ -511,10 +557,8 @@
                 hidden: true,
                 disabled:true,
                 handler: function () {
-                    //     var return_id = CouldReturnGrid.getStore().getAt(0).get('return_id');
                     var return_id = Ext.getCmp('return_id').getValue();
                     var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
-                    myMask.show();
                     Ext.Ajax.request({
                         url: '/OrderManage/CouldReturn',
                         params: {
@@ -555,15 +599,21 @@
                 handler: function () {
                     var return_id = Ext.getCmp('return_id').getValue();
                     var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                    var row = Ext.getCmp("CouldReturnGrid").getSelectionModel().getSelection();
+                    var data = "";
+                    for (var i = 0; i < row.length; i++) {
+                        data += row[i].data.item_id + "*" + row[i].data.buy_num + ";"
+                    }
+                    //if (data == "") {
+                    //    Ext.Msg.alert("提示信息", "請選擇需要退的商品！");
+                    //    return;
+                    //}
                     myMask.show();
                     Ext.Ajax.request({
                         url: '/OrderManage/CouldWareHouse',
                         params: {
                             return_id: return_id,
-                            bank_name: Ext.getCmp('bank_name').getValue(),
-                            bank_branch: Ext.getCmp('bank_branch').getValue(),
-                            bank_account: Ext.getCmp('bank_account').getValue(),
-                            account_name: Ext.getCmp('account_name').getValue(),
+                            data:data,
                         },
                         success: function (form, action) {
                             myMask.hide();
@@ -746,101 +796,99 @@
         hidden:true,
         id: 'orderDeliverForm',
         items: [
-          {
-              xtype: 'textfield',
-              fieldLabel: '客戶姓名',
-              id: 'orc_name',
-              name: 'orc_name',
-              allowBlank: false,
-              width: 360
-          },
-              {
-                  xtype: 'textfield',
-                  fieldLabel: '客戶電話',
-                  id: 'orc_phone',
-                  name: 'orc_phone',
-                  allowBlank: false,
-                  width: 360
-              },
-              {
-                  xtype: 'fieldcontainer',
-                  layout: 'hbox',
-                  items: [
-                        {
-                            xtype: 'combobox',
-                            fieldLabel: '收貨地址',
-                            id: 'orc_zipcode',
-                            name: 'orc_zipcode',
-                            store: zipStore,
-                            lastQuery:'',
-                            displayField: 'zipname',
-                            valueField: 'zipcode',
-                            allowBlank: false,
-                            width: 245
-                        },
-                        {
-                            xtype: 'textfield',
-                            id: 'orc_address',
-                            name: 'orc_address',
-                            allowBlank: false,
-                            width: 200
-                        },
-                  ],
-              },
-                             {
-                                 xtype: 'combobox',
-                                 fieldLabel: '退貨類型',
-                                 id: 'orc_type',
-                                 name: 'orc_type',
-                                 store: typeStore,
-                                 displayField: 'parameterName',
-                                 valueField: 'parameterCode',
-                                 lastQuery:'',
-                                 value: '1',
-                                 editable: false,
-                             },
-                               
-                             
-                             {
-                                 xtype: 'combobox',
-                                 fieldLabel: '發票處理',
-                                 id: 'invoice_deal',
-                                 name: 'invoice_deal',
-                                 displayField: 'parameterName',
-                                 valueField: 'parameterCode',
-                                 store: InvoiceDealStore,
-                                 lastQuery: '',
-                                 value: '1',
-                                 editable:false,
-                             },
-               {
-                   xtype: 'textarea',
-                   fieldLabel: '客戶備註(最多200字)',
-                   id: 'orc_remark',
-                   name: 'orc_remark',
-                   width: 360,
-                  maxLength:200,
-               },
-                 {
-                     xtype: 'textarea',
-                     fieldLabel: '客服備註(最多200字)',
-                     id: 'orc_service_remark',
-                     name: 'orc_service_remark',
-                     width: 360,
-                     maxLength: 200,
-                 },
-                 {
-                     xtype: 'radiogroup',
-                     fieldLabel: '是否已出貨',
-                     id: 'orc_send',
-                     name: 'orc_send_name',
-                     width: 200,
-                     allowBlank:false,
-                     items: [
-                         { id: 'yes', name: 'orc_send_name', boxLabel: '是', inputValue: '1', checked: true },
-                             { id: 'no', name: 'orc_send_name', boxLabel: '否', inputValue: '0' },
-                     ],
-                 },
+            {
+                xtype: 'textfield',
+                fieldLabel: '客戶姓名',
+                id: 'orc_name',
+                name: 'orc_name',
+                allowBlank: false,
+                width: 360
+            },
+            {
+                xtype: 'textfield',
+                fieldLabel: '客戶電話',
+                id: 'orc_phone',
+                name: 'orc_phone',
+                allowBlank: false,
+                width: 360
+            },
+            {
+                xtype: 'fieldcontainer',
+                layout: 'hbox',
+                items: [
+                    {
+                        xtype: 'combobox',
+                        fieldLabel: '收貨地址',
+                        id: 'orc_zipcode',
+                        name: 'orc_zipcode',
+                        store: zipStore,
+                        lastQuery:'',
+                        displayField: 'zipname',
+                        valueField: 'zipcode',
+                        allowBlank: false,
+                        width: 245
+                    },
+                    {
+                        xtype: 'textfield',
+                        id: 'orc_address',
+                        name: 'orc_address',
+                        allowBlank: false,
+                        width: 200
+                    },
+                ],
+            },
+            {
+                xtype: 'combobox',
+                fieldLabel: '退貨類型',
+                id: 'orc_type',
+                name: 'orc_type',
+                store: typeStore,
+                displayField: 'parameterName',
+                valueField: 'parameterCode',
+                lastQuery:'',
+                value: '1',
+                editable: false,
+            },    
+            {
+                xtype: 'combobox',
+                fieldLabel: '發票處理',
+                id: 'invoice_deal',
+                name: 'invoice_deal',
+                displayField: 'parameterName',
+                valueField: 'parameterCode',
+                store: InvoiceDealStore,
+                lastQuery: '',
+                value: '1',
+                editable:false,
+            },
+            {
+                xtype: 'textarea',
+                fieldLabel: '客戶備註(最多200字)',
+                id: 'orc_remark',
+                name: 'orc_remark',
+                width: 360,
+                maxLength:200,
+            },
+            {
+                xtype: 'textarea',
+                fieldLabel: '客服備註(最多200字)',
+                id: 'orc_service_remark',
+                name: 'orc_service_remark',
+                width: 360,
+                maxLength: 200,
+            },
+            {
+                xtype: 'radiogroup',
+                fieldLabel: '是否需回收',
+                id: 'orc_send',
+                name: 'orc_send_name',
+                width: 200,
+                allowBlank:false,
+                items: [
+                    { id: 'yes', name: 'orc_send_name', boxLabel: '是', inputValue: '1', checked: true },
+                        { id: 'no', name: 'orc_send_name', boxLabel: '否', inputValue: '0' },
+                ],
+            },
         ],
         buttonAlign: 'right',
         buttons: [{
@@ -898,89 +946,86 @@
         id: 'transport',
         hidden:true,
         items: [
-                    {
-                        xtype: 'textfield',
-                        fieldLabel: '物流編號',
-                        id: 'orc_deliver_code',
-                        name: 'orc_deliver_code',
-                        allowBlank: false,
-                        width: 360
-                    },
-
-                    {
-            xtype: 'fieldcontainer',
-            layout: 'hbox',
-            items: [
-                    {
-                        xtype: 'datefield',
-                        fieldLabel: '預計收貨時間段',
-                        id: 'orc_deliver_date',
-                        name: 'orc_deliver_date',
-                        allowBlank: false,
-                        width: 360,
-                        editable: false,
-                        listeners: {
-                            select: function () {
-                                var date =new Date(Ext.getCmp('orc_deliver_date').getValue());
-                                var now_date = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
-                                if (date <= now_date)
-                                {
-                                    Ext.Msg.alert("提示信息", "預計退貨時間需大於今日");
-                                    Ext.getCmp('orc_deliver_date').setValue()
-                                }
-
+            {
+                xtype: 'textfield',
+                fieldLabel: '物流編號',
+                id: 'orc_deliver_code',
+                name: 'orc_deliver_code',
+                allowBlank: false,
+                width: 360
+            },
+            {
+                xtype: 'fieldcontainer',
+                layout: 'hbox',
+                items: [
+                {
+                    xtype: 'datefield',
+                    fieldLabel: '預計收貨時間段',
+                    id: 'orc_deliver_date',
+                    name: 'orc_deliver_date',
+                    allowBlank: false,
+                    width: 360,
+                    editable: false,
+                    listeners: {
+                        select: function () {
+                            var date =new Date(Ext.getCmp('orc_deliver_date').getValue());
+                            var now_date = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+                            if (date <= now_date)
+                            {
+                                Ext.Msg.alert("提示信息", "預計退貨時間需大於今日");
+                                Ext.getCmp('orc_deliver_date').setValue()
                             }
-                        },
-                    },
-                    {
-                        xtype: 'combobox',
-                        store: DateStore,
-                        displayField: 'txt',
-                        valueField: 'value',
-                        id: 'orc_deliver_time',
-                        name: 'orc_deliver_time',
-                        value: 0,
-                        editable:false,
-                        allowBlank: false,
-                    },
-            ],
-        },
-        ],
-        buttonAlign: 'right',
-        buttons: [{
-            text: '確認',
-            formBind: true,
-            disabled: true,
-            handler: function () {
-                var form = this.up('form').getForm();
-                var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
-                myMask.show();
-                if (form.isValid) {
-                    form.submit({
-                        params: {
-                            return_id: Ext.getCmp('return_id').getValue(),
-                            orc_deliver_code: Ext.getCmp('orc_deliver_code').getValue(),
-                            orc_deliver_date: Ext.getCmp('orc_deliver_date').getValue(),
-                            orc_deliver_time: Ext.getCmp('orc_deliver_time').getValue(),
-                        },
-                        success: function (form, action) {
-                            myMask.hide();
-                            var result = Ext.decode(action.response.responseText);
-                            if (result.success) {
-                                myMask.hide();
-                                Ext.Msg.alert("提示信息", "物流信息新增成功！");
-                                orderReturnForm.getForm().reset();
-                                transport.hide();
-                            }
-                        },
-                        failure: function (form, action) {
-                            myMask.hide();
-                            Ext.Msg.alert("提示信息", "出現異常！");
                         }
-                    })
-                }
-            }
-        }],
+                    },
+                },
+                {
+                    xtype: 'combobox',
+                    store: DateStore,
+                    displayField: 'txt',
+                    valueField: 'value',
+                    id: 'orc_deliver_time',
+                    name: 'orc_deliver_time',
+                    value: 0,
+                    editable:false,
+                    allowBlank: false,
+                }],            
+            },
+        ],
+        //buttonAlign: 'right',
+        //buttons: [{
+        //    text: '確認',
+        //    formBind: true,
+        //    disabled: true,
+        //    handler: function () {
+        //        var form = this.up('form').getForm();
+        //        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+        //        myMask.show();
+        //        if (form.isValid) {
+        //            form.submit({
+        //                params: {
+        //                    return_id: Ext.getCmp('return_id').getValue(),
+        //                    orc_deliver_code: Ext.getCmp('orc_deliver_code').getValue(),
+        //                    orc_deliver_date: Ext.getCmp('orc_deliver_date').getValue(),
+        //                    orc_deliver_time: Ext.getCmp('orc_deliver_time').getValue(),
+        //                },
+        //                success: function (form, action) {
+        //                    myMask.hide();
+        //                    var result = Ext.decode(action.response.responseText);
+        //                    if (result.success) {
+        //                        myMask.hide();
+        //                        Ext.Msg.alert("提示信息", "物流信息新增成功！");
+        //                        orderReturnForm.getForm().reset();
+        //                        transport.hide();
+        //                    }
+        //                },
+        //                failure: function (form, action) {
+        //                    myMask.hide();
+        //                    Ext.Msg.alert("提示信息", "出現異常！");
+        //                }
+        //            })
+        //        }
+        //    }
+        //}],
     });
     //唯一的grid負責承載收到商品可退、確認入庫，確認退款單
     var CouldReturnGrid = Ext.create('Ext.grid.Panel', {
@@ -991,14 +1036,13 @@
         frame: true,
         flex: 6.1,
         columns: [
-         { header: "訂單編號", dataIndex: 'order_id', width: 150, align: 'center' },
-        { header: "商品細項編號", dataIndex: 'item_id', width: 150, align: 'center' },
-        { header: "商品名稱", dataIndex: 'product_name', width: 150, align: 'center' },
-        { header: "規格", dataIndex: 'product_spec_name', width: 120, align: 'center' },
-        { header: "數量", dataIndex: 'buy_num', width: 120, align: 'center' },
-        { header: "價格", dataIndex: 'single_money', width: 120, align: 'center' },
-         { header: "出貨方式", dataIndex: 'product_mode', width: 120, align: 'center' },
-        
+            { header: "訂單編號", dataIndex: 'order_id', width: 150, align: 'center' },
+            { header: "商品細項編號", dataIndex: 'item_id', width: 150, align: 'center' },
+            { header: "商品名稱", dataIndex: 'product_name', width: 150, align: 'center' },
+            { header: "規格", dataIndex: 'product_spec_name', width: 120, align: 'center' },
+            { header: "數量", dataIndex: 'buy_num', width: 120, align: 'center' },
+            { header: "價格", dataIndex: 'single_money', width: 120, align: 'center' },
+            { header: "出貨方式", dataIndex: 'product_mode', width: 120, align: 'center' }        
         ],
         //bbar: Ext.create('Ext.PagingToolbar', {
         //    store: CouldReturnStore,
@@ -1015,7 +1059,7 @@
                 }
             }
         },
-        //selModel: sm
+        selModel: sm
     });
 
     Ext.create('Ext.Viewport', {
@@ -1032,5 +1076,5 @@
         }
     });
     ToolAuthority();
-    QueryAuthorityByUrl('/OrderManage/OrderReturnList');
+    //QueryAuthorityByUrl('/OrderManage/OrderReturnList');
 });

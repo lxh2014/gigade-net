@@ -14,8 +14,13 @@ namespace BLL.gigade.Model
        public int status { get; set; }
        public uint create_time { get; set; }
        public int coming_time { get; set; }
+       public int source_type { get; set; }
+       public int muser_id { get; set; }
+       public int send_notice_time { get; set; }
+      
        public string s_coming_time { get; set; }
        public string recommend { get; set; }
+    
        public ArrivalNotice()
        {
            id = 0;

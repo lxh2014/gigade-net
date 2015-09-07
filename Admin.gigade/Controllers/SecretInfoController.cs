@@ -46,7 +46,8 @@ namespace Admin.gigade.Controllers
         private IManageUserImplMgr _muMgr;
         private UserLoginAttemptsMgr ulaMgr;
         private VipUserGroupMgr _vipUserGroup;
-        private IBrowseDataImplMgr _IBrowseDataMgr;
+        private IBrowseDataImplMgr _IBrowseDataMgr; 
+        private ZipMgr zMgr;
 
         #region 視圖
         /// <summary>
@@ -735,8 +736,24 @@ namespace Admin.gigade.Controllers
                         EdmTestMgr edmtestMgr = new EdmTestMgr(mySqlConnectionString);
                         EdmTestQuery etmodel = edmtestMgr.GetModel(new EdmTestQuery { email_id = Convert.ToUInt32(related_id) }).FirstOrDefault();
                         json = "{success:true,\"user_id\":\"" + etmodel.email_id + "\",\"user_name\":\"" + etmodel.test_username + "\",\"user_email\":\"" + etmodel.email_address + "\"}";
-                        break; 
-
+                        break;    
+                    case "order_master":
+                        OrderMasterMgr omMgr = new OrderMasterMgr(mySqlConnectionString);
+                        zMgr = new ZipMgr(mySqlConnectionString);
+                        DataTable dt = omMgr.GetOrderidAndName(related_id);
+                        json = "{success:true,\"order_id\":\"" + dt.Rows[0][0] + "\",\"order_name\":\"" + dt.Rows[0][1] + "\",\"order_phone\":\"" + dt.Rows[0][2] + "\",\"order_mobile\":\"" + dt.Rows[0][3] + "\",\"order_address\":\"" + zMgr.Getaddress(int.Parse(dt.Rows[0][9].ToString())) + dt.Rows[0][4] + "\",\"delivery_name\":\"" + dt.Rows[0][5] + "\",\"delivery_phone\":\"" + dt.Rows[0][6] + "\",\"delivery_mobile\":\"" + dt.Rows[0][7] + "\",\"delivery_address\":\"" + zMgr.Getaddress(int.Parse(dt.Rows[0][10].ToString())) + dt.Rows[0][8] + "\"}";
+                        break;
+                    case "order_master1":
+                        OrderMasterMgr omMgr1 = new OrderMasterMgr(mySqlConnectionString);
+                        DataTable dt1 = omMgr1.GetOrderidAndName(related_id);
+                        json = "{success:true,\"order_id\":\"" + dt1.Rows[0][0] + "\",\"order_name\":\"" + dt1.Rows[0][1] + "\"}";
+                        break;
+                    case "order_payment_hitrust":
+                        TabShowMgr OphMgr = new TabShowMgr(mySqlConnectionString);
+                        DataTable store = new DataTable();
+                        store = OphMgr.GetOderHitrustDT(related_id);
+                        json = "{success:true,\"id\":\"" + store.Rows[0]["id"] + "\",\"pan\":\"" + store.Rows[0]["pan"] + "\",\"bankname\":\"" + store.Rows[0]["bankname"] + "\"}";
+                        break;
                     //case "send_mail":
                     //    SendMailMgr sendmailMgr = new SendMailMgr(mySqlConnectionString);
                     //    SendMail sendModel = sendmailMgr.GetModel(new SendMail { id = related_id });
@@ -751,10 +768,7 @@ namespace Admin.gigade.Controllers
                         if (urlType == "/Member/RecommendMember")//推薦會員中推薦者的信息
                         {
                             UserRecommendMgr _userrecommendMgr = new UserRecommendMgr(mySqlConnectionString);
-
                             DataTable _urdtno = _userrecommendMgr.getUserInfo(related_id);
-
-
                             if (_urdtno.Rows.Count > 0)
                             {
                                 json = "{success:true,\"user_id\":\"" + "" + "\",\"user_name\":\"" + "" + "\",\"user_email\":\"" + "" + "\",\"user_phone\":\"" + "" + "\",\"user_adress\":\"" + "" + "\",\"ur_name\":\"" + _urdtno.Rows[0]["name"] + "\",\"ur_mail\":\"" + _urdtno.Rows[0]["mail"] + "\",\"no_ur_name\":\"" + _urdtno.Rows[0]["user_name"] + "\"}";

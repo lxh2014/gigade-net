@@ -790,10 +790,10 @@ namespace Admin.gigade.Controllers
                 _tbshow = new TabShowMgr(mySqlConnectionString);
                 int totalCount = 0;
                 store = _tbshow.GetOderHitrust(query, out  totalCount);
-                foreach (var item in store)
-                {
-                    item.card_number ="'"+item.pan+"','"+item.bankname+"'";
-                }
+                //foreach (var item in store)
+                //{
+                //    item.card_number ="'"+item.pan+"','"+item.bankname+"'";
+                //}
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -1319,13 +1319,8 @@ namespace Admin.gigade.Controllers
             OrderReturnMasterQuery query = new OrderReturnMasterQuery();
             _orderReturnMaster=new OrderReturnMasterMgr(mySqlConnectionString);
             string json = string.Empty;
-            //uint id;
             try
             {
-                //if (uint.TryParse(Request.Params["order_id"].ToString(), out id))
-                //{
-                //    query.order_id = id;
-                //}
                 if (!string.IsNullOrEmpty(Request.Params["detail_id"]))
                 {
                     query.detailId = Request.Params["detail_id"].ToString();
@@ -1334,13 +1329,8 @@ namespace Admin.gigade.Controllers
                 {
                     query.detailId = query.detailId.Substring(0, query.detailId.Length - 1);
                 }
-                System.Net.IPAddress[] addlist = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList;
+                System.Net.IPAddress[] addlist = Dns.GetHostByName(Dns.GetHostName()).AddressList; 
                 query.return_ipfrom = addlist[0].ToString();
-                //_tabshow = new TabShowMgr(mySqlConnectionString);
-                //int totalCount = 0;
-                //stores = _tabshow.GetNCCC(query, out totalCount);
-                //IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                //timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = _orderReturnMaster.OrderReturn(query);// "{success:true}";//返回json數據
             }
             catch (Exception ex)
@@ -1349,7 +1339,7 @@ namespace Admin.gigade.Controllers
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
-                json = "{success:flase,msg:1}";
+                json = "{success:flase}";
             }
             this.Response.Clear();
             this.Response.Write(json);
@@ -1435,37 +1425,29 @@ namespace Admin.gigade.Controllers
         }
         #endregion
         #endregion
-        //OrderWaitClick
+
         #region 轉等待付款
         public HttpResponseBase OrderWaitClick()
         {
-            List<OrderReturnMasterQuery> stores = new List<OrderReturnMasterQuery>();
-            OrderReturnMasterQuery query = new OrderReturnMasterQuery();
-            _orderReturnMaster = new OrderReturnMasterMgr(mySqlConnectionString);
             string json = string.Empty;
-            //uint id;
+            OrderMasterStatusQuery query = new OrderMasterStatusQuery();
+            _orderDetailMgr = new OrderDetailMgr(mySqlConnectionString);
+            uint id;
             try
             {
-                //if (uint.TryParse(Request.Params["order_id"].ToString(), out id))
-                //{
-                //    query.order_id = id;
-                //}
-                if (!string.IsNullOrEmpty(Request.Params["detail_id"]))
+                if (uint.TryParse(Request.Params["order_id"].ToString(), out id))
                 {
-                    query.detailId = Request.Params["detail_id"].ToString();
+                    query.order_id = id;
                 }
-                if (query.detailId.Length > 0)
+                if (!string.IsNullOrEmpty(Request.Params["remark"].ToString()))
                 {
-                    query.detailId = query.detailId.Substring(0, query.detailId.Length - 1);
+                    query.status_description = "Writer : (" + (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id + ")" + (System.Web.HttpContext.Current.Session["caller"] as Caller).user_username + ":" + Request.Params["remark"];
                 }
-                System.Net.IPAddress[] addlist = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList;
-                query.return_ipfrom = addlist[0].ToString();
-                //_tabshow = new TabShowMgr(mySqlConnectionString);
-                //int totalCount = 0;
-                //stores = _tabshow.GetNCCC(query, out totalCount);
-                //IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                //timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                json = _orderReturnMaster.OrderReturn(query);// "{success:true}";//返回json數據
+                query.order_status=0;//等待付款
+
+                System.Net.IPAddress[] addlist = Dns.GetHostByName(Dns.GetHostName()).AddressList;
+                query.status_ipfrom = addlist[0].ToString();
+                json =  _orderDetailMgr.OrderWaitClick(query);//"{success:true}";//返回json數據
             }
             catch (Exception ex)
             {
@@ -1481,8 +1463,6 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
-
-
         #endregion
 
         #region 物流單
@@ -1594,7 +1574,7 @@ namespace Admin.gigade.Controllers
                 query.bank_note = Request.Params["bank_note"];
                 query.cancel_createdate = Convert.ToDateTime(Request.Params["cancel_createdate"]);
                 query.cancel_updatedate = Convert.ToDateTime(Request.Params["cancel_updatedate"]);
-                System.Net.IPAddress[] ips = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList;
+                System.Net.IPAddress[] ips = Dns.GetHostByName(Dns.GetHostName()).AddressList;
                 if (ips.Length > 0)
                 {
                     query.cancel_ipfrom = ips[0].ToString();
@@ -2529,323 +2509,6 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
-        #region 取消訂單通知
-        #region 獲取取消訂單通知列表
-        public HttpResponseBase GetOrderCancelMsgList()
-        {
-            List<OrderCancelMsgQuery> stores = new List<OrderCancelMsgQuery>();
-            string json = string.Empty;
-            try
-            {
-                int totalCount = 0;
-                OrderCancelMsgQuery query = new OrderCancelMsgQuery();
-                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
-                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
-                _orderCancelMsgMgr = new OrderCancelMsgMgr(mySqlConnectionString);
-                stores = _orderCancelMsgMgr.Query(query, out totalCount);
-                foreach (var item in stores)
-                {
-                    item.sorder_payment = Payment(item.order_payment.ToString());
-                    item.scancel_type = Order_Cancel_Reason(item.cancel_type.ToString());
-                    item.sorder_status = Status(item.order_status.ToString());
-                }
-                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
-                //listUser是准备转换的对象
-                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(stores, Formatting.Indented, timeConverter) + "}";//返回json數據
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:true,totalCount:0,data:[]}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-
-        }
-        #endregion
-        #region 對用戶提出的問題進行回覆
-        [CustomHandleError]
-        public HttpResponseBase Reply()
-        {
-            string json = string.Empty;
-            string response_content = string.Empty;
-            OrderCancelResponse ocr = new OrderCancelResponse();
-            _ptersrc = new ParameterMgr(mySqlConnectionString);
-            int i = 0;
-            string cancel_id = string.Empty; ;
-            if (!string.IsNullOrEmpty(Request.Params["cancel_id"]))
-            {
-                cancel_id = Request.Params["cancel_id"];
-                ocr.cancel_id = uint.Parse(cancel_id);
-            }
-            string question_email = string.Empty;
-            if (!string.IsNullOrEmpty(Request.Params["question_email"]))
-            {
-                question_email = Request.Params["question_email"];
-            }
-            //獲取登錄用戶的user_email
-            string user_email = (Session["caller"] as Caller).user_email;
-            //獲取登錄用戶的user_id
-            string user_id = (Session["caller"] as Caller).user_id.ToString();
-            string res;
-            try
-            {
-                res = Request.Params["response"].ToString().Trim();
-                res = res.Replace("\n", "");
-                if (res.Length>0)
-                {
-                    response_content = Request.Params["response"] + " ";
-                    ocr.user_id = uint.Parse(user_id);
-                    ocr.response_content = response_content;
-                    System.Net.IPAddress[] addlist = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList;
-                    if (addlist.Length > 0)
-                    {
-                        ocr.response_ipfrom = addlist[0].ToString();
-                    }
-                    _orderCancelMsgMgr = new OrderCancelMsgMgr(mySqlConnectionString);
-                    i = _orderCancelMsgMgr.Reply(ocr);
-                    bool issend = false;
-                    if (i == 2)
-                    {
-                        MailHelper mail = new MailHelper();
-                        string mail1 = _ptersrc.Getmail("TestMail");
-                        if (mail1 == "gigade@gimg.com.tw")
-                        {//測試使用上正式機后可變更為gigademail則是讀取會員mail
-                            mail1 = question_email;
-                        }
-                        issend = mail.SendMailAction(mail1, "取消訂單通知信", response_content);
-                    }
-                    json = "{success:true,msg:\"" + " 發送郵件成功！" + "\"}";
-                }
-                else
-                {
-                    json = "{success:false,msg:\"" + "请填写回覆内容！" + "\"}";
-                }
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = ex.InnerException.Message;
-                json = ex.InnerException.Source;
-                json = "{success:false,msg:\"" + " 發送郵件失敗！" + "\"}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-
-        }
-        #endregion
-
-        /*取消訂單原因 */
-        #region 訂單狀態列表
-        /// <summary>
-        /// 取消訂單原因
-        /// </summary>
-        /// <param name="value">數字</param>
-        /// <returns></returns>
-        public static string Order_Cancel_Reason(string value)
-        {
-            string result = string.Empty;
-            switch (value)
-            {
-                case "1":
-                    result = "買錯了";
-                    break;
-                case "2":
-                    result = "不適合";
-                    break;
-                case "3":
-                    result = "重複選購";
-                    break;
-                case "4":
-                    result = "商品規格不符";
-                    break;
-                case "5":
-                    result = "等待時間太久";
-                    break;
-                case "6":
-                    result = "改買其他商品";
-                    break;
-                case "7":
-                    result = "運費金額太高";
-                    break;
-                case "8":
-                    result = "接收時間無法配合";
-                    break;
-                case "9":
-                    result = "改用其他付款方式";
-                    break;
-                case "10":
-                    result = "價格較貴";
-                    break;
-                case "11":
-                    result = "其他";
-                    break;
-                default:
-                    result = "";
-                    break;
-
-            }
-            return result;
-
-        }
-        #endregion
-        /*訂單狀態 */
-        #region 訂單狀態列表
-        /// <summary>
-        /// 訂單狀態
-        /// </summary>
-        /// <param name="value">數字</param>
-        /// <returns></returns>
-        public static string Status(string value)
-        {
-            string result = string.Empty;
-            switch (value)
-            {
-                case "99":
-                    result = " 訂單歸檔";
-                    break;
-                case "92":
-                    result = " 訂單換貨";
-                    break;
-                case "91":
-                    result = " 訂單退貨";
-                    break;
-                case "90":
-                    result = " 訂單取消";
-                    break;
-                case "89":
-                    result = " 單一商品取消";
-                    break;
-                case "20":
-                    result = " 訂單異常";
-                    break;
-                case "10":
-                    result = " 等待取消";
-                    break;
-                case "9":
-                    result = " 待取貨";
-                    break;
-                case "8":
-                    result = " 已分配";
-                    break;
-                case "7":
-                    result = " 已進倉";
-                    break;
-                case "6":
-                    result = " 進倉中";
-                    break;
-                case "5":
-                    result = " 處理中";
-                    break;
-                case "4":
-                    result = " 已出貨";
-                    break;
-                case "3":
-                    result = " 出貨中";
-                    break;
-                case "2":
-                    result = " 待出貨";
-                    break;
-                case "1":
-                    result = " 付款失敗";
-                    break;
-                case "0":
-                    result = " 等待付款";
-                    break;
-                default:
-                    result = "";
-                    break;
-
-            }
-            return result;
-
-        }
-        #endregion
-        /*支付方式 */
-        #region
-        /// <summary>
-        /// 支付方式
-        /// </summary>
-        /// <param name="value">數字</param>
-        /// <returns></returns>
-        public static string Payment(string value)
-        {
-            string result = string.Empty;
-            switch (value)
-            {
-                case "1":
-                    result = "信用卡";
-                    break;
-                case "2":
-                    result = "ATM";
-                    break;
-                case "3":
-                    result = "藍新";
-                    break;
-                case "4":
-                    result = "支付寶";
-                    break;
-                case "5":
-                    result = "銀聯";
-                    break;
-                case "6":
-                    result = "傳真刷卡";
-                    break;
-                case "7":
-                    result = "延遲付款";
-                    break;
-                case "8":
-                    result = "黑貓貨到付款";
-                    break;
-                case "9":
-                    result = "現金";
-                    break;
-                case "10":
-                    result = "中國信託信用卡";
-                    break;
-                case "11":
-                    result = "中國信託信用卡紅利折抵(100%)";
-                    break;
-                case "12":
-                    result = "中國信託信用卡紅利折抵(10%)";
-                    break;
-                case "13":
-                    result = "信用卡";
-                    break;
-                case "14":
-                    result = "中國信託信用卡紅利折抵(20%)";
-                    break;
-                case "15":
-                    result = "外站每月請款";
-                    break;
-                case "16":
-                    result = "台新銀行紅利折抵(50%)";
-                    break;
-                case "17":
-                    result = "其他銀行紅利折抵";
-                    break;
-                default:
-                    result = value;
-                    break;
-
-
-            }
-            return result;
-        }
-        #endregion
-        #endregion
         #region 預購單
         #region 獲取預購單信息
         public HttpResponseBase GetOrderExpectList()
@@ -3754,7 +3417,6 @@ namespace Admin.gigade.Controllers
 
         #endregion
         #endregion
-
         #region 重寫品牌營業額統計
 
         public HttpResponseBase GetNewOrderRevenueList()
@@ -4426,359 +4088,55 @@ namespace Admin.gigade.Controllers
         }
 
         #endregion
-
-        #region 暫存退貨單
-        public HttpResponseBase GetReturnMasterList()
+        #region 取消整筆訂單
+        public HttpResponseBase ReturnAllOrder()
         {
-            List<OrderReturnUserQuery> stores = new List<OrderReturnUserQuery>();
-            string json = string.Empty;
-            try
-            {
-                OrderReturnUserQuery query = new OrderReturnUserQuery();
-                IReturnMasterImplMgr _Iretrunlistmgr = new ReturnMasterMgr(mySqlConnectionString);
-                StringBuilder sb = new StringBuilder();
-                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
-                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
-                #region 查詢條件
-                if (!string.IsNullOrEmpty(Request.Params["selecttype"]))
-                {
-                    query.selecttype = Request.Params["selecttype"].ToString();
-                }
-                if (!string.IsNullOrEmpty(Request.Params["searchcon"]))
-                {
-                    query.searchcon = Request.Params["searchcon"].ToString();
-                }
-                if (!string.IsNullOrEmpty(Request.Params["seldate"]))
-                {
-                    query.seldate = Request.Params["seldate"].ToString();
-                }
-                if (!string.IsNullOrEmpty(Request.Params["timestart"]))
-                {
-                    query.timestart = Int32.Parse(CommonFunction.GetPHPTime(Request.Params["timestart"]).ToString());
-                }
-                if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
-                {
-                    query.timeend = Int32.Parse(CommonFunction.GetPHPTime(Request.Params["dateTwo"]).ToString());
-                }
-                if (!string.IsNullOrEmpty(Request.Params["temp_status"]))
-                {
-                    query.temp_status = uint.Parse(Request.Params["temp_status"].ToString());
-                }
-                #endregion
-                int totalCount = 0;
-                stores = _Iretrunlistmgr.GetOrderTempReturnList(query, out totalCount);
-                foreach (var item in stores)
-                {
-                    item.user_return_createdates = CommonFunction.GetNetTime(item.user_return_createdate);
-                    item.user_return_updatedates = CommonFunction.GetNetTime(item.user_return_updatedate);
-                }
-                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
-                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                //listUser是准备转换的对象
-                json = "{success:true,'msg':'user',totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(stores, Formatting.Indented, timeConverter) + "}";//返回json數據
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:true,totalCount:0,data:[]}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
-        /// <summary>
-        /// 暫存退貨單未歸檔送出
-        /// </summary>
-        /// <returns></returns>
-        public HttpResponseBase UpdateReturnMaster()
-        {
-            OrderReturnUserQuery query = new OrderReturnUserQuery();
-            IReturnMasterImplMgr _Iordertempretrunlistmgr = new ReturnMasterMgr(mySqlConnectionString);
-            Serial serial = new Serial();
-            string json = string.Empty;
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Params["user_return_id"]))
-                {
-                    query.user_return_id = Convert.ToUInt32(Request.Params["user_return_id"].ToString());
-                }
-                else
-                {
-                    query.user_return_id = 0;
-                }
-                if (!string.IsNullOrEmpty(Request.Params["detail_id"]))
-                {
-                    query.detail_id = Convert.ToUInt32(Request.Params["detail_id"].ToString());
-                }
-                else
-                {
-                    query.detail_id = 0;
-                }
-                if (!string.IsNullOrEmpty(Request.Params["return_reason"]))
-                {
-                    query.return_reason = Convert.ToUInt32(Request.Params["return_reason"].ToString());
-                }
-                else
-                {
-                    query.return_reason = 0;
-                }
-                if (!string.IsNullOrEmpty(Request.Params["temp_status"]))
-                {
-                    query.temp_status = Convert.ToUInt32(Request.Params["temp_status"].ToString());
+           string json = string.Empty;
+           OrderMaster order = new OrderMaster();
+           try{
+               if (!string.IsNullOrEmpty(Request.Params["return_order"]))
+               {
+                   order.Order_Id = uint.Parse(Request.Params["return_order"]);
+               }
+               if (!string.IsNullOrEmpty(Request.Params["order_note"]))
+               {
+                   order.Note_Order = Request.Params["order_note"];
 
-                    if (query.temp_status == 1)
-                    {
-                        DataTable _dt = _Iordertempretrunlistmgr.GetOrderReturnCount(query);
-                        if (int.Parse(_dt.Rows[0][0].ToString()) != 0)
-                        {
-                            string err = string.Empty;
-                            err = "{success:true,msg:\"退貨單已存在，請洽諮訊部" + "\"}";
-
-                            this.Response.Clear();
-                            this.Response.Write(err);
-                            this.Response.End();
-                            return this.Response;
-                        }
-                        else
-                        {
-                            #region 當狀態要改為歸檔時，新增一條退貨單數據
-                            ISerialImplMgr _serial = new SerialMgr(mySqlConnectionString);
-                            serial = _serial.GetSerialById(45);
-                            query.return_id = Convert.ToUInt32((serial.Serial_Value + 1).ToString());
-                            if (!string.IsNullOrEmpty(Request.Params["order_id"]))
-                            {
-                                query.order_id = uint.Parse(Request.Params["order_id"]);
-                            }
-                            else
-                            {
-                                query.order_id = 0;
-                            }
-                            if (!string.IsNullOrEmpty(Request.Params["item_vendor_id"]))
-                            {
-                                query.item_vendor_id = uint.Parse(Request.Params["item_vendor_id"]);
-                            }
-                            else
-                            {
-                                query.item_vendor_id = 0;
-                            }
-                            query.return_status = 0;
-                            if (!string.IsNullOrEmpty(Request.Params["user_note"]))
-                            {
-                                query.user_note = Request.Params["user_note"];
-                            }
-                            else
-                            {
-                                query.user_note = "";
-                            }
-                            query.return_createdate = Convert.ToUInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
-                            if (!string.IsNullOrEmpty(Request.Params["return_zip"]))
-                            {
-                                query.return_zip = uint.Parse(Request.Params["return_zip"]);
-                            }
-                            else
-                            {
-                                query.return_zip = 0;
-                            }
-                            if (!string.IsNullOrEmpty(Request.Params["return_address"]))
-                            {
-                                query.return_address = Request.Params["return_address"];
-                            }
-                            else
-                            {
-                                query.return_address = "";
-                            }
-
-                            query.return_updatedate = 0;
-                            System.Net.IPAddress[] addlist = Dns.GetHostByName(Dns.GetHostName()).AddressList;
-                            if (addlist.Length > 0)
-                            {
-                                query.return_ipfrom = addlist[0].ToString();
-                            }
-                            serial.Serial_Value = serial.Serial_Value + 1;/*所在操作表的列增加*/
-                            _serial.Update(serial);/*修改所在的表的列對應的值*/
-                            _Iordertempretrunlistmgr.InsertOrderReturnMaster(query);
-                            _Iordertempretrunlistmgr.InsertOrderReturnDetail(query);
-                            #endregion
-                            #region 新增付款單狀態
-                            OrderMasterStatus oms = new OrderMasterStatus();
-                            _serial = new SerialMgr(mySqlConnectionString);
-                            serial = _serial.GetSerialById(29);
-                            oms.serial_id = uint.Parse((serial.Serial_Value + 1).ToString());
-                            if (!string.IsNullOrEmpty(Request.Params["order_id"]))
-                            {
-                                oms.order_id = query.order_id;
-
-                            }
-                            else
-                            {
-                                oms.order_id = 0;
-                            }
-                            oms.order_status = 91;
-                            int totalCount = 0;
-                            List<LogInLogeQuery> logins = new List<LogInLogeQuery>();
-                            LogInLogeQuery login = new LogInLogeQuery();
-                            ILogInLogeImplMgr _loginloge = new LogInLogeMgr(mySqlConnectionString);
-                            logins = _loginloge.QueryList(login, out totalCount);
-                            string Description = string.Empty;
-                            Description = "Write:(" + login.user_id + ")" + login.user_username;
-                            oms.status_description = Description;
-                            System.Net.IPAddress[] addlists = Dns.GetHostByName(Dns.GetHostName()).AddressList;
-                            if (addlist.Length > 0)
-                            {
-                                oms.status_ipfrom = addlist[0].ToString();
-                            }
-
-                            oms.status_createdate = uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
-                            serial.Serial_Value = serial.Serial_Value + 1;
-                            _serial.Update(serial);
-                            _Iordertempretrunlistmgr.InsertOrderMasterStatus(oms);
-
-                            #endregion
-                            #region 修改付款單狀態
-
-                            if (!string.IsNullOrEmpty(Request.Params["order_id"]))
-                            {
-                                List<OrderReturnUserQuery> stores = new List<OrderReturnUserQuery>();
-                                query.order_id = uint.Parse(Request.Params["order_id"]);
-                                stores = _Iordertempretrunlistmgr.OrderMasterQuery(query);
-                                if (query.order_status == 90)
-                                {
-                                    query.order_date_cancel = uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
-                                }
-                                else if (query.order_status == 99)
-                                {
-                                    query.order_date_close = uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
-                                }
-                                else
-                                {
-                                    query.order_status = 5;
-                                    query.order_updatedate = uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
-                                    System.Net.IPAddress[] addresslist = Dns.GetHostByName(Dns.GetHostName()).AddressList;
-                                    if (addlist.Length > 0)
-                                    {
-                                        query.order_ipfrom = addlist[0].ToString();
-                                    }
-                                }
-                                _Iordertempretrunlistmgr.UpdateOrderMaster(query);
-                            }
-                            #endregion
-                            #region 異動訂單明細商品狀態
-                            if (!string.IsNullOrEmpty(Request.Params["detail_id"]))
-                            {
-                                query.detail_id = Convert.ToUInt32(Request.Params["detail_id"].ToString());
-                                query.detail_status = 91;
-                                _Iordertempretrunlistmgr.UpdateOrderDetailStatus(query);
-                            }
-                            #endregion
-                            int invoice_id = 0;
-                            string status = string.Empty;
-                            OrderMaster odm = new OrderMaster();
-                            odm.Order_Id = query.order_id;
-                            List<OrderMaster> Odmaster = new List<OrderMaster>();
-                            #region 是否開立過發票
-                            if (_Iordertempretrunlistmgr.SelOrderMaster(query).Rows[0]["invoice_status"].ToString() == "0")
-                            {
-                                _Iordertempretrunlistmgr.Seltime(query);
-                                #region 判斷時間  異動
-                                if (_Iordertempretrunlistmgr.SelCon(query).Rows.Count > 0)
-                                {
-                                    if (_Iordertempretrunlistmgr.SelCon(query).Rows[0]["order_freight_normal"].ToString() == "1")
-                                    {//抓取付款單
-                                        Odmaster = _Iordertempretrunlistmgr.Selpay(odm);
-                                        double free_tax, tax_amout, order_freight_normal_notax, order_freight_low_notax, order_freight_normal_tax, order_freight_low_tax;
-                                        foreach (var item in Odmaster)
-                                        {
-                                            free_tax = Int32.Parse(item.Order_Amount.ToString()) / 1.5;
-                                            tax_amout = item.Order_Amount - free_tax;
-                                            order_freight_normal_notax = item.Order_Freight_Normal / 1.5;
-                                            order_freight_low_notax = item.Order_Freight_Low / 1.5;
-                                            order_freight_normal_tax = item.Order_Freight_Normal - order_freight_normal_notax;
-                                            order_freight_low_tax = item.Order_Freight_Low - order_freight_low_notax;
-                                        }
-                                        //抓出明細
-                                        status = "0,4";
-                                        _Iordertempretrunlistmgr.Seldetail(query, status);
-                                    }
-                                    if (Int32.Parse(_Iordertempretrunlistmgr.SelCon(query).Rows[0][0].ToString()) != 1)
-                                    {
-                                        #region 運費判斷
-                                        if (_Iordertempretrunlistmgr.SelOrderMaster(query).Rows[0]["order_freight_normal"].ToString() == "0")
-                                        {
-                                            if (_Iordertempretrunlistmgr.SelOrderMaster(query).Rows[0]["order_freight_low"].ToString() == "0")
-                                            {
-                                                invoice_id = Int32.Parse(_Iordertempretrunlistmgr.SelOrderMaster(query).Rows[0]["order_freight_low"].ToString());
-                                                invoice_id = Int32.Parse(_Iordertempretrunlistmgr.SelInvoiceid(invoice_id).Rows[0][0].ToString());
-                                            }
-                                        }
-                                        #endregion
-                                        #region 寫入資料
-                                        InvoiceMasterRecord m = new InvoiceMasterRecord();
-                                        InvoiceSliveInfo n = new InvoiceSliveInfo();
-                                        if (_Iordertempretrunlistmgr.Insertdb(m, n) > 0)
-                                        {//寫入資料成功執行成功
-                                            _Iordertempretrunlistmgr.Updinvoice(query);
-                                            _Iordertempretrunlistmgr.Delinvoice(invoice_id);
-                                        }
-                                        #endregion
-                                    }
-                                }
-                                #endregion
-                                #region 過期 開立折讓單
-                                invoice_id = Int32.Parse(_Iordertempretrunlistmgr.SelOrderMaster(query).Rows[0]["invoice_id"].ToString());
-                                _Iordertempretrunlistmgr.Selmaster(invoice_id);
-                                _Iordertempretrunlistmgr.Selslive(invoice_id);
-                                status = "89,90,91";
-                                _Iordertempretrunlistmgr.Seldetail(query, status);
-                                //更新總數(開立折讓單)
-                                InvoiceAllowanceRecord larm = new InvoiceAllowanceRecord();
-                                _Iordertempretrunlistmgr.Updcount(larm);
-                                _Iordertempretrunlistmgr.UpdMaster(invoice_id);
-                                #endregion
-                            }
-                            #endregion
-                        }
-                    }
-                }
-                else
-                {
-                    query.temp_status = 0;
-                }
-                if (!string.IsNullOrEmpty(Request.Params["user_note"]))
-                {
-                    query.user_note = Request.Params["user_note"];
-
-                }
-                else
-                {
-                    query.user_note = "";
-                }
-                if (!string.IsNullOrEmpty(Request.Params["user_return_createdates"]))
-                {
-                    long times = CommonFunction.GetPHPTime(Request.Params["user_return_createdates"]);
-                    query.user_return_createdate = Convert.ToUInt32(times.ToString());
-                }
-                if (!string.IsNullOrEmpty(Request.Params["slave_status"]))
-                {
-                    uint status = Convert.ToUInt32(Request.Params["slave_status"]);
-                    if (status == 99)
-                    {
-                        string jsons = string.Empty;
-                        jsons = "{success:true,msg:\"已歸檔，無法產生退貨單" + "\"}";
-
-                        this.Response.Clear();
-                        this.Response.Write(jsons);
-                        this.Response.End();
-                        return this.Response;
-                    }
-                }
-                query.user_return_updatedate = Convert.ToUInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
-                _Iordertempretrunlistmgr.UpdateTempStatus(query);
-                json = "{success:true}";//返回json數據
+               }
+               order.User_Id = uint.Parse(((Session["caller"] as Caller).user_id).ToString());
+               order.user_name = (Session["caller"] as Caller).user_username;
+               System.Net.IPAddress[] addlist = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList;
+               if (addlist.Length > 0)
+               {
+                   order.Order_Ipfrom = addlist[0].ToString();
+               }
+               _orderCancelMgr = new OrderCancelMasterMgr(mySqlConnectionString);
+               int result = _orderCancelMgr.ReturnAllOrder(order);
+               string msg = "";
+               switch (result)
+               {
+                   case 1:
+                       msg = "消費者購物金餘額不足，無法扣除給予購物金!";
+                       break;
+                   case 2:
+                       msg = "error master!";
+                       break;
+                   case 3:
+                       msg = "error slave!";
+                       break;
+                   case 4:
+                       msg = "取得身分證字號失敗!";
+                       break;
+                   case 5:
+                       msg = "bonus type error !";
+                       break;
+                   case 100:
+                       msg = "100";//操作成功!
+                       break;
+                   default:
+                       break;
+               }
+               json = "{success:true,msg:\"" + msg + "\"}";              
             }
             catch (Exception ex)
             {
@@ -4794,6 +4152,50 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
 
+        public HttpResponseBase ReturnMsg() 
+        {
+            string json = string.Empty;
+            OrderMaster order = new OrderMaster();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["order_id"]))
+               {
+                   order.Order_Id = uint.Parse(Request.Params["order_id"]);
+               }
+                 _orderCancelMgr = new OrderCancelMasterMgr(mySqlConnectionString);
+                 int result = _orderCancelMgr.returnMsg(order);
+                 int msg =0;
+                 switch (result)
+                 {
+                     case 1:
+                         msg = 1;
+                       break;
+                     case 99:
+                       msg = 99;
+                       break;
+                  
+                   case 100:
+                       msg =100;//操作成功!
+                       break;
+                   default:
+                       break;
+                 }
+                 json = "{success:true,msg:\"" + msg + "\"}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,msg:0}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        
         #endregion
         #region  退货单
         /*獲取退貨單列表*/
@@ -5022,7 +4424,7 @@ namespace Admin.gigade.Controllers
                         query.bank_note = Request.Params["bank_note"];
                     }
                     query.return_updatedate = Convert.ToUInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString()));
-                    query.return_ipfrom = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList.FirstOrDefault().ToString();
+                    query.return_ipfrom = Dns.GetHostByName(Dns.GetHostName()).AddressList.FirstOrDefault().ToString();
 
                     if (!string.IsNullOrEmpty(Request.Params["bank_name"]))
                     {
@@ -5196,7 +4598,7 @@ namespace Admin.gigade.Controllers
                     }
                     if (item.Deduct_Welfare != 0)
                     {
-                        message = "抵用卷使用使用:" + item.Deduct_Welfare;
+                        message = "抵用劵使用使用:" + item.Deduct_Welfare;
                     }
                     if (item.Deduct_Happygo != 0)
                     {
@@ -5612,6 +5014,7 @@ namespace Admin.gigade.Controllers
             try
             {
                 store = _orderMasterMgr.GetData(orderId);
+                store.is_vendor_deliver = _orderMasterMgr.IsVendorDeliver(orderId);
                 store.OrderDatePay = CommonFunction.GetNetTime(store.order_date_pay);
                 if (!string.IsNullOrEmpty(store.money_collect_date.ToString()) && store.money_collect_date != 0)
                 {
@@ -5625,8 +5028,74 @@ namespace Admin.gigade.Controllers
                 //地址直接讀取
                 store.order_address = zMgr.Getaddress(int.Parse(store.order_zip.ToString())) + store.order_address;
                 store.delivery_address = zMgr.Getaddress(int.Parse(store.delivery_zip.ToString())) + store.delivery_address;
+                #region 添加資安的字段
+                if (store.order_name.Length > 1)
+                {
+                    store.order_name = store.order_name.ToString().Substring(0, 1) + "**";
+                }
+                else
+                {
+                    store.order_name = store.order_name.ToString() + "**";
+                }
+                if (store.order_phone.Length > 1)
+                {
+                    store.order_phone = store.order_phone.ToString().Substring(0, 1) + "****";
+                }
+                else
+                {
+                    store.order_phone = store.order_phone.ToString() + "**";
+                }
+                if (store.order_mobile.Length > 1)
+                {
+                    store.order_mobile = store.order_mobile.ToString().Substring(0, 1) + "****";
+                }
+                else
+                {
+                    store.order_mobile = store.order_mobile.ToString() + "**";
+                }
+                if (store.order_address.Length > 3)
+                {
+                    store.order_address = store.order_address.ToString().Substring(0, 3) + "****";
+                }
+                else
+                {
+                    store.order_address = store.order_address.ToString() + "**";
+                }
+                if (store.delivery_name.Length > 1)
+                {
+                    store.delivery_name = store.delivery_name.ToString().Substring(0, 1) + "**";
+                }
+                else
+                {
+                    store.delivery_name = store.delivery_name.ToString() + "**";
+                }
+                if (store.delivery_phone.Length > 1)
+                {
+                    store.delivery_phone = store.delivery_phone.ToString().Substring(0, 1) + "****";
+                }
+                else
+                {
+                    store.delivery_phone = store.delivery_phone.ToString() + "**";
+                }
+                if (store.delivery_mobile.Length > 1)
+                {
+                    store.delivery_mobile = store.delivery_mobile.ToString().Substring(0, 1) + "****";
+                }
+                else
+                {
+                    store.delivery_mobile = store.delivery_mobile.ToString() + "**";
+                }
+                if (store.delivery_address.Length > 3)
+                {
+                    store.delivery_address = store.delivery_address.ToString().Substring(0, 3) + "****";
+                }
+                else
+                {
+                    store.delivery_address = store.delivery_address.ToString() + "**";
+                }
+                #endregion
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";                
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
             }
             catch (Exception ex)
@@ -5701,7 +5170,7 @@ namespace Admin.gigade.Controllers
                 {//query.manager_name 
                     query.status_description = (Session["caller"] as Caller).user_username+ ":" + Request.Params["status_description"];
                 }
-                System.Net.IPAddress[] addlist = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList;
+                System.Net.IPAddress[] addlist = Dns.GetHostByName(Dns.GetHostName()).AddressList;
                 if (addlist.Length > 0)
                 {
                     query.status_ipfrom = addlist[0].ToString();
@@ -6042,7 +5511,36 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
-
+        //取參數表自取數據
+        public HttpResponseBase GetZQ()
+        {
+            string json = "{success:false}";
+            Parametersrc p = new Parametersrc();
+            DataTable dt = new DataTable();
+            _ptersrc = new ParameterMgr(mySqlConnectionString);
+            try
+            {
+                p.ParameterType = "Deliver_Store";
+                p.parameterName = "自取";
+                dt = _ptersrc.GetTP(p);
+                if (dt.Rows.Count > 0)
+                {
+                    json = "{success:true,data:" + JsonConvert.SerializeObject(dt, Formatting.Indented) + "}";//返回json數據
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
         #endregion
 
         #region 退款狀態
@@ -6270,8 +5768,9 @@ namespace Admin.gigade.Controllers
                     query.ors_order_id = _orderReturnStatus.GetOrderIdByReturnId(query.return_id);
                     query.ors_status = 3;
                     query.ors_createuser = (Session["caller"] as Caller).user_id;
-                    json = _orderReturnStatus.PlaceOnFile(query);
                 }
+                    query.data = Request.Params["data"];
+                    json = _orderReturnStatus.PlaceOnFile(query);
             }
             catch (Exception ex)
             {
@@ -6409,7 +5908,7 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        #region 更改付款方式
+        #region 轉自出;轉黑貓貨到付款
         public HttpResponseBase ChangePayMent()
         {
             string json = string.Empty;
@@ -6429,11 +5928,15 @@ namespace Admin.gigade.Controllers
                 {
                     query.Order_Id = Convert.ToUInt32(Request.Params["order_id"]);
                 }
-               System.Net.IPAddress[] addlist = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList;
-               query.Order_Ipfrom = addlist[0].ToString();
+                if (!string.IsNullOrEmpty(Request.Params["delivery_store"]))
+                {
+                    query.Delivery_Store = Convert.ToUInt32(Request.Params["delivery_store"]);
+                }
+                System.Net.IPAddress[] addlist = Dns.GetHostByName(Dns.GetHostName()).AddressList;
+                query.Order_Ipfrom = addlist[0].ToString();
                query.username = (Session["caller"] as Caller).user_username;
                 _orderMasterMgr = new OrderMasterMgr(mySqlConnectionString);
-             json=   _orderMasterMgr.ChangePayMent(query);
+                 json=   _orderMasterMgr.ChangePayMent(query);
             }
             catch (Exception ex)
             {
@@ -6448,6 +5951,680 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+        #endregion
+
+        #region --------棄用功能--------
+        #region 暫存退貨單
+        public HttpResponseBase GetReturnMasterList()
+        {
+            List<OrderReturnUserQuery> stores = new List<OrderReturnUserQuery>();
+            string json = string.Empty;
+            try
+            {
+                OrderReturnUserQuery query = new OrderReturnUserQuery();
+                IReturnMasterImplMgr _Iretrunlistmgr = new ReturnMasterMgr(mySqlConnectionString);
+                StringBuilder sb = new StringBuilder();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
+                #region 查詢條件
+                if (!string.IsNullOrEmpty(Request.Params["selecttype"]))
+                {
+                    query.selecttype = Request.Params["selecttype"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["searchcon"]))
+                {
+                    query.searchcon = Request.Params["searchcon"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["seldate"]))
+                {
+                    query.seldate = Request.Params["seldate"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["timestart"]))
+                {
+                    query.timestart = Int32.Parse(CommonFunction.GetPHPTime(Request.Params["timestart"]).ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
+                {
+                    query.timeend = Int32.Parse(CommonFunction.GetPHPTime(Request.Params["dateTwo"]).ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["temp_status"]))
+                {
+                    query.temp_status = uint.Parse(Request.Params["temp_status"].ToString());
+                }
+                #endregion
+                int totalCount = 0;
+                stores = _Iretrunlistmgr.GetOrderTempReturnList(query, out totalCount);
+                foreach (var item in stores)
+                {
+                    item.user_return_createdates = CommonFunction.GetNetTime(item.user_return_createdate);
+                    item.user_return_updatedates = CommonFunction.GetNetTime(item.user_return_updatedate);
+                }
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                //listUser是准备转换的对象
+                json = "{success:true,'msg':'user',totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(stores, Formatting.Indented, timeConverter) + "}";//返回json數據
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        /// <summary>
+        /// 暫存退貨單未歸檔送出
+        /// </summary>
+        /// <returns></returns>
+        public HttpResponseBase UpdateReturnMaster()
+        {
+            OrderReturnUserQuery query = new OrderReturnUserQuery();
+            IReturnMasterImplMgr _Iordertempretrunlistmgr = new ReturnMasterMgr(mySqlConnectionString);
+            Serial serial = new Serial();
+            string json = string.Empty;
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["user_return_id"]))
+                {
+                    query.user_return_id = Convert.ToUInt32(Request.Params["user_return_id"].ToString());
+                }
+                else
+                {
+                    query.user_return_id = 0;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["detail_id"]))
+                {
+                    query.detail_id = Convert.ToUInt32(Request.Params["detail_id"].ToString());
+                }
+                else
+                {
+                    query.detail_id = 0;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["return_reason"]))
+                {
+                    query.return_reason = Convert.ToUInt32(Request.Params["return_reason"].ToString());
+                }
+                else
+                {
+                    query.return_reason = 0;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["temp_status"]))
+                {
+                    query.temp_status = Convert.ToUInt32(Request.Params["temp_status"].ToString());
+
+                    if (query.temp_status == 1)
+                    {
+                        DataTable _dt = _Iordertempretrunlistmgr.GetOrderReturnCount(query);
+                        if (int.Parse(_dt.Rows[0][0].ToString()) != 0)
+                        {
+                            string err = string.Empty;
+                            err = "{success:true,msg:\"退貨單已存在，請洽諮訊部" + "\"}";
+
+                            this.Response.Clear();
+                            this.Response.Write(err);
+                            this.Response.End();
+                            return this.Response;
+                        }
+                        else
+                        {
+                            #region 當狀態要改為歸檔時，新增一條退貨單數據
+                            ISerialImplMgr _serial = new SerialMgr(mySqlConnectionString);
+                            serial = _serial.GetSerialById(45);
+                            query.return_id = Convert.ToUInt32((serial.Serial_Value + 1).ToString());
+                            if (!string.IsNullOrEmpty(Request.Params["order_id"]))
+                            {
+                                query.order_id = uint.Parse(Request.Params["order_id"]);
+                            }
+                            else
+                            {
+                                query.order_id = 0;
+                            }
+                            if (!string.IsNullOrEmpty(Request.Params["item_vendor_id"]))
+                            {
+                                query.item_vendor_id = uint.Parse(Request.Params["item_vendor_id"]);
+                            }
+                            else
+                            {
+                                query.item_vendor_id = 0;
+                            }
+                            query.return_status = 0;
+                            if (!string.IsNullOrEmpty(Request.Params["user_note"]))
+                            {
+                                query.user_note = Request.Params["user_note"];
+                            }
+                            else
+                            {
+                                query.user_note = "";
+                            }
+                            query.return_createdate = Convert.ToUInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
+                            if (!string.IsNullOrEmpty(Request.Params["return_zip"]))
+                            {
+                                query.return_zip = uint.Parse(Request.Params["return_zip"]);
+                            }
+                            else
+                            {
+                                query.return_zip = 0;
+                            }
+                            if (!string.IsNullOrEmpty(Request.Params["return_address"]))
+                            {
+                                query.return_address = Request.Params["return_address"];
+                            }
+                            else
+                            {
+                                query.return_address = "";
+                            }
+                            query.return_updatedate = 0;
+                            System.Net.IPAddress[] addlist = Dns.GetHostByName(Dns.GetHostName()).AddressList;
+                            if (addlist.Length > 0)
+                            {
+                                query.return_ipfrom = addlist[0].ToString();
+                            }
+                            serial.Serial_Value = serial.Serial_Value + 1;/*所在操作表的列增加*/
+                            _serial.Update(serial);/*修改所在的表的列對應的值*/
+                            _Iordertempretrunlistmgr.InsertOrderReturnMaster(query);
+                            _Iordertempretrunlistmgr.InsertOrderReturnDetail(query);
+                            #endregion
+                            #region 新增付款單狀態
+                            OrderMasterStatus oms = new OrderMasterStatus();
+                            _serial = new SerialMgr(mySqlConnectionString);
+                            serial = _serial.GetSerialById(29);
+                            oms.serial_id = uint.Parse((serial.Serial_Value + 1).ToString());
+                            if (!string.IsNullOrEmpty(Request.Params["order_id"]))
+                            {
+                                oms.order_id = query.order_id;
+
+                            }
+                            else
+                            {
+                                oms.order_id = 0;
+                            }
+                            oms.order_status = 91;
+                            int totalCount = 0;
+                            List<LogInLogeQuery> logins = new List<LogInLogeQuery>();
+                            LogInLogeQuery login = new LogInLogeQuery();
+                            ILogInLogeImplMgr _loginloge = new LogInLogeMgr(mySqlConnectionString);
+                            logins = _loginloge.QueryList(login, out totalCount);
+                            string Description = string.Empty;
+                            Description = "Write:(" + login.user_id + ")" + login.user_username;
+                            oms.status_description = Description;
+                            System.Net.IPAddress[] addlists = Dns.GetHostByName(Dns.GetHostName()).AddressList;
+                            if (addlist.Length > 0)
+                            {
+                                oms.status_ipfrom = addlist[0].ToString();
+                            }
+                            oms.status_createdate = uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
+                            serial.Serial_Value = serial.Serial_Value + 1;
+                            _serial.Update(serial);
+                            _Iordertempretrunlistmgr.InsertOrderMasterStatus(oms);
+
+                            #endregion
+                            #region 修改付款單狀態
+
+                            if (!string.IsNullOrEmpty(Request.Params["order_id"]))
+                            {
+                                List<OrderReturnUserQuery> stores = new List<OrderReturnUserQuery>();
+                                query.order_id = uint.Parse(Request.Params["order_id"]);
+                                stores = _Iordertempretrunlistmgr.OrderMasterQuery(query);
+                                if (query.order_status == 90)
+                                {
+                                    query.order_date_cancel = uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
+                                }
+                                else if (query.order_status == 99)
+                                {
+                                    query.order_date_close = uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
+                                }
+                                else
+                                {
+                                    query.order_status = 5;
+                                    query.order_updatedate = uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
+                                    System.Net.IPAddress[] addresslist = Dns.GetHostByName(Dns.GetHostName()).AddressList;
+                                    if (addlist.Length > 0)
+                                    {
+                                        query.order_ipfrom = addlist[0].ToString();
+                                    }
+                                }
+                                _Iordertempretrunlistmgr.UpdateOrderMaster(query);
+                            }
+                            #endregion
+                            #region 異動訂單明細商品狀態
+                            if (!string.IsNullOrEmpty(Request.Params["detail_id"]))
+                            {
+                                query.detail_id = Convert.ToUInt32(Request.Params["detail_id"].ToString());
+                                query.detail_status = 91;
+                                _Iordertempretrunlistmgr.UpdateOrderDetailStatus(query);
+                            }
+                            #endregion
+                            int invoice_id = 0;
+                            string status = string.Empty;
+                            OrderMaster odm = new OrderMaster();
+                            odm.Order_Id = query.order_id;
+                            List<OrderMaster> Odmaster = new List<OrderMaster>();
+                            #region 是否開立過發票
+                            if (_Iordertempretrunlistmgr.SelOrderMaster(query).Rows[0]["invoice_status"].ToString() == "0")
+                            {
+                                _Iordertempretrunlistmgr.Seltime(query);
+                                #region 判斷時間  異動
+                                if (_Iordertempretrunlistmgr.SelCon(query).Rows.Count > 0)
+                                {
+                                    if (_Iordertempretrunlistmgr.SelCon(query).Rows[0]["order_freight_normal"].ToString() == "1")
+                                    {//抓取付款單
+                                        Odmaster = _Iordertempretrunlistmgr.Selpay(odm);
+                                        double free_tax, tax_amout, order_freight_normal_notax, order_freight_low_notax, order_freight_normal_tax, order_freight_low_tax;
+                                        foreach (var item in Odmaster)
+                                        {
+                                            free_tax = Int32.Parse(item.Order_Amount.ToString()) / 1.5;
+                                            tax_amout = item.Order_Amount - free_tax;
+                                            order_freight_normal_notax = item.Order_Freight_Normal / 1.5;
+                                            order_freight_low_notax = item.Order_Freight_Low / 1.5;
+                                            order_freight_normal_tax = item.Order_Freight_Normal - order_freight_normal_notax;
+                                            order_freight_low_tax = item.Order_Freight_Low - order_freight_low_notax;
+                                        }
+                                        //抓出明細
+                                        status = "0,4";
+                                        _Iordertempretrunlistmgr.Seldetail(query, status);
+                                    }
+                                    if (Int32.Parse(_Iordertempretrunlistmgr.SelCon(query).Rows[0][0].ToString()) != 1)
+                                    {
+                                        #region 運費判斷
+                                        if (_Iordertempretrunlistmgr.SelOrderMaster(query).Rows[0]["order_freight_normal"].ToString() == "0")
+                                        {
+                                            if (_Iordertempretrunlistmgr.SelOrderMaster(query).Rows[0]["order_freight_low"].ToString() == "0")
+                                            {
+                                                invoice_id = Int32.Parse(_Iordertempretrunlistmgr.SelOrderMaster(query).Rows[0]["order_freight_low"].ToString());
+                                                invoice_id = Int32.Parse(_Iordertempretrunlistmgr.SelInvoiceid(invoice_id).Rows[0][0].ToString());
+                                            }
+                                        }
+                                        #endregion
+                                        #region 寫入資料
+                                        InvoiceMasterRecord m = new InvoiceMasterRecord();
+                                        InvoiceSliveInfo n = new InvoiceSliveInfo();
+                                        if (_Iordertempretrunlistmgr.Insertdb(m, n) > 0)
+                                        {//寫入資料成功執行成功
+                                            _Iordertempretrunlistmgr.Updinvoice(query);
+                                            _Iordertempretrunlistmgr.Delinvoice(invoice_id);
+                                        }
+                                        #endregion
+                                    }
+                                }
+                                #endregion
+                                #region 過期 開立折讓單
+                                invoice_id = Int32.Parse(_Iordertempretrunlistmgr.SelOrderMaster(query).Rows[0]["invoice_id"].ToString());
+                                _Iordertempretrunlistmgr.Selmaster(invoice_id);
+                                _Iordertempretrunlistmgr.Selslive(invoice_id);
+                                status = "89,90,91";
+                                _Iordertempretrunlistmgr.Seldetail(query, status);
+                                //更新總數(開立折讓單)
+                                InvoiceAllowanceRecord larm = new InvoiceAllowanceRecord();
+                                _Iordertempretrunlistmgr.Updcount(larm);
+                                _Iordertempretrunlistmgr.UpdMaster(invoice_id);
+                                #endregion
+                            }
+                            #endregion
+                        }
+                    }
+                }
+                else
+                {
+                    query.temp_status = 0;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_note"]))
+                {
+                    query.user_note = Request.Params["user_note"];
+                }
+                else
+                {
+                    query.user_note = "";
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_return_createdates"]))
+                {
+                    long times = CommonFunction.GetPHPTime(Request.Params["user_return_createdates"]);
+                    query.user_return_createdate = Convert.ToUInt32(times.ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["slave_status"]))
+                {
+                    uint status = Convert.ToUInt32(Request.Params["slave_status"]);
+                    if (status == 99)
+                    {
+                        string jsons = string.Empty;
+                        jsons = "{success:true,msg:\"已歸檔，無法產生退貨單" + "\"}";
+
+                        this.Response.Clear();
+                        this.Response.Write(jsons);
+                        this.Response.End();
+                        return this.Response;
+                    }
+                }
+                query.user_return_updatedate = Convert.ToUInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
+                _Iordertempretrunlistmgr.UpdateTempStatus(query);
+                json = "{success:true}";//返回json數據
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,msg:0}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+        #region 取消訂單通知
+        #region 獲取取消訂單通知列表
+        public HttpResponseBase GetOrderCancelMsgList()
+        {
+            List<OrderCancelMsgQuery> stores = new List<OrderCancelMsgQuery>();
+            string json = string.Empty;
+            try
+            {
+                int totalCount = 0;
+                OrderCancelMsgQuery query = new OrderCancelMsgQuery();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
+                _orderCancelMsgMgr = new OrderCancelMsgMgr(mySqlConnectionString);
+                stores = _orderCancelMsgMgr.Query(query, out totalCount);
+                foreach (var item in stores)
+                {
+                    item.sorder_payment = Payment(item.order_payment.ToString());
+                    item.scancel_type = Order_Cancel_Reason(item.cancel_type.ToString());
+                    item.sorder_status = Status(item.order_status.ToString());
+                }
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                //listUser是准备转换的对象
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(stores, Formatting.Indented, timeConverter) + "}";//返回json數據
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+        #region 對用戶提出的問題進行回覆
+        [CustomHandleError]
+        public HttpResponseBase Reply()
+        {
+            string json = string.Empty;
+            string response_content = string.Empty;
+            OrderCancelResponse ocr = new OrderCancelResponse();
+            _ptersrc = new ParameterMgr(mySqlConnectionString);
+            int i = 0;
+            string cancel_id = string.Empty; ;
+            if (!string.IsNullOrEmpty(Request.Params["cancel_id"]))
+            {
+                cancel_id = Request.Params["cancel_id"];
+                ocr.cancel_id = uint.Parse(cancel_id);
+            }
+            string question_email = string.Empty;
+            if (!string.IsNullOrEmpty(Request.Params["question_email"]))
+            {
+                question_email = Request.Params["question_email"];
+            }
+            //獲取登錄用戶的user_email
+            string user_email = (Session["caller"] as Caller).user_email;
+            //獲取登錄用戶的user_id
+            string user_id = (Session["caller"] as Caller).user_id.ToString();
+            string res;
+            try
+            {
+                res = Request.Params["response"].ToString().Trim();
+                res = res.Replace("\n", "");
+                if (res.Length > 0)
+                {
+                    response_content = Request.Params["response"] + " ";
+                    ocr.user_id = uint.Parse(user_id);
+                    ocr.response_content = response_content;
+                    System.Net.IPAddress[] addlist = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+                    if (addlist.Length > 0)
+                    {
+                        ocr.response_ipfrom = addlist[0].ToString();
+                    }
+                    _orderCancelMsgMgr = new OrderCancelMsgMgr(mySqlConnectionString);
+                    i = _orderCancelMsgMgr.Reply(ocr);
+                    bool issend = false;
+                    if (i == 2)
+                    {
+                        MailHelper mail = new MailHelper();
+                        string mail1 = _ptersrc.Getmail("TestMail");
+                        if (mail1 == "gigade@gimg.com.tw")
+                        {//測試使用上正式機后可變更為gigademail則是讀取會員mail
+                            mail1 = question_email;
+                        }
+                        issend = mail.SendMailAction(mail1, "取消訂單通知信", response_content);
+                    }
+                    json = "{success:true,msg:\"" + " 發送郵件成功！" + "\"}";
+                }
+                else
+                {
+                    json = "{success:false,msg:\"" + "请填写回覆内容！" + "\"}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = ex.InnerException.Message;
+                json = ex.InnerException.Source;
+                json = "{success:false,msg:\"" + " 發送郵件失敗！" + "\"}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+        #region 訂單狀態列表
+        /// <summary>
+        /// 取消訂單原因
+        /// </summary>
+        /// <param name="value">數字</param>
+        /// <returns></returns>
+        public static string Order_Cancel_Reason(string value)
+        {
+            string result = string.Empty;
+            switch (value)
+            {
+                case "1":
+                    result = "買錯了";
+                    break;
+                case "2":
+                    result = "不適合";
+                    break;
+                case "3":
+                    result = "重複選購";
+                    break;
+                case "4":
+                    result = "商品規格不符";
+                    break;
+                case "5":
+                    result = "等待時間太久";
+                    break;
+                case "6":
+                    result = "改買其他商品";
+                    break;
+                case "7":
+                    result = "運費金額太高";
+                    break;
+                case "8":
+                    result = "接收時間無法配合";
+                    break;
+                case "9":
+                    result = "改用其他付款方式";
+                    break;
+                case "10":
+                    result = "價格較貴";
+                    break;
+                case "11":
+                    result = "其他";
+                    break;
+                default:
+                    result = "";
+                    break;
+            }
+            return result;
+        }
+        #endregion
+        #region 訂單狀態列表
+        /// <summary>
+        /// 訂單狀態
+        /// </summary>
+        /// <param name="value">數字</param>
+        /// <returns></returns>
+        public static string Status(string value)
+        {
+            string result = string.Empty;
+            switch (value)
+            {
+                case "99":
+                    result = " 訂單歸檔";
+                    break;
+                case "92":
+                    result = " 訂單換貨";
+                    break;
+                case "91":
+                    result = " 訂單退貨";
+                    break;
+                case "90":
+                    result = " 訂單取消";
+                    break;
+                case "89":
+                    result = " 單一商品取消";
+                    break;
+                case "20":
+                    result = " 訂單異常";
+                    break;
+                case "10":
+                    result = " 等待取消";
+                    break;
+                case "9":
+                    result = " 待取貨";
+                    break;
+                case "8":
+                    result = " 已分配";
+                    break;
+                case "7":
+                    result = " 已進倉";
+                    break;
+                case "6":
+                    result = " 進倉中";
+                    break;
+                case "5":
+                    result = " 處理中";
+                    break;
+                case "4":
+                    result = " 已出貨";
+                    break;
+                case "3":
+                    result = " 出貨中";
+                    break;
+                case "2":
+                    result = " 待出貨";
+                    break;
+                case "1":
+                    result = " 付款失敗";
+                    break;
+                case "0":
+                    result = " 等待付款";
+                    break;
+                default:
+                    result = "";
+                    break;
+            }
+            return result;
+        }
+        #endregion
+        #region 支付方式
+        /// <summary>
+        /// 支付方式
+        /// </summary>
+        /// <param name="value">數字</param>
+        /// <returns></returns>
+        public static string Payment(string value)
+        {
+            string result = string.Empty;
+            switch (value)
+            {
+                case "1":
+                    result = "信用卡";
+                    break;
+                case "2":
+                    result = "ATM";
+                    break;
+                case "3":
+                    result = "藍新";
+                    break;
+                case "4":
+                    result = "支付寶";
+                    break;
+                case "5":
+                    result = "銀聯";
+                    break;
+                case "6":
+                    result = "傳真刷卡";
+                    break;
+                case "7":
+                    result = "延遲付款";
+                    break;
+                case "8":
+                    result = "黑貓貨到付款";
+                    break;
+                case "9":
+                    result = "現金";
+                    break;
+                case "10":
+                    result = "中國信託信用卡";
+                    break;
+                case "11":
+                    result = "中國信託信用卡紅利折抵(100%)";
+                    break;
+                case "12":
+                    result = "中國信託信用卡紅利折抵(10%)";
+                    break;
+                case "13":
+                    result = "信用卡";
+                    break;
+                case "14":
+                    result = "中國信託信用卡紅利折抵(20%)";
+                    break;
+                case "15":
+                    result = "外站每月請款";
+                    break;
+                case "16":
+                    result = "台新銀行紅利折抵(50%)";
+                    break;
+                case "17":
+                    result = "其他銀行紅利折抵";
+                    break;
+                default:
+                    result = value;
+                    break;
+
+
+            }
+            return result;
+        }
+        #endregion
+        #endregion
         #endregion
     }
 }

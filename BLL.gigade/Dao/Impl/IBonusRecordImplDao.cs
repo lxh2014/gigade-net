@@ -26,11 +26,5 @@ namespace BLL.gigade.Dao.Impl
         /// <param name="br"></param>
         /// <returns></returns>
         string InsertBonusRecord(BonusRecord br);
-
-        /// <summary>
-        /// 得到 bonus_record 裱中 最大的 主鍵  add by zhuoqin0830w 2015/08/25
-        /// </summary>
-        /// <returns></returns>
-        uint GetRecordID();
     }
 }

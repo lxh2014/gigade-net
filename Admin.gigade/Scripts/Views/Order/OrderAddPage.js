@@ -980,7 +980,7 @@ var orderStore = Ext.create('Ext.data.Store', {
             }
             Ext.getCmp("txtTotalPrice").setValue(accountSum());
             //add by zhuoqin0830w  2015/07/31  計算需要返還的購物金
-            Ext.getCmp("txtTotalAccbonus").setValue(accBonus());
+            //Ext.getCmp("txtTotalAccbonus").setValue(accBonus());
             if (orderStore.getCount() > 0) {
                 var numSum = 0;
                 for (var i = 0, j = orderStore.getCount() ; i < j; i++) {
@@ -996,7 +996,7 @@ var orderStore = Ext.create('Ext.data.Store', {
                     Ext.getCmp("btnSubmit").setDisabled(true);
                     Ext.getCmp("txtTotalPrice").setValue(accountSum());
                     //add by zhuoqin0830w  2015/07/31  計算需要返還的購物金
-                    Ext.getCmp("txtTotalAccbonus").setValue(accBonus());
+                    //Ext.getCmp("txtTotalAccbonus").setValue(accBonus());
                 }
             }
         }
@@ -1458,10 +1458,11 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                 var data = orderStore.getAt(e.rowIdx);
 
                 //返還購物金  add by zhuoqin0830w  2015/08/03
-                var bonus = Math.round((data.get("product_cost") - data.get("Item_Cost")) * 0.08);
-                if (bonus > 0) {
-                    bonus = bonus < 5 ? parseInt(5 * data.get("buynum")) : parseInt(bonus * data.get("buynum"));
-                } else { bonus = 0; }
+                //var bonus = Math.round((data.get("product_cost") - data.get("Item_Cost")) * 0.08);
+                //if (bonus > 0) {
+                //    bonus = bonus < 5 ? parseInt(5 * data.get("buynum")) : parseInt(bonus * data.get("buynum"));
+                //} else { bonus = 0; }
+                var bonus = 0;
                 data.set("accumulated_bonus", bonus);
                 //父商品下子商品的返還金
                 var s_must_buy = data.get("s_must_buy");
@@ -1718,7 +1719,7 @@ function clearCmp() {
     Ext.getCmp("txtTotalPrice").setValue("0");
 
     //添加清空返還購物金欄位  add by zhuoqin0830w  2015/07/31
-    Ext.getCmp("txtTotalAccbonus").setValue("0");
+    //Ext.getCmp("txtTotalAccbonus").setValue("0");
 }
 
 //訂單生成成功後的操作
@@ -1824,16 +1825,19 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
             id: 'txtTotalPrice',
             labelWidth: 65,
             height: 20,
+            colspan: 2,
             width: 150
-        }, {//add by zhuoqin0830w  2015/07/31  添加返還購物金欄位
-            xtype: 'displayfield',
-            hidden: true,
-            fieldLabel: ACCUMULATED_BONUS,
-            id: 'txtTotalAccbonus',
-            labelWidth: 65,
-            height: 20,
-            width: 150
-        }, {
+        },
+        //{//add by zhuoqin0830w  2015/07/31  添加返還購物金欄位
+        //    xtype: 'displayfield',
+        //    hidden: true,
+        //    fieldLabel: ACCUMULATED_BONUS,
+        //    id: 'txtTotalAccbonus',
+        //    labelWidth: 65,
+        //    height: 20,
+        //    width: 150
+        //},
+        {
             xtype: 'button',
             id: 'btnSubmit',
             text: BTN_SURE,
@@ -2134,7 +2138,7 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                 }
                 Ext.getCmp("txtTotalPrice").setValue(accountSum());
                 //add by zhuoqin0830w  2015/07/31  計算需要返還的購物金
-                Ext.getCmp("txtTotalAccbonus").setValue(accBonus());
+                //Ext.getCmp("txtTotalAccbonus").setValue(accBonus());
                 if (numSum == 0) {
                     Ext.getCmp("btnSubmit").setDisabled(true);
                     clearCmp();
@@ -2473,10 +2477,11 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
             }
         }
     }, {//edit by zhuoqin0830w  2015/05/13  添加購物金金額
-        header: DEDUCT_BONUS, id: 'Deduct_Bonus', dataIndex: 'Deduct_Bonus', hidden: true, sortable: false, menuDisabled: true, width: 80,
+        header: DEDUCT_BONUS, id: 'Deduct_Bonus', dataIndex: 'Deduct_Bonus', disabled: true, hidden: true, sortable: false, menuDisabled: true, width: 80,
         editor: {
             xtype: 'numberfield',
             minValue: 0,
+            disabled: true,
             vtype: 'regxMoney',
             listeners: {
                 blur: function (a, b) {
@@ -2514,10 +2519,11 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
             }
         }
     }, {//edit by zhuoqin0830w  2015/05/13  添加抵用卷金額
-        header: DEDUCT_WELFARE, id: 'Deduct_Welfare', dataIndex: 'Deduct_Welfare', hidden: true, sortable: false, menuDisabled: true, width: 80,
+        header: DEDUCT_WELFARE, id: 'Deduct_Welfare', dataIndex: 'Deduct_Welfare', disabled: true, hidden: true, sortable: false, menuDisabled: true, width: 80,
         editor: {
             xtype: 'numberfield',
             minValue: 0,
+            disabled: true,
             vtype: 'regxMoney',
             listeners: {
                 blur: function (a, b) {
@@ -2596,7 +2602,7 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
     //{ header: 's_must_buy', dataIndex: 's_must_buy', hidden: false, sortable: false, menuDisabled: true },
     //{ header: 'child_cost_scale', dataIndex: 'child_cost_scale', hidden: false, sortable: false, menuDisabled: true },
     { header: PRODUCT_STATUS, dataIndex: 'product_status_name', id: 'product_status_name', hidden: true, sortable: false, menuDisabled: true },
-    { header: ACCUMULATED_BONUS, id: 'accumulated_bonus', dataIndex: 'accumulated_bonus', hidden: true, sortable: false, menuDisabled: true, width: 80 }]
+    { header: ACCUMULATED_BONUS, id: 'accumulated_bonus', dataIndex: 'accumulated_bonus', hidden: true, sortable: false, menuDisabled: true }]
 });
 
 Ext.onReady(function () {

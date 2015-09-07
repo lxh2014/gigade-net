@@ -134,6 +134,101 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
         }
     }
 });
+
+//群組管理Model 
+Ext.define('gigade.Users', {
+    extend: 'Ext.data.Model',
+    fields: [
+    { name: "user_id", type: "int" }, //用戶編號     上面的是編輯的時候關係到的
+    { name: "user_email", type: "string" }, //用戶郵箱
+    { name: "user_name", type: "string" }, //用戶名
+    { name: "user_password", type: "string" }, //密碼
+    { name: "user_gender", type: "string" }, //性別
+    { name: "user_birthday_year", type: "string" }, //年
+    { name: "user_birthday_month", type: "string" }, //月
+    { name: "user_birthday_day", type: "string" }, //日
+    { name: "birthday", type: "string" }, //生日 
+    { name: "user_zip", type: "string" }, //用戶地址
+    { name: "user_address", type: "string" }, //用戶地址
+    { name: "user_actkey", type: "string" },
+    { name: "user_mobile", type: "string" },
+    { name: "user_phone", type: "string" }, //行動電話
+    { name: "reg_date", type: "string" }, //註冊日期 
+    { name: "mytype", type: "string" },//會員類別
+    { name: "send_sms_ad", type: "bool" }, //是否接收簡訊廣告 
+    { name: "adm_note", type: "string" }, //管理員備註   上面這些編輯時要帶入的值
+    { name: "user_type", type: "string" }, //用戶類別   下面的這些結合上面的會顯示在列表頁
+    { name: "user_status", type: "string" }, //用戶狀態
+    { name: "user_level", type: "int" }, //會員等級
+    { name: "userLevel", type: "string" }, //會員等級
+    { name: "sfirst_time", type: "string" }, //首次註冊時間
+    { name: "slast_time", type: "string" }, //下次時間
+    { name: "sbe4_last_time", type: "string" }, //下下次時間
+    { name: "user_company_id", type: "string" },
+    { name: "user_source", type: "string" },
+    { name: "source_trace", type: "string" },
+    { name: "s_id", type: "string" },
+    { name: "source_trace_url", type: "string" },
+    { name: "redirect_name", type: "string" },
+    { name: "redirect_url", type: "string" },
+    { name: "paper_invoice", type: "bool" },
+    { name: "ml_code", type: "string" }
+    ]
+});
+//用作編輯時獲得數據包含機敏信息
+var edit_UserStore = Ext.create('Ext.data.Store', {
+    pageSize: pageSize,
+    model: 'gigade.Users',
+    proxy: {
+        type: 'ajax',
+        url: '/Member/UsersList',
+        reader: {
+            type: 'json',
+            root: 'data',//在執行成功后。顯示數據。所以record.data.用戶字段可以直接讀取
+            totalProperty: 'totalCount'
+        }
+    }
+});
+Ext.define('gigade.UserLife', {
+    extend: 'Ext.data.Model',
+    fields: [
+    { name: "user_id", type: "int" },
+    { name: "user_marriage", type: "int" },
+    { name: "child_num", type: "int" },
+    { name: "vegetarian_type", type: "int" },
+    { name: "like_fivespice", type: "int" },
+    { name: "like_contact", type: "string" },
+    { name: "like_time", type: "int" },
+    { name: "work_type", type: "int" },
+    { name: "cancel_edm_date", type: "string" },
+    { name: "disable_date", type: "string" },
+    { name: "cancel_info_date", type: "string" },
+    { name: "user_educated", type: "int" },
+    { name: "user_salary", type: "int" },
+    { name: "user_religion", type: "int" },
+    { name: "user_constellation", type: "int" }
+
+    ]
+});
+var UserLifeStore = Ext.create('Ext.data.Store', {
+    model: 'gigade.UserLife',
+    proxy: {
+        type: 'ajax',
+        url: '/Member/GetUserLife',
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
+edit_UserStore.on('beforeload', function () {
+    Ext.apply(edit_UserStore.proxy.extraParams, {
+        relation_id: "",
+        isSecret: false
+    });
+});
+
+
 Ext.onReady(function () {
     var frm = Ext.create('Ext.form.Panel', {
         id: 'frm',
@@ -435,6 +530,7 @@ Ext.onReady(function () {
                         xtype: 'button',
                         text: '重置',
                         margin: '5 0 0 5',
+                        iconCls: 'ui-icon ui-icon-reset',
                         id: 'btnchongzhi',
                         handler: comeback
                     },
@@ -444,6 +540,7 @@ Ext.onReady(function () {
                         margin: '5 0 0 5',
                         iconCls: 'icon-excel',
                         id: 'btnExcel',
+                        hidden:true,
                         handler: Export
                     }
                 ]
@@ -468,7 +565,7 @@ Ext.onReady(function () {
             {
                 header: "訂購人", dataIndex: 'Order_Name', width: 110, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    return "<a href='javascript:void(0);' onclick='oneditUser(" + record.data.Order_Id + ")'>" + record.data.Order_Name + "</a>";
+                    return "<a href='javascript:void(0);' onclick='oneditUser(" + record.data.user_id + ")'>" + record.data.Order_Name + "</a>";
                 }
             },
             { header: "收貨人", dataIndex: 'Delivery_Name', width: 110, align: 'center' },
@@ -506,10 +603,10 @@ Ext.onReady(function () {
             { header: "點數使用明細", dataIndex: 'order_pay_message', width: 100, align: 'center' },
             { header: "ERP拋轉狀態", dataIndex: 'export_flag_str', width: 100, align: 'center', }
         ],
-        tbar: [
-            { xtype: 'button', id: 'Add', text: ADD, iconCls: 'icon-add', hidden: true, handler: onAddClick },
-            { xtype: 'button', id: 'Edit', text: EDIT, iconCls: 'icon-edit', hidden: true, disabled: true, handler: onEditClick }
-        ],
+        //tbar: [
+        //    { xtype: 'button', id: 'Add', text: ADD, iconCls: 'icon-add', hidden: true, handler: onAddClick },
+        //    { xtype: 'button', id: 'Edit', text: EDIT, iconCls: 'icon-edit', hidden: true, disabled: true, handler: onEditClick }
+        //],
         listeners: {
             scrollershow: function (scroller) {
                 if (scroller && scroller.scrollEl) {
@@ -581,32 +678,32 @@ Query = function () {
     }
 }
 //編輯訂購人
-function UpdateUser() {
-    var row = Ext.getCmp("OrderBrandProducesListGrid").getSelectionModel().getSelection();
-    if (row.length == 0) {
-        Ext.Msg.alert(INFORMATION, NO_SELECTION);    }
-    else if (row.length > 1) {
-        Ext.Msg.alert(INFORMATION, ONE_SELECTION);
-    } else if (row.length == 1) {
-        editFunction(row[0], OrderBrandProducesListStore);
-    }
-}
-//新增訂單
-onAddClick = function () {
-    editFunction(null, OrderBrandProducesListStore);
-}
-//編輯訂單
-onEditClick = function () {
-    var row = Ext.getCmp("OrderBrandProducesListGrid").getSelectionModel().getSelection();
-    if (row.length == 0) {
-        Ext.Msg.alert(INFORMATION, NO_SELECTION);
-    }
-    else if (row.length > 1) {
-        Ext.Msg.alert(INFORMATION, ONE_SELECTION);
-    } else if (row.length == 1) {
-        editFunction(row[0], OrderBrandProducesListStore);
-    }
-}
+//function UpdateUser() {
+//    var row = Ext.getCmp("OrderBrandProducesListGrid").getSelectionModel().getSelection();
+//    if (row.length == 0) {
+//        Ext.Msg.alert(INFORMATION, NO_SELECTION);    }
+//    else if (row.length > 1) {
+//        Ext.Msg.alert(INFORMATION, ONE_SELECTION);
+//    } else if (row.length == 1) {
+//        editFunction(row[0], OrderBrandProducesListStore);
+//    }
+//}
+////新增訂單
+//onAddClick = function () {
+//    editFunction(null, OrderBrandProducesListStore);
+//}
+////編輯訂單
+//onEditClick = function () {
+//    var row = Ext.getCmp("OrderBrandProducesListGrid").getSelectionModel().getSelection();
+//    if (row.length == 0) {
+//        Ext.Msg.alert(INFORMATION, NO_SELECTION);
+//    }
+//    else if (row.length > 1) {
+//        Ext.Msg.alert(INFORMATION, ONE_SELECTION);
+//    } else if (row.length == 1) {
+//        editFunction(row[0], OrderBrandProducesListStore);
+//    }
+//}
 
 /************匯出Excel************/
 function Export() {
@@ -647,6 +744,21 @@ function TranToDetial(orderId) {
     panel.setActiveTab(copy);
     panel.doLayout();
 }
-oneditUser = function (Order_Id) {
-    userEdit(Order_Id);
+oneditUser = function (user_id) {
+    var row = Ext.getCmp('OrderBrandProducesListGrid').getSelectionModel().getSelection();
+   // alert(row[0].data.user_id);
+    //editFunction(user_id);
+    var secret_type = '20';
+    var url = "/Member/UsersListIndex/Edit ";
+    var ralated_id = row[0].data.user_id;
+    var info_id = row[0].data.user_id;
+    boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+    if (boolPassword != "-1") {
+        if (boolPassword) {
+            SecretLoginFun(secret_type, ralated_id, true, false, true, url, "", info_id, "");//先彈出驗證框，關閉時在彈出顯示框
+        }
+        else {
+            editFunction(ralated_id);
+        }
+    }
 }

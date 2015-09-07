@@ -13,5 +13,6 @@ namespace BLL.gigade.Mgr.Impl
        int AddIpo(IpoQuery query);
        int SelectIpoCountByIpo(string ipo);
        int DeletIpo(IpoQuery query);
+       
     }
 }

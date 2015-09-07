@@ -7,6 +7,7 @@ var currentRecord = { data: {} };
 var pageSize = 19;
 var win;
 var eventID = "";
+var reset = 0;
 Ext.Loader.setConfig({ enabled: true });
 Ext.require([
     'Ext.data.*',
@@ -69,11 +70,13 @@ Ext.define('GIGADE.PROMODETAIL', {
         { name: 'product_id', type: 'int' },
         { name: 'product_name', type: 'string' },
         { name: 'gift_type', type: 'int' },
-         { name: 'product_num', type: 'int' },
-        { name: 'gift_ware', type: 'int' },
-        { name: 'gift_num', type: 'int' },
-          { name: 'quantity', type: 'int' },
-        { name: 'amount', type: 'int' }
+        { name: 'product_num', type: 'int' },
+        { name: 'quantity', type: 'int' },
+        { name: 'amount', type: 'int' },
+        { name: 'bonus', type: 'int' },
+        { name: 'bonus_multiple', type: 'int' },
+        { name: 'welfare', type: 'int' },
+        { name: 'welfare_multiple', type: 'int' },
     ]
 });
 
@@ -91,10 +94,9 @@ var promoDetailStore = Ext.create('Ext.data.Store', {
 
 
 Ext.onReady(function () {
-    treeCateStore.load();
-    //  SiteStore.load();
-    UserConStore.load();
-    ConTypeStore.load();
+   treeCateStore.load();
+   UserConStore.load();
+   ConTypeStore.load();
 
     Ext.QuickTips.init();
     Ext.create('Ext.Viewport', {
@@ -218,9 +220,8 @@ var promoAmountGiftList = Ext.create('Ext.grid.Panel', {
         { header: '活動名稱', dataIndex: 'event_name', align: 'left', menuDisabled: true, sortable: false, flex: 1 },
         { header: '開始時間', dataIndex: 'event_start', align: 'center', width: 70, menuDisabled: true, sortable: false, renderer: Ext.util.Format.dateRenderer('Y-m-d <br> H:i:s') },
         { header: '結束時間', dataIndex: 'event_end', align: 'center', width: 70, menuDisabled: true, sortable: false, renderer: Ext.util.Format.dateRenderer('Y-m-d <br> H:i:s') },
-         { header: '異動者', dataIndex: 'user_name', align: 'left', width: 40, menuDisabled: true, sortable: false },
-        {
-            header: '狀態', dataIndex: 'event_status', align: 'center', width: 40, menuDisabled: true, sortable: false,
+        { header: '異動者', dataIndex: 'user_name', align: 'left', width: 40, menuDisabled: true, sortable: false },
+        { header: '狀態', dataIndex: 'event_status', align: 'center', width: 40, menuDisabled: true, sortable: false,
             renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                 if (value == 1) {
                     return "<img hidValue='0' id='img" + record.data.row_id + "' src='../../../Content/img/icons/accept.gif'/></a>";
@@ -252,7 +253,6 @@ var promoAmountGiftList = Ext.create('Ext.grid.Panel', {
                     }
                 });
             }
-
         },
         resize: function () {
             this.doLayout();
@@ -690,41 +690,18 @@ var center = Ext.create('Ext.form.Panel', {
                                     }
                                 },
                                 {
-                                    header: '商品編號', dataIndex: 'product_id', align: 'left', width: 120, menuDisabled: true, sortable: false,
-                                    renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                                        if (value == 0) {
-                                            return "";
-                                        }
-                                        else {
-                                            return value;
-                                        }
-
-                                    }
+                                    header: '商品編號', dataIndex: 'product_id', align: 'left', width: 120, menuDisabled: true, sortable: false
                                 },
                                {
-                                   header: '贈送數量', dataIndex: 'product_num', align: 'left', width: 60, menuDisabled: true, sortable: false,
-                                   renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                                       if (record.data.gift_type != 1) {
-                                           return "";
-                                       }
-                                       else {
-                                           return value;
-                                       }
-
-                                   }
+                                   header: '贈送數量', dataIndex: 'product_num', align: 'left', width: 60, menuDisabled: true, sortable: false
                                },
-                                 { header: '贈品額度', dataIndex: 'gift_ware', align: 'left', width: 60, menuDisabled: true, sortable: false },
+                               { header: '購物金', dataIndex: 'bonus', align: 'left', width: 60, menuDisabled: true, sortable: false },
                                {
-                                   header: '贈品倍數', dataIndex: 'gift_num', align: 'left', width: 60, menuDisabled: true, sortable: false,
-                                   renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                                       if (record.data.gift_type == 1) {
-                                           return 0;
-                                       }
-                                       else {
-                                           return value;
-                                       }
-
-                                   }
+                                   header: '購物金倍數', dataIndex: 'bonus_multiple', align: 'left', width: 70, menuDisabled: true, sortable: false
+                               },
+                                { header: '抵用券', dataIndex: 'welfare', align: 'left', width: 60, menuDisabled: true, sortable: false },
+                               {
+                                   header: '抵用券倍數', dataIndex: 'welfare_multiple', align: 'left', width: 70, menuDisabled: true, sortable: false
                                },
                                { header: '滿件數量', dataIndex: 'quantity', align: 'left', width: 60, menuDisabled: true, sortable: false },
                                { header: '滿額金額', dataIndex: 'amount', align: 'left', width: 60, menuDisabled: true, sortable: false }
@@ -756,7 +733,14 @@ var center = Ext.create('Ext.form.Panel', {
         text: '重置',
         id: 'btn_reset',
         iconCls: 'ui-icon ui-icon-reset',
-        handler: function () { LoadDetail(currentRecord); }
+        handler: function () {
+            if (reset == 0) {
+                LoadDetail(currentRecord);
+            }
+            else {
+                center.getForm().reset();
+            }
+        }
     }, {
         text: '取消',
         id: 'btn_cancel',
@@ -815,30 +799,40 @@ function detailAdd(row, store) {
                              var value = Ext.getCmp("gift_type").getValue();
                              Ext.getCmp("g_product_id").hide();
                              Ext.getCmp("g_product_id").allowBlank = true;
-                             Ext.getCmp("g_product_name").allowBlank = true;
-                             Ext.getCmp("g_product_name").hide();
-                             Ext.getCmp("g_num").hide();
-                             Ext.getCmp("g_num").allowBlank = true;
+                             Ext.getCmp("product_name").allowBlank = true;
+                             Ext.getCmp("product_name").hide();
+                             Ext.getCmp("product_num").hide();
+                             Ext.getCmp("product_num").allowBlank = true;
+                 
+                             Ext.getCmp("bonus").hide();
+                             Ext.getCmp("bonus").allowBlank = true;
+                             Ext.getCmp("bonus_multiple").hide();
+                             Ext.getCmp("bonus_multiple").allowBlank = true;
 
-
-                             Ext.getCmp("gift_ware").hide();
-                             Ext.getCmp("gift_ware").allowBlank = true;
-                             Ext.getCmp("gift_num").hide();
-                             Ext.getCmp("gift_num").allowBlank = true;
+                             Ext.getCmp("welfare").hide();
+                             Ext.getCmp("welfare").allowBlank = true;
+                             Ext.getCmp("welfare_multiple").hide();
+                             Ext.getCmp("welfare_multiple").allowBlank = true;
                              switch (value) {
                                  case "1":
                                      Ext.getCmp("g_product_id").show();
                                      Ext.getCmp("g_product_id").allowBlank = false;
-                                     Ext.getCmp("g_product_name").show();
-                                     Ext.getCmp("g_product_name").allowBlank = false;
-                                     Ext.getCmp("g_num").show();
-                                     Ext.getCmp("g_num").allowBlank = false;
+                                     Ext.getCmp("product_name").show();
+                                     Ext.getCmp("product_name").allowBlank = false;
+                                     Ext.getCmp("product_num").show();
+                                     Ext.getCmp("product_num").allowBlank = false;
+                                     break;
+                                 case "2":
+                                     Ext.getCmp("bonus").show();
+                                     Ext.getCmp("bonus").allowBlank = false;
+                                     Ext.getCmp("bonus_multiple").show().setValue(1);
+                                     Ext.getCmp("bonus_multiple").allowBlank = false;
                                      break;
                                  default:
-                                     Ext.getCmp("gift_ware").show();
-                                     Ext.getCmp("gift_ware").allowBlank = false;
-                                     Ext.getCmp("gift_num").show().setValue(1);
-                                     Ext.getCmp("gift_num").allowBlank = false;
+                                     Ext.getCmp("welfare").show();
+                                     Ext.getCmp("welfare").allowBlank = false;
+                                     Ext.getCmp("welfare_multiple").show().setValue(1);
+                                     Ext.getCmp("welfare_multiple").allowBlank = false;
                                      break;
                              }
                          }
@@ -857,7 +851,7 @@ function detailAdd(row, store) {
                        listeners: {
                            'blur': function () {
                                var pid = Ext.getCmp("g_product_id");
-                               var pname = Ext.getCmp("g_product_name");
+                               var pname = Ext.getCmp("product_name");
                                if (pid.getValue() != "" && pid.getValue() != null) {
                                    Ext.Ajax.request({
                                        url: '/EventPromo/GetProdName',
@@ -890,8 +884,8 @@ function detailAdd(row, store) {
                     {
                         xtype: 'displayfield',
                         fieldLabel: '商品名稱',
-                        id: 'g_product_name',
-                        name: 'g_product_name',
+                        id: 'product_name',
+                        name: 'product_name',
                         hidden: true,
                         allowBlank: true,
                         width: 310
@@ -899,8 +893,8 @@ function detailAdd(row, store) {
                       {
                           xtype: 'numberfield',
                           fieldLabel: '贈送數量(次)',
-                          id: 'g_num',
-                          name: 'g_num',
+                          id: 'product_num',
+                          name: 'product_num',
                           value: 1,
                           minValue: 0,
                           hidden: true,
@@ -910,9 +904,22 @@ function detailAdd(row, store) {
                       },
                        {
                            xtype: 'numberfield',
-                           fieldLabel: '贈送額度',
-                           id: 'gift_ware',
-                           name: 'gift_ware',
+                           fieldLabel: '購物金',
+                           id: 'bonus',
+                           name: 'bonus',
+                           minValue: 0,
+                           value: 0,
+                           hidden: true,
+                           allowDecimals: false,
+                           allowBlank: true,
+                           width: 310
+                       },
+                       {
+                           xtype: 'numberfield',
+                           fieldLabel: '購物金倍數',
+                           id: 'bonus_multiple',
+                           name: 'bonus_multiple',
+                           value: 1,
                            minValue: 0,
                            hidden: true,
                            allowDecimals: false,
@@ -921,9 +928,21 @@ function detailAdd(row, store) {
                        },
                        {
                            xtype: 'numberfield',
-                           fieldLabel: '贈送倍數',
-                           id: 'gift_num',
-                           name: 'gift_num',
+                           fieldLabel: '抵用券',
+                           id: 'welfare',
+                           name: 'welfare',
+                           minValue: 0,
+                           value: 0,
+                           hidden: true,
+                           allowDecimals: false,
+                           allowBlank: true,
+                           width: 310
+                       },
+                       {
+                           xtype: 'numberfield',
+                           fieldLabel: '抵用券倍數',
+                           id: 'welfare_multiple',
+                           name: 'welfare_multiple',
                            value: 1,
                            minValue: 0,
                            hidden: true,
@@ -959,29 +978,43 @@ function detailAdd(row, store) {
                 if (row) {
                     Ext.getCmp("g_product_id").hide();
                     Ext.getCmp("g_product_id").allowBlank = true;
-                    Ext.getCmp("g_product_name").allowBlank = true;
-                    Ext.getCmp("g_product_name").hide();
-                    Ext.getCmp("g_num").hide();
-                    Ext.getCmp("g_num").allowBlank = true;
+                    Ext.getCmp("product_name").allowBlank = true;
+                    Ext.getCmp("product_name").hide();
+                    Ext.getCmp("product_num").hide();
+                    Ext.getCmp("product_num").allowBlank = true;
 
-                    Ext.getCmp("gift_ware").allowBlank = true;
-                    Ext.getCmp("gift_ware").hide();
-                    Ext.getCmp("gift_num").allowBlank = true;
-                    Ext.getCmp("gift_num").hide();
+                    Ext.getCmp("bonus").allowBlank = true;
+                    Ext.getCmp("bonus").hide();
+                    Ext.getCmp("bonus_multiple").allowBlank = true;
+                    Ext.getCmp("bonus_multiple").hide();
+
+                    Ext.getCmp("welfare").allowBlank = true;
+                    Ext.getCmp("welfare").hide();
+                    Ext.getCmp("welfare_multiple").allowBlank = true;
+                    Ext.getCmp("welfare_multiple").hide();
+
                     if (row.data.gift_type == 1) {
+                        Ext.getCmp("g_product_id").setValue(row.data.product_id);
                         Ext.getCmp("g_product_id").show();
                         Ext.getCmp("g_product_id").allowBlank = false;
-                        Ext.getCmp("g_product_name").show();
-                        Ext.getCmp("g_product_name").allowBlank = false;
-                        Ext.getCmp("g_num").show();
-                        Ext.getCmp("g_num").allowBlank = false;
-                        Ext.getCmp("gift_num").setValue("1");
+                        Ext.getCmp("product_name").show();
+                        Ext.getCmp("product_name").allowBlank = false;
+                        Ext.getCmp("product_num").show();
+                        Ext.getCmp("product_num").allowBlank = false;
+                        Ext.getCmp("bonus_multiple").setValue("1");
+                        Ext.getCmp("welfare_multiple").setValue("1");
+                    }
+                   else if (row.data.gift_type == 2) {
+                       Ext.getCmp("bonus").show();
+                       Ext.getCmp("bonus").allowBlank = false;
+                       Ext.getCmp("bonus_multiple").show();
+                       Ext.getCmp("bonus_multiple").allowBlank = false;
                     }
                     else {
-                        Ext.getCmp("gift_ware").show();
-                        Ext.getCmp("gift_ware").allowBlank = false;
-                        Ext.getCmp("gift_num").show();
-                        Ext.getCmp("gift_num").allowBlank = false;
+                       Ext.getCmp("welfare").show();
+                       Ext.getCmp("welfare").allowBlank = false;
+                       Ext.getCmp("welfare_multiple").show();
+                       Ext.getCmp("welfare_multiple").allowBlank = false;
                     }
                     detailAddFrm.getForm().loadRecord(row);
                 }
@@ -992,28 +1025,46 @@ function detailAdd(row, store) {
         }, {
             text: '確定',
             handler: function () {
+
                 var form = this.up('form').getForm();
-                if (form.isValid())
+                if (form.isValid()) {
                     //驗證商品是否通過審核
-                    if (Ext.getCmp("gift_type").getValue() == "1" && (Ext.getCmp("g_product_name").getValue() == "" || Ext.getCmp("g_product_name").getValue().indexOf("不可選擇組合商品") > -1)) {
+                    if (Ext.getCmp("gift_type").getValue() == "1" && (Ext.getCmp("product_name").getValue() == "" || Ext.getCmp("product_name").getValue().indexOf("不可選擇組合商品") > -1)) {
                         Ext.Msg.alert(INFORMATION, "請輸入有效的商品編號！");
                     }
                     else {
                         if (row) {
                             row.set('gift_name', Ext.getCmp("gift_name").getValue());
                             row.set('gift_type', Ext.getCmp("gift_type").getValue());
-                            if (Ext.getCmp("gift_type").getValue() == "1") {
+
+                            if (Ext.getCmp("gift_type").getValue() == "1")
+                            {
                                 row.set('product_id', Ext.getCmp("g_product_id").getValue());
-                                row.set('product_num', Ext.getCmp("g_num").getValue());
-                                row.set('product_name', Ext.getCmp("g_product_name").getValue());
-                                row.set('gift_ware', 0);
-                                row.set('gift_num', 0);
-                            } else {
-                                row.set('product_id', "");
-                                row.set('product_num', "");
+                                row.set('product_num', Ext.getCmp("product_num").getValue());
+                                row.set('product_name', Ext.getCmp("product_name").getValue());
+                                row.set('bonus', 0);
+                                row.set('bonus_multiple', 0);
+                                row.set('welfare', 0);
+                                row.set('welfare_multiple', 0);
+                            }
+                          else  if (Ext.getCmp("gift_type").getValue() == "2") {
+                                row.set('product_id', 0);
+                                row.set('product_num', 0);
                                 row.set('product_name', "");
-                                row.set('gift_ware', Ext.getCmp("gift_ware").getValue());
-                                row.set('gift_num', Ext.getCmp("gift_num").getValue());
+                                row.set('welfare', 0);
+                                row.set('welfare_multiple', 0);
+                                row.set('bonus', Ext.getCmp("bonus").getValue());
+                                row.set('bonus_multiple', Ext.getCmp("bonus_multiple").getValue());
+                            }
+                            else
+                            {
+                                row.set('product_id',0);
+                                row.set('product_num', 0); 
+                                row.set('product_name', "");
+                                row.set('bonus', 0);
+                                row.set('bonus_multiple', 0);
+                                row.set('welfare', Ext.getCmp("welfare").getValue());
+                                row.set('welfare_multiple', Ext.getCmp("welfare_multiple").getValue());
                             }
                             row.set('quantity', Ext.getCmp("quantity").getValue());
                             row.set('amount', Ext.getCmp("amount").getValue());
@@ -1024,19 +1075,21 @@ function detailAdd(row, store) {
                                 gift_id: Ext.getCmp("gift_id").getValue(),
                                 gift_name: Ext.getCmp("gift_name").getValue(),
                                 gift_type: Ext.getCmp("gift_type").getValue(),
-                                product_id: Ext.getCmp("gift_type").getValue() == "1" ? Ext.getCmp("g_product_id").getValue() : "",
-                                product_num: Ext.getCmp("gift_type").getValue() == "1" ? Ext.getCmp("g_num").getValue() : "",
-                                product_name: Ext.getCmp("gift_type").getValue() == "1" ? Ext.getCmp("g_product_name").getValue() : "",
-                                gift_ware: Ext.getCmp("gift_type").getValue() == "1" ? "" : Ext.getCmp("gift_ware").getValue(),
-                                gift_num: Ext.getCmp("gift_type").getValue() == "1" ? "" : Ext.getCmp("gift_num").getValue(),
+                                product_id: Ext.getCmp("gift_type").getValue() == "1" ? Ext.getCmp("g_product_id").getValue() : "0",
+                                product_num: Ext.getCmp("gift_type").getValue() == "1" ? Ext.getCmp("product_num").getValue() : "0",
+                                product_name: Ext.getCmp("gift_type").getValue() == "1" ? Ext.getCmp("product_name").getValue() : "",
+                                bonus: Ext.getCmp("gift_type").getValue() == "2" ? Ext.getCmp("bonus").getValue() : "0",
+                                bonus_multiple: Ext.getCmp("gift_type").getValue() == "2" ? Ext.getCmp("bonus_multiple").getValue() : "0",
+                                welfare: Ext.getCmp("gift_type").getValue() == "3" ? Ext.getCmp("welfare").getValue() : "0",
+                                welfare_multiple: Ext.getCmp("gift_type").getValue() == "3" ? Ext.getCmp("welfare_multiple").getValue() : "0",
                                 quantity: Ext.getCmp("quantity").getValue(),
                                 amount: Ext.getCmp("amount").getValue()
                             });
                         }
                         detailAddWin.destroy();
                     }
+                }
             }
-
         }]
     })
 
@@ -1058,22 +1111,28 @@ function detailAdd(row, store) {
                     if (row.data.gift_type == 1) {
                         Ext.getCmp("g_product_id").setValue(row.data.product_id).show();
                         Ext.getCmp("g_product_id").allowBlank = false;
-                        Ext.getCmp("g_product_name").setValue(row.data.product_name).show();
-                        Ext.getCmp("g_num").setValue(row.data.product_num).show();
-                        Ext.getCmp("g_num").allowBlank = false;
+                        Ext.getCmp("product_name").setValue(row.data.product_name).show();
+                        Ext.getCmp("product_num").allowBlank = false;
+                        Ext.getCmp("product_num").show();
+                    }
+                   else if (row.data.gift_type == 2) {
+                       Ext.getCmp("bonus").show();
+                       Ext.getCmp("bonus").allowBlank = false;
+                       Ext.getCmp("bonus_multiple").show();
+                       Ext.getCmp("bonus_multiple").allowBlank = false;
                     }
                     else {
-                        Ext.getCmp("gift_ware").show();
-                        Ext.getCmp("gift_ware").allowBlank = false;
-                        Ext.getCmp("gift_num").show();
-                        Ext.getCmp("gift_num").allowBlank = false;
+                       Ext.getCmp("welfare").show();
+                       Ext.getCmp("welfare").allowBlank = false;
+                       Ext.getCmp("welfare_multiple").show();
+                       Ext.getCmp("welfare_multiple").allowBlank = false;
                     }
                 } else {
                     detailAddFrm.getForm().reset();
                 }
             }
         }
-    })
+    }) 
     detailAddWin.show();
 
 }
@@ -1105,7 +1164,7 @@ function detailDelete(store) {
 
 
 function LoadDetail(record) {
-
+    reset = 0;
     if (record.data.row_id == undefined || record.data.row_id == 0) {
         Ext.getCmp('center').getForm().reset();
         promoDetailStore.removeAll();
@@ -1267,7 +1326,7 @@ function Search() {
 
 
 function Save() {
-
+    reset++;
     if (Ext.getCmp('center').getForm().isValid()) {
         if (promoDetailStore.data.length <= 0) {
             Ext.Msg.alert(INFORMATION, '請將細項資料填寫完整');
@@ -1291,7 +1350,6 @@ function Save() {
         promoAmountGift.event_end = Ext.Date.format(new Date(Ext.getCmp('event_end').getValue()), 'Y-m-d H:i:s');
         promoAmountGift.event_status = 0;//改動后默認狀態為停用
 
-
         var promoDetail = [];
 
         for (var i = 0, j = promoDetailStore.data.length ; i < j; i++) {
@@ -1302,10 +1360,12 @@ function Save() {
                 'event_id': currentRecord.data.event_id == null ? 0 : currentRecord.data.event_id,
                 'gift_name': record.get("gift_name"),
                 'gift_type': record.get("gift_type"),
-                'product_id': record.get("product_id"),
+                'product_id': record.get("gift_type") == 1 ? record.get("product_id"):0,
                 'product_num': record.get("gift_type") == 1 ? record.get("product_num") : 0,
-                'gift_ware': record.get("gift_ware"),
-                'gift_num': record.get("gift_num"),
+                'bonus': record.get("bonus"),
+                'bonus_multiple': record.get("bonus_multiple"),
+                'welfare': record.get("welfare"),
+                'welfare_multiple': record.get("welfare_multiple"),
                 'quantity': record.get("quantity"),
                 'amount': record.get("amount")
             });

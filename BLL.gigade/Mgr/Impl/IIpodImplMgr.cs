@@ -12,7 +12,9 @@ namespace BLL.gigade.Mgr.Impl
        int GetPodID(IpodQuery query);
        int AddIpod(IpodQuery query);
        int UpdateIpod(IpodQuery query);
+       int UpdateIpodCheck(IpodQuery query);
        int DeletIpod(IpodQuery query);
        List<IpodQuery> GetIpodListExprot(IpodQuery query);
+       bool GetIpodfreight(string po_id, int freight);
     }
 }

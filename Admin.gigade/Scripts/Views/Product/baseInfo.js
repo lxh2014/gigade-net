@@ -126,8 +126,7 @@ Ext.onReady(function () {
     var tureorfalse = true;
 
     PRODUCT_ID = window.parent.GetProductId();
-    if (PRODUCT_ID > 0)
-    {
+    if (PRODUCT_ID > 0) {
         tureorfalse = false;
     }
     OLD_PRODUCT_ID = window.parent.GetCopyProductId();
@@ -355,13 +354,11 @@ Ext.onReady(function () {
                         Ext.getCmp('blp').setDisabled(false);
                         Ext.getCmp('purchase_in_advance_end').setDisabled(false);
                         Ext.getCmp('e_time').setDisabled(false);
-                        Ext.getCmp('expect_msg').setDisabled(false);
                     } else {
                         Ext.getCmp('purchase_in_advance_start').setDisabled(true);
                         Ext.getCmp('blp').setDisabled(true);
                         Ext.getCmp('purchase_in_advance_end').setDisabled(true);
                         Ext.getCmp('e_time').setDisabled(true);
-                        Ext.getCmp('expect_msg').setDisabled(true);
                     }
                 }
             }
@@ -396,16 +393,7 @@ Ext.onReady(function () {
                 disabled: true,
                 value: tomRepeat,
                 minValue: new Date()
-            }]
-        }
-        , {
-            xtype: 'panel',
-            hidden: true,
-            layout: 'hbox',
-            border: false,
-            id: 'expect_time',//預計出貨時間
-            colName: 'expect_time',
-            items: [{
+            }, {
                 xtype: 'datetimefield',
                 disabledMin: true,
                 disabledSec: true,
@@ -413,105 +401,240 @@ Ext.onReady(function () {
                 format: 'Y-m-d H:i:s',
                 id: 'e_time',
                 fieldLabel: EXPECT_TIME,
-                //labelWidth: 80,
-                margin: '0 8 0 0'
-            }, {
+                labelWidth: 80,
+                margin: '0 8 0 15'
+            }]
+        }, {
+            xtype: 'panel',
+            hidden: true,
+            layout: 'hbox',
+            border: false,
+            id: 'expect_time',//預計出貨時間
+            colName: 'expect_time',
+            items: [{
                 xtype: 'textfield',
                 hidden: true,
                 width: 300,
                 id: 'expect_msg',//預計出貨信息
-                //labelWidth: 80,
-                margin: '0 0 0 8',
-                disabled: true,
+                labelWidth: 110,
                 fieldLabel: EXPECT_MSG,
                 colName: 'expect_msg',
-                name: 'expect_msg',
-                maxLength: 80
-                //,
+                name: 'expect_msg'
+                //maxLength: 80,
                 //maxLengthText:'此欄位最多輸入80個字'
             }]
         },
           {
-              xtype: 'radiogroup',
-              //colName: 'recommedde_jundge',
-              //hidden: tureorfalse,
-              hidden:true,
-              id: 'recommedde_jundge',//是否推薦商品屬性 add by dongya 2015/08/17
-              name: 'recommedde_jundge',
-              fieldLabel: RECOMMENDED_JUDGE_PRODUCT,
-              width: 200,
-              defaults: {
-                  name: 'recommedde_jundge'
-              },
-              columns: 2,
-              vertical: true,
-              items: [
-              { boxLabel: YES, inputValue: '1' },
-              { boxLabel: NO, inputValue: '0', checked: true }],
-              listeners: {
-                  change: function () {
-                      if (Ext.getCmp('recommedde_jundge').getValue().recommedde_jundge == '1') {
-                          Ext.getCmp('recommedde_time').show();//如果點擊了是  則顯示 
-                          //Ext.getCmp('recommedde_time_start').setDisabled(false);
-                          //Ext.getCmp('rts').setDisabled(false);
-                          //Ext.getCmp('recommedde_time_end').setDisabled(false);
-                          //Ext.getCmp('recommedde_expend_day').setDisabled(false);
-                      } else {
-                          Ext.getCmp('recommedde_time').hide();  //如果點擊了否 則隱藏
-                          //Ext.getCmp('recommedde_time_start').setDisabled(true);
-                          //Ext.getCmp('rts').setDisabled(true);
-                          //Ext.getCmp('recommedde_time_end').setDisabled(true);
-                          //Ext.getCmp('recommedde_expend_day').setDisabled(true);
-                      }
-                  }
-              }
-          }, {
               xtype: 'container',
               layout: 'column',
-              //hidden:tureorfalse,
               hidden:true,
-              id: 'recommedde_time',//預售起止時間
-              neme: 'recommedde_time',
+              id: 'jundge_combox',
               items: [{
-                  xtype: 'datetimefield',
-                  disabledMin: true,
-                  disabledSec: true,
-                  format: 'Y-m-d H:i:s',
-                  id: 'recommedde_time_start',
-                  fieldLabel: RECOMMENDED_JUDGE_PRODUCT_TIME,
-                  allowBlank: false,
-                  disabled: false,
-                  value: new Date(),
-                  minValue: new Date()
-              }, {
-                  xtype: 'displayfield',
-                  value: '~ ',
-                  id: 'rts',
-                  disabled: false,
-                  margin: '0 5 0 5'
-              }, {
-                  xtype: 'datetimefield',
-                  disabledMin: true,
-                  disabledSec: true,
-                  format: 'Y-m-d H:i:s',
-                  id: 'recommedde_time_end',
-                  allowBlank: false,
-                  disabled: false,
-                  value: tomRepeat,
-                  minValue: new Date()
+                  xtype: 'radiogroup',
+                  id: 'recommedde_jundge',//是否推薦商品屬性 add by dongya 2015/08/17
+                  name: 'recommedde_jundge',
+                  fieldLabel: RECOMMENDED_JUDGE_PRODUCT,
+                  width: 200,
+                  defaults: {
+                      name: 'recommedde_jundge'
+                  },
+                  columns: 2,
+                  vertical: true,
+                  items: [
+                  { boxLabel: YES, inputValue: '1' },
+                  { boxLabel: NO, inputValue: '0', checked: true }],
+                  listeners: {
+                      change: function () {
+                          if (Ext.getCmp('recommedde_jundge').getValue().recommedde_jundge == '1') {
+                              Ext.getCmp('recommedde_time').show();//如果點擊了是  則顯示 
+                              Ext.getCmp('recommedde_expend_day').show();
+                              Ext.getCmp('checkall').show();
+                              Ext.getCmp('noselect').show();
+                          } else {
+                              Ext.getCmp('recommedde_time').hide();  //如果點擊了否 則隱藏
+                              Ext.getCmp('recommedde_expend_day').hide();
+                              Ext.getCmp('recommedde_time').setValue(false);
+                              Ext.getCmp('recommedde_expend_day').setValue(0);
+                              Ext.getCmp('checkall').hide();
+                              Ext.getCmp('noselect').hide();
+                          }
+                      }
+                  }
               },
-              {
-                  xtype: 'numberfield',
-                  id: 'recommedde_expend_day',
-                  fieldLabel: USED_TIME,
-                  margin:'0 0 0 15',
-                  allowBlank: false,
-                  disabled: false,
-                  value: 0,
-                  minValue: 0
-              }
+               {
+                   xtype: 'numberfield',
+                   id: 'recommedde_expend_day',
+                   name: 'recommedde_expend_day',
+                   fieldLabel: USED_TIME,
+                   hidden: true,
+                   allowBlank: false,
+                   disabled: false,
+                   allowDecimals: false,
+                   width: 190,
+                   maxValue: 1000000,
+                   value: 0,
+                   minValue: 0
+                   ,
+                   listeners: {
+                       change: function () {
+                           if (Ext.getCmp('recommedde_jundge').getValue().recommedde_jundge == '1') {
+                               if (Ext.getCmp('recommedde_expend_day').getValue() > 1000000) {
+                                   Ext.getCmp('recommedde_expend_day').setValue(1000000);
+                               }
+                           }
+                       }
+                   }
+               }
+               ,
+                {
+                    xtype: 'button',
+                    text: '全選',
+                    hidden:true,
+                    id: 'checkall',
+                    name:'checkall',
+                    margin: '0 0 0 15',
+                    handler: function () {
+                        if (Ext.getCmp("recommedde_jundge").getValue().recommedde_jundge == 1) {
+                            Ext.getCmp('recommedde_time_one').setValue(true);
+                            Ext.getCmp('recommedde_time_two').setValue(true);
+                            Ext.getCmp('recommedde_time_three').setValue(true);
+                            Ext.getCmp('recommedde_time_four').setValue(true);
+                            Ext.getCmp('recommedde_time_five').setValue(true);
+                            Ext.getCmp('recommedde_time_six').setValue(true);
+                            Ext.getCmp('recommedde_time_seven').setValue(true);
+                            Ext.getCmp('recommedde_time_eight').setValue(true);
+                            Ext.getCmp('recommedde_time_nine').setValue(true);
+                            Ext.getCmp('recommedde_time_ten').setValue(true);
+                            Ext.getCmp('recommedde_time_eleven').setValue(true);
+                            Ext.getCmp('recommedde_time_twelve').setValue(true);
+                        }
+                    }
+                },
+        {
+            xtype: 'button',
+            text: '反選',
+            hidden:true,
+            id: 'noselect',
+            name: 'noselect',
+            margin: '0 0 0 15',
+            handler: function () {
+                if (Ext.getCmp("recommedde_jundge").getValue().recommedde_jundge == 1) {
+                    if (Ext.getCmp("recommedde_time_one").getValue() == true) {
+                        Ext.getCmp("recommedde_time_one").setValue(false)
+                    }
+                    else {
+                        Ext.getCmp("recommedde_time_one").setValue(true)
+                    }
+                    if (Ext.getCmp("recommedde_time_two").getValue() == true) {
+                        Ext.getCmp("recommedde_time_two").setValue(false)
+                    }
+                    else {
+                        Ext.getCmp("recommedde_time_two").setValue(true)
+                    }
+                    if (Ext.getCmp("recommedde_time_three").getValue() == true) {
+                        Ext.getCmp("recommedde_time_three").setValue(false)
+                    }
+                    else {
+                        Ext.getCmp("recommedde_time_three").setValue(true)
+                    }
+                    if (Ext.getCmp("recommedde_time_four").getValue() == true) {
+                        Ext.getCmp("recommedde_time_four").setValue(false)
+                    }
+                    else {
+                        Ext.getCmp("recommedde_time_four").setValue(true)
+                    }
+                    if (Ext.getCmp("recommedde_time_five").getValue() == true) {
+                        Ext.getCmp("recommedde_time_five").setValue(false)
+                    }
+                    else {
+                        Ext.getCmp("recommedde_time_five").setValue(true)
+                    }
+                    if (Ext.getCmp("recommedde_time_six").getValue() == true) {
+                        Ext.getCmp("recommedde_time_six").setValue(false)
+                    }
+                    else {
+                        Ext.getCmp("recommedde_time_six").setValue(true)
+                    }
+                    if (Ext.getCmp("recommedde_time_seven").getValue() == true) {
+                        Ext.getCmp("recommedde_time_seven").setValue(false)
+                    }
+                    else {
+                        Ext.getCmp("recommedde_time_seven").setValue(true)
+                    }
+                    if (Ext.getCmp("recommedde_time_eight").getValue() == true) {
+                        Ext.getCmp("recommedde_time_eight").setValue(false)
+                    }
+                    else {
+                        Ext.getCmp("recommedde_time_eight").setValue(true)
+                    }
+                    if (Ext.getCmp("recommedde_time_nine").getValue() == true) {
+                        Ext.getCmp("recommedde_time_nine").setValue(false)
+                    }
+                    else {
+                        Ext.getCmp("recommedde_time_nine").setValue(true)
+                    }
+                    if (Ext.getCmp("recommedde_time_ten").getValue() == true) {
+                        Ext.getCmp("recommedde_time_ten").setValue(false)
+                    }
+                    else {
+                        Ext.getCmp("recommedde_time_ten").setValue(true)
+                    }
+                    if (Ext.getCmp("recommedde_time_eleven").getValue() == true) {
+                        Ext.getCmp("recommedde_time_eleven").setValue(false)
+                    }
+                    else {
+                        Ext.getCmp("recommedde_time_eleven").setValue(true)
+                    }
+                    if (Ext.getCmp("recommedde_time_twelve").getValue() == true) {
+                        Ext.getCmp("recommedde_time_twelve").setValue(false)
+                    }
+                    else {
+                        Ext.getCmp("recommedde_time_twelve").setValue(true)
+                    }
+                }
+            }
+        }
               ]
           },
+           {
+               xtype: 'checkboxgroup',
+               id: 'recommedde_time',//是否推薦商品屬性 add by dongya 2015/08/17
+               name: 'recommedde_time',
+               fieldLabel: "推薦月份設定",
+               hidden: true,
+               width: 800,
+               columns: 6,
+               vertical: true,
+               allowBlank: true,
+               items: [
+                { boxLabel: '一月', id: 'recommedde_time_one', inputValue: '1' },
+                  { boxLabel: '二月', id: 'recommedde_time_two', inputValue: '2' },
+                  { boxLabel: '三月', id: 'recommedde_time_three', inputValue: '3' },
+                  { boxLabel: '四月', id: 'recommedde_time_four', inputValue: '4' },
+                  { boxLabel: '五月', id: 'recommedde_time_five', inputValue: '5' },
+                  { boxLabel: '六月', id: 'recommedde_time_six', inputValue: '6' },
+                  { boxLabel: '七月', id: 'recommedde_time_seven', inputValue: '7' },
+                  { boxLabel: '八月', id: 'recommedde_time_eight', inputValue: '8' },
+                  { boxLabel: '九月', id: 'recommedde_time_nine', inputValue: '9' },
+                  { boxLabel: '十月', id: 'recommedde_time_ten', inputValue: '10' },
+                  { boxLabel: '十一月', id: 'recommedde_time_eleven', inputValue: '11' },
+                  { boxLabel: '十二月', id: 'recommedde_time_twelve', inputValue: '12' }
+               ]
+               //,
+               //listeners: {
+               //    change: function () {
+               //        if (Ext.getCmp('recommedde_jundge').getValue().recommedde_jundge == '1') {
+               //            if (Ext.getCmp('recommedde_time').getChecked() == 0) {
+               //                if (Ext.getCmp('recommedde_expend_day').getValue() > 0) {
+               //                    Ext.Msg.alert(PROMPT, MONTH_SET_NOEMPTY);//推薦週期不允許為空
+               //                    Ext.getCmp('recommedde_expend_day').setValue(0);
+               //                }
+               //            }
+               //        }
+               //    }
+               //}
+           },
+
         {
             xtype: 'panel',
             layout: 'hbox',
@@ -913,33 +1036,64 @@ function Page_Load() {
             }
 
             //add by dongya 2015/08/17
-            if (resText.data.expend_day == 0 && resText.data.Recommended_time_start == 0 && resText.data.Recommended_time_end == 0) {
+            if (resText.data.expend_day == 0 && resText.data.months == "") {
                 Ext.getCmp("recommedde_jundge").setValue({ "recommedde_jundge": 0 });
                 Ext.getCmp('recommedde_time').hide();//如果點擊的是否,則不顯示
+                Ext.getCmp('recommedde_expend_day').hide();
             }
             else {
+                Ext.getCmp('recommedde_time').show();//如果點擊的是否,則不顯示
+                Ext.getCmp('recommedde_expend_day').show();
                 Ext.getCmp("recommedde_jundge").setValue({ "recommedde_jundge": 1 });
-                if (resText.data.Recommended_time_start != '0') {
-                    Ext.getCmp("recommedde_time_start").setValue(new Date(resText.data.Recommended_time_start * 1000));
-                } else {
-                    Ext.getCmp("recommedde_time_start").setValue(new Date());
-                }
-
-                if (resText.data.Recommended_time_end != '0') {
-                    Ext.getCmp("recommedde_time_end").setValue(new Date(resText.data.Recommended_time_end * 1000));
-                } else {
-                    Ext.getCmp("recommedde_time_end").setValue(Tomorrow());
+                var arraylist = resText.data.months.split(',');
+                for (var a = 0; a < arraylist.length; a++) {
+                    if (arraylist[a] == 1) {
+                        Ext.getCmp("recommedde_time_one").setValue(true);
+                    }
+                    if (arraylist[a] == 2) {
+                        Ext.getCmp("recommedde_time_two").setValue(true);
+                    }
+                    if (arraylist[a] == 3) {
+                        Ext.getCmp("recommedde_time_three").setValue(true);
+                    }
+                    if (arraylist[a] == 4) {
+                        Ext.getCmp("recommedde_time_four").setValue(true);
+                    }
+                    if (arraylist[a] == 5) {
+                        Ext.getCmp("recommedde_time_five").setValue(true);
+                    }
+                    if (arraylist[a] == 6) {
+                        Ext.getCmp("recommedde_time_six").setValue(true);
+                    }
+                    if (arraylist[a] == 7) {
+                        Ext.getCmp("recommedde_time_seven").setValue(true);
+                    }
+                    if (arraylist[a] == 8) {
+                        Ext.getCmp("recommedde_time_eight").setValue(true);
+                    }
+                    if (arraylist[a] == 9) {
+                        Ext.getCmp("recommedde_time_nine").setValue(true);
+                    }
+                    if (arraylist[a] == 10) {
+                        Ext.getCmp("recommedde_time_ten").setValue(true);
+                    }
+                    if (arraylist[a] == 11) {
+                        Ext.getCmp("recommedde_time_eleven").setValue(true);
+                    }
+                    if (arraylist[a] == 12) {
+                        Ext.getCmp("recommedde_time_twelve").setValue(true);
+                    }
                 }
                 Ext.getCmp("recommedde_expend_day").setValue(resText.data.expend_day);
             }
-          
+
         }
     })
     /**/
 }
 
 //驗證表單
-function validateForm(product_start, product_end, expect_time, purchase_in_advance_start, purchase_in_advance_end, recommedde_time_start, recommedde_time_end) {
+function validateForm(product_start, product_end, expect_time, purchase_in_advance_start, purchase_in_advance_end) {
     if (!Ext.getCmp('baseinfo').getForm().isValid()) {
         return;
     }
@@ -991,17 +1145,18 @@ function validateForm(product_start, product_end, expect_time, purchase_in_advan
             return;
         }
     }
-    //add by dongya 2015/08/17
-    if (Ext.getCmp('recommedde_jundge').getValue().recommedde_jundge == '1') {
-        if (recommedde_time_start >= recommedde_time_end) {
-            Ext.Msg.alert(PROMPT, START_END_LIMIT_RECOMMENDED);
-            return;
-        }
-    }
 
     //若填寫預計出貨時間則預計出貨信息必填
     if (Ext.getCmp("e_time").rawValue != "") {
         if (Ext.getCmp("expect_msg").getValue() == "") { Ext.Msg.alert(PROMPT, PLEASE_WRITE_SHIPMENT_MESSAGE); return; }
+    }
+
+    //add by dongya 2015/08/25
+    if (Ext.getCmp("recommedde_jundge").getValue().recommedde_jundge == 1) {
+        if (Ext.getCmp('recommedde_time').getChecked() == 0 || Ext.getCmp("recommedde_expend_day").getValue() == 0) {
+            Ext.Msg.alert(PROMPT, MONTH_SET_USED_TIME_NOEMPTY);
+            return;
+        }
     }
     return true;
 }
@@ -1026,16 +1181,53 @@ function save(functionid) {
     purchase_in_advance_start = Ext.getCmp("purchase_in_advance_start").getValue() / 1000;
     purchase_in_advance_end = Ext.getCmp("purchase_in_advance_end").getValue() / 1000;
 
-    //add by dongya 2015/08/17
-    recommedde_time_start = Ext.getCmp("recommedde_time_start").getValue() / 1000;
-    recommedde_time_end = Ext.getCmp("recommedde_time_end").getValue() / 1000;
     var retVal = true;
-    if (!validateForm(product_start, product_end, expect_time, purchase_in_advance_start, purchase_in_advance_end, recommedde_time_start, recommedde_time_end)) {
+    if (!validateForm(product_start, product_end, expect_time, purchase_in_advance_start, purchase_in_advance_end)) {
         window.parent.setMoveEnable(true);
         return false;
     }
     if (!functionid) {
         functionid = '';
+    }
+    //add by dongya 2015/08/26
+    var recommededcheckall = "";
+    if (Ext.getCmp("recommedde_jundge").getValue().recommedde_jundge == 1) {
+        if (Ext.getCmp("recommedde_time_one").getValue() == true) {
+            recommededcheckall = recommededcheckall + "1,";
+        }
+        if (Ext.getCmp("recommedde_time_two").getValue() == true) {
+            recommededcheckall = recommededcheckall + "2,";
+        }
+        if (Ext.getCmp("recommedde_time_three").getValue() == true) {
+            recommededcheckall = recommededcheckall + "3,";
+        }
+        if (Ext.getCmp("recommedde_time_four").getValue() == true) {
+            recommededcheckall = recommededcheckall + "4,";
+        }
+        if (Ext.getCmp("recommedde_time_five").getValue() == true) {
+            recommededcheckall = recommededcheckall + "5,";
+        }
+        if (Ext.getCmp("recommedde_time_six").getValue() == true) {
+            recommededcheckall = recommededcheckall + "6,";
+        }
+        if (Ext.getCmp("recommedde_time_seven").getValue() == true) {
+            recommededcheckall = recommededcheckall + "7,";
+        }
+        if (Ext.getCmp("recommedde_time_eight").getValue() == true) {
+            recommededcheckall = recommededcheckall + "8,";
+        }
+        if (Ext.getCmp("recommedde_time_nine").getValue() == true) {
+            recommededcheckall = recommededcheckall + "9,";
+        }
+        if (Ext.getCmp("recommedde_time_ten").getValue() == true) {
+            recommededcheckall = recommededcheckall + "10,";
+        }
+        if (Ext.getCmp("recommedde_time_eleven").getValue() == true) {
+            recommededcheckall = recommededcheckall + "11,";
+        }
+        if (Ext.getCmp("recommedde_time_twelve").getValue() == true) {
+            recommededcheckall = recommededcheckall + "12,";
+        }
     }
     //儲存數據
     Ext.Ajax.request({
@@ -1087,8 +1279,7 @@ function save(functionid) {
             "purchase_in_advance_end": purchase_in_advance_end,
             //add by dongya 2015/08/17
             "recommedde_jundge": Ext.htmlEncode(Ext.getCmp("recommedde_jundge").getValue().recommedde_jundge),
-            "recommedde_time_start": recommedde_time_start,
-            "recommedde_time_end": recommedde_time_end,
+            "recommededcheckall": recommededcheckall,
             "recommedde_expend_day": Ext.htmlEncode(Ext.getCmp("recommedde_expend_day").getValue())
         }, success: function (msg) {
             var resMsg = eval("(" + msg.responseText + ")");

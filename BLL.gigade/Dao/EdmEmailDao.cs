@@ -109,6 +109,11 @@ FROM edm_email ee INNER  JOIN edm_group_email ege ON ee.email_id=ege.email_id  W
                     sql.AppendFormat(" AND ee.email_address LIKE N'%{0}%'", query.email_address);
                     count.AppendFormat(" AND ee.email_address LIKE N'%{0}%'", query.email_address);
                 }
+                if (query.email_id != 0)
+                {
+                    sql.AppendFormat(" AND ee.email_id ={0}", query.email_id);
+                    count.AppendFormat(" AND ee.email_id={0}", query.email_id);
+                }
                 sql.AppendFormat(" GROUP BY(ee.email_id)");
                 if (query.IsPage)
                 {

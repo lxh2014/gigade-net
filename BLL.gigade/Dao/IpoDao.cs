@@ -43,6 +43,14 @@ namespace BLL.gigade.Dao
                 {
                     sqlCondi.AppendFormat(" and i.po_type ='{0}' ", query.po_type);
                 }
+                if (query.start_time!=DateTime.MinValue)
+                {
+                    sqlCondi.AppendFormat(" and i.create_dtim >= '{0}'", Common.CommonFunction.DateTimeToString(query.start_time));
+                }
+                if (query.end_time != DateTime.MinValue)
+                {
+                    sqlCondi.AppendFormat(" and i.create_dtim <= '{0}'", Common.CommonFunction.DateTimeToString(query.end_time));
+                }
                 totalcount = 0;
                 sqlCondi.Append(" order by i.row_id desc ");
                 if (query.IsPage)

@@ -2006,6 +2006,8 @@ namespace Admin.gigade.Controllers
                     //向 order_master 裱中 添加 抵用金 和 購物金  add by zhuoqin0830w  2015/05/14
                     ordermaster.Deduct_Welfare = deduct_welfareTotal;
                     ordermaster.Deduct_Bonus = deduct_bonusTotal;
+                    //向 order_master 表中 添加 返還購物金  add by zhuoqin0830w  2015/09/01
+                    ordermaster.Accumulated_Bonus = (int)acc_bonusTotal;
                     #endregion
 
                     #region 出貨時間
@@ -2574,25 +2576,34 @@ namespace Admin.gigade.Controllers
                                     }
                                 }
                             }
-                        }
-                        if (!string.IsNullOrEmpty(dt.Rows[j][2].ToString()))
-                        {
-                            int account_collection_money = 0;
-                            if (int.TryParse(dt.Rows[j][2].ToString(), out account_collection_money))
+
+                            if (!string.IsNullOrEmpty(dt.Rows[j][2].ToString()))
                             {
-                                model.account_collection_money = account_collection_money;
+                                int account_collection_money = 0;
+                                if (int.TryParse(dt.Rows[j][2].ToString(), out account_collection_money))
+                                {
+                                    model.account_collection_money = account_collection_money;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
                             }
                             else
                             {
                                 continue;
                             }
-                        }
-                        if (!string.IsNullOrEmpty(dt.Rows[j][3].ToString()))
-                        {
-                            int poundage = 0;
-                            if (int.TryParse(dt.Rows[j][3].ToString(), out poundage))
+                            if (!string.IsNullOrEmpty(dt.Rows[j][3].ToString()))
                             {
-                                model.poundage = poundage;
+                                int poundage = 0;
+                                if (int.TryParse(dt.Rows[j][3].ToString(), out poundage))
+                                {
+                                    model.poundage = poundage;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
                             }
                             else
                             {
@@ -2638,33 +2649,42 @@ namespace Admin.gigade.Controllers
                                     }
                                 }
                             }
-                        }
-                        if (!string.IsNullOrEmpty(dt.Rows[j][5].ToString()))
-                        {
-                            int return_collection_money = 0;
-                            if (int.TryParse(dt.Rows[j][5].ToString(), out return_collection_money))
+                            if (!string.IsNullOrEmpty(dt.Rows[j][5].ToString()))
                             {
-                                model.return_collection_money = return_collection_money;
+                                int return_collection_money = 0;
+                                if (int.TryParse(dt.Rows[j][5].ToString(), out return_collection_money))
+                                {
+                                    model.return_collection_money = return_collection_money;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            if (!string.IsNullOrEmpty(dt.Rows[j][6].ToString()))
+                            {
+                                int return_poundage = 0;
+                                if (int.TryParse(dt.Rows[j][6].ToString(), out return_poundage))
+                                {
+                                    model.return_poundage = return_poundage;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
                             }
                             else
                             {
                                 continue;
                             }
                         }
-                        if (!string.IsNullOrEmpty(dt.Rows[j][6].ToString()))
-                        {
-                            int return_poundage = 0;
-                            if (int.TryParse(dt.Rows[j][6].ToString(), out return_poundage))
-                            {
-                                model.return_poundage = return_poundage;
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                        }
+
                         model.remark = dt.Rows[j][7].ToString();
-                        if (model != null)
+                        if (model != null && !(model.account_collection_time == model.return_collection_time && model.return_collection_time == DateTime.MinValue))
                         {
                             oacli.Add(model);
                         }
@@ -2942,6 +2962,10 @@ namespace Admin.gigade.Controllers
                 {
                     query.show_type = Convert.ToInt32(Request.Params["show_type"]);
                 }
+                if (!string.IsNullOrEmpty(Request.Params["invoice_type"]))
+                {
+                    query.invoice_type = Convert.ToInt32(Request.Params["invoice_type"]);
+                }
                 int totalCount = 0;
                 _OrderMasterMgr = new OrderMasterMgr(connectionString);
                 _dt = _OrderMasterMgr.OrderMasterExportList(query, out totalCount);
@@ -3005,6 +3029,9 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["show_type"]))
                 {
                     query.show_type = Convert.ToInt32(Request.Params["show_type"]);
+                } if (!string.IsNullOrEmpty(Request.Params["invoice_type"]))
+                {
+                    query.invoice_type = Convert.ToInt32(Request.Params["invoice_type"]);
                 }
                 _OrderMasterMgr = new OrderMasterMgr(connectionString);
                 _dt = _OrderMasterMgr.OrderMasterHuiZong(query);
@@ -3196,6 +3223,9 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["show_type"]))
                 {
                     query.show_type = Convert.ToInt32(Request.Params["show_type"]);
+                } if (!string.IsNullOrEmpty(Request.Params["invoice_type"]))
+                {
+                    query.invoice_type = Convert.ToInt32(Request.Params["invoice_type"]);
                 }
                 _OrderMasterMgr = new OrderMasterMgr(connectionString);
                 _dt = _OrderMasterMgr.OrderMasterExport(query);

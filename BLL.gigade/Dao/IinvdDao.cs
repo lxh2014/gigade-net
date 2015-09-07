@@ -526,7 +526,7 @@ LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where i.upc_id='{0}' ;", id);
             sb.AppendFormat(@"SELECT SUBSTRING(nvd.cde_dt,1,10) as cde_dt,
 nvd.plas_loc_id,  loc.lcat_id,pext.cde_dt_incr,pext.cde_dt_shp,pext.cde_dt_var,nvd.item_id,nvd.prod_qty,p.prepaid,nvd.ista_id,
 CONCAT(v.brand_name,'-',p.product_name) AS 'product_name',concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz,
-p.product_freight_set ");
+dfsm.delivery_freight_set as product_freight_set ");
             sb.AppendFormat(@"FROM iinvd nvd 
 LEFT JOIN iloc loc on loc.loc_id=nvd.plas_loc_id 
 LEFT JOIN product_ext pext on pext.item_id=nvd.item_id 
@@ -535,6 +535,7 @@ LEFT JOIN product_spec ps1 ON pi.spec_id_1 = ps1.spec_id
 LEFT JOIN product_spec ps2 ON pi.spec_id_2 = ps2.spec_id 
 LEFT JOIN product p on p.product_id= pi.product_id 
 LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id
+left join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set
 where pext.pwy_dte_ctl='Y' ");
             //LEFT JOIN (SELECT item_id,upc_id from iupc GROUP BY item_id) upc on upc.item_id=nvd.item_id 
             sb.Append(sbt.ToString());

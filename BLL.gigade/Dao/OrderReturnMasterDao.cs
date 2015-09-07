@@ -192,7 +192,7 @@ namespace BLL.gigade.Dao
                     //查詢訂單內容
                     OrderMaster om = _ordermasterdao.GetOrderMasterByOrderId4Change(Convert.ToInt32(query.order_id));
                     // 查退貨單內容詳情
-                    DataTable odli = _orderDetailDao.OrderDetailTable(query.return_id);
+                    DataTable odli = _orderDetailDao.OrderDetailTable(query.return_id,0);
                     if (odli != null)
                     {
                         int paymoney = 0;
@@ -205,9 +205,9 @@ namespace BLL.gigade.Dao
                         int deduct_happygo_money = 0;
                         foreach (DataRow od in odli.Rows)
                         {
-                           
+
                             // 退款金額 = 商品購買金額 - 購物金
-                            paymoney +=(Convert.ToInt32(od["single_money"]) * Convert.ToInt32(od["buy_num"]));
+                            paymoney += (Convert.ToInt32(od["single_money"]) * Convert.ToInt32(od["buy_num"]));
                             deductbonus += Convert.ToInt32(od["deduct_bonus"]);
                             deductcash += Convert.ToInt32(od["deduct_welfare"]);
                             accumulated_bonus += Convert.ToInt32(od["accumulated_bonus"]);
@@ -355,7 +355,7 @@ namespace BLL.gigade.Dao
                                         idStr += "," + record.id;
                                     }
                                 }
-                            mySqlCmd.CommandText = _userRecommendDao.UpdateIsCommend(idStr);
+                                mySqlCmd.CommandText = _userRecommendDao.UpdateIsCommend(idStr);
                             }
                             sql.Append(mySqlCmd.CommandText);
                             mySqlCmd.ExecuteNonQuery();
@@ -363,7 +363,7 @@ namespace BLL.gigade.Dao
                         }
                     }
                 }
-                #endregion 
+                #endregion
 
 
 
@@ -375,37 +375,37 @@ namespace BLL.gigade.Dao
                 #region 取消退款
                 if (query.return_status == 2)
                 {
-                    OrderMasterStatusQuery statusquery=new OrderMasterStatusQuery ();
-                    OrderDetailQuery detailquery=new OrderDetailQuery ();
-                    string description = "Writer:(" + query.user_id + ")" + query.user_username + ",return_id:"+query.return_id+",取消退貨請協助通知營管貨品確實出貨";
-                   string sqlSerial = serialDao.Update(29);//訂單主檔狀態流水號
-                   DataTable _dt = _accessMySql.getDataTable(sqlSerial);
-                   statusquery.serial_id =Convert.ToUInt64(_dt.Rows[0][0]);
-                   statusquery.order_id = query.order_id;
-                   statusquery.order_status = query.return_status;
-                   statusquery.status_description = description;
-                   statusquery.status_ipfrom = query.return_ipfrom;
-                   mySqlCmd.CommandText += InsertOrderMasterS(statusquery);
-                   List<OrderDetailQuery> odli = _orderDetailDao.OrderDetail(query.return_id);
+                    OrderMasterStatusQuery statusquery = new OrderMasterStatusQuery();
+                    OrderDetailQuery detailquery = new OrderDetailQuery();
+                    string description = "Writer:(" + query.user_id + ")" + query.user_username + ",return_id:" + query.return_id + ",取消退貨請協助通知營管貨品確實出貨";
+                    string sqlSerial = serialDao.Update(29);//訂單主檔狀態流水號
+                    DataTable _dt = _accessMySql.getDataTable(sqlSerial);
+                    statusquery.serial_id = Convert.ToUInt64(_dt.Rows[0][0]);
+                    statusquery.order_id = query.order_id;
+                    statusquery.order_status = query.return_status;
+                    statusquery.status_description = description;
+                    statusquery.status_ipfrom = query.return_ipfrom;
+                    mySqlCmd.CommandText += InsertOrderMasterS(statusquery);
+                    List<OrderDetailQuery> odli = _orderDetailDao.OrderDetail(query.return_id);
 
-                   foreach (var item in odli)
-                   {
-                       detailquery.Slave_Id = item.Slave_Id;
-                       detailquery.Parent_Id = item.Parent_Id;
-                       detailquery.pack_id = item.pack_id;
-                       detailquery.Detail_Id = item.Detail_Id;
-                       if (item.item_mode == 1)
-                       {
-                           mySqlCmd.CommandText = _orderDetailDao.UpdateOrderDetailSome(detailquery);
-                       }
-                       else
-                       {
-                           mySqlCmd.CommandText = _orderDetailDao.UpdateOrderDetail(detailquery);
+                    foreach (var item in odli)
+                    {
+                        detailquery.Slave_Id = item.Slave_Id;
+                        detailquery.Parent_Id = item.Parent_Id;
+                        detailquery.pack_id = item.pack_id;
+                        detailquery.Detail_Id = item.Detail_Id;
+                        if (item.item_mode == 1)
+                        {
+                            mySqlCmd.CommandText = _orderDetailDao.UpdateOrderDetailSome(detailquery);
+                        }
+                        else
+                        {
+                            mySqlCmd.CommandText = _orderDetailDao.UpdateOrderDetail(detailquery);
                         }
                     }
-                   mySqlCmd.ExecuteNonQuery();
+                    mySqlCmd.ExecuteNonQuery();
                 }
-               #endregion
+                #endregion
 
                 mySqlCmd.Transaction.Commit();
                 id = 1;
@@ -422,7 +422,7 @@ namespace BLL.gigade.Dao
                     mySqlConn.Close();
                 }
             }
-            return id;
+            return 0;
         }
 
         public int GetUserBonus(uint user_id, int bonus_type)

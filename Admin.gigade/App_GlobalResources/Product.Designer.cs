@@ -248,7 +248,18 @@ namespace Resources {
                 return ResourceManager.GetString("SPEC_NOT_FIND", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   查找类似 所對應出貨天數不能為0 的本地化字符串。
+        /// </summary>
+        internal static string TRANSPORT_DAYS
+        {
+            get
+            {
+                return ResourceManager.GetString("TRANSPORT_DAYS", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   查找类似 KB 的本地化字符串。
         /// </summary>
@@ -257,7 +268,9 @@ namespace Resources {
                 return ResourceManager.GetString("UNIT", resourceCulture);
             }
         }
-        
+
+      
+
         /// <summary>
         ///   查找类似 文件大小或格式不正確，上傳失敗 的本地化字符串。
         /// </summary>
@@ -275,5 +288,7 @@ namespace Resources {
                 return ResourceManager.GetString("UPLOAD_FAILURE", resourceCulture);
             }
         }
+
+       
     }
 }

@@ -645,7 +645,14 @@ namespace BLL.gigade.Dao
                 }
                 if (!String.IsNullOrEmpty(p.parameterName))
                 {
-                    sb.AppendFormat(" AND parameterName='{0}' ", p.parameterName);
+                    if (p.parameterName == "自取")
+                    {
+                        sb.AppendFormat(" AND parameterName like '{0}%' ", p.parameterName);
+                    }
+                    else
+                    {
+                        sb.AppendFormat(" AND parameterName='{0}' ", p.parameterName);
+                    }
                 }
                 if (!String.IsNullOrEmpty(p.TopValue))
                 {

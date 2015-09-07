@@ -20,8 +20,10 @@ namespace BLL.gigade.Model.Query
         public int master_type { get; set; }
         public string writer { get; set; }
         public int master_status { get; set; }
-       
+
         public int record_id { get; set; }
+        public string masterid { get; set; }
+        public string usebonus { get; set; }
         public BonusMasterQuery()
         {
             user_name = string.Empty;

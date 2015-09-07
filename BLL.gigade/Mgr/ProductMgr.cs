@@ -43,6 +43,7 @@ namespace BLL.gigade.Mgr
         private IPriceUpdateApplyImplDao puApplyDao;
         private MySqlDao _mysqlDao;
         private ProductDao productDao;
+        private RecommendedProductAttributeDao _rProductAttribute;
         private string connectionStr;
         public ProductMgr(string connectionStr)
         {
@@ -54,6 +55,7 @@ namespace BLL.gigade.Mgr
             this.connectionStr = connectionStr;
             _mysqlDao = new MySqlDao(connectionStr);
             productDao = new ProductDao(connectionStr);
+            _rProductAttribute = new RecommendedProductAttributeDao(connectionStr);
         }
 
         public DataTable dt()
@@ -318,12 +320,42 @@ namespace BLL.gigade.Mgr
                 sqls.Add(proSpecTempMgr.TempMoveSpec(proSpecTemp));
                 sqls.Add(proSpecTempMgr.TempDelete(proSpecTemp));
 
+
+
                 string priceMaster = priceMasterTempMgr.Move2PriceMaster(priceMasterTemp);
 
                 ItemPriceMgr itemPriceMgr = new ItemPriceMgr("");
                 string itemPrice = itemPriceMgr.SaveFromItem(writerId, product_Id);
 
                 product_id = _productDao.TempMove2Pro(movePro, moveCourProd, moveItem, moveCourDetaItem, selItem, priceMaster, itemPrice, sqls);
+                //把商品推薦屬性臨時表中的數據moveto商品推薦屬性表中,然後刪除商品推薦臨時表 通過product_id指定商品推薦屬性對應的商品
+                #region 推薦商品屬性插入recommended_product_attribute表中做記錄
+                if (_rProductAttribute.ExsitInTemp(writerId, int.Parse(product_Id),combo_type) > 0)//判斷臨時表中是否存在 product_Id為傳入的productId
+                {
+                    DataTable _dt = _rProductAttribute.GetTempList(writerId, int.Parse(product_Id),combo_type);
+                    RecommendedProductAttribute rPA = new RecommendedProductAttribute();
+                    rPA.product_id = Convert.ToUInt32(product_id);
+                    rPA.time_start = 0;
+                    rPA.time_end = 0;
+                    rPA.expend_day = Convert.ToUInt32(_dt.Rows[0]["expend_day"]);
+                    rPA.months = _dt.Rows[0]["months"].ToString();
+                    rPA.combo_type = 1;
+                    if (_rProductAttribute.GetMsgByProductId(product_id) > 0)//如果大於0,表示推薦表中存在數據
+                    {
+                        if (_rProductAttribute.Update(rPA) > 0)
+                        {
+                            _rProductAttribute.DeleteTemp(writerId, int.Parse(product_Id),combo_type);//刪除臨時表中的數據
+                        }
+                    }
+                    else
+                    {
+                        if (_rProductAttribute.Save(rPA) > 0)
+                        {
+                            _rProductAttribute.DeleteTemp(writerId, int.Parse(product_Id),combo_type);//刪除臨時表中的數據
+                        }
+                    }
+                }
+                #endregion
                 if (product_id > 0)
                 {
                     piDao.UpdateErpId(product_id.ToString());
@@ -341,7 +373,36 @@ namespace BLL.gigade.Mgr
                 ItemPriceTempMgr itemPriceTempMgr = new ItemPriceTempMgr("");
                 string itemPrice = itemPriceTempMgr.Move2ItemPrice();
                 sqls.Add(itemPriceTempMgr.Delete(product_Id, combo_type, writerId));
-                return _productDao.TempMove2Pro(movePro, "", "", "", selPrice, priceMaster, itemPrice, sqls);
+                product_id= _productDao.TempMove2Pro(movePro, "", "", "", selPrice, priceMaster, itemPrice, sqls);
+                //把商品推薦屬性臨時表中的數據moveto商品推薦屬性表中,然後刪除商品推薦臨時表 通過product_id指定商品推薦屬性對應的商品
+                #region 推薦商品屬性插入recommended_product_attribute表中做記錄
+                if (_rProductAttribute.ExsitInTemp(writerId, int.Parse(product_Id),combo_type) > 0)//判斷臨時表中是否存在 product_Id為傳入的productId
+                {
+                    DataTable _dt = _rProductAttribute.GetTempList(writerId, int.Parse(product_Id),combo_type);
+                    RecommendedProductAttribute rPA = new RecommendedProductAttribute();
+                    rPA.product_id = Convert.ToUInt32(product_id);
+                    rPA.time_start = 0;
+                    rPA.time_end = 0;
+                    rPA.expend_day = Convert.ToUInt32(_dt.Rows[0]["expend_day"]);
+                    rPA.months = _dt.Rows[0]["months"].ToString();
+                    rPA.combo_type = 2;
+                    if (_rProductAttribute.GetMsgByProductId(product_id) > 0)//如果大於0,表示推薦表中存在數據
+                    {
+                        if (_rProductAttribute.Update(rPA) > 0)
+                        {
+                            _rProductAttribute.DeleteTemp(writerId, int.Parse(product_Id),combo_type);//刪除臨時表中的數據
+                        }
+                    }
+                    else
+                    {
+                        if (_rProductAttribute.Save(rPA) > 0)
+                        {
+                            _rProductAttribute.DeleteTemp(writerId, int.Parse(product_Id),combo_type);//刪除臨時表中的數據
+                        }
+                    }
+                }
+                return product_id;
+                #endregion
             }
         }
 
@@ -489,7 +550,7 @@ namespace BLL.gigade.Mgr
                     return ExcelHelperXhf.ExportExcel(items, columns, authority);
                 case 4:///子商品價格信息匯出
                     int sum = 0;
-                    List<QueryandVerifyCustom> product = _productDao.QueryByProSite(query,out sum);///獲得根據條件查詢到的相關信息
+                    List<QueryandVerifyCustom> product = _productDao.QueryByProSite(query, out sum);///獲得根據條件查詢到的相關信息
 
                     foreach (var p in product)
                     {
@@ -504,13 +565,18 @@ namespace BLL.gigade.Mgr
                     IPriceMasterImplMgr _priceMgr = new PriceMasterMgr(connectionStr);
                     List<PriceMasterCustom> listPirce = _priceMgr.GetExcelItemIdInfo(price_master_id);
                     IParametersrcImplDao _paramerDao = new ParametersrcDao(connectionStr);
-                    List<Parametersrc> listParameter = _paramerDao.QueryParametersrcByTypes("price_status");
+                    List<Parametersrc> listParameter = _paramerDao.QueryParametersrcByTypes("price_status", "product_status");
                     foreach (PriceMasterCustom p in listPirce)
                     {
                         var listTemp = listParameter.Find(m => m.ParameterCode == p.price_status.ToString());
-                        if(listTemp!=null)
+                        var listTemp2 = listParameter.Find(m => m.ParameterCode == p.product_status.ToString());
+                        if (listTemp != null)
                         {
                             p.price_status_str = listTemp.parameterName;
+                        }
+                        if (listTemp2 != null)
+                        {
+                            p.product_status_str = listTemp2.parameterName;
                         }
                     }
                    

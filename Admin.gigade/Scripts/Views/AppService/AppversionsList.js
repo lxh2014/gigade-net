@@ -45,9 +45,16 @@ var AppVersionsStore = Ext.create('Ext.data.Store', {
 });
 //數據源加載前事件
 AppVersionsStore.on('beforeload', function () {
+    AppVersionsStore.removeAll();
+    //驗證查詢條件
+    var cmbdrivervalue = Ext.getCmp('cmbdriver').getValue();
+    if (cmbdrivervalue == null) {
+        Ext.Msg.alert(INFORMATION, SEARCHNULLTEXT);
+        return false;
+    }
     Ext.apply(AppVersionsStore.proxy.extraParams,
         {
-            cmbdriver: Ext.getCmp('cmbdriver').getValue(),
+            cmbdriver: cmbdrivervalue
         });
 });
 //創建多選
@@ -61,9 +68,15 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
 //查詢事件
 function Query(x) {
     AppVersionsStore.removeAll();
+    //驗證查詢條件
+    var cmbdrivervalue = Ext.getCmp('cmbdriver').getValue();
+    if (cmbdrivervalue == null) {
+        Ext.Msg.alert(INFORMATION, SEARCHNULLTEXT);
+        return false;
+    }
     Ext.getCmp("AppVersionsList").store.loadPage(1, {
         params: {
-            cmbdriver: Ext.getCmp('cmbdriver').getValue(),
+            cmbdriver: cmbdrivervalue
         }
     });
 }
@@ -83,22 +96,27 @@ var SelectDriver = Ext.create('Ext.form.ComboBox', {
     store: driverModel,
     id: "cmbdriver",
     queryMode: 'local',
-    margin: "0 5 0 5",
+    margin: "0 5 0 0",
     displayField: 'drivername',
     valueField: 'drivervalue',
     triggerAction: 'all',
-    queryMode: 'local',
     selectOnFocus: true,
     forceSelection: true,
     editable: true,
     emptyText: SHULDCHECK + DRIVERTEXT,
     blankText: SHULDCHECK + DRIVERTEXT,
     labelWidth: 35,
-    width: 150,
+    width: 150
 });
 
 
 Ext.onReady(function () {
+    //回撤鍵查詢
+    document.body.onkeydown = function () {
+        if (event.keyCode == 13) {
+            $("#btnQuery").click();
+        }
+    };
     //建立列表
     var GShow = Ext.create('Ext.grid.Panel', {
         id: 'AppVersionsList',
@@ -110,9 +128,9 @@ Ext.onReady(function () {
         columns: [
             { header: RID, dataIndex: 'id', width: 100, align: 'center', hidden: true, menuDisabled: true, sortable: false },
             { text: XID, xtype: 'rownumberer', width: 40, align: 'center', menuDisabled: true, sortable: false },
-            { header: VERSIONS_ID, dataIndex: 'versions_id', width: 150, align: 'center', menuDisabled: true, sortable: false },
+            { header: VERSIONS_ID, dataIndex: 'versions_id', width: 100, align: 'center', menuDisabled: true, sortable: false },
             { header: VERSIONS_CODE, dataIndex: 'versions_code', width: 100, align: 'center', menuDisabled: true, sortable: false },
-            { header: VERSIONS_NAME, dataIndex: 'versions_name', width: 100, align: 'center', menuDisabled: true, sortable: false },
+            { header: VERSIONS_NAME, dataIndex: 'versions_name', width: 200, align: 'center', menuDisabled: true, sortable: false },
             { header: VERSIONS_DESC, dataIndex: 'versions_desc', width: 200, align: 'center', menuDisabled: true, sortable: false },
             {
                 header: DRIVERTEXT, dataIndex: 'drive', width: 100, align: 'center', menuDisabled: true, sortable: false,
@@ -125,8 +143,36 @@ Ext.onReady(function () {
                     }
                 }
             },
-            { header: RELEASE_DATE, dataIndex: 'releasedateQuery', width: 100, align: 'center', menuDisabled: true, sortable: false }
+            {
+                header: RELEASE_DATE, dataIndex: 'releasedateQuery', width: 100, align: 'center', menuDisabled: true, sortable: false,
+                renderer: function (val) { return val == '1970-01-01' ? "" : val; }
+            }
         ],
+        dockedItems: [{
+            dock: 'top',
+            xtype: 'toolbar',
+            items: [
+                SelectDriver,
+                 {
+                     xtype: 'button',
+                     text: SEARCHBTN,
+                     iconCls: 'ui-icon ui-icon-search-2',
+                     id: 'btnQuery',
+                     handler: Query
+                 },
+                 {
+                     xtype: 'button',
+                     text: REPEATBTN,
+                     id: 'btn_reset',
+                     iconCls: 'ui-icon ui-icon-reset',
+                     listeners: {
+                         click: function () {
+                             Ext.getCmp("cmbdriver").reset();
+                         }
+                     }
+                 }
+            ]
+        }],
         tbar: [
             {
                 xtype: 'button',
@@ -144,27 +190,7 @@ Ext.onReady(function () {
                 iconCls: 'ui-icon ui-icon-user-delete',
                 xtype: 'button',
                 handler: btnDelete
-            },
-            '->',
-                SelectDriver,
-           {
-               xtype: 'button',
-               text: SEARCHBTN,
-               iconCls: 'icon-search',
-               id: 'btnQuery',
-               handler: Query
-           },
-          {
-              xtype: 'button',
-              text: REPEATBTN,
-              id: 'btn_reset',
-              iconCls: 'ui-icon ui-icon-reset',
-              listeners: {
-                  click: function () {
-                      Ext.getCmp("cmbdriver").reset();
-                  }
-              }
-          }
+            }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: AppVersionsStore,

@@ -1,4 +1,18 @@
-﻿var CallidForm;
+﻿/// <reference path="AppMessageList.js" />
+/*
+* 文件名稱 :AppMessageList.js
+* 文件功能描述 :訊息公告列表JS
+* 版權宣告 :
+* 開發人員 : 白明威
+* 版本資訊 : 1.0
+* 日期 : 2015.8.27
+* 修改人員 :
+* 版本資訊 : 
+* 日期 : 
+* 修改備註 : 
+*/
+
+var CallidForm;
 var pageSize = 25;
 /**********************************************************************站臺管理主頁面**************************************************************************************/
 //站臺管理Model
@@ -24,6 +38,7 @@ Ext.define('gigade.AppMessage', {
 var AppMessageStore = Ext.create('Ext.data.Store', {
     autoDestroy: true,
     pageSize: pageSize,
+    autoLoad: false,
     model: 'gigade.AppMessage',
     proxy: {
         type: 'ajax',
@@ -56,20 +71,30 @@ var FitOsStore = Ext.create('Ext.data.Store', {
 var DisplayTypeStore = Ext.create('Ext.data.Store', {
     fields: ['parameterCode', 'parameterName'],
     data: [
-         { parameterCode: '0', parameterName: '否' },
-         { parameterCode: '1', parameterName: '是' },
+         { parameterCode: '0', parameterName: NO },//否
+         { parameterCode: '1', parameterName: YES },//是
     ]
 });
 //進行分頁查詢的時候附帶上查詢條件
 AppMessageStore.on("beforeload", function () {
+    var timestartvalue = Ext.getCmp('msg_start_first').getValue();
+    var timestartendvalue = Ext.getCmp('msg_start_second').getValue();
+    var timeendstartvalue = Ext.getCmp('msg_end_first').getValue();
+    var timeendendvalue = Ext.getCmp('msg_end_second').getValue();
+    AppMessageStore.removeAll();
+    if (timestartvalue == null && timestartendvalue == null && timeendstartvalue == null && timeendendvalue == null) {
+        Ext.Msg.alert(INFORMATION, SEARCHNULLTEXT);
+        return false;
+    }
     Ext.apply(AppMessageStore.proxy.extraParams, {
-        msg_start: Ext.getCmp('msg_start') ? Ext.getCmp('msg_start').getValue() : '',
-        msg_end: Ext.getCmp('msg_end') ? Ext.getCmp('msg_end').getValue() : '',
+        msg_start_first: timestartvalue,
+        msg_start_second: timestartendvalue,
+        msg_end_first: timeendstartvalue,
+        msg_end_second: timeendendvalue
     });
 });
-
+//查詢數據
 function Query(x) {
-    AppMessageStore.removeAll();
     Ext.getCmp("AppMessageList").store.loadPage(1, {
         params: {
 
@@ -78,6 +103,11 @@ function Query(x) {
 }
 
 Ext.onReady(function () {
+    document.body.onkeydown = function () {
+        if (event.keyCode == 13) {
+            $("#btnQuery").click();
+        }
+    };
     var AppMessageList = Ext.create('Ext.grid.Panel', {
         id: 'AppMessageList',
         store: AppMessageStore,
@@ -86,73 +116,108 @@ Ext.onReady(function () {
         frame: true,
         columns: [
             { header: "", xtype: 'rownumberer', width: 38, align: 'center', sortable: false, menuDisabled: true },
-            { header: "序號", dataIndex: 'message_id', width: 40, align: 'center', sortable: false, menuDisabled: true },
-            { header: "標題", dataIndex: 'title', width: 120, align: 'center', sortable: false, menuDisabled: true },
-            { header: "內容", dataIndex: 'content', width: 200, align: 'center', sortable: false, menuDisabled: true },
-            { header: "URL", dataIndex: 'linkurl', width: 100, align: 'center', sortable: false, menuDisabled: true },
-            { header: "開始時間", dataIndex: 'msg_start_time', width: 140, align: 'center', sortable: false, menuDisabled: true },
-            { header: "結束時間", dataIndex: 'msg_end_time', width: 140, align: 'center', sortable: false, menuDisabled: true },
-            { header: "稱謂", dataIndex: 'appellation', width: 100, align: 'center', sortable: false, menuDisabled: true },
-            { header: "適用平臺", dataIndex: 'fit_os', width: 100, align: 'center', sortable: false, menuDisabled: true },
-            { header: "新增日期", dataIndex: 'messagedate_time', width: 140, align: 'center', sortable: false, menuDisabled: true },
+            { header: MESSAGE_ID, dataIndex: 'message_id', width: 40, align: 'center', sortable: false, menuDisabled: true },//序號
+            { header: TITLE, dataIndex: 'title', width: 120, align: 'center', sortable: false, menuDisabled: true },//標題
+            { header: CONTENT, dataIndex: 'content', width: 200, align: 'center', sortable: false, menuDisabled: true },//內容
+            { header: LINKURL, dataIndex: 'linkurl', width: 100, align: 'center', sortable: false, menuDisabled: true },//URL
+            { header: MSG_START_TIME, dataIndex: 'msg_start_time', width: 140, align: 'center', sortable: false, menuDisabled: true },//開始時間
+            { header: MSG_END_TIME, dataIndex: 'msg_end_time', width: 140, align: 'center', sortable: false, menuDisabled: true },//結束時間
+            { header: APPELLATION, dataIndex: 'appellation', width: 100, align: 'center', sortable: false, menuDisabled: true },//稱謂
+            { header: FIT_OS, dataIndex: 'fit_os', width: 100, align: 'center', sortable: false, menuDisabled: true },//適用平臺
+            { header: MESSAGEDATE_TIME, dataIndex: 'messagedate_time', width: 140, align: 'center', sortable: false, menuDisabled: true },//新增日期
         ],
+        dockedItems: [{
+            dock: 'top',
+            xtype: 'toolbar',
+            items: [
+                 {
+                     xtype: 'datefield',
+                     format: 'Y-m-d',
+                     id: 'msg_start_first',
+                     fieldLabel: MSG_START_TIME,//開始時間
+                     labelWidth: 60,
+                     width: 200,
+                     editable: false,
+                     listeners: {
+                         change: function () {
+                             Ext.getCmp("msg_start_second").setMinValue(this.getValue());
+                             Ext.getCmp("msg_end_first").setMinValue(this.getValue());
+                             Ext.getCmp("msg_end_second").setMinValue(this.getValue());
+                         }
+                     }
+                 }, {
+                     xtype: 'displayfield',
+                     value: '~ ',
+                     id: 'blp_start',
+                     disabled: true,
+                     margin: '0 5 0 5'
+                 }, {
+                     xtype: 'datefield',
+                     format: 'Y-m-d',
+                     id: 'msg_start_second',
+                     labelWidth: 60,
+                     editable: false,
+                     listeners: {
+                         change: function () {
+                             Ext.getCmp("msg_start_first").setMaxValue(this.getValue());
+                         }
+                     }
+                 }, {
+                     xtype: 'datefield',
+                     format: 'Y-m-d',
+                     id: 'msg_end_first',
+                     fieldLabel: MSG_END_TIME,
+                     labelWidth: 60,
+                     width: 200,
+                     editable: false,
+                     listeners: {
+                         change: function () {
+                             Ext.getCmp("msg_end_second").setMinValue(this.getValue());
+                         }
+                     }
+                 }, {
+                     xtype: 'displayfield',
+                     value: '~ ',
+                     id: 'blp_end',
+                     disabled: true,
+                     margin: '0 5 0 5'
+                 }, {
+                     xtype: 'datefield',
+                     format: 'Y-m-d',
+                     id: 'msg_end_second',
+                     labelWidth: 60,
+                     editable: false,
+                     listeners: {
+                         change: function () {
+                             Ext.getCmp("msg_start_first").setMaxValue(this.getValue());
+                             Ext.getCmp("msg_start_second").setMaxValue(this.getValue());
+                             Ext.getCmp("msg_end_first").setMaxValue(this.getValue());
+                         }
+                     }
+                 }, {
+                     xtype: 'button',
+                     text: QUERY,//查詢
+                     iconCls: 'icon-search',
+                     id: 'btnQuery',
+                     handler: Query
+                 }, {
+                     xtype: 'button',
+                     text: RESET,//重置
+                     iconCls: 'ui-icon ui-icon-reset',
+                     id: 'btn_reset',
+                     listeners: {
+                         click: function () {
+                             Ext.getCmp('msg_start_first').reset();
+                             Ext.getCmp('msg_start_second').reset();
+                             Ext.getCmp('msg_end_first').reset();
+                             Ext.getCmp('msg_end_second').reset();
+                         }
+                     }
+                 }
+            ]
+        }],
         tbar: [
-            { xtype: 'button', id: 'add', text: '新增', iconCls: 'ui-icon ui-icon-user-add', handler: onAddClick },
-           '->', {
-               xtype: 'datetimefield',
-               format: 'Y-m-d H:i:s',
-               id: 'msg_start',
-               fieldLabel: '開始時間',
-               labelWidth: 60,
-               editable: false,
-               listeners: {
-                   change: function () {
-                       var select_msg_end = Ext.getCmp('msg_end').getValue()
-                       if (select_msg_end != null && this.getValue() > select_msg_end) {
-                           Ext.Msg.alert(INFORMATION, '開始時間不能小於結束時間');
-                           console.log(select_msg_end);
-                           console.log(this.getValue());
-                       }
-                   }
-               }
-           }, {
-               xtype: 'displayfield',
-               value: '~ ',
-               id: 'blp',
-               disabled: true,
-               margin: '0 5 0 5'
-           }, {
-               xtype: 'datetimefield',
-               format: 'Y-m-d H:i:s',
-               id: 'msg_end',
-               fieldLabel: '結束時間',
-               labelWidth: 60,
-               editable: false,
-               listeners: {
-                   change: function () {
-                       var select_msg_start = Ext.getCmp('msg_start').getValue()
-                       if (select_msg_start != null && this.getValue() < select_msg_start) {
-                           Ext.Msg.alert(INFORMATION, '結束時間不能大於開始時間');
-                       }
-                   }
-               }
-           }, {
-               xtype: 'button',
-               text: '查詢',
-               iconCls: 'icon-search',
-               id: 'btnQuery',
-               handler: Query
-           }, {
-               xtype: 'button',
-               text: '重置',
-               id: 'btn_reset',
-               listeners: {
-                   click: function () {
-                       Ext.getCmp('msg_start').reset();
-                       Ext.getCmp('msg_end').reset();
-                   }
-               }
-           }
+            { xtype: 'button', id: 'add', text: INSERT, iconCls: 'ui-icon ui-icon-user-add', handler: onAddClick },//新增
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: AppMessageStore,
@@ -184,147 +249,10 @@ Ext.onReady(function () {
         }
     });
     ToolAuthority();
-    AppMessageStore.load({ params: { start: 0, limit: 25 } });
+    //AppMessageStore.load({ params: { start: 0, limit: 25 } });
 });
 function onAddClick() {
     pcFrm.getForm().reset();
     addPc.show();
     Ext.getCmp('new_display_type').setValue(1);
-}
-var pcFrm = Ext.create('Ext.form.Panel', {
-    id: 'pcFrm',
-    layout: 'anchor',
-    frame: true,
-    plain: true,
-    border: false,
-    bodyStyle: "padding: 12px 12px 6px 12px;",
-    url: '/AppService/AppMessageInsert',
-    items: [{
-        xtype: 'textfield',
-        id: 'new_title',
-        fieldLabel: '標題',
-        width: 300,
-        allowBlank: false
-    }, {
-        xtype: 'textfield',
-        id: 'new_linkurl',
-        fieldLabel: 'URL',
-        width: 300,
-        vtype: 'url'
-    }, {
-        xtype: 'textarea',
-        id: 'new_content',
-        fieldLabel: '內容',
-        margin: '0 0 20 0',
-        height: 60,
-        width: 300,
-        allowBlank: false
-    }, {
-        xtype: 'datetimefield',
-        format: 'Y-m-d H:i:s',
-        id: 'new_msg_start',
-        fieldLabel: '開始時間',
-        width: 300,
-        allowBlank: false,
-        editable: false
-    }, {
-        xtype: 'datetimefield',
-        format: 'Y-m-d H:i:s',
-        id: 'new_msg_end',
-        fieldLabel: '結束時間',
-        width: 300,
-        allowBlank: false,
-        editable: false
-    }, {
-        xtype: 'combobox',
-        id: 'new_fit_os',
-        store: FitOsStore,
-        fieldLabel: '適用平台',
-        displayField: 'parameterName',
-        width: 300,
-        queryMode: 'local',
-        allowBlank: false
-    }, {
-        xtype: 'combobox',
-        id: 'new_display_type',
-        store: DisplayTypeStore,
-        displayField: 'parameterName',
-        valueField: 'parameterCode',
-        fieldLabel: '顯示類別',
-        width: 300,
-        editable: false,
-        //disabled: true,
-        //hidden: true
-    }, {
-        xtype: 'textfield',
-        id: 'new_appellation',
-        width: 300,
-        fieldLabel: '稱謂',
-        allowBlank: false
-    }],
-    buttons: [{
-        text: '保存',
-        id: 'btnSave',
-        //formBind: true,
-        handler: function () {
-            var form = this.up('form').getForm();
-            if (Ext.getCmp('new_msg_start').getValue() > Ext.getCmp('new_msg_end').getValue()) {
-                Ext.Msg.alert("提示信息", "開始時間不能小於結束時間！");
-                return;
-            }
-            if (form.isValid()) {
-                form.submit({
-                    params: getParams(),
-                    success: function (form, action) {
-                        var result = Ext.decode(action.response.responseText);
-                        if (result.success) {
-                            addPc.hide();
-                            pcFrm.getForm().reset();
-                            AppMessageStore.load();
-                            //FitOsStore.load();
-                            Ext.Msg.alert(INFORMATION, '新增數據成功');
-                        }
-                    },
-                    failure: function () {
-                        Ext.Msg.alert(INFORMATION, '新增數據失敗');
-                    }
-                });
-            }
-        }
-    }]
-})
-var addPc = Ext.create('Ext.window.Window', {
-    title: '添加記錄',
-    id: 'addPc',
-    width: 360,
-    height: 400,
-    iconCls: 'ui-icon ui-icon-add',
-    plain: true,
-    border: false,
-    modal: true,
-    resizable: false,
-    draggable: true,
-    hidden: true,
-    bodyStyle: "padding: 10px 10px 7px 10px;",
-    layout: 'fit',
-    items: [pcFrm],
-    closable: false,
-    tools: [{
-        type: 'close',
-        handler: function (event, toolEl, panel) {
-            addPc.hide();
-        }
-    }]
-})
-function getParams() {
-    var params = new Object();
-    params.title = Ext.getCmp('new_title').getValue();
-    params.content = Ext.getCmp('new_content').getValue();
-    params.linkurl = Ext.getCmp('new_linkurl').getValue();
-    params.msg_start = Ext.getCmp('new_msg_start').getValue();
-    params.msg_end = Ext.getCmp('new_msg_end').getValue();
-    params.appellation = Ext.getCmp('new_appellation').getValue();
-    params.fit_os = Ext.getCmp('new_fit_os').getValue();
-    params.display_type = Ext.getCmp('new_display_type').getValue();
-    return params;
 }

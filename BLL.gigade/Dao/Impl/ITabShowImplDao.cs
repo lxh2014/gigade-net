@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using BLL.gigade.Model;
@@ -27,5 +28,6 @@ namespace BLL.gigade.Dao.Impl
         List<LogisticsDetailQuery> GetLogistics(LogisticsDetailQuery store, out int totalCount);
         List<OrderReturnContentQuery> GetOrderReturnContentQueryUp(OrderReturnContentQuery store, out int totalCount);
         List<OrderReturnMasterQuery> GetReturnMasterDown(OrderReturnMasterQuery store, out int totalCount);
+        DataTable GetOderHitrustDT(int order_id);
     }
 }

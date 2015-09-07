@@ -36,9 +36,9 @@ namespace BLL.gigade.Mgr
         private HappyGoMgr _happyGoMgr;
         //Se_serialDao
         private MySqlDao _mysqlDao;
-      private  SerialDao _serialDao;
-      private OrderReturnStatusDao _orsDao;
-    
+        private SerialDao _serialDao;
+        private OrderReturnStatusDao _orsDao;
+
         private string conn;
         public OrderMasterMgr(string connectionStr)
         {
@@ -237,15 +237,10 @@ namespace BLL.gigade.Mgr
                             if (DtTemp.Rows.Count > 0)
                             {
                                 if (string.IsNullOrEmpty(DtTemp.Rows[0]["account_collection_time"].ToString()) ||
-                                    (string.IsNullOrEmpty(DtTemp.Rows[0]["account_collection_money"].ToString()) && DtTemp.Rows[0]["account_collection_money"] != "0") ||
-                                   (string.IsNullOrEmpty(DtTemp.Rows[0]["poundage"].ToString()) && DtTemp.Rows[0]["poundage"] != "0") ||
-                                   string.IsNullOrEmpty(DtTemp.Rows[0]["return_collection_time"].ToString()) ||
-                                       (string.IsNullOrEmpty(DtTemp.Rows[0]["return_collection_money"].ToString()) && DtTemp.Rows[0]["return_collection_money"] != "0") ||
-                                       (string.IsNullOrEmpty(DtTemp.Rows[0]["return_poundage"].ToString()) && DtTemp.Rows[0]["return_poundage"] != "0")
-                                       || string.IsNullOrEmpty(DtTemp.Rows[0]["remark"].ToString()))
+                                   string.IsNullOrEmpty(DtTemp.Rows[0]["return_collection_time"].ToString()))
                                 {
                                     arryList.Add(_orderMasterDao.UpdateOac(DtTemp, item));
-            }
+                                }
                             }
                             else
                             {
@@ -327,7 +322,7 @@ namespace BLL.gigade.Mgr
                         if (alist != null)
                         {
                             item["remark"] = alist.remark.ToString();
-            }
+                        }
                         switch (item["item_mode"].ToString())
                         {
                             case "0":
@@ -607,7 +602,7 @@ om.export_flag=1,");
                     if (omModel.Order_Amount < order.deduct_card_bonus)
                     {
                         return false;
-                }
+                    }
                     sbSql.AppendFormat(",om.deduct_card_bonus={0},", order.deduct_card_bonus);
                     sbSql.AppendFormat("om.order_amount={0}", omModel.Order_Amount - order.deduct_card_bonus);
                 }
@@ -669,48 +664,48 @@ om.export_flag=1,");
                     }
                     #endregion
                     #region hg點
-                        if (omModel.Accumulated_Happygo > 0)
+                    if (omModel.Accumulated_Happygo > 0)
+                    {
+                        if (_happyGoMgr.GetHGDeductList(omModel.Order_Id).Count > 0)
                         {
-                            if (_happyGoMgr.GetHGDeductList(omModel.Order_Id).Count > 0)
-                            {
-                                //有則進行點數累積，無則發信通知
-                            }
-                            else
-                            {
-                                MailHelper mailHelper = new MailHelper();
-                                string MailTitle = "HG累點失敗";
-                                string MailBody = string.Format("{0}無HG資料，無法累點。", omModel.Order_Id);
-                                mailHelper.SendToGroup("BonusFailure", MailTitle, MailBody);
-                            }
-
+                            //有則進行點數累積，無則發信通知
                         }
-                    #endregion
+                        else
+                        {
+                            MailHelper mailHelper = new MailHelper();
+                            string MailTitle = "HG累點失敗";
+                            string MailBody = string.Format("{0}無HG資料，無法累點。", omModel.Order_Id);
+                            mailHelper.SendToGroup("BonusFailure", MailTitle, MailBody);
+                        }
+
                     }
+                    #endregion
+                }
                 #endregion
-                    //更新條件
-                    StringBuilder sql = new StringBuilder();
+                //更新條件
+                StringBuilder sql = new StringBuilder();
                 sql.Append(@"update order_master om,order_slave os,order_detail od
 set ");
-                    sql.Append(sbSql);
-                    sql.AppendFormat(@" where om.order_id={0}  AND om.order_id = os.order_id
+                sql.Append(sbSql);
+                sql.AppendFormat(@" where om.order_id={0}  AND om.order_id = os.order_id
  AND os.slave_id = od.slave_id ", order.order_id);
-                    try
-                    {
+                try
+                {
                     _orderMasterDao.UpdateOrderMaster(sql.ToString());
-                        return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception("OrderMasterMgr-->ModifyOrderMsaterForDeliver-->" + ex.Message, ex);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("OrderMasterMgr-->ModifyOrderMsaterForDeliver-->" + ex.Message, ex);
 
-                    }
+                }
             }
             catch (Exception ex)
             {
-                
+
                 throw new Exception("OrderMasterMgr-->ModifyOrderMsaterForDeliver-->" + ex.Message, ex);
             }
-            
+
         }
 
         public void AddBonusRecord(OrderModifyModel model)
@@ -730,24 +725,24 @@ set ");
             {
                 if (model.bonus_num > 0)
                 {
-                BonusRecord bonusRecord = new BonusRecord();
-                int decuteBonusNum = bonus.master_balance > model.bonus_num ? model.bonus_num : bonus.master_balance;
-                Serial ser = _serialDao.GetSerialById(28);
+                    BonusRecord bonusRecord = new BonusRecord();
+                    int decuteBonusNum = bonus.master_balance > model.bonus_num ? model.bonus_num : bonus.master_balance;
+                    Serial ser = _serialDao.GetSerialById(28);
                     ser.Serial_Value = ser.Serial_Value + 1;
-                _serialDao.Update(ser);
-                bonusRecord.record_id = Convert.ToUInt32(ser.Serial_Value);
-                bonusRecord.master_id = bonus.master_id;
-                bonusRecord.type_id = bonus.type_id;
-                bonusRecord.order_id = Convert.ToUInt32(model.order_id);
-                bonusRecord.record_use = Convert.ToUInt32(decuteBonusNum);
-                bonusRecord.record_note = model.record_note;
-                bonusRecord.record_writer = model.record_writer;
+                    _serialDao.Update(ser);
+                    bonusRecord.record_id = Convert.ToUInt32(ser.Serial_Value);
+                    bonusRecord.master_id = bonus.master_id;
+                    bonusRecord.type_id = bonus.type_id;
+                    bonusRecord.order_id = Convert.ToUInt32(model.order_id);
+                    bonusRecord.record_use = Convert.ToUInt32(decuteBonusNum);
+                    bonusRecord.record_note = model.record_note;
+                    bonusRecord.record_writer = model.record_writer;
                     bonusRecord.record_ipfrom = model.ip_from;
-                bonusMasterDao.InsertIntoBonusRecord(bonusRecord);
-                bonus.master_balance = bonus.master_balance - decuteBonusNum;//減去扣除的購物金
-                bonusMasterDao.UpdateBonusMasterMasterBalance(bonus);
-                model.bonus_num -= decuteBonusNum;//更新
-            }
+                    bonusMasterDao.InsertIntoBonusRecord(bonusRecord);
+                    bonus.master_balance = bonus.master_balance - decuteBonusNum;//減去扣除的購物金
+                    bonusMasterDao.UpdateBonusMasterMasterBalance(bonus);
+                    model.bonus_num -= decuteBonusNum;//更新
+                }
                 else
                 {
                     return;
@@ -796,82 +791,135 @@ set ");
                 throw new Exception("OrderMasterMgr-->IsExistOrderId-->" + ex.Message, ex);
             }
         }
-
+        public string UpFirstTime(OrderMasterQuery query)
+        {
+            try
+            {
+                DataTable _dt = _orderMasterDao.IsFirstTime(query);
+                if (_dt != null && _dt.Rows.Count > 0)
+                {
+                    return _orderMasterDao.UpFirstTime(query);
+                }
+                else
+                {
+                    return "";
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->UpFirstTime-->" + ex.Message, ex);
+            }
+        }
         public string ChangePayMent(OrderMasterQuery query)
         {
             string json = string.Empty;
             ArrayList arrList = new ArrayList();
-            OrderSlaveQuery slaveQuery = new OrderSlaveQuery();
-            OrderDetailQuery detailQuery = new OrderDetailQuery();
             OrderMasterStatusQuery omsQuery = new OrderMasterStatusQuery();
             OrderShowMasterQuery osmQuery = new OrderShowMasterQuery();
+            osmQuery = _orderMasterDao.GetData(query.Order_Id);
             try
             {
-                DataTable _dt = _orderMasterDao.GetInfo(query);
-                if (_dt != null && _dt.Rows.Count > 0)
+                if (query.payment == "T_CAT")
                 {
-                    slaveQuery.Slave_Id = Convert.ToUInt32(_dt.Rows[0]["slave_id"] );
-                    detailQuery.Detail_Id = Convert.ToUInt32(_dt.Rows[0]["detail_id"]);
-                    osmQuery = _orderMasterDao.GetData(query.Order_Id);
-                    if (query.payment == "T_CAT")
+                    query.Order_Payment = 8;
+                    query.Order_Date_Pay = (uint)CommonFunction.GetPHPTime();
+                    query.status_description = query.username + "轉黑貓貨到付款";
+                    query.Delivery_Store = (uint)query.delivery;
+                    #region modify_order_status
+                    arrList.Add(_orderMasterDao.ModifyOrderStatus(query));
+                    omsQuery.serial_id = Convert.ToUInt64(_orderMasterDao.GetNextSerial(new Serial { Serial_id = 29 }).Rows[0][0]);
+                    omsQuery.order_id = query.Order_Id;
+                    omsQuery.status_description = query.status_description;
+                    omsQuery.order_status = 2;
+                    omsQuery.status_ipfrom = query.Order_Ipfrom;
+                    query.user_id = osmQuery.user_id;
+                    arrList.Add(_orderMasterDao.OMSRecord(omsQuery));
+                    DataTable _dt = _orderMasterDao.IsFirstTime(query);
+                    if (_dt != null && _dt.Rows.Count > 0)
                     {
-                        int t_cat_amount = 0;
-                        query.status_description =  query.username+ "轉黑貓貨到付款";//todo user_name
-                         arrList= ModifyOrderStatus(query, slaveQuery, detailQuery, omsQuery);
-                        //加30運費
-                        if (osmQuery.order_freight_normal != 0)
-                        {
-                            query.Order_Freight_Normal = osmQuery.order_freight_normal += 30;
-                            t_cat_amount += 30;
-                        }
-                        if (osmQuery.order_freight_low != 0)
-                        {
-                            query.Order_Freight_Low = osmQuery.order_freight_low += 30;
-                            t_cat_amount += 30;
-                        }
-                        if (t_cat_amount != 0)
-                        {
-                            query.Order_Amount = osmQuery.order_amount +=(uint)t_cat_amount;
-                        }
+                        arrList.Add(_orderMasterDao.UpFirstTime(query));
                     }
-                    if (query.delivery == 12)
+                    #endregion
+                    //加30運費
+                    if (osmQuery.order_freight_normal != 0)
                     {
-                        arrList.Add(_orderMasterDao.UpDeliveryMaster(query.Order_Id));
-                        query.Order_Amount=osmQuery.order_amount-(osmQuery.order_freight_normal+osmQuery.order_freight_low);
+                        query.Order_Freight_Normal = osmQuery.order_freight_normal += 30;
+                        query.t_cat_amount += 30;
+                    }
+                    if (osmQuery.order_freight_low != 0)
+                    {
+                        query.Order_Freight_Low = osmQuery.order_freight_low += 30;
+                        query.t_cat_amount += 30;
+                    }
+                    if (query.t_cat_amount != 0)
+                    {
+                        query.Order_Amount = osmQuery.order_amount += query.t_cat_amount;
+                    }
+                }
+                if (query.delivery == 12)
+                {
+                    if (osmQuery.order_status == 0)
+                    {
+                        query.Order_Amount = osmQuery.order_amount - (osmQuery.order_freight_normal + osmQuery.order_freight_low);
                         query.Order_Freight_Normal = 0;
                         query.Order_Freight_Low = 0;
                         query.Order_Payment = 9;
-                        query.Order_Date_Pay =(uint)CommonFunction.GetPHPTime();
+                        query.Order_Date_Pay = (uint)CommonFunction.GetPHPTime();
                         query.status_description = query.username + "轉自取，現金";
-                        arrList = ModifyOrderStatus(query, slaveQuery, detailQuery, omsQuery);
+                        #region modify_order_status
+                        arrList.Add(_orderMasterDao.ModifyOrderStatus(query));
+                        omsQuery.serial_id = Convert.ToUInt64(_orderMasterDao.GetNextSerial(new Serial { Serial_id = 29 }).Rows[0][0]);
+                        omsQuery.order_id = query.Order_Id;
+                        omsQuery.status_description = query.status_description;
+                        omsQuery.order_status = 2;
+                        omsQuery.status_ipfrom = query.Order_Ipfrom;
+                        arrList.Add(_orderMasterDao.OMSRecord(omsQuery));
+                        query.user_id = osmQuery.user_id;
+                        DataTable _dt = _orderMasterDao.IsFirstTime(query);
+                        if (_dt != null && _dt.Rows.Count > 0)
+                        {
+                            arrList.Add(_orderMasterDao.UpFirstTime(query));
+                        }
+                        #endregion
                         int master_total = osmQuery.accumulated_bonus;
                         if (master_total > 0)
                         {
                             BonusMaster bm = new BonusMaster();
                             bm.master_start = (uint)CommonFunction.GetPHPTime();
                             bm.master_end = bm.master_start + (86400 * 90);
-                            bm.master_note = "";
+                            bm.master_note = query.Order_Id.ToString();
                             bm.master_writer = "Writer : 轉自取發放購物金";
                             bm.type_id = 30;
                             bm.master_total = (uint)master_total;
+                            bm.master_balance = master_total;
+                            bm.user_id = osmQuery.user_id;
+                            bm.master_createdate = (uint)CommonFunction.GetPHPTime();
+                            bm.master_updatedate = bm.master_createdate;
+                            bm.master_ipfrom = query.Order_Ipfrom;
                             _orsDao.Bonus_Master_Add(bm);
                         }
-                        else
-                        {
-                            omsQuery.serial_id = Convert.ToUInt64(_orderMasterDao.GetNextSerial(new Serial { Serial_id = 29 }));
-                            arrList.Add(_orderMasterDao.OMSRecord(omsQuery));
-                        }
-                    }
-                    //更新order_master
-                    arrList.Add(_orderMasterDao.UpDeliveryStore(query));
-                    if (_mysqlDao.ExcuteSqlsThrowException(arrList))
-                    {
-                        json = "{success:true}";
                     }
                     else
                     {
-                        json = "{success:false}";
+                        DataTable _serDt = _orderMasterDao.GetNextSerial(new Serial { Serial_id = 29 });
+                        omsQuery.serial_id = Convert.ToUInt64(_serDt.Rows[0][0]);
+                        omsQuery.order_id = query.Order_Id;
+                        omsQuery.status_description = query.username + "轉自取";
+                        omsQuery.order_status = osmQuery.order_status;
+                        omsQuery.status_ipfrom = query.Order_Ipfrom;
+                        arrList.Add(_orderMasterDao.OMSRecord(omsQuery));
                     }
+                    arrList.Add(_orderMasterDao.UpDeliveryMaster(query.Order_Id, query.Delivery_Store));
+                }
+                //更新order_master
+                arrList.Add(_orderMasterDao.UpdateOrderMaster(query, osmQuery));
+                if (_mysqlDao.ExcuteSqlsThrowException(arrList))
+                {
+                    json = "{success:true}";
+                }
+                else
+                {
+                    json = "{success:false}";
                 }
             }
             catch (Exception ex)
@@ -881,19 +929,16 @@ set ");
             return json;
         }
 
-        public ArrayList ModifyOrderStatus(OrderMasterQuery query,OrderSlaveQuery slaveQuery, OrderDetailQuery detailQuery, OrderMasterStatusQuery omsQuery)
+        public ArrayList ModifyOrderStatus(OrderMasterQuery query, OrderMasterStatusQuery omsQuery)
         {
             ArrayList arrList = new ArrayList();
             try
             {
-                //更新order_master
-                arrList.Add(_orderMasterDao.UpOrderMaster(query));
-                //更新order_slave
-                arrList.Add(_orderMasterDao.UpOrderSlave(slaveQuery));
-                //更新order_detail
-                arrList.Add(_orderMasterDao.UpOrderDetail(detailQuery));
-                //向order_master_status中插入記錄
-                omsQuery.serial_id = Convert.ToUInt64(_orderMasterDao.GetNextSerial(new Serial { Serial_id = 29 }));
+                arrList.Add(_orderMasterDao.ModifyOrderStatus(query));
+                omsQuery.serial_id = Convert.ToUInt64(_orderMasterDao.GetNextSerial(new Serial { Serial_id = 29 }).Rows[0][0]);
+                omsQuery.order_id = query.Order_Id;
+                omsQuery.status_description = query.status_description;
+                omsQuery.order_status = query.Order_Status;
                 arrList.Add(_orderMasterDao.OMSRecord(omsQuery));
                 return arrList;
             }
@@ -901,7 +946,28 @@ set ");
             {
                 throw new Exception("OrderMasterMgr-->ModifyOrderStatus-->" + ex.Message, ex);
             }
-         
+
+        }
+
+        public bool IsVendorDeliver(uint order_id)
+        {
+            //  string json = string.Empty;
+            try
+            {
+                DataTable _dt = _orderMasterDao.IsVendorDeliver(order_id);
+                if (Convert.ToInt32(_dt.Rows[0][0]) == 0)
+                {
+                    return false;
+                }
+                else//是自出，不能轉自取
+                {
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->IsVendorDeliver-->" + ex.Message, ex);
+            }
+        }
     }
-}
 }

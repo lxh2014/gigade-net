@@ -39,5 +39,27 @@ namespace BLL.gigade.Mgr
                 throw new Exception("OrderCancelMasterMgr.Update-->" + ex.Message, ex);
             }
         }
+        public int ReturnAllOrder(OrderMaster om)
+        {
+            try
+            {
+                return _orderCancelMaster.ReturnAllOrder(om);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderCancelMasterMgr.ReturnAllOrder-->" + ex.Message, ex);
+            }
+        }
+        public int returnMsg(OrderMaster om)
+        {
+            try
+            {
+                return _orderCancelMaster.returnMsg(om);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderCancelMasterMgr.returnMsg-->" + ex.Message, ex);
+            }
+        }
     }
 }

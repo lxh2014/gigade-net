@@ -27,7 +27,7 @@ namespace BLL.gigade.Dao.Impl
         string GetLoginId(int vendorid);
         List<BLL.gigade.Model.Query.VendorQuery> Query(BLL.gigade.Model.Query.VendorQuery query, ref int totalCount);
         DataTable GetVendorDetail(string sqlwhere);
-       
+
         List<Vendor> VendorQueryAll(Vendor query);
         List<Vendor> VendorQueryList(Vendor query);
         //int Update(VendorQuery model, string update_log);
@@ -44,6 +44,7 @@ namespace BLL.gigade.Dao.Impl
         string UpdateVendor(Vendor model);
         int GetOffGradeCount(string vendorId);
         int UnGrade(string vendorId,string active);
+        List<Vendor> GetArrayDaysInfo(uint brand_id);
     }
 }
  
