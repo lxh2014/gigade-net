@@ -38,7 +38,7 @@ namespace Admin.gigade.Controllers
         private OrderReturnMasterMgr _orderReturnMaster;
         private IOrderExpectDeliverImplMgr _orderExpectDeliverMgr;
         private OrderBrandProducesMgr _Iorderbrandproduces;
-        private OrderVendorProducesMgr _orderVendorProducesMgr;
+        private OrderVendorProducesMgr _orderVendorProducesMgr; 
         private ZipMgr zMgr;
         private VendorMgr _vendorMgr;
         private OrderMasterMgr _ordermaster;
