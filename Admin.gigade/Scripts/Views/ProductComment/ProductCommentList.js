@@ -293,6 +293,7 @@ Ext.onReady(function () {
                  valueField: 'value',
                  displayField: 'txt',
                  value: '1',
+                 editable:false
              },
             
             //  {
