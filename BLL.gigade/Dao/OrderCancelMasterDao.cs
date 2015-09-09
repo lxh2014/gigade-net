@@ -765,13 +765,16 @@ namespace BLL.gigade.Dao
                     }
                     #region 發放購物金扣除
                     s = _serial.GetSerialById(28);
+                    uint a = 1;
                     if (user)
                     {//發放給顧客的購物金沒有被使用
                         //變更bonus_master表裏面的發放的購物金
                         b.master_balance = deduct_bonus;
                         sqlstr.Append(_bonus.UpBonusMaster(b));
                         //記錄到購物金記錄表中
-                        br.record_id = uint.Parse(s.Serial_Value.ToString());
+                        br.record_id = uint.Parse(s.Serial_Value.ToString())+a;
+                        a++; 
+                        sqlstr.Append(_serial.Update(28));
                         br.master_id = b.master_id;
                         br.type_id = 32;
                         br.order_id =uint.Parse(b.master_note);
@@ -779,7 +782,7 @@ namespace BLL.gigade.Dao
                         br.record_note = "訂單整筆取消";
                         br.record_ipfrom = b.master_ipfrom;
                         sqlstr.Append(_bonus.InsertBonusRecord(br));
-                        sqlstr.Append(_serial.Update(28));
+                       
                         bonus_num = 0;
                     }
                     else
@@ -808,15 +811,16 @@ namespace BLL.gigade.Dao
                                 //變更bonus_master表裏面的發放的購物金
                                 sqlstr.Append(_bonus.UpBonusMaster(b));
                                 //記錄到購物金記錄表中
-                                br.record_id = uint.Parse(s.Serial_Value.ToString());
+                                br.record_id = uint.Parse(s.Serial_Value.ToString())+a;
+                                a++;
+                                sqlstr.Append(_serial.Update(28));   
                                 br.master_id = b.master_id;
                                 br.type_id = 32;
                                 br.order_id = order;
                                 br.record_use = uint.Parse(deduct_bonus.ToString());
                                 br.record_note = "訂單整筆取消";
                                 br.record_ipfrom = b.master_ipfrom;
-                                sqlstr.Append(_bonus.InsertBonusRecord(br));
-                                sqlstr.Append(_serial.Update(28));                                
+                                sqlstr.Append(_bonus.InsertBonusRecord(br));              
                             }
                         }
                         if (bonus_num > 0)

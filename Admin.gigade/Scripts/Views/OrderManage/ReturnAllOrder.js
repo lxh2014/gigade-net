@@ -66,6 +66,8 @@
                         var myMask = new Ext.LoadMask(Ext.getBody(), { msg: 'Loading...' });
                         myMask.show();
                         form.submit({
+                            timeout: 900000,
+                            method: 'post',
                             params: {
                                 return_order: Ext.htmlEncode(Ext.getCmp('return_Order_id').getValue()),
                                 order_note: Ext.htmlEncode(Ext.getCmp('return_note').getValue()),
