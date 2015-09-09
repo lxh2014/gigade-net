@@ -381,7 +381,25 @@ var user_zip_source = Ext.create('Ext.data.Store', {
 	{ user_zip: 290, user_zip_name: "290 釣魚台列嶼" }
     ]
 });
-
+Ext.define('gigade.zipAddress', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: "zipcode", type: "string" },
+        { name: "zipname", type: "string" }
+    ]
+});
+var zipStore = Ext.create('Ext.data.Store', {
+    model: 'gigade.zipAddress',
+    autoLoad: true,
+    proxy: {
+        type: 'ajax',
+        url: "/VipUserGroup/GetZipStore",
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
 //編輯客戶備註
 editOrderNote = function () {
     var editNoteFrm = Ext.create('Ext.form.Panel', {
@@ -472,7 +490,7 @@ editOrderNote = function () {
                 Ext.Ajax.request({
                     url: '/OrderManage/GetData',
                     params: {
-                        order_id: document.getElementById('OrderId').value
+                        order_id: document.getElementById('OrderId').value,
                     },
                     success: function (form, action) {
                         var result = Ext.decode(form.responseText);
@@ -1038,11 +1056,12 @@ modifyDeliverData = function () {
                 xtype: 'displayfield',
                 name: 'd_order_id',
                 id: 'd_order_id',
-                //hidden:true,
+                hidden:true,
             },
                {
                    xtype: 'textfield',
                    fieldLabel: '收貨人姓名',
+                   allowBlank:false,
                    id: 'd_user_name',
                    name: 'd_user_name',
                    width: 300
@@ -1051,6 +1070,7 @@ modifyDeliverData = function () {
                 xtype: 'radiogroup',
                 fieldLabel: '性別',
                 id: 'd_user_gender',
+                allowBlank: false,
                 width: 300,
                 items: [
                     { boxLabel: '先生', id: 'Mr', name: 'dn_user_gender', inputValue: '1', checked: true },
@@ -1060,16 +1080,17 @@ modifyDeliverData = function () {
             },
             {
                 xtype: 'textfield',
-                fieldLabel: '行動電話',
-                id: 'd_user_mobile',
-                name: 'd_user_mobile',
+                fieldLabel: '室內電話',
+                id: 'd_user_phone',
+                name: 'd_user_phone',
                 width: 300
             },
                {
                    xtype: 'textfield',
-                   fieldLabel: '市內電話',
-                   id: 'd_user_phone',
-                   name: 'd_user_phone',
+                   fieldLabel: '手機',
+                   allowBlank: false,
+                   id: 'd_user_mobile',
+                       name: 'd_user_mobile',
                    width: 300
                },
                {
@@ -1078,10 +1099,11 @@ modifyDeliverData = function () {
                    items: [
                       {
                           xtype: 'combobox',
-                          fieldLabel: '地址',
+                          fieldLabel: '收貨地址',
                           queryModel: 'local',
                           id: 'd_zip',
                           store: zipStore,
+                          allowBlank: false,
                           valueField: 'zipcode',
                           editable: false,
                           displayField: 'zipname',
@@ -1090,6 +1112,7 @@ modifyDeliverData = function () {
                       },
                       {
                           xtype: 'textfield',
+                          allowBlank: false,
                           id: 'd_user_address',
                           name: 'd_user_address',
                           // width: 300
@@ -1126,9 +1149,8 @@ modifyDeliverData = function () {
                                     deliverDataWin.destroy();
                                 }
                                 else {
-                                    Ext.Msg.alert("提示信息", "保存成功！");
                                     deliverDataWin.destroy();
-                                    TranToDetial(document.getElementById('OrderId').value);
+                                    window.location.reload(true);
                                 }
 
                             }
@@ -1207,25 +1229,5 @@ modifyDeliverData = function () {
         ]
     });
     deliverDataWin.show();
-}
-
-//訂單內容頁面刷新方法
-function TranToDetial(orderId) {
-    var url = '/OrderManage/OrderDetialList?Order_Id=' + orderId;
-    var panel = window.parent.parent.Ext.getCmp('ContentPanel');
-    var old = panel.down('#detial');
-    var copy = panel.down('#detiallist');
-    if (copy) {
-        copy.close();
-    }
-    copy = panel.add({
-        id: 'detiallist',
-        title: '訂單內容',
-        html: window.top.rtnFrame(url),
-        closable: true
-    });
-    panel.setActiveTab(copy);
-    panel.doLayout();
-    old.close();
 }
 

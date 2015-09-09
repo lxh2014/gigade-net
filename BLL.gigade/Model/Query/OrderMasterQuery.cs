@@ -91,6 +91,8 @@ namespace BLL.gigade.Model.Query
         public int delivery { get; set; }
         public string username { get; set; }
         public uint t_cat_amount { get; set; }
+
+        public bool mdd { get; set; }
         public OrderMasterQuery()
         {
             KeyWords = string.Empty;
@@ -146,6 +148,7 @@ namespace BLL.gigade.Model.Query
             delivery = 0;
             username = string.Empty;
             t_cat_amount = 0;
+            mdd = true;
 
         }
     }

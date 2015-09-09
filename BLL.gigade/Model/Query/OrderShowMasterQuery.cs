@@ -26,6 +26,8 @@ namespace BLL.gigade.Model.Query
         public string Amount { get; set; }
         public string Subtotal { get; set; }
         public bool is_vendor_deliver { get; set; }
+        public bool isSecret { get; set; }
+        public string delivery_address_str { get; set; }
         public  OrderShowMasterQuery()
         {
             OrderDatePay = DateTime.MinValue;
@@ -45,6 +47,8 @@ namespace BLL.gigade.Model.Query
             payment_string = string.Empty;
             deliver_str = string.Empty;
             is_vendor_deliver = false;
+            isSecret = true;
+            delivery_address_str = string.Empty;
         }
     }
 }
