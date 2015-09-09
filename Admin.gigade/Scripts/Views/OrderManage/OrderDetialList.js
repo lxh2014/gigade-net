@@ -1056,6 +1056,7 @@ Ext.onReady(function () {
                         root: 'data'
                     },
                     params: {
+                        isSecret: true,
                         order_id: document.getElementById('OrderId').value
                     },
                     success: function (form, action) {
