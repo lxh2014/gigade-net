@@ -708,7 +708,7 @@ namespace BLL.gigade.Common
                     }  
                 }
                 #endregion
-                bool pdftable_flag = false;
+                document.Add(pdftable);
                 for (int i = 0; i < dtSource.Rows.Count; i++)
                 {
                     for (int j = 0; j < dtSource.Columns.Count; j++)
@@ -737,8 +737,6 @@ namespace BLL.gigade.Common
                     {
                         if ((i + 1) % count == 0 && i != dtSource.Rows.Count - 1 )
                         {
-                            pdftable_flag = true;
-                            document.Add(pdftable);
                             document.Add(table);
                             table.Rows.Clear();
                             document.NewPage();
@@ -765,18 +763,12 @@ namespace BLL.gigade.Common
                         table.AddCell(cell);
                         if ((i + 1) % count == 0 && i != dtSource.Rows.Count-1 && j == cols * rows - 1)
                         {
-                            pdftable_flag = true;
-                            document.Add(pdftable);
                             document.Add(table);
                             table.Rows.Clear();
                             document.NewPage();
                         }
                     }
 
-                }
-                if (!pdftable_flag)
-                {
-                    document.Add(pdftable);
                 }
                 document.Add(table);
                 ////關閉document
