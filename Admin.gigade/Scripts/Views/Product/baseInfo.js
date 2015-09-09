@@ -5,7 +5,7 @@ var PRODUCT_ID, OLD_PRODUCT_ID = '';
 var isChange = false;
 var SAVEPANEL, COURSEPANEL;
 var productInfo;///add by wwei0216w 定義一個productInfo 用來存儲查詢到的商品信息,以便其他代碼調用
-
+//123456git
 //品牌Model
 Ext.define("gigade.Brand", {
     extend: 'Ext.data.Model',
