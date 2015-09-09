@@ -85,7 +85,8 @@
                                         myMask.hide();
                                         Ext.Msg.alert(INFORMATION, SUCCESS);
                                       
-                                        TranToDetial(Ext.htmlEncode(Ext.getCmp('return_Order_id').getValue()));
+                                       // TranToDetial(Ext.htmlEncode(Ext.getCmp('return_Order_id').getValue()));
+                                        window.location.reload(true);
                                         //editWin.close();
                                     }
                                 } else {
