@@ -1025,8 +1025,18 @@ Ext.onReady(function () {
                     margin: '0 0 0 26',
                     width: 400,
                     name: 'delivery_address'
-                }]                      
-            }]            
+                },
+                ]
+            },
+               {
+                   xtype: 'button',
+                   id: 'change_info',
+                   text: '更改收貨人資訊',
+                   margin: '0 0 0 0',
+                   hidden: true,
+                   handler: onModifyDeliverData
+               },
+            ]
         }]        
     });
     //管理員欄位設定
@@ -1209,7 +1219,9 @@ Ext.onReady(function () {
                                 Ext.getCmp('change').setDisabled(true);
                                 Ext.getCmp('t_cat').setDisabled(true);
                             }
-
+                            if (result.data.cart_id != 16 && (result.data.order_status == 2 || result.data.order_status == 0)) {
+                                Ext.getCmp('change_info').show();
+                            }
                             //購買人
                         }
                     }
@@ -1428,6 +1440,11 @@ onEditOrderNote = function () {
 }
 onEditNoteAdmin = function () {
     editNoteAdmin();
+}
+
+//變更收貨人資訊
+onModifyDeliverData = function () {
+    modifyDeliverData();
 }
 onAddStatus = function () {
     addStatus();
