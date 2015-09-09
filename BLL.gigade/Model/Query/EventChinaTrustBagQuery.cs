@@ -15,7 +15,6 @@ namespace BLL.gigade.Model.Query
      public string end_time { get; set; }
      public string show_start_time { get; set; }
      public string show_end_time { get; set; }
-     public string bag_banner { get; set; }
      public int date { get; set; }
      public string s_bag_banner { get; set; }
      public EventChinaTrustBagQuery()
@@ -28,7 +27,6 @@ namespace BLL.gigade.Model.Query
          end_time = string.Empty;
          show_start_time = string.Empty;
          show_end_time = string.Empty;
-         bag_banner = string.Empty;
          date = 0;
          s_bag_banner = string.Empty;
      }
