@@ -1,4 +1,4 @@
-﻿editFunction = function (Order_id, Order_Status) {
+﻿ReturnALLOrderFunction = function (Order_id, Order_Status) {
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
         frame: true,
