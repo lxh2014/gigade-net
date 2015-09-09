@@ -1145,7 +1145,7 @@ Ext.onReady(function () {
                             }
                             Ext.getCmp('accumulated_bonus').setValue(result.data.accumulated_bonus + " 元");
                             if (result.data.deduct_happygo != "0") {
-                                Ext.getCmp('deduct_happygo').setValue("-" + result.data.deduct_happygo + " 點 " + result.data.Hg_Nt + " 元 ");
+                                Ext.getCmp('deduct_happygo').setValue(result.data.deduct_happygo + " 點 " + result.data.Hg_Nt + " 元 ");
                             }
                             else {
                                 Ext.getCmp('deduct_happygo').setValue(result.data.deduct_happygo + " 點 " + result.data.Hg_Nt + " 元 ");
