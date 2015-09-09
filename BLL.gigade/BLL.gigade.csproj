@@ -47,9 +47,21 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Lib\itextsharp.dll</HintPath>
     </Reference>
+    <Reference Include="Kendo.Mvc, Version=2014.2.716.340, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\Kendo.Mvc.dll</HintPath>
+    </Reference>
     <Reference Include="LHUntil, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Lib\LHUntil.dll</HintPath>
+    </Reference>
+    <Reference Include="LitJSON, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\LitJSON.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\log4net.dll</HintPath>
     </Reference>
     <Reference Include="mysql.data, Version=6.5.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -89,6 +101,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WebDav, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\WebDav.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\CommonFunction.cs" />
@@ -1777,14 +1793,21 @@
     <Content Include="bin\Debug\DBAccess.dll" />
     <Content Include="bin\Debug\mysql.data.dll" />
     <Content Include="bin\Debug\Sphinx.Client.dll" />
+    <Content Include="Lib\DBAccess.dll" />
     <Content Include="Lib\ICSharpCode.SharpZipLib.dll" />
     <Content Include="Lib\itextsharp.dll" />
+    <Content Include="Lib\Kendo.Mvc.dll" />
     <Content Include="Lib\LHUntil.dll" />
+    <Content Include="Lib\LitJSON.dll" />
+    <Content Include="Lib\log4net.dll" />
+    <Content Include="Lib\mysql.data.dll" />
     <Content Include="Lib\Newtonsoft.Json.dll" />
     <Content Include="Lib\NPOI.dll" />
     <Content Include="Lib\NPOI.OOXML.dll" />
     <Content Include="Lib\NPOI.OpenXml4Net.dll" />
     <Content Include="Lib\NPOI.OpenXmlFormats.dll" />
+    <Content Include="Lib\Sphinx.Client.dll" />
+    <Content Include="Lib\WebDav.dll" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

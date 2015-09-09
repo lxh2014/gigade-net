@@ -1017,7 +1017,7 @@ Ext.onReady(function () {
                 {
                     xtype: 'displayfield',
                     id: 'address',
-                    value: '帳單地址:'
+                    value: '收貨地址:'
                 },
                 {
                     xtype: 'displayfield',
@@ -1025,8 +1025,18 @@ Ext.onReady(function () {
                     margin: '0 0 0 26',
                     width: 400,
                     name: 'delivery_address'
-                }]                      
-            }]            
+                },
+                ]
+            },
+               {
+                   xtype: 'button',
+                   id: 'change_info',
+                   text: '更改收貨人資訊',
+                   margin: '0 0 0 0',
+                   hidden: true,
+                   handler: onModifyDeliverData
+               },
+            ]
         }]        
     });
     //管理員欄位設定
@@ -1046,6 +1056,7 @@ Ext.onReady(function () {
                         root: 'data'
                     },
                     params: {
+                        isSecret: true,
                         order_id: document.getElementById('OrderId').value
                     },
                     success: function (form, action) {
@@ -1167,6 +1178,7 @@ Ext.onReady(function () {
                             Ext.getCmp('note_admin').setValue(result.data.note_admin);
 
                             var orderGender = result.data.order_gender == "0" ? "小姐" : "先生";
+                           var  deliveryGender=result.data.delivery_gender=="0"?"小姐":"先生";
                             //購買人添加資安
                             Ext.getCmp('order_name').setValue("<a href='javascript:void(0);' onclick='oneditUser(" + result.data.user_id + ")'>" + result.data.order_name + "</a>" + " / " + orderGender);
                             //Ext.getCmp('order_phone').setValue(result.data.order_phone);
@@ -1183,7 +1195,7 @@ Ext.onReady(function () {
                             //Ext.getCmp('delivery_zip').setValue(result.data.delivery_zip);
                             //Ext.getCmp('delivery_address').setValue(result.data.delivery_address);
                             Ext.getCmp('delivery_address').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.delivery_address + "</a>");
-                            Ext.getCmp('delivery_name').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.delivery_name + "</a>" + "/" + orderGender);
+                            Ext.getCmp('delivery_name').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.delivery_name + "</a>" + "/" + deliveryGender);
                             //等待付款加驗證
                             if (result.data.order_status == 1 || result.data.order_status == 2 || result.data.order_status == 10 || result.data.order_status == 20) {
                                 Ext.getCmp('wait').setDisabled(false);
@@ -1209,7 +1221,9 @@ Ext.onReady(function () {
                                 Ext.getCmp('change').setDisabled(true);
                                 Ext.getCmp('t_cat').setDisabled(true);
                             }
-
+                            if (result.data.cart_id != 16 && (result.data.order_status == 2 || result.data.order_status == 0)) {
+                                Ext.getCmp('change_info').show();
+                            }
                             //購買人
                         }
                     }
@@ -1428,6 +1442,11 @@ onEditOrderNote = function () {
 }
 onEditNoteAdmin = function () {
     editNoteAdmin();
+}
+
+//變更收貨人資訊
+onModifyDeliverData = function () {
+    modifyDeliverData();
 }
 onAddStatus = function () {
     addStatus();

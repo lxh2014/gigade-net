@@ -294,7 +294,14 @@ Ext.onReady(function () {
                          margin: "0 5 0 0",
                          name: 'productName',
                          fieldLabel: '商品名稱',
-                         labelWidth: 60
+                         labelWidth: 60,
+                         listeners: {
+                             specialkey: function (field, e) {
+                                 if (e.getKey() == e.ENTER) {
+                                     Query();
+                                 }
+                             }
+                         }
                      },
                      {
                          xtype: 'textfield',
@@ -303,7 +310,14 @@ Ext.onReady(function () {
                          margin: "0 5 0 0",
                          name: 'productId',
                          fieldLabel: '商品編號',
-                         labelWidth: 60
+                         labelWidth: 60,
+                         listeners: {
+                             specialkey: function (field, e) {
+                                 if (e.getKey() == e.ENTER) {
+                                     Query();
+                                 }
+                             }
+                         }
                      },
              {
                  xtype: 'textfield',
@@ -312,7 +326,14 @@ Ext.onReady(function () {
                  name: 'userName',
                  margin: "0 5 0 0",
                  fieldLabel: '用戶名稱',
-                 labelWidth: 60
+                 labelWidth: 60,
+                 listeners: {
+                     specialkey: function (field, e) {
+                         if (e.getKey() == e.ENTER) {
+                             Query();
+                         }
+                     }
+                 }
              }
 
                 ]
@@ -329,7 +350,14 @@ Ext.onReady(function () {
                  name: 'userEmail',
                  margin: "0 5 0 0",
                  fieldLabel: '用戶郵箱',
-                 labelWidth: 60
+                 labelWidth: 60,
+                 listeners: {
+                     specialkey: function (field, e) {
+                         if (e.getKey() == e.ENTER) {
+                             Query();
+                         }
+                     }
+                 }
              },
               {
                   xtype: 'combobox',
@@ -405,26 +433,50 @@ Ext.onReady(function () {
                         margin: "0 5 0 0",
                         items: [
                                {
-                                   xtype: 'datetimefield',
+                                   xtype: 'datefield',
                                    allowBlank: true,
                                    id: 'timestart',
                                    margin: "0 5 0 0",
                                    name: 'serchcontent',
                                    fieldLabel: '諮詢時間',
                                    labelWidth: 60,
-                                   dateRange: { begin: 'timestart', end: 'timeend' },
-                                   vtype: 'dateRange'
+                                   editable: false,
+                                   listeners: {
+                                       select: function (a, b, c) {
+                                           var tstart = Ext.getCmp("timestart");
+                                           var tend = Ext.getCmp("timeend");
+                                           if (tend.getValue() == null) {
+                                               tend.setValue(setNextMonth(tstart.getValue(), 1));
+                                           }
+                                           else if (tend.getValue() < tstart.getValue()) {
+                                               Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                                               tend.setValue(setNextMonth(tstart.getValue(), 1));
+                                           }
+                                       }
+                                   }
                                },
                                {
-                                   xtype: 'datetimefield',
+                                   xtype: 'datefield',
                                    allowBlank: true,
                                    id: 'timeend',
                                    margin: "0 5 0 0",
                                    name: 'serchcontent',
                                    fieldLabel: '到',
                                    labelWidth: 15,
-                                   dateRange: { begin: 'timestart', end: 'timeend' },
-                                   vtype: 'dateRange'
+                                   editable: false,
+                                   listeners: {
+                                       select: function (a, b, c) {
+                                           var tstart = Ext.getCmp("timestart");
+                                           var tend = Ext.getCmp("timeend");
+                                           if (tstart.getValue() == null) {
+                                               tstart.setValue(setNextMonth(tend.getValue(), -1));
+                                           }
+                                           else if (tend.getValue() < tstart.getValue()) {
+                                               Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                                               tstart.setValue(setNextMonth(tend.getValue(), -1));
+                                           }
+                                       }
+                                   }
                                },
                         ]
                     }, ]
@@ -776,4 +828,15 @@ function UpdateActive(id) {
             Ext.Msg.alert('錯誤信息', '更改失敗');
         }
     });
+}
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

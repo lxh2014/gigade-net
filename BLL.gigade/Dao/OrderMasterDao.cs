@@ -601,8 +601,8 @@ namespace BLL.gigade.Dao
                 sql.AppendFormat(",om.order_freight_normal ,om.order_freight_low ,om.order_amount ,om.money_cancel ,om.money_return ");
                 sql.AppendFormat(",om.user_id ,om.order_name ,om.order_gender ,om.order_phone,om.order_mobile ,om.order_zip ");
                 sql.AppendFormat(",om.order_address ,om.delivery_same ,om.delivery_name ,om.delivery_gender,om.delivery_phone,om.delivery_mobile  ,om.delivery_zip ");
-                sql.AppendFormat(",om.delivery_address,om.note_admin,om.estimated_arrival_period,om.deduct_card_bonus,om.deduct_happygo_convert ");
-                sql.AppendFormat(",om.note_order_modify_time,chan.channel_name_simple,mu.user_id as manager_id,mu.user_username as manager_name,para.remark as order_status_str,  payments.parameterName as payment_string,deliver.parameterName as deliver_str   ");
+                sql.AppendFormat(",om.delivery_address,  om.delivery_address  as 'delivery_address_str' , om.cart_id, om.note_admin,om.estimated_arrival_period,om.deduct_card_bonus,om.deduct_happygo_convert ");
+                sql.AppendFormat(",om.note_order_modify_time,chan.channel_name_simple,mu.user_id as manager_id,mu.user_username as manager_name,para.remark as order_status_str,  payments.parameterName as payment_string,deliver.parameterName as deliver_str,om.cart_id    ");
                 sql.AppendFormat("   from order_master om LEFT JOIN manage_user mu on om.note_order_modifier=mu.user_id  ");
                 sql.AppendFormat(" LEFT JOIN channel chan on om.channel =chan.channel_id  ");
                 sql.AppendFormat(" LEFT JOIN( select parameterType,parameterCode,remark from t_parametersrc WHERE parameterType='order_status') para ON para.parameterCode=om.order_status ");
@@ -1850,7 +1850,14 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("update order_master set order_status='2',order_date_pay='{0}',order_date_cancel='{1}',money_cancel=0,export_flag=1 where order_id='{1}';", CommonFunction.GetPHPTime(), query.Order_Id);
+                if (query.mdd)
+                {
+                    sql.AppendFormat("update order_master set delivery_name='{0}',delivery_gender='{1}',delivery_mobile='{2}',delivery_phone='{3}',delivery_zip='{4}',delivery_address='{5}',delivery_same='0',note_order='{6}' where order_id='{7}';", query.delivery_name, query.user_gender, query.Delivery_Mobile, query.Delivery_Phone, query.Delivery_Zip, query.Delivery_Address, query.note_order, query.Order_Id);
+                }
+                else
+                {
+                    sql.AppendFormat("update order_master set order_status='2',order_date_pay='{0}',order_date_cancel='{1}',money_cancel=0,export_flag=1 where order_id='{1}';", CommonFunction.GetPHPTime(), query.Order_Id);
+                }
                 return sql.ToString();
             }
             catch (Exception ex)
@@ -2016,6 +2023,35 @@ namespace BLL.gigade.Dao
             catch (Exception ex)
             {
                 throw new Exception("OrderMasterDao-->UpFirstTime-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable CheckDeliveryStatus(OrderMasterQuery om)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("select deliver_id from deliver_master where order_id='{0}' and delivery_status=0;", om.Order_Id);
+                return _dbAccess.getDataTable(sql.ToString());
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->CheckDeliveryStatus-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public string UpdateDM(OrderMasterQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("update deliver_master set delivery_name='{0}',delivery_mobile='{1}',delivery_phone='{2}',delivery_zip='{3}',delivery_address='{4}' where order_id='{5}';", query.delivery_name, query.Delivery_Mobile, query.Delivery_Phone, query.Delivery_Zip, query.Delivery_Address, query.Order_Id);
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->UpdataDM-->" + sql.ToString() + ex.Message, ex);
             }
         }
     }

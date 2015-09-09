@@ -1,4 +1,4 @@
-﻿editFunction = function (Order_id, Order_Status) {
+﻿ReturnALLOrderFunction = function (Order_id, Order_Status) {
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
         frame: true,
@@ -66,6 +66,8 @@
                         var myMask = new Ext.LoadMask(Ext.getBody(), { msg: 'Loading...' });
                         myMask.show();
                         form.submit({
+                            timeout: 900000,
+                            method: 'post',
                             params: {
                                 return_order: Ext.htmlEncode(Ext.getCmp('return_Order_id').getValue()),
                                 order_note: Ext.htmlEncode(Ext.getCmp('return_note').getValue()),
@@ -82,7 +84,9 @@
                                     else {
                                         myMask.hide();
                                         Ext.Msg.alert(INFORMATION, SUCCESS);
-                                        TranToDetial(Ext.htmlEncode(Ext.getCmp('return_Order_id').getValue()));
+                                      
+                                       // TranToDetial(Ext.htmlEncode(Ext.getCmp('return_Order_id').getValue()));
+                                        window.location.reload(true);
                                         //editWin.close();
                                     }
                                 } else {

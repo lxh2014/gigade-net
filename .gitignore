@@ -44,7 +44,7 @@ x64/
 *.pidb
 *.log
 *.scc
-
+web.config
 
 # OS generated files #
 .DS_Store*
