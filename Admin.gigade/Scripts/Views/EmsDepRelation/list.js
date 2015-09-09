@@ -109,7 +109,7 @@ Ext.onReady(function () {
          //    xtype: 'combobox', fieldLabel: '查詢日期', id: 'serchDate', store: dateStore, value: 0, displayField: 'txt', labelWidth: 65,
          //    valueField: 'value', margin: '0 0 0 5', editable: false,
          //},
-        { xtype: 'datetimefield', id: 'date', fieldLabel: '查詢日期', hidden: false, value: new Date(), format: 'Y-m-d', editable: false,labelWidth:60,margin:'0 0 0 10' },
+        { xtype: 'datefield', id: 'date', fieldLabel: '查詢日期', hidden: false, value: new Date(), format: 'Y-m-d', editable: false,labelWidth:60,margin:'0 0 0 10' },
          { xtype: 'button', text: "查詢", id: 'query', hidden: false, handler: onQuery, iconCls: 'icon-search', },
           {
               xtype: 'button', text: "重置", id: 'reset', hidden: false, iconCls: 'ui-icon ui-icon-reset',

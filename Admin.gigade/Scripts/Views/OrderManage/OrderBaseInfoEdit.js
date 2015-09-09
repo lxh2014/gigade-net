@@ -381,7 +381,25 @@ var user_zip_source = Ext.create('Ext.data.Store', {
 	{ user_zip: 290, user_zip_name: "290 釣魚台列嶼" }
     ]
 });
-
+Ext.define('gigade.zipAddress', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: "zipcode", type: "string" },
+        { name: "zipname", type: "string" }
+    ]
+});
+var zipStore = Ext.create('Ext.data.Store', {
+    model: 'gigade.zipAddress',
+    autoLoad: true,
+    proxy: {
+        type: 'ajax',
+        url: "/VipUserGroup/GetZipStore",
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
 //編輯客戶備註
 editOrderNote = function () {
     var editNoteFrm = Ext.create('Ext.form.Panel', {
@@ -472,7 +490,7 @@ editOrderNote = function () {
                 Ext.Ajax.request({
                     url: '/OrderManage/GetData',
                     params: {
-                        order_id: document.getElementById('OrderId').value
+                        order_id: document.getElementById('OrderId').value,
                     },
                     success: function (form, action) {
                         var result = Ext.decode(form.responseText);
@@ -1026,5 +1044,190 @@ userEdit = function (o_id) {
 
     });
     userEditWin.show();
+}
+
+//更改收貨人資訊
+modifyDeliverData = function () {
+    var deliverData = Ext.create('Ext.form.Panel', {
+        constrain: true,
+        url: '/OrderManage/ModifyDeliveryData',
+        items: [
+            {
+                xtype: 'displayfield',
+                name: 'd_order_id',
+                id: 'd_order_id',
+                hidden:true,
+            },
+               {
+                   xtype: 'textfield',
+                   fieldLabel: '收貨人姓名',
+                   allowBlank:false,
+                   id: 'd_user_name',
+                   name: 'd_user_name',
+                   width: 300
+               },
+            {
+                xtype: 'radiogroup',
+                fieldLabel: '性別',
+                id: 'd_user_gender',
+                allowBlank: false,
+                width: 300,
+                items: [
+                    { boxLabel: '先生', id: 'Mr', name: 'dn_user_gender', inputValue: '1', checked: true },
+                       { boxLabel: '小姐', id: 'Mrs', name: 'dn_user_gender', inputValue: '0' },
+                ]
+
+            },
+            {
+                xtype: 'textfield',
+                fieldLabel: '室內電話',
+                id: 'd_user_phone',
+                name: 'd_user_phone',
+                width: 300
+            },
+               {
+                   xtype: 'textfield',
+                   fieldLabel: '手機',
+                   allowBlank: false,
+                   id: 'd_user_mobile',
+                       name: 'd_user_mobile',
+                   width: 300
+               },
+               {
+                   xtype: 'fieldcontainer',
+                   layout: 'hbox',
+                   items: [
+                      {
+                          xtype: 'combobox',
+                          fieldLabel: '收貨地址',
+                          queryModel: 'local',
+                          id: 'd_zip',
+                          store: zipStore,
+                          allowBlank: false,
+                          valueField: 'zipcode',
+                          editable: false,
+                          displayField: 'zipname',
+                          queryModel: 'local',
+                          allowBlank: false,
+                      },
+                      {
+                          xtype: 'textfield',
+                          allowBlank: false,
+                          id: 'd_user_address',
+                          name: 'd_user_address',
+                          // width: 300
+                      },
+                   ]
+               },
+
+        ],
+        buttons: [{
+            text: '確定',
+            formBind: true,
+            disabled: true,
+            handler: function () {
+                var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                myMask.show();
+                var form = this.up('form').getForm();
+                if (form.isValid()) {
+                    form.submit({
+                        params: {
+                            order_id: Ext.getCmp('d_order_id').getValue(),
+                            user_name: Ext.getCmp('d_user_name').getValue(),
+                            user_gender: Ext.getCmp('d_user_gender').getValue().dn_user_gender,
+                            user_mobile: Ext.getCmp('d_user_mobile').getValue(),
+                            user_phone: Ext.getCmp('d_user_phone').getValue(),
+                            user_zip: Ext.getCmp('d_zip').getValue(),
+                            user_address: Ext.getCmp('d_user_address').getValue(),
+                        },
+                        success: function (form, action) {
+                            myMask.hide();
+                            var result = Ext.decode(action.response.responseText);
+                            if (result.success) {
+                                if (result.msg == 1) {
+                                    Ext.Msg.alert("提示信息", "已出貨，不可修改！");
+                                    deliverDataWin.destroy();
+                                }
+                                else {
+                                    deliverDataWin.destroy();
+                                    window.location.reload(true);
+                                }
+
+                            }
+                            else {
+                                Ext.Msg.alert("提示信息", "保存失敗！");
+                                deliverDataWin.destroy();
+                            }
+
+                        },
+                        failure: function () {
+                            myMask.hide();
+                            Ext.Msg.alert("提示信息", "出現異常！");
+                            deliverDataWin.destroy();
+                        }
+                    });
+                }
+            }
+        }]
+    });
+    var deliverDataWin = Ext.create('Ext.window.Window', {
+        title: '變更收件人資訊',
+        iconCls: 'icon-user-edit',
+        width: 450,
+        height: 300,
+        layout: 'fit',
+        items: [deliverData],
+        constrain: true,
+        closeAction: 'destroy',
+        modal: true,
+        resizable: false,
+        labelWidth: 60,
+        bodyStyle: 'padding:5px 5px 5px 5px',
+        closable: false,
+        listeners: {
+            'beforerender': function () {
+                Ext.Ajax.request({
+                    url: '/OrderManage/GetData',
+                    params: {
+                        order_id: document.getElementById('OrderId').value,
+                        isSecret: 'false',
+                    },
+                    success: function (form, action) {
+                        var result = Ext.decode(form.responseText);
+                        if (result.success) {
+                            Ext.getCmp('d_order_id').setValue(result.data.order_id);
+                            Ext.getCmp('d_user_name').setValue(result.data.delivery_name);
+                            Ext.getCmp('d_user_mobile').setValue(result.data.delivery_mobile);
+                            Ext.getCmp('d_user_phone').setValue(result.data.delivery_phone);
+                            Ext.getCmp('d_zip').setValue(result.data.delivery_zip);
+                            Ext.getCmp('d_user_address').setValue(result.data.delivery_address_str);
+                            if (result.data.delivery_gender == 1) {
+                                Ext.getCmp('Mr').setValue(true);
+                            }
+                            else {
+                                Ext.getCmp('Mrs').setValue(true);
+                            }
+                        }
+                    }
+                });
+            }
+        },
+        tools: [
+        {
+            type: 'close',
+            handler: function (event, toolEl, panel) {
+                Ext.MessageBox.confirm('提示信息', '是否關閉窗口', function (btn) {
+                    if (btn == "yes") {
+                        deliverDataWin.destroy();
+                    }
+                    else {
+                        return false;
+                    }
+                });
+            }
+        }
+        ]
+    });
+    deliverDataWin.show();
 }
 

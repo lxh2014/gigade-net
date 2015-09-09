@@ -102,5 +102,8 @@ namespace BLL.gigade.Dao.Impl
         string ModifyOrderStatus(OrderMasterQuery query);
         DataTable IsFirstTime(OrderMasterQuery query);
         string UpFirstTime(OrderMasterQuery query);
+        DataTable CheckDeliveryStatus(OrderMasterQuery query);
+        string UpdateDM(OrderMasterQuery query);
+        string InsertOrderMasterStatus(OrderShowMasterQuery store);
     }
 }

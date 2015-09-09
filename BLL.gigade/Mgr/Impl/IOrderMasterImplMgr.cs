@@ -82,5 +82,6 @@ namespace BLL.gigade.Mgr.Impl
         DataTable IsExistOrderId(uint order_id);
         string ChangePayMent(OrderMasterQuery query);
         bool IsVendorDeliver(uint order_id);
+        string ModifyDeliveryData(OrderMasterQuery om);
     }
 }

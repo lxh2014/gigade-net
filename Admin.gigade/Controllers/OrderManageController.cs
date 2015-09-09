@@ -38,7 +38,7 @@ namespace Admin.gigade.Controllers
         private OrderReturnMasterMgr _orderReturnMaster;
         private IOrderExpectDeliverImplMgr _orderExpectDeliverMgr;
         private OrderBrandProducesMgr _Iorderbrandproduces;
-        private OrderVendorProducesMgr _orderVendorProducesMgr;
+        private OrderVendorProducesMgr _orderVendorProducesMgr; 
         private ZipMgr zMgr;
         private VendorMgr _vendorMgr;
         private OrderMasterMgr _ordermaster;
@@ -5014,6 +5014,18 @@ namespace Admin.gigade.Controllers
             try
             {
                 store = _orderMasterMgr.GetData(orderId);
+                if (!string.IsNullOrEmpty(Request.Params["isSecret"]))
+                {
+                    if (Request.Params["isSecret"] == "false")
+                    {
+                        store.isSecret = false;
+                    }
+                    else
+                    {
+                        store.isSecret = true;
+                    }
+
+                }
                 store.is_vendor_deliver = _orderMasterMgr.IsVendorDeliver(orderId);
                 store.OrderDatePay = CommonFunction.GetNetTime(store.order_date_pay);
                 if (!string.IsNullOrEmpty(store.money_collect_date.ToString()) && store.money_collect_date != 0)
@@ -5028,72 +5040,75 @@ namespace Admin.gigade.Controllers
                 //地址直接讀取
                 store.order_address = zMgr.Getaddress(int.Parse(store.order_zip.ToString())) + store.order_address;
                 store.delivery_address = zMgr.Getaddress(int.Parse(store.delivery_zip.ToString())) + store.delivery_address;
-                #region 添加資安的字段
-                if (store.order_name.Length > 1)
+                if (store.isSecret)
                 {
-                    store.order_name = store.order_name.ToString().Substring(0, 1) + "**";
+                    #region 添加資安的字段
+                    if (store.order_name.Length > 1)
+                    {
+                        store.order_name = store.order_name.ToString().Substring(0, 1) + "**";
+                    }
+                    else
+                    {
+                        store.order_name = store.order_name.ToString() + "**";
+                    }
+                    if (store.order_phone.Length > 1)
+                    {
+                        store.order_phone = store.order_phone.ToString().Substring(0, 1) + "****";
+                    }
+                    else
+                    {
+                        store.order_phone = store.order_phone.ToString() + "**";
+                    }
+                    if (store.order_mobile.Length > 1)
+                    {
+                        store.order_mobile = store.order_mobile.ToString().Substring(0, 1) + "****";
+                    }
+                    else
+                    {
+                        store.order_mobile = store.order_mobile.ToString() + "**";
+                    }
+                    if (store.order_address.Length > 3)
+                    {
+                        store.order_address = store.order_address.ToString().Substring(0, 3) + "****";
+                    }
+                    else
+                    {
+                        store.order_address = store.order_address.ToString() + "**";
+                    }
+                    if (store.delivery_name.Length > 1)
+                    {
+                        store.delivery_name = store.delivery_name.ToString().Substring(0, 1) + "**";
+                    }
+                    else
+                    {
+                        store.delivery_name = store.delivery_name.ToString() + "**";
+                    }
+                    if (store.delivery_phone.Length > 1)
+                    {
+                        store.delivery_phone = store.delivery_phone.ToString().Substring(0, 1) + "****";
+                    }
+                    else
+                    {
+                        store.delivery_phone = store.delivery_phone.ToString() + "**";
+                    }
+                    if (store.delivery_mobile.Length > 1)
+                    {
+                        store.delivery_mobile = store.delivery_mobile.ToString().Substring(0, 1) + "****";
+                    }
+                    else
+                    {
+                        store.delivery_mobile = store.delivery_mobile.ToString() + "**";
+                    }
+                    if (store.delivery_address.Length > 3)
+                    {
+                        store.delivery_address = store.delivery_address.ToString().Substring(0, 3) + "****";
+                    }
+                    else
+                    {
+                        store.delivery_address = store.delivery_address.ToString() + "**";
+                    }
+                    #endregion
                 }
-                else
-                {
-                    store.order_name = store.order_name.ToString() + "**";
-                }
-                if (store.order_phone.Length > 1)
-                {
-                    store.order_phone = store.order_phone.ToString().Substring(0, 1) + "****";
-                }
-                else
-                {
-                    store.order_phone = store.order_phone.ToString() + "**";
-                }
-                if (store.order_mobile.Length > 1)
-                {
-                    store.order_mobile = store.order_mobile.ToString().Substring(0, 1) + "****";
-                }
-                else
-                {
-                    store.order_mobile = store.order_mobile.ToString() + "**";
-                }
-                if (store.order_address.Length > 3)
-                {
-                    store.order_address = store.order_address.ToString().Substring(0, 3) + "****";
-                }
-                else
-                {
-                    store.order_address = store.order_address.ToString() + "**";
-                }
-                if (store.delivery_name.Length > 1)
-                {
-                    store.delivery_name = store.delivery_name.ToString().Substring(0, 1) + "**";
-                }
-                else
-                {
-                    store.delivery_name = store.delivery_name.ToString() + "**";
-                }
-                if (store.delivery_phone.Length > 1)
-                {
-                    store.delivery_phone = store.delivery_phone.ToString().Substring(0, 1) + "****";
-                }
-                else
-                {
-                    store.delivery_phone = store.delivery_phone.ToString() + "**";
-                }
-                if (store.delivery_mobile.Length > 1)
-                {
-                    store.delivery_mobile = store.delivery_mobile.ToString().Substring(0, 1) + "****";
-                }
-                else
-                {
-                    store.delivery_mobile = store.delivery_mobile.ToString() + "**";
-                }
-                if (store.delivery_address.Length > 3)
-                {
-                    store.delivery_address = store.delivery_address.ToString().Substring(0, 3) + "****";
-                }
-                else
-                {
-                    store.delivery_address = store.delivery_address.ToString() + "**";
-                }
-                #endregion
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
@@ -6625,6 +6640,65 @@ namespace Admin.gigade.Controllers
         }
         #endregion
         #endregion
+        #endregion
+
+
+        #region 更改收貨人資訊
+        public HttpResponseBase ModifyDeliveryData()
+        {
+            string json = string.Empty;
+            OrderMasterQuery om = new OrderMasterQuery();
+            DeliverMasterQuery dm = new DeliverMasterQuery();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["order_id"]))
+                {
+                    om.Order_Id = Convert.ToUInt32(Request.Params["order_id"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_name"]))
+                {
+                    om.delivery_name = Request.Params["user_name"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_gender"]))
+                {
+                    om.user_gender = Convert.ToUInt32(Request.Params["user_gender"]);//delivery_gender
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_mobile"]))
+                {
+                    om.Delivery_Mobile = Request.Params["user_mobile"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_phone"]))
+                {
+                    om.Delivery_Phone = Request.Params["user_phone"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_zip"]))
+                {
+                    om.Delivery_Zip = Convert.ToUInt32(Request.Params["user_zip"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_address"]))
+                {
+                    om.Delivery_Address = Request.Params["user_address"].ToString();
+                }
+                om.user_id = Convert.ToUInt32((Session["caller"] as Caller).user_id);
+                om.user_name = (Session["caller"] as Caller).user_username;
+                System.Net.IPAddress[] addlist = Dns.GetHostByName(Dns.GetHostName()).AddressList;
+                om.Order_Ipfrom = addlist[0].ToString();
+                _orderMasterMgr = new OrderMasterMgr(mySqlConnectionString);
+                json = _orderMasterMgr.ModifyDeliveryData(om);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
         #endregion
     }
 }

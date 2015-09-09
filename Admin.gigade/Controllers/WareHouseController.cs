@@ -9961,7 +9961,7 @@ namespace Admin.gigade.Controllers
                          cell.DisableBorderSide(4);
                          cell.DisableBorderSide(8);
                          ptable.AddCell(cell);
-                         cell = new PdfPCell(new Phrase("      吉甲地好市集股份有限公司", new iTextSharp.text.Font(bf, 15)));
+                         cell = new PdfPCell(new Phrase("    吉甲地好市集股份有限公司", new iTextSharp.text.Font(bf, 15)));
                          cell.VerticalAlignment = Element.ALIGN_CENTER;//字體水平居左
                          cell.Colspan = 5;
                          cell.DisableBorderSide(1);
@@ -9977,7 +9977,7 @@ namespace Admin.gigade.Controllers
                          cell.DisableBorderSide(4);
                          cell.DisableBorderSide(8);
                          ptable.AddCell(cell);
-                         cell = new PdfPCell(new Phrase("    採購單" + "-" + ipoStore[a].po_type_desc, new iTextSharp.text.Font(bf, 12)));
+                         cell = new PdfPCell(new Phrase("採購單" + "-" + ipoStore[a].po_type_desc, new iTextSharp.text.Font(bf, 12)));
                          cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                          cell.Colspan = 4;
                          cell.DisableBorderSide(1);

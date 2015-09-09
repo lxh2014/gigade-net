@@ -33,7 +33,7 @@ Ext.apply(Ext.form.VTypes, {
 Ext.define('gigade.ProductCommentModel', {
     extend: 'Ext.data.Model',
     fields: [
-        
+
         { name: "comment_detail_id", type: "int" },
         { name: "comment_id", type: "int" },
         { name: "product_name", type: "string" },
@@ -179,7 +179,14 @@ Ext.onReady(function () {
                          margin: "0 5 0 0",
                          name: 'productName',
                          fieldLabel: '商品名稱',
-                         labelWidth: 60
+                         labelWidth: 60,
+                         listeners: {
+                             specialkey: function (field, e) {
+                                 if (e.getKey() == e.ENTER) {
+                                     Query();
+                                 }
+                             }
+                         }
                      },
                      {
                          xtype: 'textfield',
@@ -188,7 +195,14 @@ Ext.onReady(function () {
                          margin: "0 5 0 0",
                          name: 'productId',
                          fieldLabel: '商品編號',
-                         labelWidth: 60
+                         labelWidth: 60,
+                         listeners: {
+                             specialkey: function (field, e) {
+                                 if (e.getKey() == e.ENTER) {
+                                     Query();
+                                 }
+                             }
+                         }
                      },
              {
                  xtype: 'combobox',
@@ -215,7 +229,14 @@ Ext.onReady(function () {
                     margin: "0 5 0 0",
                     name: 'brand_name',
                     fieldLabel: '品牌名稱',
-                    labelWidth: 60
+                    labelWidth: 60,
+                    listeners: {
+                        specialkey: function (field, e) {
+                            if (e.getKey() == e.ENTER) {
+                                Query();
+                            }
+                        }
+                    }
                 },
              {
                  xtype: 'textfield',
@@ -224,7 +245,14 @@ Ext.onReady(function () {
                  margin: "0 5 0 0",
                  name: 'userName',
                  fieldLabel: '用戶名稱',
-                 labelWidth: 60
+                 labelWidth: 60,
+                 listeners: {
+                     specialkey: function (field, e) {
+                         if (e.getKey() == e.ENTER) {
+                             Query();
+                         }
+                     }
+                 }
              }
 
                 ]
@@ -241,7 +269,14 @@ Ext.onReady(function () {
                          margin: "0 5 0 0",
                          name: 'userEmail',
                          fieldLabel: '用戶郵箱',
-                         labelWidth: 60
+                         labelWidth: 60,
+                         listeners: {
+                             specialkey: function (field, e) {
+                                 if (e.getKey() == e.ENTER) {
+                                     Query();
+                                 }
+                             }
+                         }
                      },
                     {
                         xtype: 'combobox',
@@ -262,26 +297,50 @@ Ext.onReady(function () {
                         }
                     },
                  {
-                     xtype: 'datetimefield',
+                     xtype: 'datefield',
                      allowBlank: true,
                      id: 'timestart',
                      margin: "0 5 0 0",
                      name: 'serchcontent',
                      fieldLabel: '評價時間',
                      labelWidth: 60,
-                     dateRange: { begin: 'timestart', end: 'timeend' },
-                     vtype: 'dateRange'
+                     editable: false,
+                     listeners: {
+                         select: function (a, b, c) {
+                             var tstart = Ext.getCmp("timestart");
+                             var tend = Ext.getCmp("timeend");
+                             if (tend.getValue() == null) {
+                                 tend.setValue(setNextMonth(tstart.getValue(), 1));
+                             }
+                             else if (tend.getValue() < tstart.getValue()) {
+                                 Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                                 tend.setValue(setNextMonth(tstart.getValue(), 1));
+                             }
+                         }
+                     }
                  },
              {
-                 xtype: 'datetimefield',
+                 xtype: 'datefield',
                  allowBlank: true,
                  id: 'timeend',
                  margin: "0 5 0 0",
                  name: 'serchcontent',
                  fieldLabel: '到',
                  labelWidth: 60,
-                 dateRange: { begin: 'timestart', end: 'timeend' },
-                 vtype: 'dateRange'
+                 editable: false,
+                 listeners: {
+                     select: function (a, b, c) {
+                         var tstart = Ext.getCmp("timestart");
+                         var tend = Ext.getCmp("timeend");
+                         if (tstart.getValue() == null) {
+                             tstart.setValue(setNextMonth(tend.getValue(), -1));
+                         }
+                         else if (tend.getValue() < tstart.getValue()) {
+                             Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                             tstart.setValue(setNextMonth(tend.getValue(), -1));
+                         }
+                     }
+                 }
              },
              {
                  xtype: 'combobox',
@@ -293,9 +352,9 @@ Ext.onReady(function () {
                  valueField: 'value',
                  displayField: 'txt',
                  value: '1',
-                 editable:false
+                 editable: false
              },
-            
+
             //  {
             //      xtype: 'button',
             //      text: SEARCH,
@@ -329,24 +388,24 @@ Ext.onReady(function () {
                 ]
             },
             {
-            xtype: 'fieldcontainer',
-            combineErrors: true,
-            layout: 'hbox',
-            items: [
-                 {
-                     xtype: 'combobox',
-                     fieldLabel: '滿意度',
-                     labelWidth: 60,
-                     editable: false,
-                     id: 'commentsel',
-                     name: 'commentsel',
-                     store: CommentStore,
-                     valueField: 'value',
-                     displayField: 'txt',
-                     //value: '0',
-                 },
+                xtype: 'fieldcontainer',
+                combineErrors: true,
+                layout: 'hbox',
+                items: [
+                     {
+                         xtype: 'combobox',
+                         fieldLabel: '滿意度',
+                         labelWidth: 60,
+                         editable: false,
+                         id: 'commentsel',
+                         name: 'commentsel',
+                         store: CommentStore,
+                         valueField: 'value',
+                         displayField: 'txt',
+                         //value: '0',
+                     },
                 ]
-              }
+            }
         ],
         buttonAlign: 'center',
         buttons: [
@@ -419,6 +478,7 @@ Ext.onReady(function () {
                 }
             },
             { header: "留言內容", dataIndex: 'comment_info', width: 200, align: 'center', align: 'center' },
+            { header: "評價時間", dataIndex: 'create_time', width: 200, align: 'center', align: 'center' },
             { header: "留言回覆", dataIndex: 'comment_answer', width: 200, align: 'center', align: 'center' },
             {
                 header: "回覆是否顯示", dataIndex: 'answer_is_show', width: 100, align: 'center',
@@ -539,7 +599,7 @@ Ext.onReady(function () {
             '->',
               {
                   xtype: 'button',
-                  text: '匯出CSV',
+                  text: '匯出',
                   iconCls: 'icon-excel',
                   id: 'btnExcel',
                   handler: function (scroller) {
@@ -555,7 +615,7 @@ Ext.onReady(function () {
                       if (Ext.getCmp('timeend').getValue() != null) {
                           timeend = new Date(Ext.getCmp('timeend').getValue()).toLocaleDateString();
                       }
-                     // var timeend = new Date(Ext.getCmp('timeend').getValue()).toLocaleDateString();
+                      // var timeend = new Date(Ext.getCmp('timeend').getValue()).toLocaleDateString();
                       var shopClass = Ext.getCmp('shopClass').getValue();
                       var productId = Ext.getCmp('productId').getValue();
                       var userName = Ext.getCmp('userName').getValue();
@@ -651,7 +711,7 @@ Ext.onReady(function () {
         layout: 'vbox',
         items: [searchForm, pcGift],
         renderTo: Ext.getBody(),
-       // autoScroll: true,
+        // autoScroll: true,
         listeners: {
             resize: function () {
                 pcGift.width = document.documentElement.clientWidth;
@@ -728,4 +788,15 @@ function UpdateActive(id) {
             Ext.Msg.alert('111', '222');
         }
     });
+}
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }
