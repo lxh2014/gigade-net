@@ -1563,7 +1563,8 @@ onWaitClick = function () {
                             } else if (result.msg == 3) {
                                 Ext.Msg.alert("錯誤提示", "slave表沒數據！");
                             } else {//轉等待付款成功刷新頁面
-                                TranToDetial(document.getElementById('OrderId').value);
+                                //TranToDetial(document.getElementById('OrderId').value);
+                                window.location.reload(true);
                             }
                             WaitWin.close();
                             orderListStore.load();
@@ -1671,7 +1672,8 @@ onChangePayment_cash = function () {
                                     Ext.Msg.alert("錯誤提示", "slave沒數據！");
                                 } else {
                                     Ext.Msg.alert("提示", "轉自取成功!");
-                                    TranToDetial(document.getElementById('OrderId').value);
+                                    window.location.reload(true);
+                                   // TranToDetial(document.getElementById('OrderId').value);
                                 }
                             },
                             failure: function () {
