@@ -84,9 +84,9 @@
                                     else {
                                         myMask.hide();
                                         Ext.Msg.alert(INFORMATION, SUCCESS);
-                                      
+                                        setTimeout('closedthis()', 3000);
                                        // TranToDetial(Ext.htmlEncode(Ext.getCmp('return_Order_id').getValue()));
-                                        window.location.reload(true);
+                                      //  window.location.reload(true);
                                         //editWin.close();
                                     }
                                 } else {
@@ -103,6 +103,7 @@
                 }
             }]
     });
+   
     var editWin = Ext.create('Ext.window.Window', {
         title: '取消訂單',
         iconCls: 'icon-user-edit',
@@ -163,4 +164,7 @@
         }
     });
     editWin.show();
+}
+function closedthis() {
+    window.location.reload(true);
 }
