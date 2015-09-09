@@ -243,7 +243,7 @@ var frm = Ext.create('Ext.form.Panel', {
                                 start.setValue(setNextMonth(end.getValue(), -1));
                             }
                             else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                               // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                                // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
                                 end.setValue(setNextMonth(start.getValue(), 1));
                             }
                         },
@@ -280,7 +280,7 @@ var frm = Ext.create('Ext.form.Panel', {
                                     end.setValue(setNextMonth(start.getValue(), 1));
                                 }
                                 else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                                   // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                                    // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
                                     start.setValue(setNextMonth(end.getValue(), -1));
                                 }
                             }
@@ -307,7 +307,14 @@ var frm = Ext.create('Ext.form.Panel', {
                        id: 'product_id',
                        name: 'product_id',
                        margin: '0 5px',
-                       fieldLabel: '商品編號'
+                       fieldLabel: '商品編號',
+                       listeners: {
+                           specialkey: function (field, e) {
+                               if (e.getKey() == e.ENTER) {
+                                   Query();
+                               }
+                           }
+                       }
                    },
                    {
                        xtype: 'radiogroup',

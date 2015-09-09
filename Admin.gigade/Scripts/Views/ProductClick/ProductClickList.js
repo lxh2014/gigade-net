@@ -30,8 +30,7 @@ var ProductClickStore = Ext.create('Ext.data.Store', {
     }
 });
 
-ProductClickStore.on('beforeload', function ()
-{
+ProductClickStore.on('beforeload', function () {
     Ext.apply(ProductClickStore.proxy.extraParams, {
         product_status: Ext.getCmp('product_status').getValue(),
         brand_id: Ext.getCmp('brand_id').getValue(),
@@ -42,8 +41,7 @@ ProductClickStore.on('beforeload', function ()
         enddate: Ext.getCmp('enddate').getValue()
     });
 });
-Ext.onReady(function ()
-{
+Ext.onReady(function () {
     Ext.tip.QuickTipManager.init();
     var gdProductClick = Ext.create('Ext.grid.Panel', {
         id: 'gdProductClick',
@@ -57,8 +55,7 @@ Ext.onReady(function ()
             { header: "商品編號", dataIndex: 'product_id', flex: 0.5, align: 'center' },
             {
                 header: "商品名稱", dataIndex: 'product_name', flex: 2, align: 'center',
-                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store)
-                {
+                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     cellmeta.style = 'overflow:visible;padding:3px 3px 3px 5px;white-space:normal';
                     return value;
                 }
@@ -66,10 +63,8 @@ Ext.onReady(function ()
             { header: "品牌名稱", dataIndex: 'brand_name', flex: 2, align: 'center' },
             {
                 header: "商品館別", dataIndex: 'prod_classify', flex: 1, align: 'center',
-                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store)
-                {
-                    switch (value)
-                    {
+                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                    switch (value) {
                         case "0":
                             break;
                         case "10":
@@ -95,10 +90,8 @@ Ext.onReady(function ()
             emptyMsg: NOTHING_DISPLAY
         }),
         listeners: {
-            scrollershow: function (scroller)
-            {
-                if (scroller && scroller.scrollEl)
-                {
+            scrollershow: function (scroller) {
+                if (scroller && scroller.scrollEl) {
                     scroller.clearManagedListeners();
                     scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
                 }
@@ -112,24 +105,22 @@ Ext.onReady(function ()
         renderTo: Ext.getBody(),
         autoScroll: true,
         listeners: {
-            resize: function ()
-            {
+            resize: function () {
                 gdProductClick.width = document.documentElement.clientWidth;
                 this.doLayout();
             }
         }
     });
     ToolAuthority();
-  //  ProductClickStore.load({ params: { start: 0, limit: 25 } });
+    //  ProductClickStore.load({ params: { start: 0, limit: 25 } });
 });
-OutExcel = function ()
-{
+OutExcel = function () {
     var paras = 'product_status=' + Ext.getCmp('product_status').getValue() + '&brand_id=' + Ext.getCmp('brand_id').getValue()
         + '&prod_classify=' + Ext.getCmp('prod_classify').getValue()
         + '&product_id=' + Ext.getCmp('product_id').getValue() + '&type=' + Ext.getCmp('type').getValue().type
         + '&startdate=' + Ext.Date.format(new Date(Ext.getCmp('startdate').getValue()), 'Y-m-d H:i:s') +
        '&enddate=' + Ext.Date.format(new Date(Ext.getCmp('enddate').getValue()), 'Y-m-d H:i:s');
-    window.open('/ProductClick/OutProductClickExcel?'+paras);
+    window.open('/ProductClick/OutProductClickExcel?' + paras);
 
 }
 
