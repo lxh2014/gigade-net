@@ -947,7 +947,7 @@ Ext.onReady(function () {
                     items: [
                         {
                             xtype: 'displayfield',
-                            value: '收貨地址:'
+                            value: '帳單地址:'
                         },
                         {
                             xtype: 'displayfield',
@@ -1017,7 +1017,7 @@ Ext.onReady(function () {
                 {
                     xtype: 'displayfield',
                     id: 'address',
-                    value: '帳單地址:'
+                    value: '收貨地址:'
                 },
                 {
                     xtype: 'displayfield',
