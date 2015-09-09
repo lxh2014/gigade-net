@@ -84,6 +84,7 @@
                                     else {
                                         myMask.hide();
                                         Ext.Msg.alert(INFORMATION, SUCCESS);
+                                      
                                         TranToDetial(Ext.htmlEncode(Ext.getCmp('return_Order_id').getValue()));
                                         //editWin.close();
                                     }
