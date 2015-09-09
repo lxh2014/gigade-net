@@ -472,7 +472,7 @@ editOrderNote = function () {
                 Ext.Ajax.request({
                     url: '/OrderManage/GetData',
                     params: {
-                        order_id: document.getElementById('OrderId').value
+                        order_id: document.getElementById('OrderId').value,
                     },
                     success: function (form, action) {
                         var result = Ext.decode(form.responseText);

@@ -6626,5 +6626,64 @@ namespace Admin.gigade.Controllers
         #endregion
         #endregion
         #endregion
+
+
+        #region 更改收貨人資訊
+        public HttpResponseBase ModifyDeliveryData()
+        {
+            string json = string.Empty;
+            OrderMasterQuery om = new OrderMasterQuery();
+            DeliverMasterQuery dm = new DeliverMasterQuery();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["order_id"]))
+                {
+                    om.Order_Id = Convert.ToUInt32(Request.Params["order_id"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_name"]))
+                {
+                    om.delivery_name = Request.Params["user_name"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_gender"]))
+                {
+                    om.user_gender = Convert.ToUInt32(Request.Params["user_gender"]);//delivery_gender
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_mobile"]))
+                {
+                    om.Delivery_Mobile = Request.Params["user_mobile"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_phone"]))
+                {
+                    om.Delivery_Phone = Request.Params["user_phone"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_zip"]))
+                {
+                    om.Delivery_Zip = Convert.ToUInt32(Request.Params["user_zip"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_address"]))
+                {
+                    om.Delivery_Address = Request.Params["user_address"].ToString();
+                }
+                om.user_id = Convert.ToUInt32((Session["caller"] as Caller).user_id);
+                om.user_name = (Session["caller"] as Caller).user_username;
+                System.Net.IPAddress[] addlist = Dns.GetHostByName(Dns.GetHostName()).AddressList;
+                om.Order_Ipfrom = addlist[0].ToString();
+                _orderMasterMgr = new OrderMasterMgr(mySqlConnectionString);
+                json = _orderMasterMgr.ModifyDeliveryData(om);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
     }
 }
