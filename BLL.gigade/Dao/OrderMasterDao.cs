@@ -1850,7 +1850,14 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("update order_master set order_status='2',order_date_pay='{0}',order_date_cancel='{1}',money_cancel=0,export_flag=1 where order_id='{1}';", CommonFunction.GetPHPTime(), query.Order_Id);
+                if (query.mdd)
+                {
+                    sql.AppendFormat("update order_master set delivery_name='{0}',delivery_gender='{1}',delivery_mobile='{2}',delivery_phone='{3}',delivery_zip='{4}',delivery_address='{5}',delivery_same='0',note_order='{6}' where order_id='{7}';", query.delivery_name, query.user_gender, query.Delivery_Mobile, query.Delivery_Phone, query.Delivery_Zip, query.Delivery_Address, query.note_order, query.Order_Id);
+                }
+                else
+                {
+                    sql.AppendFormat("update order_master set order_status='2',order_date_pay='{0}',order_date_cancel='{1}',money_cancel=0,export_flag=1 where order_id='{1}';", CommonFunction.GetPHPTime(), query.Order_Id);
+                }
                 return sql.ToString();
             }
             catch (Exception ex)
