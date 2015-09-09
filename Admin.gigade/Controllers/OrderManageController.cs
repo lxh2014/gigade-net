@@ -5014,6 +5014,18 @@ namespace Admin.gigade.Controllers
             try
             {
                 store = _orderMasterMgr.GetData(orderId);
+                if (!string.IsNullOrEmpty(Request.Params["isSecret"]))
+                {
+                    if (Request.Params["isSecret"] == "false")
+                    {
+                        store.isSecret = false;
+                    }
+                    else
+                    {
+                        store.isSecret = true;
+                    }
+
+                }
                 store.is_vendor_deliver = _orderMasterMgr.IsVendorDeliver(orderId);
                 store.OrderDatePay = CommonFunction.GetNetTime(store.order_date_pay);
                 if (!string.IsNullOrEmpty(store.money_collect_date.ToString()) && store.money_collect_date != 0)
@@ -5028,72 +5040,75 @@ namespace Admin.gigade.Controllers
                 //地址直接讀取
                 store.order_address = zMgr.Getaddress(int.Parse(store.order_zip.ToString())) + store.order_address;
                 store.delivery_address = zMgr.Getaddress(int.Parse(store.delivery_zip.ToString())) + store.delivery_address;
-                #region 添加資安的字段
-                if (store.order_name.Length > 1)
+                if (store.isSecret)
                 {
-                    store.order_name = store.order_name.ToString().Substring(0, 1) + "**";
+                    #region 添加資安的字段
+                    if (store.order_name.Length > 1)
+                    {
+                        store.order_name = store.order_name.ToString().Substring(0, 1) + "**";
+                    }
+                    else
+                    {
+                        store.order_name = store.order_name.ToString() + "**";
+                    }
+                    if (store.order_phone.Length > 1)
+                    {
+                        store.order_phone = store.order_phone.ToString().Substring(0, 1) + "****";
+                    }
+                    else
+                    {
+                        store.order_phone = store.order_phone.ToString() + "**";
+                    }
+                    if (store.order_mobile.Length > 1)
+                    {
+                        store.order_mobile = store.order_mobile.ToString().Substring(0, 1) + "****";
+                    }
+                    else
+                    {
+                        store.order_mobile = store.order_mobile.ToString() + "**";
+                    }
+                    if (store.order_address.Length > 3)
+                    {
+                        store.order_address = store.order_address.ToString().Substring(0, 3) + "****";
+                    }
+                    else
+                    {
+                        store.order_address = store.order_address.ToString() + "**";
+                    }
+                    if (store.delivery_name.Length > 1)
+                    {
+                        store.delivery_name = store.delivery_name.ToString().Substring(0, 1) + "**";
+                    }
+                    else
+                    {
+                        store.delivery_name = store.delivery_name.ToString() + "**";
+                    }
+                    if (store.delivery_phone.Length > 1)
+                    {
+                        store.delivery_phone = store.delivery_phone.ToString().Substring(0, 1) + "****";
+                    }
+                    else
+                    {
+                        store.delivery_phone = store.delivery_phone.ToString() + "**";
+                    }
+                    if (store.delivery_mobile.Length > 1)
+                    {
+                        store.delivery_mobile = store.delivery_mobile.ToString().Substring(0, 1) + "****";
+                    }
+                    else
+                    {
+                        store.delivery_mobile = store.delivery_mobile.ToString() + "**";
+                    }
+                    if (store.delivery_address.Length > 3)
+                    {
+                        store.delivery_address = store.delivery_address.ToString().Substring(0, 3) + "****";
+                    }
+                    else
+                    {
+                        store.delivery_address = store.delivery_address.ToString() + "**";
+                    }
+                    #endregion
                 }
-                else
-                {
-                    store.order_name = store.order_name.ToString() + "**";
-                }
-                if (store.order_phone.Length > 1)
-                {
-                    store.order_phone = store.order_phone.ToString().Substring(0, 1) + "****";
-                }
-                else
-                {
-                    store.order_phone = store.order_phone.ToString() + "**";
-                }
-                if (store.order_mobile.Length > 1)
-                {
-                    store.order_mobile = store.order_mobile.ToString().Substring(0, 1) + "****";
-                }
-                else
-                {
-                    store.order_mobile = store.order_mobile.ToString() + "**";
-                }
-                if (store.order_address.Length > 3)
-                {
-                    store.order_address = store.order_address.ToString().Substring(0, 3) + "****";
-                }
-                else
-                {
-                    store.order_address = store.order_address.ToString() + "**";
-                }
-                if (store.delivery_name.Length > 1)
-                {
-                    store.delivery_name = store.delivery_name.ToString().Substring(0, 1) + "**";
-                }
-                else
-                {
-                    store.delivery_name = store.delivery_name.ToString() + "**";
-                }
-                if (store.delivery_phone.Length > 1)
-                {
-                    store.delivery_phone = store.delivery_phone.ToString().Substring(0, 1) + "****";
-                }
-                else
-                {
-                    store.delivery_phone = store.delivery_phone.ToString() + "**";
-                }
-                if (store.delivery_mobile.Length > 1)
-                {
-                    store.delivery_mobile = store.delivery_mobile.ToString().Substring(0, 1) + "****";
-                }
-                else
-                {
-                    store.delivery_mobile = store.delivery_mobile.ToString() + "**";
-                }
-                if (store.delivery_address.Length > 3)
-                {
-                    store.delivery_address = store.delivery_address.ToString().Substring(0, 3) + "****";
-                }
-                else
-                {
-                    store.delivery_address = store.delivery_address.ToString() + "**";
-                }
-                #endregion
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
