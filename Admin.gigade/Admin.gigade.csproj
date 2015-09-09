@@ -1916,6 +1916,7 @@
     <Content Include="Scripts\Views\Service\OrderQuestionAdd.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaEdit.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaList.js" />
+    <Content Include="Scripts\Views\SiteManager\SiteAnalyticsEdit.js" />
     <Content Include="Scripts\Views\SiteManager\SiteAnalyticsList.js" />
     <Content Include="Scripts\Views\SiteManager\SiteStatisticsEdit.js" />
     <Content Include="Scripts\Views\SiteManager\SiteStatisticsList.js" />

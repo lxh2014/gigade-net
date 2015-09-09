@@ -63,8 +63,8 @@ namespace BLL.gigade.Dao
                 for (int i = 0; i < _dt.Rows.Count; i++)
                 {
                     selectSql = new StringBuilder();
-                   
-                    if (_dt.Rows[i][0].ToString() != ""&& _dt.Rows[i][1].ToString() != ""&&_dt.Rows[i][2].ToString()!="")
+
+                    if (_dt.Rows[i][0].ToString() != "" && _dt.Rows[i][1].ToString() != "" && _dt.Rows[i][2].ToString() != "")
                     {
 
                         string sa_date = Convert.ToDateTime(_dt.Rows[i][0]).ToString("yyyy-MM-dd");
@@ -98,7 +98,7 @@ namespace BLL.gigade.Dao
                 {
                     return true;
                 }
-            
+
             }
             catch (Exception ex)
             {
@@ -118,7 +118,7 @@ namespace BLL.gigade.Dao
                 sqlWhere.Append(" where 1=1 ");
                 if (query.search_con != 0)
                 {
-                    sqlWhere.AppendFormat(" and  saly.sa_date ='{0}' ",query.s_sa_date );
+                    sqlWhere.AppendFormat(" and  saly.sa_date ='{0}' ", query.s_sa_date);
                 }
                 sqlWhere.Append(" order by sa_date asc ");
                 return _accessMySql.getDataTable(sql.ToString() + sqlWhere.ToString());
@@ -137,7 +137,7 @@ namespace BLL.gigade.Dao
             {
                 //string sa_date = Convert.ToDateTime(_dt.Rows[i][0]).ToString("yyyy-MM-dd");
                 sql.AppendFormat(" select sa_id from site_analytics where sa_date='{0}'", query.s_sa_date);
-                DataTable _dt=_accessMySql.getDataTable(sql.ToString());
+                DataTable _dt = _accessMySql.getDataTable(sql.ToString());
                 //return
                 if (_dt.Rows.Count > 0)
                 {
@@ -152,7 +152,7 @@ namespace BLL.gigade.Dao
             {
                 throw new Exception("SiteAnalyticsDao-->IsExist-->" + ex.Message + sql.ToString(), ex);
             }
-           
+
         }
 
         public string UpdateSNA(SiteAnalytics query)
@@ -184,7 +184,7 @@ namespace BLL.gigade.Dao
             }
         }
 
-        public bool ExecSql(ArrayList  arrList)
+        public bool ExecSql(ArrayList arrList)
         {
             try
             {
@@ -194,6 +194,48 @@ namespace BLL.gigade.Dao
             catch (Exception ex)
             {
                 throw new Exception(" EmsDao-->ExecSql--> " + arrList + ex.Message, ex);
+            }
+        }
+
+        public int InsertSiteAnalytics(SiteAnalytics query)
+        {
+            string sql = string.Empty;
+            try
+            {
+                sql =InsertSNA(query);
+                return _accessMySql.execCommand(sql);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("SiteAnalyticsDao-->InsertSiteAnalytics-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+
+        public int UpdateSiteAnalytics(SiteAnalytics query)
+        {
+            string sql = string.Empty;
+            try
+            {
+                sql = UpdateSNA(query);
+                return _accessMySql.execCommand(sql);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("SiteAnalyticsDao-->UpdateSiteAnalytics-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+
+        public int DeleteSiteAnalytics(SiteAnalytics query)
+        {
+            string sql = string.Empty;
+            try
+            {
+                sql = string.Format("delete from site_analytics where sa_id in({0})", query.sa_ids);
+                return _accessMySql.execCommand(sql);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("SiteAnalyticsDao-->UpdateSiteAnalytics-->" + ex.Message + sql.ToString(), ex);
             }
         }
     }
