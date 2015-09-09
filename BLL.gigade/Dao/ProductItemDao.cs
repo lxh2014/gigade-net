@@ -367,14 +367,14 @@ namespace BLL.gigade.Dao
             sbSqlColumn.Append("select v.vendor_id,p.product_id,p.product_name,(select max(create_time) from item_ipo_create_log where item_id=pi.item_id ) as create_datetime, p.sale_status ,'' as sale_name,p.product_mode ,'' as product_mode_name, p.prepaid,pi.erp_id,pi.item_id,pi.item_stock, pi.item_alarm,p.safe_stock_amount,  ");
             sbSqlColumn.Append("pm.price as item_money,pm.cost as item_cost,sum_biao.sum_total,  p.min_purchase_amount,v.vendor_name_simple, v.procurement_days,p.product_status, ");
             sbSqlColumn.Append("  pi.product_id,pi.spec_id_1 , '' as spec_title_1,pi.spec_id_2,'' as spec_title_2 ,''as NoticeGoods ");
-            sbSqlTable.Append(" from (SELECT  od.item_id,sum(od.buy_num*od.parent_num) as sum_total from order_master om LEFT JOIN order_slave os USING(order_id)LEFT JOIN order_detail od USING(slave_id)  ");
-            sbSqlTable.AppendFormat(" where FROM_UNIXTIME( om.order_createdate)>='{0}'  GROUP BY od.item_id) sum_biao ", sumdate);
-            sbSqlTable.Append(" left join  product_item pi on sum_biao.item_id=pi.item_id");
-            sbSqlTable.Append(" left join product p on p.product_id=pi.product_id ");
-            sbSqlTable.Append(" LEFT JOIN vendor_brand vb on vb.brand_id=p.brand_id");
-            sbSqlTable.Append(" LEFT JOIN vendor v on v.vendor_id=vb.vendor_id ");
+            sbSqlTable.Append(" from (SELECT  od.item_id,sum( case item_mode when 0 then od.buy_num when  2 then od.buy_num*od.parent_num end ) as sum_total from order_master om INNER JOIN order_slave os USING(order_id)INNER JOIN order_detail od USING(slave_id)  ");
+            sbSqlTable.AppendFormat(" where FROM_UNIXTIME( om.order_createdate)>='{0}' and od.item_mode in (0,2) GROUP BY od.item_id) sum_biao ", sumdate);
+            sbSqlTable.Append(" INNER join  product_item pi on sum_biao.item_id=pi.item_id");
+            sbSqlTable.Append(" INNER join product p on p.product_id=pi.product_id ");
+            sbSqlTable.Append(" INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id");
+            sbSqlTable.Append(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id ");
             sbSqlTable.Append(" LEFT JOIN item_ipo_create_log iicl on iicl.item_id=pi.item_id ");
-            sbSqlTable.Append(" left join price_master pm on pm.product_id=p.product_id and pm.site_id=1 ");
+            sbSqlTable.Append(" INNER join price_master pm on pm.product_id=p.product_id and pm.site_id=1 ");
             sbSqlCondition.Append(" WHERE  p.product_status =5  ");  //現在只要上架的
             sbSqlCondition.Append(" and ((p.prepaid=1) or (p.prepaid=0 and p.product_mode=2)) ");  //如果商品為買斷商品（product.prepaid=1）,則全部顯示.如果商品為非買斷商品（product.prepaid=0）,則只要寄倉的
             if (query.prepaid != -1)
