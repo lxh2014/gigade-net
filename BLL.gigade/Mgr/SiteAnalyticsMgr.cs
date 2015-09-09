@@ -84,5 +84,40 @@ namespace BLL.gigade.Mgr
                 throw new Exception("SiteAnalyticsMgr-->SiteAnalyticsDt-->" + ex.Message, ex);
             }
         }
+
+        public int UpdateSiteAnalytics(SiteAnalytics query)
+        {
+            try
+            {
+                return _siteAnalytics.UpdateSiteAnalytics(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("SiteAnalyticsMgr-->UpdateSiteAnalytics-->" + ex.Message, ex);
+            }
+        }
+        public int InsertSiteAnalytics(SiteAnalytics query)
+        {
+            try
+            {
+                return _siteAnalytics.InsertSiteAnalytics(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("SiteAnalyticsMgr-->InsertSiteAnalytics-->" + ex.Message, ex);
+            }
+        }
+
+        public int DeleteSiteAnalytics(SiteAnalytics query)
+        {
+            try
+            {
+                return _siteAnalytics.DeleteSiteAnalytics(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("SiteAnalyticsMgr-->DeleteSiteAnalytics-->" + ex.Message, ex);
+            }
+        }
     }
 }

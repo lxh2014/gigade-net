@@ -19,7 +19,7 @@ namespace BLL.gigade.Model
       public string s_sa_create_time { get; set; }
       public string s_sa_create_user { get; set; }
       public int search_con { get; set; }
-
+      public string sa_ids { get; set; }
       public SiteAnalytics()
       {
           sa_id = 0;
@@ -34,6 +34,7 @@ namespace BLL.gigade.Model
           s_sa_create_time = string.Empty;
           s_sa_create_user = string.Empty;
           search_con = 0;
+          sa_ids = string.Empty;
       }
     }
 }
