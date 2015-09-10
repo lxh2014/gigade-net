@@ -4627,7 +4627,7 @@ namespace Admin.gigade.Controllers
                     }
                     if (item.Deduct_Happygo != 0)
                     {
-                        message = "HG使用:" + item.Deduct_Happygo + "點/" + Math.Round(Convert.ToDecimal(item.Deduct_Happygo * item.Deduct_Happygo_Convert)) + "元";
+                        message = "HG使用:" + item.Deduct_Happygo + "點/" + Math.Round(Convert.ToDecimal(item.Deduct_Happygo * item.deduct_happygo_convert)) + "元";//deduct_happygo_convert
                     }
                     item.order_pay_message = message;
                     if (item.Order_Payment >0)
