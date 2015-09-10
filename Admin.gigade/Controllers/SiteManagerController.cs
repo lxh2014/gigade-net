@@ -442,7 +442,7 @@ namespace Admin.gigade.Controllers
                     {
                         query.s_sa_date = (Convert.ToDateTime(Request.Params["serch_sa_date"]).ToString("yyyy-MM-dd"));
                     }
-                    json = _siteAnalytics.ImportExcelToDt(_dt);//匯入成功
+                    json = _siteAnalytics.ImportExcelToDt(_dt);//匯入成功 
                 }
             }
             catch (Exception ex)

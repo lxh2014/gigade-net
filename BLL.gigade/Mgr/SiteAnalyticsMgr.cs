@@ -129,6 +129,6 @@ namespace BLL.gigade.Mgr
             {
                 throw new Exception("SiteAnalyticsMgr-->IsExistSiteAnalytics-->" + ex.Message, ex);
             }
-        }
+        } 
     }
 }
