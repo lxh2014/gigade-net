@@ -4283,7 +4283,7 @@ namespace Admin.gigade.Controllers
                 {
                     source = (int.Parse(serival) + 1).ToString();
                 }
-                serival = CommonFunction.Supply(source, "0", 4);
+                serival = CommonFunction.Supply(source, "0", 5);
 
             }
             catch (Exception ex)
