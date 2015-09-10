@@ -293,9 +293,7 @@ namespace BLL.gigade.Mgr
         }
         #endregion
 
-        #region 聯合信用卡
-
-
+        #region 聯合信用卡        
         public List<OrderPaymentNcccQuery> GetNCCC(OrderPaymentNcccQuery store, out int totalCount)
         {
             try
@@ -304,7 +302,17 @@ namespace BLL.gigade.Mgr
             }
             catch (Exception ex)
             {
-
+                throw new Exception("TabShowMgr-->GetNCCC-->" + ex.Message, ex);
+            }
+        }
+        public DataTable GetNCCC(int order_id)
+        {
+            try
+            {
+                return _tabshowdao.GetNCCC(order_id);
+            }
+            catch (Exception ex)
+            {
                 throw new Exception("TabShowMgr-->GetNCCC-->" + ex.Message, ex);
             }
         }

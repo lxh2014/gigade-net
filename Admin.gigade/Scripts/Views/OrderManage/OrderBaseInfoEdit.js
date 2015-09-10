@@ -1083,6 +1083,10 @@ modifyDeliverData = function () {
                 fieldLabel: '室內電話',
                 id: 'd_user_phone',
                 name: 'd_user_phone',
+                regex: /^[-+]?([0-9]\d*|0)$/,
+                regexText: '格式不正確',
+                maxLength: 20,
+                maxLengthText: '最大長度為20',
                 width: 300
             },
                {
@@ -1090,7 +1094,11 @@ modifyDeliverData = function () {
                    fieldLabel: '手機',
                    allowBlank: false,
                    id: 'd_user_mobile',
-                       name: 'd_user_mobile',
+                   name: 'd_user_mobile',
+                   regex: /^[-+]?([0-9]\d*|0)$/,
+                   regexText: '格式不正確',
+                   maxLength: 20,
+                   maxLengthText: '最大長度為20',
                    width: 300
                },
                {

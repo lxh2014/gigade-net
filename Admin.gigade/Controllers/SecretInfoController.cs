@@ -48,6 +48,7 @@ namespace Admin.gigade.Controllers
         private VipUserGroupMgr _vipUserGroup;
         private IBrowseDataImplMgr _IBrowseDataMgr; 
         private ZipMgr zMgr;
+        private ITabShowImplMgr _tabshow;
 
         #region 視圖
         /// <summary>
@@ -754,6 +755,12 @@ namespace Admin.gigade.Controllers
                         store = OphMgr.GetOderHitrustDT(related_id);
                         json = "{success:true,\"id\":\"" + store.Rows[0]["id"] + "\",\"pan\":\"" + store.Rows[0]["pan"] + "\",\"bankname\":\"" + store.Rows[0]["bankname"] + "\"}";
                         break;
+                    case "order_payment_nccc":
+                        TabShowMgr OpnMgr = new TabShowMgr(mySqlConnectionString);
+                        DataTable Opn = new DataTable();
+                        store = OpnMgr.GetNCCC(related_id);
+                        json = "{success:true,\"nccc_id\":\"" + Opn.Rows[0]["nccc_id"] + "\",\"nccc_pan\":\"" + Opn.Rows[0]["pan"] + "\",\"nccc_bankname\":\"" + Opn.Rows[0]["bankname"] + "\"}";
+                        break;
                     //case "send_mail":
                     //    SendMailMgr sendmailMgr = new SendMailMgr(mySqlConnectionString);
                     //    SendMail sendModel = sendmailMgr.GetModel(new SendMail { id = related_id });
@@ -899,6 +906,13 @@ namespace Admin.gigade.Controllers
                         string user_id = (_dtBrowse.Rows[0]["user_id"].ToString());
                         json = "{success:true,\"user_name\":\"" + user_name + "\",\"user_id\":\"" + user_id + "\"}";
                         break;
+                    case 22://聯合信用卡銀行卡號
+                        _tabshow = new TabShowMgr(mySqlConnectionString);
+                       //  OrderPaymentNcccQuery OPNQuery = new OrderPaymentNcccQuery();
+                        OrderPaymentNcccQuery OPNQuery = _tabshow.GetNCCC(new OrderPaymentNcccQuery { nccc_id = (uint)related_id, IsPage = false, isSecret = false }, out totalCount).FirstOrDefault();
+                        json = "{success:true,\"nccc_id\":\"" + OPNQuery.nccc_id + "\",\"nccc_pan\":\"" + OPNQuery.pan + "\",\"nccc_bankname\":\"" + OPNQuery.bankname + "\"}";
+                        break;
+
                 }
 
             }
