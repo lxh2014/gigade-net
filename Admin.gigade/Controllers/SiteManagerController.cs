@@ -591,13 +591,13 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["ids"]))
                 {
                     query.sa_ids = Request.Params["ids"].TrimEnd(',');
-                }       
-                _siteAnalytics = new SiteAnalyticsMgr(mySqlConnectionString);
-                if(_siteAnalytics.DeleteSiteAnalytics(query)>0)
-                {
-                    return Json(new { success="true"});
                 }
-                return Json(new {success="false" });
+                _siteAnalytics = new SiteAnalyticsMgr(mySqlConnectionString);
+                if (_siteAnalytics.DeleteSiteAnalytics(query) > 0)
+                {
+                    return Json(new { success = "true" });
+                }
+                return Json(new { success = "false" });
             }
             catch (Exception ex)
             {
@@ -607,6 +607,34 @@ namespace Admin.gigade.Controllers
                 log.Error(logMessage);
                 return Json(new { success = "false" });
             }
+        }
+
+        public JsonResult CheckSiteAnalytics()
+        {
+            try
+            {
+                SiteAnalytics query = new SiteAnalytics();
+                _siteAnalytics = new SiteAnalyticsMgr(mySqlConnectionString);
+                DateTime date;
+                if (DateTime.TryParse(Request.Params["sa_date"], out date))
+                {
+                    query.s_sa_date = date.ToString("yyyy-MM-dd");
+                    int num = _siteAnalytics.IsExistSiteAnalytics(query);
+                    if (num > 0)
+                    {
+                        return Json(new { success = "true" });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return Json(new { success = "false" });
         }
         #endregion
 
