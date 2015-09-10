@@ -84,9 +84,9 @@
                                     else {
                                         myMask.hide();
                                         Ext.Msg.alert(INFORMATION, SUCCESS);
-                                      
+                                        setTimeout('frushthis()', 3000);
                                        // TranToDetial(Ext.htmlEncode(Ext.getCmp('return_Order_id').getValue()));
-                                        window.location.reload(true);
+                                      //  window.location.reload(true);
                                         //editWin.close();
                                     }
                                 } else {
@@ -103,6 +103,7 @@
                 }
             }]
     });
+   
     var editWin = Ext.create('Ext.window.Window', {
         title: '取消訂單',
         iconCls: 'icon-user-edit',
@@ -146,9 +147,16 @@
                     success: function (response) {
                         var result = Ext.decode(response.responseText);
                        
-                        if (result.msg != "100")
+                        var result = Ext.decode(response.responseText);
+                        if (result.msg == "0") {
+                            Ext.Msg.alert("提示", "程式出現異常!");//error master!
+                        }
+                        if (result.msg == "1") {
+                            Ext.Msg.alert("提示", "error master!");//error master!
+                        }
+                        if (result.msg == "99")//消費者購物金餘額不足，無法扣除給予購物金!
                         {
-                            Ext.Msg.alert("提示", result.msg);
+                            Ext.Msg.alert("提示", "消費者購物金餘額不足，無法扣除給予購物金");//error master!
                         }
                     }
                 });

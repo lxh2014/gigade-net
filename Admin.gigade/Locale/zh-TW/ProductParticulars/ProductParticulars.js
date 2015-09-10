@@ -94,3 +94,6 @@ MANIPULATE_SUCCESS = "操作成功";
 SHOW_ALL_COUNT = "显示 {0} - {1} 条，共计 {2} 条";
 NON_DATA = "没有数据";
 NOMESSAGEINFOOFSITE = "不存在修改站臺相關信息或要修改站臺已在審核,作用中";
+
+/*guodong1130w添加*/
+SAVEWRONGMESSAGE = "若有保存期限、允出天數、允收天數請勾選有效期控制"

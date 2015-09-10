@@ -58,11 +58,11 @@ namespace BLL.gigade.Dao
                 `repeat_count`='{5}',`repeat_hours`='{6}',`time_type`='{7}',`week_day`='{8}',
                 `start_time`='{9}',`end_time`='{10}',`duration_start`='{11}',`duration_end`={12},schedule_name='{13}',
                 `desc`='{14}',create_user={15},create_date='{16}' WHERE schedule_id = {17}",
-                schedule.type, schedule.execute_type, schedule.day_type, schedule.month_type, schedule.date_value, 
+                schedule.type, schedule.execute_type, schedule.day_type, schedule.month_type, schedule.date_value,
                 schedule.repeat_count, schedule.repeat_hours,
                 schedule.time_type, schedule.week_day, schedule.start_time.ToString("HH:mm:ss"), schedule.end_time.ToString("HH:mm:ss"),
                 schedule.duration_start.ToString("yyyy-MM-dd"),
-                schedule.duration_end == DateTime.MinValue ? "null" : "'"+schedule.duration_end.ToString("yyyy-MM-dd")+"'",
+                schedule.duration_end == DateTime.MinValue ? "null" : "'" + schedule.duration_end.ToString("yyyy-MM-dd") + "'",
                 schedule.schedule_name, schedule.desc, schedule.create_user,
                 schedule.create_date.ToString("yyyy-MM-dd HH:mm:ss"), schedule.schedule_id);
 
@@ -77,7 +77,6 @@ namespace BLL.gigade.Dao
         /// <returns>List集合</returns>
         public List<Schedule> Query(Model.Query.ScheduleQuery schedule)
         {
-         
             try
             {
                 StringBuilder sb = new StringBuilder();
@@ -90,17 +89,22 @@ namespace BLL.gigade.Dao
                 {
                     sb.AppendFormat(" and schedule_id = {0} ", schedule.schedule_id);
                 }
+                //add by zhuoqin0830w  2015/09/09  排程查詢添加 名稱 查詢條件
+                if (!string.IsNullOrEmpty(schedule.schedule_name))
+                {
+                    sb.AppendFormat(" and schedule_name like '%{0}%' ", schedule.schedule_name);
+                }
                 if (schedule.SearchType != 0)
                 {
                     switch (schedule.SearchType)
                     {
-                        case 1:              
+                        case 1:
                             sb.Append(" and  create_date ");
                             break;
                         case 2:
                             sb.Append(" and  duration_start ");
                             break;
-                            //sb.Append(" and  duration_end "); ///add by wwei0216w 2015/3/30 修改原因:看不懂該段代碼,且按照結束時間查詢結果集不正確,將該段代碼移至case 3處
+                        //sb.Append(" and  duration_end "); ///add by wwei0216w 2015/3/30 修改原因:看不懂該段代碼,且按照結束時間查詢結果集不正確,將該段代碼移至case 3處
                         case 3:
                             sb.Append(" and  duration_end ");
                             break;

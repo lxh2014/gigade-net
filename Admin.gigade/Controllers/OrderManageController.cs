@@ -4112,7 +4112,7 @@ namespace Admin.gigade.Controllers
                }
                _orderCancelMgr = new OrderCancelMasterMgr(mySqlConnectionString);
                int result = _orderCancelMgr.ReturnAllOrder(order);
-               string msg = "";
+               string msg = "等待超時";
                switch (result)
                {
                    case 1:
@@ -4598,7 +4598,7 @@ namespace Admin.gigade.Controllers
                     }
                     if (item.Deduct_Welfare != 0)
                     {
-                        message = "抵用劵使用使用:" + item.Deduct_Welfare;
+                        message = "抵用劵使用:" + item.Deduct_Welfare;
                     }
                     if (item.Deduct_Happygo != 0)
                     {
