@@ -2113,7 +2113,10 @@ function editFunction(rowID) {
                 allowBlank: false,//
                 readOnly: true,
                 name: 'erp_id',
-                labelWidth: 90
+                labelWidth: 90,
+                //minLength: 9,
+                //maxLength: 9,//設定erp_id長度為9
+                allowBlank: false
             },
             {
                 xtype: 'fieldcontainer',

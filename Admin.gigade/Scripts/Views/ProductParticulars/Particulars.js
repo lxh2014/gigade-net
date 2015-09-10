@@ -16,7 +16,7 @@ Ext.require([
 //定義商品細項Model&Store
 Ext.define('gigade.Particulars', {
     extend: 'Ext.data.Model',
-    idProperty:'Item_id',
+    idProperty: 'Item_id',
     fields: [{ name: "Product_id", type: "string" },
         { name: "Item_id", type: "string" },
         { name: "Product_name", type: "string" },
@@ -433,12 +433,20 @@ Ext.onReady(function () {
 
                         var particulars = [];
                         var upDataStore = particularsStore.getUpdatedRecords();//僅獲得修改后的行 add by wwei0216w 2015/6/24
+                        var sumday=0;
                         for (var i = 0, j = upDataStore.length ; i < j; i++) {
 
                             var record = upDataStore[i];
-
+                            //2015/09/09 guodong1130w增加有效期控制判斷
+                            sumday = record.get("Cde_dt_shp") + record.get("Cde_dt_var") + record.get("Cde_dt_incr");
+                            if (sumday > 0 && record.get("Pwy_dte_ctl_bool") == false)
+                            {
+                                Ext.Msg.alert(INFORMATION, SAVEWRONGMESSAGE);
+                                myMask.hide();
+                                return;
+                            }
                             particulars.push({
-                                "Product_id":record.get("Product_id"),//add by wwei0216w 註:後臺需要product_id作為歷史繼續查詢時的查詢條件 2015/7/6 
+                                "Product_id": record.get("Product_id"),//add by wwei0216w 註:後臺需要product_id作為歷史繼續查詢時的查詢條件 2015/7/6 
                                 "item_id": record.get("Item_id"),
                                 "pend_del_bool": record.get("Pend_del_bool"),
                                 "cde_dt_shp": record.get("Cde_dt_shp"),
@@ -476,6 +484,7 @@ Ext.onReady(function () {
                                 var res = Ext.decode(response.responseText);
                                 if (res.success) {
                                     Ext.Msg.alert(INFORMATION, SUCCESS);
+                                    search();
                                 } else {
                                     Ext.Msg.alert(INFORMATION, MANIPULATE_FAILED);//操作失敗
                                 }

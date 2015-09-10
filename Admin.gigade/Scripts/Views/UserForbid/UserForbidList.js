@@ -100,7 +100,7 @@ Ext.onReady(function () {
             { xtype: 'button', text: '刪除', id: 'remove', hidden: false, disabled: true, iconCls: 'icon-user-remove', handler: onRemoveClick },
              '->',
                               {
-                                  xtype: 'datetimefield',
+                                  xtype: 'datefield',
                                   allowBlank: true,
                                   id: 'timestart',
                                   margin: "0 5 0 0",
@@ -109,11 +109,23 @@ Ext.onReady(function () {
                                   name: 'serchcontent',
                                   fieldLabel: '創建時間',
                                   labelWidth: 60,
-                                  dateRange: { begin: 'timestart', end: 'timeend' },
-                                  vtype: 'dateRange'
+                                  editable: false,
+                                  listeners: {
+                                      select: function (a, b, c) {
+                                          var tstart = Ext.getCmp("timestart");
+                                          var tend = Ext.getCmp("timeend");
+                                          if (tend.getValue() == null) {
+                                              tend.setValue(setNextMonth(tstart.getValue(), 1));
+                                          }
+                                          else if (tend.getValue() < tstart.getValue()) {
+                                              Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                                              tend.setValue(setNextMonth(tstart.getValue(), 1));
+                                          }
+                                      }
+                                  }
                               },
              {
-                 xtype: 'datetimefield',
+                 xtype: 'datefield',
                  allowBlank: true,
                  editable: false,
                  id: 'timeend',
@@ -122,8 +134,19 @@ Ext.onReady(function () {
                  fieldLabel: '到',
                  value:new Date(),
                  labelWidth: 15,
-                 dateRange: { begin: 'timestart', end: 'timeend' },
-                 vtype: 'dateRange'
+                 listeners: {
+                     select: function (a, b, c) {
+                         var tstart = Ext.getCmp("timestart");
+                         var tend = Ext.getCmp("timeend");
+                         if (tstart.getValue() == null) {
+                             tstart.setValue(setNextMonth(tend.getValue(), -1));
+                         }
+                         else if (tend.getValue() < tstart.getValue()) {
+                             Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                             tstart.setValue(setNextMonth(tend.getValue(), -1));
+                         }
+                     }
+                 }
              },
              {
                  xtype: 'textfield', fieldLabel: "查詢IP", id: 'serchcontent', labelWidth: 55, listeners: {
@@ -239,6 +262,17 @@ onRemoveClick = function () {
             }
         });
     }
+}
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }
 
 

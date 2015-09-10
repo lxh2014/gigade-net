@@ -384,7 +384,7 @@ Ext.onReady(function () {
          {
              xtype: 'container',
              layout: 'column',
-             hidden: true,
+             //hidden: true,
              id: 'jundge_combox',
              items: [{
                  xtype: 'radiogroup',
@@ -1033,12 +1033,12 @@ function validateForm(product_start, product_end, expect_time, purchase_in_advan
     }
 
     //若填寫預計出貨時間則預計出貨信息必填
-    if (Ext.getCmp("e_time").rawValue != "") {
-        if (Ext.getCmp("expect_msg").getValue() == "") { Ext.Msg.alert(PROMPT, PLEASE_WRITE_SHIPMENT_MESSAGE); return; }
-    }
+    //if (Ext.getCmp("e_time").rawValue != "") {
+    //    if (Ext.getCmp("expect_msg").getValue() == "") { Ext.Msg.alert(PROMPT, PLEASE_WRITE_SHIPMENT_MESSAGE); return; }
+    //}
     //add by dongya 2015/08/25
     if (Ext.getCmp("recommedde_jundge").getValue().recommedde_jundge == 1) {
-        if (Ext.getCmp('recommedde_time').getChecked() == 0 || Ext.getCmp("recommedde_expend_day").getValue() == 0) {
+        if (Ext.getCmp('recommedde_time').getChecked() == 0 || Ext.getCmp("recommedde_expend_day").getValue() < 0) {
             Ext.Msg.alert(PROMPT, MONTH_SET_USED_TIME_NOEMPTY);
             return;
         }

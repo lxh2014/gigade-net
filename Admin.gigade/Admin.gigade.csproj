@@ -3798,7 +3798,9 @@
     <Content Include="Template\AppcategoryImport\t_category.xls" />
     <Content Include="Views\ProductPurchase\RIS.cshtml" />
     <Content Include="Views\WareHouse\Check.cshtml" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

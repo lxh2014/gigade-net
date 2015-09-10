@@ -1286,8 +1286,33 @@ namespace Admin.gigade.Controllers
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
                 query.order_id = Convert.ToUInt32(Request.Params["Order_Id"].ToString());
                 _tabshow = new TabShowMgr(mySqlConnectionString);
+                if (!string.IsNullOrEmpty(Request.Params["isSecret"]))
+                {
+                    if (Request.Params["isSecret"] == "true")
+                    {
+                        query.isSecret = true;
+                    }
+                    else
+                    {
+                        query.isSecret = false;
+                    }
+                }
                 int totalCount = 0;
                 stores = _tabshow.GetNCCC(query, out totalCount);
+                if (query.isSecret)
+                {
+                    foreach (var item in stores)
+                    {
+                        item.pan_bankname = "*****(******)";
+                    }
+                }
+                else
+                {
+                    foreach (var item in stores)
+                    {
+                        item.pan_bankname = item.pan + "(" + item.bankname + ")";
+                    }
+                }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
 
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -4112,7 +4137,7 @@ namespace Admin.gigade.Controllers
                }
                _orderCancelMgr = new OrderCancelMasterMgr(mySqlConnectionString);
                int result = _orderCancelMgr.ReturnAllOrder(order);
-               string msg = "";
+               string msg = "等待超時";
                switch (result)
                {
                    case 1:
@@ -4598,11 +4623,11 @@ namespace Admin.gigade.Controllers
                     }
                     if (item.Deduct_Welfare != 0)
                     {
-                        message = "抵用劵使用使用:" + item.Deduct_Welfare;
+                        message = "抵用劵使用:" + item.Deduct_Welfare;
                     }
                     if (item.Deduct_Happygo != 0)
                     {
-                        message = "HG使用:" + item.Deduct_Happygo + "點/" + Math.Round(Convert.ToDecimal(item.Deduct_Happygo * item.Deduct_Happygo_Convert)) + "元";
+                        message = "HG使用:" + item.Deduct_Happygo + "點/" + Math.Round(Convert.ToDecimal(item.Deduct_Happygo * item.deduct_happygo_convert)) + "元";//deduct_happygo_convert
                     }
                     item.order_pay_message = message;
                     if (item.Order_Payment >0)
