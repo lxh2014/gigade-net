@@ -81,7 +81,7 @@ Ext.onReady(function () {
             { header: "日", dataIndex: 'click_day', flex: 1, id: 'day', align: 'center' },
             { header: "點擊次數", dataIndex: 'click_total', flex: 1, align: 'center' }
         ],
-        tbar: [{ xtype: 'button', id: 'excel', hidden: false, icon: '../../../Content/img/icons/excel.gif', handler: OutExcel }],
+        tbar: [{ xtype: 'button', id: 'excel', text:'匯出',hidden: false, icon: '../../../Content/img/icons/excel.gif', handler: OutExcel }],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: ProductClickStore,
             pageSize: pageSize,
