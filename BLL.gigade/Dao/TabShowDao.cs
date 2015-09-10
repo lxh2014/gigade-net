@@ -723,16 +723,15 @@ namespace BLL.gigade.Dao
         {
             StringBuilder sql = new StringBuilder();
             StringBuilder sqlcount = new StringBuilder();
-
             try
             {
-                sql.AppendLine(@"SELECT opnc.nccc_id,opnc.order_id,opnc.merchantid,opnc.terminalid,opnc.orderid,");
-                sql.AppendLine(@"opnc.pan,opnc.bankname,opnc.transcode,opnc.transmode,opnc.transdate,opnc.transtime,");
-                sql.AppendLine(@"opnc.transamt,opnc.approvecode,opnc.responsecode,opnc.responsemsg,opnc.installtype,");
-                sql.AppendLine(@"opnc.`install`,opnc.firstamt,opnc.eachamt,opnc.fee,opnc.redeemtype,opnc.redeemused,");
-                sql.AppendLine(@"opnc.redeembalance,opnc.creditamt,opnc.riskmark,opnc.foreign1,");
-                sql.AppendLine(@"opnc.secure_status,FROM_UNIXTIME(opnc.nccc_createdate) AS nccc_createdates ,opnc.nccc_ipfrom,opnc.post_data");
-                sql.AppendFormat(@"FROM order_payment_nccc opnc WHERE opnc.order_id={0}", store.order_id);
+                sql.AppendLine(@"SELECT nccc_id,order_id,merchantid,terminalid,orderid,");
+                sql.AppendLine(@"pan,bankname,transcode,transmode,transdate,transtime,");
+                sql.AppendLine(@"transamt,approvecode,responsecode,responsemsg,installtype,");
+                sql.AppendLine(@"`install`,firstamt,eachamt,fee,redeemtype,redeemused,");
+                sql.AppendLine(@"redeembalance,creditamt,riskmark,foreign1,");
+                sql.AppendLine(@"secure_status,FROM_UNIXTIME(nccc_createdate) AS nccc_createdates ,nccc_ipfrom,post_data");
+                sql.AppendFormat(@"FROM order_payment_nccc WHERE order_id={0}", store.order_id);
                 sqlcount.AppendFormat(@"SELECT count(*) AS search_total FROM order_payment_nccc WHERE order_id={0} ", store.order_id);
                 totalCount = 0;
                 if (store.IsPage)
@@ -749,9 +748,20 @@ namespace BLL.gigade.Dao
             }
             catch (Exception ex)
             {
-
-
                 throw new Exception("TabShowDao-->GetNCCC " + ex.Message + sql.ToString(), ex);
+            }
+        }
+        public DataTable GetNCCC(int order_id)
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                sb.AppendFormat(@"select nccc_id,pan,bankname from order_payment_nccc where order_id ='{0}' ", order_id);
+                return _access.getDataTable(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("TabShowDao-->GetNCCC " + ex.Message + sb.ToString(), ex);
             }
         }
 

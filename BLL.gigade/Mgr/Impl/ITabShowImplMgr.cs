@@ -29,5 +29,6 @@ namespace BLL.gigade.Mgr.Impl
         List<OrderReturnContentQuery> GetOrderReturnContentQueryUp(OrderReturnContentQuery store, out int totalCount);
         List<OrderReturnMasterQuery> GetReturnMasterDown(OrderReturnMasterQuery store, out int totalCount);
         DataTable GetOderHitrustDT(int order_id);
+        DataTable GetNCCC(int order_id);
     }
 }
