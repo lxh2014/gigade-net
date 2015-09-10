@@ -78,7 +78,7 @@ function editFunction(RowID, Store) {
                             Ext.Msg.alert(INFORMATION, FAILURE);
                         }
                     });
-                }
+                } 
                 if(result1==0)
                 {
                     var form = this.up('form').getForm();//沿着 ownerCt 查找匹配简单选择器的祖先容器.

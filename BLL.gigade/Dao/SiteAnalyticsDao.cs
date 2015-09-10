@@ -235,7 +235,7 @@ namespace BLL.gigade.Dao
             }
             catch (Exception ex)
             {
-                throw new Exception("SiteAnalyticsDao-->UpdateSiteAnalytics-->" + ex.Message + sql.ToString(), ex);
+                throw new Exception("SiteAnalyticsDao-->UpdateSiteAnalytics-->" + ex.Message + sql.ToString(), ex); 
             }
         }
     }
