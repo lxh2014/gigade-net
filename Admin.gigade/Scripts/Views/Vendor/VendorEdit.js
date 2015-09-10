@@ -2110,8 +2110,7 @@ function editFunction(rowID) {
                 xtype: 'textfield',
                 fieldLabel: 'ERP 廠商編號',
                 id: 'erp_id',
-                //editable: false,
-                allowBlank: false,
+                allowBlank: false,//
                 readOnly: true,
                 name: 'erp_id',
                 labelWidth: 90
