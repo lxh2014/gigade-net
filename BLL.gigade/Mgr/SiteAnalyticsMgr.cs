@@ -119,5 +119,16 @@ namespace BLL.gigade.Mgr
                 throw new Exception("SiteAnalyticsMgr-->DeleteSiteAnalytics-->" + ex.Message, ex);
             }
         }
+        public int IsExistSiteAnalytics(SiteAnalytics query)
+        {
+            try
+            {
+                return _siteAnalytics.IsExist(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("SiteAnalyticsMgr-->IsExistSiteAnalytics-->" + ex.Message, ex);
+            }
+        }
     }
 }

@@ -114,7 +114,7 @@ namespace BLL.gigade.Dao
             StringBuilder sqlWhere = new StringBuilder();
             try
             {
-                sql.Append("  select saly.sa_date,saly.sa_work_stage,saly.sa_user from site_analytics saly ");
+                sql.Append("  select CASE saly.sa_date WHEN '0000-00-00' THEN '0001-01-01' ELSE sa_date  END  AS sa_date,saly.sa_work_stage,saly.sa_user from site_analytics saly ");
                 sqlWhere.Append(" where 1=1 ");
                 if (query.search_con != 0)
                 {
