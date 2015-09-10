@@ -73,5 +73,5 @@
 
     MONTH_SET_NOEMPTY = "推薦月份不能為空";
 
-    MONTH_SET_USED_TIME_NOEMPTY = "推薦月份設定為必填項，且預計消耗時間必須大於0";
+    MONTH_SET_USED_TIME_NOEMPTY = "推薦月份設定為必填項，且預計消耗時間必須大於等於0";
 });

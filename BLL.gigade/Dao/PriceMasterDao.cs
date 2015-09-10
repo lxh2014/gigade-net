@@ -749,7 +749,7 @@ where pm2.price_master_id={0}", query.price_master_id);
             StringBuilder sb = new StringBuilder();
             try
             {
-                sb.AppendFormat(@"SELECT s.site_name,p.product_id,p.product_name,ip.item_id,pm.product_name as item_name,p.product_status,pm.price_status,ip.item_money,ip.item_cost,ip.event_money,ip.event_cost AS item_event_cost 
+                sb.AppendFormat(@"SELECT s.site_name,p.product_id,p.product_name,ip.item_id,pm.product_name as item_name,p.product_status,pm.price_status,ip.item_money,ip.item_cost,ip.event_money,ip.event_cost AS item_event_cost,p.spec_title_1,p.spec_title_2 
                                   FROM price_master pm
                                       INNER JOIN product p ON p.product_id = pm.product_id
                                       LEFT JOIN item_price ip ON ip.price_master_id = pm.price_master_id
