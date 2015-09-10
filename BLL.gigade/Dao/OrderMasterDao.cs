@@ -2031,7 +2031,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("select deliver_id from deliver_master where order_id='{0}' and delivery_status=0;", om.Order_Id);
+                sql.AppendFormat("select deliver_id,delivery_status from deliver_master where order_id='{0}';", om.Order_Id);
                 return _dbAccess.getDataTable(sql.ToString());
 
             }

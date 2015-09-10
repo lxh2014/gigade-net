@@ -980,15 +980,71 @@ set ");
             try
             {
                 DataTable _dt = _orderMasterDao.CheckDeliveryStatus(om);
-                if (_dt != null && _dt.Rows.Count > 0)
+                int i = 0;
+                if (_dt != null)//有數據，看看裏面的status是不是都是==0？執行變更：已出貨不能變更
+                {
+                    foreach (DataRow item in _dt.Rows)
+                    {
+                        if (Convert.ToInt32(item["delivery_status"]) == 0)
+                        {
+                            i++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    if (i == _dt.Rows.Count)//都是0，可以變更
+                    {
+                        oms.status_description = "Writer:" + "(" + om.user_id + ")" + om.user_name + "," + "\r\n" + "異動收貨資訊";
+                        oms.status_ipfrom = om.Order_Ipfrom;
+                        oms.StatusCreateDate = DateTime.Now;
+                        oms.order_id = om.Order_Id;
+                        om.mdd = true;
+                        newOms = _orderMasterDao.GetData(om.Order_Id);
+                        string note_order = newOms.note_order;
+                        if (note_order == "")
+                        {
+                            om.note_order = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "更改收件人資訊";
+                        }
+                        else
+                        {
+                            om.note_order = note_order + '/' + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "更改收件人資訊";
+                        }
+                        oms.order_status = newOms.order_status;
+                        arrList.Add(_orderMasterDao.UpOrderMaster(om));//更新order_master
+                        arrList.Add(_orderMasterDao.UpdateDM(om));//更新deliver_master
+                        serial = _serialDao.GetSerialById(29);
+                        oms.serial_id = Convert.ToInt32(serial.Serial_Value) + 1;
+                        serial.Serial_Value = Convert.ToUInt64(oms.serial_id);
+                        arrList.Add(_serialDao.UpdateAutoIncreament(serial));//更新serial表
+                        arrList.Add(_orderMasterDao.InsertOrderMasterStatus(oms));//插入order_master_status表
+                        if (_mysqlDao.ExcuteSqlsThrowException(arrList))
+                        {
+                            json = "{success:true}";
+                            #region 發送郵件
+                            MailHelper mail = new MailHelper();
+                            string body = "付款單號 : " + om.Order_Id + " 已更改收貨人資訊，請重新檢視出貨單<br/>更改時間：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "<br/><br/>以上為系統通知信請勿直接回覆，謝謝！               ";
+                            mail.SendMailAction("shiwei0620j@gimg.tw", "收貨人資訊變更", body);
+                            #endregion
+                        }
+                        else
+                        {
+                            json = "{success:false}";
+                        }
+                    }
+                    else
+                    {
+                        json = "{success:true,msg:'1'}";//已出貨，不能更改。
+                    }
+                }
+                else
                 {
                     oms.status_description = "Writer:" + "(" + om.user_id + ")" + om.user_name + "," + "\r\n" + "異動收貨資訊";
                     oms.status_ipfrom = om.Order_Ipfrom;
                     oms.StatusCreateDate = DateTime.Now;
                     oms.order_id = om.Order_Id;
                     om.mdd = true;
-
-
                     newOms = _orderMasterDao.GetData(om.Order_Id);
                     string note_order = newOms.note_order;
                     if (note_order == "")
@@ -1002,10 +1058,7 @@ set ");
                     oms.order_status = newOms.order_status;
                     arrList.Add(_orderMasterDao.UpOrderMaster(om));//更新order_master
                     arrList.Add(_orderMasterDao.UpdateDM(om));//更新deliver_master
-                    // arrList.Add(_orderMasterDao);
                     serial = _serialDao.GetSerialById(29);
-                    //serial.Serial_id = 29;
-                    //serial.Serial_Value = serial.Serial_Value + 1;
                     oms.serial_id = Convert.ToInt32(serial.Serial_Value) + 1;
                     serial.Serial_Value = Convert.ToUInt64(oms.serial_id);
                     arrList.Add(_serialDao.UpdateAutoIncreament(serial));//更新serial表
@@ -1024,10 +1077,6 @@ set ");
                     {
                         json = "{success:false}";
                     }
-                }
-                else
-                {
-                    json = "{success:true,msg:'1'}";//已出貨，不能更改。
                 }
                 return json;
             }
