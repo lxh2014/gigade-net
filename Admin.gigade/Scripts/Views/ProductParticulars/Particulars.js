@@ -484,6 +484,7 @@ Ext.onReady(function () {
                                 var res = Ext.decode(response.responseText);
                                 if (res.success) {
                                     Ext.Msg.alert(INFORMATION, SUCCESS);
+                                    search();
                                 } else {
                                     Ext.Msg.alert(INFORMATION, MANIPULATE_FAILED);//操作失敗
                                 }
