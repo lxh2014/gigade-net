@@ -48,6 +48,7 @@ namespace Admin.gigade.Controllers
         private VipUserGroupMgr _vipUserGroup;
         private IBrowseDataImplMgr _IBrowseDataMgr; 
         private ZipMgr zMgr;
+        private ITabShowImplMgr _tabshow;
 
         #region 視圖
         /// <summary>
@@ -905,6 +906,13 @@ namespace Admin.gigade.Controllers
                         string user_id = (_dtBrowse.Rows[0]["user_id"].ToString());
                         json = "{success:true,\"user_name\":\"" + user_name + "\",\"user_id\":\"" + user_id + "\"}";
                         break;
+                    case 22://聯合信用卡銀行卡號
+                        _tabshow = new TabShowMgr(mySqlConnectionString);
+                       //  OrderPaymentNcccQuery OPNQuery = new OrderPaymentNcccQuery();
+                        OrderPaymentNcccQuery OPNQuery = _tabshow.GetNCCC(new OrderPaymentNcccQuery { nccc_id = (uint)related_id, IsPage = false, isSecret = false }, out totalCount).FirstOrDefault();
+                        json = "{success:true,\"nccc_id\":\"" + OPNQuery.nccc_id + "\",\"nccc_pan\":\"" + OPNQuery.pan + "\",\"nccc_bankname\":\"" + OPNQuery.bankname + "\"}";
+                        break;
+
                 }
 
             }
