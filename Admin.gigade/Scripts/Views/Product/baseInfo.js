@@ -1130,7 +1130,7 @@ function validateForm(product_start, product_end, expect_time, purchase_in_advan
 
     //add by dongya 2015/08/25
     if (Ext.getCmp("recommedde_jundge").getValue().recommedde_jundge == 1) {
-        if (Ext.getCmp('recommedde_time').getChecked() == 0 || Ext.getCmp("recommedde_expend_day").getValue() == 0) {
+        if (Ext.getCmp('recommedde_time').getChecked() == 0 || Ext.getCmp("recommedde_expend_day").getValue() < 0) {
             Ext.Msg.alert(PROMPT, MONTH_SET_USED_TIME_NOEMPTY);
             return;
         }
