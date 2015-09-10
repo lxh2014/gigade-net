@@ -2115,11 +2115,7 @@ function editFunction(rowID) {
                 name: 'erp_id',
                 labelWidth: 90,
                 //minLength: 9,
-<<<<<<< HEAD
                 //maxLength: 9,//erp_id長度限定為9
-=======
-                //maxLength: 9,//設定erp_id長度為9
->>>>>>> bb38dd1ad445adb837b19b56bad43b2a1fad4b08
                 allowBlank: false
             },
             {
