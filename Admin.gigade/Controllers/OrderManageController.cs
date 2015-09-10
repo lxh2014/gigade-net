@@ -1286,8 +1286,33 @@ namespace Admin.gigade.Controllers
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
                 query.order_id = Convert.ToUInt32(Request.Params["Order_Id"].ToString());
                 _tabshow = new TabShowMgr(mySqlConnectionString);
+                if (!string.IsNullOrEmpty(Request.Params["isSecret"]))
+                {
+                    if (Request.Params["isSecret"] == "true")
+                    {
+                        query.isSecret = true;
+                    }
+                    else
+                    {
+                        query.isSecret = false;
+                    }
+                }
                 int totalCount = 0;
                 stores = _tabshow.GetNCCC(query, out totalCount);
+                if (query.isSecret)
+                {
+                    foreach (var item in stores)
+                    {
+                        item.pan_bankname = "*****(******)";
+                    }
+                }
+                else
+                {
+                    foreach (var item in stores)
+                    {
+                        item.pan_bankname = item.pan + "(" + item.bankname + ")";
+                    }
+                }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
 
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";

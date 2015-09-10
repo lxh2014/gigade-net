@@ -731,8 +731,18 @@ namespace BLL.gigade.Dao
                 sql.AppendLine(@"`install`,firstamt,eachamt,fee,redeemtype,redeemused,");
                 sql.AppendLine(@"redeembalance,creditamt,riskmark,foreign1,");
                 sql.AppendLine(@"secure_status,FROM_UNIXTIME(nccc_createdate) AS nccc_createdates ,nccc_ipfrom,post_data");
-                sql.AppendFormat(@"FROM order_payment_nccc WHERE order_id={0}", store.order_id);
-                sqlcount.AppendFormat(@"SELECT count(*) AS search_total FROM order_payment_nccc WHERE order_id={0} ", store.order_id);
+                sql.AppendFormat(@"FROM order_payment_nccc  ");
+                sqlcount.AppendFormat(@"SELECT count(*) AS search_total FROM order_payment_nccc   ");
+                if (!store.isSecret)
+                {
+                    sqlcount.AppendFormat("  where nccc_id='{0}' ", store.nccc_id);
+                    sql.AppendFormat("  where nccc_id='{0}' ", store.nccc_id);
+                }
+                else
+                {
+                    sqlcount.AppendFormat("  where order_id='{0}' ", store.order_id);
+                    sql.AppendFormat("  where order_id='{0}' ", store.order_id);
+                }
                 totalCount = 0;
                 if (store.IsPage)
                 {
