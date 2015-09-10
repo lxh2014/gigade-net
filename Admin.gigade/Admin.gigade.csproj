@@ -3467,15 +3467,6 @@
     <Content Include="Scripts\Views\WebContentType\WebContentType8List.js" />
     <Content Include="Views\ProductSelect\Index.cshtml" />
     <Content Include="Views\ProductSelect\ModifyEventCost.cshtml" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
     <Content Include="Scripts\jquery-1.4.4.js" />
     <Content Include="Scripts\jquery-1.4.4.min.js" />
     <Content Include="Scripts\jquery-1.4.4-vsdoc.js" />
@@ -3807,6 +3798,13 @@
     <Content Include="Template\AppcategoryImport\t_category.xls" />
     <Content Include="Views\ProductPurchase\RIS.cshtml" />
     <Content Include="Views\WareHouse\Check.cshtml" />
+    <Content Include="Web.config" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="aimg.gigade100.com\product\150x150\" />

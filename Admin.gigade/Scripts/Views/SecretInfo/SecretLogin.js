@@ -215,6 +215,10 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                     {
                         editEmailFunction(relatedID, edit_UserStore);
                     }
+                    if (urlType == "/OrderManage/ModifyDeliverData")
+                    {
+                        modifyDeliverData();
+                    }
                     else {
                         editFunction(relatedID);
                     }
@@ -430,6 +434,24 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                 id: 'bankname',
                 name: 'bankname',
                 hidden: true
+            },
+            {
+                fieldLabel: '查詢ID',
+                id: 'nccc_id',
+                name: 'nccc_id',
+                hidden: true
+            },
+            {
+                fieldLabel: '交易卡號',
+                id: 'nccc_pan',
+                name: 'nccc_pan',
+                hidden: true
+            },
+            {
+                fieldLabel: '髮卡銀行',
+                id: 'nccc_bankname',
+                name: 'nccc_bankname',
+                hidden: true
             }
         ]
 
@@ -616,18 +638,24 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                             if (result.delivery_address != undefined) {//
                                 Ext.getCmp('delivery_address').setValue(result.delivery_address).show();
                             }
-                            if (result.id != undefined) {//
+                            if (result.id != undefined) {//網際威信-ID
                                 Ext.getCmp('id').setValue(result.id).show();
                             }
-                            if (result.pan != undefined) {//
+                            if (result.pan != undefined) {//網際威信-卡號
                                 Ext.getCmp('pan').setValue(result.pan).show();
                             }
-                            if (result.bankname != undefined) {//
+                            if (result.bankname != undefined) {//網際威信-髮卡銀行
                                 Ext.getCmp('bankname').setValue(result.bankname).show();
                             }
-
-
-
+                            if (result.nccc_id != undefined) {//聯合信用卡-ID
+                                Ext.getCmp('nccc_id').setValue(result.nccc_id).show();
+                            }
+                            if (result.nccc_pan != undefined) {//聯合信用卡-卡號
+                                Ext.getCmp('nccc_pan').setValue(result.nccc_pan).show();
+                            }
+                            if (result.nccc_bankname != undefined) {//聯合信用卡-髮卡銀行
+                                Ext.getCmp('nccc_bankname').setValue(result.nccc_bankname).show();
+                            }
                         } else {
                             Ext.Msg.alert(INFORMATION, FAILURE);
                         }

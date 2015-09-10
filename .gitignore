@@ -44,6 +44,8 @@ x64/
 *.pidb
 *.log
 *.scc
+*.xls
+*.pdf
 Web.config
 
 # OS generated files #

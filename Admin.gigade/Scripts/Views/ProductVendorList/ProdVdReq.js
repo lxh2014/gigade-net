@@ -82,7 +82,7 @@ var reqTime = {
         {
             xtype: 'combobox',
             id: 'reqtype',
-            margin: '0 5px',
+            margin: '0 5px 0 0',
             fieldLabel: '申請類型',
             colName: 'reqtype',
             queryMode: 'local',
@@ -96,7 +96,7 @@ var reqTime = {
             id: 'time_start',
             name: 'time_start',
             fieldLabel: '申請時間',
-            margin: '0 5px 0 20px',
+            margin: '0 5px 0 15px',
             editable: false,
             vtype: 'daterange',
             endDateField: 'time_end'
