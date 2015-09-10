@@ -157,9 +157,14 @@ Ext.onReady(function () {
             dock: 'top',
             items: [{
                 xtype: 'textfield',
-                fieldLabel: ID_CODE,//ID編號
+                fieldLabel: ID_CODE,//排程編號
                 id: 'schedule_id',
                 //name: 'schedule_id',
+                labelWidth: 60
+            }, {
+                xtype: 'textfield',
+                fieldLabel: TIER_NAME,//排程名稱
+                id: 'schedule_name',
                 labelWidth: 60
             }, {
                 xtype: 'combobox',
@@ -206,6 +211,7 @@ Ext.onReady(function () {
                 listeners: {
                     click: function () {
                         Ext.getCmp("schedule_id").setValue("");
+                        Ext.getCmp("schedule_name").setValue("");
                         Ext.getCmp("search_date_type").setValue("");
                         Ext.getCmp("time_start").setValue("");
                         Ext.getCmp("time_end").setValue("");
@@ -314,6 +320,7 @@ function Search() {
     tierStore.load({
         params: {
             schedule_id: Ext.getCmp("schedule_id").getValue(),
+            schedule_name: Ext.getCmp("schedule_name").getValue(),
             SearchType: Ext.getCmp('search_date_type').getValue(),
             start: Ext.getCmp('time_start').getValue(),
             end: Ext.getCmp('time_end').getValue()

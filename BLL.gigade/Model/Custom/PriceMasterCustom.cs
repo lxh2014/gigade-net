@@ -48,6 +48,8 @@ namespace BLL.gigade.Model.Custom
         public int product_status { get; set; }                                                    
         public string product_status_str { get; set; }///商品狀態字符類型
         public string item_name {get;set;}
+        public string spec_title_1 { get; set; }
+        public string spec_title_2 { get; set; }
 
         //public int price {get;set;}
         //public int cost{get;set;}
@@ -82,7 +84,8 @@ namespace BLL.gigade.Model.Custom
             product_status_str = string.Empty;
             item_name = string.Empty;
             product_status = 0;
-            //price = 0;
+            spec_title_1 = string.Empty;
+            spec_title_2 = string.Empty;
             //cost = 0;
             //event_cost = 0;
             //event_price = 0;

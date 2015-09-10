@@ -7,7 +7,6 @@ using BLL.gigade.Mgr;
 using BLL.gigade.Model.Query;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using BLL.gigade.Mgr;
 using BLL.gigade.Model;
 using System.Configuration;
 using BLL.gigade.Common;

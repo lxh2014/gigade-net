@@ -215,6 +215,10 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                     {
                         editEmailFunction(relatedID, edit_UserStore);
                     }
+                    if (urlType == "/OrderManage/ModifyDeliverData")
+                    {
+                        modifyDeliverData();
+                    }
                     else {
                         editFunction(relatedID);
                     }

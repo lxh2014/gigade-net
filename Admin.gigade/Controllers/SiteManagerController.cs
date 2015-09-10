@@ -515,6 +515,99 @@ namespace Admin.gigade.Controllers
                 return results;
             }
         }
+
+        public JsonResult SaveSiteAnalytics()
+        {
+            string json = string.Empty;
+            SiteAnalytics query = new SiteAnalytics();
+            DateTime date;
+            int number = 0;
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["sa_id"]))
+                {
+                    query.sa_id = Convert.ToInt32(Request.Params["sa_id"]);
+                }
+
+                if (DateTime.TryParse(Request.Params["sa_date"], out date))
+                {
+                    query.s_sa_date = date.ToString("yyyy-MM-dd");
+                }
+                if (!string.IsNullOrEmpty(Request.Params["sa_work_stage"]))
+                {
+                    if (int.TryParse(Request.Params["sa_work_stage"], out number))
+                    {
+                        query.sa_work_stage = number;
+                    }
+                }
+                if (!string.IsNullOrEmpty(Request.Params["sa_user"]))
+                {
+                    if (int.TryParse(Request.Params["sa_user"], out number))
+                    {
+                        query.sa_user = number;
+                    }
+                }
+                query.sa_create_user = (Session["caller"] as Caller).user_id;
+                _siteAnalytics = new SiteAnalyticsMgr(mySqlConnectionString);
+                if (query.sa_id == 0)
+                {
+                    if (_siteAnalytics.InsertSiteAnalytics(query) > 0)
+                    {
+                        return Json(new { success = "true" });
+                    }
+                    else
+                    {
+                        return Json(new { success = "false" });
+                    }
+                }
+                else
+                {
+                    if (_siteAnalytics.UpdateSiteAnalytics(query) > 0)
+                    {
+                        return Json(new { success = "true" });
+                    }
+                    else
+                    {
+                        return Json(new { success = "false" });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                return Json(new { success = "false" });
+            }
+        }
+
+        public JsonResult DeleteSiteAnalyticsById()
+        {
+            try
+            {
+                SiteAnalytics query = new SiteAnalytics();
+                if (!string.IsNullOrEmpty(Request.Params["ids"]))
+                {
+                    query.sa_ids = Request.Params["ids"].TrimEnd(',');
+                }       
+                _siteAnalytics = new SiteAnalyticsMgr(mySqlConnectionString);
+                if(_siteAnalytics.DeleteSiteAnalytics(query)>0)
+                {
+                    return Json(new { success="true"});
+                }
+                return Json(new {success="false" });
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                return Json(new { success = "false" });
+            }
+        }
         #endregion
 
         #region 獲取有效站台(store)

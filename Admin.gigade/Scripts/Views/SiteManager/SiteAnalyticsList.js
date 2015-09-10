@@ -44,6 +44,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
         selectionchange: function (sm, selections) {
             var row = Ext.getCmp("SiteAnalyticsList").getSelectionModel().getSelection();
             Ext.getCmp("SiteAnalyticsList").down('#edit').setDisabled(selections.length == 0);
+            Ext.getCmp("SiteAnalyticsList").down('#delete').setDisabled(selections.length == 0);
         }
     }
 });
@@ -53,8 +54,51 @@ SiteAnalyticsListStore.on('beforeload', function () {
         search_con: Ext.getCmp("search_con").getValue(),
     });
 });
-
-
+/***************************新增***********************/
+onAddClick = function () {
+    editFunction(null, SiteAnalyticsListStore);
+}
+/*********************編輯**********************/
+onEditClick = function () {
+    var row = Ext.getCmp("SiteAnalyticsList").getSelectionModel().getSelection();//獲取選中的行數
+    if (row.length > 1) {
+        Ext.Msg.alert(INFORMATION, ONE_SELECTION);
+    } else if (row.length == 1) {
+        editFunction(row[0], SiteAnalyticsListStore);
+    }
+}
+//刪除
+onDeleteClick = function () {
+    var row = Ext.getCmp("SiteAnalyticsList").getSelectionModel().getSelection();
+    Ext.Msg.confirm(CONFIRM, Ext.String.format("刪除選中" + row.length + "條數據?", row.length), function (btn) {
+        if (btn == 'yes') {
+            var rowIDs = '';
+            for (var i = 0; i < row.length; i++) {
+                rowIDs += row[i].data["sa_id"] + ',';
+            }
+            Ext.Ajax.request({
+                url: '/SiteManager/DeleteSiteAnalyticsById',//執行方法
+                method: 'post',
+                params: { ids: rowIDs },
+                success: function (response) {
+                    var result = Ext.decode(response.responseText);
+                    if (result.success) {
+                        Ext.Msg.alert(INFORMATION, "刪除成功!");
+                        for (var i = 0; i < row.length; i++) {
+                            SiteAnalyticsListStore.remove(row[i]);
+                        }
+                    }
+                    else {
+                        Ext.Msg.alert(INFORMATION, "無法刪除!");
+                    }
+                },
+                failure: function () {
+                    Ext.Msg.alert(INFORMATION, FAILURE);
+                }
+            });
+        }
+    });
+}
  Ext.onReady(function () {
 
      function Query() {
@@ -162,6 +206,9 @@ SiteAnalyticsListStore.on('beforeload', function () {
             { header: "創建人", dataIndex: 's_sa_create_user', align: '80', align: 'center' },
         ],
         tbar: [
+           { xtype: 'button', text: "新增", id: 'add', iconCls: 'icon-user-add', handler: onAddClick }, '-',
+           { xtype: 'button', text: "編輯", id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick }, '-',
+           { xtype: 'button', text: "刪除", id: 'delete', iconCls: 'icon-user-remove', disabled: true, handler: onDeleteClick }, '-',
             { xtype: 'button', text: "匯出Excel", id: 'outExcel', icon: '../../../Content/img/icons/excel.gif', handler: outExcel },
             '->',
             {

@@ -1446,7 +1446,20 @@ onEditNoteAdmin = function () {
 
 //變更收貨人資訊
 onModifyDeliverData = function () {
-    modifyDeliverData();
+    var secret_type = '20';
+    var url = "/OrderManage/ModifyDeliverData";
+    var ralated_id = "";
+    var info_id = "";
+    boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+    if (boolPassword != "-1") {
+        if (boolPassword) {
+            SecretLoginFun(secret_type, ralated_id, true, false, true, url, "", info_id, "");//先彈出驗證框，關閉時在彈出顯示框
+        }
+        else {
+            modifyDeliverData();
+        }
+    }
+  
 }
 onAddStatus = function () {
     addStatus();
@@ -1583,6 +1596,7 @@ onWaitClick = function () {
                                 Ext.Msg.alert("錯誤提示", "slave表沒數據！");
                             } else {//轉等待付款成功刷新頁面
                                 TranToDetial(document.getElementById('OrderId').value);
+                              
                             }
                             WaitWin.close();
                             orderListStore.load();
@@ -1690,7 +1704,9 @@ onChangePayment_cash = function () {
                                     Ext.Msg.alert("錯誤提示", "slave沒數據！");
                                 } else {
                                     Ext.Msg.alert("提示", "轉自取成功!");
-                                    TranToDetial(document.getElementById('OrderId').value);
+                                    setTimeout('frushthis()', 3000);
+                                   // window.location.reload(true);
+                                   // TranToDetial(document.getElementById('OrderId').value);
                                 }
                             },
                             failure: function () {
@@ -1764,8 +1780,9 @@ onChangePayment_cat = function () {
             } else if (result.msg == 3) {
                 Ext.Msg.alert("錯誤提示", "slave沒數據！");
             } else {
-                TranToDetial(document.getElementById('OrderId').value);
+               // TranToDetial(document.getElementById('OrderId').value);
                 Ext.Msg.alert("提示", "轉黑貓貨到付款成功!");
+                setTimeout('frushthis()', 3000);
             }
         },
         failure: function () {
@@ -1828,6 +1845,9 @@ oneditUser = function (user_id) {
             editFunction(ralated_id);
         }
     }
+}
+function frushthis() {
+    window.location.reload(true);
 }
 //訂單退貨詳情
 //DesigneeFunction = function (rowIDs) {
