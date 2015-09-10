@@ -754,6 +754,12 @@ namespace Admin.gigade.Controllers
                         store = OphMgr.GetOderHitrustDT(related_id);
                         json = "{success:true,\"id\":\"" + store.Rows[0]["id"] + "\",\"pan\":\"" + store.Rows[0]["pan"] + "\",\"bankname\":\"" + store.Rows[0]["bankname"] + "\"}";
                         break;
+                    case "order_payment_nccc":
+                        TabShowMgr OpnMgr = new TabShowMgr(mySqlConnectionString);
+                        DataTable Opn = new DataTable();
+                        store = OpnMgr.GetNCCC(related_id);
+                        json = "{success:true,\"nccc_id\":\"" + Opn.Rows[0]["nccc_id"] + "\",\"nccc_pan\":\"" + Opn.Rows[0]["pan"] + "\",\"nccc_bankname\":\"" + Opn.Rows[0]["bankname"] + "\"}";
+                        break;
                     //case "send_mail":
                     //    SendMailMgr sendmailMgr = new SendMailMgr(mySqlConnectionString);
                     //    SendMail sendModel = sendmailMgr.GetModel(new SendMail { id = related_id });
