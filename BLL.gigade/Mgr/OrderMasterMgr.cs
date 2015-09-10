@@ -1025,7 +1025,7 @@ set ");
                             #region 發送郵件
                             MailHelper mail = new MailHelper();
                             string body = "付款單號 : " + om.Order_Id + " 已更改收貨人資訊，請重新檢視出貨單<br/>更改時間：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "<br/><br/>以上為系統通知信請勿直接回覆，謝謝！               ";
-                            mail.SendMailAction("shiwei0620j@gimg.tw", "收貨人資訊變更", body);
+                            mail.SendMailAction("zhaopeng0205j@gimg.tw", "收貨人資訊變更", body);
                             #endregion
                         }
                         else
@@ -1069,7 +1069,7 @@ set ");
                         #region 發送郵件
                         MailHelper mail = new MailHelper();
                         string body = "付款單號 : " + om.Order_Id + " 已更改收貨人資訊，請重新檢視出貨單<br/>更改時間：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "<br/><br/>以上為系統通知信請勿直接回覆，謝謝！               ";
-                        mail.SendMailAction("shiwei0620j@gimg.tw", "收貨人資訊變更", body);
+                        mail.SendMailAction("zhaopeng0205j@gimg.tw", "收貨人資訊變更", body);
                         //    mail.SendMailAction
                         #endregion
                     }
