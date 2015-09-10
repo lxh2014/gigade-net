@@ -325,7 +325,7 @@ Ext.onReady(function () {
         tbar: [
            { xtype: 'button', text: "新增補貨通知", id: 'add', iconCls: 'ui-icon ui-icon-user-add', handler: onAddClick },
            { xtype: 'button', text: "取消通知", id: 'edit', iconCls: 'ui-icon ui-icon-user-edit',handler: onEditClick },
-           { xtype: 'button', text: '匯出Excel', margin: '0 0 0 5', iconCls: 'icon-excel', id: 'btnExcel', handler: Export }
+           { xtype: 'button', text: '匯出', margin: '0 0 0 5', iconCls: 'icon-excel', id: 'btnExcel', handler: Export }
 
         ],
         bbar: Ext.create('Ext.PagingToolbar', {

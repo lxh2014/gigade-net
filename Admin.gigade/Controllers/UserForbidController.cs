@@ -56,12 +56,12 @@ namespace Admin.gigade.Controllers
                 query.login_mail = Request.Params["login_mail"];
                 query.login_ipfrom = Request.Params["login_ipfrom"];
                 if (!string.IsNullOrEmpty(Request.Params["start_date"]))
-                {
-                    query.slogin_createdate = int.Parse(CommonFunction.GetPHPTime(Request.Params["start_date"]).ToString());
+                {                  
+                    query.slogin_createdate = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_date"]).ToString("yyyy-MM-dd 00:00:00"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["end"]))
                 {
-                    query.elogin_createdate = int.Parse(CommonFunction.GetPHPTime(Request.Params["end"]).ToString());
+                    query.elogin_createdate = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end"]).ToString("yyyy-MM-dd 23:59:59"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["sumtotal"]))
                 {
