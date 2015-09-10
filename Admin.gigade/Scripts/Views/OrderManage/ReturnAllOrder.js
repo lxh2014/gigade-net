@@ -84,7 +84,7 @@
                                     else {
                                         myMask.hide();
                                         Ext.Msg.alert(INFORMATION, SUCCESS);
-                                        setTimeout('closedthis()', 3000);
+                                        setTimeout('frushthis()', 3000);
                                        // TranToDetial(Ext.htmlEncode(Ext.getCmp('return_Order_id').getValue()));
                                       //  window.location.reload(true);
                                         //editWin.close();
@@ -164,7 +164,4 @@
         }
     });
     editWin.show();
-}
-function closedthis() {
-    window.location.reload(true);
 }
