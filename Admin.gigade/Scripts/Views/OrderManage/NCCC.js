@@ -80,7 +80,7 @@ Ext.onReady(function () {
             {
                 header: "交易卡號", dataIndex: 'pan_bankname', width: 150, align: 'center',
                     renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                        return "<span onclick='SecretLogin(" + record.data.nccc_id + ")'  >" + value + "</span>";
+                        return "<a href='#' onclick='SecretLogin(" + record.data.nccc_id + ")'  >" + value + "</a>";
                     }
             },
             { header: "交易金額", dataIndex: 'transamt', width: 80, align: 'center' },
