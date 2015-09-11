@@ -542,8 +542,8 @@ namespace BLL.gigade.Dao
                     result = mySqlCmd.ExecuteNonQuery();
                     sqlstr.Clear();
                 }
-
-                if (Convert.ToInt32(ordermaster.Rows[0]["money_collect_date"]) > 0 && (Convert.ToInt32(ordermaster.Rows[0]["order_amount"]) > 0 || Convert.ToInt32(ordermaster.Rows[0]["deduct_card_bonus"]) > 0))
+                int collect_date = string.IsNullOrEmpty(ordermaster.Rows[0]["money_collect_date"].ToString()) ? 0 : Convert.ToInt32(ordermaster.Rows[0]["money_collect_date"]);//付款日期有null的判斷
+                if (collect_date > 0 && (Convert.ToInt32(ordermaster.Rows[0]["order_amount"]) > 0 || Convert.ToInt32(ordermaster.Rows[0]["deduct_card_bonus"]) > 0))
                 {
                     int Money_Type = 0;
                     if (Convert.ToInt32(ordermaster.Rows[0]["order_amount"]) == 0)
@@ -672,7 +672,7 @@ namespace BLL.gigade.Dao
                     sqlstr.Clear();
                 }
                  mySqlCmd.Transaction.Commit();
-               // mySqlCmd.Transaction.Rollback();
+                // mySqlCmd.Transaction.Rollback();
 
                 send_cancel_mail_for_vendor(SendMail);
                 return 100;//完成
@@ -913,7 +913,7 @@ namespace BLL.gigade.Dao
                 {
                     string Master_Start = DateTime.Now.ToString("yyyy-MM-dd 00:00:00");
                     string Master_End = DateTime.Now.AddDays(90).ToString("yyyy-MM-dd 23:59:59");
-                    sb.Append(Bonus_Master_Add(Convert.ToInt32(_dtOrderMaster.Rows[0]["user_id"]), 4, bonus1, Master_Start, Master_End, order_id.ToString(), "system", 2, ip));
+                    sb.Append(Bonus_Master_Add(Convert.ToInt32(_dtOrderMaster.Rows[0]["user_id"]), 4, bonus1, Master_Start, Master_End, order_id.ToString(), "訂單取消退還使用抵用券", 2, ip));
                 }
 
                 if (hg > 0)
