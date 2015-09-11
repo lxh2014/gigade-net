@@ -13,7 +13,7 @@ function editFunction(RowID, Store) {
         autoScroll: true,
         labelWidth: 45,
         url: '/SiteManager/SaveSiteAnalytics',
-        defaults: { anchor: "95%", msgTarget: "side", labelWidth: 80 },//side添加一个错误图标在域的右边，鼠标悬停上面时弹出显示消息。
+        defaults: { anchor: "80%", msgTarget: "side", labelWidth: 80 },//side添加一个错误图标在域的右边，鼠标悬停上面时弹出显示消息。
         //这个布局将子元素的位置与父容器大小进行关联固定. 如果容器大小改变, 所有固定的子项将按各自的anchor 规则自动被重新渲染固定.
         items: [
         {
@@ -24,12 +24,9 @@ function editFunction(RowID, Store) {
             margin: '10 0 10 0',
             format: 'Y-m-d',
             editable: false,
-            value: new Date(),
-            listeners: {
-                show: function () {
-                    Ext.getCmp("sa_date").setMaxValue(new Date());
-                }
-            }
+            disabled: RowID ? true : false,
+            allowBlank: false,
+            value: new Date()
         },
         {
             xtype: 'numberfield',
@@ -39,6 +36,7 @@ function editFunction(RowID, Store) {
             margin: '10 0 10 0',
             maxValue: 2147483647,
             minValue: 0,
+            allowBlank: false,
             hideTrigger:true
         },
         {
@@ -49,6 +47,7 @@ function editFunction(RowID, Store) {
             margin: '10 0 10 0',
             maxValue: 2147483647,
             minValue: 0,
+            allowBlank: false,
             hideTrigger:true
         }
         ],
@@ -57,27 +56,53 @@ function editFunction(RowID, Store) {
             text: '保存',
             formBind: true,// 设置按钮与表单绑定，需在表单验证通过后才可使用
             handler: function () {
-                var form = this.up('form').getForm();//沿着 ownerCt 查找匹配简单选择器的祖先容器.
-                if (form.isValid()) {//这个函数会调用已经定义的校验规则来验证输入框中的值，如果通过则返回true
-                    form.submit({
-                        params: {
-                            sa_id: ID,
-                            sa_date: Ext.getCmp("s_sa_date").getValue(),
-                            sa_work_stage: Ext.htmlEncode(Ext.getCmp("sa_work_stage").getValue()),
-                            sa_user: Ext.htmlEncode(Ext.getCmp("sa_user").getValue())
+                var sa_date = Ext.getCmp("s_sa_date").getValue();
+                var result1 = 0;
+                if(RowID==null)
+                {
+                    $.ajax({
+                        url: "/SiteManager/CheckSiteAnalytics",
+                        data: {
+                            "sa_date": Ext.htmlEncode(Ext.Date.format(sa_date, 'Y-m-d'))
                         },
-                        success: function (form, action) {
-                            var result = Ext.decode(action.response.responseText);
-                            if (result.success == "true") {
-                                Ext.Msg.alert(INFORMATION, "保存成功!");
-                                editWin.close();
-                                SiteAnalyticsListStore.removeAll();
-                                SiteAnalyticsListStore.load();
-                            } else {
-                                Ext.Msg.alert(INFORMATION, FAILURE);
+                        type: "post",
+                        type: 'text',
+                        success: function (msg) {
+                            if (msg.success == 'true') {
+                                Ext.Msg.alert(INFORMATION, '已存在該日索引');
+                                Ext.getCmp("s_sa_date").setValue('');
+                                result1++;
                             }
+                        },
+                        error: function (msg) {
+                            Ext.Msg.alert(INFORMATION, FAILURE);
                         }
-                    })
+                    });
+                } 
+                if(result1==0)
+                {
+                    var form = this.up('form').getForm();//沿着 ownerCt 查找匹配简单选择器的祖先容器.
+                    if (form.isValid()) {//这个函数会调用已经定义的校验规则来验证输入框中的值，如果通过则返回true
+                        form.submit({
+                            params: {
+                                sa_id: ID,
+                                sa_date: sa_date,
+                                sa_work_stage: Ext.htmlEncode(Ext.getCmp("sa_work_stage").getValue()),
+                                sa_user: Ext.htmlEncode(Ext.getCmp("sa_user").getValue())
+                            },
+                            success: function (form, action) {
+                                var result = Ext.decode(action.response.responseText);
+                                if (result.success == "true") {
+                                    Ext.Msg.alert(INFORMATION, "保存成功!");
+                                    editWin.close();
+                                    SiteAnalyticsListStore.removeAll();
+                                    SiteAnalyticsListStore.load();
+                                } else {
+                                    Ext.Msg.alert(INFORMATION, FAILURE);
+                                }
+                            }
+                        })
+                    }
                 }
             }
         }]

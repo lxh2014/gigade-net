@@ -54,7 +54,8 @@ SAVE = "保存";
 SAVE_SUCCESS = "保存成功";
 SCHEDULE_CONFIG = "排成設定";
 
-ID_CODE = "ID編號";
+ID_CODE = "排程編號";
+TIER_NAME = '排程名稱';
 TIME_CONDITION = "時間條件";
 QUERY = "查詢";
 RESET = "重置";

@@ -239,6 +239,7 @@
     <Compile Include="Controllers\SendProductController.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
     <Compile Include="Controllers\SiteManagerController.cs" />
+    <Compile Include="Controllers\SuperController.cs" />
     <Compile Include="Controllers\SystemController.cs" />
     <Compile Include="Controllers\SiteConfigController.cs" />
     <Compile Include="Controllers\SystemKeyWordController.cs" />
@@ -1345,6 +1346,7 @@
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeList.js" />
     <Content Include="Scripts\Views\ProductPurchase\SuggestPurchaseList.js" />
     <Content Include="Scripts\Views\ProductSearch\ProductSearchList.js" />
+    <Content Include="Scripts\Views\Product\InventoryQueryList.js" />
     <Content Include="Scripts\Views\Product\ProductDetailEdit.js" />
     <Content Include="Scripts\Views\Product\ProductDetailList.js" />
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsEdit.js" />
@@ -1360,6 +1362,7 @@
     <Content Include="Scripts\Views\SiteManager\SiteAnalyticsList.js" />
     <Content Include="Scripts\Views\SiteManager\SiteStatisticsEdit.js" />
     <Content Include="Scripts\Views\SiteManager\SiteStatisticsList.js" />
+    <Content Include="Scripts\Views\Super\SuperList.js" />
     <Content Include="Scripts\Views\SystemKeyWord\ExportKeyWordExcel.js" />
     <Content Include="Scripts\Views\SystemKeyWord\KeyWordAdd.js" />
     <Content Include="Scripts\Views\SystemKeyWord\KeyWordEdit.js" />
@@ -3467,15 +3470,6 @@
     <Content Include="Scripts\Views\WebContentType\WebContentType8List.js" />
     <Content Include="Views\ProductSelect\Index.cshtml" />
     <Content Include="Views\ProductSelect\ModifyEventCost.cshtml" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
     <Content Include="Scripts\jquery-1.4.4.js" />
     <Content Include="Scripts\jquery-1.4.4.min.js" />
     <Content Include="Scripts\jquery-1.4.4-vsdoc.js" />
@@ -3807,6 +3801,17 @@
     <Content Include="Template\AppcategoryImport\t_category.xls" />
     <Content Include="Views\ProductPurchase\RIS.cshtml" />
     <Content Include="Views\WareHouse\Check.cshtml" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Views\Super\Index.cshtml" />
+    <Content Include="Views\Product\InventoryQuery.cshtml" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="aimg.gigade100.com\product\150x150\" />

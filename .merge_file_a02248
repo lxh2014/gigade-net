@@ -9,7 +9,7 @@ function editFunction(rowID) {
     var comCity_i = false;
     var delconnect = '';
 
-
+ 
     //區域Model
     Ext.define('gigade.Area', {
         extend: 'Ext.data.Model',
@@ -20,7 +20,7 @@ function editFunction(rowID) {
     });
     //地址Model
     Ext.define('gigade.City', {
-        extend: 'Ext.data.Model',
+        extend: 'Ext.data.Model', 
         fields: [
             { name: "middle", type: "string" },
             { name: "middlecode", type: "string" }
@@ -363,7 +363,7 @@ function editFunction(rowID) {
                     typeAhead: true,
                     value: 0,
                     forceSelection: false,
-                    editable: false,
+                    editable:false,
                     queryMode: 'local'
                 }
             },
@@ -372,7 +372,7 @@ function editFunction(rowID) {
                 editor: {
                     // id: 'txt_contactname',
                     listeners: {
-                        blur: function (txt, e) {
+                        blur: function (txt, e) {                          
                             if (txt.rawValue != old_name) {
                                 var bre = ContactStore.getAt(ContactStore.findBy(function (record, id) {
                                     return record.data.contact_name == txt.getValue();
@@ -403,7 +403,7 @@ function editFunction(rowID) {
                                     old_name = "";
                                 }
                             }
-                        }
+                        }                     
                     }
                 }
             },
@@ -547,7 +547,7 @@ function editFunction(rowID) {
                                         //編輯時分步保存
                                         var InsertValues = "";
                                         var gdcontact = Ext.getCmp("gdcontact").store.data.items;
-
+                                     
                                         for (var a = 0; a < gdcontact.length; a++) {
                                             var type = gdcontact[a].get("contact_type");
                                             var name = gdcontact[a].get("contact_name");
@@ -668,7 +668,7 @@ function editFunction(rowID) {
                                 //編輯時分步保存
                                 var InsertValues = "";
                                 var gdcontact = Ext.getCmp("gdcontact").store.data.items;
-
+                              
                                 for (var a = 0; a < gdcontact.length; a++) {
                                     var type = gdcontact[a].get("contact_type");
                                     var name = gdcontact[a].get("contact_name");
@@ -778,7 +778,7 @@ function editFunction(rowID) {
                     else {
                         var InsertValues = "";
                         var gdcontact = Ext.getCmp("gdcontact").store.data.items;
-
+                   
                         for (var a = 0; a < gdcontact.length; a++) {
                             var type = gdcontact[a].get("contact_type");
                             var name = gdcontact[a].get("contact_name");
@@ -793,7 +793,7 @@ function editFunction(rowID) {
                             params: {
                                 vendor_id: VendorID,
                                 delconnect: delconnect,
-
+                            
                                 vendor_code: Ext.htmlEncode(Ext.getCmp("vendor_code").getValue()),
                                 vendor_status: Ext.htmlEncode(Ext.getCmp("vendor_status").getValue().vendor_status),
                                 vendor_email: Ext.htmlEncode(Ext.getCmp("vendor_email").getValue()),
@@ -1322,7 +1322,7 @@ function editFunction(rowID) {
                       boxLabel: '發票地址同公司地址',
                       id: 'same_adress',
                       name: 'same_adress',
-                      inputValue: '0',
+                      inputValue: '0',                      
                       listeners: {
                           change: function (checkbox, newValue, oldValue) {
                               var cob_ccity_ai = Ext.getCmp('cob_ccity_ai');
@@ -1359,11 +1359,11 @@ function editFunction(rowID) {
 
 
                               }
-                              else {
+                              else {                                 
                                   cob_ccity_ai.setValue("");
                                   cob_ccity_i.setValue("");
                                   invoice_zip.setValue("");
-                                  invoice_address.setValue("");
+                                  invoice_address.setValue("");                  
                               }
 
                           }
@@ -2110,6 +2110,7 @@ function editFunction(rowID) {
                 xtype: 'textfield',
                 fieldLabel: 'ERP 廠商編號',
                 id: 'erp_id',
+                //editable: false,
                 readOnly: true,
                 name: 'erp_id',
                 labelWidth: 90,
@@ -2184,7 +2185,7 @@ function editFunction(rowID) {
                        var InsertValues = "";
                        if (form.isValid()) {
                            var gdcontact = Ext.getCmp("gdcontact").store.data.items;
-
+                     
                            for (var a = 0; a < gdcontact.length; a++) {
                                var type = gdcontact[a].get("contact_type");
                                var name = gdcontact[a].get("contact_name");
@@ -2200,7 +2201,7 @@ function editFunction(rowID) {
                                params: {
                                    vendor_id: VendorID,
                                    delconnect: delconnect,
-
+                            
                                    vendor_code: Ext.htmlEncode(Ext.getCmp("vendor_code").getValue()),
                                    vendor_status: Ext.htmlEncode(Ext.getCmp("vendor_status").getValue().vendor_status),
                                    vendor_email: Ext.htmlEncode(Ext.getCmp("vendor_email").getValue()),
@@ -2541,7 +2542,7 @@ function editFunction(rowID) {
                 contact_mobile: row.data.contact_mobile_1,
                 contact_email: row.data.contact_email_1
             });
-
+           
         }
         if (row.data.contact_type_2 !== 0) {
             ContactStore.add({
@@ -2552,7 +2553,7 @@ function editFunction(rowID) {
                 contact_mobile: row.data.contact_mobile_2,
                 contact_email: row.data.contact_email_2
             });
-
+          
         }
         if (row.data.contact_type_3 !== 0) {
             ContactStore.add({
@@ -2563,7 +2564,7 @@ function editFunction(rowID) {
                 contact_mobile: row.data.contact_mobile_3,
                 contact_email: row.data.contact_email_3
             });
-
+           
         }
         if (row.data.contact_type_4 !== 0) {
             ContactStore.add({
@@ -2574,7 +2575,7 @@ function editFunction(rowID) {
                 contact_mobile: row.data.contact_mobile_4,
                 contact_email: row.data.contact_email_4
             });
-
+           
         }
         if (row.data.contact_type_5 !== 0) {
             ContactStore.add({
@@ -2585,7 +2586,7 @@ function editFunction(rowID) {
                 contact_mobile: row.data.contact_mobile_5,
                 contact_email: row.data.contact_email_5
             });
-
+          
         }
     }
 

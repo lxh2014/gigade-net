@@ -280,7 +280,7 @@ namespace BLL.gigade.Dao
             StringBuilder sqlwhere = new StringBuilder();
             try
             {
-                sqlClm.AppendFormat(@"SELECT DISTINCT om.order_id,u.user_id,channel_name_simple as channel_name_full,om.export_flag,om.order_name,om.delivery_name,om.order_amount,om.order_payment,om.order_status,om.order_createdate,om.channel as channel_id,om.note_admin,om.source_trace,om.deduct_welfare,om.deduct_happygo,om.deduct_bonus,u.user_email,imr.invoice_number,redirect.redirect_name as redirect_name,redirect.redirect_url as redirect_url,u.user_id,user_password,user_name,user_gender,user_mobile,user_phone,user_zip,user_address,user_reg_date , CASE user_type  when '1' THEN '網路會員' else'電話會員' END as mytype ,send_sms_ad,adm_note ,concat(user_birthday_year,'/',user_birthday_month,'/',user_birthday_day) as birthday");
+                sqlClm.AppendFormat(@"SELECT DISTINCT om.order_id,u.user_id,channel_name_simple as channel_name_full,om.deduct_happygo_convert,om.export_flag,om.order_name,om.delivery_name,om.order_amount,om.order_payment,om.order_status,om.order_createdate,om.channel as channel_id,om.note_admin,om.source_trace,om.deduct_welfare,om.deduct_happygo,om.deduct_bonus,u.user_email,imr.invoice_number,redirect.redirect_name as redirect_name,redirect.redirect_url as redirect_url,u.user_id,user_password,user_name,user_gender,user_mobile,user_phone,user_zip,user_address,user_reg_date , CASE user_type  when '1' THEN '網路會員' else'電話會員' END as mytype ,send_sms_ad,adm_note ,concat(user_birthday_year,'/',user_birthday_month,'/',user_birthday_day) as birthday");
                 string sqlcount = "select count(DISTINCT om.order_id) AS search_total ";
                 sqljoin.AppendFormat(@" FROM order_master om INNER JOIN users u ON u.user_id = om.user_id LEFT JOIN invoice_master_record imr ON om.order_id =  imr.order_id LEFT  JOIN channel on om.channel=channel.channel_id left join redirect on redirect.redirect_id=om.source_trace");
                 sqljoin.AppendFormat(" LEFT JOIN deliver_master dm ON dm.order_id = om.order_id ");
@@ -2031,7 +2031,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("select deliver_id from deliver_master where order_id='{0}' and delivery_status=0;", om.Order_Id);
+                sql.AppendFormat("select deliver_id,delivery_status from deliver_master where order_id='{0}';", om.Order_Id);
                 return _dbAccess.getDataTable(sql.ToString());
 
             }

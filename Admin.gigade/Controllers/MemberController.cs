@@ -831,7 +831,7 @@ namespace Admin.gigade.Controllers
                     query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
 
                 }
-                if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
+                if (!string.IsNullOrEmpty(Request.Params["dateTwo"])) 
                 {
                     query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
 

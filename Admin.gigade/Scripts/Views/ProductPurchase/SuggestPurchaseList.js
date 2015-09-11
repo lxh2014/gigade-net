@@ -261,7 +261,7 @@ Ext.onReady(function () {
                          },
                          {
                              xtype: 'textfield',
-                             fieldLabel: "供應商名稱",
+                             fieldLabel: "供應商簡稱",
                              margin: '0 0 0 25',
                              id: 'vendor_name',
                              labelWidth: 80,
@@ -433,7 +433,7 @@ Ext.onReady(function () {
             { header: "下單採購時間", dataIndex: 'create_datetime', width: 80, align: 'center' }
         ],
         tbar: [
-            { xtype: 'button', text: "匯出Excel", id: 'exportExcel', icon: '../../../Content/img/icons/excel.gif', handler: ExportExcel },
+            { xtype: 'button', text: "匯出", id: 'exportExcel', icon: '../../../Content/img/icons/excel.gif', handler: ExportExcel },
             { xtype: 'button', text: "下單採購", id: 'Pod', disabled: true, handler: PodQuery }
     
         ],

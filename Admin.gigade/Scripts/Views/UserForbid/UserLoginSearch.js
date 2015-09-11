@@ -142,12 +142,12 @@ var frm = Ext.create('Ext.form.Panel', {
                     labelWidth: 60
                 },
                 {
-                    xtype: 'datetimefield',
+                    xtype: 'datefield',
                     id: 'start',
                     name: 'start',
                     margin: '0 5px 0 0',
-                    width: 160,
-                    format: 'Y-m-d H:i:s',
+                    width: 110,
+                    format: 'Y-m-d',
                     editable: false,
                     value: Tomorrow(1),
                     listeners: {
@@ -159,7 +159,7 @@ var frm = Ext.create('Ext.form.Panel', {
                             {
                                 var stime = new Date(start);
                                 stime.setDate(stime.getDate() + 1);
-                                Ext.getCmp('end').setValue(Ext.Date.format(stime, 'Y-m-d H:i:s'));
+                                Ext.getCmp('end').setValue(Ext.Date.format(stime, 'Y-m-d'));
                             }
                         }
                     }
@@ -170,12 +170,12 @@ var frm = Ext.create('Ext.form.Panel', {
                     margin: '0 5px'
                 },
                 {
-                    xtype: 'datetimefield',
+                    xtype: 'datefield',
                     id: 'end',
                     name: 'end',
                     margin: '0 5px',
-                    width: 160,
-                    format: 'Y-m-d H:i:s',
+                    width: 110,
+                    format: 'Y-m-d',
                     editable: false,
                     value: new Date(),
                     listeners: {
@@ -187,7 +187,7 @@ var frm = Ext.create('Ext.form.Panel', {
                             {
                                 var etime = new Date(endDate);
                                 etime.setDate(etime.getDate() - 1);
-                                Ext.getCmp('start').setValue(Ext.Date.format(etime, 'Y-m-d H:i:s'));
+                                Ext.getCmp('start').setValue(Ext.Date.format(etime, 'Y-m-d'));
                             }
                         }
                     }

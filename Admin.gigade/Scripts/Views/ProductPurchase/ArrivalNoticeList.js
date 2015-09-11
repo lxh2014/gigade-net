@@ -229,6 +229,7 @@ Ext.onReady(function () {
                           labelWidth: 60,
                           id: 'start_time',
                           format: 'Y-m-d',
+                          width: 170,
                           value: Tomorrow(1 - new Date().getDate()),
                           editable: false,
                           listeners: {
@@ -254,6 +255,7 @@ Ext.onReady(function () {
                           xtype: 'datefield',
                           id: 'end_time',
                           format: 'Y-m-d',
+                          width: 110,
                           value: Tomorrow(0),
                           editable: false,
                           listeners: {
@@ -325,7 +327,7 @@ Ext.onReady(function () {
         tbar: [
            { xtype: 'button', text: "新增補貨通知", id: 'add', iconCls: 'ui-icon ui-icon-user-add', handler: onAddClick },
            { xtype: 'button', text: "取消通知", id: 'edit', iconCls: 'ui-icon ui-icon-user-edit',handler: onEditClick },
-           { xtype: 'button', text: '匯出Excel', margin: '0 0 0 5', iconCls: 'icon-excel', id: 'btnExcel', handler: Export }
+           { xtype: 'button', text: '匯出', margin: '0 0 0 5', iconCls: 'icon-excel', id: 'btnExcel', handler: Export }
 
         ],
         bbar: Ext.create('Ext.PagingToolbar', {

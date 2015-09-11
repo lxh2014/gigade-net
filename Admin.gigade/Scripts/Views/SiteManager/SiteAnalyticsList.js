@@ -124,11 +124,6 @@ onDeleteClick = function () {
         width: 600,
         border: false,
         url: '/SiteManager/ImportExcel',
-        //defaults: {
-        //    labelWidth: 150,
-        //    width: 400,
-        //    margin: '10 5 0 10'
-        //},
         items: [
            {
                xtype: 'fieldcontainer',

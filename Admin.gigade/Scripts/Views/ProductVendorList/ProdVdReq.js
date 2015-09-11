@@ -82,7 +82,7 @@ var reqTime = {
         {
             xtype: 'combobox',
             id: 'reqtype',
-            margin: '0 5px',
+            margin: '0 5px 0 0',
             fieldLabel: '申請類型',
             colName: 'reqtype',
             queryMode: 'local',
@@ -96,7 +96,8 @@ var reqTime = {
             id: 'time_start',
             name: 'time_start',
             fieldLabel: '申請時間',
-            margin: '0 5px 0 20px',
+            margin: '0 5px 0 15px',
+            width: 220,
             editable: false,
             vtype: 'daterange',
             endDateField: 'time_end'
@@ -107,6 +108,7 @@ var reqTime = {
             xtype: 'datefield',
             id: 'time_end',
             name: 'time_end',
+            width: 110,
             margin: '0 5px',
             editable: false,
             vtype: 'daterange',
@@ -208,7 +210,7 @@ Ext.onReady(function () {
                 click: function () {
                     frm.getForm().reset();
                     Ext.getCmp("reqstatus").setValue(1);
-                    Ext.getCmp("reqtype").setValue(0);
+                    Ext.getCmp("reqtype").reset();
                 }
             }
         }]

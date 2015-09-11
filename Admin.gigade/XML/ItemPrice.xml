@@ -6,7 +6,8 @@
 	<column key="product_id">商品編號</column>
 	<column key="product_name">商品名稱</column>
 	<column key="item_id">商品細項編號</column>
-	<column key="item_name">商品細項名稱</column>
+	<column key="spec_title_1">規格1</column>
+	<column key="spec_title_2">規格2</column>
 	<column key="product_status_str">商品狀態</column>
 	<column key="price_status_str">價格狀態</column>
 	<column key="item_money">售價</column>
