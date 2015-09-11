@@ -441,15 +441,18 @@ namespace BLL.gigade.Dao
                 sql.AppendFormat("  FROM order_detail od,order_slave os WHERE os.order_id ='{0}' AND os.slave_id = od.slave_id ;", om.Order_Id);
                 orderDetailList = _accessMySql.getDataTableForObj<OrderDetail>(sql.ToString());
                 sql.Clear();
+                 accumulated_bonus =string.IsNullOrEmpty(ordermaster.Rows[0]["accumulated_bonus"].ToString())?0:Convert.ToInt32(ordermaster.Rows[0]["accumulated_bonus"]);
+                 accumulated_happygo = string.IsNullOrEmpty(ordermaster.Rows[0]["accumulated_happygo"].ToString()) ? 0 : Convert.ToInt32(ordermaster.Rows[0]["accumulated_happygo"]);
+                 deduct_happygo = string.IsNullOrEmpty(ordermaster.Rows[0]["deduct_happygo"].ToString()) ? 0 : Convert.ToInt32(ordermaster.Rows[0]["deduct_happygo"]);
 
-                for (int i = 0; i < orderDetailList.Count; i++)
-                {
-                    if (orderDetailList[i].item_mode == 2)
-                        continue;
-                    accumulated_bonus += orderDetailList[i].Accumulated_Bonus;
-                    accumulated_happygo += orderDetailList[i].Accumulated_Happygo;
-                    deduct_happygo += orderDetailList[i].Deduct_Happygo;
-                }
+                //for (int i = 0; i < orderDetailList.Count; i++)
+                //{
+                //    if (orderDetailList[i].item_mode == 2)
+                //        continue;
+                //    accumulated_bonus += orderDetailList[i].Accumulated_Bonus;
+                //    accumulated_happygo += orderDetailList[i].Accumulated_Happygo;
+                //    deduct_happygo += orderDetailList[i].Deduct_Happygo;
+                //}
 
                 //int user_bonus = GetUserBonus( ordermaster.Rows[0]["user_id"].ToString(), 1);
                 //if (accumulated_bonus > user_bonus)
