@@ -47,7 +47,7 @@ Ext.onReady(function () {
             { header: "付款單狀態", dataIndex: 'states', width: 200, align: 'center' },
             { header: "記錄日期", dataIndex: 'status_createdates', width: 150, align: 'center' },
             { header: "來源IP", dataIndex: 'status_ipfrom', width: 120, align: 'center' },
-            { header: "備註", dataIndex: 'status_description', width: 200, align: 'center' }
+            { header: "備註", dataIndex: 'status_description', width:300, align: 'center' }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: StatusStore,
