@@ -435,7 +435,6 @@ Ext.onReady(function () {
                         var upDataStore = particularsStore.getUpdatedRecords();//僅獲得修改后的行 add by wwei0216w 2015/6/24
                         var sumday=0;
                         for (var i = 0, j = upDataStore.length ; i < j; i++) {
-
                             var record = upDataStore[i];
                             //2015/09/09 guodong1130w增加有效期控制判斷
                             sumday = record.get("Cde_dt_shp") + record.get("Cde_dt_var") + record.get("Cde_dt_incr");
@@ -467,9 +466,12 @@ Ext.onReady(function () {
                                 "inner_pack_hgt": record.get("Inner_pack_hgt")
                             });
                         }
-                        var particulars = JSON.stringify(particulars);
-
+                        particulars = JSON.stringify(particulars);
                         if (particulars == "[]") {
+                            if (particularsStore.count()>0)
+                            {
+                                Ext.Msg.alert(INFORMATION, SUCCESS)
+                            }
                             myMask.hide();
                             return;
                         }
