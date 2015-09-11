@@ -1346,6 +1346,7 @@
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeList.js" />
     <Content Include="Scripts\Views\ProductPurchase\SuggestPurchaseList.js" />
     <Content Include="Scripts\Views\ProductSearch\ProductSearchList.js" />
+    <Content Include="Scripts\Views\Product\InventoryQueryList.js" />
     <Content Include="Scripts\Views\Product\ProductDetailEdit.js" />
     <Content Include="Scripts\Views\Product\ProductDetailList.js" />
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsEdit.js" />
@@ -3804,6 +3805,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Super\Index.cshtml" />
+    <Content Include="Views\Product\InventoryQuery.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

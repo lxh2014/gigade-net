@@ -114,6 +114,7 @@ namespace Admin.gigade.Controllers
         private IProductStockImportImplMgr _pStockMgr;
         private IProductSpecImplMgr _pSpecStatusMgr;
         private VendorBrandMgr vbMgr;
+        public ArrivalNoticeMgr arrivalnoticemgr;
         #region View
 
         public ActionResult Index()
@@ -124,6 +125,7 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+
         public ActionResult ProductSave(string id)
         {
             ViewBag.ProductId = id;
@@ -211,6 +213,10 @@ namespace Admin.gigade.Controllers
         /// </summary>
         /// <returns></returns>
         public ActionResult ProductDetailList()
+        {
+            return View();
+        }
+        public ActionResult InventoryQuery()//商品庫存查詢 by yachao1120j 2015-9-9
         {
             return View();
         }
@@ -5986,5 +5992,194 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
+
+        public HttpResponseBase GetInventoryQueryList()// yachoa1120j 2015-9-10 商品庫存查詢
+        {
+
+            string json = string.Empty;
+            int totalcount = 0;
+            try
+            {
+                ArrivalNoticeQuery query = new ArrivalNoticeQuery();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                arrivalnoticemgr = new ArrivalNoticeMgr(connectionString);
+                if (!string.IsNullOrEmpty(Request.Params["vendor_name_full_OR_vendor_id"]))
+                {
+                    query.vendor_name_full_OR_vendor_id = Request.Params["vendor_name_full_OR_vendor_id"];//供应商名称/编号
+                }
+                if (!string.IsNullOrEmpty(Request.Params["product_id_OR_product_name"]))
+                {
+                    query.product_id_OR_product_name = Request.Params["product_id_OR_product_name"];//商品编号/名称
+                }
+                if (!string.IsNullOrEmpty(Request.Params["brand_id_OR_brand_name"]))
+                {
+                    query.brand_id_OR_brand_name = Request.Params["brand_id_OR_brand_name"];//品牌编号/名称
+                }
+                if (!string.IsNullOrEmpty(Request.Params["product_status"]))
+                {
+                    query.product_status = Convert.ToUInt32(Request.Params["product_status"]);//商品状态
+                }
+                if (!string.IsNullOrEmpty(Request.Params["item_stock_start"]))
+                {
+                    query.item_stock_start = Convert.ToInt32(Request.Params["item_stock_start"]);//库存数量--开始
+                }
+                if (!string.IsNullOrEmpty(Request.Params["item_stock_end"]))
+                {
+                    query.item_stock_end = Convert.ToInt32(Request.Params["item_stock_end"]);//库存数量--结束
+                }
+                if (query.item_stock_start > query.item_stock_end)
+                {
+                    query.item_stock_start = query.item_stock_end = 10000000;//判斷庫存數量取值範圍  如果star>end,則把start=end=10000000;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["ignore_stockRdo"]))
+                {
+                    query.ignore_stock = Convert.ToInt32(Request.Params["ignore_stockRdo"]);//补货中停止贩售
+                }
+                List<ArrivalNoticeQuery> list = arrivalnoticemgr.GetInventoryQueryList(query, out totalcount);
+                //如果查詢數據為空,怎麼進行提示,或給出提示信息!!!
+                //if (list.Count==0)
+                //{
+                //    this.Response.Write("暫無數據顯示<br/>");
+                //}
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return Response;
+        }
+
+        public void ExportCSV()// yachao1120j 2015-9-10 匯出商品庫存查詢記錄
+        {
+            ArrivalNoticeQuery query = new ArrivalNoticeQuery();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["vendor_name_full_OR_vendor_id"]))
+                {
+                    query.vendor_name_full_OR_vendor_id = Request.Params["vendor_name_full_OR_vendor_id"];//供应商名称/编号
+                }
+                if (!string.IsNullOrEmpty(Request.Params["product_id_OR_product_name"]))
+                {
+                    query.product_id_OR_product_name = Request.Params["product_id_OR_product_name"];//商品编号/名称
+                }
+                if (!string.IsNullOrEmpty(Request.Params["brand_id_OR_brand_name"]))
+                {
+                    query.brand_id_OR_brand_name = Request.Params["brand_id_OR_brand_name"];//品牌编号/名称
+                }
+                if (!string.IsNullOrEmpty(Request.Params["product_status"]))
+                {
+                    query.product_status = Convert.ToUInt32(Request.Params["product_status"]);//商品状态
+                }
+                if (!string.IsNullOrEmpty(Request.Params["item_stock_start"]))
+                {
+                    query.item_stock_start = Convert.ToInt32(Request.Params["item_stock_start"]);//库存数量--开始
+                }
+                if (!string.IsNullOrEmpty(Request.Params["item_stock_end"]))
+                {
+                    query.item_stock_end = Convert.ToInt32(Request.Params["item_stock_end"]);//库存数量--结束
+                }
+                if (!string.IsNullOrEmpty(Request.Params["ignore_stockRdo"]))
+                {
+                    query.ignore_stock = Convert.ToInt32(Request.Params["ignore_stockRdo"]);//补货中停止贩售
+                }
+                DataTable dtHZ = new DataTable();
+                int totalcount = 0;
+                query.IsPage = false;
+                string newExcelName = string.Empty;
+                dtHZ.Columns.Add("商品編號", typeof(String));
+                dtHZ.Columns.Add("商品名稱", typeof(String));
+                dtHZ.Columns.Add("商品細項編號", typeof(String));
+                dtHZ.Columns.Add("商品規格", typeof(String));
+                dtHZ.Columns.Add("供應商編號", typeof(String));
+                dtHZ.Columns.Add("供應商名稱", typeof(String));
+                dtHZ.Columns.Add("品牌編號", typeof(String));
+                dtHZ.Columns.Add("品牌名稱", typeof(String));
+                dtHZ.Columns.Add("商品狀態", typeof(String));
+                dtHZ.Columns.Add("庫存數量", typeof(String));
+                dtHZ.Columns.Add("補貨中停止販售", typeof(String));
+                List<ArrivalNoticeQuery> list = new List<ArrivalNoticeQuery>();
+                arrivalnoticemgr = new ArrivalNoticeMgr(connectionString);
+                list = arrivalnoticemgr.GetInventoryQueryList(query, out totalcount);
+                if (list.Count > 0)
+                {
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        DataRow dr = dtHZ.NewRow();
+                        dr[0] = list[i].product_id;
+                        dr[1] = list[i].product_name;
+                        dr[2] = list[i].item_id;
+                        dr[3] = list[i].product_spec;
+                        dr[4] = list[i].vendor_id;
+                        dr[5] = list[i].vendor_name_full;
+                        dr[6] = list[i].brand_id;
+                        dr[7] = list[i].brand_name;
+                        if (list[i].product_status == 0)
+                        {
+                            dr[8] = "新建立商品";
+                        }
+                        if (list[i].product_status == 1)
+                        {
+                            dr[8] = "申請審核";
+                        }
+                        if (list[i].product_status == 2)
+                        {
+                            dr[8] = "審核通過";
+                        }
+                        if (list[i].product_status == 5)
+                        {
+                            dr[8] = "上架";
+                        }
+                        if (list[i].product_status == 6)
+                        {
+                            dr[8] = "下架";
+                        }
+                        if (list[i].product_status == 20)
+                        {
+                            dr[8] = "供應商新建商品";
+                        }
+                        dr[9] = list[i].item_stock;
+                        if (list[i].ignore_stock == 0)
+                        {
+                            dr[10] = "否";
+                        }
+                        if (list[i].ignore_stock == 1)
+                        {
+                            dr[10] = "是";
+                        }
+                        dtHZ.Rows.Add(dr);
+                    }
+                    string fileName = "商品庫存查詢_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                    MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "");
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                    Response.BinaryWrite(ms.ToArray());
+                }
+                else
+                {
+                    Response.Clear();
+                    this.Response.Write("無數據存在<br/>");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+
+
+        }
     }
 }
