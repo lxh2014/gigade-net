@@ -610,6 +610,7 @@
     <Compile Include="Dao\SmsDao.cs" />
     <Compile Include="Dao\SmsLogDao.cs" />
     <Compile Include="Dao\SphinxExcludeDao.cs" />
+    <Compile Include="Dao\SuperDao.cs" />
     <Compile Include="Dao\SystemKeyWordDao.cs" />
     <Compile Include="Dao\TableChangeLogDao.cs" />
     <Compile Include="Dao\TableHistoryDao.cs" />
@@ -1154,6 +1155,7 @@
     <Compile Include="Mgr\SmsLogMgr.cs" />
     <Compile Include="Mgr\SmsMgr.cs" />
     <Compile Include="Mgr\SphinxExcludeMgr.cs" />
+    <Compile Include="Mgr\SuperMgr.cs" />
     <Compile Include="Mgr\SystemKeyWordMgr.cs" />
     <Compile Include="Mgr\TableChangeLogMgr.cs" />
     <Compile Include="Mgr\TableHistoryItemMgr.cs" />
@@ -1388,6 +1390,7 @@
     <Compile Include="Model\Query\ShippingVoucherQuery.cs" />
     <Compile Include="Model\Query\SphinxExcludeQuery.cs" />
     <Compile Include="Model\Query\SphinxKeywordQuery.cs" />
+    <Compile Include="Model\Query\SuperQuery.cs" />
     <Compile Include="Model\Query\TableChangeLogQuery.cs" />
     <Compile Include="Model\Query\TicketReturnQuery.cs" />
     <Compile Include="Model\Query\TrialQuery.cs" />
@@ -1718,6 +1721,7 @@
     <Compile Include="Model\SphinxKeyword.cs" />
     <Compile Include="Model\StatisticCm.cs" />
     <Compile Include="Model\StatisticCmMap.cs" />
+    <Compile Include="Model\Super.cs" />
     <Compile Include="Model\TableChangeLog.cs" />
     <Compile Include="Model\TableHistory.cs" />
     <Compile Include="Model\TableHistoryItem.cs" />
