@@ -229,6 +229,7 @@ Ext.onReady(function () {
                           labelWidth: 60,
                           id: 'start_time',
                           format: 'Y-m-d',
+                          width: 170,
                           value: Tomorrow(1 - new Date().getDate()),
                           editable: false,
                           listeners: {
@@ -254,6 +255,7 @@ Ext.onReady(function () {
                           xtype: 'datefield',
                           id: 'end_time',
                           format: 'Y-m-d',
+                          width: 110,
                           value: Tomorrow(0),
                           editable: false,
                           listeners: {

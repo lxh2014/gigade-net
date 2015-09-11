@@ -229,6 +229,7 @@ var frm = Ext.create('Ext.form.Panel', {
                     editable: false,
                     value: Tomorrow(1),
                     format: 'Y/m/d',
+                    width:110,
                     vtype: 'daterange',
                     endDateField: 'enddate',
                     listeners: {
@@ -265,6 +266,7 @@ var frm = Ext.create('Ext.form.Panel', {
                     id: 'enddate',
                     name: 'enddate',
                     margin: '0 5px',
+                    width: 110,
                     editable: false,
                     value: new Date(),
                     format: 'Y/m/d',
