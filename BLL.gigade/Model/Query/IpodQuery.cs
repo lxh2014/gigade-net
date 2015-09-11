@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BLL.gigade.Model.Attributes;
 
 namespace BLL.gigade.Model.Query
 {
+    [DBTableInfo("ipod")]
     public class IpodQuery : Ipod
     {
         public string row_ids { set; get; }
@@ -21,7 +23,8 @@ namespace BLL.gigade.Model.Query
         public string parameterName { set; get; }
         public string ParameterCode { set; get; }
         public string Erp_Id { get; set; }
-        
+        public int item_stock { get; set; } //商品庫存
+        public string user_email { get; set; }
         public IpodQuery() 
         {
             row_ids = string.Empty;
@@ -37,7 +40,8 @@ namespace BLL.gigade.Model.Query
             user_username = string.Empty;
             ParameterCode=string.Empty;
             Erp_Id = string.Empty;
-            
+            item_stock = 0;
+            user_email = string.Empty;
         }
 
     }
