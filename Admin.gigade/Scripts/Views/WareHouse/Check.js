@@ -105,7 +105,8 @@ Ext.define('gigade.Ipod', {
      { name: "user_username", type: "string" },
      { name: "parameterName", type: "string" },
      { name: "plst_id", type: "string" },
-     { name: "spec", type: "string" }
+     { name: "spec", type: "string" },
+    { name: "item_stock", type: "string" }//庫存
     ]
 });
 
@@ -122,8 +123,58 @@ var IpodStore = Ext.create('Ext.data.Store', {
             type: 'json',
             root: 'data'
         }
+    },
+
+    listeners: {
+    update: function (store, record) {
+        //如果編輯的是轉移數量
+        //var row_id = e.record.data.row_id;
+        var qty_damaged = record.get("qty_damaged");
+        var qty_claimed = record.get("qty_claimed");
+        var qty_ord = record.get("qty_ord");
+        if (parseInt(qty_damaged) + parseInt(qty_claimed) != parseInt(qty_ord))
+        {
+            Ext.Msg.alert("錯誤提示", "不允收的量 + 實際收貨量 != 下單採購量,保存失敗！");
+            return false;
+        }
+
+            if (record.isModified('qty_damaged') || record.isModified('qty_claimed')) {
+                Ext.Ajax.request({
+                    url: '/WareHouse/UpdateIpodCheck',
+                    params: {
+                        row_id: record.get("row_id"),
+                        qty_damaged: record.get("qty_damaged"),
+                        qty_claimed: record.get("qty_claimed"),
+                        item_stock: parseInt(record.get("item_stock")) + parseInt(qty_claimed),
+                        
+                        plst_id:"F"
+
+                    },
+                    success: function (response)
+                    {
+                        var res = Ext.decode(response.responseText);
+                        if (res.success)
+                        {
+                            Ext.Msg.alert("提示信息", "驗收成功!");
+                            IpodStore.load();
+                        }
+                        else
+                        {
+                            Ext.Msg.alert("提示信息", "驗收失敗!");
+                            IpodStore.load();
+                        }
+                    },
+                    failure: function () {
+
+                        Ext.Msg.alert("提示信息", "驗收失敗!");
+
+                    }
+                });
+            }
+        }
     }
 });
+
 
 IpoStore.on("beforeload", function ()
 {
@@ -291,6 +342,7 @@ var ipoList = Ext.create('Ext.grid.Panel', {
     columns: [
         { header: '採購單單號', dataIndex: 'po_id', align: 'center', width: 120, menuDisabled: true, sortable: false },
         { header: '採購單別描述', dataIndex: 'po_type_desc', align: 'center', width: 120, menuDisabled: true, sortable: false, flex: 1 },
+        { header: "廠商代號", dataIndex: 'vend_id', width: 100, align: 'center', menuDisabled: true, sortable: false },
         { header: '創建時間', dataIndex: 'create_dtim', align: 'center', menuDisabled: true, sortable: false }
 
     ],
@@ -313,15 +365,34 @@ var ipoList = Ext.create('Ext.grid.Panel', {
     }
 })
 
-var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
-    clicksToEdit: 0
-});
+var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
+    clicksToMoveEditor: 1,
+    autoCancel: false,
+    clicksToEdit: 1,
+    errorSummary: false,
+    listeners: {
+        beforeedit: function (e, eOpts)
+        {
+            if (e.colIdx == 0)
+            {
+                e.hide();
+            }
+            if (e.record.data.plst_id == "已驗收")
+            {
+                return false;
+            }
 
+        }
+    }
+});
+Ext.grid.RowEditor.prototype.saveBtnText = "保存";
+Ext.grid.RowEditor.prototype.cancelBtnText = "取消";
+//Ext.grid.RowEditor.buttonAlign = "center";
 var center = Ext.create('Ext.form.Panel', {
     id: 'center',
     autoScroll: true,
     border: false,
-    frame: false,
+    frame: false, 
     layout: { type: 'vbox', align: 'stretch' },
     defaults: { margin: '2 2 2 2' },
     items: [
@@ -345,8 +416,9 @@ var center = Ext.create('Ext.form.Panel', {
             id: 'detailist',
             autoScroll: true,
             frame: false,
+            height: document.documentElement.clientHeight,
             store: IpodStore,
-            plugins: [cellEditing],
+            plugins: [rowEditing],
             columns: [
                 {
                     header: "驗收狀態", dataIndex: 'plst_id', width: 80, align: 'center',
@@ -372,8 +444,13 @@ var center = Ext.create('Ext.form.Panel', {
                 {
                     header: "下單採購量", dataIndex: 'qty_ord', width: 80, align: 'center'
                 },
+                {
+                    header: "庫存", dataIndex: 'item_stock', width: 80, align: 'center'
+                },
                 //{ header: "是否允許多次收貨", dataIndex: 'bkord_allow', width: 120, align: 'center' },
-                { header: "不允收的量", dataIndex: 'qty_damaged', flex: 1, align: 'center',editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, allowDecimals: false }  },
+                {
+                    header: "不允收的量", dataIndex: 'qty_damaged', flex: 1, align: 'center', editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, allowDecimals: false },
+                },
                 { header: "實際收貨量", dataIndex: 'qty_claimed', flex: 1, align: 'center', editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, allowDecimals: false } },
                 //{ header: "品項庫存用途", dataIndex: 'promo_invs_flg', flex: 1, align: 'center' },
                 //{ header: "訂貨價格", dataIndex: 'new_cost', flex: 1, align: 'center' },
@@ -401,60 +478,7 @@ var center = Ext.create('Ext.form.Panel', {
                         scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
                     }
                 },
-                edit: function (editor, e)
-                {
-                    //如果編輯的是轉移數量
-                    var row_id = e.record.data.row_id;
-                    var qty_damaged = e.record.data.qty_damaged;
-                    var qty_claimed = e.record.data.qty_claimed;
-                    
-                    if (e.field == "qty_damaged")
-                    {
-                        if (qty_damaged == "")
-                        {
-                            Ext.Msg.alert("提示信息", "值不能為空!");
-                            return;
-                        }
-                    }
-                    else if (e.field == "qty_claimed")
-                    {
-                        if (qty_claimed == "")
-                        {
-                            Ext.Msg.alert("提示信息", "值不能為空!");
-                            return;
-                        }
-                    }
-                    
-                    if (e.value != e.originalValue)
-                    {
-                        Ext.Ajax.request({
-                            url: '/WareHouse/UpdateIpodCheck',
-                            params: {
-                                row_id: row_id,
-                                qty_damaged: qty_damaged,
-                                qty_claimed: qty_claimed,
-                                plst_id:"F"
-
-                            },
-                            success: function (response)
-                            {
-                                var res = Ext.decode(response.responseText);
-                                if (res.success)
-                                {
-                                    Ext.Msg.alert("提示信息", "驗收成功!");
-                                    IpodStore.load();
-                                }
-                                else
-                                {
-                                    Ext.Msg.alert("提示信息", "驗收失敗!");
-                                    IpodStore.load();
-                                }
-                            }
-                        });
-                    }
-                    
-                   
-                }
+                
             }
 
         }
@@ -484,7 +508,7 @@ Ext.onReady(function ()
             xtype: 'panel',
             autoScroll: true,
             frame: false,
-            width: 400,
+            width: 420,
             margins: '5 4 5 5',
             id: 'west-region-container',
             layout: 'anchor',
@@ -498,6 +522,7 @@ Ext.onReady(function ()
             frame: false,
             layout: 'fit',
             width: 480,
+            
             margins: '5 4 5 5',
             items: center
         }

@@ -8248,6 +8248,7 @@ namespace Admin.gigade.Controllers
                 {
                     if (Request.Params["freight"].ToString() != "0")
                     {
+                        totalCount = 0;
                         _ipodMgr = new IpodMgr(mySqlConnectionString);
                         List<IpoQuery> newstore = new List<IpoQuery>();
                         foreach (IpoQuery item in store)
@@ -8257,6 +8258,7 @@ namespace Admin.gigade.Controllers
                                 if (_ipodMgr.GetIpodfreight(item.po_id, Convert.ToInt32(Request.Params["freight"].ToString())))
                                 {
                                     newstore.Add(item);
+                                    totalCount++;
                                 }
                             }
                         }
@@ -8267,7 +8269,7 @@ namespace Admin.gigade.Controllers
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式    ,totalCount:" + totalCount + " 
                 timeConverter.DateTimeFormat = "yyyy-MM-dd";
-                json = "{success:true,'msg':'user',data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";//返回json數據
+                json = "{success:true,'msg':'user',totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";//返回json數據
             }
             catch (Exception ex)
             {
@@ -8641,6 +8643,7 @@ namespace Admin.gigade.Controllers
         /// <returns></returns>
          public HttpResponseBase UpdateIpodCheck()
          {
+           
              IpodQuery query = new IpodQuery();
              string json = string.Empty;
              try
@@ -8649,6 +8652,7 @@ namespace Admin.gigade.Controllers
                  {
                      query.row_id = Convert.ToInt32(Request.Params["row_id"].ToString());
                      query.change_user = (Session["caller"] as Caller).user_id;
+                     query.user_email = (Session["caller"] as Caller).user_email;
                      query.change_dtim = DateTime.Now;
                  }
                  if (!string.IsNullOrEmpty(Request.Params["qty_damaged"]))
@@ -8659,16 +8663,19 @@ namespace Admin.gigade.Controllers
                  {
                      query.qty_claimed = Convert.ToInt32(Request.Params["qty_claimed"].ToString());
                  }
+                 if (!string.IsNullOrEmpty(Request.Params["item_stock"]))
+                 {
+                     query.item_stock = Convert.ToInt32(Request.Params["item_stock"].ToString());
+                 }
                  if (!string.IsNullOrEmpty(Request.Params["plst_id"]))
                  {
                      query.plst_id = Request.Params["plst_id"].ToString();
                  }
-
                  
                  _ipodMgr = new IpodMgr(mySqlConnectionString);
 
-                 int result = _ipodMgr.UpdateIpodCheck(query);
-                 if (result > 0)
+                 bool result = _ipodMgr.UpdateIpodCheck(query);
+                 if (result)
                  {
 
                      json = "{success:true,msg:\"" + result + "\"}";
