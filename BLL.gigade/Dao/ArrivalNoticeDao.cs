@@ -90,7 +90,7 @@ namespace BLL.gigade.Dao
         {
             StringBuilder str = new StringBuilder();//  
             StringBuilder strcont = new StringBuilder();// 
-          
+
             totalCount = 0;
             try
             {
@@ -167,8 +167,8 @@ namespace BLL.gigade.Dao
         }
         public int SaveArrivaleNotice(ArrivalNotice query)
         {
-            StringBuilder sql = new StringBuilder(); 
-            int result=1;
+            StringBuilder sql = new StringBuilder();
+            int result = 1;
             try
             {
                 sql.AppendFormat(" select Count(user_id) as Total from arrival_notice where user_id='{0}' and item_id='{1}' and status=0;", query.user_id, query.item_id);
@@ -184,7 +184,7 @@ namespace BLL.gigade.Dao
                     sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}' ", query.user_id, query.item_id, query.product_id, query.status, query.create_time, query.source_type);
                     sql.AppendFormat(",'{0}','{1}'); ", query.muser_id, query.send_notice_time);
                     _access.execCommand(sql.ToString());
-                    result= 99;
+                    result = 99;
                 }
                 return result;
             }
@@ -207,14 +207,14 @@ namespace BLL.gigade.Dao
                     sql.AppendFormat("  set sql_safe_updates = 0;UPDATE arrival_notice SET status='2' where item_id='{0}' and user_id='{1}';  set sql_safe_updates = 1; ", query.item_id, query.user_id);
                     return _access.execCommand(sql.ToString());
                 }
-                else 
+                else
                 {
                     return 100;
                 }
             }
             catch (Exception ex)
             {
-              throw new Exception("ArrivalNoticeDao-->UpArrivaleNoticeStatus-->" + ex.Message + sql.ToString(), ex);
+                throw new Exception("ArrivalNoticeDao-->UpArrivaleNoticeStatus-->" + ex.Message + sql.ToString(), ex);
             }
         }
 
@@ -248,7 +248,15 @@ namespace BLL.gigade.Dao
 
                 if (!string.IsNullOrEmpty(query.brand_id_OR_brand_name))//品牌名稱或者品牌編號
                 {
-                    strcont.AppendFormat(" and (vb.brand_name LIKE '%{0}%' or vb.brand_id like '{1}') ", query.brand_id_OR_brand_name, query.brand_id_OR_brand_name);
+                    int ID = 0;
+                    if (int.TryParse(query.brand_id_OR_brand_name, out ID))
+                    {
+                        strcont.AppendFormat(" and vb.brand_id = '{0}'", query.brand_id_OR_brand_name);
+                    }
+                    else
+                    {
+                        strcont.AppendFormat(" and vb.brand_name LIKE '%{0}%'", query.brand_id_OR_brand_name);
+                    }
                 }
                 if (query.product_status != 10)//商品狀態
                 {
