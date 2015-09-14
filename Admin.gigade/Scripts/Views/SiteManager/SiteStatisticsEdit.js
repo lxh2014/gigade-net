@@ -48,7 +48,7 @@
                },
                {
                    xtype: 'numberfield',
-                   fieldLabel: '點閱數',
+                   fieldLabel: '點擊',
                    id: 'ss_click_num',
                    name: 'ss_click_num',
                    allowBlank: false,
@@ -81,11 +81,11 @@
                    minValue: 0.00,
                    value: 0.00
                },
-               {
+                {
                    xtype: 'numberfield',
-                   fieldLabel: '預算',
-                   name: 'ss_budget',
-                   id: 'ss_budget',
+                   fieldLabel: '新會員數',
+                   name: 'ss_newuser_number',
+                   id: 'ss_newuser_number',
                    allowDecimals: true,
                    decimalPrecision: 2,
                    allowBlank: false,
@@ -95,9 +95,9 @@
                },
               {
                   xtype: 'numberfield',
-                  fieldLabel: '有效點閱數',
-                  id: 'ss_effect_num',
-                  name: 'ss_effect_num',
+                  fieldLabel: '實際轉換',
+                  id: 'ss_converted_newuser',
+                  name: 'ss_converted_newuser',
                   allowBlank: false,
                   allowDecimals: false,
                   minValue: 0,
@@ -106,9 +106,9 @@
               },
               {
                   xtype: 'numberfield',
-                  fieldLabel: '平均排名',
-                  name: 'ss_rank',
-                  id: 'ss_rank',
+                  fieldLabel: '訂單金額',
+                  name: 'ss_sum_order_amount',
+                  id: 'ss_sum_order_amount',
                   allowDecimals: true,
                   decimalPrecision: 2,
                   allowBlank: false,
@@ -116,14 +116,41 @@
                   minValue: 0.00,
                   value: 0.00
               },
-               //{
-               //    xtype: 'textfield',
-               //    fieldLabel: '廠家代碼',
-               //    id: 'ss_code',
-               //    name: 'ss_code',
-               //    allowBlank: false,
-               //    submitValue: true
-               //},
+              // {
+              //     xtype: 'numberfield',
+              //     fieldLabel: '預算',
+              //     name: 'ss_budget',
+              //     id: 'ss_budget',
+              //     allowDecimals: true,
+              //     decimalPrecision: 2,
+              //     allowBlank: false,
+              //     submitValue: true,
+              //     minValue: 0.00,
+              //     value: 0.00
+              // },
+              //{
+              //    xtype: 'numberfield',
+              //    fieldLabel: '有效點閱數',
+              //    id: 'ss_effect_num',
+              //    name: 'ss_effect_num',
+              //    allowBlank: false,
+              //    allowDecimals: false,
+              //    minValue: 0,
+              //    value: 0,
+              //    submitValue: true
+              //},
+              //{
+              //    xtype: 'numberfield',
+              //    fieldLabel: '平均排名',
+              //    name: 'ss_rank',
+              //    id: 'ss_rank',
+              //    allowDecimals: true,
+              //    decimalPrecision: 2,
+              //    allowBlank: false,
+              //    submitValue: true,
+              //    minValue: 0.00,
+              //    value: 0.00
+              //},
                {
                    xtype: 'combobox', //status
                    fieldLabel: '廠家代碼',
@@ -146,7 +173,7 @@
                },
                {
                    xtype: "datefield",
-                   fieldLabel: '時間',
+                   fieldLabel: '日期',
                    id: 'ss_date',
                    name: 'ss_date',
                    format: 'Y-m-d',
@@ -253,8 +280,8 @@
                             }
 
                         }
-                    });
-                    if (issubmit)
+                    });  
+                    if (issubmit) 
                     {
                         form.submit({
                             params: {
@@ -264,9 +291,9 @@
                                 //ss_click_through: Ext.Date.format(new Date(Ext.getCmp('paperStart').getValue()), 'Y-m-d H:i:s'),
                                 ss_click_through: Ext.htmlEncode(Ext.getCmp('ss_click_through').getValue()),
                                 ss_cost: Ext.htmlEncode(Ext.getCmp('ss_cost').getValue()),
-                                ss_budget: Ext.getCmp('ss_budget').getValue(),
-                                ss_effect_num: Ext.htmlEncode(Ext.getCmp('ss_effect_num').getValue()),
-                                ss_rank: Ext.htmlEncode(Ext.getCmp('ss_rank').getValue()),
+                                ss_newuser_number: Ext.getCmp('ss_newuser_number').getValue(),
+                                ss_sum_order_amount: Ext.htmlEncode(Ext.getCmp('ss_sum_order_amount').getValue()),
+                                ss_converted_newuser: Ext.htmlEncode(Ext.getCmp('ss_converted_newuser').getValue()),
                                 ss_date: Ext.htmlEncode(Ext.getCmp('ss_date').getValue()),
                                 ss_code: Ext.htmlEncode(Ext.getCmp('ss_code').getValue())
                             },

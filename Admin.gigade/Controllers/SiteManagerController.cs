@@ -225,40 +225,55 @@ namespace Admin.gigade.Controllers
             string json = string.Empty;
             try
             {
-                SiteStatistics query = new SiteStatistics();
-                ssMgr = new SiteStatisticsMgr(mySqlConnectionString);
-                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
-                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
-                query.ss_code = Request.Params["ss_code"];
-                if (!string.IsNullOrEmpty(Request.Params["startdate"]))
+                if (Request.Files.Count > 0)
                 {
-                    query.sss_date = DateTime.Parse(Request.Params["startdate"]);
+                    string path = Request.Params["ImportExcel"];
+                    HttpPostedFileBase excelFile = Request.Files["ImportExcel"];
+                    FileManagement fileManagement = new FileManagement();
+                    string newExcelName = Server.MapPath(excelPath) + "statistics\\" + fileManagement.NewFileName(excelFile.FileName);
+                    excelFile.SaveAs(newExcelName);
+                    NPOI4ExcelHelper helper = new NPOI4ExcelHelper(newExcelName);
+                    DataTable _dt = helper.ExcelToTableForXLSX();
+                    ssMgr = new SiteStatisticsMgr(mySqlConnectionString);
+                    json = ssMgr.ImportExcelToDt(_dt);//匯入成功 
                 }
-                if (!string.IsNullOrEmpty(Request.Params["enddate"]))
+                else
                 {
-                    query.ess_date = DateTime.Parse(Request.Params["enddate"]);
+                    SiteStatistics query = new SiteStatistics();
+                    ssMgr = new SiteStatisticsMgr(mySqlConnectionString);
+                    query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                    query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                    query.ss_code = Request.Params["ss_code"];
+                    if (!string.IsNullOrEmpty(Request.Params["startdate"]))
+                    {
+                        query.sss_date = Convert.ToDateTime(DateTime.Parse(Request.Params["startdate"]).ToString("yyyy-MM-dd 00:00:00"));
+                    }
+                    if (!string.IsNullOrEmpty(Request.Params["enddate"]))
+                    {
+                        query.ess_date = Convert.ToDateTime(DateTime.Parse(Request.Params["enddate"]).ToString("yyyy-MM-dd 23:59:59"));
+                    }
+                    #region  用來判斷相同的廠家代碼和時間是否已經存在
+                    if (!string.IsNullOrEmpty(Request.Params["ss_id"]))
+                    {
+                        query.ss_id = int.Parse(Request.Params["ss_id"]);
+                    }
+                    if (!string.IsNullOrEmpty(Request.Params["ss_date"]))
+                    {
+                        query.ss_date = DateTime.Parse(Request.Params["ss_date"]);
+                    }
+                    if (!string.IsNullOrEmpty(Request.Params["ispage"]))
+                    {
+                        query.IsPage = bool.Parse(Request.Params["ispage"]);
+                    }
+                    #endregion
+                    int totalCount = 0;
+                    DataTable dt = ssMgr.GetSiteStatisticsList(query, out totalCount);
+                    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                    //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                    timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                    //listUser是准备转换的对象
+                    json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(dt, Formatting.Indented, timeConverter) + "}";//返回json數據
                 }
-                #region  用來判斷相同的廠家代碼和時間是否已經存在
-                if (!string.IsNullOrEmpty(Request.Params["ss_id"]))
-                {
-                    query.ss_id = int.Parse(Request.Params["ss_id"]);
-                }
-                if (!string.IsNullOrEmpty(Request.Params["ss_date"]))
-                {
-                    query.ss_date = DateTime.Parse(Request.Params["ss_date"]);
-                }
-                if (!string.IsNullOrEmpty(Request.Params["ispage"]))
-                {
-                    query.IsPage = bool.Parse(Request.Params["ispage"]);
-                }
-                #endregion
-                int totalCount = 0;
-                DataTable dt = ssMgr.GetSiteStatisticsList(query, out totalCount);
-                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
-                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                //listUser是准备转换的对象
-                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(dt, Formatting.Indented, timeConverter) + "}";//返回json數據
             }
             catch (Exception ex)
             {
@@ -296,17 +311,17 @@ namespace Admin.gigade.Controllers
                 {
                     ss.ss_cost = float.Parse(Request.Params["ss_cost"]);
                 }
-                if (!string.IsNullOrEmpty(Request.Params["ss_budget"]))
+                if (!string.IsNullOrEmpty(Request.Params["ss_converted_newuser"]))
                 {
-                    ss.ss_budget = float.Parse(Request.Params["ss_budget"]);
+                    ss.ss_converted_newuser = int.Parse(Request.Params["ss_converted_newuser"]);
                 }
-                if (!string.IsNullOrEmpty(Request.Params["ss_effect_num"]))
+                if (!string.IsNullOrEmpty(Request.Params["ss_sum_order_amount"]))
                 {
-                    ss.ss_effect_num = int.Parse(Request.Params["ss_effect_num"]);
+                    ss.ss_sum_order_amount = int.Parse(Request.Params["ss_sum_order_amount"]);
                 }
-                if (!string.IsNullOrEmpty(Request.Params["ss_rank"]))
+                if (!string.IsNullOrEmpty(Request.Params["ss_newuser_number"]))
                 {
-                    ss.ss_rank = float.Parse(Request.Params["ss_rank"]);
+                    ss.ss_newuser_number = int.Parse(Request.Params["ss_newuser_number"]);
                 }
                 if (!string.IsNullOrEmpty(Request.Params["ss_date"]))
                 {
@@ -371,6 +386,71 @@ namespace Admin.gigade.Controllers
             else
             {
                 return Json(new { success = "false", msg = "" });
+            }
+        }
+
+
+        public void ExportExcelStatistics()
+        {
+            try
+            {
+                int totalCount=0;
+                SiteStatistics query = new SiteStatistics();
+                ssMgr = new  SiteStatisticsMgr(mySqlConnectionString);
+                query.ss_code = Request.Params["ss_code"];
+                if (!string.IsNullOrEmpty(Request.Params["startdate"]))
+                {
+                    query.sss_date = Convert.ToDateTime(DateTime.Parse(Request.Params["startdate"]).ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["enddate"]))
+                {
+                    query.ess_date = Convert.ToDateTime(DateTime.Parse(Request.Params["enddate"]).ToString("yyyy-MM-dd 23:59:59"));
+                }
+                DataTable _dt = ssMgr.GetSiteStatisticsList(query, out totalCount);
+                DataTable _newDt = new DataTable();
+                _newDt.Columns.Add("日期", typeof(string));
+                _newDt.Columns.Add("曝光", typeof(string));
+                _newDt.Columns.Add("點擊", typeof(string));
+                _newDt.Columns.Add("點閱率", typeof(string));
+                _newDt.Columns.Add("費用", typeof(string));
+                _newDt.Columns.Add("會員數", typeof(string));
+                //_newDt.Columns.Add("新會員成本", typeof(string));
+                _newDt.Columns.Add("實際轉換", typeof(string));
+               // _newDt.Columns.Add("轉換率", typeof(string));
+                //_newDt.Columns.Add("平均訂單金額", typeof(string));
+                _newDt.Columns.Add("訂單金額", typeof(string));
+                //_newDt.Columns.Add("ROI", typeof(string));
+                for (int i = 0; i < _dt.Rows.Count; i++)
+                {
+                    DataRow newRow = _newDt.NewRow();
+                    newRow["日期"] = Convert.ToDateTime(_dt.Rows[i]["ss_date"]).ToString("yyyy-MM-dd"); ;
+                    newRow["曝光"] = GetString(_dt.Rows[i]["ss_show_num"].ToString());
+                    newRow["點擊"] = GetString(_dt.Rows[i]["ss_click_num"].ToString());
+                    newRow["點閱率"] = _dt.Rows[i]["ss_click_through"].ToString();
+                    newRow["費用"] = _dt.Rows[i]["ss_cost"].ToString();
+                    newRow["會員數"] = GetString(_dt.Rows[i]["ss_newuser_number"].ToString());
+                    newRow["實際轉換"] = GetString(_dt.Rows[i]["ss_converted_newuser"].ToString());
+                    newRow["訂單金額"] = GetString(_dt.Rows[i]["ss_sum_order_amount"].ToString());
+                    //newRow[2] = GetString(_dt.Rows[i]["ss_click_num"].ToString());
+                    //newRow[1] = GetString(_dt.Rows[i]["ss_show_num"].ToString());
+                    //newRow[2] = GetString(_dt.Rows[i]["ss_click_num"].ToString());
+
+                    _newDt.Rows.Add(newRow);
+                }
+                //_dt.Columns["sa_date"].ColumnName = "日索引";
+                //_dt.Columns["sa_work_stage"].ColumnName = "工作階段";
+                //_dt.Columns["sa_user"].ColumnName = "使用者";
+                string fileName = "站臺訪問量統計" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                MemoryStream ms = ExcelHelperXhf.ExportDT(_newDt, "");
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                Response.BinaryWrite(ms.ToArray());
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
             }
         }
         #endregion

@@ -163,6 +163,53 @@ namespace BLL.gigade.Common
             }
             return dt;
         }
+
+        //add by yafeng0715j 2015-09-11 PM
+        /// <summary>
+        /// 讀取excel文件第一個sheet的資料  07
+        /// </summary>
+        /// <param name="filePath">文件路徑</param>
+        /// <returns></returns>
+        public DataTable ExcelToTableForXLSX()
+        {
+            if (hssfworkbook == null) { return null; };
+
+            ISheet sheet = hssfworkbook.GetSheetAt(0);
+            System.Collections.IEnumerator rows = sheet.GetRowEnumerator();
+
+            DataTable dt = new DataTable();
+
+            //第一行添加未table的列名
+            //一行最后一个方格的编号 即总的列数
+            rows.MoveNext();
+            IRow headerRow = (XSSFRow)rows.Current;
+            for (int j = 0; j < (sheet.GetRow(0).LastCellNum); j++)
+            {
+                dt.Columns.Add(headerRow.GetCell(j) != null ? headerRow.GetCell(j).StringCellValue.Trim() : "");
+            }
+
+            while (rows.MoveNext())
+            {
+                IRow row = (XSSFRow)rows.Current;
+                DataRow dr = dt.NewRow();
+
+                for (int i = 0; i < (row.LastCellNum <= dt.Columns.Count ? row.LastCellNum : dt.Columns.Count); i++)
+                {
+                    ICell cell = row.GetCell(i);
+
+                    if (cell == null)
+                    {
+                        dr[i] = null;
+                    }
+                    else
+                    {           
+                     dr[i] = cell.ToString().Trim();    
+                    }
+                }
+                dt.Rows.Add(dr);
+            }
+            return dt;
+        }
         /// <summary>
         /// 讀取excel文件第一個sheet的資料  03
         /// </summary>

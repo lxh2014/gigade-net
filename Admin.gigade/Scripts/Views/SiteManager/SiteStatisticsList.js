@@ -9,9 +9,12 @@ Ext.define('gigade.SiteStatistics', {
         { name: "ss_click_num", type: "string" },
         { name: "ss_click_through", type: "string" },
         { name: "ss_cost", type: "string" },
-        { name: "ss_budget", type: "string" },
-        { name: "ss_effect_num", type: "string" },
-        { name: "ss_rank", type: "string" },
+        //{ name: "ss_budget", type: "string" },
+        //{ name: "ss_effect_num", type: "string" },
+        //{ name: "ss_rank", type: "string" },
+        { name: "ss_newuser_number", type: "string" },
+        { name: "ss_converted_newuser", type: "string" },
+        { name: "ss_sum_order_amount", type: "string" },
         { name: "ss_date", type: "string" },
         { name: "ss_code", type: "string" },
         { name: "ss_create_time", type: "string" },
@@ -110,6 +113,7 @@ Ext.onReady(function ()
         flex: 1.1,
         border: 0,
         bodyPadding: 10,
+        url: '/SiteManager/GetSiteStatisticsList',
         width: document.documentElement.clientWidth,
         items: [
             {
@@ -137,7 +141,8 @@ Ext.onReady(function ()
                          forceSelection: false,
                          queryMode: 'local',
                          allowBlank: true,
-                         emptyText:'請選擇'
+                         emptyText: '請選擇',
+                         value:''
                      },
                      {
                          xtype: 'displayfield',
@@ -170,8 +175,28 @@ Ext.onReady(function ()
                         format: 'Y/m/d',
                         vtype: 'daterange',
                         startDateField: 'startdate'
+                    },
+                    {
+                        xtype: 'filefield',
+                        id: 'ImportExcel',
+                        width: 400,
+                        labelWidth:70,
+                        anchor: '100%',
+                        name: 'ImportExcel',
+                        fieldLabel: '匯入Excel',
+                        buttonText: '選擇Excel...'
+                    },
+                    {
+                        xtype: 'displayfield',
+                        margin:'0 0 0 10',
+                        value: '<a href="/Template/SiteStatistics/廣告成效匯入範本.xlsx">範例下載</a>'
+                    },
+                    {
+                        xtype: 'button',
+                        margin: '0 10 0 10',
+                        text: "匯入",
+                        handler: Import
                     }
-
                 ]
             },
                 {
@@ -220,9 +245,12 @@ Ext.onReady(function ()
             { header: "點閱數", dataIndex: 'ss_click_num', width: 100, align: 'center' },
             { header: "點閱率", dataIndex: 'ss_click_through', width: 80, align: 'center' },
             { header: "費用", dataIndex: 'ss_cost', width: 60, align: 'center' },
-            { header: "預算", dataIndex: 'ss_budget', width: 150, align: 'center' },
-            { header: "有效點閱數", dataIndex: 'ss_effect_num', width: 80, align: 'center' },
-            { header: "平均排名", dataIndex: 'ss_rank', width: 100, align: 'center' },
+            //{ header: "預算", dataIndex: 'ss_budget', width: 150, align: 'center' },
+            //{ header: "有效點閱數", dataIndex: 'ss_effect_num', width: 80, align: 'center' },
+            //{ header: "平均排名", dataIndex: 'ss_rank', width: 100, align: 'center' },
+            { header: "新會員數", dataIndex: 'ss_newuser_number', width: 150, align: 'center' },
+            { header: "實際轉換", dataIndex: 'ss_converted_newuser', width: 80, align: 'center' },
+            { header: "訂單金額", dataIndex: 'ss_sum_order_amount', width: 100, align: 'center' },
             {
                 header: "時間", dataIndex: 'ss_date', width: 110, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store)
@@ -243,7 +271,9 @@ Ext.onReady(function ()
         ],
         tbar: [
          { xtype: 'button', text: "新增", id: 'add', hidden: true, iconCls: 'icon-user-add', handler: onAddClick },
-         { xtype: 'button', text: "編輯", id: 'edit', hidden: true, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick }, '->',
+         { xtype: 'button', text: "編輯", id: 'edit', hidden: true, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
+         { xtype: 'button', text: "匯出Excel", id: 'outExcel', icon: '../../../Content/img/icons/excel.gif', handler: outExcel },
+         '->',
          { text: ' ' }],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: SiteStatisticsStore,
@@ -294,6 +324,38 @@ function Query(x)
         }
     });
 }
+
+function Import()
+{
+    var file = Ext.getCmp('ImportExcel').getValue();
+    if (file != '') {
+        var form = Ext.getCmp('frm').getForm();
+        form.submit({
+            waitMsg: '正在匯入...',
+            params: {
+                ImportExcel: Ext.htmlEncode(Ext.getCmp('ImportExcel').getValue())
+            },
+            success: function (form, action) {
+                var result = Ext.decode(action.response.responseText);
+                if (result.success) {
+                    Ext.Msg.alert("提示信息", "匯入成功");
+                    SiteStatisticsStore.load();
+                }
+                else {
+                    Ext.Msg.alert("提示信息", "匯入失敗");
+                }
+            },
+            failure: function () {
+                Ext.Msg.alert("提示信息", "匯入失敗");
+            }
+        });
+    }
+    else {
+        Ext.Msg.alert("提示信息", "請選擇Excel文件");
+    }
+        
+    
+}
 /*************************************************************************************新增*************************************************************************************************/
 onAddClick = function ()
 {
@@ -316,6 +378,10 @@ onEditClick = function ()
     {
         editSiteStatisticsFunction(row[0], SiteStatisticsStore);
     }
+}
+outExcel = function () {
+    var params = 'ss_code=' + Ext.getCmp('s_code').getValue() + '&startdate=' + Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('startdate').getValue()), 'Y-m-d')) + '&enddate=' + Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('enddate').getValue()), 'Y-m-d'))
+    window.open('/SiteManager/ExportExcelStatistics?' + params);
 }
 //更改狀態(啟用或者禁用)
 function Delete(id)
