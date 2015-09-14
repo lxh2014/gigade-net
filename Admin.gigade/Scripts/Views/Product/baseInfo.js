@@ -1013,7 +1013,7 @@ function Page_Load() {
             }
 
             //add by dongya 2015/08/17
-            if (resText.data.expend_day < 0 && resText.data.months == "") {
+            if (resText.data.expend_day == 0 && resText.data.months == "") {
                 Ext.getCmp("recommedde_jundge").setValue({ "recommedde_jundge": 0 });
                 Ext.getCmp('recommedde_time').hide();//如果點擊的是否,則不顯示
                 Ext.getCmp('recommedde_expend_day').hide();
