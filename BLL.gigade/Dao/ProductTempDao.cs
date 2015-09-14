@@ -106,7 +106,7 @@ namespace BLL.gigade.Dao
                 strSql.AppendFormat(" '{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}',{9},", p.show_listprice, p.expect_msg, p.Create_Channel, p.Show_In_Deliver, p.Prepaid, p.Process_Type, p.Product_Type, p.Prod_Name, p.Prod_Sz, p.Prod_Classify);
                 strSql.AppendFormat(" {0},{1},{2},{3},'{4}','{5}','{6}','{7}');", p.Deliver_Days, p.Min_Purchase_Amount, p.Safe_Stock_Amount, p.Extra_Days, p.Product_alt, p.purchase_in_advance, p.purchase_in_advance_start, p.purchase_in_advance_end);
      
-                if (p.expend_day>0&&p.months!="")//新增單一商品或者組合商品商品推薦臨時表
+                if (p.expend_day>=0&&p.months!="")//新增單一商品或者組合商品商品推薦臨時表
                 {
                     strSql.AppendFormat("insert into recommended_product_attribute_temp(`product_id`,`write_id`,`time_start`,`time_end`,`expend_day`,`months`,`combo_type`)values('{0}','{1}','{2}','{3}','{4}','{5}','{6}');", p.Product_Id, p.Writer_Id, 0, 0, p.expend_day, p.months,p.Combo_Type);
                 }
@@ -142,7 +142,7 @@ namespace BLL.gigade.Dao
                 stb.AppendFormat(" and product_id='{0}';", pTemp.Product_Id);
 
                 //如果存在更新或者刪除  如果是是否推薦點擊了否,則刪除
-                if (pTemp.Combo_Type == 1 && pTemp.expend_day > 0)//如果是單一商品
+                if (pTemp.Combo_Type == 1 && pTemp.expend_day >= 0)//如果是單一商品
                 {
                     if (reProductDao.ExsitInTemp(Convert.ToInt32(pTemp.Writer_Id), Convert.ToInt32(pTemp.Product_Id), pTemp.Combo_Type) > 0)
                     {
@@ -158,7 +158,7 @@ namespace BLL.gigade.Dao
                     stb.AppendFormat("delete from recommended_product_attribute_temp where product_id='{0}'and write_id='{1}' and combo_type='{2}'; ", pTemp.Product_Id, pTemp.Writer_Id, pTemp.Combo_Type);
                 }
                 
-                if (pTemp.Combo_Type == 2 && pTemp.expend_day > 0)//如果是組合商品
+                if (pTemp.Combo_Type == 2 && pTemp.expend_day >= 0)//如果是組合商品
                 {
                     if (reProductDao.ExsitInTemp(Convert.ToInt32(pTemp.Writer_Id), Convert.ToInt32(pTemp.Product_Id), pTemp.Combo_Type) > 0)
                     {
