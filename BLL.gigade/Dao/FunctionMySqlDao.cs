@@ -141,7 +141,8 @@ WHERE functiontype<>2
                 throw new Exception("FunctionMySqlDao-->QueryFunction-->" + ex.Message , ex);
             }
         }
-        
+
+      
 
         /// <summary>
         /// 根據funcitonId獲取擁有該功能的user集合
