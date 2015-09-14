@@ -419,6 +419,12 @@ Ext.onReady(function () {
                      this.up('form').getForm().reset();
                      Ext.getCmp("pcGift").hide();
                  }
+             }, {
+                 text: '重置',
+                 handler: function () {
+                     this.up('form').getForm().reset();
+                     Ext.getCmp('pcGift').hide();
+                 }
              }
         ],
         listeners: {

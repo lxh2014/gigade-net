@@ -6,6 +6,7 @@
  */
 var pageSize = 25;
 
+
 // 列表頁的model
 Ext.define('gridlistIQ', {
     extend: 'Ext.data.Model',
@@ -197,7 +198,7 @@ Ext.onReady(function () {
                         xtype: 'numberfield',
                         id: 'item_stock_start',
                         margin: '0 0 0 10',
-                        fieldLabel: '庫存數量',
+                        fieldLabel: '庫存數量',                
                         value: 0,
                         minValue: -1000000,
                         maxValue: 99999,
@@ -207,6 +208,11 @@ Ext.onReady(function () {
                                 if (e.getKey() == Ext.EventObject.ENTER) {
                                     Query();
                                 }
+                            }
+                            , change: function () {
+                                var start = Ext.getCmp('item_stock_start').getValue();
+                                var end = Ext.getCmp('item_stock_end');
+                                end.setMinValue(start);
                             }
                         }
                     },
@@ -220,7 +226,7 @@ Ext.onReady(function () {
                         anchor: '100%',
                         id: 'item_stock_end',
                         labelWidth: 100,
-                        margin: '0 0 0 10',
+                        margin: '0 0 0 10', 
                         value: 0,
                         minValue: -1000000,
                         maxValue: 99999,
@@ -230,7 +236,12 @@ Ext.onReady(function () {
                                     Query();
                                 }
                             }
-                        }
+                            , change: function () {
+                                var start = Ext.getCmp('item_stock_start');
+                                var end = Ext.getCmp('item_stock_end').getValue(); 
+                                start.setMaxValue(end);
+                            }
+                            }
                     }
                 ]
             },
