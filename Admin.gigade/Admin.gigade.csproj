@@ -1331,6 +1331,7 @@
     <Content Include="Scripts\Views\MemberEvent\MemberLevelWin.js" />
     <Content Include="Scripts\Views\Member\ShippingVoucher.js" />
     <Content Include="Scripts\Views\OrderManage\Logistics.js" />
+    <Content Include="Scripts\Views\OrderManage\OrderDetailManage.js" />
     <Content Include="Scripts\Views\OrderManage\OrderReturn.js" />
     <Content Include="Scripts\Views\OrderManage\OrderReturnList.js" />
     <Content Include="Scripts\Views\OrderManage\ReturnAllOrder.js" />
@@ -1408,6 +1409,7 @@
     <Content Include="XML\ParticularsSrc.xml" />
     <Content Include="XML\ProductItemHistory.xml" />
     <Content Include="XML\SaleSum.xml" />
+    <None Include="Properties\PublishProfiles\7110.pubxml" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all-vsdoc.js" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all.min.intellisense.js" />
     <Content Include="Scripts\kendo\2014.2.716\kendo.all.min.js" />
@@ -3806,6 +3808,7 @@
     </Content>
     <Content Include="Views\Super\Index.cshtml" />
     <Content Include="Views\Product\InventoryQuery.cshtml" />
+    <Content Include="Views\OrderManage\OrderDetailManage.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

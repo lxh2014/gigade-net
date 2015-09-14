@@ -10,7 +10,7 @@ var pageSize = 25;
 Ext.define('gridlistIQ', {
     extend: 'Ext.data.Model',
     fields: [
-         { name: "id", type: "int" },//商品編號
+        { name: "id", type: "int" },//商品編號
         { name: "product_id", type: "int" },//商品編號
         { name: "product_name", type: "string" },//商品名稱
         { name: "item_id", type: "int" },//商品細項編號
@@ -180,7 +180,6 @@ Ext.onReady(function () {
                               beforerender: function () {
                                   prodStatusStore.load({
                                       callback: function () {
-
                                           prodStatusStore.insert(0, { parameterCode: '10', parameterName: '全部' });
                                           Ext.getCmp('product_status').setValue(prodStatusStore.data.items[0].data.parameterCode);
                                           //alert(prodStatusStore.data.items[0].data.parameterCode);
