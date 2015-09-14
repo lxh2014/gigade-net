@@ -2054,5 +2054,19 @@ namespace BLL.gigade.Dao
                 throw new Exception("OrderMasterDao-->UpdataDM-->" + sql.ToString() + ex.Message, ex);
             }
         }
+
+        public DataTable VerifySession(uint user_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("select odm_user_id from order_detail_manager where odm_user_id='{0}' and odm_status=1;",user_id);
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->VerifySession-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
     }
 }
