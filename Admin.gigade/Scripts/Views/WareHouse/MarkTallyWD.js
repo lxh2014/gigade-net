@@ -1179,16 +1179,3 @@ function JhQuery()
 function closedthis() {
     document.location.href = "/WareHouse/MarkTally";
 }
-var config = {
-    title: "自定义对话框",
-    msg: "这是一个自定义对话框",
-    width: 400,
-    multiline: true,
-    closable: false,
-    buttons: Ext.MessageBox.YESNOCANCEL,
-    icon: Ext.MessageBox.QUESTION,
-    fn: function (btn, txt) {
-        Ext.MessageBox.alert("Result", "你点击了'yes'按钮<br>,输入的值是：" + txt);
-
-    }
-}

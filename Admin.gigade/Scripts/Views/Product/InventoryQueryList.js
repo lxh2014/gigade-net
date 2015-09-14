@@ -10,7 +10,7 @@ var pageSize = 25;
 Ext.define('gridlistIQ', {
     extend: 'Ext.data.Model',
     fields: [
-         { name: "id", type: "int" },//商品編號
+        { name: "id", type: "int" },//商品編號
         { name: "product_id", type: "int" },//商品編號
         { name: "product_name", type: "string" },//商品名稱
         { name: "item_id", type: "int" },//商品細項編號
