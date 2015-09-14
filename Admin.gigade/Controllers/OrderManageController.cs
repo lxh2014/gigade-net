@@ -44,6 +44,7 @@ namespace Admin.gigade.Controllers
         private OrderMasterMgr _ordermaster;
         private OrderReturnStatusMgr _orderReturnStatus;
         private OrderMoneyReturnMgr _orderMoneyReturnMgr;
+        private OrderDetailManagerMgr _orderDetailManagerMgr;
         static string excelPath = ConfigurationManager.AppSettings["ImportOrderExcel"];//關於導入的excel文件的限制
         static string HgReturnUrl = ConfigurationManager.AppSettings["HG_RETURN_URL"];//退货单返回hg点数url
         static string HgMerchandID = ConfigurationManager.AppSettings["HG_MERCHANDID"];//退货单返回hg点数url
@@ -6733,5 +6734,136 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
+
+        #region order_detail_manager
+        //列表頁
+        public HttpResponseBase GetODMList()
+        {
+            List<OrderDetailManagerQuery> store = new List<OrderDetailManagerQuery>();
+            OrderDetailManagerQuery query = new OrderDetailManagerQuery();
+            string json = string.Empty;
+            try
+            {
+                int totalCount = 0;
+                _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");//用於分頁的變量
+                if(!string.IsNullOrEmpty(Request.Params["odm_status"]))
+                {
+                    query.odm_status = Convert.ToInt32(Request.Params["odm_status"]);
+                }
+                store = _orderDetailManagerMgr.GetODMList(query, out totalCount);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}"; 
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        //新增
+        public HttpResponseBase InsertODM()
+        {
+            OrderDetailManagerQuery query = new OrderDetailManagerQuery();
+            string json = string.Empty;
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["odm_user_id"]))
+                {
+                    query.odm_user_id = Convert.ToUInt32(Request.Params["odm_user_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["odm_user_name"]))
+                {
+                    query.odm_user_name =Request.Params["odm_user_name"];
+                }
+             query.odm_createuser=(Session["caller"] as Caller).user_id;
+             _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
+             json = _orderDetailManagerMgr.InsertODM(query);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        //變更狀態
+        public JsonResult UpODMStatus()
+        {
+            {
+                try
+                {
+                    OrderDetailManagerQuery query = new OrderDetailManagerQuery();
+                    if (!string.IsNullOrEmpty(Request.Params["odm_user_id"].ToString()))
+                    {
+                        query.odm_user_id = Convert.ToUInt32(Request.Params["odm_user_id"].ToString());
+                    }
+                    query.odm_status = Convert.ToInt32(Request.Params["active"] ?? "0");
+                    _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
+                    int result = _orderDetailManagerMgr.UpODMStatus(query);
+                    if (result > 0)
+                    {
+                        return Json(new { success = "true" });
+                    }
+                    else
+                    {
+                        return Json(new { success = "false" });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                    logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                    logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                    log.Error(logMessage);
+                    return Json(new { success = "false" });
+                }
+            }
+        }
+
+        //store
+        public HttpResponseBase ManageUserStore()
+        {
+            List<ManageUserQuery> store = new List<ManageUserQuery>();
+        
+            string json = string.Empty;
+            try
+            {
+                _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
+                store = _orderDetailManagerMgr.ManageUserStore();
+                json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+
     }
 }
