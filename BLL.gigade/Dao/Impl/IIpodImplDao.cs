@@ -12,9 +12,11 @@ namespace BLL.gigade.Dao.Impl
         int GetPodID(IpodQuery query);
         int AddIpod(IpodQuery query);
         int UpdateIpod(IpodQuery query);
-        int UpdateIpodCheck(IpodQuery query);
+        string UpdateIpodCheck(IpodQuery query);
         int DeletIpod(IpodQuery query);
         List<IpodQuery> GetIpodListExprot(IpodQuery query);
         bool GetIpodfreight(string po_id, int freight);
+        BLL.gigade.Model.ProductItem GetStockHistorySql(IpodQuery query, out string Stock);
+        BLL.gigade.Model.Product GetIgnoreHistorySql(IpodQuery query, out string Shortage);
     }
 }

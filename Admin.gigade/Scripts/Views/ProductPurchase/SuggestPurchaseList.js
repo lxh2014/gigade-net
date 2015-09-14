@@ -261,7 +261,7 @@ Ext.onReady(function () {
                          },
                          {
                              xtype: 'textfield',
-                             fieldLabel: "供應商名稱",
+                             fieldLabel: "供應商簡稱",
                              margin: '0 0 0 25',
                              id: 'vendor_name',
                              labelWidth: 80,

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using BLL.gigade.Model;
 
 namespace BLL.gigade.Dao
 {
@@ -71,7 +72,7 @@ namespace BLL.gigade.Dao
             StringBuilder sqlCondi = new StringBuilder();
             try
             {
-                sql.Append(@" select ipl.loc_id,p.product_id,p.product_name,dfsm.delivery_freight_set as product_freight_set,pi.erp_id,p.product_name,p.spec_title_1,p.spec_title_2,pi.spec_id_1,pi.spec_id_2,i.row_id,i.po_id,i.pod_id,i.plst_id,i.bkord_allow,i.cde_dt_incr,i.cde_dt_var,i.cde_dt_shp,i.pwy_dte_ctl,i.qty_ord,i.qty_damaged,i.qty_claimed,i.promo_invs_flg,i.req_cost, ");
+                sql.Append(@" select ipl.loc_id,p.product_id,p.product_name,dfsm.delivery_freight_set as product_freight_set,pi.item_stock,pi.erp_id,p.product_name,p.spec_title_1,p.spec_title_2,pi.spec_id_1,pi.spec_id_2,i.row_id,i.po_id,i.pod_id,i.plst_id,i.bkord_allow,i.cde_dt_incr,i.cde_dt_var,i.cde_dt_shp,i.pwy_dte_ctl,i.qty_ord,i.qty_damaged,i.qty_claimed,i.promo_invs_flg,i.req_cost, ");
                 sql.Append(" i.off_invoice,i.new_cost,i.freight_price,i.prod_id,i.create_user,i.create_dtim,mu.user_username,i.change_user,i.change_dtim ");
                 sqlCondi.Append(" from ipod i ");
                 sqlCondi.Append(" left join product_item pi on pi.item_id=i.prod_id ");
@@ -150,22 +151,103 @@ namespace BLL.gigade.Dao
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public int UpdateIpodCheck(IpodQuery query)
+        public string UpdateIpodCheck(IpodQuery query)
         {
             StringBuilder sb = new StringBuilder();
             try
             {
-                sb.AppendFormat("set sql_safe_updates=0;");
-                sb.AppendFormat(" update ipod set qty_damaged='{0}',qty_claimed='{1}',plst_id='{2}' ", query.qty_damaged, query.qty_claimed,query.plst_id);
+                //sb.AppendFormat("set sql_safe_updates=0;");
+                sb.AppendFormat(" update ipod set qty_damaged='{0}',qty_claimed='{1}',plst_id='{2}' ", query.qty_damaged, query.qty_claimed, query.plst_id);
                 sb.AppendFormat(" ,change_user='{0}',change_dtim='{1}' where row_id='{2}'; ", query.change_user, Common.CommonFunction.DateTimeToString(query.change_dtim), query.row_id);
-                sb.AppendFormat("set sql_safe_updates=0;");
-                return _access.execCommand(sb.ToString());
+                //sb.AppendFormat("set sql_safe_updates=0;");
+                //int result = _access.execCommand(sb.ToString());
+
+                return sb.ToString();
             }
             catch (Exception ex)
             {
                 throw new Exception("IpodDao.UpdateIpodCheck-->" + ex.Message + sb.ToString(), ex);
             }
         }
+
+        public ProductItem GetStockHistorySql(IpodQuery query, out string Stock)
+        {
+            StringBuilder sqlStock = new StringBuilder();
+            Stock = string.Empty;
+            try
+            {
+                sqlStock.AppendFormat("update product_item pi,ipod set pi.item_stock='{0}' where pi.item_id=ipod.prod_id and ipod.row_id='{1}' ;", query.item_stock, query.row_id);
+                //_access.execCommand(sqlStock.ToString());
+                Stock = sqlStock.ToString();
+                sqlStock.Clear();
+                sqlStock.AppendFormat(@"SELECT pi.* FROM ipod i LEFT JOIN product_item pi ON pi.item_id = i.prod_id where i.row_id='{0}';", query.row_id);
+                
+                ProductItem productitem = new ProductItem();
+                productitem = _access.getSinggleObj<ProductItem>(sqlStock.ToString());
+
+                return productitem;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IpodDao-->GetStockHistorySql-->" + ex.Message + sqlStock.ToString(), ex);
+            }
+        }
+        public Product GetIgnoreHistorySql(IpodQuery query, out string Ignore)
+        {
+            StringBuilder sqlIgnore = new StringBuilder();
+            Ignore = string.Empty;
+            try
+            {
+                sqlIgnore.AppendFormat("update product p,product_item pi,ipod set p.ignore_stock=1 where pi.product_id=p.product_id and pi.item_id=ipod.prod_id and p.ignore_stock=0 and ipod.row_id='{0}'  ;", query.row_id);
+                //_access.execCommand(sqlShortage.ToString());
+                Ignore = sqlIgnore.ToString();
+                sqlIgnore.Clear();
+                sqlIgnore.AppendFormat(@"SELECT p.* FROM ipod i LEFT JOIN product_item pi ON pi.item_id = i.prod_id inner join product p on pi.product_id=p.product_id  where  p.ignore_stock=0 and i.row_id='{0}';", query.row_id);
+                
+                Product product = new Product();
+                product = _access.getSinggleObj<Product>(sqlIgnore.ToString());
+
+                return product;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IpodDao-->GetIgnoreHistorySql-->" + ex.Message + sqlIgnore.ToString(), ex);
+            }
+        }
+
+
+        public string GetHistorySql(IpodQuery query, out string Shortage)
+        {
+            StringBuilder sqlStock = new StringBuilder();
+            StringBuilder sqlShortage = new StringBuilder();
+            Shortage = string.Empty;
+            try
+            {
+                sqlStock.AppendFormat("update product_item pi,ipod set pi.item_stock='{0}' where pi.item_id=ipod.prod_id and ipod.row_id='{1}'  ;", query.item_stock, query.row_id);
+
+                sqlShortage.AppendFormat(@"SELECT p.product_id FROM ipod i LEFT JOIN product_item pi ON pi.item_id = i.prod_id inner join product p on pi.product_id=p.product_id and p.shortage=0 and i.row_id='{0}';", query.row_id);
+                DataTable _dt = _access.getDataTable(sqlShortage.ToString());
+                if (_dt.Rows.Count > 0)
+                {
+                    sqlShortage.Clear();
+                    sqlShortage.AppendFormat("update product p set p.shortage='{0}' where p.product_id='{1}'  ;", 1, Convert.ToUInt32(_dt.Rows[0]["product_id"].ToString()));
+                    Shortage = sqlShortage.ToString();
+                    //if (_access.execCommand(sb.ToString()) > 0)
+                    //{
+                    //    //
+                    //    sb.Clear();
+                    //    sb.AppendFormat("INSERT into table_change_log(user_type,pk_id,change_table,change_field,field_ch_name,old_value,new_value,create_user,create_time) values('1','{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}');", Convert.ToUInt32(_dt.Rows[0]["product_id"].ToString()), "product", "shortage", "補貨中停止販售", '0', '1', query.change_user, Common.CommonFunction.DateTimeToString(DateTime.Now));
+                    //    _access.execCommand(sb.ToString());
+                    //}
+                }
+                return sqlStock.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductCommentDao-->GetHistorySql-->" + ex.Message + sqlShortage.ToString(), ex);
+            }
+        }
+
         /// <summary>
         /// 採購單單身的序號-->通過採購單單號來算出序號
         /// </summary>

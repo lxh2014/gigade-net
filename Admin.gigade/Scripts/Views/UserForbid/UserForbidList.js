@@ -109,6 +109,7 @@ Ext.onReady(function () {
                                   name: 'serchcontent',
                                   fieldLabel: '創建時間',
                                   labelWidth: 60,
+                                  width:170,
                                   editable: false,
                                   listeners: {
                                       select: function (a, b, c) {
@@ -132,6 +133,7 @@ Ext.onReady(function () {
                  margin: "0 5 0 0",
                  name: 'serchcontent',
                  fieldLabel: '到',
+                 width: 125,
                  value:new Date(),
                  labelWidth: 15,
                  listeners: {

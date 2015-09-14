@@ -90,7 +90,7 @@ namespace BLL.gigade.Dao
         {
             StringBuilder str = new StringBuilder();//  
             StringBuilder strcont = new StringBuilder();// 
-          
+
             totalCount = 0;
             try
             {
@@ -167,8 +167,8 @@ namespace BLL.gigade.Dao
         }
         public int SaveArrivaleNotice(ArrivalNotice query)
         {
-            StringBuilder sql = new StringBuilder(); 
-            int result=1;
+            StringBuilder sql = new StringBuilder();
+            int result = 1;
             try
             {
                 sql.AppendFormat(" select Count(user_id) as Total from arrival_notice where user_id='{0}' and item_id='{1}' and status=0;", query.user_id, query.item_id);
@@ -184,7 +184,7 @@ namespace BLL.gigade.Dao
                     sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}' ", query.user_id, query.item_id, query.product_id, query.status, query.create_time, query.source_type);
                     sql.AppendFormat(",'{0}','{1}'); ", query.muser_id, query.send_notice_time);
                     _access.execCommand(sql.ToString());
-                    result= 99;
+                    result = 99;
                 }
                 return result;
             }
@@ -207,15 +207,97 @@ namespace BLL.gigade.Dao
                     sql.AppendFormat("  set sql_safe_updates = 0;UPDATE arrival_notice SET status='2' where item_id='{0}' and user_id='{1}';  set sql_safe_updates = 1; ", query.item_id, query.user_id);
                     return _access.execCommand(sql.ToString());
                 }
-                else 
+                else
                 {
                     return 100;
                 }
             }
             catch (Exception ex)
             {
-              throw new Exception("ArrivalNoticeDao-->UpArrivaleNoticeStatus-->" + ex.Message + sql.ToString(), ex);
+                throw new Exception("ArrivalNoticeDao-->UpArrivaleNoticeStatus-->" + ex.Message + sql.ToString(), ex);
             }
+        }
+
+        public List<ArrivalNoticeQuery> GetInventoryQueryList(ArrivalNoticeQuery query, out int totalCount)// by yachao1120j 2015-9-10 商品库存查询
+        {
+            StringBuilder str = new StringBuilder();
+            StringBuilder strcont = new StringBuilder();
+            totalCount = 0;
+
+            try
+            {
+                str.AppendFormat("SELECT an.id,p.product_id,p.product_name,an.item_id,CONCAT(p.spec_title_1,' ',ps1.spec_name) as spec_title_1,CONCAT(p.spec_title_2,' ',ps2.spec_name) as spec_title_2 ,v.vendor_id,v.vendor_name_full, vb.brand_id,vb.brand_name,p.product_status,pi.item_stock,p.ignore_stock from arrival_notice an ");
+                strcont.AppendFormat(" INNER JOIN product p on p.product_id=an.product_id ");
+                strcont.AppendFormat(" INNER JOIN product_item pi on pi.product_id=p.product_id ");
+                strcont.AppendFormat(" INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id ");
+                strcont.AppendFormat(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id ");
+                strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
+                strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
+                strcont.AppendFormat(" where 1=1 ");
+
+
+                if (!string.IsNullOrEmpty(query.product_id_OR_product_name))//商品名稱或者商品編號
+                {
+                    strcont.AppendFormat(" and (p.product_name LIKE '%{0}%' or p.product_id like '{1}') ", query.product_id_OR_product_name, query.product_id_OR_product_name);
+                }
+
+                if (!string.IsNullOrEmpty(query.vendor_name_full_OR_vendor_id))//供應商名稱或者供應商編號
+                {
+                    strcont.AppendFormat(" and (v.vendor_name_full LIKE '%{0}%' or v.vendor_id like '{1}') ", query.vendor_name_full_OR_vendor_id, query.vendor_name_full_OR_vendor_id);
+                }
+
+                if (!string.IsNullOrEmpty(query.brand_id_OR_brand_name))//品牌名稱或者品牌編號
+                {
+                    int ID = 0;
+                    if (int.TryParse(query.brand_id_OR_brand_name, out ID))
+                    {
+                        strcont.AppendFormat(" and vb.brand_id = '{0}'", query.brand_id_OR_brand_name);
+                    }
+                    else
+                    {
+                        strcont.AppendFormat(" and vb.brand_name LIKE '%{0}%'", query.brand_id_OR_brand_name);
+                    }
+                }
+                if (query.product_status != 10)//商品狀態
+                {
+                    strcont.AppendFormat("and p.product_status like '{0}'", query.product_status);
+                }
+
+                if (query.item_stock_start <= query.item_stock_end)//库存数量开始--库存数量结束   
+                {
+                    strcont.AppendFormat("  and pi.item_stock >='{0}' and pi.item_stock <='{1}'  ", query.item_stock_start, query.item_stock_end);
+                }
+
+                if (1 == 1)//補貨中停止販售
+                {
+                    strcont.AppendFormat("and p.ignore_stock = '{0}'", query.ignore_stock);
+                }
+                strcont.AppendFormat("GROUP BY an.item_id ");
+                str.Append(strcont);
+
+                if (query.IsPage)
+                {
+                    StringBuilder strpage = new StringBuilder();//  
+                    StringBuilder strcontpage = new StringBuilder();
+                    strpage.AppendFormat("SELECT count(biao.item_id) as totalCount FROM(select an.item_id from arrival_notice an  ");
+                    strpage.Append(strcont);
+                    strpage.AppendFormat(")as biao ");
+                    string sql = strpage.ToString();
+                    DataTable _dt = _access.getDataTable(sql);
+                    if (_dt.Rows.Count > 0)
+                    {
+                        totalCount = Convert.ToInt32(_dt.Rows[0][0]);
+                        str.AppendFormat(" limit {0},{1}", query.Start, query.Limit);
+                    }
+                }
+                return _access.getDataTableForObj<ArrivalNoticeQuery>(str.ToString());// 獲取查詢記錄
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ArrivalNoticeDao-->GetInventoryQueryList-->" + ex.Message);
+            }
+
         }
     }
 }
