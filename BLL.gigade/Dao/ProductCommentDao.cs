@@ -24,7 +24,7 @@ namespace BLL.gigade.Dao
         /// <param name="store"></param>
         /// <param name="totalCount">總數</param>
         /// <returns></returns>
-        public List<Model.Query.ProductCommentQuery> Query(Model.Query.ProductCommentQuery store, out int totalCount)
+        public DataTable Query(Model.Query.ProductCommentQuery store, out int totalCount)
         {
             StringBuilder strSql = new StringBuilder();
             StringBuilder strCondition = new StringBuilder();
@@ -34,7 +34,7 @@ namespace BLL.gigade.Dao
             {
                 store.Replace4MySQL();
                 totalCount = 0;
-                strSelect.AppendFormat("select pc.comment_id as comment_id ,pc.product_id,p.product_name as product_name,vb.brand_name as brand_name,uc.user_id, uc.user_email as user_email,uc.user_name,pc.is_show_name ,replace(replace(cd.comment_info, char(10), ''), char(13), '')  as comment_info,cd.comment_detail_id as comment_detail_id,cd.comment_advice as comment_advice, cd.comment_answer as comment_answer,cd.status as status,cd.answer_is_show, FROM_UNIXTIME(cd.create_time) as create_time,cn.product_desc as product_desc,cn.seller_server as seller_server,cn.web_server as web_server,cn.logistics_deliver as logistics_deliver,cd.reply_time,mu.user_username 's_reply_user'");
+                strSelect.AppendFormat("select pc.comment_id as comment_id ,pc.order_id,pc.product_id,p.product_name as product_name,vb.brand_name as brand_name,uc.user_id, uc.user_email as user_email,uc.user_name,pc.is_show_name ,replace(replace(cd.comment_info, char(10), ''), char(13), '')  as comment_info,cd.comment_detail_id as comment_detail_id,cd.comment_advice as comment_advice, cd.comment_answer as comment_answer,cd.status as status,cd.answer_is_show, FROM_UNIXTIME(cd.create_time) as create_time,cn.product_desc as product_desc,cn.seller_server as seller_server,cn.web_server as web_server,cn.logistics_deliver as logistics_deliver, FROM_UNIXTIME(cd.reply_time) as reply_time,mu.user_username 's_reply_user',p.prod_classify as productIds ");
                 strCondition.AppendFormat(" from product_comment pc left join product p on p.product_id=pc.product_id left join comment_detail cd on cd.comment_id=pc.comment_id left join comment_num cn on cn.comment_id=pc.comment_id left join users uc on uc.user_id=pc.user_id left join manage_user mu on mu.user_id=cd.reply_user  ");
                 strCondition.AppendFormat(" left join vendor_brand vb on p.brand_id=vb.brand_id");
                 strCondition.AppendFormat(" where 1=1");
@@ -68,9 +68,9 @@ namespace BLL.gigade.Dao
                         strCondition.AppendFormat(" and cn.product_desc+cn.seller_server+cn.web_server+cn.logistics_deliver <= 9");
                     }
                 }
-                if (store.commentsel != 0)
+                if (store.commentsel !=string.Empty)
                 {
-                    strCondition.AppendFormat(" and (cn.product_desc = {0} or cn.seller_server ={1} or cn.web_server={2} or cn.logistics_deliver ={3})", store.commentsel, store.commentsel, store.commentsel, store.commentsel);
+                    strCondition.AppendFormat(" and (cn.product_desc in ({0}) or cn.seller_server in( {1}) or cn.web_server in ({2}) or cn.logistics_deliver  in ({3}))", store.commentsel, store.commentsel, store.commentsel, store.commentsel);
                 }
                 if (store.beginTime != 0)
                 {
@@ -113,6 +113,7 @@ namespace BLL.gigade.Dao
                 {
                     strCondition.AppendFormat(" and cd.comment_answer is not null ", store.comment_answer);
                 }
+                strCondition.AppendFormat(" order by pc.comment_id desc ");
                 if (store.IsPage)
                 {
                     strSql.AppendFormat(strTotalCount.ToString());
@@ -121,8 +122,7 @@ namespace BLL.gigade.Dao
                     if (_dt != null && _dt.Rows.Count > 0)
                     {
                         totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
-                    }
-                    strCondition.AppendFormat(" order by pc.comment_id desc ");
+                    }       
                     strCondition.AppendFormat(" limit {0},{1}", store.Start, store.Limit);
                     strCondition.AppendFormat(";");
                 }
@@ -130,7 +130,7 @@ namespace BLL.gigade.Dao
                 strTemp.AppendFormat(strCondition.ToString());
                 strTemp.AppendFormat(";");
                 strSql.AppendFormat(strTemp.ToString());
-                return _access.getDataTableForObj<Model.Query.ProductCommentQuery>(strTemp.ToString());
+                return _access.getDataTable(strTemp.ToString());
             }
             catch (Exception ex)
             {
