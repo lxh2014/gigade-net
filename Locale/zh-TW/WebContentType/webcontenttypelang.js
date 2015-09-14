@@ -1,0 +1,64 @@
+﻿//列表頁
+ADD = "新增";
+EDIT = "編輯";
+DELETE = "刪除";
+REMOVE = "移除";
+TOTAL = "共計";
+NOW_DISPLAY_RECORD = "當前顯示記錄";
+NOTHING_DISPLAY = "沒有記錄可以顯示";
+PID = "編號";
+OPTION = "條件";
+SEARCH = "查詢";
+TOOL_CALLID = "人員管理"
+TOOL_AUTHORITY = "權限分配";
+//--表頭
+CONTENTID = "序號";
+SITEID = "網站";
+PAGEID = "網頁";
+AREAID = "區域";
+TYPRID = "類別";
+
+CONTENTTITLE = "內頁標";
+CONTENTIMAGE = "首頁圖";
+ISDEFAULT = "是否預設";
+CONTENTDEFAULT = "預設";
+NOCONTENTDEFAULT = "非預設";
+ISSTATUS = "是否啟用";
+CONTENTSTATUS = "啟用";
+NOCONTENTSTATUS = "不啟用";
+STATUSTIP = "啟用數目已達極限，將取消最舊的一條，是否執行？";
+CONTENTHTML = "內頁文";
+LINKURL = "連結";
+LINKPAGE = "顯示頁面";
+LINKMODE = "開新視窗";
+NOLINKMODE = "不開";
+OLDLINKMODE = "開原視窗";
+UPDATEON = "修改日期";
+CREATEDON = "建立日期";
+HOMETITLE = "首頁標";
+BIGTITLE = "大標";
+SMALLTITLE = "小標";
+HOMETEXT = "首頁文";
+PRODUCTID = "商品編號";
+BRANDID = "品牌";
+SELECT = "請選擇";
+GJZ = "關鍵字";
+SORT = "排序";
+STARTTIME = "上架時間";
+ENDTIME = "下架時間";
+
+PHOTOTITLE = "圖片標";
+PHOTO = "圖檔";
+SELECTPHOTO = "選擇圖檔";
+SAVE = "保存";
+
+WEBCONTENTTYPEONE = "影音廣告";
+WEBCONTENTTYPEFIVE = "食安生活";
+WEBCONTENTTYPETWO = "本月推薦、吉時分享";
+WEBCONTENTTYPETHREE = "品牌推薦";
+WEBCONTENTTYPEFOUR = "品牌頁";
+WEBCONTENTTYPESIX = "吉甲地單元";
+WEBCONTENTTYPESEVEN = "明星達人";
+WEBCONTENTTYPEEIGHT = "精選推薦";
+CLOSEFORM = "关闭窗口";
+BRANDTIP = "所有品牌已經使用完畢,是否關閉窗口?";

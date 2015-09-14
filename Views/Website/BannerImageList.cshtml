@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "BannerImageList";
+}
+<input type="hidden" id="sid" value="@ViewBag.sid" />
+<input type="hidden" id="sname" value="@ViewBag.sname" />
+<input type="hidden" id="history" value="@ViewBag.history" />
+<script src="../../Scripts/Common/jquery.colorbox-min.js"></script>
+<link href="../../Content/css/colorbox.css" rel="stylesheet" />
+<script type="text/javascript" src="../../Locale/@Html.Raw(Request.Cookies["lang"]==null? "zh-TW":Request.Cookies["lang"].ToString())/WareHouse/lang.js?v=@Context.Application["Version"].ToString()"></script>
+    <script src="../../Scripts/Common/ComboTree.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Views/Website/BannerImageList.js" type="text/javascript"></script>
+    <script src="../../Scripts/Views/Website/BannerImageEdit.js" type="text/javascript"></script>
+    <script src="../../Scripts/Views/Website/BannerImageHistoryDetail.js" type="text/javascript"></script>

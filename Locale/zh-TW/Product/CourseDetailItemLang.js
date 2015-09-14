@@ -1,0 +1,11 @@
+﻿//add by mingwei0727w 2015/07017
+PRODUCT_NON_SPEC = "無規格";
+CURRICULUM_SETTING = "課程設定";
+POINT_OUT = "提示";
+THIS_CURRICULUM_IS_SELL_CANT_DELETE_MESSAGE = "該課程已經售出，不可以刪除！";
+PRODUCT_DETAIL = "商品細項";
+CURRICULUM_DETAIL = "課程細項";
+PEOPLE_COUNT = "人數";
+NEW_ONE_ITEM = "新增";
+SAVE_COMPLETE = "保存成功";
+SAVE_FAIL = "保存失敗";

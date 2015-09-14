@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+ <input type="hidden" id="BaseAddress" name="BaseAddress" value="@ViewBag.BaseAddress" />
+<input type="hidden" id="path" name="path" value="@ViewBag.path" />
+@section Js{
+    <script type="text/javascript" src="../../Locale/@Html.Raw(Request.Cookies["lang"]==null? "zh-TW":Request.Cookies["lang"].ToString())/Element/ElementLang.js?v=@Context.Application["Version"].ToString()"></script>
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimePicker.js" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimeField.js" type="text/javascript"></script>
+    <script src="../../Scripts/Views/News/List.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Views/News/Add.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+}
+ <link href="@Url.Content("~/Content/kendo/2014.2.716/kendo.common.min.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Content/kendo/2014.2.716/kendo.bootstrap.min.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/kendo/2014.2.716/jquery.min.js")"></script>
+<script src="@Url.Content("~/Scripts/kendo/2014.2.716/kendo.all.min.js")"></script>
+<script src="@Url.Content("~/Scripts/kendo/2014.2.716/kendo.aspnetmvc.min.js")"></script>
+<script src="@Url.Content("~/Scripts/kendo/kendo.zh-TW.js")"></script>
+          <style type="text/css">
+
+    .k-vHtml {
+        background-position: -288px -120px;
+    }
+
+    .k-cLink {
+        background-position: -288px -48px;
+    }
+
+    .k-iFile {
+        background-position: -288px -216px;
+    }
+
+    .k-iImage {
+        background-position: -288px -96px;
+    }
+</style>

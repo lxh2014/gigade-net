@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="gb2312"?>
+<InformationRecord>
+  <OperateExtendName date="2015-04-30">
+    <info>2015/4/30 11:31:17: OperateExtendName Start</info>
+    <info>2015/4/30 11:31:19: OperateExtendName End</info>
+  </OperateExtendName>
+  <SaleStatus date="2015-04-30">
+    <info>2015/4/30 11:31:22: SaleStatus Start</info>
+    <info>2015/4/30 11:31:27: SaleStatus End </info>
+  </SaleStatus>
+</InformationRecord>
