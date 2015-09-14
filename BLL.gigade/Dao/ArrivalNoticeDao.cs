@@ -238,12 +238,29 @@ namespace BLL.gigade.Dao
 
                 if (!string.IsNullOrEmpty(query.product_id_OR_product_name))//商品名稱或者商品編號或商品細項編號
                 {
-                    strcont.AppendFormat(" and (p.product_name LIKE '%{0}%' or p.product_id like '{1}' or pi.item_id like '{2}') ", query.product_id_OR_product_name, query.product_id_OR_product_name,query.product_id_OR_product_name);
+                    int ID = 0;
+                    if (int.TryParse(query.product_id_OR_product_name, out ID))
+                    {
+                        strcont.AppendFormat(" and ( p.product_id = '{0}' or pi.item_id = '{1}') ", query.product_id_OR_product_name, query.product_id_OR_product_name);
+                    }
+                    else 
+                    {
+                        strcont.AppendFormat(" and p.product_name LIKE '%{0}%'", query.product_id_OR_product_name);
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(query.vendor_name_full_OR_vendor_id))//供應商名稱或者供應商編號
                 {
-                    strcont.AppendFormat(" and (v.vendor_name_full LIKE '%{0}%' or v.vendor_id like '{1}') ", query.vendor_name_full_OR_vendor_id, query.vendor_name_full_OR_vendor_id);
+                    int ID = 0;
+                    if (int.TryParse(query.vendor_name_full_OR_vendor_id, out ID))
+                    {
+                        strcont.AppendFormat(" and  v.vendor_id = '{0}' ", query.vendor_name_full_OR_vendor_id);
+                    }
+                    else 
+                    {
+                        strcont.AppendFormat(" and v.vendor_name_full LIKE '%{0}%'", query.vendor_name_full_OR_vendor_id);
+                    }
+                   
                 }
 
                 if (!string.IsNullOrEmpty(query.brand_id_OR_brand_name))//品牌名稱或者品牌編號
@@ -258,9 +275,10 @@ namespace BLL.gigade.Dao
                         strcont.AppendFormat(" and vb.brand_name LIKE '%{0}%'", query.brand_id_OR_brand_name);
                     }
                 }
+
                 if (query.product_status != 10)//商品狀態
                 {
-                    strcont.AppendFormat("and p.product_status like '{0}'", query.product_status);
+                    strcont.AppendFormat("and p.product_status = '{0}'", query.product_status);
                 }
 
                 if (query.item_stock_start <= query.item_stock_end)//库存数量开始--库存数量结束   
