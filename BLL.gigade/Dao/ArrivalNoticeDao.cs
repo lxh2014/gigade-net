@@ -90,7 +90,7 @@ namespace BLL.gigade.Dao
         {
             StringBuilder str = new StringBuilder();//  
             StringBuilder strcont = new StringBuilder();// 
-          
+
             totalCount = 0;
             try
             {
@@ -167,8 +167,8 @@ namespace BLL.gigade.Dao
         }
         public int SaveArrivaleNotice(ArrivalNotice query)
         {
-            StringBuilder sql = new StringBuilder(); 
-            int result=1;
+            StringBuilder sql = new StringBuilder();
+            int result = 1;
             try
             {
                 sql.AppendFormat(" select Count(user_id) as Total from arrival_notice where user_id='{0}' and item_id='{1}' and status=0;", query.user_id, query.item_id);
@@ -184,7 +184,7 @@ namespace BLL.gigade.Dao
                     sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}' ", query.user_id, query.item_id, query.product_id, query.status, query.create_time, query.source_type);
                     sql.AppendFormat(",'{0}','{1}'); ", query.muser_id, query.send_notice_time);
                     _access.execCommand(sql.ToString());
-                    result= 99;
+                    result = 99;
                 }
                 return result;
             }
@@ -207,14 +207,14 @@ namespace BLL.gigade.Dao
                     sql.AppendFormat("  set sql_safe_updates = 0;UPDATE arrival_notice SET status='2' where item_id='{0}' and user_id='{1}';  set sql_safe_updates = 1; ", query.item_id, query.user_id);
                     return _access.execCommand(sql.ToString());
                 }
-                else 
+                else
                 {
                     return 100;
                 }
             }
             catch (Exception ex)
             {
-              throw new Exception("ArrivalNoticeDao-->UpArrivaleNoticeStatus-->" + ex.Message + sql.ToString(), ex);
+                throw new Exception("ArrivalNoticeDao-->UpArrivaleNoticeStatus-->" + ex.Message + sql.ToString(), ex);
             }
         }
 
@@ -236,23 +236,49 @@ namespace BLL.gigade.Dao
                 strcont.AppendFormat(" where 1=1 ");
 
 
-                if (!string.IsNullOrEmpty(query.product_id_OR_product_name))//商品名稱或者商品編號
+                if (!string.IsNullOrEmpty(query.product_id_OR_product_name))//商品名稱或者商品編號或商品細項編號
                 {
-                    strcont.AppendFormat(" and (p.product_name LIKE '%{0}%' or p.product_id like '{1}') ", query.product_id_OR_product_name, query.product_id_OR_product_name);
+                    int ID = 0;
+                    if (int.TryParse(query.product_id_OR_product_name, out ID))
+                    {
+                        strcont.AppendFormat(" and ( p.product_id = '{0}' or pi.item_id = '{1}') ", query.product_id_OR_product_name, query.product_id_OR_product_name);
+                    }
+                    else 
+                    {
+                        strcont.AppendFormat(" and p.product_name LIKE '%{0}%'", query.product_id_OR_product_name);
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(query.vendor_name_full_OR_vendor_id))//供應商名稱或者供應商編號
                 {
-                    strcont.AppendFormat(" and (v.vendor_name_full LIKE '%{0}%' or v.vendor_id like '{1}') ", query.vendor_name_full_OR_vendor_id, query.vendor_name_full_OR_vendor_id);
+                    int ID = 0;
+                    if (int.TryParse(query.vendor_name_full_OR_vendor_id, out ID))
+                    {
+                        strcont.AppendFormat(" and  v.vendor_id = '{0}' ", query.vendor_name_full_OR_vendor_id);
+                    }
+                    else 
+                    {
+                        strcont.AppendFormat(" and v.vendor_name_full LIKE '%{0}%'", query.vendor_name_full_OR_vendor_id);
+                    }
+                   
                 }
 
                 if (!string.IsNullOrEmpty(query.brand_id_OR_brand_name))//品牌名稱或者品牌編號
                 {
-                    strcont.AppendFormat(" and (vb.brand_name LIKE '%{0}%' or vb.brand_id like '{1}') ", query.brand_id_OR_brand_name, query.brand_id_OR_brand_name);
+                    int ID = 0;
+                    if (int.TryParse(query.brand_id_OR_brand_name, out ID))
+                    {
+                        strcont.AppendFormat(" and vb.brand_id = '{0}'", query.brand_id_OR_brand_name);
+                    }
+                    else
+                    {
+                        strcont.AppendFormat(" and vb.brand_name LIKE '%{0}%'", query.brand_id_OR_brand_name);
+                    }
                 }
+
                 if (query.product_status != 10)//商品狀態
                 {
-                    strcont.AppendFormat("and p.product_status like '{0}'", query.product_status);
+                    strcont.AppendFormat("and p.product_status = '{0}'", query.product_status);
                 }
 
                 if (query.item_stock_start <= query.item_stock_end)//库存数量开始--库存数量结束   

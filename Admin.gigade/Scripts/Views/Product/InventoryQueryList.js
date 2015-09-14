@@ -10,7 +10,7 @@ var pageSize = 25;
 Ext.define('gridlistIQ', {
     extend: 'Ext.data.Model',
     fields: [
-         { name: "id", type: "int" },//商品編號
+        { name: "id", type: "int" },//商品編號
         { name: "product_id", type: "int" },//商品編號
         { name: "product_name", type: "string" },//商品名稱
         { name: "item_id", type: "int" },//商品細項編號
@@ -63,7 +63,7 @@ var prodStatusStore = Ext.create('Ext.data.Store', {
     //  autoLoad: true,
     proxy: {
         type: 'ajax',
-        url: "/Parameter/QueryPara?paraType=product_status",
+        url: "/Parameter/QueryPara?paraType=product_status",//調用查詢商品狀態的方法
         getMethod: function () { return 'get'; },
         actionMethods: 'post',
         reader: {
@@ -180,7 +180,6 @@ Ext.onReady(function () {
                               beforerender: function () {
                                   prodStatusStore.load({
                                       callback: function () {
-
                                           prodStatusStore.insert(0, { parameterCode: '10', parameterName: '全部' });
                                           Ext.getCmp('product_status').setValue(prodStatusStore.data.items[0].data.parameterCode);
                                           //alert(prodStatusStore.data.items[0].data.parameterCode);
@@ -193,43 +192,46 @@ Ext.onReady(function () {
             }, {
                 xtype: 'fieldcontainer',
                 layout: 'hbox',
-                items: [{
-                    xtype: 'numberfield',
-                    id: 'item_stock_start',
-                    margin: '0 0 0 10',
-                    fieldLabel: '庫存數量',
-                    value: 0,
-                    minValue: -1000000,
-                    maxValue: 99999,
-                    anchor: '100%',
-                    listeners: {
-                        change: function (field, value) {
-                            if (e.getKey() == Ext.EventObject.ENTER) {
-                                Query();
+                items: [
+                    {
+                        xtype: 'numberfield',
+                        id: 'item_stock_start',
+                        margin: '0 0 0 10',
+                        fieldLabel: '庫存數量',
+                        value: 0,
+                        minValue: -1000000,
+                        maxValue: 99999,
+                        anchor: '100%',
+                        listeners: {
+                            specialkey: function (field, e) {
+                                if (e.getKey() == Ext.EventObject.ENTER) {
+                                    Query();
+                                }
                             }
-                        },
-                    }
-                }, {
+                        }
+                    },
+                    {
                     xtype: 'displayfield',
                     margin: '2 0 0 8',
                     value: '~ ~'
-                }, {
-                    xtype: 'numberfield',
-                    anchor: '100%',
-                    id: 'item_stock_end',
-                    labelWidth: 100,
-                    margin: '0 0 0 10',
-                    value: 0,
-                    minValue: -1000000,
-                    maxValue: 99999,
-                    listeners: {
-                        change: function (field, value) {
-                            if (e.getKey() == Ext.EventObject.ENTER) {
-                                Query();
+                    },
+                    {
+                        xtype: 'numberfield',
+                        anchor: '100%',
+                        id: 'item_stock_end',
+                        labelWidth: 100,
+                        margin: '0 0 0 10',
+                        value: 0,
+                        minValue: -1000000,
+                        maxValue: 99999,
+                        listeners: {
+                            specialkey: function (field, e) {
+                                if (e.getKey() == Ext.EventObject.ENTER) {
+                                    Query();
+                                }
                             }
-                        },
+                        }
                     }
-                },
                 ]
             },
             {
@@ -270,13 +272,8 @@ Ext.onReady(function () {
                     text: '重置',
                     iconCls: 'ui-icon ui-icon-reset',
                     handler: function () {
-                        this.up('form').getForm().reset();
-                        Ext.getCmp('vendor_name_full_OR_vendor_id').setValue('');
-                        Ext.getCmp('product_id_OR_product_name').setValue('');
-                        Ext.getCmp('brand_id_OR_brand_name').setValue('');
-                        Ext.getCmp('product_status').setValue('10');
-                        Ext.getCmp('item_stock_start').setValue('0');
-                        Ext.getCmp('item_stock_end').setValue('0');
+                        Comeback();
+                       
                     }
                 }
         ]
@@ -350,6 +347,17 @@ function Query(x) {
         }
     });
 }
+/*************************************************************************************重置按鈕*************************************************************************************************/
+function Comeback() {
+    Ext.getCmp('vendor_name_full_OR_vendor_id').setValue('');
+    Ext.getCmp('product_id_OR_product_name').setValue('');
+    Ext.getCmp('brand_id_OR_brand_name').setValue('');
+    Ext.getCmp('product_status').setValue('10');
+    Ext.getCmp('item_stock_start').setValue('0');
+    Ext.getCmp('item_stock_end').setValue('0');
+    Ext.getCmp('id1').setValue(true);// 補貨中停止販售
+}
+
 /************匯入到Exce************/
 function Export() {
     var vendor_name_full_OR_vendor_id = Ext.getCmp('vendor_name_full_OR_vendor_id').getValue();
