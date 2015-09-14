@@ -236,9 +236,9 @@ namespace BLL.gigade.Dao
                 strcont.AppendFormat(" where 1=1 ");
 
 
-                if (!string.IsNullOrEmpty(query.product_id_OR_product_name))//商品名稱或者商品編號
+                if (!string.IsNullOrEmpty(query.product_id_OR_product_name))//商品名稱或者商品編號或商品細項編號
                 {
-                    strcont.AppendFormat(" and (p.product_name LIKE '%{0}%' or p.product_id like '{1}') ", query.product_id_OR_product_name, query.product_id_OR_product_name);
+                    strcont.AppendFormat(" and (p.product_name LIKE '%{0}%' or p.product_id like '{1}' or pi.item_id like '{2}') ", query.product_id_OR_product_name, query.product_id_OR_product_name,query.product_id_OR_product_name);
                 }
 
                 if (!string.IsNullOrEmpty(query.vendor_name_full_OR_vendor_id))//供應商名稱或者供應商編號
