@@ -3805,12 +3805,9 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-<<<<<<< HEAD
     <Content Include="Views\Super\Index.cshtml" />
     <Content Include="Views\Product\InventoryQuery.cshtml" />
-=======
     <Content Include="Views\OrderManage\OrderDetailManage.cshtml" />
->>>>>>> linda
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
