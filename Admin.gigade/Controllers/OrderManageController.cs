@@ -68,6 +68,14 @@ namespace Admin.gigade.Controllers
             return View();
         }
         /// <summary>
+        /// 訂單內容權限頁面
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult OrderDetailManage()
+        {
+            return View();
+        }
+        /// <summary>
         /// 品牌訂單查詢
         /// </summary>
         /// <returns></returns>
