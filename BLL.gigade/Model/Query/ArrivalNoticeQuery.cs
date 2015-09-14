@@ -33,7 +33,7 @@ namespace BLL.gigade.Model.Query
         public string spec_title_1 { get; set; }
         public string spec_title_2 { get; set; }
 
-        //商品库存查询--新增
+        //商品库存查询--新增字段
         public uint product_status { get; set; }
         public string product_status_string { get; set; }
         public int ignore_stock { get; set; }

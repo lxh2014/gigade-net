@@ -61,11 +61,9 @@ Ext.define("gigade.gridPara", {
 var prodStatusStore = Ext.create('Ext.data.Store', {
     model: 'gigade.gridPara',
     //  autoLoad: true,
-
     proxy: {
         type: 'ajax',
         url: "/Parameter/QueryPara?paraType=product_status",
-        //  noCache: false,
         getMethod: function () { return 'get'; },
         actionMethods: 'post',
         reader: {
@@ -89,14 +87,14 @@ ProductStore.on('beforeload', function () {
         });
 });
 
-//每行數據前段的矩形選擇框
-var sm = Ext.create('Ext.selection.CheckboxModel', {
-    listeners: {
-        selectionchange: function (sm, selections) {
-            Ext.getCmp("IQGrid").down('#edit').setDisabled(selections.length == 0);
-        }
-    }
-});
+////每行數據前段的矩形選擇框
+//var sm = Ext.create('Ext.selection.CheckboxModel', {
+//    listeners: {
+//        selectionchange: function (sm, selections) {
+//            Ext.getCmp("IQGrid").down('#edit').setDisabled(selections.length == 0);
+//        }
+//    }
+//});
 
 //頁面加載
 Ext.onReady(function () {
@@ -238,13 +236,13 @@ Ext.onReady(function () {
                 xtype: 'fieldcontainer',
                 combineErrors: true,
                 layout: 'hbox',
-                margin: '0 0 0 10',
                 items: [
                 {
-                    fieldLabel: '  補貨中停止販售',
+                    fieldLabel: '補貨中停止販售',
                     xtype: 'radiogroup',
                     id: 'ignore_stockRdo',
                     labelWidth: 100,
+                    margin: '0 0 0 10',
                     width: 200,
                     defaults: {
                         name: 'ignore_stockVal'
@@ -323,7 +321,7 @@ Ext.onReady(function () {
             }
 
         },
-        selModel: sm
+        //selModel: sm  // 矩形選擇框
     });
 
     Ext.create('Ext.Viewport', {
