@@ -1486,27 +1486,27 @@ namespace Admin.gigade.Controllers
                         RecommendedProductAttributeMgr rProductAttributeMgr = new RecommendedProductAttributeMgr(connectionString);
                         RecommendedProductAttribute rPA = new RecommendedProductAttribute();
                         rPA.product_id = Convert.ToUInt32(p.Product_Id);
-                        rPA.time_start = pTemp.Recommended_time_start;
-                        rPA.time_end = pTemp.Recommended_time_end;
-                        rPA.expend_day = pTemp.expend_day;
-                        rPA.months = pTemp.months;
+                        rPA.time_start = 0;
+                        rPA.time_end = 0;
+                        rPA.expend_day = recommedde_expend_day;
+                        rPA.months = recommededcheckall;
                         rPA.combo_type = 2;//組合商品
                         //首先判斷表中是否對該product_id設置為推薦
                         int productId = Convert.ToInt32(rPA.product_id);
                         if (rProductAttributeMgr.GetMsgByProductId(productId) > 0)//如果大於0,表示推薦表中存在數據
                         {
-                            if (pTemp.recommedde_jundge == 1)//==1表示推薦 
+                            if (recommedde_jundge == 1)//==1表示推薦 
                             {
                                 rProductAttributeMgr.Update(rPA);
                             }
-                            else if (pTemp.recommedde_jundge == 0)//==0表示不推薦 
+                            else if (recommedde_jundge == 0)//==0表示不推薦 
                             {
                                 rProductAttributeMgr.Delete(productId);
                             }
                         }
                         else
                         {
-                            if (pTemp.recommedde_jundge == 1)//==1表示推薦 
+                            if (recommedde_jundge == 1)//==1表示推薦 
                             {
                                 rProductAttributeMgr.Save(rPA);
                             }

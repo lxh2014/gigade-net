@@ -33,8 +33,9 @@ namespace BLL.gigade.Dao
           try
           {
               sqlCount.Append("select count(odm.odm_id) as 'totalCount'  ");
-              sql.Append("select odm.odm_id,odm.odm_user_id,odm.odm_user_name,odm.odm_status,odm.odm_createdate,odm_createuser ");
+              sql.Append("select odm.odm_id,odm.odm_user_id,odm.odm_user_name,odm.odm_status,odm.odm_createdate,odm_createuser,mu.user_username");
               sqlFrom.Append(" from order_detail_manager odm   ");
+              sqlFrom.Append(" LEFT JOIN manage_user mu on mu.user_id=odm.odm_createuser  ");
               sqlWhere.Append("  where 1=1  ");
               if (query.odm_status != -1)
               {
