@@ -39,7 +39,7 @@ namespace BLL.gigade.Model.Query
         public int reply_user { get; set; }
         public string s_reply_time { get; set; }
         public string s_reply_user { get; set; }
-        public int commentsel { get; set; } //滿意度
+        public string commentsel { get; set; } //滿意度
         //異動記錄
         public DateTime start_time { get; set; }
         public DateTime end_time { get; set; }
@@ -78,7 +78,7 @@ namespace BLL.gigade.Model.Query
             reply_user = 0;
             s_reply_time = string.Empty;
             s_reply_user = string.Empty;
-            commentsel = 0;
+            commentsel = string.Empty;
             start_time = DateTime.MinValue;
             end_time = DateTime.MinValue;
             change_table = string.Empty;

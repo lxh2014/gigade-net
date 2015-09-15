@@ -1,0 +1,18 @@
+﻿@{int? timestp =  Model as int? ?? 500;
+  
+}
+<script type="text/javascript">
+    setTimeout(function () {
+        Ext.get('loading').remove();
+        Ext.get('loading-mask').fadeOut({ remove: true });
+    },@timestp );
+</script>
+<link href="../../Content/css/main.css" rel="stylesheet" type="text/css" />
+    <div id="loading">
+        <div class="loading-indicator">
+                <img src="../../Content/img/loading.gif" alt="" width="32" height="32"  style="margin-right: 8px;" align="middle" />
+            
+        </div>
+    </div>
+    <div id="loading-mask">
+    </div>

@@ -19,7 +19,7 @@ namespace BLL.gigade.Mgr
             _proCommentDao = new ProductCommentDao(connectionString);
             this.connStr = connectionString;
         }
-        public List<Model.Query.ProductCommentQuery> Query(Model.Query.ProductCommentQuery store, out int totalCount)
+        public DataTable Query(Model.Query.ProductCommentQuery store, out int totalCount)
         {
             try
             {

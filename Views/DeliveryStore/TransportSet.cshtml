@@ -1,0 +1,18 @@
+﻿@{
+    ViewBag.Title = "TransportSet";
+}
+
+
+
+@section Js{<script src="../../Scripts/Ext4.0/src/selection/Model.js" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/selection/RowModel.js" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/selection/CheckboxModel.js" type="text/javascript"></script>
+
+
+    <script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/DeliveryStore/TransportSetLang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+
+    <script src="../../Scripts/Common/ToolAuthority.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Common/ManageButton.js" type="text/javascript"></script>
+    <script src="../../Scripts/Views/DeliveryStore/TransportSetControl.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Views/DeliveryStore/TransportSet.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+}

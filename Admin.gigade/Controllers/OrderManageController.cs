@@ -5048,6 +5048,15 @@ namespace Admin.gigade.Controllers
             try
             {
                 store = _orderMasterMgr.GetData(orderId);
+                uint user_id =(uint)(Session["caller"] as Caller).user_id;
+                if (_orderMasterMgr.VerifySession(user_id) > 0)
+                {
+                    store.is_manage_user = true;
+                }
+                else
+                {
+                    store.is_manage_user = false;
+                }
                 if (!string.IsNullOrEmpty(Request.Params["isSecret"]))
                 {
                     if (Request.Params["isSecret"] == "false")
@@ -6786,6 +6795,7 @@ namespace Admin.gigade.Controllers
                 {
                     query.odm_user_name =Request.Params["odm_user_name"];
                 }
+                query.odm_status = 1;
              query.odm_createuser=(Session["caller"] as Caller).user_id;
              _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
              json = _orderDetailManagerMgr.InsertODM(query);
@@ -6807,34 +6817,33 @@ namespace Admin.gigade.Controllers
         //變更狀態
         public JsonResult UpODMStatus()
         {
+            try
             {
-                try
+                OrderDetailManagerQuery query = new OrderDetailManagerQuery();
+                if (!string.IsNullOrEmpty(Request.Params["odm_id"].ToString()))
                 {
-                    OrderDetailManagerQuery query = new OrderDetailManagerQuery();
-                    if (!string.IsNullOrEmpty(Request.Params["odm_user_id"].ToString()))
-                    {
-                        query.odm_user_id = Convert.ToUInt32(Request.Params["odm_user_id"].ToString());
-                    }
-                    query.odm_status = Convert.ToInt32(Request.Params["active"] ?? "0");
-                    _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
-                    int result = _orderDetailManagerMgr.UpODMStatus(query);
-                    if (result > 0)
-                    {
-                        return Json(new { success = "true" });
-                    }
-                    else
-                    {
-                        return Json(new { success = "false" });
-                    }
+                    query.odm_id = Convert.ToInt32(Request.Params["odm_id"].ToString());
                 }
-                catch (Exception ex)
+                query.odm_status = Convert.ToInt32(Request.Params["active"]);
+
+                _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
+                int result = _orderDetailManagerMgr.UpODMStatus(query);
+                if (result > 0)
                 {
-                    Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                    logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                    logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                    log.Error(logMessage);
+                    return Json(new { success = "true" });
+                }
+                else
+                {
                     return Json(new { success = "false" });
                 }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                return Json(new { success = "false" });
             }
         }
 

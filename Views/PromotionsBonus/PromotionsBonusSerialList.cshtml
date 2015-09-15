@@ -1,0 +1,11 @@
+﻿@{
+    ViewBag.Title = "PromotionsBonus";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Js{<script type="text/javascript" src="/Locale/@Html.Raw(Request.Cookies["lang"]==null? "zh-TW":Request.Cookies["lang"].ToString())/Promotions/PromotionsLang.js?v=@Context.Application["Version"].ToString()"></script>
+
+
+
+<input type="hidden" id="SerialId" value="@ViewBag.SerialId" />
+
+<script src="/Scripts/Views/PromotionsBonus/SerialList.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>

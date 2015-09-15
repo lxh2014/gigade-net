@@ -34,36 +34,38 @@ Ext.define('gigade.ProductCommentModel', {
     extend: 'Ext.data.Model',
     fields: [
 
-        { name: "comment_detail_id", type: "int" },
-        { name: "comment_id", type: "int" },
-        { name: "product_name", type: "string" },
-        { name: "product_id", type: "int" },
-         { name: "user_id", type: "int" },
-        { name: "user_email", type: "string" },
-         { name: "user_name", type: "string" },
-        { name: "is_show_name", type: "int" },
-        { name: "comment_info", type: "string" },
-        { name: "status", type: "int" },
-        { name: "create_time", type: "string" },
-        { name: "product_desc", type: "int" },
-        { name: "seller_server", type: "int" },
-        { name: "web_server", type: "int" },
-        { name: "logistics_deliver", type: "int" },
-        { name: "sender_attitude", type: "int" },
-        { name: "brand_name", type: "string" },
-        { name: "comment_advice", type: "string" },
-        { name: "comment_answer", type: "string" },
+    { name: "comment_detail_id", type: "int" },
+    { name: "comment_id", type: "int" },
+    { name: "order_id", type: "int" },
+    { name: "product_name", type: "string" },
+    { name: "product_id", type: "int" },
+    { name: "user_id", type: "int" },
+    { name: "user_email", type: "string" },
+    { name: "user_name", type: "string" },
+    { name: "is_show_name", type: "int" },
+    { name: "comment_info", type: "string" },
+    { name: "status", type: "int" },
+    { name: "create_time", type: "string" },
+    { name: "product_desc", type: "int" },
+    { name: "seller_server", type: "int" },
+    { name: "web_server", type: "int" },
+    { name: "logistics_deliver", type: "int" },
+    { name: "sender_attitude", type: "int" },
+    { name: "brand_name", type: "string" },
+    { name: "comment_advice", type: "string" },
+    { name: "comment_answer", type: "string" },
     { name: "answer_is_show", type: "int" },
     { name: 's_reply_user', type: "string" },
-     { name: 's_reply_time', type: "string" },
+    { name: 'reply_time', type: "string" },
+    { name: 'productIds', type: 'int' }
     ]
 });
 
 var ParameterStore = Ext.create('Ext.data.Store', {
     fields: ['parameterName', 'parameterCode'],
     data: [
-        { "parameterName": '食品館', "parameterCode": "10" },
-        { "parameterName": '用品館', "parameterCode": "20" }
+    { "parameterName": '食品館', "parameterCode": "10" },
+    { "parameterName": '用品館', "parameterCode": "20" }
     ]
 });
 var ProductCommentStore = Ext.create('Ext.data.Store', {
@@ -95,27 +97,28 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
 var DDLStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
-        { "txt": '好評', "value": "0" },
-        { "txt": '中評', "value": "1" },
-        { "txt": '差評', "value": "2" }
+    { "txt": '全部', "value": "-1" },
+    { "txt": '好評(15-20分)', "value": "0" },
+    { "txt": '中評(10-14分)', "value": "1" },
+    { "txt": '差評(4-9分)', "value": "2" }
     ]
 });
 var ReplayStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
-        { "txt": '全部', "value": "0" },
-        { "txt": '未回覆', "value": "1" },
-        { "txt": '已回覆', "value": "2" }
+    { "txt": '全部', "value": "0" },
+    { "txt": '未回覆', "value": "1" },
+    { "txt": '已回覆', "value": "2" }
     ]
 });
 var CommentStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
-        { "txt": '非常不滿意', "value": "1" },
-        { "txt": '不滿意', "value": "2" },
-        { "txt": '一般', "value": "3" },
-        { "txt": '滿意', "value": "4" },
-        { "txt": '非常滿意', "value": "5" }
+    { "txt": '非常不滿意(1分)', "value": "1" },
+    { "txt": '不滿意(2分)', "value": "2" },
+    { "txt": '一般(3分)', "value": "3" },
+    { "txt": '滿意(4分)', "value": "4" },
+    { "txt": '非常滿意(5分)', "value": "5" }
     ]
 });
 
@@ -156,6 +159,7 @@ function Query(x) {
     });
 
 }
+var prod_Classify = 0;
 //頁面載入
 Ext.onReady(function () {
     var searchForm = Ext.create('Ext.form.Panel', {
@@ -167,193 +171,162 @@ Ext.onReady(function () {
         bodyPadding: 10,
         width: document.documentElement.clientWidth,
         items: [
+        {
+            xtype: 'fieldcontainer',
+            combineErrors: true,
+            layout: 'hbox',
+            items: [
             {
-                xtype: 'fieldcontainer',
-                combineErrors: true,
-                layout: 'hbox',
-                items: [
-                     {
-                         xtype: 'textfield',
-                         allowBlank: true,
-                         id: 'productName',
-                         margin: "0 5 0 0",
-                         name: 'productName',
-                         fieldLabel: '商品名稱',
-                         labelWidth: 60,
-                         listeners: {
-                             specialkey: function (field, e) {
-                                 if (e.getKey() == e.ENTER) {
-                                     Query();
-                                 }
-                             }
-                         }
-                     },
-                     {
-                         xtype: 'textfield',
-                         allowBlank: true,
-                         id: 'productId',
-                         margin: "0 5 0 0",
-                         name: 'productId',
-                         fieldLabel: '商品編號',
-                         labelWidth: 60,
-                         listeners: {
-                             specialkey: function (field, e) {
-                                 if (e.getKey() == e.ENTER) {
-                                     Query();
-                                 }
-                             }
-                         }
-                     },
-             {
-                 xtype: 'combobox',
-                 editable: false,
-                 fieldLabel: '好評度',
-                 labelWidth: 60,
-                 id: 'ddlSel',
-                 store: DDLStore,
-                 margin: "0 5 0 0",
-                 displayField: 'txt',
-                 valueField: 'value',
-                 emptyValue: '請選擇',
-                 labelWidth: 60,
-                 listeners: {
-                     "select": function (combo, record) {
-
-                     }
-                 }
-             },
-                {
-                    xtype: 'textfield',
-                    allowBlank: true,
-                    id: 'brand_name',
-                    margin: "0 5 0 0",
-                    name: 'brand_name',
-                    fieldLabel: '品牌名稱',
-                    labelWidth: 60,
-                    listeners: {
-                        specialkey: function (field, e) {
-                            if (e.getKey() == e.ENTER) {
-                                Query();
-                            }
+                xtype: 'textfield',
+                allowBlank: true,
+                id: 'productName',
+                margin: "0 5 0 0",
+                name: 'productName',
+                fieldLabel: '商品名稱',
+                labelWidth: 60,
+                listeners: {
+                    specialkey: function (field, e) {
+                        if (e.getKey() == e.ENTER) {
+                            Query();
                         }
                     }
-                },
-             {
-                 xtype: 'textfield',
-                 allowBlank: true,
-                 id: 'userName',
-                 margin: "0 5 0 0",
-                 name: 'userName',
-                 fieldLabel: '用戶名稱',
-                 labelWidth: 60,
-                 listeners: {
-                     specialkey: function (field, e) {
-                         if (e.getKey() == e.ENTER) {
-                             Query();
-                         }
-                     }
-                 }
-             }
-
-                ]
+                }
             },
             {
-                xtype: 'fieldcontainer',
-                combineErrors: true,
-                layout: 'hbox',
-                items: [
-                     {
-                         xtype: 'textfield',
-                         allowBlank: true,
-                         id: 'userEmail',
-                         margin: "0 5 0 0",
-                         name: 'userEmail',
-                         fieldLabel: '用戶郵箱',
-                         labelWidth: 60,
-                         listeners: {
-                             specialkey: function (field, e) {
-                                 if (e.getKey() == e.ENTER) {
-                                     Query();
-                                 }
-                             }
-                         }
-                     },
-                    {
-                        xtype: 'combobox',
-                        editable: false,
-                        fieldLabel: '館別',
-                        labelWidth: 60,
-                        id: 'shopClass',
-                        margin: "0 5 0 0",
-                        store: ParameterStore,
-                        displayField: 'parameterName',
-                        valueField: 'parameterCode',
-                        emptyValue: '請選擇',
-                        labelWidth: 60,
-                        listeners: {
-                            "select": function (combo, record) {
-
-                            }
+                xtype: 'textfield',
+                allowBlank: true,
+                id: 'productId',
+                margin: "0 5 0 0",
+                name: 'productId',
+                fieldLabel: '商品編號',
+                labelWidth: 60,
+                listeners: {
+                    specialkey: function (field, e) {
+                        if (e.getKey() == e.ENTER) {
+                            Query();
                         }
-                    },
-                 {
-                     xtype: 'datefield',
-                     allowBlank: true,
-                     id: 'timestart',
-                     margin: "0 5 0 0",
-                     name: 'serchcontent',
-                     fieldLabel: '評價時間',
-                     labelWidth: 60,
-                     editable: false,
-                     listeners: {
-                         select: function (a, b, c) {
-                             var tstart = Ext.getCmp("timestart");
-                             var tend = Ext.getCmp("timeend");
-                             if (tend.getValue() == null) {
-                                 tend.setValue(setNextMonth(tstart.getValue(), 1));
-                             }
-                             else if (tend.getValue() < tstart.getValue()) {
-                                 Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
-                                 tend.setValue(setNextMonth(tstart.getValue(), 1));
-                             }
-                         }
-                     }
-                 },
-             {
-                 xtype: 'datefield',
-                 allowBlank: true,
-                 id: 'timeend',
-                 margin: "0 5 0 0",
-                 name: 'serchcontent',
-                 fieldLabel: '到',
-                 labelWidth: 60,
-                 editable: false,
-                 listeners: {
-                     select: function (a, b, c) {
-                         var tstart = Ext.getCmp("timestart");
-                         var tend = Ext.getCmp("timeend");
-                         if (tstart.getValue() == null) {
-                             tstart.setValue(setNextMonth(tend.getValue(), -1));
-                         }
-                         else if (tend.getValue() < tstart.getValue()) {
-                             Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
-                             tstart.setValue(setNextMonth(tend.getValue(), -1));
-                         }
-                     }
-                 }
-             },
-             {
-                 xtype: 'combobox',
-                 fieldLabel: '是否回覆',
-                 labelWidth: 60,
-                 id: 'isReplay',
-                 name: 'isReplay',
-                 store: ReplayStore,
-                 valueField: 'value',
-                 displayField: 'txt',
-                 value: '1',
-                 editable: false
-             },
+                    }
+                }
+            },
+            {
+                xtype: 'combobox',
+                editable: false,
+                fieldLabel: '好評度',
+                labelWidth: 60,
+                id: 'ddlSel',
+                store: DDLStore,
+                margin: "0 5 0 0",
+                displayField: 'txt',
+                valueField: 'value',
+                emptyValue: '請選擇',
+                labelWidth: 60,
+                listeners: {
+                    "select": function (combo, record) {
+
+                    }
+                }
+            },
+            {
+                xtype: 'textfield',
+                allowBlank: true,
+                id: 'brand_name',
+                margin: "0 5 0 0",
+                name: 'brand_name',
+                fieldLabel: '品牌名稱',
+                labelWidth: 60,
+                listeners: {
+                    specialkey: function (field, e) {
+                        if (e.getKey() == e.ENTER) {
+                            Query();
+                        }
+                    }
+                }
+            }
+            ]
+        },
+        {
+            xtype: 'fieldcontainer',
+            combineErrors: true,
+            layout: 'hbox',
+            items: [
+            {
+                xtype: 'textfield',
+                allowBlank: true,
+                id: 'userName',
+                margin: "0 5 0 0",
+                name: 'userName',
+                fieldLabel: '用戶名稱',
+                labelWidth: 60,
+                listeners: {
+                    specialkey: function (field, e) {
+                        if (e.getKey() == e.ENTER) {
+                            Query();
+                        }
+                    }
+                }
+            },
+            {
+                xtype: 'textfield',
+                allowBlank: true,
+                id: 'userEmail',
+                margin: "0 5 0 0",
+                name: 'userEmail',
+                fieldLabel: '用戶郵箱',
+                labelWidth: 60,
+                listeners: {
+                    specialkey: function (field, e) {
+                        if (e.getKey() == e.ENTER) {
+                            Query();
+                        }
+                    }
+                }
+            },
+            {
+                xtype: 'datefield',
+                allowBlank: true,
+                id: 'timestart',
+                margin: "0 5 0 0",
+                name: 'serchcontent',
+                fieldLabel: '評價時間',
+                labelWidth: 60,
+                editable: false,
+                listeners: {
+                    select: function (a, b, c) {
+                        var tstart = Ext.getCmp("timestart");
+                        var tend = Ext.getCmp("timeend");
+                        if (tend.getValue() == null) {
+                            tend.setValue(setNextMonth(tstart.getValue(), 1));
+                        }
+                        else if (tend.getValue() < tstart.getValue()) {
+                            Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                            tend.setValue(setNextMonth(tstart.getValue(), 1));
+                        }
+                    }
+                }
+            },
+            {
+                xtype: 'datefield',
+                allowBlank: true,
+                id: 'timeend',
+                margin: "0 5 0 0",
+                name: 'serchcontent',
+                fieldLabel: '到',
+                labelWidth: 60,
+                editable: false,
+                listeners: {
+                    select: function (a, b, c) {
+                        var tstart = Ext.getCmp("timestart");
+                        var tend = Ext.getCmp("timeend");
+                        if (tstart.getValue() == null) {
+                            tstart.setValue(setNextMonth(tend.getValue(), -1));
+                        }
+                        else if (tend.getValue() < tstart.getValue()) {
+                            Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                            tstart.setValue(setNextMonth(tend.getValue(), -1));
+                        }
+                    }
+                }
+            },
 
             //  {
             //      xtype: 'button',
@@ -385,42 +358,70 @@ Ext.onReady(function () {
             //        }
             //    }
             //}
-                ]
+            ]
+        },
+        {
+            xtype: 'fieldcontainer',
+            combineErrors: true,
+            layout: 'hbox',
+            items: [
+            {
+                xtype: 'combobox',
+                fieldLabel: '是否回覆',
+                labelWidth: 60,
+                id: 'isReplay',
+                margin: "0 5 0 0",
+                name: 'isReplay',
+                store: ReplayStore,
+                valueField: 'value',
+                displayField: 'txt',
+                value: '1',
+                editable: false
             },
             {
-                xtype: 'fieldcontainer',
-                combineErrors: true,
-                layout: 'hbox',
-                items: [
-                     {
-                         xtype: 'combobox',
-                         fieldLabel: '滿意度',
-                         labelWidth: 60,
-                         editable: false,
-                         id: 'commentsel',
-                         name: 'commentsel',
-                         store: CommentStore,
-                         valueField: 'value',
-                         displayField: 'txt',
-                         //value: '0',
-                     },
-                ]
-            }
+                xtype: 'combobox',
+                editable: false,
+                fieldLabel: '館別',
+                labelWidth: 60,
+                id: 'shopClass',
+                margin: "0 5 0 0",
+                store: ParameterStore,
+                displayField: 'parameterName',
+                valueField: 'parameterCode',
+                emptyValue: '請選擇',
+                labelWidth: 60,
+                listeners: {
+                    "select": function (combo, record) {
+
+                    }
+                }
+            },
+            {
+                xtype: 'combobox',
+                fieldLabel: '滿意度',
+                labelWidth: 60,
+                multiSelect: true, //支持多選
+                editable: false,
+                id: 'commentsel',
+                name: 'commentsel',
+                store: CommentStore,
+                valueField: 'value',
+                displayField: 'txt',
+                //value: '0',
+            },   
+            ]
+        }
         ],
         buttonAlign: 'center',
         buttons: [
             {
                 text: '查詢',
                 handler: Query,
+                iconCls: 'icon-search'
             },
              {
                  text: '重置',
-                 handler: function () {
-                     this.up('form').getForm().reset();
-                     Ext.getCmp("pcGift").hide();
-                 }
-             }, {
-                 text: '重置',
+                 iconCls: 'ui-icon ui-icon-reset',
                  handler: function () {
                      this.up('form').getForm().reset();
                      Ext.getCmp('pcGift').hide();
@@ -429,7 +430,7 @@ Ext.onReady(function () {
         ],
         listeners: {
         }
-    });
+    });         
     //var cellEditingEx = Ext.create('Ext.grid.plugin.CellEditing', {
     //    clicksToEdit: 1
     //});
@@ -438,7 +439,7 @@ Ext.onReady(function () {
         store: ProductCommentStore,
         width: document.documentElement.clientWidth,
         columnLines: true,
-        hidden: false,
+        hidden: true,
         frame: true,
         flex: 8.8,
         //  plugins: [cellEditingEx],
@@ -450,229 +451,235 @@ Ext.onReady(function () {
             }
         },
         columns: [
-            { header: '編號', dataIndex: 'comment_id', width: 70, align: 'center', align: 'center' },
-             { header: '商品編號', dataIndex: 'product_id', width: 70, align: 'center', align: 'center' },
-            {
-                header: '商品名稱', dataIndex: 'product_name', width: 200, align: 'center'
-            },
-            {
-                header: '品牌名稱', dataIndex: 'brand_name', width: 200, align: 'center'
-            },
-            {
-                header: '用戶名稱', dataIndex: 'user_name', width: 100, align: 'center',
-                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {//secretcopy
-                    return "<span onclick='SecretLogin(" + record.data.comment_id + "," + record.data.user_id + ",\"" + info_type + "\")'  >" + value + "</span>";
+        { header: '編號', dataIndex: 'comment_id', width: 70, align: 'center', align: 'center' },
+        { header: '訂單編號', dataIndex: 'order_id', width: 70, align: 'center', align: 'center' },
+        {
+            header: '商品編號', dataIndex: 'product_id', width: 70, align: 'center', align: 'center',
+            renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                prod_Classify = record.data.productIds;
+                return "<a href='javascript:void(0)' onclick='ProductPreview(" + record.data.product_id + ")'>" + value + "</a>"
+            }
+        },
+        {
+            header: '商品名稱', dataIndex: 'product_name', width: 200, align: 'center'
+        },
+        {
+            header: '品牌名稱', dataIndex: 'brand_name', width: 200, align: 'center'
+        },
+        {
+            header: '用戶姓名', dataIndex: 'user_name', width: 100, align: 'center',
+            renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {//secretcopy
+                return "<span onclick='SecretLogin(" + record.data.comment_id + "," + record.data.user_id + ",\"" + info_type + "\")'  >" + value + "</span>";
 
-                }
-            },
-             {
-                 header: '用戶郵箱', dataIndex: 'user_email', width: 200, align: 'center',
-                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {//secretcopy
-                     return "<span onclick='SecretLogin(" + record.data.comment_id + "," + record.data.user_id + ",\"" + info_type + "\")'  >" + value + "</span>";
+            }
+        },
+        {
+            header: '用戶郵箱', dataIndex: 'user_email', width: 200, align: 'center',
+            renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {//secretcopy
+                return "<span onclick='SecretLogin(" + record.data.comment_id + "," + record.data.user_id + ",\"" + info_type + "\")'  >" + value + "</span>";
 
-                 }
-             },
-            {
-                header: "留言狀態", dataIndex: 'is_show_name', width: 70, align: 'center',
-                renderer: function (value) {
-                    if (value == 0) {
-                        return Ext.String.format('匿名');
-                    }
-                    else if (value == 1) {
-                        return Ext.String.format('公開');
-                    }
+            }
+        },
+        {
+            header: "留言狀態", dataIndex: 'is_show_name', width: 70, align: 'center',
+            renderer: function (value) {
+                if (value == 0) {
+                    return Ext.String.format('匿名');
+                }
+                else if (value == 1) {
+                    return Ext.String.format('公開');
+                }
+            }
+        },
+        { header: "留言內容", dataIndex: 'comment_info', width: 200, align: 'center', align: 'center' },
+        { header: "評價時間", dataIndex: 'create_time', width: 200, align: 'center', align: 'center' },
+        { header: "留言回覆", dataIndex: 'comment_answer', width: 200, align: 'center', align: 'center' },
+        {
+            header: "回覆是否顯示", dataIndex: 'answer_is_show', width: 100, align: 'center',
+            renderer: function (value) {
+                if (value == 1) {
+                    return "顯示";
+                }
+                else if (value == 0) {
+                    return "<span style='color:red'>隱藏</>";
                 }
             },
-            { header: "留言內容", dataIndex: 'comment_info', width: 200, align: 'center', align: 'center' },
-            { header: "評價時間", dataIndex: 'create_time', width: 200, align: 'center', align: 'center' },
-            { header: "留言回覆", dataIndex: 'comment_answer', width: 200, align: 'center', align: 'center' },
-            {
-                header: "回覆是否顯示", dataIndex: 'answer_is_show', width: 100, align: 'center',
-                renderer: function (value) {
-                    if (value == 1) {
-                        return "顯示";
-                    }
-                    else if (value == 0) {
-                        return "<span style='color:red'>隱藏</>";
-                    }
-                },
-                //editor: {
-                //    xtype: 'checkboxfield',
-                //    width: 40,
-                //    labelWidth: 30
-                //}
-            },
-            {
-                header: "商品描述相符度", dataIndex: 'product_desc', width: 100, align: 'center',
-                renderer: function (value) {
-                    if (value == 1) {
-                        return Ext.String.format('非常不滿意');
-                    }
-                    else if (value == 2) {
-                        return Ext.String.format('不滿意');
-                    }
-                    else if (value == 3) {
-                        return Ext.String.format('一般');
-                    } else if (value == 4) {
-                        return Ext.String.format('滿意');
-                    } else if (value == 5) {
-                        return Ext.String.format('非常滿意');
-                    }
+            //editor: {
+            //    xtype: 'checkboxfield',
+            //    width: 40,
+            //    labelWidth: 30
+            //}
+        },
+        {
+            header: "商品描述相符度", dataIndex: 'product_desc', width: 100, align: 'center',
+            renderer: function (value) {
+                if (value == 1) {
+                    return Ext.String.format('非常不滿意');
                 }
-            },
-            {
-                header: '客戶服務滿意度', dataIndex: 'seller_server', width: 100, align: 'center',
-                renderer: function (value) {
-                    if (value == 1) {
-                        return Ext.String.format('非常不滿意');
-                    }
-                    else if (value == 2) {
-                        return Ext.String.format('不滿意');
-                    }
-                    else if (value == 3) {
-                        return Ext.String.format('一般');
-                    } else if (value == 4) {
-                        return Ext.String.format('滿意');
-                    } else if (value == 5) {
-                        return Ext.String.format('非常滿意');
-                    }
+                else if (value == 2) {
+                    return Ext.String.format('不滿意');
                 }
-            },
-            {
-                header: '網站整體服務滿意度', dataIndex: 'web_server', width: 115, align: 'center',
-                renderer: function (value) {
-                    if (value == 1) {
-                        return Ext.String.format('非常不滿意');
-                    }
-                    else if (value == 2) {
-                        return Ext.String.format('不滿意');
-                    }
-                    else if (value == 3) {
-                        return Ext.String.format('一般');
-                    } else if (value == 4) {
-                        return Ext.String.format('滿意');
-                    } else if (value == 5) {
-                        return Ext.String.format('非常滿意');
-                    }
+                else if (value == 3) {
+                    return Ext.String.format('一般');
+                } else if (value == 4) {
+                    return Ext.String.format('滿意');
+                } else if (value == 5) {
+                    return Ext.String.format('非常滿意');
                 }
-            },
-
-            {
-                header: '配送速度滿意度', dataIndex: 'logistics_deliver', width: 100, align: 'center',
-                renderer: function (value) {
-                    if (value == 1) {
-                        return Ext.String.format('非常不滿意');
-                    }
-                    else if (value == 2) {
-                        return Ext.String.format('不滿意');
-                    }
-                    else if (value == 3) {
-                        return Ext.String.format('一般');
-                    } else if (value == 4) {
-                        return Ext.String.format('滿意');
-                    } else if (value == 5) {
-                        return Ext.String.format('非常滿意');
-                    }
+            }
+        },
+        {
+            header: '客戶服務滿意度', dataIndex: 'seller_server', width: 100, align: 'center',
+            renderer: function (value) {
+                if (value == 1) {
+                    return Ext.String.format('非常不滿意');
                 }
-            },
-     //         { name: 's_reply_user', type: "string" },
-     //{ name: 's_reply_time', type: "string" },
-     { header: '回覆人', dataIndex: 's_reply_user', width: 100, align: 'center' },
-     { header: '回覆時間', dataIndex: 's_reply_time', width: 150, align: 'center' },
-             {
-                 header: '狀態',
-                 dataIndex: 'status',
-                 align: 'center',
-                 id: 'commentControlActive',
-                 hidden: true,
-                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                     if (value == 1) {
-                         return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.comment_id + ")'><img hidValue='0' id='img" + record.data.comment_id + "' src='../../../Content/img/icons/accept.gif'/></a>";
-                     } else {
-                         return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.comment_id + ")'><img hidValue='1' id='img" + record.data.comment_id + "' src='../../../Content/img/icons/drop-no.gif'/></a>";
-                     }
-                 }
-             }
+                else if (value == 2) {
+                    return Ext.String.format('不滿意');
+                }
+                else if (value == 3) {
+                    return Ext.String.format('一般');
+                } else if (value == 4) {
+                    return Ext.String.format('滿意');
+                } else if (value == 5) {
+                    return Ext.String.format('非常滿意');
+                }
+            }
+        },
+        {
+            header: '網站整體服務滿意度', dataIndex: 'web_server', width: 115, align: 'center',
+            renderer: function (value) {
+                if (value == 1) {
+                    return Ext.String.format('非常不滿意');
+                }
+                else if (value == 2) {
+                    return Ext.String.format('不滿意');
+                }
+                else if (value == 3) {
+                    return Ext.String.format('一般');
+                } else if (value == 4) {
+                    return Ext.String.format('滿意');
+                } else if (value == 5) {
+                    return Ext.String.format('非常滿意');
+                }
+            }
+        },
+        {
+            header: '配送速度滿意度', dataIndex: 'logistics_deliver', width: 100, align: 'center',
+            renderer: function (value) {
+                if (value == 1) {
+                    return Ext.String.format('非常不滿意');
+                }
+                else if (value == 2) {
+                    return Ext.String.format('不滿意');
+                }
+                else if (value == 3) {
+                    return Ext.String.format('一般');
+                } else if (value == 4) {
+                    return Ext.String.format('滿意');
+                } else if (value == 5) {
+                    return Ext.String.format('非常滿意');
+                }
+            }
+        },
+        //         { name: 's_reply_user', type: "string" },
+        //{ name: 's_reply_time', type: "string" },
+        { header: '回覆人', dataIndex: 's_reply_user', width: 100, align: 'center' },
+        { header: '回覆時間', dataIndex: 'reply_time', width: 150, align: 'center' },
+        {
+            header: '狀態',
+            dataIndex: 'status',
+            align: 'center',
+            id: 'commentControlActive',
+            hidden: true,
+            renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                if (value == 1) {
+                    return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.comment_id + ")'><img hidValue='0' id='img" + record.data.comment_id + "' src='../../../Content/img/icons/accept.gif'/></a>";
+                } else {
+                    return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.comment_id + ")'><img hidValue='1' id='img" + record.data.comment_id + "' src='../../../Content/img/icons/drop-no.gif'/></a>";
+                }
+            }
+        }
         ],
         plugins: [
-  Ext.create('Ext.grid.plugin.CellEditing', {
-      clicksToEdit: 1
-  })],
+        Ext.create('Ext.grid.plugin.CellEditing', {
+            clicksToEdit: 1
+        })],
 
         tbar: [
-            { xtype: 'button', text: ADD, id: 'add', hidden: true, iconCls: 'icon-user-add', handler: onAddClick },
-            { xtype: 'button', text: '回覆', id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
-            '->',
-              {
-                  xtype: 'button',
-                  text: '匯出',
-                  iconCls: 'icon-excel',
-                  id: 'btnExcel',
-                  handler: function (scroller) {
+        { xtype: 'button', text: ADD, id: 'add', hidden: true, iconCls: 'icon-user-add', handler: onAddClick },
+        { xtype: 'button', text: '回覆', id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
+        '->',
+        {
+            xtype: 'button',
+            text: '匯出',
+            iconCls: 'icon-excel',
+            id: 'btnExcel',
+            handler: function (scroller) {
 
-                      var ddlSel = Ext.getCmp('ddlSel').getValue();
-                      var brand_name = Ext.getCmp('brand_name').getValue();
-                      var productName = Ext.getCmp('productName').getValue();
-                      var timestart = null;
-                      if (Ext.getCmp('timestart').getValue() != null) {
-                          timestart = new Date(Ext.getCmp('timestart').getValue()).toLocaleDateString();
-                      }
-                      var timeend = null;
-                      if (Ext.getCmp('timeend').getValue() != null) {
-                          timeend = new Date(Ext.getCmp('timeend').getValue()).toLocaleDateString();
-                      }
-                      // var timeend = new Date(Ext.getCmp('timeend').getValue()).toLocaleDateString();
-                      var shopClass = Ext.getCmp('shopClass').getValue();
-                      var productId = Ext.getCmp('productId').getValue();
-                      var userName = Ext.getCmp('userName').getValue();
-                      var userEmail = Ext.getCmp('userEmail').getValue();
-                      var isReplay = Ext.getCmp('isReplay').getValue();
-                      var commentsel = Ext.getCmp('commentsel').getValue();
-                      var paras = "?ddlSel=" + ddlSel + "&commentsel=" + commentsel + "&brand_name=" + brand_name + "&productName=" + productName + "&timestart=" + timestart + "&timeend=" + timeend + "&shopClass=" + shopClass + "&productId=" + productId + "&userName=" + userName + "&userEmail=" + userEmail + "&isReplay=" + isReplay;
-                      window.open('/ProductComment/IndexExport' + paras);
-                  }
-                  // ,handler: Query 
-              },
-            //'->',
-            // { xtype: 'textfield', allowBlank: true, id: 'productName', name: 'productName', fieldLabel: '產品名稱', labelWidth: 60 },
-            // {
-            //     xtype: 'combobox', editable: false, fieldLabel: '好評度', labelWidth: 60, id: 'ddlSel', store: DDLStore, displayField: 'txt', valueField: 'value', emptyValue: '請選擇', labelWidth: 50, listeners: {
-            //         "select": function (combo, record) {
-            //             //ProductCommentStore.removeAll();
-            //             //Ext.getCmp("pcGift").store.loadPage(1, {
-            //             //    params: {
-            //             //        ddlSel: Ext.getCmp('ddlSel').getValue(),
-            //             //        brand_name: Ext.getCmp('brand_name').getValue(),
-            //             //        productName: Ext.getCmp('productName').getValue(),
-            //             //        timestart: Ext.getCmp('timestart').getValue(),
-            //             //        timeend: Ext.getCmp('timeend').getValue()
-            //             //    }
-            //             //});
-            //         }
-            //     }
-            // },
-            // { xtype: 'textfield', allowBlank: true, id: 'brand_name', name: 'brand_name', fieldLabel: '品牌名稱', labelWidth: 60 },
-            //  { xtype: 'datetimefield', allowBlank: true, id: 'timestart', name: 'serchcontent', fieldLabel: '評價時間', labelWidth: 60, dateRange: { begin: 'timestart', end: 'timeend' }, vtype: 'dateRange' },
-            // { xtype: 'datetimefield', allowBlank: true, id: 'timeend', name: 'serchcontent', fieldLabel: '到', labelWidth: 15, dateRange: { begin: 'timestart', end: 'timeend' }, vtype: 'dateRange' },
-            //{
-            //    text: SEARCH,
-            //    iconCls: 'icon-search',
-            //    id: 'btnQuery',
-            //    handler: Query
-            //},
-            //{
-            //    text: RESET,
-            //    id: 'btn_reset',
-            //    listeners: {
-            //        click: function () {
-            //            Ext.getCmp("brand_name").setValue("");
-            //            Ext.getCmp("productName").setValue("");
-            //            Ext.getCmp("ddlSel").setValue(null);
-            //            Ext.getCmp("timestart").setValue("");
-            //            Ext.getCmp("timeend").setValue("");
-            //        }
-                         //    }
-            //}
+                var ddlSel = Ext.getCmp('ddlSel').getValue();
+                var brand_name = Ext.getCmp('brand_name').getValue();
+                var productName = Ext.getCmp('productName').getValue();
+                var timestart = null;
+                if (Ext.getCmp('timestart').getValue() != null) {
+                    timestart = new Date(Ext.getCmp('timestart').getValue()).toLocaleDateString();
+                }
+                var timeend = null;
+                if (Ext.getCmp('timeend').getValue() != null) {
+                    timeend = new Date(Ext.getCmp('timeend').getValue()).toLocaleDateString();
+                }
+                // var timeend = new Date(Ext.getCmp('timeend').getValue()).toLocaleDateString();
+                var shopClass = Ext.getCmp('shopClass').getValue();
+                var productId = Ext.getCmp('productId').getValue();
+                var userName = Ext.getCmp('userName').getValue();
+                var userEmail = Ext.getCmp('userEmail').getValue();
+                var isReplay = Ext.getCmp('isReplay').getValue();
+                var commentsel = Ext.getCmp('commentsel').getValue();
+                var paras = "?ddlSel=" + ddlSel + "&commentsel=" + commentsel + "&brand_name=" + brand_name + "&productName=" + productName + "&timestart=" + timestart + "&timeend=" + timeend + "&shopClass=" + shopClass + "&productId=" + productId + "&userName=" + userName + "&userEmail=" + userEmail + "&isReplay=" + isReplay;
+                window.open('/ProductComment/IndexExport' + paras);
+            }
+            // ,handler: Query 
+        },
+        //'->',
+        // { xtype: 'textfield', allowBlank: true, id: 'productName', name: 'productName', fieldLabel: '產品名稱', labelWidth: 60 },
+        // {
+        //     xtype: 'combobox', editable: false, fieldLabel: '好評度', labelWidth: 60, id: 'ddlSel', store: DDLStore, displayField: 'txt', valueField: 'value', emptyValue: '請選擇', labelWidth: 50, listeners: {
+        //         "select": function (combo, record) {
+        //             //ProductCommentStore.removeAll();
+        //             //Ext.getCmp("pcGift").store.loadPage(1, {
+        //             //    params: {
+        //             //        ddlSel: Ext.getCmp('ddlSel').getValue(),
+        //             //        brand_name: Ext.getCmp('brand_name').getValue(),
+        //             //        productName: Ext.getCmp('productName').getValue(),
+        //             //        timestart: Ext.getCmp('timestart').getValue(),
+        //             //        timeend: Ext.getCmp('timeend').getValue()
+        //             //    }
+        //             //});
+        //         }
+        //     }
+        // },
+        // { xtype: 'textfield', allowBlank: true, id: 'brand_name', name: 'brand_name', fieldLabel: '品牌名稱', labelWidth: 60 },
+        //  { xtype: 'datetimefield', allowBlank: true, id: 'timestart', name: 'serchcontent', fieldLabel: '評價時間', labelWidth: 60, dateRange: { begin: 'timestart', end: 'timeend' }, vtype: 'dateRange' },
+        // { xtype: 'datetimefield', allowBlank: true, id: 'timeend', name: 'serchcontent', fieldLabel: '到', labelWidth: 15, dateRange: { begin: 'timestart', end: 'timeend' }, vtype: 'dateRange' },
+        //{
+        //    text: SEARCH,
+        //    iconCls: 'icon-search',
+        //    id: 'btnQuery',
+        //    handler: Query
+        //},
+        //{
+        //    text: RESET,
+        //    id: 'btn_reset',
+        //    listeners: {
+        //        click: function () {
+        //            Ext.getCmp("brand_name").setValue("");
+        //            Ext.getCmp("productName").setValue("");
+        //            Ext.getCmp("ddlSel").setValue(null);
+        //            Ext.getCmp("timestart").setValue("");
+        //            Ext.getCmp("timeend").setValue("");
+        //        }
+        //    }
+        //}
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: ProductCommentStore,
@@ -805,4 +812,23 @@ setNextMonth = function (source, n) {
         s.setHours(23, 59, 59);
     }
     return s;
+}
+function ProductPreview(value) {
+    var product_id = value;
+    var type = 0;
+    //var prod_Classify = row[0].data.prod_classify;
+    Ext.Ajax.request({
+        url: '/ProductList/ProductPreview',
+        params: { Product_Id: product_id, Type: type, prod_Classify: prod_Classify },
+        success: function (form, action) {
+            var result = form.responseText;
+            //var wl = "<a href=" + result + " target='new'>" + result + "</a>";
+            if (result != "無預覽信息") {
+                window.open(result, '_blank');
+            }
+            else {
+                Ext.Msg.alert(INFORMATION, PRODUCT_PARALLELISM_NOT_IN_FRONT);
+            }
+        }
+    })
 }

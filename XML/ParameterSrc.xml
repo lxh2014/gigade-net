@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ParameterSrc>
+	<parameter parameterType="productCategory" parameterProperty="1162" parameterCode="10" parameterName="食品館" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+	<parameter parameterType="productCategory" parameterProperty="1239" parameterCode="20" parameterName="用品館" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+  
+  <!--add by zhuoqin0830w  2015/02/25  公關單與報廢單功能-->
+  <parameter parameterType="orderPattern" parameterProperty="" parameterCode="" parameterName="一般" remark="" kdate="" kuser="" used="" sort=""  topValue="1"/>
+  <parameter parameterType="orderPattern" parameterProperty="" parameterCode="10" parameterName="公關單" remark="" kdate="" kuser="" used="" sort=""  topValue="1"/>
+  <parameter parameterType="orderPattern" parameterProperty="" parameterCode="20" parameterName="報廢單" remark="" kdate="" kuser="" used="" sort=""  topValue="1"/>
+  <parameter parameterType="orderPattern" parameterProperty="" parameterCode="30" parameterName="料位代管" remark="" kdate="" kuser="" used="" sort=""  topValue="2"/>
+
+  <!--add by zhuoqin0830w  2015/03/11  已買斷商品的篩選功能-->
+  <parameter parameterType="productPrepaid" parameterProperty="" parameterCode="" parameterName="全部" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+  <parameter parameterType="productPrepaid" parameterProperty="" parameterCode="1" parameterName="買斷" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+  <parameter parameterType="productPrepaid" parameterProperty="" parameterCode="0" parameterName="非買斷" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+
+  <!--add by wwei0216w  2015/03/11  已買斷商品的篩選功能-->
+  <parameter parameterType="ticketStatus" parameterProperty="" parameterCode="0" parameterName="未使用" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+  <parameter parameterType="ticketStatus" parameterProperty="" parameterCode="1" parameterName="已使用" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+  <parameter parameterType="ticketStatus" parameterProperty="" parameterCode="2" parameterName="已退訂" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+
+	<parameter parameterType="tiresSearchType" parameterProperty="" parameterCode="1" parameterName="創建時間" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+	<parameter parameterType="tiresSearchType" parameterProperty="" parameterCode="2" parameterName="開始時間" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+	<parameter parameterType="tiresSearchType" parameterProperty="" parameterCode="3" parameterName="結束時間" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+
+<!-- add by wwei0216w 2015/5/7 排程對照設置中類別-->
+	<parameter parameterType="ScheduleType" parameterProperty="" parameterCode="1" parameterName="product" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+	<parameter parameterType="ScheduleType" parameterProperty="" parameterCode="2" parameterName="product_item" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+	<parameter parameterType="ScheduleType" parameterProperty="" parameterCode="3" parameterName="price_master" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+
+	<!-- add by wwei0216w 2015/5/7 key-->
+	<parameter parameterType="Schedule_Key" parameterProperty="" parameterCode="1" parameterName="供應商" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+
+	<!-- add by wwei0216w 2015/5/7 value-->
+	<parameter parameterType="Schedule_KeyValue" parameterProperty="" parameterCode="1" parameterName="product" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
+
+  <!--add by zhuoqin0830w  2015/06/26  失格商品的相關備註  topValue="1" 表示 下架 topValue="2" 表示 下架不販售 topValue="3" 表示 上架-->
+  <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="1" parameterName="供應商通知" remark="" kdate="" kuser="" used="" sort=""  topValue="1"/>
+  <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="2" parameterName="活動結束" remark="" kdate="" kuser="" used="" sort=""  topValue="1"/>
+  <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="3" parameterName="失格商品" remark="" kdate="" kuser="" used="" sort=""  topValue="1"/>
+  <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="4" parameterName="商品售完或不再販售" remark="" kdate="" kuser="" used="" sort=""  topValue="2"/>
+  <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="5" parameterName="新品上架" remark="" kdate="" kuser="" used="" sort=""  topValue="3"/>
+  <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="6" parameterName="供應商通知" remark="" kdate="" kuser="" used="" sort=""  topValue="3"/>
+</ParameterSrc>
+
+
+

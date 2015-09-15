@@ -49,7 +49,7 @@ namespace Admin.gigade.Controllers
         [CustomHandleError]
         public HttpResponseBase GetProductCommentList()
         {
-            List<ProductCommentQuery> store = new List<ProductCommentQuery>();
+            DataTable store = new DataTable();
             string json = string.Empty;
             string str = string.Empty;
             try
@@ -67,7 +67,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["commentsel"]))
                 {
-                    query.commentsel = Convert.ToInt32(Request.Params["commentsel"]);
+                    query.commentsel = Request.Params["commentsel"];
                 }
                 if (!string.IsNullOrEmpty(Request.Params["productName"]))
                 {
@@ -108,23 +108,13 @@ namespace Admin.gigade.Controllers
 
                 int totalCount = 0;
                 store = _proCommentImpl.Query(query, out totalCount);
-
-                foreach (var item in store)
+                for (int i = 0; i < store.Rows.Count; i++)
                 {
-                    if (!string.IsNullOrEmpty(item.user_name))
+                    if (!string.IsNullOrEmpty(store.Rows[i]["user_name"].ToString()))
                     {
-                        item.user_name = item.user_name.Substring(0, 1) + "**";
+                        store.Rows[i]["user_name"] = store.Rows[i]["user_name"].ToString().Substring(0, 1) + "**";
                     }
-                    item.user_email = item.user_email.Split('@')[0] + "@***";
-                    item.s_reply_time = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(item.reply_time));
-                    if (CommonFunction.DateTimeToString(CommonFunction.GetNetTime(item.reply_time)) != "1970-01-01 08:00:00")
-                    {
-                        item.s_reply_time = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(item.reply_time));
-                    }
-                    else
-                    {
-                        item.s_reply_time = "";
-                    }
+                    store.Rows[i]["user_email"] = store.Rows[i]["user_email"].ToString().Split('@')[0] + "@***";
                 }
 
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
@@ -156,7 +146,7 @@ namespace Admin.gigade.Controllers
             StringBuilder sb = new StringBuilder();
             try
             {
-                List<ProductCommentQuery> store = new List<ProductCommentQuery>();
+                DataTable store = new DataTable();
                 #region 前提查詢條件
 
                 ProductCommentQuery query = new ProductCommentQuery();
@@ -171,7 +161,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["commentsel"]) && Request.Params["commentsel"] != "null")
                 {
-                    query.commentsel = Convert.ToInt32(Request.Params["commentsel"]);
+                    query.commentsel = Request.Params["commentsel"];
                 }
                 if (!string.IsNullOrEmpty(Request.Params["productName"]))
                 {
@@ -218,6 +208,8 @@ namespace Admin.gigade.Controllers
                 DataTable dtHZ = new DataTable();
                 string newExcelName = string.Empty;
                 dtHZ.Columns.Add("編號", typeof(String));
+                dtHZ.Columns.Add("訂單編號", typeof(String));
+                dtHZ.Columns.Add("商品編號", typeof(String));
                 dtHZ.Columns.Add("商品名稱", typeof(String));
                 dtHZ.Columns.Add("品牌名稱", typeof(String));
                 dtHZ.Columns.Add("用戶姓名", typeof(String));
@@ -235,45 +227,55 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("狀態", typeof(String));
 
 
-                for (int i = 0; i < store.Count; i++)
+                for (int i = 0; i < store.Rows.Count; i++)
                 {
                     DataRow dr = dtHZ.NewRow(); 
-                    dr[0] = store[i].comment_id;
-                    string comment_info = store[i].product_name;
+                    dr[0] = store.Rows[i]["comment_id"];
+                    string comment_info = store.Rows[i]["product_name"].ToString();
                     comment_info = comment_info.Replace(',', '，');
                     comment_info = comment_info.Replace("\n", "");
-                    dr[1] = comment_info;
-                    comment_info = store[i].brand_name;
+                    dr[1] = store.Rows[i]["order_id"].ToString() == "" ? "0" : store.Rows[i]["order_id"];
+                    dr[2] = store.Rows[i]["product_id"];
+                    dr[3] = comment_info;
+                    comment_info = store.Rows[i]["brand_name"].ToString();
                     comment_info = comment_info.Replace(',', '，');
                     comment_info = comment_info.Replace("\n", "");
-                    dr[2] = comment_info;
-                    dr[3] = store[i].user_name;
+                    dr[4] = comment_info;
+                    dr[5] = store.Rows[i]["user_name"];
                     //dr[4] = store[i].user_email;
-                    dr[4] = store[i].is_show_name == 0 ? "匿名" : "公開";//0-匿名，1-公開
-                    comment_info = store[i].comment_info;
+                    comment_info = store.Rows[i]["is_show_name"].ToString();
+                    dr[6] = Convert.ToInt32(comment_info) == 0 ? "匿名" : "公開";//0-匿名，1-公開
+                    comment_info = store.Rows[i]["comment_info"].ToString();
                     comment_info = comment_info.Replace(',', '，');
                     comment_info = comment_info.Replace("\n", "");
-                    dr[5] = comment_info;
+                    dr[7] = comment_info;
                     //dr[6] = store[i].comment_answer;
-                    dr[6] = store[i].comment_answer.ToString().Replace(',', '，').Replace("\r", "").Replace("\n", "");
+                    dr[8] = store.Rows[i]["comment_answer"].ToString().Replace(',', '，').Replace("\r", "").Replace("\n", "");
                     //   dtHZ.Columns.Add("留言回覆", typeof(String));
-                    dr[7] = store[i].answer_is_show == 0 ? "隱藏" : "顯示";
-                    dr[8] = Satisfaction(store[i].product_desc);//滿意度
-                    dr[9] = Satisfaction(store[i].seller_server);
-                    dr[10] = Satisfaction(store[i].web_server);
-                    dr[11] = Satisfaction(store[i].logistics_deliver);
-                    dr[12] = store[i].s_reply_user;
+                    comment_info = store.Rows[i]["answer_is_show"].ToString();
+                    dr[9] = Convert.ToInt32(comment_info) == 0 ? "隱藏" : "顯示";
+                    dr[10] = Satisfaction(Convert.ToInt32(store.Rows[i]["product_desc"].ToString()));//滿意度
+                    dr[11] = Satisfaction(Convert.ToInt32(store.Rows[i]["seller_server"].ToString()));
+                    dr[12] = Satisfaction(Convert.ToInt32(store.Rows[i]["web_server"].ToString()));
+                    dr[13] = Satisfaction(Convert.ToInt32(store.Rows[i]["logistics_deliver"].ToString()));
+                    dr[14] = store.Rows[i]["s_reply_user"];
 
-                    if (CommonFunction.DateTimeToString(CommonFunction.GetNetTime(store[i].reply_time)) == "1970-01-01 08:00:00")
+                    if (CommonFunction.DateTimeToString(Convert.ToDateTime(store.Rows[i]["reply_time"].ToString())) == "1970-01-01 08:00:00")
                     {
-                        dr[13] = "";
+                        dr[15] = "";
                     }
+                    //if (CommonFunction.DateTimeToString(CommonFunction.GetNetTime((long)Convert.ToInt32(store.Rows[i]["reply_time"].ToString()))) == "1970-01-01 08:00:00")
+                    //{
+                    //    dr[15] = "";
+                    //}
                     else
                     {
-                        dr[13] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(store[i].reply_time));
+                        dr[15] = CommonFunction.DateTimeToString(Convert.ToDateTime(store.Rows[i]["reply_time"].ToString()));
+                        //dr[15] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime((long)Convert.ToInt32(store.Rows[i]["reply_time"].ToString())));
 
                     }
-                    dr[14] = store[i].status == 1 ? "開啟" : "關閉";//1,開啟。2.關閉
+                    comment_info = store.Rows[i]["status"].ToString();
+                    dr[16] = Convert.ToInt32(comment_info) == 1 ? "開啟" : "關閉";//1,開啟。2.關閉
                     dtHZ.Rows.Add(dr);
                 }
                 if (!System.IO.Directory.Exists(Server.MapPath(excelPath)))

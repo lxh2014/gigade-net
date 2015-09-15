@@ -46,7 +46,7 @@ namespace BLL.gigade.Mgr
 
              //查看是否重複
              DataTable _dt = _ODMDao.IsExist(query);
-             if (_dt == null)//不重複
+             if (_dt.Rows.Count==0)//不重複
              {
                  if (_ODMDao.InsertODM(query) > 0)
                  {

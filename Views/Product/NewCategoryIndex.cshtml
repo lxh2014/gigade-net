@@ -1,0 +1,10 @@
+﻿@{
+    ViewBag.Title = "NewCategoryIndex";
+}
+<script>
+    var coboType = 1;
+</script>
+<script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/Product/ProductCategoryLang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+
+<script src="../../Scripts/Views/Product/NewProductCategory.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+

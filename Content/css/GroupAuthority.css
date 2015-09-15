@@ -1,0 +1,39 @@
+﻿.View {
+    padding:2px;
+    font: 11px tahoma,arial,helvetica,sans-serif;
+}
+
+.View h2 {
+    border-bottom: 2px solid #99bbe8;
+    cursor:pointer;
+    padding-top:6px;
+}
+.View h2 div {
+    background:transparent url(/Scripts/Ext4.0/resources/themes/images/default/grid/group-expand-sprite.gif) no-repeat 3px -47px;
+    color:#3764a0;
+    font:bold 12px Helvetica, Arial, sans-serif;
+    padding:4px 4px 4px 17px;
+}
+.View .collapsed h2 div {
+    background-position: 3px 3px;
+}
+.View .collapsed dl {
+    display:none;
+}
+
+.View .tool ,#AuthView .name{
+	padding-top:3px;
+	padding-bottom:3px;
+}
+
+.View .name div, #AuthView .name input{
+	padding-left:15px;
+}
+
+.downline{
+	margin-top:5px;
+	margin-bottom:3px;
+	border-bottom:1px solid;
+    border-bottom-color:#dadada;
+    width:100%;
+}
