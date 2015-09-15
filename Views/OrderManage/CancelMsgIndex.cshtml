@@ -1,0 +1,7 @@
+﻿@{
+    ViewBag.Title = "CancelMsgIndex";
+}
+@section Js{<script type="text/javascript" src="../../Locale/@Html.Raw(Request.Cookies["lang"]==null? "zh-TW":Request.Cookies["lang"].ToString())/OrderManage/OrderManageLang.js?v=@Context.Application["Version"].ToString()"></script>
+<script src="../../Scripts/Views/OrderManage/CancelMsgList.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/OrderManage/CancelMsgResponse.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+

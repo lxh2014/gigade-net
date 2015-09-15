@@ -1,0 +1,25 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+<style type="text/css">
+    .ul-detail
+    {
+        width:800px
+    }
+    .ul-detail li
+    {
+        margin:0.5em;
+    }
+    .tbl-cls td
+    {
+        padding:5px;
+        border:1px solid #2261f8;
+    }
+    .tbl-cls th 
+    {
+        padding:5px;
+        border:1px solid #2261f8;
+    }
+</style>
+<script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/ProductHistory/ProductHistoryLang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/ProductHistory/Index.js"></script>

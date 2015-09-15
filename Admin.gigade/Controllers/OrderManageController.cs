@@ -5048,6 +5048,15 @@ namespace Admin.gigade.Controllers
             try
             {
                 store = _orderMasterMgr.GetData(orderId);
+                uint user_id =(uint)(Session["caller"] as Caller).user_id;
+                if (_orderMasterMgr.VerifySession(user_id) > 0)
+                {
+                    store.is_manage_user = true;
+                }
+                else
+                {
+                    store.is_manage_user = false;
+                }
                 if (!string.IsNullOrEmpty(Request.Params["isSecret"]))
                 {
                     if (Request.Params["isSecret"] == "false")

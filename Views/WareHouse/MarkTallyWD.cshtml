@@ -1,0 +1,26 @@
+﻿@{
+    ViewBag.Title = "理貨--寄倉流程";
+    string assg_id = ViewBag.number;
+}
+<!--工作代號-->
+<input type="hidden" id="hid_assg_id" name="hid_assg_id" value="@assg_id" />
+<!--商品細項編號-->
+<input type="hidden" id="hid_item_id" name="hid_item_id" />
+<!--商品國際條碼-->
+<input type="hidden" id="hid_upc_id" name="hid_upc_id" />
+<!--定單詳情編號order_detail.detail_id-->
+<input type="hidden" id="hid_ordd_id" name="hid_ordd_id" />
+<!--aseld表的流水號-->
+<input type="hidden" id="hid_seld_id" name="hid_seld_id" />
+<!--iinvd表的有效日期-->
+<input type="hidden" id="hid_cde_dt" name="hid_cde_dt" />
+<!--product_ext表的有效日期-->
+<input type="hidden" id="hid_cde_dt_shp" name="hid_cde_dt_shp" />
+<!--揀貨數量-->
+<input type="hidden" id="hid_ord_qty" name="hid_ord_qty" />
+
+@section Js{
+    <script type="text/javascript" src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/WareHouse/lang.js?v=@Context.Application["Version"].ToString()"></script>
+    <script type="text/javascript" src="../../Scripts/Views/WareHouse/MarkTallyWD.js?v=@Context.Application["Version"].ToString()"></script>    
+     <script src="../../Scripts/Views/WareHouse/CheckCode.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+}

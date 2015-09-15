@@ -537,11 +537,11 @@ Ext.onReady(function () {
                 panel.doLayout();
             }
         },
-        { xtype: 'button', text: "取消整筆訂單", id: 'return_All_Order', disabled: true, handler: onReturnALLOrderClick },
-        { xtype: 'button', text: "退貨", id: 'return', disabled: true, handler: onReturnClick },
-        { xtype: 'button', text: "等待付款", id: 'wait', disabled: true, handler: onWaitClick },
-        { xtype: 'button', text: "轉自取", id: 'change', disabled: true, handler: onChangePayment_cash },
-        { xtype: 'button', text: "轉黑貓貨到付款", id: 't_cat', disabled: true, handler: onChangePayment_cat }
+        { xtype: 'button', text: "取消整筆訂單", id: 'return_All_Order', hidden: true, disabled: true, handler: onReturnALLOrderClick },
+        { xtype: 'button', text: "退貨", id: 'return', disabled: true,hidden:true, handler: onReturnClick },
+        { xtype: 'button', text: "等待付款", id: 'wait', disabled: true, hidden:true,handler: onWaitClick },
+        { xtype: 'button', text: "轉自取", id: 'change', disabled: true,hidden:true, handler: onChangePayment_cash },
+        { xtype: 'button', text: "轉黑貓貨到付款", id: 't_cat', disabled: true,hidden:true, handler: onChangePayment_cat }
         ],
         //bbar: Ext.create('Ext.PagingToolbar', {
         //    store: orderListStore,
@@ -1205,23 +1205,36 @@ Ext.onReady(function () {
                             }
                             statusname = result.data.order_status_str;
                             var is_vendor_deliver = result.data.is_vendor_deliver;
-                            if (result.data.order_status == 0 || result.data.order_status == 2)
+                            if (result.data.is_manage_user)
+                            {
+                                Ext.getCmp('return').setDisabled(false);
+                                Ext.getCmp('return').show();
+
+                                Ext.getCmp('wait').setDisabled(false);
+                                Ext.getCmp('wait').show();
+                                Ext.getCmp('return_All_Order').setDisabled(false);
+                                Ext.getCmp('return_All_Order').show();
+                                
+                            }
+                            if (result.data.is_manage_user&&(result.data.order_status == 0 || result.data.order_status == 2))
                             {
                                 if (result.data.is_vendor_deliver == false) {
                                     Ext.getCmp('change').setDisabled(false);
+                                    Ext.getCmp('change').show();
                                 }
                                 if (result.data.order_status == 0)
                                 {
                                     if (result.data.is_vendor_deliver == false) {
                                         Ext.getCmp('t_cat').setDisabled(false);
+                                        Ext.getCmp('t_cat').show();
                                     }
                                 }
                             }
-                            else {
-                                Ext.getCmp('change').setDisabled(true);
-                                Ext.getCmp('t_cat').setDisabled(true);
-                            }
-                            if (result.data.cart_id != 16 && (result.data.order_status == 2 || result.data.order_status == 0)) {
+                            //else {
+                            //    Ext.getCmp('change').setDisabled(true);
+                            //    Ext.getCmp('t_cat').setDisabled(true);
+                            //}
+                            if (result.data.cart_id != 16&&result.data.is_manage_user&& (result.data.order_status == 2 || result.data.order_status == 0)) {
                                 Ext.getCmp('change_info').show();
                             }
                             //購買人

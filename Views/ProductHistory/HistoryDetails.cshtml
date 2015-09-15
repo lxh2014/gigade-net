@@ -1,0 +1,73 @@
+﻿@using BLL.gigade.Model;
+@model IEnumerable<IGrouping<string, BLL.gigade.Model.Custom.TableHistoryItemCustom>> 
+<style type="text/css">
+    body
+    {
+        width: 1242px;
+    }
+
+    table
+    {
+        font-family: verdana,arial,sans-serif;
+        font-size: 11px;
+        color: #333333;
+        width: 500px;
+        border-width: 1px;
+        border-color: #a9c6c9;
+        border-collapse: collapse;
+        float: left;
+        margin: 20px 20px;
+    }
+
+    td
+    {
+        border: 1px;
+        padding: 3px;
+        border-style: solid;
+        border-color: #a9c6c9;
+    }
+</style>
+
+
+@foreach (var table in Model)
+{
+    <table id="@table.Key" class="altrowstable">
+        <thead>
+            <tr style="width: 19%; font-family: 'Arial Unicode MS'; font-size: medium">
+                <td>表名：@table.Key</td>
+                <td colspan="3">功能說明：@TableHistory.FunctionDescription(table.Key)</td>
+            </tr>
+            <tr>
+                <td>欄位
+                </td>
+                <td style="width: 19%;">欄位中文名稱
+                </td>
+                <td style="width: 31%;">修改前
+                </td>
+                <td style="width: 31%;">修改后
+                </td>
+            </tr>
+
+        </thead>
+        @foreach (var tr in table)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => tr.col_name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => tr.col_chsname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => tr.col_value)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => tr.old_value)
+                </td>
+            </tr>
+        }
+
+    </table>
+
+}
+

@@ -1086,5 +1086,25 @@ set ");
             }
 
         }
+
+        public int VerifySession(uint user_id)
+        {
+            try
+            {
+                DataTable _dt = _orderMasterDao.VerifySession(user_id);
+                if (_dt.Rows.Count > 0)
+                {
+                    return Convert.ToInt32(_dt.Rows[0][0]);
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->VerifySession-->" + ex.Message, ex);
+            }
+        }
     }
 }

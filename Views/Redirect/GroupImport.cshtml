@@ -1,0 +1,9 @@
+﻿@{
+    ViewBag.Title = "GroupImport";
+}
+@section Js{
+    <script type="text/javascript" src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/Redirect/RedirectLang.js?v=@Context.Application["Version"].ToString()"></script>
+    <script src="../../Scripts/Views/Redirect/GroupImport.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <input id="hidden_group_id" type="hidden" value="@ViewBag.group_id" />
+}
+

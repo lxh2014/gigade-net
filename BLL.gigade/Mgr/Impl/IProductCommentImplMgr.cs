@@ -9,7 +9,7 @@ namespace BLL.gigade.Mgr.Impl
 {
     public interface IProductCommentImplMgr
     {
-        List<ProductCommentQuery> Query(ProductCommentQuery store, out int totalCount);
+        DataTable Query(ProductCommentQuery store, out int totalCount);
         int UpdateActive(ProductCommentQuery model);
         int ProductCommentSave(ProductCommentQuery query);
         ProductCommentQuery GetUsetInfo(Model.Query.ProductCommentQuery store);

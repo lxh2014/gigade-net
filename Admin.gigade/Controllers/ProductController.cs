@@ -6160,7 +6160,7 @@ namespace Admin.gigade.Controllers
                         }
                         dtHZ.Rows.Add(dr);
                     }
-                    string fileName = "商品庫存查詢_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                    string fileName = "product_stock_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
                     MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "");
                     Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
                     Response.BinaryWrite(ms.ToArray());

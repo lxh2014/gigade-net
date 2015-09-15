@@ -1,0 +1,8 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+@section Js{
+    <script type="text/javascript" src="../../Locale/@Html.Raw(Request.Cookies["lang"]==null? "zh-TW":Request.Cookies["lang"].ToString())/GroupAuthMap/GroupAuthMapLang.js?v=@Context.Application["Version"].ToString()"></script>
+    <script src="../../Scripts/Views/GroupAuthMap/GroupAuthMapList.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Views/GroupAuthMap/GroupAuthMapEdit.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+}
