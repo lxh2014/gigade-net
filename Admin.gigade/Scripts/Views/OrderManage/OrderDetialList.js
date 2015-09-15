@@ -537,7 +537,7 @@ Ext.onReady(function () {
                 panel.doLayout();
             }
         },
-        { xtype: 'button', text: "取消整筆訂單", id: 'return_All_Order', disabled: true, handler: onReturnALLOrderClick },
+        { xtype: 'button', text: "取消整筆訂單", id: 'return_All_Order', hidden: true, disabled: true, handler: onReturnALLOrderClick },
         { xtype: 'button', text: "退貨", id: 'return', disabled: true,hidden:true, handler: onReturnClick },
         { xtype: 'button', text: "等待付款", id: 'wait', disabled: true, hidden:true,handler: onWaitClick },
         { xtype: 'button', text: "轉自取", id: 'change', disabled: true,hidden:true, handler: onChangePayment_cash },
@@ -1212,6 +1212,9 @@ Ext.onReady(function () {
 
                                 Ext.getCmp('wait').setDisabled(false);
                                 Ext.getCmp('wait').show();
+                                Ext.getCmp('return_All_Order').setDisabled(false);
+                                Ext.getCmp('return_All_Order').show();
+                                
                             }
                             if (result.data.is_manage_user&&(result.data.order_status == 0 || result.data.order_status == 2))
                             {
