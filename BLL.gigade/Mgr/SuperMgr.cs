@@ -40,7 +40,7 @@ namespace BLL.gigade.Mgr
             }
             catch (Exception ex)
             {
-                throw new Exception("SuperMgr->SuperExportExcel" + ex.Message);
+                throw new Exception("SuperMgr-->SuperExportExcel-->" + ex.Message);
             }
         }
         #endregion
