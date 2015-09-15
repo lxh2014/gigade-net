@@ -3751,7 +3751,6 @@
     <Content Include="Views\Ticket\TicketVerification.cshtml" />
     <Content Include="Views\ReportManagement\OrderAllSearch.cshtml" />
     <Content Include="Views\WareHouse\IlocChangeDetailLink.cshtml" />
-    <Content Include="Template\SiteAnalytics\SiteAnalytics.xlsx" />
     <Content Include="Views\WareHouse\idiffcountbook.cshtml" />
     <Content Include="Views\ProductHistory\ParticularsHistory.cshtml" />
     <Content Include="Views\WareHouse\IwmsRecord.cshtml" />
@@ -3809,6 +3808,7 @@
     <Content Include="Views\Product\InventoryQuery.cshtml" />
     <Content Include="Template\SiteStatistics\廣告成效匯入範本.xlsx" />
     <Content Include="Views\OrderManage\OrderDetailManage.cshtml" />
+    <Content Include="Template\SiteAnalytics\SiteAnalytics.xlsx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

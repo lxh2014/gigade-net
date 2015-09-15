@@ -30,9 +30,9 @@ function editFunction(RowID, Store) {
         },
         {
             xtype: 'numberfield',
-            fieldLabel: '工作階段',
-            name: 'sa_work_stage',
-            id: 'sa_work_stage',
+            fieldLabel: '造訪數',
+            name: 'sa_session',
+            id: 'sa_session',
             margin: '10 0 10 0',
             maxValue: 2147483647,
             minValue: 0,
@@ -49,6 +49,50 @@ function editFunction(RowID, Store) {
             minValue: 0,
             allowBlank: false,
             hideTrigger:true
+        },
+        {
+            xtype: 'numberfield',
+            fieldLabel: '瀏覽量',
+            name: 'sa_pageviews',
+            id: 'sa_pageviews',
+            margin: '10 0 10 0',
+            maxValue: 2147483647,
+            minValue: 0,
+            allowBlank: false,
+            hideTrigger:true
+        },
+        {
+        xtype: 'numberfield',
+        fieldLabel: '單次造訪頁數',
+        name: 'sa_pages_session',
+        id: 'sa_pages_session',
+        margin: '10 0 10 0',
+        maxValue: 2147483647,
+        minValue: 0,
+        allowBlank: false,
+        hideTrigger:true
+        },
+        {
+            xtype: 'textfield',
+            fieldLabel: '跳出率',
+            name: 'sa_bounce_rate',
+            id: 'sa_bounce_rate',
+            margin: '10 0 10 0',
+            maxValue: 2147483647,
+            minValue: 0,
+            allowBlank: false,
+            hideTrigger:true
+        },
+        {
+        xtype: 'textfield',
+        fieldLabel: '平均停留時間',
+        name: 'sa_avg_session_duration',
+        id: 'sa_avg_session_duration',
+        margin: '10 0 10 0',
+        maxValue: 2147483647,
+        minValue: 0,
+        allowBlank: false,
+        hideTrigger:true
         }
         ],
         buttons: [
@@ -87,8 +131,15 @@ function editFunction(RowID, Store) {
                             params: {
                                 sa_id: ID,
                                 sa_date: sa_date,
-                                sa_work_stage: Ext.htmlEncode(Ext.getCmp("sa_work_stage").getValue()),
-                                sa_user: Ext.htmlEncode(Ext.getCmp("sa_user").getValue())
+                                sa_session: Ext.htmlEncode(Ext.getCmp("sa_session").getValue()),
+                                sa_user: Ext.htmlEncode(Ext.getCmp("sa_user").getValue()),
+
+                                sa_pageviews: Ext.htmlEncode(Ext.getCmp("sa_pageviews").getValue()),
+                                sa_pages_session: Ext.htmlEncode(Ext.getCmp("sa_pages_session").getValue()),
+                                sa_bounce_rate: Ext.htmlEncode(Ext.getCmp("sa_bounce_rate").getValue()),
+                                sa_avg_session_duration: Ext.htmlEncode(Ext.getCmp("sa_avg_session_duration").getValue()),
+
+
                             },
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);
@@ -112,7 +163,7 @@ function editFunction(RowID, Store) {
         id: 'editWin',
         iconCls: RowID ? "icon-user-edit" : "icon-user-add",
         width: 400,
-        height: 230,
+        height: 350,
         layout: 'fit',
         items: [editFrm],
         constrain: true, //束縛窗口在框架內

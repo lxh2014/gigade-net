@@ -9,7 +9,7 @@ using System.Text;
 
 namespace BLL.gigade.Mgr
 {
-    public  class SiteAnalyticsMgr
+    public class SiteAnalyticsMgr
     {
         private SiteAnalyticsDao _siteAnalytics;
         public SiteAnalyticsMgr(string connectionString)
@@ -31,11 +31,12 @@ namespace BLL.gigade.Mgr
 
         public string ImportExcelToDt(DataTable _dt)
         {
-            string  json = "{success:'true'}";
+            string json = "{success:'true'}";
             ArrayList arrList = new ArrayList();
             SiteAnalytics query = new SiteAnalytics();
             try
             {
+                float number = 0;
                 for (int i = 0; i < _dt.Rows.Count; i++)
                 {
                     if (_dt.Rows[i][0].ToString() != "" && _dt.Rows[i][1].ToString() != "" && _dt.Rows[i][2].ToString() != "")
@@ -44,12 +45,25 @@ namespace BLL.gigade.Mgr
                         query.s_sa_date = Convert.ToDateTime(_dt.Rows[i][0]).ToString("yyyy-MM-dd");
                         query.sa_id = _siteAnalytics.IsExist(query);
                         query.s_sa_date = Convert.ToDateTime(_dt.Rows[i][0]).ToString("yyyy-MM-dd");
-                        query.sa_work_stage = Convert.ToInt32(_dt.Rows[i][1].ToString().Replace(',', ' ').Replace(" ", ""));
+                        query.sa_session = Convert.ToInt32(_dt.Rows[i][1].ToString().Replace(',', ' ').Replace(" ", ""));
                         query.sa_user = Convert.ToInt32(_dt.Rows[i][2].ToString().Replace(',', ' ').Replace(" ", ""));
+                        query.sa_pageviews = Convert.ToInt32(_dt.Rows[i][3].ToString().Replace(',', ' ').Replace(" ", ""));
+                        query.sa_pages_session = Convert.ToInt32(_dt.Rows[i][4].ToString().Replace(',', ' ').Replace(" ", ""));
+                        if (float.TryParse(_dt.Rows[i][5].ToString(), out number))
+                        {
+                            query.sa_bounce_rate = Convert.ToSingle(_dt.Rows[i][5].ToString());
+                        }
+                        if (float.TryParse(_dt.Rows[i][6].ToString(), out number))
+                        {
+                            query.sa_avg_session_duration = Convert.ToSingle(_dt.Rows[i][6].ToString());
+                        }
                         query.sa_create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+                        query.sa_create_time = DateTime.Now;
+                        query.sa_modify_time = query.sa_create_time;
+                        query.sa_modify_user = query.sa_create_user;
                         if (query.sa_id > 0)
                         {
-                          arrList.Add(_siteAnalytics.UpdateSNA(query));
+                            arrList.Add(_siteAnalytics.UpdateSNA(query));
                         }
                         else
                         {
@@ -65,7 +79,7 @@ namespace BLL.gigade.Mgr
                     }
                 }
                 return json;
-               // return _siteAnalytics.ImportExcelToDt(query, _dt);
+                // return _siteAnalytics.ImportExcelToDt(query, _dt);
             }
             catch (Exception ex)
             {
@@ -129,6 +143,6 @@ namespace BLL.gigade.Mgr
             {
                 throw new Exception("SiteAnalyticsMgr-->IsExistSiteAnalytics-->" + ex.Message, ex);
             }
-        } 
+        }
     }
 }
