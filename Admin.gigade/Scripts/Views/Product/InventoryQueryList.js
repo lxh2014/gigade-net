@@ -210,9 +210,12 @@ Ext.onReady(function () {
                                 }
                             }
                             , change: function () {
-                                var start = Ext.getCmp('item_stock_start').getValue();
+                                var start = Ext.getCmp('item_stock_start');
                                 var end = Ext.getCmp('item_stock_end');
-                                end.setMinValue(start);
+                                if (start.getValue() > end.getValue())
+                                {
+                                    end.setValue(start.getValue());
+                                }
                             }
                         }
                     },
@@ -238,8 +241,11 @@ Ext.onReady(function () {
                             }
                             , change: function () {
                                 var start = Ext.getCmp('item_stock_start');
-                                var end = Ext.getCmp('item_stock_end').getValue(); 
-                                start.setMaxValue(end);
+                                var end = Ext.getCmp('item_stock_end');
+                                if (start.getValue() > end.getValue())
+                                {
+                                    end.setValue(start.getValue());
+                                }
                             }
                             }
                     }
