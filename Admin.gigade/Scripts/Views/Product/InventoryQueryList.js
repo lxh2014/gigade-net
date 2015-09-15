@@ -355,9 +355,7 @@ Ext.onReady(function () {
 /*************************************************************************************查询信息*************************************************************************************************/
 
 function Query(x) {
-    //alert(Ext.getCmp('product_status').getValue());
     var ignore_stockRdo = Ext.getCmp('ignore_stockRdo').getValue().ignore_stockVal;
-    // alert(a);
     Ext.getCmp('IQGrid').store.loadPage(1, {
         params: {
 
