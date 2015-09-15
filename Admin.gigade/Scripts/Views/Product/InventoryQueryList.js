@@ -51,6 +51,8 @@ var ProductStore = Ext.create('Ext.data.Store', {//ProductStore
     }
 });
 
+
+//定義商品狀態的model
 Ext.define("gigade.gridPara", {
     extend: 'Ext.data.Model',
     fields: [
