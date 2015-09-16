@@ -103,9 +103,22 @@ namespace BLL.gigade.Dao
                 strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
                 strcont.AppendFormat(" where 1=1 ");
 
-                if (query.product_id != 0)//商品編號
+                //if (query.product_id != 0)//商品編號
+                //{
+                //    strcont.AppendFormat(" and an.product_id like  '{0}' ", query.product_id);
+                //}
+
+                if (!string.IsNullOrEmpty(query.product_id_OR_product_name))//商品名稱或者商品編號或商品細項編號
                 {
-                    strcont.AppendFormat(" and an.product_id like  '{0}' ", query.product_id);
+                    int ID = 0;
+                    if (int.TryParse(query.product_id_OR_product_name, out ID))
+                    {
+                        strcont.AppendFormat(" and ( p.product_id = '{0}' or pi.item_id = '{1}') ", query.product_id_OR_product_name, query.product_id_OR_product_name);
+                    }
+                    else
+                    {
+                        strcont.AppendFormat(" and p.product_name LIKE '%{0}%'", query.product_id_OR_product_name);
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(query.vendor_name_full_OR_vendor_id))//供應商名稱或者供應商編號
@@ -226,13 +239,14 @@ namespace BLL.gigade.Dao
 
             try
             {
-                str.AppendFormat("SELECT an.id,p.product_id,p.product_name,an.item_id,CONCAT(p.spec_title_1,' ',ps1.spec_name) as spec_title_1,CONCAT(p.spec_title_2,' ',ps2.spec_name) as spec_title_2 ,v.vendor_id,v.vendor_name_full, vb.brand_id,vb.brand_name,p.product_status,pi.item_stock,p.ignore_stock from arrival_notice an ");
+                str.AppendFormat("SELECT an.id,p.product_id,p.product_name,an.item_id,CONCAT(p.spec_title_1,' ',ps1.spec_name) as spec_title_1,CONCAT(p.spec_title_2,' ',ps2.spec_name) as spec_title_2 ,v.vendor_id,v.vendor_name_full, vb.brand_id,vb.brand_name,tp.parameterName as product_status_string,p.product_status,pi.item_stock,p.ignore_stock from arrival_notice an ");
                 strcont.AppendFormat(" INNER JOIN product p on p.product_id=an.product_id ");
                 strcont.AppendFormat(" INNER JOIN product_item pi on pi.product_id=p.product_id ");
                 strcont.AppendFormat(" INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id ");
                 strcont.AppendFormat(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id ");
                 strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
                 strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
+                strcont.AppendFormat(" left JOIN t_parametersrc tp on tp.parameterCode=p.product_status and  tp.parameterType='product_status' ");
                 strcont.AppendFormat(" where 1=1 ");
 
 
