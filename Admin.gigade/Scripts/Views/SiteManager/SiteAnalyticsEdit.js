@@ -77,7 +77,7 @@ function editFunction(RowID, Store) {
         allowDecimals: false
         },
         {
-            xtype: 'textfield',
+            xtype: 'numberfield',
             fieldLabel: '跳出率',
             name: 'sa_bounce_rate',
             id: 'sa_bounce_rate',
@@ -88,15 +88,15 @@ function editFunction(RowID, Store) {
             hideTrigger:true
         },
         {
-        xtype: 'textfield',
-        fieldLabel: '平均停留時間',
-        name: 'sa_avg_session_duration',
-        id: 'sa_avg_session_duration',
-        margin: '10 0 10 0',
-        maxValue: 2147483647,
-        minValue: 0,
-        allowBlank: false,
-        hideTrigger:true
+            xtype: 'numberfield',
+            fieldLabel: '平均停留時間',
+            name: 'sa_avg_session_duration',
+            id: 'sa_avg_session_duration',
+            margin: '10 0 10 0',
+            maxValue: 2147483647,
+            minValue: 0,
+            allowBlank: false,
+            hideTrigger:true
         }
         ],
         buttons: [
