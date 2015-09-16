@@ -212,7 +212,7 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("商品編號", typeof(String));
                 dtHZ.Columns.Add("商品名稱", typeof(String));
                 dtHZ.Columns.Add("品牌名稱", typeof(String));
-                dtHZ.Columns.Add("用戶姓名", typeof(String));
+                dtHZ.Columns.Add("用戶名稱", typeof(String));
                 //dtHZ.Columns.Add("用戶郵箱", typeof(String));
                 dtHZ.Columns.Add("留言狀態", typeof(String));
                 dtHZ.Columns.Add("留言內容", typeof(String));//--處理
