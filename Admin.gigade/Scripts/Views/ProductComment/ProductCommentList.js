@@ -476,7 +476,7 @@ Ext.onReady(function () {
             header: '品牌名稱', dataIndex: 'brand_name', width: 200, align: 'center'
         },
         {
-            header: '用戶姓名', dataIndex: 'user_name', width: 100, align: 'center',
+            header: '用戶名稱', dataIndex: 'user_name', width: 100, align: 'center',
             renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {//secretcopy
                 return "<span onclick='SecretLogin(" + record.data.comment_id + "," + record.data.user_id + ",\"" + info_type + "\")'  >" + value + "</span>";
 
