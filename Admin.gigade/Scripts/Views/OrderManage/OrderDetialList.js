@@ -1204,36 +1204,49 @@ Ext.onReady(function () {
                                 Ext.getCmp('wait').setDisabled(true);
                             }
                             statusname = result.data.order_status_str;
-                            var is_vendor_deliver = result.data.is_vendor_deliver;
-                            if (result.data.is_manage_user)
-                            {
-                                Ext.getCmp('return').setDisabled(false);
+                            var is_vendor_deliver = result.data.is_vendor_deliver;  
+                            if (result.data.is_manage_user) {
+                                Ext.getCmp('t_cat').show();
+                                Ext.getCmp('change').show();
                                 Ext.getCmp('return').show();
-
-                                Ext.getCmp('wait').setDisabled(false);
-                                Ext.getCmp('wait').show();
-                                Ext.getCmp('return_All_Order').setDisabled(false);
                                 Ext.getCmp('return_All_Order').show();
-                                
-                            }
-                            if (result.data.is_manage_user&&(result.data.order_status == 0 || result.data.order_status == 2))
-                            {
-                                if (result.data.is_vendor_deliver == false) {
-                                    Ext.getCmp('change').setDisabled(false);
-                                    Ext.getCmp('change').show();
+                                Ext.getCmp('wait').show();
+                                switch (result.data.order_status) {
+                                    case 0:
+                                        if (result.data.is_vendor_deliver == false) {
+                                            Ext.getCmp('change').setDisabled(false);
+                                            Ext.getCmp('t_cat').setDisabled(false);
+                                        }
+                                        Ext.getCmp('return_All_Order').setDisabled(false);
+                                        break;
+                                    case 1:
+                                        Ext.getCmp('wait').setDisabled(false);
+                                        Ext.getCmp('return_All_Order').setDisabled(false);
+                                        break;
+                                    case 2:
+                                        Ext.getCmp('wait').setDisabled(false);
+                                        if (result.data.is_vendor_deliver == false) {
+                                            Ext.getCmp('change').setDisabled(false);
+                                        }
+                                        Ext.getCmp('return_All_Order').setDisabled(false);
+                                        break;
+                                    case 10:
+                                        Ext.getCmp('wait').setDisabled(false);
+                                        Ext.getCmp('return_All_Order').setDisabled(false);
+                                        break;
+                                    case 20:
+                                        Ext.getCmp('return_All_Order').setDisabled(false);
+                                        Ext.getCmp('wait').setDisabled(false);
+                                        break;
+                                    default:
+                                        Ext.getCmp("orderListGrid").down('#return_All_Order').setDisabled(true);
+                                        Ext.getCmp('t_cat').setDisabled(true);
+                                        Ext.getCmp('change').setDisabled(true);
+                                        Ext.getCmp('return').setDisabled(true);
+                                        Ext.getCmp('wait').setDisabled(true);
+                                        break;
                                 }
-                                if (result.data.order_status == 0)
-                                {
-                                    if (result.data.is_vendor_deliver == false) {
-                                        Ext.getCmp('t_cat').setDisabled(false);
-                                        Ext.getCmp('t_cat').show();
-                                    }
-                                }
                             }
-                            //else {
-                            //    Ext.getCmp('change').setDisabled(true);
-                            //    Ext.getCmp('t_cat').setDisabled(true);
-                            //}
                             if (result.data.cart_id != 16&&result.data.is_manage_user&& (result.data.order_status == 2 || result.data.order_status == 0)) {
                                 Ext.getCmp('change_info').show();
                             }
