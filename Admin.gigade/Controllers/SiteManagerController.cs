@@ -230,7 +230,8 @@ namespace Admin.gigade.Controllers
                     string path = Request.Params["ImportExcel"];
                     HttpPostedFileBase excelFile = Request.Files["ImportExcel"];
                     FileManagement fileManagement = new FileManagement();
-                    string newExcelName = Server.MapPath(excelPath) + "statistics\\" + fileManagement.NewFileName(excelFile.FileName);
+                    string savePath=Server.MapPath(excelPath) + "statistics";
+                    string newExcelName = savePath+ fileManagement.NewFileName(excelFile.FileName);
                     excelFile.SaveAs(newExcelName);
                     NPOI4ExcelHelper helper = new NPOI4ExcelHelper(newExcelName);
                     DataTable _dt = helper.ExcelToTableForXLSX();
@@ -419,11 +420,11 @@ namespace Admin.gigade.Controllers
                 // _newDt.Columns.Add("轉換率", typeof(string));
                 //_newDt.Columns.Add("平均訂單金額", typeof(string));
                 _newDt.Columns.Add("訂單金額", typeof(string));
-                //_newDt.Columns.Add("ROI", typeof(string));
+                _newDt.Columns.Add("廠商代碼", typeof(string));
                 for (int i = 0; i < _dt.Rows.Count; i++)
                 {
                     DataRow newRow = _newDt.NewRow();
-                    newRow["日期"] = Convert.ToDateTime(_dt.Rows[i]["ss_date"]).ToString("yyyy-MM-dd"); ;
+                    newRow["日期"] = Convert.ToDateTime(_dt.Rows[i]["ss_date"]).ToString("MM/dd/yyyy"); ;
                     newRow["曝光"] = GetString(_dt.Rows[i]["ss_show_num"].ToString());
                     newRow["點擊"] = GetString(_dt.Rows[i]["ss_click_num"].ToString());
                     newRow["點閱率"] = _dt.Rows[i]["ss_click_through"].ToString();
@@ -431,7 +432,7 @@ namespace Admin.gigade.Controllers
                     newRow["會員數"] = GetString(_dt.Rows[i]["ss_newuser_number"].ToString());
                     newRow["實際轉換"] = GetString(_dt.Rows[i]["ss_converted_newuser"].ToString());
                     newRow["訂單金額"] = GetString(_dt.Rows[i]["ss_sum_order_amount"].ToString());
-                    //newRow[2] = GetString(_dt.Rows[i]["ss_click_num"].ToString());
+                    newRow["廠商代碼"] = _dt.Rows[i]["ss_code"].ToString();
                     //newRow[1] = GetString(_dt.Rows[i]["ss_show_num"].ToString());
                     //newRow[2] = GetString(_dt.Rows[i]["ss_click_num"].ToString());
 

@@ -128,26 +128,28 @@ Ext.onReady(function ()
                          defaultListConfig: {              //取消loading的Mask
                              loadMask: false,
                              loadingHeight: 70,
-                             minWidth: 70,
+                             minWidth: 30,
                              maxHeight: 300,
                              shadow: "sides"
                          },
                          id: 's_code',
-                         margin: '0 5px',
+                         margin: '0 0',
                          store: scodeStore,
-                         displayField: 'parameterName',
+                         displayField: 'parameterCode',
                          valueField: 'parameterCode',
                          typeAhead: true,
                          forceSelection: false,
                          queryMode: 'local',
                          allowBlank: true,
                          emptyText: '請選擇',
-                         value:''
+                         value: '',
+                         labelWidth:60
                      },
                      {
                          xtype: 'displayfield',
                          fieldLabel: '查詢日期',
-                         margin: '0 0 0 5'
+                         margin: '0 0 0 5',
+                         labelWidth: 60
                      },
                     {
                         xtype: 'datefield',
@@ -169,7 +171,7 @@ Ext.onReady(function ()
                         xtype: 'datefield',
                         id: 'enddate',
                         name: 'enddate',
-                        margin: '0 5px',
+                        margin: '0 5',
                         editable: false,
                         value: new Date(),
                         format: 'Y/m/d',
@@ -181,7 +183,7 @@ Ext.onReady(function ()
                         id: 'ImportExcel',
                         width: 400,
                         labelWidth:70,
-                        anchor: '100%',
+                        anchor: '80%',
                         name: 'ImportExcel',
                         fieldLabel: '匯入Excel',
                         buttonText: '選擇Excel...'
@@ -189,7 +191,7 @@ Ext.onReady(function ()
                     {
                         xtype: 'displayfield',
                         margin:'0 0 0 10',
-                        value: '<a href="/Template/SiteStatistics/廣告成效匯入範本.xlsx">範例下載</a>'
+                        value: '<a href="/Template/SiteStatistics/站臺訪問量統計匯入範本.xlsx">範例下載</a>'
                     },
                     {
                         xtype: 'button',
