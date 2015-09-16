@@ -185,5 +185,14 @@ namespace Resources {
                 return ResourceManager.GetString("SINGLE_SPEC_PRICE_WRONG", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 可使用抵用券的金額不足！請確認后再輸入~ 的本地化字符串。
+        /// </summary>
+        internal static string WELFARE_PRICE_NULL {
+            get {
+                return ResourceManager.GetString("WELFARE_PRICE_NULL", resourceCulture);
+            }
+        }
     }
 }
