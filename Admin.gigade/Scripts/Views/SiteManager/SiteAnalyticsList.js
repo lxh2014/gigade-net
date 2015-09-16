@@ -10,8 +10,7 @@ Ext.define('gigade.SiteAnalyticsList', {
         { name: "sa_create_user", type: "int" },
         { name: "s_sa_create_user", type: "string" },
         { name: "s_sa_date", type: "string" },
-        { name: "s_sa_create_time", type: "string" },
-             
+        { name: "s_sa_create_time", type: "string" },  
         { name: "sa_pageviews", type: "int" },
         { name: "sa_pages_session", type: "string" },
         { name: "sa_bounce_rate", type: "string" },
@@ -297,6 +296,4 @@ onDeleteClick = function () {
     });
     ToolAuthority();
    // SiteAnalyticsListStore.load({ params: { start: 0, limit: 25 } });
-
-
 });

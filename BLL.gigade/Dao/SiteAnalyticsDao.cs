@@ -46,7 +46,6 @@ namespace BLL.gigade.Dao
                     }
                 }
                 sqlWhere.AppendFormat(" order by sa_date desc limit {0},{1}; ", query.Start, query.Limit);
-
                 return _accessMySql.getDataTableForObj<SiteAnalytics>(sql.ToString() + sqlFrom.ToString() + sqlWhere.ToString());
             }
             catch (Exception ex)

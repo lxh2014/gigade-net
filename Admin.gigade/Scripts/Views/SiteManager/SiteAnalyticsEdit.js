@@ -82,7 +82,7 @@ function editFunction(RowID, Store) {
             name: 'sa_bounce_rate',
             id: 'sa_bounce_rate',
             margin: '10 0 10 0',
-            maxValue: 2147483647,
+            maxValue: 100,
             minValue: 0,
             allowBlank: false,
             hideTrigger:true
@@ -95,6 +95,7 @@ function editFunction(RowID, Store) {
             margin: '10 0 10 0',
             maxValue: 2147483647,
             minValue: 0,
+            decimalPrecision: 5,
             allowBlank: false,
             hideTrigger:true
         }

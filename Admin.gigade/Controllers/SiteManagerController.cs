@@ -390,7 +390,6 @@ namespace Admin.gigade.Controllers
             }
         }
 
-
         public void ExportExcelStatistics()
         {
             try
@@ -410,37 +409,29 @@ namespace Admin.gigade.Controllers
                 DataTable _dt = ssMgr.GetSiteStatisticsList(query, out totalCount);
                 DataTable _newDt = new DataTable();
                 _newDt.Columns.Add("日期", typeof(string));
-                _newDt.Columns.Add("曝光", typeof(string));
-                _newDt.Columns.Add("點擊", typeof(string));
+                _newDt.Columns.Add("曝光數", typeof(string));
+                _newDt.Columns.Add("點閱數", typeof(string));
                 _newDt.Columns.Add("點閱率", typeof(string));
                 _newDt.Columns.Add("費用", typeof(string));
-                _newDt.Columns.Add("會員數", typeof(string));
-                //_newDt.Columns.Add("新會員成本", typeof(string));
+                _newDt.Columns.Add("新會員數", typeof(string));
                 _newDt.Columns.Add("實際轉換", typeof(string));
-                // _newDt.Columns.Add("轉換率", typeof(string));
-                //_newDt.Columns.Add("平均訂單金額", typeof(string));
                 _newDt.Columns.Add("訂單金額", typeof(string));
                 _newDt.Columns.Add("廠商代碼", typeof(string));
                 for (int i = 0; i < _dt.Rows.Count; i++)
                 {
                     DataRow newRow = _newDt.NewRow();
                     newRow["日期"] = Convert.ToDateTime(_dt.Rows[i]["ss_date"]).ToString("MM/dd/yyyy"); ;
-                    newRow["曝光"] = GetString(_dt.Rows[i]["ss_show_num"].ToString());
-                    newRow["點擊"] = GetString(_dt.Rows[i]["ss_click_num"].ToString());
+                    newRow["曝光數"] = _dt.Rows[i]["ss_show_num"].ToString();
+                    newRow["點閱數"] = _dt.Rows[i]["ss_click_num"].ToString();
                     newRow["點閱率"] = _dt.Rows[i]["ss_click_through"].ToString();
                     newRow["費用"] = _dt.Rows[i]["ss_cost"].ToString();
-                    newRow["會員數"] = GetString(_dt.Rows[i]["ss_newuser_number"].ToString());
-                    newRow["實際轉換"] = GetString(_dt.Rows[i]["ss_converted_newuser"].ToString());
-                    newRow["訂單金額"] = GetString(_dt.Rows[i]["ss_sum_order_amount"].ToString());
+                    newRow["新會員數"] = _dt.Rows[i]["ss_newuser_number"].ToString();
+                    newRow["實際轉換"] = _dt.Rows[i]["ss_converted_newuser"].ToString();
+                    newRow["訂單金額"] = _dt.Rows[i]["ss_sum_order_amount"].ToString();
                     newRow["廠商代碼"] = _dt.Rows[i]["ss_code"].ToString();
-                    //newRow[1] = GetString(_dt.Rows[i]["ss_show_num"].ToString());
-                    //newRow[2] = GetString(_dt.Rows[i]["ss_click_num"].ToString());
 
                     _newDt.Rows.Add(newRow);
                 }
-                //_dt.Columns["sa_date"].ColumnName = "日索引";
-                //_dt.Columns["sa_work_stage"].ColumnName = "工作階段";
-                //_dt.Columns["sa_user"].ColumnName = "使用者";
                 string fileName = "站臺訪問量統計" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
                 MemoryStream ms = ExcelHelperXhf.ExportDT(_newDt, "");
                 Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
