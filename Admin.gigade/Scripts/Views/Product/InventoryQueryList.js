@@ -198,7 +198,7 @@ Ext.onReady(function () {
                         margin: '0 0 0 10',
                         fieldLabel: '庫存數量',                
                         value: 0,
-                        minValue: -1000000,
+                        minValue: -999999,
                         maxValue: 99999,
                         anchor: '100%',
                         listeners: {
@@ -229,7 +229,7 @@ Ext.onReady(function () {
                         labelWidth: 100,
                         margin: '0 0 0 10', 
                         value: 0,
-                        minValue: -1000000,
+                        minValue: -999999,
                         maxValue: 99999,
                         listeners: {
                             specialkey: function (field, e) {
