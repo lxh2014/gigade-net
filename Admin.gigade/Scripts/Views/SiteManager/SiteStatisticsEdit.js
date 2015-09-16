@@ -86,7 +86,7 @@
                    fieldLabel: '新會員數',
                    name: 'ss_newuser_number',
                    id: 'ss_newuser_number',
-                   allowDecimals: true,
+                   allowDecimals: false,
                    decimalPrecision: 2,
                    allowBlank: false,
                    submitValue: true,

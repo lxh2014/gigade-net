@@ -3806,7 +3806,7 @@
     </Content>
     <Content Include="Views\Super\Index.cshtml" />
     <Content Include="Views\Product\InventoryQuery.cshtml" />
-    <Content Include="Template\SiteStatistics\廣告成效匯入範本.xlsx" />
+    <Content Include="Template\SiteStatistics\站臺訪問量統計匯入範本.xlsx" />
     <Content Include="Views\OrderManage\OrderDetailManage.cshtml" />
     <Content Include="Template\SiteAnalytics\SiteAnalytics.xlsx" />
     <None Include="Web.Debug.config">
@@ -3834,7 +3834,6 @@
     <Folder Include="ImportOrderExcel\" />
     <Folder Include="ImportOrderPDF\" />
     <Folder Include="ImportTransportExcel\" />
-    <Folder Include="ImportUserIOExcel\statistics\" />
     <Folder Include="ImportVendorCsv\" />
     <Folder Include="kindeditor\attached\" />
     <Folder Include="Locale\en-US\" />

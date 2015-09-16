@@ -37,7 +37,8 @@ function editFunction(RowID, Store) {
             maxValue: 2147483647,
             minValue: 0,
             allowBlank: false,
-            hideTrigger:true
+            hideTrigger: true,
+            allowDecimals: false
         },
         {
             xtype: 'numberfield',
@@ -48,7 +49,8 @@ function editFunction(RowID, Store) {
             maxValue: 2147483647,
             minValue: 0,
             allowBlank: false,
-            hideTrigger:true
+            hideTrigger: true,
+            allowDecimals: false
         },
         {
             xtype: 'numberfield',
@@ -59,7 +61,8 @@ function editFunction(RowID, Store) {
             maxValue: 2147483647,
             minValue: 0,
             allowBlank: false,
-            hideTrigger:true
+            hideTrigger: true,
+            allowDecimals: false
         },
         {
         xtype: 'numberfield',
@@ -70,7 +73,8 @@ function editFunction(RowID, Store) {
         maxValue: 2147483647,
         minValue: 0,
         allowBlank: false,
-        hideTrigger:true
+        hideTrigger: true,
+        allowDecimals: false
         },
         {
             xtype: 'textfield',
