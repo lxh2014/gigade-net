@@ -212,7 +212,7 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("商品編號", typeof(String));
                 dtHZ.Columns.Add("商品名稱", typeof(String));
                 dtHZ.Columns.Add("品牌名稱", typeof(String));
-                dtHZ.Columns.Add("用戶姓名", typeof(String));
+                dtHZ.Columns.Add("用戶名稱", typeof(String));
                 //dtHZ.Columns.Add("用戶郵箱", typeof(String));
                 dtHZ.Columns.Add("留言狀態", typeof(String));
                 dtHZ.Columns.Add("留言內容", typeof(String));//--處理
@@ -244,7 +244,13 @@ namespace Admin.gigade.Controllers
                     dr[5] = store.Rows[i]["user_name"];
                     //dr[4] = store[i].user_email;
                     comment_info = store.Rows[i]["is_show_name"].ToString();
-                    dr[6] = Convert.ToInt32(comment_info) == 0 ? "匿名" : "公開";//0-匿名，1-公開
+                    if (comment_info != "")
+                    {
+                        dr[6] = Convert.ToInt32(comment_info) == 0 ? "匿名" : "公開";//0-匿名，1-公開
+                    }
+                    else {
+                        dr[6] = "";
+                    }
                     comment_info = store.Rows[i]["comment_info"].ToString();
                     comment_info = comment_info.Replace(',', '，');
                     comment_info = comment_info.Replace("\n", "");
@@ -253,29 +259,40 @@ namespace Admin.gigade.Controllers
                     dr[8] = store.Rows[i]["comment_answer"].ToString().Replace(',', '，').Replace("\r", "").Replace("\n", "");
                     //   dtHZ.Columns.Add("留言回覆", typeof(String));
                     comment_info = store.Rows[i]["answer_is_show"].ToString();
-                    dr[9] = Convert.ToInt32(comment_info) == 0 ? "隱藏" : "顯示";
+                    if (comment_info != "")
+                    {
+                        dr[9] = Convert.ToInt32(comment_info) == 0 ? "隱藏" : "顯示";
+                    }
+                    else {
+                        dr[9] = "";
+                    }
                     dr[10] = Satisfaction(Convert.ToInt32(store.Rows[i]["product_desc"].ToString()));//滿意度
                     dr[11] = Satisfaction(Convert.ToInt32(store.Rows[i]["seller_server"].ToString()));
                     dr[12] = Satisfaction(Convert.ToInt32(store.Rows[i]["web_server"].ToString()));
                     dr[13] = Satisfaction(Convert.ToInt32(store.Rows[i]["logistics_deliver"].ToString()));
                     dr[14] = store.Rows[i]["s_reply_user"];
-
-                    if (CommonFunction.DateTimeToString(Convert.ToDateTime(store.Rows[i]["reply_time"].ToString())) == "1970-01-01 08:00:00")
+                    if (!string.IsNullOrEmpty(store.Rows[i]["reply_time"].ToString()))
                     {
+                        if (CommonFunction.DateTimeToString(Convert.ToDateTime(store.Rows[i]["reply_time"].ToString())) == "1970-01-01 08:00:00")
+                        {
+                            dr[15] = "";
+                        }                    
+                        else
+                        {
+                            dr[15] = CommonFunction.DateTimeToString(Convert.ToDateTime(store.Rows[i]["reply_time"].ToString()));                           
+                        }
+                    }
+                    else {
                         dr[15] = "";
                     }
-                    //if (CommonFunction.DateTimeToString(CommonFunction.GetNetTime((long)Convert.ToInt32(store.Rows[i]["reply_time"].ToString()))) == "1970-01-01 08:00:00")
-                    //{
-                    //    dr[15] = "";
-                    //}
-                    else
-                    {
-                        dr[15] = CommonFunction.DateTimeToString(Convert.ToDateTime(store.Rows[i]["reply_time"].ToString()));
-                        //dr[15] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime((long)Convert.ToInt32(store.Rows[i]["reply_time"].ToString())));
-
-                    }
                     comment_info = store.Rows[i]["status"].ToString();
-                    dr[16] = Convert.ToInt32(comment_info) == 1 ? "開啟" : "關閉";//1,開啟。2.關閉
+                    if (comment_info != "")
+                    {
+                        dr[16] = Convert.ToInt32(comment_info) == 1 ? "開啟" : "關閉";//1,開啟。2.關閉
+                    }
+                    else {
+                        dr[16] = "";
+                    }
                     dtHZ.Rows.Add(dr);
                 }
                 if (!System.IO.Directory.Exists(Server.MapPath(excelPath)))

@@ -417,7 +417,6 @@ function Tomorrow(month)
 {
     var d;
     d = new Date();                             // 创建 Date 对象。
-    //d.setDate(d.getDate() + days);
     d.setMonth(d.getMonth() - 1);
     return d;
 }

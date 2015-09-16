@@ -116,41 +116,6 @@
                   minValue: 0.00,
                   value: 0.00
               },
-              // {
-              //     xtype: 'numberfield',
-              //     fieldLabel: '預算',
-              //     name: 'ss_budget',
-              //     id: 'ss_budget',
-              //     allowDecimals: true,
-              //     decimalPrecision: 2,
-              //     allowBlank: false,
-              //     submitValue: true,
-              //     minValue: 0.00,
-              //     value: 0.00
-              // },
-              //{
-              //    xtype: 'numberfield',
-              //    fieldLabel: '有效點閱數',
-              //    id: 'ss_effect_num',
-              //    name: 'ss_effect_num',
-              //    allowBlank: false,
-              //    allowDecimals: false,
-              //    minValue: 0,
-              //    value: 0,
-              //    submitValue: true
-              //},
-              //{
-              //    xtype: 'numberfield',
-              //    fieldLabel: '平均排名',
-              //    name: 'ss_rank',
-              //    id: 'ss_rank',
-              //    allowDecimals: true,
-              //    decimalPrecision: 2,
-              //    allowBlank: false,
-              //    submitValue: true,
-              //    minValue: 0.00,
-              //    value: 0.00
-              //},
                {
                    xtype: 'combobox', //status
                    fieldLabel: '廠家代碼',
@@ -164,7 +129,7 @@
                        shadow: "sides"
                    },
                    store: sscodeStore,
-                   displayField: 'parameterName',
+                   displayField: 'parameterCode',
                    valueField: 'parameterCode',
                    typeAhead: true,
                    queryMode:'local',
@@ -193,28 +158,6 @@
                        }
                    }
                }
-               //,
-               //{
-               //    xtype: 'displayfield',
-               //    fieldLabel: '建立時間',
-               //    id: 'created',
-               //    name: 'created',
-               //    hidden: true
-               //},
-               //{
-               //    xtype: 'displayfield',
-               //    fieldLabel: '修改時間',
-               //    id: 'modified',
-               //    name: 'modified',
-               //    hidden: true
-               //},
-               //{
-               //    xtype: 'displayfield',
-               //    fieldLabel: '來源IP',
-               //    id: 'ipfrom',
-               //    name: 'ipfrom',
-               //    hidden: true
-               //}
         ],
         buttons: [{
             formBind: true,
