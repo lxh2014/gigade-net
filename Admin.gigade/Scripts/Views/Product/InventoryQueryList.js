@@ -51,6 +51,8 @@ var ProductStore = Ext.create('Ext.data.Store', {//ProductStore
     }
 });
 
+
+//定義商品狀態的model
 Ext.define("gigade.gridPara", {
     extend: 'Ext.data.Model',
     fields: [
@@ -123,26 +125,21 @@ Ext.onReady(function () {
                                   }
                               }
                           }
-                      }
-                ]
-            }, {
-                xtype: 'fieldcontainer',
-                layout: 'hbox',
-                items: [
-                      {
-                          xtype: 'textfield',
-                          id: 'product_id_OR_product_name',
-                          labelWidth: 100,
-                          fieldLabel: '商品編號/名稱',
-                          margin: '0 0 0 10',
-                          listeners: {
-                              specialkey: function (field, e) {
-                                  if (e.getKey() == Ext.EventObject.ENTER) {
-                                      Query();
-                                  }
-                              }
-                          }
-                      }
+                      },
+                       {
+                           xtype: 'textfield',
+                           id: 'product_id_OR_product_name',
+                           labelWidth: 100,
+                           fieldLabel: '商品編號/名稱',
+                           margin: '0 0 0 10',
+                           listeners: {
+                               specialkey: function (field, e) {
+                                   if (e.getKey() == Ext.EventObject.ENTER) {
+                                       Query();
+                                   }
+                               }
+                           }
+                       }
                 ]
             }, {
                 xtype: 'fieldcontainer',
@@ -161,12 +158,7 @@ Ext.onReady(function () {
                                   }
                               }
                           }
-                      }
-                ]
-            }, {
-                xtype: 'fieldcontainer',
-                layout: 'hbox',
-                items: [
+                      },
                       {
                           xtype: 'combobox',
                           margin: '0 0 0 10',
@@ -189,6 +181,12 @@ Ext.onReady(function () {
                               }
                           }
                       }
+                ]
+            }, {
+                xtype: 'fieldcontainer',
+                layout: 'hbox',
+                items: [
+                      
                 ]
             }, {
                 xtype: 'fieldcontainer',
@@ -314,7 +312,7 @@ Ext.onReady(function () {
                 { header: "品牌名稱", dataIndex: "brand_name", width: 180 },
                 { header: "商品狀態", dataIndex: "product_status_string" },
                 { header: "庫存數量", dataIndex: "item_stock" },
-                { header: "補貨中停止販售 ", dataIndex: "ignore_stock_string" },
+                { header: "補貨中停止販售 ", dataIndex: "ignore_stock_string" }
         ],
         tbar: [
         { xtype: 'button', text: '匯出Excel', margin: '0 0 0 5', iconCls: 'icon-excel', id: 'btnExcel', handler: Export }

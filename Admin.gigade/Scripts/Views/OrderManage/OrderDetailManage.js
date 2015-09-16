@@ -144,7 +144,7 @@ Ext.onReady(function () {
             }
         }
     });
-    OrderDetailManageStore.load({ params: { start: 0, limit: 25 } });
+    //OrderDetailManageStore.load({ params: { start: 0, limit: 25 } });
 })
 
 var addClick = function () {

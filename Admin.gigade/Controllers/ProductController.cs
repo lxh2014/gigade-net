@@ -6037,11 +6037,6 @@ namespace Admin.gigade.Controllers
                     query.ignore_stock = Convert.ToInt32(Request.Params["ignore_stockRdo"]);//补货中停止贩售
                 }
                 List<ArrivalNoticeQuery> list = arrivalnoticemgr.GetInventoryQueryList(query, out totalcount);
-                //如果查詢數據為空,怎麼進行提示,或給出提示信息!!!
-                //if (list.Count==0)
-                //{
-                //    this.Response.Write("暫無數據顯示<br/>");
-                //}
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 timeConverter.DateTimeFormat = "yyyy-MM-dd";

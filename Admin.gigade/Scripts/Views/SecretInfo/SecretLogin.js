@@ -430,7 +430,7 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                 hidden: true
             },
             {
-                fieldLabel: '髮卡銀行',
+                fieldLabel: '發卡銀行',
                 id: 'bankname',
                 name: 'bankname',
                 hidden: true

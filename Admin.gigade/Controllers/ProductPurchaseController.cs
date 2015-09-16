@@ -458,10 +458,18 @@ namespace Admin.gigade.Controllers
             {
                 query.vendor_name_full_OR_vendor_id = Request.Params["vendor_name_full_OR_vendor_id"];//供應商名稱/供應商編號
             }
-            if (!string.IsNullOrEmpty(Request.Params["product_id"]))//商品編號
+            // 要修改商品編號  改為 商品編號/名稱
+
+            //if (!string.IsNullOrEmpty(Request.Params["product_id"]))//商品編號
+            //{
+            //    query.product_id = Convert.ToUInt32(Request.Params["product_id"]);
+            //}
+
+            if (!string.IsNullOrEmpty(Request.Params["product_id_OR_product_name"]))
             {
-                query.product_id = Convert.ToUInt32(Request.Params["product_id"]);
+                query.product_id_OR_product_name = Request.Params["product_id_OR_product_name"];//商品编号/名称
             }
+
             if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
             {
                 query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
@@ -680,9 +688,9 @@ namespace Admin.gigade.Controllers
                 {
                     query.vendor_name_full_OR_vendor_id = Request.Params["vendor_name_full_OR_vendor_id"];//供應商名稱/供應商編號
                 }
-                if (!string.IsNullOrEmpty(Request.Params["product_id"]))//商品編號
+                if (!string.IsNullOrEmpty(Request.Params["product_id_OR_product_name"]))//商品編號或商品名稱
                 {
-                    query.product_id = Convert.ToUInt32(Request.Params["product_id"]);
+                    query.product_id_OR_product_name = Request.Params["product_id_OR_product_name"];
                 }
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
                 {

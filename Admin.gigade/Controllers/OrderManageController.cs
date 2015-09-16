@@ -4159,7 +4159,7 @@ namespace Admin.gigade.Controllers
                        msg = "error slave!";
                        break;
                    case 4:
-                       msg = "取得身分證字號失敗!";
+                       msg = "取得身份證字號失敗!";
                        break;
                    case 5:
                        msg = "bonus type error !";
