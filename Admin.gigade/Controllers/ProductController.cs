@@ -6036,7 +6036,7 @@ namespace Admin.gigade.Controllers
                 {
                     query.ignore_stock = Convert.ToInt32(Request.Params["ignore_stockRdo"]);//补货中停止贩售
                 }
-                List<ArrivalNoticeQuery> list = arrivalnoticemgr.GetInventoryQueryList(query, out totalcount);
+                List<ProductItemQuery> list = arrivalnoticemgr.GetInventoryQueryList(query, out totalcount);
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 timeConverter.DateTimeFormat = "yyyy-MM-dd";
@@ -6104,7 +6104,7 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("商品狀態", typeof(String));
                 dtHZ.Columns.Add("庫存數量", typeof(String));
                 dtHZ.Columns.Add("補貨中停止販售", typeof(String));
-                List<ArrivalNoticeQuery> list = new List<ArrivalNoticeQuery>();
+                List<ProductItemQuery> list = new List<ProductItemQuery>();
                 arrivalnoticemgr = new ArrivalNoticeMgr(connectionString);
                 list = arrivalnoticemgr.GetInventoryQueryList(query, out totalcount);
                 if (list.Count > 0)
@@ -6112,39 +6112,42 @@ namespace Admin.gigade.Controllers
                     for (int i = 0; i < list.Count; i++)
                     {
                         DataRow dr = dtHZ.NewRow();
-                        dr[0] = list[i].product_id;
+                        dr[0] = list[i].Product_Id;
                         dr[1] = list[i].product_name;
-                        dr[2] = list[i].item_id;
+                        dr[2] = list[i].Item_Id;
                         dr[3] = list[i].product_spec;
                         dr[4] = list[i].vendor_id;
                         dr[5] = list[i].vendor_name_full;
                         dr[6] = list[i].brand_id;
                         dr[7] = list[i].brand_name;
-                        if (list[i].product_status == 0)
-                        {
-                            dr[8] = "新建立商品";
-                        }
-                        if (list[i].product_status == 1)
-                        {
-                            dr[8] = "申請審核";
-                        }
-                        if (list[i].product_status == 2)
-                        {
-                            dr[8] = "審核通過";
-                        }
-                        if (list[i].product_status == 5)
-                        {
-                            dr[8] = "上架";
-                        }
-                        if (list[i].product_status == 6)
-                        {
-                            dr[8] = "下架";
-                        }
-                        if (list[i].product_status == 20)
-                        {
-                            dr[8] = "供應商新建商品";
-                        }
-                        dr[9] = list[i].item_stock;
+                        dr[8] = list[i].product_status_string;
+
+                        //if (list[i].product_status == 0)
+                        //{
+                        //    dr[8] = "新建立商品";
+                        //}
+                        //if (list[i].product_status == 1)
+                        //{
+                        //    dr[8] = "申請審核";
+                        //}
+                        //if (list[i].product_status == 2)
+                        //{
+                        //    dr[8] = "審核通過";
+                        //}
+                        //if (list[i].product_status == 5)
+                        //{
+                        //    dr[8] = "上架";
+                        //}
+                        //if (list[i].product_status == 6)
+                        //{
+                        //    dr[8] = "下架";
+                        //}
+                        //if (list[i].product_status == 20)
+                        //{
+                        //    dr[8] = "供應商新建商品";
+                        //}
+
+                        dr[9] = list[i].Item_Stock;
                         if (list[i].ignore_stock == 0)
                         {
                             dr[10] = "否";
