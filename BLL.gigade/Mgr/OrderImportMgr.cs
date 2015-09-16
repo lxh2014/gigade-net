@@ -1453,7 +1453,7 @@ namespace BLL.gigade.Mgr
         /// <param name="bm">bonus_master</param>
         /// <param name="br">bonus_record</param>
         /// <returns></returns>
-        public bool Save2DB(OrderMaster master, List<OrderSlave> slaves, List<ChannelOrder> cOrders, List<OrdersImport> all, OrderMasterPattern op = null, BonusMaster bm = null, BonusRecord br = null)
+        public bool Save2DB(OrderMaster master, List<OrderSlave> slaves, List<ChannelOrder> cOrders, List<OrdersImport> all, OrderMasterPattern op = null, BonusMaster bm = null, BonusRecord brBonus = null, BonusRecord brWelfare = null)
         {
             try
             {
@@ -1472,6 +1472,7 @@ namespace BLL.gigade.Mgr
                     orderPayment = _orderPaymentHncbMgr.AddPaymentHncb(orderPaymentHncb);
                 }
 
+                #region 使用 購物金 和 抵用卷   add by zhuoqin0830w 2015/08/24
                 //添加 bonus_master 的數據新增  add by zhuoqin0830w 2015/08/24
                 SerialDao _serialDao = new SerialDao(MySqlConnStr);
                 _bonusMasterMgr = new BonusMasterMgr(MySqlConnStr);
@@ -1484,15 +1485,15 @@ namespace BLL.gigade.Mgr
                     bm.master_id = Convert.ToUInt32(ser.Serial_Value);
                 }
                 string bonusMaster = bm == null ? string.Empty : _bonusMasterMgr.AddBonusMaster(bm);
-
                 //對 bonus_record 的數據新增  和 對 bonus_master 數據 修改  add by zhuoqin0830w 2015/08/25
                 _bonusRecordMgr = new BonusRecordMgr(MySqlConnStr);
                 string bonusRecord = string.Empty;
-                if (br != null)
+                //購物金
+                if (brBonus != null)
                 {
-                    List<BonusMaster> queryBonusMaster = _bonusMasterMgr.GetBonusMasterByEndTime(br);
+                    List<BonusMaster> queryBonusMaster = _bonusMasterMgr.GetBonusByEndTime(brBonus);
                     //將前臺的到的購物金額存儲
-                    int useBonus = (int)br.record_use;
+                    int useBonus = (int)brBonus.record_use;
                     foreach (BonusMaster bonus in queryBonusMaster)
                     {
                         //判斷 從 bonus_master 裱中查詢出來的 master_balance 是否 大於用戶 使用金額  如果大於 就 使用 用戶金額  如果小於  則使用 master_balance 金額 
@@ -1503,13 +1504,13 @@ namespace BLL.gigade.Mgr
                             Serial ser = _serialDao.GetSerialById(28);
                             ser.Serial_Value = ser.Serial_Value + 1;
                             _serialDao.Update(ser);
-                            br.record_id = Convert.ToUInt32(ser.Serial_Value);
-                            br.master_id = bonus.master_id;
-                            br.type_id = bonus.type_id;
-                            br.record_use = Convert.ToUInt32(decuteBonusNum);
-                            br.record_note = bonus.master_note;
-                            br.record_writer = bonus.master_writer;
-                            bonusRecord += _bonusRecordMgr.InsertBonusRecord(br);
+                            brBonus.record_id = Convert.ToUInt32(ser.Serial_Value);
+                            brBonus.master_id = bonus.master_id;
+                            brBonus.type_id = bonus.type_id;
+                            brBonus.record_use = Convert.ToUInt32(decuteBonusNum);
+                            brBonus.record_note = bonus.master_note;
+                            brBonus.record_writer = bonus.master_writer;
+                            bonusRecord += _bonusRecordMgr.InsertBonusRecord(brBonus);
                             //使 bonus_master 裱中的 購物金 減去 使用的購物金
                             bonus.master_balance = bonus.master_balance - decuteBonusNum;
                             bonus.master_updatedate = Convert.ToUInt32(BLL.gigade.Common.CommonFunction.GetPHPTime());
@@ -1521,6 +1522,41 @@ namespace BLL.gigade.Mgr
                         }
                     }
                 }
+                //抵用卷
+                if (brWelfare != null)
+                {
+                    List<BonusMaster> queryBonusMaster = _bonusMasterMgr.GetWelfareByEndTime(brWelfare);
+                    //將前臺的到的抵用券金額存儲
+                    int useWelfare = (int)brWelfare.record_use;
+                    foreach (BonusMaster bonus in queryBonusMaster)
+                    {
+                        //判斷 從 bonus_master 裱中查詢出來的 master_balance 是否 大於用戶 使用金額  如果大於 就 使用 用戶金額  如果小於  則使用 master_balance 金額 
+                        int decuteWelfareNum = bonus.master_balance > useWelfare ? useWelfare : bonus.master_balance;
+                        if (decuteWelfareNum > 0)
+                        {
+                            //使用 Serial 表中的 流水賬號
+                            Serial ser = _serialDao.GetSerialById(28);
+                            ser.Serial_Value = ser.Serial_Value + 1;
+                            _serialDao.Update(ser);
+                            brWelfare.record_id = Convert.ToUInt32(ser.Serial_Value);
+                            brWelfare.master_id = bonus.master_id;
+                            brWelfare.type_id = bonus.type_id;
+                            brWelfare.record_use = Convert.ToUInt32(decuteWelfareNum);
+                            brWelfare.record_note = bonus.master_note;
+                            brWelfare.record_writer = bonus.master_writer;
+                            bonusRecord += _bonusRecordMgr.InsertBonusRecord(brWelfare);
+                            //使 bonus_master 裱中的 購物金 減去 使用的購物金
+                            bonus.master_balance = bonus.master_balance - decuteWelfareNum;
+                            bonus.master_updatedate = Convert.ToUInt32(BLL.gigade.Common.CommonFunction.GetPHPTime());
+                            bonusMaster += _bonusMasterMgr.UpdateBonusMasterBalance(bonus);
+                            //將 前臺傳來的總金額 減去使用金額
+                            useWelfare -= decuteWelfareNum;
+                            //如果useBonus == 0 為 true  則表示 使用金已經用完 可以不用在循環到下一步
+                            if (useWelfare == 0) { break; }
+                        }
+                    }
+                }
+                #endregion
 
                 ArrayList orderSlavesSql = new ArrayList();
                 ArrayList orderDetailsSql = new ArrayList();
@@ -1637,7 +1673,6 @@ namespace BLL.gigade.Mgr
         #endregion
 
         #region 查询商品
-
         public Product QueryProduct(uint produtId)
         {
             try
@@ -1651,6 +1686,5 @@ namespace BLL.gigade.Mgr
             }
         }
         #endregion
-
     }
 }

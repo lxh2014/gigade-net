@@ -74,7 +74,7 @@ function editFunction(RowID, Store) {
         minValue: 0,
         allowBlank: false,
         hideTrigger: true,
-        allowDecimals: false
+        decimalPrecision: 2
         },
         {
             xtype: 'numberfield',
@@ -118,9 +118,9 @@ function editFunction(RowID, Store) {
                         type: 'text',
                         success: function (msg) {
                             if (msg.success == 'true') {
+                                result1++;
                                 Ext.Msg.alert(INFORMATION, '已存在該日索引');
                                 Ext.getCmp("s_sa_date").setValue('');
-                                result1++;
                             }
                         },
                         error: function (msg) {

@@ -851,11 +851,11 @@ namespace Admin.gigade.Controllers
                                 if (pList.Count() <= 0)
                                 {
                                     jsonStr = "{success:false,msg:'" + Resources.OrderAdd.PRODUCT_NOT_EXIST + "'}";//商品不存在
-                                    this.Response.Clear();
-                                    this.Response.Write(jsonStr);
-                                    this.Response.End();
-                                    return this.Response;
-                                }
+            this.Response.Clear();
+            this.Response.Write(jsonStr);
+            this.Response.End();
+            return this.Response;
+        }
                                 //補貨中停止販售 1:是 0:否
                                 if (pList[0].Shortage == 1)
                                 {
@@ -946,7 +946,7 @@ namespace Admin.gigade.Controllers
                                 {
                                     jsonStr = "{success:false,msg:'" + Resources.OrderAdd.PRODUCT_PRICE_NOT_EXIST + "'}";
                                 }
-                                #endregion
+        #endregion
                             }
                             else
                             {
@@ -1683,150 +1683,117 @@ namespace Admin.gigade.Controllers
 
                         if (orderType == 1)
                         {
-                            #region 重新計算組合商品價格
-                            IPriceMasterImplMgr priceMgr = new PriceMasterMgr(connectionString);
+                        #region 重新計算組合商品價格
+                        IPriceMasterImplMgr priceMgr = new PriceMasterMgr(connectionString);
 
-                            var parentList = from rec in odcList2 where rec.parent_id == 0 && rec.Item_Id == 0 && rec.price_type != 2 select rec;  //rec.price_type!=2:各自定價的價格是從表中讀取的，所以到後臺不需要重新計算價格
+                        var parentList = from rec in odcList2 where rec.parent_id == 0 && rec.Item_Id == 0 && rec.price_type != 2 select rec;  //rec.price_type!=2:各自定價的價格是從表中讀取的，所以到後臺不需要重新計算價格
 
-                            var singleList = from rec in odcList2 where rec.Item_Id != 0 && rec.parent_id == 0 select rec;
+                        var singleList = from rec in odcList2 where rec.Item_Id != 0 && rec.parent_id == 0 select rec;
 
-                            var priceSelfList = from rec in odcList2 where rec.Item_Id == 0 && rec.parent_id == 0 && rec.price_type == 2 select rec;
+                        var priceSelfList = from rec in odcList2 where rec.Item_Id == 0 && rec.parent_id == 0 && rec.price_type == 2 select rec;
 
-                            //單一商品計算價格
-                            foreach (var item in singleList)
+                        //單一商品計算價格
+                        foreach (var item in singleList)
+                        {
+                            //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
+                            productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
+                            // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
+                            deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
+                            deduct_welfareTotal += uint.Parse(item.deduct_welfare.ToString());
+                            PriceMaster pM = priceMgr.QueryPriceMaster(new PriceMaster
                             {
-                                //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
-                                productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
-                                // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
-                                deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
-                                deduct_welfareTotal += uint.Parse(item.deduct_welfare.ToString());
+                                product_id = uint.Parse(item.Product_Id.ToString()),
+                                user_id = 0,
+                                user_level = 1,
+                                site_id = 1,
+                                child_id = 0
+                            });
+                            if (pM != null)
+                            {
+                                odcList2.Find(rec => rec.Product_Id == item.Product_Id).price_master_id = pM.price_master_id;
+                            }
+                        }
+
+                        //組合商品各自定價計算價格
+                        foreach (var item in priceSelfList)
+                        {
+                            //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
+                            productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
+
+                            // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
+                            deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
+                            deduct_welfareTotal += uint.Parse(item.deduct_welfare.ToString());
+
+                            PriceMaster pM = priceMgr.QueryPriceMaster(new PriceMaster { product_id = item.Product_Id, user_id = 0, user_level = 1, site_id = 1, child_id = Convert.ToInt32(item.Product_Id) });
+                            if (pM != null)
+                            {
+                                odcList2.Find(rec => rec.Product_Id == item.Product_Id && rec.group_id == item.group_id).price_master_id = pM.price_master_id;
+                            }
+                            //找出當前父商品的子商品
+                            var childList = from rec in odcList2 where rec.parent_id == item.Product_Id && rec.group_id == item.group_id select rec;
+                            foreach (var child in childList)
+                            {
+                                pM = priceMgr.QueryPriceMaster(new PriceMaster { product_id = item.Product_Id, user_id = 0, user_level = 1, site_id = 1, child_id = Convert.ToInt32(child.Product_Id) });
+                                if (pM != null)
+                                {
+                                    IItemPriceImplMgr iPMgr = new ItemPriceMgr(connectionString);
+                                    ItemPrice price = iPMgr.Query(new ItemPrice { item_id = child.Item_Id, price_master_id = pM.price_master_id }).FirstOrDefault();
+                                    if (price != null)
+                                    {
+                                        odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Item_Cost = price.item_cost;       //成本
+                                        odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Event_Item_Cost = price.event_cost;//活動成本
+                                        odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Item_Money = price.item_money;//售價
+                                    }
+                                }
+                            }
+                        }
+
+                        //組合商品按比例拆分計算價格
+                        foreach (var item in parentList)
+                        {
+                            var TotalPrice = 0.0;
+                            var TotalCost = 0.0;
+                            //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
+                            productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
+
+                            // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
+                            deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
+                            deduct_welfareTotal += uint.Parse(item.deduct_welfare.ToString());
+
+                            PriceMaster pMaster = priceMgr.QueryPriceMaster(new PriceMaster
+                            {
+                                product_id = uint.Parse(item.Product_Id.ToString()),
+                                user_id = 0,
+                                user_level = 1,
+                                site_id = 1,
+                                child_id = int.Parse(item.Product_Id.ToString())
+                            });
+                            odcList2.Find(rec => rec.Product_Id == item.Product_Id && rec.group_id == item.group_id).price_master_id = pMaster.price_master_id;
+
+                            //找出當前父商品的子商品
+                            var childList = from rec in odcList2 where rec.parent_id == item.Product_Id && rec.group_id == item.group_id select rec;
+
+                            var parentPrice = item.product_cost;
+                            var parentCost = pMaster != null ? pMaster.cost : 0;
+
+                            //子商品總價
+                            foreach (var child in childList)
+                            {
+                                //價格
+                                IItemPriceImplMgr iPMgr = new ItemPriceMgr(connectionString);
+
                                 PriceMaster pM = priceMgr.QueryPriceMaster(new PriceMaster
                                 {
-                                    product_id = uint.Parse(item.Product_Id.ToString()),
+                                    product_id = uint.Parse(child.Product_Id.ToString()),
                                     user_id = 0,
                                     user_level = 1,
                                     site_id = 1,
                                     child_id = 0
                                 });
+                                List<ItemPriceCustom> ipList = new List<ItemPriceCustom>();
                                 if (pM != null)
                                 {
-                                    odcList2.Find(rec => rec.Product_Id == item.Product_Id).price_master_id = pM.price_master_id;
-                                }
-                            }
-
-                            //組合商品各自定價計算價格
-                            foreach (var item in priceSelfList)
-                            {
-                                //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
-                                productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
-
-                                // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
-                                deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
-                                deduct_welfareTotal += uint.Parse(item.deduct_welfare.ToString());
-
-                                PriceMaster pM = priceMgr.QueryPriceMaster(new PriceMaster { product_id = item.Product_Id, user_id = 0, user_level = 1, site_id = 1, child_id = Convert.ToInt32(item.Product_Id) });
-                                if (pM != null)
-                                {
-                                    odcList2.Find(rec => rec.Product_Id == item.Product_Id && rec.group_id == item.group_id).price_master_id = pM.price_master_id;
-                                }
-                                //找出當前父商品的子商品
-                                var childList = from rec in odcList2 where rec.parent_id == item.Product_Id && rec.group_id == item.group_id select rec;
-                                foreach (var child in childList)
-                                {
-                                    pM = priceMgr.QueryPriceMaster(new PriceMaster { product_id = item.Product_Id, user_id = 0, user_level = 1, site_id = 1, child_id = Convert.ToInt32(child.Product_Id) });
-                                    if (pM != null)
-                                    {
-                                        IItemPriceImplMgr iPMgr = new ItemPriceMgr(connectionString);
-                                        ItemPrice price = iPMgr.Query(new ItemPrice { item_id = child.Item_Id, price_master_id = pM.price_master_id }).FirstOrDefault();
-                                        if (price != null)
-                                        {
-                                            odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Item_Cost = price.item_cost;       //成本
-                                            odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Event_Item_Cost = price.event_cost;//活動成本
-                                            odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Item_Money = price.item_money;//售價
-                                        }
-                                    }
-                                }
-                            }
-
-                            //組合商品按比例拆分計算價格
-                            foreach (var item in parentList)
-                            {
-                                var TotalPrice = 0.0;
-                                var TotalCost = 0.0;
-                                //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
-                                productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
-
-                                // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
-                                deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
-                                deduct_welfareTotal += uint.Parse(item.deduct_welfare.ToString());
-
-                                PriceMaster pMaster = priceMgr.QueryPriceMaster(new PriceMaster
-                                {
-                                    product_id = uint.Parse(item.Product_Id.ToString()),
-                                    user_id = 0,
-                                    user_level = 1,
-                                    site_id = 1,
-                                    child_id = int.Parse(item.Product_Id.ToString())
-                                });
-                                odcList2.Find(rec => rec.Product_Id == item.Product_Id && rec.group_id == item.group_id).price_master_id = pMaster.price_master_id;
-
-                                //找出當前父商品的子商品
-                                var childList = from rec in odcList2 where rec.parent_id == item.Product_Id && rec.group_id == item.group_id select rec;
-
-                                var parentPrice = item.product_cost;
-                                var parentCost = pMaster != null ? pMaster.cost : 0;
-
-                                //子商品總價
-                                foreach (var child in childList)
-                                {
-                                    //價格
-                                    IItemPriceImplMgr iPMgr = new ItemPriceMgr(connectionString);
-
-                                    PriceMaster pM = priceMgr.QueryPriceMaster(new PriceMaster
-                                    {
-                                        product_id = uint.Parse(child.Product_Id.ToString()),
-                                        user_id = 0,
-                                        user_level = 1,
-                                        site_id = 1,
-                                        child_id = 0
-                                    });
-                                    List<ItemPriceCustom> ipList = new List<ItemPriceCustom>();
-                                    if (pM != null)
-                                    {
-                                        //必購數量
-                                        _prodCombMgr = new ProductComboMgr(connectionString);
-                                        List<ProductComboCustom> prodComList = _prodCombMgr.combQuery(new ProductComboCustom
-                                        {
-                                            Parent_Id = int.Parse(item.Product_Id.ToString()),
-                                            Child_Id = child.Product_Id.ToString() //add by wangwei02016w 2014/9/24 
-                                        });
-                                        var s_must_buy = prodComList[0].S_Must_Buy == 0 ? child.s_must_buy : prodComList[0].S_Must_Buy;
-
-                                        if (pM.same_price == 1)//同價
-                                        {
-                                            TotalPrice += pM.price * s_must_buy;
-                                            TotalCost += pM.cost * s_must_buy;
-                                        }
-                                        else
-                                        {
-                                            ipList = iPMgr.Query(new ItemPrice
-                                            {
-                                                item_id = child.Item_Id,
-                                                price_master_id = pM.price_master_id
-                                            });
-
-                                            if (ipList.Count != 0)
-                                            {
-                                                TotalPrice += ipList[0].item_money * s_must_buy;
-                                                TotalCost += ipList[0].item_cost * s_must_buy;
-                                            }
-                                        }
-                                    }
-                                }
-
-                                //子商品按比例拆分后的價格
-                                foreach (var child in childList)
-                                {
+                                    //必購數量
                                     _prodCombMgr = new ProductComboMgr(connectionString);
                                     List<ProductComboCustom> prodComList = _prodCombMgr.combQuery(new ProductComboCustom
                                     {
@@ -1835,25 +1802,101 @@ namespace Admin.gigade.Controllers
                                     });
                                     var s_must_buy = prodComList[0].S_Must_Buy == 0 ? child.s_must_buy : prodComList[0].S_Must_Buy;
 
-                                    IItemPriceImplMgr iPMgr = new ItemPriceMgr(connectionString);
-
-                                    PriceMaster pM = priceMgr.QueryPriceMaster(new PriceMaster
+                                    if (pM.same_price == 1)//同價
                                     {
-                                        product_id = uint.Parse(child.Product_Id.ToString()),
-                                        user_id = 0,
-                                        user_level = 1,
-                                        site_id = 1,
-                                        child_id = 0
-                                    });
-                                    List<ItemPriceCustom> ipList = new List<ItemPriceCustom>();
-                                    if (pM != null)
+                                        TotalPrice += pM.price * s_must_buy;
+                                        TotalCost += pM.cost * s_must_buy;
+                                    }
+                                    else
                                     {
-                                        odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).price_master_id = pM.price_master_id;
-                                        if (pM.same_price == 1)
+                                        ipList = iPMgr.Query(new ItemPrice
                                         {
-                                            odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Item_Cost = uint.Parse(pM.cost.ToString());       //成本
-                                            odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Event_Item_Cost = uint.Parse(pM.event_cost.ToString());//活動成本
+                                            item_id = child.Item_Id,
+                                            price_master_id = pM.price_master_id
+                                        });
 
+                                        if (ipList.Count != 0)
+                                        {
+                                            TotalPrice += ipList[0].item_money * s_must_buy;
+                                            TotalCost += ipList[0].item_cost * s_must_buy;
+                                        }
+                                    }
+                                }
+                            }
+
+                            //子商品按比例拆分后的價格
+                            foreach (var child in childList)
+                            {
+                                _prodCombMgr = new ProductComboMgr(connectionString);
+                                List<ProductComboCustom> prodComList = _prodCombMgr.combQuery(new ProductComboCustom
+                                {
+                                    Parent_Id = int.Parse(item.Product_Id.ToString()),
+                                    Child_Id = child.Product_Id.ToString() //add by wangwei02016w 2014/9/24 
+                                });
+                                var s_must_buy = prodComList[0].S_Must_Buy == 0 ? child.s_must_buy : prodComList[0].S_Must_Buy;
+
+                                IItemPriceImplMgr iPMgr = new ItemPriceMgr(connectionString);
+
+                                PriceMaster pM = priceMgr.QueryPriceMaster(new PriceMaster
+                                {
+                                    product_id = uint.Parse(child.Product_Id.ToString()),
+                                    user_id = 0,
+                                    user_level = 1,
+                                    site_id = 1,
+                                    child_id = 0
+                                });
+                                List<ItemPriceCustom> ipList = new List<ItemPriceCustom>();
+                                if (pM != null)
+                                {
+                                    odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).price_master_id = pM.price_master_id;
+                                    if (pM.same_price == 1)
+                                    {
+                                        odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Item_Cost = uint.Parse(pM.cost.ToString());       //成本
+                                        odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Event_Item_Cost = uint.Parse(pM.event_cost.ToString());//活動成本
+
+                                        var afterPrice = 0;
+                                        var afterCost = 0;
+                                        if (TotalPrice <= 0)
+                                        {
+                                            afterPrice = 0;
+                                        }
+                                        else
+                                        {
+                                                afterPrice = Convert.ToInt16(Math.Round(parentPrice * (Convert.ToDouble(pM.price * s_must_buy) / TotalPrice / s_must_buy)));
+                                        }
+                                        if (TotalCost <= 0)
+                                        {
+                                            afterCost = 0;
+                                        }
+                                        else
+                                        {
+                                                afterCost = Convert.ToInt16(Math.Round(parentCost * (Convert.ToDouble(pM.cost * s_must_buy) / TotalCost / s_must_buy)));
+                                        }
+
+                                        //var singleTotal = afterPrice * s_must_buy;
+                                        var singleTotal = afterPrice;
+                                        parentPrice -= uint.Parse(singleTotal.ToString());
+                                        TotalPrice -= Convert.ToDouble(pM.price) * s_must_buy;
+                                        odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).product_cost = uint.Parse(afterPrice.ToString());
+
+                                        //var singleCostTotal = afterCost * s_must_buy;
+                                        var singleCostTotal = afterCost;
+                                        parentCost -= singleCostTotal;
+                                        TotalCost -= Convert.ToDouble(pM.cost) * s_must_buy;
+                                        odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Item_Cost = uint.Parse(afterCost.ToString());
+                                    }
+                                    else
+                                    {
+                                        ipList = iPMgr.Query(new ItemPrice { item_id = child.Item_Id, price_master_id = pM.price_master_id });
+                                        if (ipList.Count != 0)
+                                        {
+                                            odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Item_Cost = ipList[0].item_cost;       //成本
+                                            odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Event_Item_Cost = ipList[0].event_cost;//活動成本
+
+                                            //var afterPrice = CommonFunction.Math4Cut5Plus(parentPrice * ipList[0].item_money * s_must_buy / TotalPrice / s_must_buy);
+                                            //beforePrice += afterPrice * s_must_buy;
+
+                                            //new logic
                                             var afterPrice = 0;
                                             var afterCost = 0;
                                             if (TotalPrice <= 0)
@@ -1862,82 +1905,39 @@ namespace Admin.gigade.Controllers
                                             }
                                             else
                                             {
-                                                afterPrice = Convert.ToInt16(Math.Round(parentPrice * (Convert.ToDouble(pM.price * s_must_buy) / TotalPrice / s_must_buy)));
+                                                    afterPrice = Convert.ToInt16(Math.Round(parentPrice * (Convert.ToDouble(ipList[0].item_money * s_must_buy) / TotalPrice / s_must_buy)));
+
                                             }
+
                                             if (TotalCost <= 0)
                                             {
                                                 afterCost = 0;
                                             }
                                             else
                                             {
-                                                afterCost = Convert.ToInt16(Math.Round(parentCost * (Convert.ToDouble(pM.cost * s_must_buy) / TotalCost / s_must_buy)));
+                                                    afterCost = Convert.ToInt16(Math.Round(parentCost * (Convert.ToDouble(ipList[0].item_cost * s_must_buy) / TotalCost / s_must_buy)));
                                             }
 
                                             //var singleTotal = afterPrice * s_must_buy;
                                             var singleTotal = afterPrice;
                                             parentPrice -= uint.Parse(singleTotal.ToString());
-                                            TotalPrice -= Convert.ToDouble(pM.price) * s_must_buy;
-                                            odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).product_cost = uint.Parse(afterPrice.ToString());
+                                            TotalPrice -= Convert.ToDouble(ipList[0].item_money) * s_must_buy;
+                                            // beforePrice += singleTotal;
 
                                             //var singleCostTotal = afterCost * s_must_buy;
                                             var singleCostTotal = afterCost;
                                             parentCost -= singleCostTotal;
-                                            TotalCost -= Convert.ToDouble(pM.cost) * s_must_buy;
+                                            TotalCost -= Convert.ToDouble(ipList[0].item_cost) * s_must_buy;
+                                            odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).product_cost = uint.Parse(afterPrice.ToString());
                                             odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Item_Cost = uint.Parse(afterCost.ToString());
-                                        }
-                                        else
-                                        {
-                                            ipList = iPMgr.Query(new ItemPrice { item_id = child.Item_Id, price_master_id = pM.price_master_id });
-                                            if (ipList.Count != 0)
-                                            {
-                                                odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Item_Cost = ipList[0].item_cost;       //成本
-                                                odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Event_Item_Cost = ipList[0].event_cost;//活動成本
-
-                                                //var afterPrice = CommonFunction.Math4Cut5Plus(parentPrice * ipList[0].item_money * s_must_buy / TotalPrice / s_must_buy);
-                                                //beforePrice += afterPrice * s_must_buy;
-
-                                                //new logic
-                                                var afterPrice = 0;
-                                                var afterCost = 0;
-                                                if (TotalPrice <= 0)
-                                                {
-                                                    afterPrice = 0;
-                                                }
-                                                else
-                                                {
-                                                    afterPrice = Convert.ToInt16(Math.Round(parentPrice * (Convert.ToDouble(ipList[0].item_money * s_must_buy) / TotalPrice / s_must_buy)));
-
-                                                }
-
-                                                if (TotalCost <= 0)
-                                                {
-                                                    afterCost = 0;
-                                                }
-                                                else
-                                                {
-                                                    afterCost = Convert.ToInt16(Math.Round(parentCost * (Convert.ToDouble(ipList[0].item_cost * s_must_buy) / TotalCost / s_must_buy)));
-                                                }
-
-                                                //var singleTotal = afterPrice * s_must_buy;
-                                                var singleTotal = afterPrice;
-                                                parentPrice -= uint.Parse(singleTotal.ToString());
-                                                TotalPrice -= Convert.ToDouble(ipList[0].item_money) * s_must_buy;
-                                                // beforePrice += singleTotal;
-
-                                                //var singleCostTotal = afterCost * s_must_buy;
-                                                var singleCostTotal = afterCost;
-                                                parentCost -= singleCostTotal;
-                                                TotalCost -= Convert.ToDouble(ipList[0].item_cost) * s_must_buy;
-                                                odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).product_cost = uint.Parse(afterPrice.ToString());
-                                                odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).Item_Cost = uint.Parse(afterCost.ToString());
-                                                odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).s_must_buy = s_must_buy;
-                                            }
+                                            odcList2.Find(rec => rec.Product_Id == child.Product_Id && rec.group_id == item.group_id).s_must_buy = s_must_buy;
                                         }
                                     }
-
                                 }
+
                             }
-                            #endregion
+                        }
+                        #endregion
                         }
                         else
                         {
@@ -2045,8 +2045,8 @@ namespace Admin.gigade.Controllers
                     }
                     #endregion
 
-                    #region add by zhuoqin0830w 2015/08/24  在內部訂單輸入時 同時將 輸入的 購物金 和 返還購物金 添加至 bonus_master 和 bonus_record 表中
-                    BonusMaster bm = null; BonusRecord br = null;
+                    #region add by zhuoqin0830w 2015/08/24  在內部訂單輸入時 同時將 輸入的 購物金 和 返還購物金 以及 抵用券 添加至 bonus_master 和 bonus_record 表中
+                    BonusMaster bm = null; BonusRecord brBonus = null; BonusRecord brWelfare = null; 
                     //判斷返還購物金 是否 大於0 如果大於 0 表示需要在 bonus_master 新增一筆數據 
                     if (acc_bonusTotal > 0)
                     {
@@ -2068,7 +2068,7 @@ namespace Admin.gigade.Controllers
                     //並且需要 在 bonus_master 中 按照 過期日期 減去 相應的 參數
                     if (deduct_bonusTotal > 0)
                     {
-                        br = new BonusRecord
+                        brBonus = new BonusRecord
                         {
                             user_id = ordermaster.User_Id,
                             record_use = deduct_bonusTotal,
@@ -2077,7 +2077,7 @@ namespace Admin.gigade.Controllers
                         };
                         //判斷購物金是否小於或等於數據庫中的購物金
                         _bonusMasterMgr = new BonusMasterMgr(connectionString);
-                        int userBonusTotal = _bonusMasterMgr.GetSumBouns(br);
+                        int userBonusTotal = _bonusMasterMgr.GetSumBouns(brBonus);
                         if (deduct_bonusTotal > userBonusTotal)
                         {
                             jsonStr = "{success:false,msg:'" + Resources.OrderAdd.BONUS_PRICE_NULL + "'}";
@@ -2087,10 +2087,32 @@ namespace Admin.gigade.Controllers
                             return this.Response;
                         }
                     }
+                    //判斷 抵用卷 金額 是否 大於 0 
+                    if (deduct_welfareTotal > 0)
+                    {
+                        brWelfare = new BonusRecord
+                        {
+                            user_id = ordermaster.User_Id,
+                            record_use = deduct_welfareTotal,
+                            record_createdate = Convert.ToUInt32(BLL.gigade.Common.CommonFunction.GetPHPTime()),
+                            record_updatedate = Convert.ToUInt32(BLL.gigade.Common.CommonFunction.GetPHPTime())
+                        };
+                        //判斷購物金是否小於或等於數據庫中的購物金
+                        _bonusMasterMgr = new BonusMasterMgr(connectionString);
+                        int userWelfateTotal = _bonusMasterMgr.GetSumWelfare(brWelfare);
+                        if (deduct_welfareTotal > userWelfateTotal)
+                        {
+                            jsonStr = "{success:false,msg:'" + Resources.OrderAdd.WELFARE_PRICE_NULL + "'}";
+                            this.Response.Clear();
+                            this.Response.Write(jsonStr);
+                            this.Response.End();
+                            return this.Response;
+                        }
+                    }
                     #endregion
 
                     #region 保存至數據庫
-                    bool result = orderImportMgr.Save2DB(ordermaster, slaves, channelList, null, op, bm, br);
+                    bool result = orderImportMgr.Save2DB(ordermaster, slaves, channelList, null, op, bm, brBonus, brWelfare);
                     #endregion
 
                     if (result)
@@ -2554,18 +2576,18 @@ namespace Admin.gigade.Controllers
                                 }
                                 else
                                 {
-                                    string[] str = dt.Rows[j][1].ToString().Split('/');
-                                    int year = 0;
-                                    if (str[2].Length == 2)
-                                    {
-                                        year = Convert.ToInt32("20" + str[2]);
-                                    }
-                                    else
-                                    {
-                                        year = Convert.ToInt32(str[2]);
-                                    }
-                                    int month = Convert.ToInt32(str[0]);
-                                    int day = Convert.ToInt32(str[1]);
+                                string[] str = dt.Rows[j][1].ToString().Split('/');
+                                int year = 0;
+                                if (str[2].Length == 2)
+                                {
+                                    year = Convert.ToInt32("20" + str[2]);
+                                }
+                                else
+                                {
+                                    year = Convert.ToInt32(str[2]);
+                                }
+                                int month = Convert.ToInt32(str[0]);
+                                int day = Convert.ToInt32(str[1]);
                                     if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
                                     {
                                         model.account_collection_time = st;
@@ -2576,34 +2598,25 @@ namespace Admin.gigade.Controllers
                                     }
                                 }
                             }
-
-                            if (!string.IsNullOrEmpty(dt.Rows[j][2].ToString()))
+                        }
+                        if (!string.IsNullOrEmpty(dt.Rows[j][2].ToString()))
+                        {
+                            int account_collection_money = 0;
+                            if (int.TryParse(dt.Rows[j][2].ToString(), out account_collection_money))
                             {
-                                int account_collection_money = 0;
-                                if (int.TryParse(dt.Rows[j][2].ToString(), out account_collection_money))
-                                {
-                                    model.account_collection_money = account_collection_money;
-                                }
-                                else
-                                {
-                                    continue;
-                                }
+                                model.account_collection_money = account_collection_money;
                             }
                             else
                             {
                                 continue;
                             }
-                            if (!string.IsNullOrEmpty(dt.Rows[j][3].ToString()))
+                        }
+                        if (!string.IsNullOrEmpty(dt.Rows[j][3].ToString()))
+                        {
+                            int poundage = 0;
+                            if (int.TryParse(dt.Rows[j][3].ToString(), out poundage))
                             {
-                                int poundage = 0;
-                                if (int.TryParse(dt.Rows[j][3].ToString(), out poundage))
-                                {
-                                    model.poundage = poundage;
-                                }
-                                else
-                                {
-                                    continue;
-                                }
+                                model.poundage = poundage;
                             }
                             else
                             {
@@ -2649,42 +2662,33 @@ namespace Admin.gigade.Controllers
                                     }
                                 }
                             }
-                            if (!string.IsNullOrEmpty(dt.Rows[j][5].ToString()))
+                        }
+                        if (!string.IsNullOrEmpty(dt.Rows[j][5].ToString()))
+                        {
+                            int return_collection_money = 0;
+                            if (int.TryParse(dt.Rows[j][5].ToString(), out return_collection_money))
                             {
-                                int return_collection_money = 0;
-                                if (int.TryParse(dt.Rows[j][5].ToString(), out return_collection_money))
-                                {
-                                    model.return_collection_money = return_collection_money;
-                                }
-                                else
-                                {
-                                    continue;
-                                }
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                            if (!string.IsNullOrEmpty(dt.Rows[j][6].ToString()))
-                            {
-                                int return_poundage = 0;
-                                if (int.TryParse(dt.Rows[j][6].ToString(), out return_poundage))
-                                {
-                                    model.return_poundage = return_poundage;
-                                }
-                                else
-                                {
-                                    continue;
-                                }
+                                model.return_collection_money = return_collection_money;
                             }
                             else
                             {
                                 continue;
                             }
                         }
-
+                        if (!string.IsNullOrEmpty(dt.Rows[j][6].ToString()))
+                        {
+                            int return_poundage = 0;
+                            if (int.TryParse(dt.Rows[j][6].ToString(), out return_poundage))
+                            {
+                                model.return_poundage = return_poundage;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            }
                         model.remark = dt.Rows[j][7].ToString();
-                        if (model != null && !(model.account_collection_time == model.return_collection_time && model.return_collection_time == DateTime.MinValue))
+                        if (model != null)
                         {
                             oacli.Add(model);
                         }
@@ -2789,7 +2793,6 @@ namespace Admin.gigade.Controllers
             }
         }
         #endregion
-
 
         #region 異常訂單匯出列表頁+HttpResponseBase ArrorOrderList()
         public HttpResponseBase ArrorOrderList()
@@ -3090,13 +3093,13 @@ namespace Admin.gigade.Controllers
             string json = json = "{success:true,data:''}"; ;
             OrderModifyModel orderModifyModel = new OrderModifyModel();
 
-
+            
             try
             {
                 if (!string.IsNullOrEmpty(Request.Params["order_id"]))
                 {
                     orderModifyModel.order_id = Convert.ToInt32(Request.Params["order_id"]);
-
+                    
                 }
                 if (!string.IsNullOrEmpty(Request.Params["deduct_card_bonus"]))
                 {
@@ -3137,12 +3140,12 @@ namespace Admin.gigade.Controllers
                         log.Error(logMessage);
                         json = "{success:false,data:'轉單失敗！'}";
                     }
-
+                    
                 }
             }
             catch (Exception ex)
             {
-
+                
                 Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
@@ -3155,9 +3158,6 @@ namespace Admin.gigade.Controllers
             return this.Response;
 
         }
-
-
-
 
         #region 會計入帳時間匯出Excel信息+void OrderMasterExport()
         public void OrderMasterExport()
