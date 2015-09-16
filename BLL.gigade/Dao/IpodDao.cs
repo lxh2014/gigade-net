@@ -198,11 +198,11 @@ namespace BLL.gigade.Dao
             Ignore = string.Empty;
             try
             {
-                sqlIgnore.AppendFormat("update product p,product_item pi,ipod set p.ignore_stock=1 where pi.product_id=p.product_id and pi.item_id=ipod.prod_id and p.ignore_stock=0 and ipod.row_id='{0}'  ;", query.row_id);
+                sqlIgnore.AppendFormat("update product p,product_item pi,ipod set p.ignore_stock=0 where pi.product_id=p.product_id and pi.item_id=ipod.prod_id and p.ignore_stock=1 and ipod.row_id='{0}'  ;", query.row_id);
                 //_access.execCommand(sqlShortage.ToString());
                 Ignore = sqlIgnore.ToString();
                 sqlIgnore.Clear();
-                sqlIgnore.AppendFormat(@"SELECT p.* FROM ipod i LEFT JOIN product_item pi ON pi.item_id = i.prod_id inner join product p on pi.product_id=p.product_id  where  p.ignore_stock=0 and i.row_id='{0}';", query.row_id);
+                sqlIgnore.AppendFormat(@"SELECT p.* FROM ipod i LEFT JOIN product_item pi ON pi.item_id = i.prod_id inner join product p on pi.product_id=p.product_id  where  p.ignore_stock=1 and i.row_id='{0}';", query.row_id);
                 
                 Product product = new Product();
                 product = _access.getSinggleObj<Product>(sqlIgnore.ToString());
@@ -212,39 +212,6 @@ namespace BLL.gigade.Dao
             catch (Exception ex)
             {
                 throw new Exception("IpodDao-->GetIgnoreHistorySql-->" + ex.Message + sqlIgnore.ToString(), ex);
-            }
-        }
-
-
-        public string GetHistorySql(IpodQuery query, out string Shortage)
-        {
-            StringBuilder sqlStock = new StringBuilder();
-            StringBuilder sqlShortage = new StringBuilder();
-            Shortage = string.Empty;
-            try
-            {
-                sqlStock.AppendFormat("update product_item pi,ipod set pi.item_stock='{0}' where pi.item_id=ipod.prod_id and ipod.row_id='{1}'  ;", query.item_stock, query.row_id);
-
-                sqlShortage.AppendFormat(@"SELECT p.product_id FROM ipod i LEFT JOIN product_item pi ON pi.item_id = i.prod_id inner join product p on pi.product_id=p.product_id and p.shortage=0 and i.row_id='{0}';", query.row_id);
-                DataTable _dt = _access.getDataTable(sqlShortage.ToString());
-                if (_dt.Rows.Count > 0)
-                {
-                    sqlShortage.Clear();
-                    sqlShortage.AppendFormat("update product p set p.shortage='{0}' where p.product_id='{1}'  ;", 1, Convert.ToUInt32(_dt.Rows[0]["product_id"].ToString()));
-                    Shortage = sqlShortage.ToString();
-                    //if (_access.execCommand(sb.ToString()) > 0)
-                    //{
-                    //    //
-                    //    sb.Clear();
-                    //    sb.AppendFormat("INSERT into table_change_log(user_type,pk_id,change_table,change_field,field_ch_name,old_value,new_value,create_user,create_time) values('1','{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}');", Convert.ToUInt32(_dt.Rows[0]["product_id"].ToString()), "product", "shortage", "補貨中停止販售", '0', '1', query.change_user, Common.CommonFunction.DateTimeToString(DateTime.Now));
-                    //    _access.execCommand(sb.ToString());
-                    //}
-                }
-                return sqlStock.ToString();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("ProductCommentDao-->GetHistorySql-->" + ex.Message + sqlShortage.ToString(), ex);
             }
         }
 

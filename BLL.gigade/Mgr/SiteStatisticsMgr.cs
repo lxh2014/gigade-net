@@ -82,7 +82,7 @@ namespace BLL.gigade.Mgr
                         query.ss_newuser_number = Convert.ToInt32(_dt.Rows[i][5]);
                         query.ss_converted_newuser = Convert.ToInt32(_dt.Rows[i][6]);
                         query.ss_sum_order_amount = Convert.ToInt32(_dt.Rows[i][7]);
-                        query.ss_code = _dt.Rows[i][8].ToString();
+                        query.ss_code = _dt.Rows[i][8].ToString().ToUpper();
                         DataTable dt=GetSiteStatisticsList(query, out total);
                         if (dt.Rows.Count == 0)
                         {
