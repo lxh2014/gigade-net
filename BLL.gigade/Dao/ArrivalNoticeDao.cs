@@ -96,7 +96,7 @@ namespace BLL.gigade.Dao
             {
                 str.AppendFormat("SELECT an.id,p.product_id,p.product_name,an.item_id,CONCAT(p.spec_title_1,' ',ps1.spec_name) as spec_title_1,CONCAT(p.spec_title_2,' ',ps2.spec_name) as spec_title_2 ,v.vendor_id,v.vendor_name_full, COUNT(DISTINCT(an.id)) as 'ri_nums' from arrival_notice an ");
                 strcont.AppendFormat(" INNER JOIN product p on p.product_id=an.product_id ");
-                strcont.AppendFormat(" INNER JOIN product_item pi on pi.product_id=p.product_id ");
+                strcont.AppendFormat(" INNER JOIN product_item pi on pi.item_id=an.item_id ");
                 strcont.AppendFormat(" INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id ");
                 strcont.AppendFormat(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id ");
                 strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
@@ -241,12 +241,12 @@ namespace BLL.gigade.Dao
             {
                 str.AppendFormat("SELECT an.id,p.product_id,p.product_name,an.item_id,CONCAT(p.spec_title_1,' ',ps1.spec_name) as spec_title_1,CONCAT(p.spec_title_2,' ',ps2.spec_name) as spec_title_2 ,v.vendor_id,v.vendor_name_full, vb.brand_id,vb.brand_name,tp.parameterName as product_status_string,p.product_status,pi.item_stock,p.ignore_stock from arrival_notice an ");
                 strcont.AppendFormat(" INNER JOIN product p on p.product_id=an.product_id ");
-                strcont.AppendFormat(" INNER JOIN product_item pi on pi.product_id=p.product_id ");
+                strcont.AppendFormat(" INNER JOIN product_item pi on pi.item_id=an.item_id ");
                 strcont.AppendFormat(" INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id ");
                 strcont.AppendFormat(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id ");
                 strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
                 strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
-                strcont.AppendFormat(" left JOIN t_parametersrc tp on tp.parameterCode=p.product_status and  tp.parameterType='product_status' ");
+                strcont.AppendFormat(" inner JOIN t_parametersrc tp on tp.parameterCode=p.product_status and  tp.parameterType='product_status' ");
                 strcont.AppendFormat(" where 1=1 ");
 
 

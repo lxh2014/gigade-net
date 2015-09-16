@@ -1,0 +1,29 @@
+﻿@{
+    ViewBag.Title = "InventoryQuery";
+}
+@section Js{
+    <script src="../../Scripts/Ext4.0/src/selection/Model.js" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/selection/RowModel.js" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/selection/CheckboxModel.js" type="text/javascript"></script>
+    <script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/ProductPurchase/ProductPurchaseLang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Common/ComboTree.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Common/ToolAuthority.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+   
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimePicker.js" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/form/field/DateTimeField.js" type="text/javascript"></script>
+
+<<<<<<< HEAD
+ <script src="../../Scripts/Ext4.0/src/selection/Model.js" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/selection/RowModel.js" type="text/javascript"></script>
+    <script src="../../Scripts/Ext4.0/src/selection/CheckboxModel.js" type="text/javascript"></script>
+    <script src="../../Locale/@Html.Raw(Request.Cookies["lang"] == null ? "zh-TW" : Request.Cookies["lang"].ToString())/ProductPurchase/ProductPurchaseLang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Common/ComboTree.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+    <script src="../../Scripts/Common/ToolAuthority.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+
+<script src="../../Scripts/Ext4.0/ext-all.js"></script>
+<script src="../../Scripts/Views/Product/InventoryQueryList.js"></script>
+=======
+
+    <script src="../../Scripts/Views/Product/InventoryQueryList.js"></script>
+    }
+>>>>>>> b5a47e931c091941a32549bae70e2804cbed1c82

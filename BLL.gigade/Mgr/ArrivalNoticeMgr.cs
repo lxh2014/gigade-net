@@ -163,6 +163,7 @@ namespace BLL.gigade.Mgr
               {
                   item.product_spec = item.spec_title_1;
                   item.product_spec += string.IsNullOrEmpty(item.spec_title_1) ? item.spec_title_2 : (string.IsNullOrEmpty(item.spec_title_2) ? "" : " / " + item.spec_title_2);
+                  #region 商品狀態
                   //if (item.product_status == 0)
                   //{
                   //    item.product_status_string = "新建立商品";
@@ -191,7 +192,7 @@ namespace BLL.gigade.Mgr
                   //{
                   //    item.product_status_string = "下架不販售";
                   //}
-
+                  #endregion
                   if (item.ignore_stock == 0)
                   {
                       item.ignore_stock_string = "否";
