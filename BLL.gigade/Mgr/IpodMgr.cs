@@ -110,7 +110,7 @@ namespace BLL.gigade.Mgr
                 product = _IpodDao.GetIgnoreHistorySql(query, out Ignore_Stock);
                 if (product != null)
                 {
-                    product.Ignore_Stock = 1;
+                    product.Ignore_Stock = 0;
                     aList.Clear();
                     aList.Add(Ignore_Stock);
                     result = _tableHistoryMgr.SaveHistory<Product>(product, batch, aList);

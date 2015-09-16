@@ -164,7 +164,7 @@
                        shadow: "sides"
                    },
                    store: sscodeStore,
-                   displayField: 'parameterName',
+                   displayField: 'parameterCode',
                    valueField: 'parameterCode',
                    typeAhead: true,
                    queryMode:'local',
