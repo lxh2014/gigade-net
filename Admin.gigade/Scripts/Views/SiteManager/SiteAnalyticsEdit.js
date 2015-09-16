@@ -74,7 +74,7 @@ function editFunction(RowID, Store) {
         minValue: 0,
         allowBlank: false,
         hideTrigger: true,
-        allowDecimals: false
+        decimalPrecision: 2
         },
         {
             xtype: 'numberfield',

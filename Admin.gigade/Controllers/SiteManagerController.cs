@@ -551,7 +551,6 @@ namespace Admin.gigade.Controllers
                 _newDt.Columns.Add("日索引", typeof(string));
                 _newDt.Columns.Add("造訪數", typeof(string));
                 _newDt.Columns.Add("使用者", typeof(string));
-
                 _newDt.Columns.Add("瀏覽量", typeof(string));
                 _newDt.Columns.Add("單次造訪頁數", typeof(string));
                 _newDt.Columns.Add("跳出率", typeof(string));
@@ -562,18 +561,15 @@ namespace Admin.gigade.Controllers
                 {
                     DataRow newRow = _newDt.NewRow();
                     newRow[0] = Convert.ToDateTime(_dt.Rows[i]["sa_date"]).ToString("yyyy-MM-dd"); ;
-                    newRow[1] = GetString(_dt.Rows[i]["sa_session"].ToString());
-                    newRow[2] = GetString(_dt.Rows[i]["sa_user"].ToString());
+                    newRow[1] = _dt.Rows[i]["sa_session"].ToString();
+                    newRow[2] = _dt.Rows[i]["sa_user"].ToString();
 
-                    newRow[3] = GetString(_dt.Rows[i]["sa_pageviews"].ToString());
-                    newRow[4] = GetString(_dt.Rows[i]["sa_pages_session"].ToString());
+                    newRow[3] = _dt.Rows[i]["sa_pageviews"].ToString();
+                    newRow[4] = _dt.Rows[i]["sa_pages_session"].ToString();
                     newRow[5] = _dt.Rows[i]["sa_bounce_rate"].ToString();
                     newRow[6] = _dt.Rows[i]["sa_avg_session_duration"].ToString();
                     _newDt.Rows.Add(newRow);
                 }
-                //_dt.Columns["sa_date"].ColumnName = "日索引";
-                //_dt.Columns["sa_work_stage"].ColumnName = "工作階段";
-                //_dt.Columns["sa_user"].ColumnName = "使用者";
                 string fileName = "SiteAnalytics目標對" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
                 MemoryStream ms = ExcelHelperXhf.ExportDT(_newDt, "");
                 Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);

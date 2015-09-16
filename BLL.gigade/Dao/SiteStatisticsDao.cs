@@ -24,9 +24,10 @@ namespace BLL.gigade.Dao
             StringBuilder sqlwhere = new StringBuilder();
             totalCount = 0;
             sql.AppendFormat(@"SELECT ss_id,ss_show_num,ss_click_num,ss_click_through,ss_cost,ss_newuser_number,");
-            sql.AppendFormat(@" ss_converted_newuser,ss_sum_order_amount,ss_date,ss_code,ss_create_time,ss_create_user,");
-            sql.AppendFormat(@" ss_modify_time,ss_modify_user ");
-            sqlwhere.AppendFormat(@" FROM site_statistics");
+            sql.AppendFormat(@" ss_converted_newuser,ss_sum_order_amount,ss_date,ss_code,ss_create_time,mu.user_username as ss_create_username,");
+            sql.AppendFormat(@" ss_modify_time,mu1.user_username as ss_modify_username ");
+            sqlwhere.AppendFormat(@" FROM site_statistics ss  LEFT JOIN manage_user mu on mu.user_id=ss.ss_create_user");
+            sqlwhere.Append(" left join manage_user mu1 on mu1.user_id=ss.ss_modify_user ");
             sqlwhere.AppendFormat(@" WHERE 1=1 ");
             if (query.ss_id != 0)
             {
