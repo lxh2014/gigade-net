@@ -4,14 +4,20 @@ Ext.define('gigade.SiteAnalyticsList', {
     fields: [
         { name: "sa_id", type: "int" },
         { name: "sa_date", type: "string" },
-        { name: "sa_work_stage", type: "int" },
+        { name: "sa_session", type: "int" },
         { name: "sa_user", type: "int" },
         { name: "sa_create_time", type: "string" },
         { name: "sa_create_user", type: "int" },
         { name: "s_sa_create_user", type: "string" },
-             { name: "s_sa_date", type: "string" },
-                   { name: "s_sa_create_time", type: "string" },
+        { name: "s_sa_date", type: "string" },
+        { name: "s_sa_create_time", type: "string" },
              
+        { name: "sa_pageviews", type: "int" },
+        { name: "sa_pages_session", type: "string" },
+        { name: "sa_bounce_rate", type: "string" },
+        { name: "sa_avg_session_duration", type: "string" },
+        { name: "sa_modify_time_query", type: "string" },
+        { name: "sa_modify_username", type: "string" },
         
         
     ]
@@ -195,10 +201,17 @@ onDeleteClick = function () {
         columns: [
             { header: "編號", dataIndex: 'sa_id', width: 80, align: 'center' },
             { header: "日索引", dataIndex: 's_sa_date', width: 150, align: 'center' },
-            { header: "工作階段", dataIndex: 'sa_work_stage', align: '120', align: 'center' },
+            { header: "造訪數", dataIndex: 'sa_session', align: '120', align: 'center' },
             { header: "使用者", dataIndex: 'sa_user', align: '120', align: 'center' },
             { header: "創建時間", dataIndex: 's_sa_create_time', width: 165, align: 'center' },
             { header: "創建人", dataIndex: 's_sa_create_user', align: '80', align: 'center' },
+
+            { header: "瀏覽量", dataIndex: 'sa_pageviews', width: 50, align: 'center' },
+            { header: "單次造訪頁數", dataIndex: 'sa_pages_session', width: 120, align: 'center' },
+            { header: "跳出率", dataIndex: 'sa_bounce_rate', align: '120', align: 'center' },
+            { header: "平均停留時間", dataIndex: 'sa_avg_session_duration', width: 165, align: 'center' },
+            { header: "更新時間", dataIndex: 'sa_modify_time_query', width: 120, align: 'center' },
+            { header: "更新人", dataIndex: 'sa_modify_username', width: 120, align: 'center' }
         ],
         tbar: [
            { xtype: 'button', text: "新增", id: 'add', iconCls: 'icon-user-add', handler: onAddClick }, '-',

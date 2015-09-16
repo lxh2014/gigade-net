@@ -39,7 +39,7 @@ namespace Admin.gigade.Controllers
 
         private SuperMgr _superMgr = new SuperMgr(mySqlConnectionString);
 
-        #region 介面視圖
+        #region 界面視圖
         public ActionResult Index()
         {
             return View();
@@ -103,26 +103,37 @@ namespace Admin.gigade.Controllers
                 }
                 catch (Exception ex)
                 {
-
                     throw new Exception("找不到路徑" + excelPath + ex.Message);
                 }
 
+                //檢查Sql語句是否為查詢語句，不是則拋出錯誤
+                //檢查Sql語句是否為空，為空則拋出錯誤
                 if (!string.IsNullOrEmpty(Request.Params["superSql"]))
                 {
                     query.superSql = Request.Params["superSql"];
                     string[] sqlArray = query.superSql.Split(' ', ',', '(', ')');
-
                     if (sqlArray[0].ToLower() != "select")
                     {
-                        Response.Write("Sql語句不是查詢語句，請輸入查詢語句");
+                        Response.Write("Sql語句不是查詢語句，請輸入查詢語句 ");
+                        throw new Exception("Sql語句不是查詢語句，請輸入查詢語句 ");
                     }
                 }
                 else
                 {
                     Response.Write("查詢語句為空！");
+                    throw new Exception("查詢語句為空，請輸入查詢語句 ");
                 }
 
-                _dt = _superMgr.SuperExportExcel(query, out totalCount);
+                //檢查Sql語句是否錯誤
+                try
+                {
+                    _dt = _superMgr.SuperExportExcel(query, out totalCount);
+                }
+                catch (Exception ex)
+                {
+                    Response.Write("Sql語句有錯誤" + ex.Message);
+                    throw new Exception(ex.Message);                  
+                }
 
                 if (totalCount >= 60000)
                 {

@@ -394,9 +394,9 @@ namespace Admin.gigade.Controllers
         {
             try
             {
-                int totalCount=0;
+                int totalCount = 0;
                 SiteStatistics query = new SiteStatistics();
-                ssMgr = new  SiteStatisticsMgr(mySqlConnectionString);
+                ssMgr = new SiteStatisticsMgr(mySqlConnectionString);
                 query.ss_code = Request.Params["ss_code"];
                 if (!string.IsNullOrEmpty(Request.Params["startdate"]))
                 {
@@ -416,7 +416,7 @@ namespace Admin.gigade.Controllers
                 _newDt.Columns.Add("會員數", typeof(string));
                 //_newDt.Columns.Add("新會員成本", typeof(string));
                 _newDt.Columns.Add("實際轉換", typeof(string));
-               // _newDt.Columns.Add("轉換率", typeof(string));
+                // _newDt.Columns.Add("轉換率", typeof(string));
                 //_newDt.Columns.Add("平均訂單金額", typeof(string));
                 _newDt.Columns.Add("訂單金額", typeof(string));
                 //_newDt.Columns.Add("ROI", typeof(string));
@@ -481,6 +481,7 @@ namespace Admin.gigade.Controllers
                 {
                     item.s_sa_date = (item.sa_date).ToString("yyyy-MM-dd");
                     item.s_sa_create_time = (item.sa_create_time).ToString("yyyy-MM-dd HH:mm:ss");
+                    item.sa_modify_time_query = (item.sa_modify_time).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented) + "}";
             }
@@ -512,7 +513,7 @@ namespace Admin.gigade.Controllers
                     string newExcelName = Server.MapPath(excelPath) + "analytics" + fileManagement.NewFileName(excelFile.FileName);
                     excelFile.SaveAs(newExcelName);
                     NPOI4ExcelHelper helper = new NPOI4ExcelHelper(newExcelName);
-                    DataTable _dt = helper.SheetData();
+                    DataTable _dt = helper.ExcelToTableForXLSX();
                     _siteAnalytics = new SiteAnalyticsMgr(mySqlConnectionString);
                     if (!string.IsNullOrEmpty(Request.Params["search_con"]))
                     {
@@ -556,14 +557,26 @@ namespace Admin.gigade.Controllers
                 DataTable _dt = _siteAnalytics.SiteAnalyticsDt(query);
                 DataTable _newDt = new DataTable();
                 _newDt.Columns.Add("日索引", typeof(string));
-                _newDt.Columns.Add("工作階段", typeof(string));
+                _newDt.Columns.Add("造訪數", typeof(string));
                 _newDt.Columns.Add("使用者", typeof(string));
+
+                _newDt.Columns.Add("瀏覽量", typeof(string));
+                _newDt.Columns.Add("單次造訪頁數", typeof(string));
+                _newDt.Columns.Add("跳出率", typeof(string));
+                _newDt.Columns.Add("平均停留時間", typeof(string));
+
+
                 for (int i = 0; i < _dt.Rows.Count; i++)
                 {
                     DataRow newRow = _newDt.NewRow();
                     newRow[0] = Convert.ToDateTime(_dt.Rows[i]["sa_date"]).ToString("yyyy-MM-dd"); ;
-                    newRow[1] = GetString(_dt.Rows[i]["sa_work_stage"].ToString());
+                    newRow[1] = GetString(_dt.Rows[i]["sa_session"].ToString());
                     newRow[2] = GetString(_dt.Rows[i]["sa_user"].ToString());
+
+                    newRow[3] = GetString(_dt.Rows[i]["sa_pageviews"].ToString());
+                    newRow[4] = GetString(_dt.Rows[i]["sa_pages_session"].ToString());
+                    newRow[5] = _dt.Rows[i]["sa_bounce_rate"].ToString();
+                    newRow[6] = _dt.Rows[i]["sa_avg_session_duration"].ToString();
                     _newDt.Rows.Add(newRow);
                 }
                 //_dt.Columns["sa_date"].ColumnName = "日索引";
@@ -602,8 +615,37 @@ namespace Admin.gigade.Controllers
             SiteAnalytics query = new SiteAnalytics();
             DateTime date;
             int number = 0;
+            float number1 = 0;
             try
             {
+                if (!string.IsNullOrEmpty(Request.Params["sa_pageviews"]))
+                {
+                    if (int.TryParse(Request.Params["sa_pageviews"], out number))
+                    {
+                        query.sa_pageviews = number;
+                    }
+                }
+                if (!string.IsNullOrEmpty(Request.Params["sa_pages_session"]))
+                {
+                    if (float.TryParse(Request.Params["sa_pages_session"], out number1))
+                    {
+                        query.sa_pages_session = number1;
+                    }
+                }
+                if (!string.IsNullOrEmpty(Request.Params["sa_bounce_rate"]))
+                {
+                    if (float.TryParse(Request.Params["sa_bounce_rate"], out number1))
+                    {
+                        query.sa_bounce_rate = number1;
+                    }
+                }
+                if (!string.IsNullOrEmpty(Request.Params["sa_avg_session_duration"]))
+                {
+                    if (float.TryParse(Request.Params["sa_avg_session_duration"], out number1))
+                    {
+                        query.sa_avg_session_duration = number1;
+                    }
+                }
                 if (!string.IsNullOrEmpty(Request.Params["sa_id"]))
                 {
                     query.sa_id = Convert.ToInt32(Request.Params["sa_id"]);
@@ -613,11 +655,11 @@ namespace Admin.gigade.Controllers
                 {
                     query.s_sa_date = date.ToString("yyyy-MM-dd");
                 }
-                if (!string.IsNullOrEmpty(Request.Params["sa_work_stage"]))
+                if (!string.IsNullOrEmpty(Request.Params["sa_session"]))
                 {
-                    if (int.TryParse(Request.Params["sa_work_stage"], out number))
+                    if (int.TryParse(Request.Params["sa_session"], out number))
                     {
-                        query.sa_work_stage = number;
+                        query.sa_session = number;
                     }
                 }
                 if (!string.IsNullOrEmpty(Request.Params["sa_user"]))
@@ -627,8 +669,12 @@ namespace Admin.gigade.Controllers
                         query.sa_user = number;
                     }
                 }
+
                 query.sa_create_user = (Session["caller"] as Caller).user_id;
+                query.sa_create_time=DateTime.Now;
                 _siteAnalytics = new SiteAnalyticsMgr(mySqlConnectionString);
+                query.sa_modify_user = query.sa_create_user;
+                query.sa_modify_time=query.sa_create_time;
                 if (query.sa_id == 0)
                 {
                     if (_siteAnalytics.InsertSiteAnalytics(query) > 0)

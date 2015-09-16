@@ -101,7 +101,7 @@ namespace BLL.gigade.Dao
                 strcont.AppendFormat(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id ");
                 strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
                 strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
-                strcont.AppendFormat(" where 1=1 ");
+                strcont.AppendFormat(" where 1=1 and  status<>'2' ");
 
                 //if (query.product_id != 0)//商品編號
                 //{

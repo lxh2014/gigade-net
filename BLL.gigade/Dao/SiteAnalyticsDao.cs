@@ -28,8 +28,10 @@ namespace BLL.gigade.Dao
             totalCount = 0;
             try
             {
-                sql.Append(" select saly.sa_id,saly.sa_date,saly.sa_work_stage,saly.sa_user,saly.sa_create_time,saly.sa_create_user,mu.user_username as 's_sa_create_user' ");
+                sql.Append(" select saly.sa_id,saly.sa_date,saly.sa_session,saly.sa_user,saly.sa_create_time,saly.sa_create_user,mu.user_username as 's_sa_create_user',mu1.user_username as sa_modify_username, ");
+                sql.Append("sa_pageviews,sa_pages_session,sa_bounce_rate,sa_avg_session_duration, sa_modify_time");
                 sqlFrom.Append(" from site_analytics saly LEFT JOIN manage_user mu on mu.user_id=saly.sa_create_user   ");
+                sqlFrom.Append("left join manage_user mu1 on mu1.user_id=saly.sa_modify_user");
                 sqlWhere.Append(" where 1=1   ");
                 if (query.search_con != 0)
                 {
@@ -114,7 +116,7 @@ namespace BLL.gigade.Dao
             StringBuilder sqlWhere = new StringBuilder();
             try
             {
-                sql.Append("  select CASE saly.sa_date WHEN '0000-00-00' THEN '0001-01-01' ELSE sa_date  END  AS sa_date,saly.sa_work_stage,saly.sa_user from site_analytics saly ");
+                sql.Append("  select CASE saly.sa_date WHEN '0000-00-00' THEN '0001-01-01' ELSE sa_date  END  AS sa_date,saly.sa_session,saly.sa_user,sa_avg_session_duration,sa_bounce_rate,sa_pages_session,sa_pageviews from site_analytics saly ");
                 sqlWhere.Append(" where 1=1 ");
                 if (query.search_con != 0)
                 {
@@ -156,11 +158,12 @@ namespace BLL.gigade.Dao
         }
 
         public string UpdateSNA(SiteAnalytics query)
-        {
+        { 
             StringBuilder updateSql = new StringBuilder();
             try
             {
-                updateSql.AppendFormat(" update site_analytics set sa_date='{0}',sa_work_stage='{1}',sa_user='{2}',sa_create_time='{3}'  where sa_id='{4}';", query.s_sa_date, query.sa_work_stage, query.sa_user, CommonFunction.DateTimeToString(DateTime.Now), query.sa_id);
+                updateSql.AppendFormat(" update site_analytics set sa_date='{0}',sa_session='{1}',sa_user='{2}',sa_modify_time='{3}',", query.s_sa_date, query.sa_session, query.sa_user, CommonFunction.DateTimeToString(query.sa_modify_time));
+                updateSql.AppendFormat("sa_pageviews='{0}',sa_pages_session='{1}',sa_bounce_rate='{2}',sa_avg_session_duration='{3}',sa_modify_user='{5}' where sa_id='{4}';", query.sa_pageviews, query.sa_pages_session, query.sa_bounce_rate, query.sa_avg_session_duration,query.sa_id,query.sa_modify_user);
                 return updateSql.ToString();
             }
             catch (Exception ex)
@@ -174,8 +177,10 @@ namespace BLL.gigade.Dao
             StringBuilder insertSql = new StringBuilder();
             try
             {
-                insertSql.Append("insert into site_analytics(sa_date,sa_work_stage,sa_user,sa_create_time,sa_create_user) values( ");
-                insertSql.AppendFormat("'{0}','{1}','{2}','{3}','{4}');", query.s_sa_date, query.sa_work_stage, query.sa_user, CommonFunction.DateTimeToString(DateTime.Now), query.sa_create_user);
+                insertSql.Append("insert into site_analytics(sa_date,sa_session,sa_user,sa_create_time,sa_create_user,sa_pageviews,sa_pages_session,sa_bounce_rate,sa_avg_session_duration,sa_modify_time,sa_modify_user) values( ");
+                insertSql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}');", query.s_sa_date, query.sa_session, query.sa_user,
+                    CommonFunction.DateTimeToString(query.sa_create_time), query.sa_create_user, query.sa_pageviews, query.sa_pages_session, query.sa_bounce_rate, query.sa_avg_session_duration,
+                    Common.CommonFunction.DateTimeToString(query.sa_modify_time),query.sa_modify_user );
                 return insertSql.ToString();
             }
             catch (Exception ex)
