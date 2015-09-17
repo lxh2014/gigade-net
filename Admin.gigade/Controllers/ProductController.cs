@@ -36,7 +36,6 @@ namespace Admin.gigade.Controllers
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         static string connectionString = ConfigurationManager.AppSettings["MySqlConnectionString"];
         private static DataTable DTExcel = new DataTable();
-        
         private IProductImplMgr _productMgr;
         private IProductTempImplMgr _productTempMgr;
         private IProductCategoryImplMgr _procateMgr;
@@ -115,8 +114,7 @@ namespace Admin.gigade.Controllers
         private IProductStockImportImplMgr _pStockMgr;
         private IProductSpecImplMgr _pSpecStatusMgr;
         private VendorBrandMgr vbMgr;
-        //public ArrivalNoticeMgr arrivalnoticemgr;
-        public ProductItemMgr productitemMgr;
+        public ArrivalNoticeMgr arrivalnoticemgr;
         #region View
 
         public ActionResult Index()
@@ -6002,17 +6000,17 @@ namespace Admin.gigade.Controllers
             int totalcount = 0;
             try
             {
-                ProductItemQuery query = new ProductItemQuery();
+                ArrivalNoticeQuery query = new ArrivalNoticeQuery();
                 query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
-                productitemMgr = new ProductItemMgr(connectionString);
+                arrivalnoticemgr = new ArrivalNoticeMgr(connectionString);
                 if (!string.IsNullOrEmpty(Request.Params["vendor_name_full_OR_vendor_id"]))
                 {
                     query.vendor_name_full_OR_vendor_id = Request.Params["vendor_name_full_OR_vendor_id"];//供应商名称/编号
                 }
                 if (!string.IsNullOrEmpty(Request.Params["product_id_OR_product_name"]))
                 {
-                    query.product_id_OR_product_name = Request.Params["product_id_OR_product_name"];//商品编号/名称/商品細項編號
+                    query.product_id_OR_product_name = Request.Params["product_id_OR_product_name"];//商品编号/名称
                 }
                 if (!string.IsNullOrEmpty(Request.Params["brand_id_OR_brand_name"]))
                 {
@@ -6030,11 +6028,15 @@ namespace Admin.gigade.Controllers
                 {
                     query.item_stock_end = Convert.ToInt32(Request.Params["item_stock_end"]);//库存数量--结束
                 }
+                if (query.item_stock_start > query.item_stock_end)
+                {
+                    query.item_stock_start = query.item_stock_end = 10000000;//判斷庫存數量取值範圍  如果star>end,則把start=end=10000000;
+                }
                 if (!string.IsNullOrEmpty(Request.Params["ignore_stockRdo"]))
                 {
                     query.ignore_stock = Convert.ToInt32(Request.Params["ignore_stockRdo"]);//补货中停止贩售
                 }
-                List<ProductItemQuery> list = productitemMgr.GetInventoryQueryList(query, out totalcount);
+                List<ProductItemQuery> list = arrivalnoticemgr.GetInventoryQueryList(query, out totalcount);
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 timeConverter.DateTimeFormat = "yyyy-MM-dd";
@@ -6056,7 +6058,7 @@ namespace Admin.gigade.Controllers
 
         public void ExportCSV()// yachao1120j 2015-9-10 匯出商品庫存查詢記錄
         {
-            ProductItemQuery query = new ProductItemQuery();
+            ArrivalNoticeQuery query = new ArrivalNoticeQuery();
             try
             {
                 if (!string.IsNullOrEmpty(Request.Params["vendor_name_full_OR_vendor_id"]))
@@ -6103,8 +6105,8 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("庫存數量", typeof(String));
                 dtHZ.Columns.Add("補貨中停止販售", typeof(String));
                 List<ProductItemQuery> list = new List<ProductItemQuery>();
-                productitemMgr = new ProductItemMgr(connectionString);
-                list = productitemMgr.GetInventoryQueryList(query, out totalcount);
+                arrivalnoticemgr = new ArrivalNoticeMgr(connectionString);
+                list = arrivalnoticemgr.GetInventoryQueryList(query, out totalcount);
                 if (list.Count > 0)
                 {
                     for (int i = 0; i < list.Count; i++)
@@ -6119,8 +6121,41 @@ namespace Admin.gigade.Controllers
                         dr[6] = list[i].brand_id;
                         dr[7] = list[i].brand_name;
                         dr[8] = list[i].product_status_string;
+
+                        //if (list[i].product_status == 0)
+                        //{
+                        //    dr[8] = "新建立商品";
+                        //}
+                        //if (list[i].product_status == 1)
+                        //{
+                        //    dr[8] = "申請審核";
+                        //}
+                        //if (list[i].product_status == 2)
+                        //{
+                        //    dr[8] = "審核通過";
+                        //}
+                        //if (list[i].product_status == 5)
+                        //{
+                        //    dr[8] = "上架";
+                        //}
+                        //if (list[i].product_status == 6)
+                        //{
+                        //    dr[8] = "下架";
+                        //}
+                        //if (list[i].product_status == 20)
+                        //{
+                        //    dr[8] = "供應商新建商品";
+                        //}
+
                         dr[9] = list[i].Item_Stock;
-                        dr[10] = list[i].ignore_stock_string;
+                        if (list[i].ignore_stock == 0)
+                        {
+                            dr[10] = "否";
+                        }
+                        if (list[i].ignore_stock == 1)
+                        {
+                            dr[10] = "是";
+                        }
                         dtHZ.Rows.Add(dr);
                     }
                     string fileName = "product_stock_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";

@@ -143,7 +143,7 @@ Ext.onReady(function () {
                         typeAhead: true,
                         forceSelection: false,
                         editable: false,
-                        fieldLabel: "文章標題",
+                        fieldLabel: "查詢條件",
                         emptyText: '請選擇文章標題',
                         lastQuery: '',
                         listeners: {
@@ -154,9 +154,9 @@ Ext.onReady(function () {
                     },
                     {
                         xtype: 'textfield',
-                        fieldLabel: "文章編號/標題/會員編號",
-                        //width: 200,
-                        labelWidth: 140,
+                        fieldLabel: "查詢內容",
+                        width: 200,
+                        labelWidth: 55,
                         margin: '5 10 0 0',
                         id: 'searchContent',
                         name: 'searchContent',
@@ -168,93 +168,64 @@ Ext.onReady(function () {
                             }
                         }
                     },
-                      {
-                          xtype: 'combobox',
-                          allowBlank: true,
-                          hidden: false,
-                          id: 'vote_status',
-                          name: 'vote_status',
-                          store: StatusStore,
-                          queryMode: 'local',
-                          width: 200,
-                          labelWidth: 55,
-                          margin: '5 10 0 0',
-                          displayField: 'status_name',
-                          valueField: 'status_id',
-                          typeAhead: true,
-                          forceSelection: false,
-                          editable: false,
-                          fieldLabel: "查詢狀態",
-                          emptyText: '請選擇',
-                          //value: -1
-                      }
-                ]
-            },
-            {
-                xtype: 'fieldcontainer',
-                combineErrors: true,
-                layout: 'hbox',
-                items: [
-                       {
-                           xtype: "datefield",
-                           fieldLabel: "日期條件",
-                           labelWidth: 55,
-                           margin: '5 0 0 5',
-                           id: 'time_start',
-                           name: 'time_start',
-                           editable: false,
-                           allowBlank: false,
-                           submitValue: true,
-                           format: 'Y-m-d',
-                           width: 165,
-                           value: Tomorrow(1 - new Date().getDate()),
-                           listeners: {
-                               select: function () {
-                                   var startTime = Ext.getCmp("time_start");
-                                   var endTime = Ext.getCmp("time_end");
-                                   var s_date = new Date(startTime.getValue());
+                    {
+                        xtype: "datetimefield",
+                        fieldLabel: "日期條件",
+                        labelWidth: 55,
+                        margin: '5 0 0 0',
+                        id: 'time_start',
+                        name: 'time_start',
+                        editable: false,
+                        allowBlank: false,
+                        submitValue: true,
+                        format: 'Y-m-d 00:00:00',
+                        value: Tomorrow(1 - new Date().getDate()),
+                        listeners: {
+                            select: function () {
+                                var startTime = Ext.getCmp("time_start");
+                                var endTime = Ext.getCmp("time_end");
+                                var s_date = new Date(startTime.getValue());
 
-                                   var data1 = Date.parse(startTime.getValue());
-                                   var data2 = Date.parse(endTime.getValue());
-                                   var datadiff = data2 - data1;
-                                   //var time = 31 * 24 * 60 * 60 * 1000;
-                                   //if (endTime.getValue() < startTime.getValue()) {
-                                   //    Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間!");
-                                   //    startTime.setValue(new Date(endTime.getValue()));
-                                   //}
-                                   //else
-                                   if (datadiff < 0 ) {
-                                       Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                                       endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                   }
-                                   //else {
-                                   //    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                   //}
-
-                               },
-                               specialkey: function (field, e) {
-                                   if (e.getKey() == Ext.EventObject.ENTER) {
-                                       Query();
-                                   }
-                               }
-                           }
-                       },
+                                var data1 = Date.parse(startTime.getValue());
+                                var data2 = Date.parse(endTime.getValue());
+                                var datadiff = data2 - data1;
+                                var time = 31 * 24 * 60 * 60 * 1000;
+                                //if (endTime.getValue() < startTime.getValue()) {
+                                //    Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間!");
+                                //    startTime.setValue(new Date(endTime.getValue()));
+                                //}
+                                //else
+                                if (datadiff < 0 || datadiff > time) {
+                                    Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                                    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1))); 
+                                }
+                                else {
+                                    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                }
+                                
+                            },
+                            specialkey: function (field, e) {
+                                if (e.getKey() == Ext.EventObject.ENTER) {
+                                    Query();
+                                }
+                            }
+                        }
+                    },
                     {
                         xtype: 'displayfield',
-                        margin: '5 0 0 5',
+                        margin: '5 0 0 0',
                         value: "~"
                     },
                     {
-                        xtype: "datefield",
+                        xtype: "datetimefield",
                         id: 'time_end',
                         name: 'time_end',
-                        margin: '5 0 0 5',
+                        margin: '5 0 0 0',
                         // format: 'Y-m-d H:i:s',
                         editable: false,
                         allowBlank: false,
                         submitValue: true,
-                        format: 'Y-m-d',
-                        width: 110,
+                        format: 'Y-m-d 23:59:59',
                         value: Tomorrow(0),
                         listeners: {
                             select: function () {
@@ -265,13 +236,13 @@ Ext.onReady(function () {
                                 var data1 = Date.parse(startTime.getValue());
                                 var data2 = Date.parse(endTime.getValue());
                                 var datadiff = data2 - data1;
-                                //var time = 31 * 24 * 60 * 60 * 1000;
+                                var time = 31 * 24 * 60 * 60 * 1000;
                                 if (endTime.getValue() < startTime.getValue()) {
                                     Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間!");
                                     endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
                                     //endTime.setValue(new Date(startTime.getValue()));
                                 }
-                                else if (datadiff < 0 ) {
+                                else if (datadiff < 0 || datadiff > time) {
                                     Ext.Msg.alert(INFORMATION, DATE_LIMIT);
                                     endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
                                     //endTime.setValue(new Date(startTime.getValue()));
@@ -283,8 +254,34 @@ Ext.onReady(function () {
                                 }
                             }
                         }
-                    }      
-                  
+                    }
+                ]
+            },
+            {
+                xtype: 'fieldcontainer',
+                combineErrors: true,
+                layout: 'hbox',
+                items: [
+                    {
+                        xtype: 'combobox',
+                        allowBlank: true,
+                        hidden: false,
+                        id: 'vote_status',
+                        name: 'vote_status',
+                        store: StatusStore,
+                        queryMode: 'local',
+                        width: 200,
+                        labelWidth: 55,
+                        margin: '0 10 0 5',
+                        displayField: 'status_name',
+                        valueField: 'status_id',
+                        typeAhead: true,
+                        forceSelection: false,
+                        editable: false,
+                        fieldLabel: "查詢狀態",
+                        emptyText: '所有狀態',
+                        value: -1
+                    }
                 ]
             }
         ],
@@ -356,28 +353,10 @@ Ext.onReady(function () {
             { xtype: 'button', text: '新增', id: 'add', hidden: false, iconCls: 'icon-user-add', handler: onAddClick },
             { xtype: 'button', text: "編輯", id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
             {
-                xtype: 'button',
-                text: "匯出",
-                id: 'export',
-                hidden: false,
-                iconCls: 'icon-excel',
-                handler: function () {
-                    window.open("/Vote/VoteDetailExportExcel?article_id="
-                        + Ext.getCmp('vote_article').getValue()
-                        + "&searchContent=" + Ext.getCmp('searchContent').getValue()
-                        + "&vote_status=" + Ext.getCmp('vote_status').getValue()
-                        + "&time_start=" + Ext.Date.format(Ext.getCmp('time_start').getValue(), 'Y-m-d')
-                        + "&time_end=" + Ext.Date.format(Ext.getCmp('time_end').getValue(), 'Y-m-d'));
+                xtype: 'button', text: "匯出", id: 'export', hidden: false, iconCls: 'icon-user-edit', handler: function () {
+                    window.open("/Vote/VoteDetailExportExcel?article_id=" + Ext.getCmp('vote_article').getValue() + "&searchContent=" + Ext.getCmp('searchContent').getValue() + "&vote_status=" + Ext.getCmp('vote_status').getValue() + "&time_start=" + Ext.Date.format(Ext.getCmp('time_start').getValue(), 'Y-m-d') + "&time_end=" + Ext.Date.format(Ext.getCmp('time_end').getValue(), 'Y-m-d'));
                 }
             }
-            //{
-            //    xtype: 'button',
-            //    id: 'export',
-            //    text: '匯出',
-            //    iconCls: 'icon-excel',
-            //    hidden: true,
-            //    handler: Export
-            //}
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: VoteDetailStore,
@@ -483,53 +462,5 @@ onEditClick = function () {
             }
         }
        // editFunction(row[0], VoteDetailStore);
-    }
-}
-setNextMonth = function (source, n) {
-    var s = new Date(source);
-    s.setMonth(s.getMonth() + n);
-    if (n < 0) {
-        s.setHours(0, 0, 0);
-    }
-    else if (n > 0) {
-        s.setHours(23, 59, 59);
-    }
-    return s;
-}
-var Export = function () {
-    var article_id = Ext.getCmp('vote_article').getValue();
-    var searchContent = Ext.getCmp('searchContent').getValue();
-    var time_start = Ext.getCmp('time_start').getValue();
-    var time_end = Ext.getCmp('time_end').getValue();
-    var vote_status = Ext.htmlEncode(Ext.getCmp("vote_status").getValue());
-    if (article_id == null && searchContent == "" && time_start == null && time_end == null && vote_status == null) {
-        Ext.Msg.alert(INFORMATION, '請選擇查詢條件');
-    }
-    else {
-        Ext.MessageBox.show({
-            msg: 'Loading....',
-            wait: true
-        });
-        Ext.Ajax.request({
-            url: '/Vote/VoteDetailExportExcel',
-            timeout: 900000,
-            params: {            
-                article_id: article_id,
-                searchContent: searchContent,
-                vote_status: vote_status,
-                time_start: time_start,
-                time_end: time_end,
-            },
-            success: function (form, action) {
-                var result = Ext.decode(form.responseText);
-                if (result.success) {
-                    window.open = '../../ImportUserIOExcel/' + result.ExcelName;
-                    Ext.MessageBox.hide();
-                } else {
-                    Ext.MessageBox.hide();
-                    Ext.Msg.alert(INFORMATION, "匯出失敗或沒有數據,請先搜索查看!");
-                }
-            }
-        });
     }
 }

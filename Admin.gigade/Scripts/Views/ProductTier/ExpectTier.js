@@ -11,8 +11,7 @@ var pcStore = Ext.create('Ext.data.Store', {
         //{ "id": "1", "name": "出貨一次" },
         //{ "id": "2", "name": "重複出貨" }]
         { "id": "1", "name": EXECUTE_ONCE },//單次執行
-        { "id": "2", "name": EXECUTE_REPEAT },
-        { "id": "3", "name": EXECUTE_IRREGULAR }]// edit by wwei0216w 2015/5/20 重複執行
+        { "id": "2", "name": EXECUTE_REPEAT }]// edit by wwei0216w 2015/5/20 重複執行
 });
 
 
@@ -24,27 +23,6 @@ var runStore = Ext.create('Ext.data.Store', {
         { "runtype": "2W", "runname": EVERYWEEK },//每週
         { "runtype": "2M", "runname": EVERYMONTH }]//每月
 });
-
-//不規律執行（每週）
-var irregularStore = Ext.create('Ext.data.Store', {
-    fields: ['irregulartype', 'irregularname'],
-    data: [{ "irregulartype": "w", "irregularname": EVERYWEEK }]
-});
-
-
-//不規律執行zhou
-var weeksStore = Ext.create('Ext.data.Store', {
-    fields: ['abbr', 'name'],
-    data: [
-        { "abbr": "1", "name": MONDAY },//星期一
-        { "abbr": "2", "name": TUESDAY },//星期二
-        { "abbr": "3", "name": WEDNESDAY },//星期三
-        { "abbr": "4", "name": THURSDAY },//星期四
-        { "abbr": "5", "name": FRIDAY },//星期五
-        { "abbr": "6", "name": SATURADY },//星期六
-        { "abbr": "7", "name": SUNDAY }]//星期日
-});
-
 
 //第幾周
 var onweeksStore = Ext.create('Ext.data.Store', {
@@ -126,115 +104,6 @@ var gxGrid = Ext.create('Ext.grid.Panel', {
         }]
 });
 
-Ext.define('GIGADE.irregularTier', {
-    extend: 'Ext.data.Model',
-    fields: [
-                { name: 'schedule_id', type: 'int' },
-                { name: 'schedule_name', type: 'string' },
-                { name: 'type', type: 'int' },
-                { name: 'week_day', type: 'string' },
-                { name: 'repeat_count', type: 'int' },
-                { name: 'duration_start', type: 'string' },
-                { name: 'desc', type: 'string' }]
-
-});
-
-var irregulartimeStore = Ext.create('Ext.data.Store', {
-    model: 'GIGADE.irregularTier',
-    pageSize: pageSize,
-    proxy: {
-        type: 'ajax',
-        url: '/ProductTier/GetTiers',
-        actionMethods: 'post',
-        reader: {
-            type: 'json',
-            root: 'item',
-            totalProperty: 'totalCount'
-        }
-    }
-});
-
-irregularGrid = Ext.create('Ext.grid.Panel', {
-    plugins: [{ ptype: 'cellediting' }],
-    //title: '不規則排程設置',
-    store: irregulartimeStore,
-    margin: '',
-    id: ' irregularGrid',
-    width: 450,
-    height: 150,
-    columns: [
-        { xtype: 'rownumberer', width: 25, align: 'center' },
-        {
-            text: '', menuDisabled: true, width: 40, align: 'center', xtype: 'actioncolumn',
-            icon: '../../../Content/img/icons/cross.gif',
-            handler: function (grid, rowIndex, colIndex) {
-                irregularStore.removeAt(rowIndex);
-            }
-        }, {
-            text: '開始于星期', dataIndex: 'week_day', width: 86, align: 'right', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'combobox',
-                queryMode: 'local',
-                editable: false,
-                store: weeksStore,
-                displayField: 'name',
-                valueField: 'abbr',
-                renderer: function (val) {
-                    var record = irregularStore.findRecord('abbr', val);
-                    if (record) {
-                        return record.data.name;
-                    }
-                    return val ? val : '';
-                }
-            }
-        }, {
-            text: '幾點(時)', dataIndex: '', width: 56, align: 'left', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'numberfield',
-                allowBlank: false,
-                minValue: 0
-            }
-        }, {
-            text: '結束于星期', dataIndex: 'week_day', width: 86, align: 'right', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'combobox',
-                queryMode: 'local',
-                editable: false,
-                store: weeksStore,
-                displayField: 'name',
-                valueField: 'abbr',
-                renderer: function (val) {
-                    var record = irregularStore.findRecord('abbr', val);
-                    if (record) {
-                        return record.data.name;
-                    }
-                    return val ? val : '';
-                }
-            }
-        }, {
-            text: '幾點(時)', dataIndex: '', width: 56, align: 'left', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'numberfield',
-                allowBlank: false,
-                minValue: 0
-            }
-        }, {
-            text: '執行時間(天后)', dataIndex: '', width: 90, flex: 1, align: 'center', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'numberfield',
-                allowBlank: false,
-                minValue: 0
-            }
-        }],
-    tbar: [{
-        text: '新增', handler: function () {
-            irregularGrid.getStore().add({});
-        }
-    }]
-});
-
-
-
 
 var pcFrm = Ext.create('Ext.form.Panel', {
     id: 'pcFrm',
@@ -260,28 +129,17 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                 change: function (chose) {
                     Ext.getCmp('mst').setText("");
                     Ext.getCmp('ms').setText("");
-                    switch (Ext.getCmp('pc_type').getValue()) {
-
-                        case '1':
-                            Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
-                            Ext.getCmp('pcFrm').down('#cxsj').setDisabled(true);
-                            Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(false);
-                            Ext.getCmp('pcFrm').down('#bglzx').setDisabled(true);
-                            break;
-                        case '2':
-                            Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
-                            Ext.getCmp('pcFrm').down('#pl').setDisabled(false);
-                            Ext.getCmp('pcFrm').down('#cxsj').setDisabled(false);
-                            Ext.getCmp('pcFrm').down('#bglzx').setDisabled(true);
-                            break;
-                        case '3':
-                            Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
-                            Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
-                            Ext.getCmp('pcFrm').down('#cxsj').setDisabled(true);
-                            Ext.getCmp('pcFrm').down('#bglzx').setDisabled(false);
-                            break;
+                    if (Ext.getCmp('pc_type').getValue() == 2) {
+                        Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
+                        Ext.getCmp('pcFrm').down('#pl').setDisabled(false);
+                        //Ext.getCmp('pcFrm').down('#mtpl').setDisabled(false);
+                        Ext.getCmp('pcFrm').down('#cxsj').setDisabled(false);
+                    } else {
+                        Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
+                        //Ext.getCmp('pcFrm').down('#mtpl').setDisabled(true);
+                        Ext.getCmp('pcFrm').down('#cxsj').setDisabled(true);
+                        Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(false);
                     }
-
                 }
             }
         }, {
@@ -985,7 +843,6 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                id: 'cs_time',
                listeners: {
                    change: function () {
-                       Ext.getCmp("ce_time").setMinValue(this.getValue());
                        if (Ext.getCmp('noendtime').checked) {
                            messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
                            Ext.getCmp('mst').setText(messagestime);
@@ -1006,7 +863,6 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                id: 'ce_time',
                listeners: {
                    change: function () {
-                       Ext.getCmp("cs_time").setMaxValue(this.getValue());
                        if (Ext.getCmp('noendtime').checked) {
                            messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + '。';
                            Ext.getCmp('mst').setText(messagestime);
@@ -1027,7 +883,6 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                    change: function (chack) {
                        if (chack.checked) {
                            Ext.getCmp('ce_time').setDisabled(true);
-                           Ext.getCmp("ce_time").setValue('');
                            messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
                            Ext.getCmp('mst').setText(messagestime);
                        } else {
@@ -1038,27 +893,6 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                    }
                }
            }]
-       }, {
-           xtype: 'fieldset',
-           title: '不規律執行',//不規律執行
-           id: 'bglzx',
-           layout: 'column',
-           padding: '10 10 10 10',
-           disabled: true,
-           items: [{
-               xtype: 'combobox',
-               fieldLabel: '執行于',//執行于(每週)
-               allowBlank: false,
-               id: 'irregularwhen',
-               displayField: 'irregularname',
-               valueField: 'irregulartype',
-               labelWidth: 54,
-               width: 150,
-               margin: '10 10 15 10',
-               editable: false,
-               value: 'w',
-               store: irregularStore
-           }, irregularGrid]
        }, {
            xtype: 'container',
            layout: 'column',
@@ -1196,12 +1030,6 @@ function Tier_Load(record) {
             Ext.getCmp('pc_type').setValue(1)
             Ext.getCmp('datatime').setRawValue(record.data.duration_start);
             break;
-
-
-        case 3:
-            irregulartimeStore.load();
-            break;
-
     }
 
     var desces = record.data.desc.split("。");
@@ -1213,7 +1041,6 @@ function Tier_Load(record) {
     }
     Ext.getCmp('ms').setText(ms);
     Ext.getCmp('mst').setText(mst);
-
 
 }
 
@@ -1288,13 +1115,6 @@ function getParams() {
         case '1':
             params.duration_start = Ext.getCmp('datatime').getValue();
             break;
-
-        case '3':
-            Ext.each(irregulartimeStore.data.items, function () {
-                irregulartimeStore.push(this.data);
-            });
-            break;
-
     }
 
     return params;

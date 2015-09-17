@@ -213,34 +213,5 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductItemMgr-->GetProductItemByID" + ex.Message, ex);
             }
         }
-
-        public List<ProductItemQuery> GetInventoryQueryList(ProductItemQuery query, out int totalCount)
-        {
-            try
-            {
-                List<ProductItemQuery> store = new List<ProductItemQuery>();
-                store = _productItemDao.GetInventoryQueryList(query, out totalCount);
-                foreach (var item in store)
-                {
-                    item.product_spec = item.Spec_Name_1;
-                    item.product_spec += string.IsNullOrEmpty(item.Spec_Name_1) ? item.Spec_Name_2 : (string.IsNullOrEmpty(item.Spec_Name_2) ? "" : " / " + item.Spec_Name_2);
-                    if (item.ignore_stock == 0)
-                    {
-                        item.ignore_stock_string = "否";
-                    }
-                    if (item.ignore_stock == 1)
-                    {
-                        item.ignore_stock_string = "是";
-                    }
-                }
-
-                return store;
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("ProductItemMgr->GetInventoryQueryList" + ex.Message);
-            }
-        }
     }
 }

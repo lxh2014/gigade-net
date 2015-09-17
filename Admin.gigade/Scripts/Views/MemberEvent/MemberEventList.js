@@ -283,7 +283,7 @@ Ext.onReady(function () {
          { xtype: 'button', text: "編輯", id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
           '->',
                 {
-                    xtype: 'datefield',
+                    xtype: 'datetimefield',
                     allowBlank: true,
                     id: 'timestart',
                     margin: "0 5 0 0",
@@ -297,7 +297,7 @@ Ext.onReady(function () {
                 },
 
              {
-                 xtype: 'datefield',
+                 xtype: 'datetimefield',
                  allowBlank: true,
                  editable: false,
                  id: 'timeend',
@@ -334,8 +334,9 @@ Ext.onReady(function () {
              listeners: {
                  click: function () {
                      Ext.getCmp('search_content').setValue("");
-                     Ext.getCmp('timestart').reset();
-                     Ext.getCmp('timeend').reset();
+                     Ext.getCmp('timestart').setValue(new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()));
+                     Ext.getCmp('timeend').setValue(new Date());
+                     Query();
                  }
              }
          }

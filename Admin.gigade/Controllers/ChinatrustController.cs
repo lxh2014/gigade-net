@@ -102,10 +102,6 @@ namespace Admin.gigade.Controllers
                     query.event_id_name = Request.Params["event_search"];
                     //}
                 }
-                if (!string.IsNullOrEmpty(Request.Params["date"]))
-                {
-                    query.dateCondition = Convert.ToInt32(Request.Params["date"]);
-                }
                 if (!string.IsNullOrEmpty(Request.Params["TimeStart"]))
                 {
                     query.event_start_time = DateTime.Parse(Request.Params["TimeStart"]);

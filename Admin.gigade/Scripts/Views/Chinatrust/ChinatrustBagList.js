@@ -15,11 +15,10 @@ var dateStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
            { 'txt': '所有日期', 'value': '0' },
-           { 'txt': '活動開始時間', 'value': '1' },
-           { 'txt': '活動結束時間', 'value': '2' },
-           { 'txt': '顯示開始時間', 'value': '3' },
-           { 'txt': '顯示結束時間', 'value': '4' },
+            { 'txt': '活動時間', 'value': '1' },
+            { 'txt': '顯示時間', 'value': '2' }
     ]
+
 });
 //群組管理Model
 Ext.define('gigade.ChinaTrustBag', {
@@ -126,8 +125,8 @@ Ext.onReady(function () {
                     {
                         xtype: 'combobox',
                         fieldLabel: '狀態',
-                        margin: '0 0 0 20',
-                        labelWidth:40,
+                        margin: '0 0 0 10',
+                        labelWidth:60,
                         id: 'bag_status',
                         store: StatusStore,
                         displayField: 'txt',
@@ -147,7 +146,6 @@ Ext.onReady(function () {
                         store: dateStore,
                         fieldLabel: '查詢日期',
                         editable: false,
-                        width: 220,
                         displayField: 'txt',
                         valueField: 'value',
                         value: '0',
@@ -157,9 +155,8 @@ Ext.onReady(function () {
                         margin: '0 0 0 10',
                       
                         id: 'start_time',
-                        format: 'Y-m-d',
-                        width: 110,
-                        //value: Tomorrow(1 - new Date().getDate()),
+                        format: 'Y-m-d 00:00:00',
+                        value: Tomorrow(1 - new Date().getDate()),
                         editable: false,
                         listeners: {
                             select: function (a, b, c) {
@@ -195,18 +192,15 @@ Ext.onReady(function () {
                     {
                         xtype: 'datefield',
                         id: 'end_time',
-                        format: 'Y-m-d',
-                        width:110,
-                        //value: Tomorrow(0),
+                        format: 'Y-m-d 23:59:59',
+                        value: Tomorrow(0),
                         editable: false,
                         listeners: {
                             select: function (a, b, c) {
                                 var start = Ext.getCmp("start_time");
-                                var end = Ext.getCmp("end_time");                                
-                                var s_date = new Date(end.getValue());
-                                if (start.getValue() == null) {
-                                    Ext.getCmp("start_time").setValue(new Date(s_date.setMonth(s_date.getMonth() - 1)));
-                                }
+                                var end = Ext.getCmp("end_time");
+                                var s_date = new Date(start.getValue());
+
                                 //var data1 = Date.parse(start.getValue());
                                 //var data2 = Date.parse(end.getValue());
                                 //var datadiff = data2 - data1;
@@ -387,28 +381,16 @@ function UpdateActive(id) {
 
 
 function Query() {
-    ChinaTrustBagStore.removeAll();
-    var date = Ext.getCmp('date').getValue();
-    var start_time = Ext.getCmp('start_time').getValue() == null ? "" : Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s'));
-    var end_time = Ext.getCmp('end_time').getValue() == null ? "" : Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'));
-    if (date != 0 && (start_time == "" && end_time == "")) {
-        Ext.Msg.alert(INFORMATION, '請選擇日期');
-    }
-    else if (date == 0 && (start_time != "" && end_time != "")) {
-        Ext.Msg.alert(INFORMATION, '請選擇日期條件');
-    }
-    else {
-        Ext.getCmp('ChinaTrustBag').store.loadPage(1, {
-            params: {
-                bag_status: Ext.getCmp('bag_status').getValue(),
-                bag_id_name: Ext.getCmp('bag_search_name').getValue(),
-                date: Ext.getCmp('date').getValue(),
-                start_time: Ext.getCmp('start_time').getValue() == null ? "" : Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s')),
-                end_time: Ext.getCmp('end_time').getValue() == null ? "" : Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'))
-
-            }
-        });
-    }
+    Ext.getCmp('ChinaTrustBag').store.loadPage(1, {
+        params: {
+            bag_status: Ext.getCmp('bag_status').getValue(),
+            bag_id_name: Ext.getCmp('bag_search_name').getValue(),
+            date: Ext.getCmp('date').getValue(),
+            start_time:Ext.getCmp('start_time').getValue()==null?"": Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s')),
+            end_time:Ext.getCmp('end_time').getValue()==null?"": Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'))
+            
+        }
+    });
 }
 
 function TranToDetial(bag_id) {

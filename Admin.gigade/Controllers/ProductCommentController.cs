@@ -223,9 +223,9 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("留言回覆", typeof(String));
                 dtHZ.Columns.Add("回覆是否顯示", typeof(String));
                 dtHZ.Columns.Add("商品描述相符度", typeof(String));
-                dtHZ.Columns.Add("商品質量滿意度", typeof(String));
+                dtHZ.Columns.Add("客戶服務滿意度", typeof(String));
+                dtHZ.Columns.Add("網站整體服務滿意度", typeof(String));
                 dtHZ.Columns.Add("配送速度滿意度", typeof(String));
-                dtHZ.Columns.Add("網站整體滿意度", typeof(String));
                 dtHZ.Columns.Add("回覆人", typeof(String));
                 dtHZ.Columns.Add("回覆時間", typeof(String));
                 dtHZ.Columns.Add("狀態", typeof(String));

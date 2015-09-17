@@ -18,7 +18,6 @@ namespace BLL.gigade.Model.Query
         public int article_sort { get; set; }
         public Int64 reception_count { set; get; }
         public string prod_link { get; set; }
-        public int date { get; set; }
         
     }
 }

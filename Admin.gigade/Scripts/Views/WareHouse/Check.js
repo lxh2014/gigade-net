@@ -181,8 +181,8 @@ IpoStore.on("beforeload", function ()
     Ext.apply(IpoStore.proxy.extraParams, {
         Poid: Ext.getCmp("po_id").getValue(),
         Potype: Ext.getCmp('Poty').getValue(),
-        start_time : Ext.getCmp('start_time').getValue() == null ? null : Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d 00:00:00')),
-        end_time : Ext.getCmp('end_time').getValue() == null ? null : Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d 23:59:59')),
+        start_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d 00:00:00')),
+        end_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d 23:59:59')),
         freight:Ext.getCmp("freight").getValue()
     })
 })
@@ -216,8 +216,7 @@ var ipoList = Ext.create('Ext.grid.Panel', {
             labelWidth: 70,
             id: 'start_time',
             format: 'Y-m-d',
-            value: "",
-            //value: Tomorrow(1 - new Date().getDate()),
+            value: Tomorrow(1 - new Date().getDate()),
             editable: false,
             listeners: {
                 select: function (a, b, c)
@@ -246,8 +245,7 @@ var ipoList = Ext.create('Ext.grid.Panel', {
             id: 'end_time',
             format: 'Y-m-d',
             margin: '5 0 0 0',
-            value: "",
-            //value: Tomorrow(0),
+            value: Tomorrow(0),
             editable: false,
             listeners: {
                 select: function (a, b, c)
@@ -580,17 +578,13 @@ function LoadDetail(record)
 
 function Search()
 {
-    var Poid  = Ext.getCmp("po_id").getValue();
-    var Potype= Ext.getCmp('Poty').getValue();
-    var start_time = Ext.getCmp('start_time').getValue() == null ? null : Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d 00:00:00'));
-    var end_time = Ext.getCmp('end_time').getValue() == null ? null : Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d 23:59:59'));
-    var freight=Ext.getCmp("freight").getValue();
-    if (Poid.trim() == "" && Potype.trim() == "" && start_time == null && end_time == null && freight == "0")
+    var potys = Ext.getCmp('Poty').getValue();
+    var Poid = Ext.getCmp('po_id').getValue();
+    if (potys.trim() == "" && Poid.trim() == "")
     {
-        Ext.Msg.alert("提示", "請輸入查詢條件!");
+        Ext.Msg.alert("提示", "請輸入採購單號或選擇查詢類別!");
         return;
     }
-    //Ext.Msg.alert("提示", Poid+Potype+start_time +end_time+freight);
     IpoStore.removeAll();
     IpoStore.loadPage(1);
 }
@@ -608,16 +602,13 @@ function onExportEnter()
 {
     var potys = Ext.getCmp('Poty').getValue();
     var Poid = Ext.getCmp('po_id').getValue();
-    var start_time = Ext.getCmp('start_time').getValue() == null ? "" : Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d 00:00:00'));
-    var end_time = Ext.getCmp('end_time').getValue() == null ? "" : Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d 23:59:59'));
+    var start_time = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d 00:00:00'));
+    var end_time = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d 23:59:59'));
     var freight = Ext.getCmp("freight").getValue();
-    
-    if (Poid.trim() == "" && potys.trim() == "" && start_time == "" && end_time == "" && freight == "0")
+    if (potys.trim() == "")
     {
-        Ext.Msg.alert("提示", "請輸入查詢條件!");
-        return;
-    }
-    else
+        Ext.Msg.alert("提示", "請選擇匯出類別!");
+    } else
     {
         var Potype = Ext.getCmp('Poty').getValue();
         window.open("/WareHouse/WritePdf?Poid=" + Poid + "&Potype=" + Potype + "&start_time=" + start_time + "&end_time=" + end_time + "&freight=" + freight);

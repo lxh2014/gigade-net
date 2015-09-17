@@ -38,6 +38,5 @@ namespace BLL.gigade.Mgr.Impl
         List<Model.ProductItem> GetProductItemByID(int productId);//add by wangwei0216w 2014/9/22
         ProductItemCustom GetProductArriveDay(ProductItem pi,string type);//add by wwei0216w 2015/6/4
         List<ProductItemQuery> GetProductItemByID(ProductItemQuery query);//根據item_id查詢商品規格以及商品的信息add chaojie1124j2015/8/31
-        List<ProductItemQuery> GetInventoryQueryList(ProductItemQuery query, out int totalCount); //by yachao1120j 2015-9-10 商品库存查询
     }
 }

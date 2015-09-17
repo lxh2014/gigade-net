@@ -498,7 +498,6 @@ Ext.apply(Ext.form.field.VTypes, {
     },
     daterangeText: START_BEFORE_END
 });
-
 var start_end = {
     xtype: 'fieldcontainer',
     layout: 'hbox',
@@ -521,15 +520,6 @@ var start_end = {
             },
             beforerender: function () {
                 addDateType();
-            },
-            select: function (combo, record, e) {
-                if (record[0].data.code == "product_createdate") {
-                    Ext.getCmp("time_start").setMaxValue(new Date());
-                    Ext.getCmp("time_end").setMaxValue(new Date());
-                } else {
-                    Ext.getCmp("time_start").setMaxValue("");
-                    Ext.getCmp("time_end").setMaxValue("");
-                }
             }
         }
     }, {

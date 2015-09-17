@@ -381,10 +381,6 @@ Ext.onReady(function () {
                     Ext.getCmp("product_freight_set").setValue(freightStore.getAt(0).data.parameterCode);
                     Ext.getCmp("product_mode").setValue(modeStore.getAt(0).data.parameterCode);
                     Ext.getCmp("tax_type").setValue(taxStore.getAt(0).data.value);
-                    //移除重置后時間的緩存  add by zhuoqin0830w  2015/09/15
-                    Ext.getCmp("time_start").setMaxValue("");
-                    Ext.getCmp("time_end").setMinValue("");
-                    Ext.getCmp("time_end").setMaxValue("");
                 }
             }
         }]

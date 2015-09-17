@@ -61,7 +61,7 @@ var DDRStore = Ext.create('Ext.data.Store', {
 var searchStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
-          { 'txt': '全部', 'value': '0' },
+          { 'txt': '請選擇...', 'value': '0' },
           { 'txt': '活動名稱', 'value': '1' },
           { 'txt': '區域包名稱', 'value': '2' },
     ]
@@ -83,15 +83,8 @@ ChinatrustMapBag.on('beforeload', function () {
 });
 //勾選框
 function Query(x) {
-    ChinatrustMapBag.removeAll();
-    if (Ext.getCmp('search_con').getValue() == "0" && Ext.getCmp('con').getValue().trim() != "") {
-        Ext.Msg.alert(INFORMATION, "請選擇搜索條件");
-    }
-    else if (Ext.getCmp('search_con').getValue() != "0" && Ext.getCmp('con').getValue().trim() == "")
-    {
-        Ext.Msg.alert(INFORMATION, "請輸入搜索條件");
-    }
-    else {
+    if (Ext.getCmp('search_con').getValue() != "0" && Ext.getCmp('con').getValue().trim() != "") {
+        ChinatrustMapBag.removeAll();
         Ext.getCmp("gdFgroup").store.loadPage(1, {
             params: {
                 search_con: Ext.getCmp('search_con').getValue(),
@@ -99,8 +92,10 @@ function Query(x) {
             }
         });
     }
+    else {
+        Ext.Msg.alert(INFORMATION, "請選擇搜索條件!");
+    }
 }
-
 Ext.onReady(function () {
     var frm = Ext.create('Ext.form.Panel', {
         id: 'frm',
@@ -154,8 +149,8 @@ Ext.onReady(function () {
                         iconCls: 'ui-icon ui-icon-reset',
                         listeners: {
                             click: function () {
-                                Ext.getCmp('search_con').reset();
-                                Ext.getCmp('con').reset();
+                                Ext.getCmp('search_con').setValue(0);
+                                Ext.getCmp('con').setValue('');
                             }
                         }
                     }
