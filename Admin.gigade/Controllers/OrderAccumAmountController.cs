@@ -60,13 +60,17 @@ namespace Admin.gigade.Controllers
                         query.event_name = Request.Params["event_search"];
                     }
                 }
+                if (!string.IsNullOrEmpty(Request.Params["date"]))
+                {
+                    query.dateCondition = Convert.ToInt32(Request.Params["date"]);
+                }
                 if (!string.IsNullOrEmpty(Request.Params["TimeStart"]))
                 {
-                    query.event_start_time = DateTime.Parse(Request.Params["TimeStart"]);
+                    query.event_start_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["TimeStart"].ToString()).ToString("yyyy-MM-dd 00:00:00"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["TimeEnd"]))
                 {
-                    query.event_end_time = DateTime.Parse(Request.Params["TimeEnd"]);
+                    query.event_end_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["TimeEnd"].ToString()).ToString("yyyy-MM-dd 23:59:59"));
                 }
                 int totalCount = 0;
                 _IOrderAccumAmount = new OrderAccumAmountMgr(mySqlConnectionString);
