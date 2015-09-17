@@ -556,24 +556,6 @@ Ext.onReady(function () {
             }
         },
         {
-            header: '網站整體服務滿意度', dataIndex: 'web_server', width: 115, align: 'center',
-            renderer: function (value) {
-                if (value == 1) {
-                    return Ext.String.format('非常不滿意');
-                }
-                else if (value == 2) {
-                    return Ext.String.format('不滿意');
-                }
-                else if (value == 3) {
-                    return Ext.String.format('一般');
-                } else if (value == 4) {
-                    return Ext.String.format('滿意');
-                } else if (value == 5) {
-                    return Ext.String.format('非常滿意');
-                }
-            }
-        },
-        {
             header: '配送速度滿意度', dataIndex: 'logistics_deliver', width: 100, align: 'center',
             renderer: function (value) {
                 if (value == 1) {
@@ -591,6 +573,25 @@ Ext.onReady(function () {
                 }
             }
         },
+        {
+            header: '網站整體滿意度', dataIndex: 'web_server', width: 115, align: 'center',
+            renderer: function (value) {
+                if (value == 1) {
+                    return Ext.String.format('非常不滿意');
+                }
+                else if (value == 2) {
+                    return Ext.String.format('不滿意');
+                }
+                else if (value == 3) {
+                    return Ext.String.format('一般');
+                } else if (value == 4) {
+                    return Ext.String.format('滿意');
+                } else if (value == 5) {
+                    return Ext.String.format('非常滿意');
+                }
+            }
+        },
+    
         //         { name: 's_reply_user', type: "string" },
         //{ name: 's_reply_time', type: "string" },
         { header: '回覆人', dataIndex: 's_reply_user', width: 100, align: 'center' },
