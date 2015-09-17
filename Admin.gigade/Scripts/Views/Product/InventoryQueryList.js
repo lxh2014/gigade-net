@@ -304,7 +304,7 @@ Ext.onReady(function () {
                 { header: "補貨中停止販售 ", dataIndex: "ignore_stock_string" }
         ],
         tbar: [
-        { xtype: 'button', text: '匯出Excel', margin: '0 0 0 5', iconCls: 'icon-excel', id: 'btnExcel', handler: Export }
+        { xtype: 'button', text: '匯出商品庫存報表', margin: '0 0 0 5', iconCls: 'icon-excel', id: 'btnExcel', handler: Export }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: ProductStore,

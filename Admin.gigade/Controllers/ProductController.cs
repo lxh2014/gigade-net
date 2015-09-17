@@ -6120,7 +6120,7 @@ namespace Admin.gigade.Controllers
                         dr[7] = list[i].brand_name;
                         dr[8] = list[i].product_status_string;
                         dr[9] = list[i].Item_Stock;
-                       dr[10] = list[i].ignore_stock_string;
+                        dr[10] = list[i].ignore_stock_string;
                         dtHZ.Rows.Add(dr);
                     }
                     string fileName = "product_stock_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
