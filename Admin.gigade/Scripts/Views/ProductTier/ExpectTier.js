@@ -32,18 +32,36 @@ var irregularStore = Ext.create('Ext.data.Store', {
 });
 
 
+////不規律執行zhou
+//var startWeeksStore = Ext.create('Ext.data.Store', {
+//    fields: ['abbr', 'name'],
+//    autoDestroy: true,
+//    autoLoad: false,
+//    data: [
+//        { abbr: "1", name: MONDAY },//星期一
+//        { abbr: "2", name: TUESDAY },//星期二
+//        { abbr: "3", name: WEDNESDAY },//星期三
+//        { abbr: "4", name: THURSDAY },//星期四
+//        { abbr: "5", name: FRIDAY },//星期五
+//        { abbr: "6", name: SATURADY },//星期六
+//        { abbr: "7", name: SUNDAY }]//星期日
+//});
+
 //不規律執行zhou
-var weeksStore = Ext.create('Ext.data.Store', {
-    fields: ['abbr', 'name'],
-    data: [
-        { "abbr": "1", "name": MONDAY },//星期一
-        { "abbr": "2", "name": TUESDAY },//星期二
-        { "abbr": "3", "name": WEDNESDAY },//星期三
-        { "abbr": "4", "name": THURSDAY },//星期四
-        { "abbr": "5", "name": FRIDAY },//星期五
-        { "abbr": "6", "name": SATURADY },//星期六
-        { "abbr": "7", "name": SUNDAY }]//星期日
-});
+//var endWeeksStore = Ext.create('Ext.data.Store', {
+//    fields: ['abbr', 'name'],
+//    autoDestroy: true,
+//    autoLoad: false,
+//    data: [
+//        { abbr: "1", name: MONDAY },//星期一
+//        { abbr: "2", name: TUESDAY },//星期二
+//        { abbr: "3", name: WEDNESDAY },//星期三
+//        { abbr: "4", name: THURSDAY },//星期四
+//        { abbr: "5", name: FRIDAY },//星期五
+//        { abbr: "6", name: SATURADY },//星期六
+//        { abbr: "7", name: SUNDAY }]//星期日
+//});
+
 
 
 //第幾周
@@ -139,99 +157,94 @@ Ext.define('GIGADE.irregularTier', {
 
 });
 
-var irregulartimeStore = Ext.create('Ext.data.Store', {
-    model: 'GIGADE.irregularTier',
-    pageSize: pageSize,
-    proxy: {
-        type: 'ajax',
-        url: '/ProductTier/GetTiers',
-        actionMethods: 'post',
-        reader: {
-            type: 'json',
-            root: 'item',
-            totalProperty: 'totalCount'
-        }
-    }
-});
+//var irregulartimeStore = Ext.create('Ext.data.Store', {
+//    model: 'GIGADE.irregularTier',
+//    //pageSize: pageSize,
+//    proxy: {
+//        type: 'ajax',
+//        url: '/ProductTier/GetTiers',
+//        actionMethods: 'post',
+//        reader: {
+//            type: 'json',
+//            root: 'item',
+//            totalProperty: 'totalCount'
+//        }
+//    }
+//});
 
-irregularGrid = Ext.create('Ext.grid.Panel', {
-    plugins: [{ ptype: 'cellediting' }],
-    //title: '不規則排程設置',
-    store: irregulartimeStore,
-    margin: '',
-    id: ' irregularGrid',
-    width: 450,
-    height: 150,
-    columns: [
-        { xtype: 'rownumberer', width: 25, align: 'center' },
-        {
-            text: '', menuDisabled: true, width: 40, align: 'center', xtype: 'actioncolumn',
-            icon: '../../../Content/img/icons/cross.gif',
-            handler: function (grid, rowIndex, colIndex) {
-                irregularStore.removeAt(rowIndex);
-            }
-        }, {
-            text: '開始于星期', dataIndex: 'week_day', width: 86, align: 'right', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'combobox',
-                queryMode: 'local',
-                editable: false,
-                store: weeksStore,
-                displayField: 'name',
-                valueField: 'abbr',
-                renderer: function (val) {
-                    var record = irregularStore.findRecord('abbr', val);
-                    if (record) {
-                        return record.data.name;
-                    }
-                    return val ? val : '';
-                }
-            }
-        }, {
-            text: '幾點(時)', dataIndex: '', width: 56, align: 'left', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'numberfield',
-                allowBlank: false,
-                minValue: 0
-            }
-        }, {
-            text: '結束于星期', dataIndex: 'week_day', width: 86, align: 'right', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'combobox',
-                queryMode: 'local',
-                editable: false,
-                store: weeksStore,
-                displayField: 'name',
-                valueField: 'abbr',
-                renderer: function (val) {
-                    var record = irregularStore.findRecord('abbr', val);
-                    if (record) {
-                        return record.data.name;
-                    }
-                    return val ? val : '';
-                }
-            }
-        }, {
-            text: '幾點(時)', dataIndex: '', width: 56, align: 'left', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'numberfield',
-                allowBlank: false,
-                minValue: 0
-            }
-        }, {
-            text: '執行時間(天后)', dataIndex: '', width: 90, flex: 1, align: 'center', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'numberfield',
-                allowBlank: false,
-                minValue: 0
-            }
-        }],
-    tbar: [{
-        text: '新增', handler: function () {
-            irregularGrid.getStore().add({});
-        }
-    }]
-});
+//irregularGrid = Ext.create('Ext.grid.Panel', {
+//    plugins: [{ ptype: 'cellediting' }],
+//    //title: '不規則排程設置',
+//    store: irregulartimeStore,
+//    margin: '',
+//    id: ' irregularGrid',
+//    width: 450,
+//    height: 150,
+//    columns: [
+//        { xtype: 'rownumberer', width: 25, align: 'center' },
+//        {
+//            text: '', menuDisabled: true, width: 40, align: 'center', xtype: 'actioncolumn',
+//            icon: '../../../Content/img/icons/cross.gif',
+//            handler: function (grid, rowIndex, colIndex) {
+//                irregularStore.removeAt(rowIndex);
+//            }
+//        }, {
+//            text: '星期(開始)', dataIndex: 'week_day_start', width: 86, align: 'right', menuDisabled: true, sortable: false,
+//            editor: {
+//                xtype: 'combobox',
+//                queryMode: 'local',
+//                editable: false,
+//                store: startWeeksStore,
+//                displayField: 'name',
+//                valueField: 'abbr',
+//                renderer: function (val) {
+
+//                }
+//            }
+//        }, {
+//            text: '幾點(開始)', dataIndex: 'startHour', width: 56, align: 'left', menuDisabled: true, sortable: false,
+//            editor: {
+//                xtype: 'numberfield',
+//                allowBlank: false,
+//                value:0,
+//                minValue: 0
+//            }
+//        }, {
+//            text: '星期(結束)', dataIndex: 'week_day_end', width: 86, align: 'right', menuDisabled: true, sortable: false,
+//            editor: {
+//                xtype: 'combobox',
+//                id: 'week_day_end',
+//                queryMode: 'local',
+//                displayField: 'name',
+//                valueField: 'abbr',
+//                store: endWeeksStore,
+//                editable: false,
+//                allowBlank: false,
+//                renderer: function (val) {
+//                }
+//            }
+//        }, {
+//            text: '幾點(結束)', dataIndex: 'endHour', width: 56, align: 'left', menuDisabled: true, sortable: false,
+//            editor: {
+//                xtype: 'numberfield',
+//                allowBlank: false,
+//                value: 0,
+//                minValue: 0
+//            }
+//        }, {
+//            text: '執行時間(天后)', dataIndex: 'executeDays', width: 90, flex: 1, align: 'center', menuDisabled: true, sortable: false,
+//            editor: {
+//                xtype: 'numberfield',
+//                allowBlank: false,
+//                minValue: 0
+//            }
+//        }],
+//    tbar: [{
+//        text: '新增', handler: function () {
+//            irregularGrid.getStore().add({});
+//        }
+//    }]
+//});
 
 
 
@@ -1058,7 +1071,9 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                editable: false,
                value: 'w',
                store: irregularStore
-           }, irregularGrid]
+           }
+           //irregularGrid
+           ]
        }, {
            xtype: 'container',
            layout: 'column',
@@ -1106,8 +1121,6 @@ var pcFrm = Ext.create('Ext.form.Panel', {
         }
     }]
 });
-
-
 
 var addPc = Ext.create('Ext.window.Window', {
     title: SCHEDULE_CONFIG,//排成設定
@@ -1198,9 +1211,10 @@ function Tier_Load(record) {
             break;
 
 
-        case 3:
-            irregulartimeStore.load();
-            break;
+        //case 3:
+        //    //irregulartimeStore.load();
+        //    irregulartimeStoreLoad(record);
+        //    break;
 
     }
 
@@ -1216,6 +1230,30 @@ function Tier_Load(record) {
 
 
 }
+
+/////特殊排程值設置
+//function irregulartimeStoreLoad(record) {
+//    irregulartimeStore.removeAll();
+//    if (record.data.type == 3){
+//        Ext.getCmp('pc_type').setValue(record.data.type);
+//    }
+
+//    var dateValue = record.data.desc.split(',');
+//    var weekValue = record.data.week_day.split(',');
+//    for (var i = 0; i < weekValue.length; i++) {
+//        var temp = i / 2;
+//        if (i % 2 == 0) {
+//            //var temp = i;
+//            irregulartimeStore.add({
+//                week_day_start: parseInt((weekValue[i] / 24), 10),
+//                startHour: parseInt((weekValue[i] % 24), 10),
+//                week_day_end: parseInt((weekValue[i + 1] / 24), 10),
+//                endHour: parseInt((weekValue[i + 1] / 24), 10),
+//                executeDays: dateValue[temp]
+//            });
+//        }
+//    }
+//}
 
 
 function getParams() {
@@ -1259,26 +1297,7 @@ function getParams() {
                     }
                     break;
             }
-            //var zxycradio = Ext.getCmp('zxycradio');
-            //if (zxycradio.checked) {
-            //    params.day_type = 1;
-            //    params.start_time = Ext.String.format('{0}:{1}:{2}',
-            //        Ext.getCmp('ro_hou').getValue(),
-            //        Ext.getCmp('ro_min').getValue(),
-            //        Ext.getCmp('ro_sen').getValue());
-            //} else {
-            //    params.day_type = 2;
-            //    params.repeat_hours = Ext.getCmp('cfnh').getValue();
-            //    params.time_type = Ext.getCmp('cfhms').getValue();
-            //    params.start_time = Ext.String.format('{0}:{1}:{2}',
-            //        Ext.getCmp('s_hour').getValue(),
-            //        Ext.getCmp('s_min').getValue(),
-            //        Ext.getCmp('s_sen').getValue());
-            //    params.end_time = Ext.String.format('{0}:{1}:{2}',
-            //        Ext.getCmp('e_hour').getValue(),
-            //        Ext.getCmp('e_min').getValue(),
-            //        Ext.getCmp('e_sen').getValue());
-            //}
+
             params.duration_start = Ext.getCmp('cs_time').getValue();
 
             if (!Ext.getCmp('noendtime').checked) {
@@ -1289,12 +1308,26 @@ function getParams() {
             params.duration_start = Ext.getCmp('datatime').getValue();
             break;
 
-        case '3':
-            Ext.each(irregulartimeStore.data.items, function () {
-                irregulartimeStore.push(this.data);
-            });
-            break;
-
+        //case '3':
+        //    //Ext.each(irregulartimeStore.data.items, function () {
+        //    //    irregulartimeStore.push(this.data);
+        //    //});
+        //    //var data = irregulartimeStore;
+        //    params.week_day = "";
+        //    params.desc = "";
+        //    var source = irregulartimeStore.data;///獲得不規則排程的store
+        //    //var beginDay = source.items[0].data.week_day_start;///獲得頭數據的開始天數
+        //    //beginDay = (beginDay - 1) * 24 + source.items[0].data.startHour///獲得頭數據的小時數
+        //    for (var i = 0; i < source.items.length; i++)
+        //    {
+        //        params.week_day += (source.items[i].data.week_day_start - 1) * 24 + source.items[i].data.startHour + ",";
+        //        params.week_day += (source.items[i].data.week_day_end - 1) * 24 + source.items[i].data.endHour + ",";
+        //        params.desc += source.items[i].data.executeDays + ",";
+        //    }
+        //    //params.week_day = beginDay + "," + params.week_day;
+        //    params.week_day = params.week_day.substring(0, params.week_day.length - 1);
+        //    params.desc = params.desc.substring(0, params.desc.length - 1);
+        //    break;
     }
 
     return params;
