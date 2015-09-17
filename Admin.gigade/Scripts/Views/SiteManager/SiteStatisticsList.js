@@ -251,7 +251,7 @@ Ext.onReady(function ()
             { header: "實際轉換", dataIndex: 'ss_converted_newuser', width: 80, align: 'center' },
             { header: "訂單金額", dataIndex: 'ss_sum_order_amount', width: 100, align: 'center' },
             {
-                header: "時間", dataIndex: 'ss_date', width: 110, align: 'center',
+                header: "日期", dataIndex: 'ss_date', width: 110, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store)
                 {
                     return value.substr(0, 10);

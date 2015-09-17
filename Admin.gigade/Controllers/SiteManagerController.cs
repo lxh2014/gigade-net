@@ -417,6 +417,10 @@ namespace Admin.gigade.Controllers
                 _newDt.Columns.Add("實際轉換", typeof(string));
                 _newDt.Columns.Add("訂單金額", typeof(string));
                 _newDt.Columns.Add("廠商代碼", typeof(string));
+                //_newDt.Columns.Add("創建人員", typeof(string));
+                //_newDt.Columns.Add("創建時間", typeof(string));
+                //_newDt.Columns.Add("異動人員", typeof(string));
+                //_newDt.Columns.Add("異動時間", typeof(string));
                 for (int i = 0; i < _dt.Rows.Count; i++)
                 {
                     DataRow newRow = _newDt.NewRow();
@@ -429,6 +433,10 @@ namespace Admin.gigade.Controllers
                     newRow["實際轉換"] = _dt.Rows[i]["ss_converted_newuser"].ToString();
                     newRow["訂單金額"] = _dt.Rows[i]["ss_sum_order_amount"].ToString();
                     newRow["廠商代碼"] = _dt.Rows[i]["ss_code"].ToString();
+                    //newRow["創建人員"] = _dt.Rows[i]["ss_create_username"].ToString();
+                    //newRow["創建時間"] = _dt.Rows[i]["ss_create_time"].ToString();
+                    //newRow["異動人員"] = _dt.Rows[i]["ss_modify_username"].ToString();
+                    //newRow["異動時間"] = _dt.Rows[i]["ss_modify_time"].ToString();
 
                     _newDt.Rows.Add(newRow);
                 }
