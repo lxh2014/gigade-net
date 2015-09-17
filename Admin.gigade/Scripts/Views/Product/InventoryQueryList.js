@@ -18,8 +18,6 @@ Ext.define('gridlistIQ', {
         { name: "product_spec", type: "string" },//商品規格
         { name: "product_status", type: "int" },//商品狀態
         { name: "product_status_string", type: "string" },//商品狀態顯示
-        //{ name: "product_id_OR_product_name", type: "string" },//商品編號或名稱
-        //{ name: "vendor_name_full_OR_vendor_id", type: "string" },//供應商名稱或編號
         { name: "vendor_name_full", type: "string" },//供應商名稱
         { name: "vendor_id", type: "int" },//供應商編號
         { name: "brand_id", type: "int" },//品牌編號
@@ -28,10 +26,6 @@ Ext.define('gridlistIQ', {
         { name: "item_stock", type: "int" },//庫存數量
         { name: "ignore_stock", type: "int" },//補貨中停止販售
         { name: "ignore_stock_string", type: "string" },//補貨中停止販售顯示
-        //{ name: "item_stock_start", type: "int" },//庫存數量開始
-        //{ name: "item_stock_end", type: "int" },//庫存數量結束
-        //{ name: "spec_title_1", type: "string" },//規格1
-        //{ name: "spec_title_2", type: "string" }//規格2
     ],
 });
 
