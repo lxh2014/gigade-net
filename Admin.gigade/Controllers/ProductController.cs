@@ -6012,7 +6012,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["product_id_OR_product_name"]))
                 {
-                    query.product_id_OR_product_name = Request.Params["product_id_OR_product_name"];//商品编号/名称
+                    query.product_id_OR_product_name = Request.Params["product_id_OR_product_name"];//商品编号/名称/商品細項編號
                 }
                 if (!string.IsNullOrEmpty(Request.Params["brand_id_OR_brand_name"]))
                 {
@@ -6121,14 +6121,6 @@ namespace Admin.gigade.Controllers
                         dr[8] = list[i].product_status_string;
                         dr[9] = list[i].Item_Stock;
                        dr[10] = list[i].ignore_stock_string;
-                        //if (list[i].ignore_stock == 0)
-                        //{
-                        //    dr[10] = "否";
-                        //}
-                        //if (list[i].ignore_stock == 1)
-                        //{
-                        //    dr[10] = "是";
-                        //}
                         dtHZ.Rows.Add(dr);
                     }
                     string fileName = "product_stock_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";

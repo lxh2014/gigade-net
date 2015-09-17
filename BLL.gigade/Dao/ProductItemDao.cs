@@ -599,7 +599,6 @@ namespace BLL.gigade.Dao
                 str.AppendFormat(" ,CONCAT(p.spec_title_2,' ',ps2.spec_name) as Spec_Name_2 ,v.vendor_id,v.vendor_name_full, vb.brand_id ");
                 str.Append(" ,vb.brand_name,tp.parameterName as product_status_string,p.product_status,pi.item_stock,p.ignore_stock  ");
                 strcont.AppendFormat("  from product_item pi ");
-                //strcont.AppendFormat(" left JOIN arrival_notice an on pi.item_id=pi.item_id ");
                 strcont.AppendFormat(" left JOIN product p on p.product_id=pi.product_id ");
                 strcont.AppendFormat(" INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id ");
                 strcont.AppendFormat(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id ");
@@ -619,7 +618,6 @@ namespace BLL.gigade.Dao
                         strcont.AppendFormat(" and p.product_name LIKE '%{0}%'", query.product_id_OR_product_name);
                     }
                 }
-
                 if (!string.IsNullOrEmpty(query.vendor_name_full_OR_vendor_id))//供應商名稱或者供應商編號
                 {
                     int ID = 0;
@@ -645,7 +643,7 @@ namespace BLL.gigade.Dao
                         strcont.AppendFormat(" and vb.brand_name LIKE '%{0}%'", query.brand_id_OR_brand_name);
                     }
                 }
-                if (query.product_status != 10)//商品狀態
+                if (query.product_status != 10)//商品狀態  10 代表全部
                 {
                     strcont.AppendFormat("and p.product_status = '{0}'", query.product_status);
                 }
