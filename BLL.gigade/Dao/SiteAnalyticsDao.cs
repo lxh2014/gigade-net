@@ -137,10 +137,8 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                //string sa_date = Convert.ToDateTime(_dt.Rows[i][0]).ToString("yyyy-MM-dd");
                 sql.AppendFormat(" select sa_id from site_analytics where sa_date='{0}'", query.s_sa_date);
                 DataTable _dt = _accessMySql.getDataTable(sql.ToString());
-                //return
                 if (_dt.Rows.Count > 0)
                 {
                     return Convert.ToInt32(_dt.Rows[0][0]);

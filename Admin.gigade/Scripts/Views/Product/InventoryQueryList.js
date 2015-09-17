@@ -360,7 +360,7 @@ function Comeback() {
     Ext.getCmp('id1').setValue(true);// 補貨中停止販售
 }
 
-/************匯入到Exce************/
+/************匯出到Exce************/
 function Export() {
     var vendor_name_full_OR_vendor_id = Ext.getCmp('vendor_name_full_OR_vendor_id').getValue();
     var product_id_OR_product_name = Ext.getCmp('product_id_OR_product_name').getValue();

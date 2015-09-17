@@ -67,7 +67,8 @@
                    allowBlank: false,
                    submitValue: true,
                    minValue: 0.00,
-                   value: 0.00
+                   value: 0.00,
+                   maxValue:100
                },
                {
                    xtype: "numberfield",

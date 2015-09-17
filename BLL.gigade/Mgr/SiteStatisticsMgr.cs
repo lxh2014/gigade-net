@@ -67,6 +67,8 @@ namespace BLL.gigade.Mgr
             SiteStatistics query = new SiteStatistics();
             query.ss_create_time = DateTime.Now;
             query.ss_create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+            query.ss_modify_time = query.ss_create_time;
+            query.ss_modify_user = query.ss_create_user;
             try
             {
                 int total = 0;
