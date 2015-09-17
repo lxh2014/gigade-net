@@ -134,7 +134,7 @@ Ext.onReady(function () {
         ],
         tbar: [
             {
-                xtype: 'button', text: '匯出Excel', id: 'outexcel', hidden: false, handler: function () {
+                xtype: 'button', text: '匯出', id: 'outexcel', hidden: false, iconCls: 'icon-excel', handler: function () {
                     var paper_id = Ext.getCmp('paper').getValue();
                     window.open('/Paper/OutExcel?paper_id=' + paper_id + '&user_id=' + user_id);
                 }

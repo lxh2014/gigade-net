@@ -153,63 +153,63 @@ namespace BLL.gigade.Mgr
           }
       }
 
-      public List<ProductItemQuery> GetInventoryQueryList(ArrivalNoticeQuery query, out int totalCount)
-      {
-          try
-          {
-              List<ProductItemQuery> store = new List<ProductItemQuery>();
-              store = _IArrivalNoticeDao.GetInventoryQueryList(query, out totalCount);
-              foreach (var item in store)
-              {
-                  item.product_spec = item.Spec_Name_1;
-                  item.product_spec += string.IsNullOrEmpty(item.Spec_Name_1) ? item.Spec_Name_2 : (string.IsNullOrEmpty(item.Spec_Name_2) ? "" : " / " + item.Spec_Name_2);
-                  #region 商品狀態
-                  //if (item.product_status == 0)
-                  //{
-                  //    item.product_status_string = "新建立商品";
-                  //}
-                  //if (item.product_status == 1)
-                  //{
-                  //    item.product_status_string = "申請審核";
-                  //}
-                  //if (item.product_status == 2)
-                  //{
-                  //    item.product_status_string = "審核通過";
-                  //}
-                  //if (item.product_status == 5)
-                  //{
-                  //    item.product_status_string = "上架";
-                  //}
-                  //if (item.product_status == 6)
-                  //{
-                  //    item.product_status_string = "下架";
-                  //}
-                  //if (item.product_status == 20)
-                  //{
-                  //    item.product_status_string = "供應商新建商品";
-                  //}
-                  //if (item.product_status == 99)
-                  //{
-                  //    item.product_status_string = "下架不販售";
-                  //}
-                  #endregion
-                  if (item.ignore_stock == 0)
-                  {
-                      item.ignore_stock_string = "否";
-                  }
-                  if (item.ignore_stock == 1)
-                  {
-                      item.ignore_stock_string = "是";
-                  }
-              }
+      //public List<ProductItemQuery> GetInventoryQueryList(ArrivalNoticeQuery query, out int totalCount)
+      //{
+      //    try
+      //    {
+      //        List<ProductItemQuery> store = new List<ProductItemQuery>();
+      //        store = _IArrivalNoticeDao.GetInventoryQueryList(query, out totalCount);
+      //        foreach (var item in store)
+      //        {
+      //            item.product_spec = item.Spec_Name_1;
+      //            item.product_spec += string.IsNullOrEmpty(item.Spec_Name_1) ? item.Spec_Name_2 : (string.IsNullOrEmpty(item.Spec_Name_2) ? "" : " / " + item.Spec_Name_2);
+      //            #region 商品狀態
+      //            //if (item.product_status == 0)
+      //            //{
+      //            //    item.product_status_string = "新建立商品";
+      //            //}
+      //            //if (item.product_status == 1)
+      //            //{
+      //            //    item.product_status_string = "申請審核";
+      //            //}
+      //            //if (item.product_status == 2)
+      //            //{
+      //            //    item.product_status_string = "審核通過";
+      //            //}
+      //            //if (item.product_status == 5)
+      //            //{
+      //            //    item.product_status_string = "上架";
+      //            //}
+      //            //if (item.product_status == 6)
+      //            //{
+      //            //    item.product_status_string = "下架";
+      //            //}
+      //            //if (item.product_status == 20)
+      //            //{
+      //            //    item.product_status_string = "供應商新建商品";
+      //            //}
+      //            //if (item.product_status == 99)
+      //            //{
+      //            //    item.product_status_string = "下架不販售";
+      //            //}
+      //            #endregion
+      //            if (item.ignore_stock == 0)
+      //            {
+      //                item.ignore_stock_string = "否";
+      //            }
+      //            if (item.ignore_stock == 1)
+      //            {
+      //                item.ignore_stock_string = "是";
+      //            }
+      //        }
 
-              return store;
+      //        return store;
 
-          }
-          catch (Exception ex)
-          {
-              throw new Exception("ArrivalNoticeMgr->GetInventoryQueryList" + ex.Message);
-          }
-      }
+      //    }
+      //    catch (Exception ex)
+      //    {
+      //        throw new Exception("ArrivalNoticeMgr->GetInventoryQueryList" + ex.Message);
+      //    }
+      //}
     }
 }
