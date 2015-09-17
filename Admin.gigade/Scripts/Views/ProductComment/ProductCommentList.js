@@ -538,7 +538,7 @@ Ext.onReady(function () {
             }
         },
         {
-            header: '客戶服務滿意度', dataIndex: 'seller_server', width: 100, align: 'center',
+            header: '商品質量滿意度', dataIndex: 'seller_server', width: 100, align: 'center',
             renderer: function (value) {
                 if (value == 1) {
                     return Ext.String.format('非常不滿意');
