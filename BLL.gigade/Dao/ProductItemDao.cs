@@ -651,8 +651,8 @@ namespace BLL.gigade.Dao
                 {
                     strcont.AppendFormat("  and pi.item_stock >='{0}' and pi.item_stock <='{1}'  ", query.item_stock_start, query.item_stock_end);
                 }
-                    
-                strcont.AppendFormat("and p.ignore_stock = '{0}'", query.ignore_stock);
+
+                strcont.AppendFormat("and p.ignore_stock = '{0}'", query.ignore_stock);//庫存為0時是否還能販售
                 str.Append(strcont);
 
                 if (query.IsPage)

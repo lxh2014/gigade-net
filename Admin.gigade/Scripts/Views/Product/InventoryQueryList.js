@@ -25,7 +25,7 @@ Ext.define('gridlistIQ', {
         { name: "brand_id_OR_brand_name", type: "string" },//品牌編號或名稱
         { name: "item_stock", type: "int" },//庫存數量
         { name: "ignore_stock", type: "int" },//補貨中停止販售
-        { name: "ignore_stock_string", type: "string" },//補貨中停止販售顯示
+        { name: "ignore_stock_string", type: "string" },//庫存為0時是否還能販售
     ],
 });
 
@@ -80,7 +80,7 @@ ProductStore.on('beforeload', function () {
             product_status: Ext.getCmp('product_status').getValue(),//商品狀態
             item_stock_start: Ext.getCmp('item_stock_start').getValue(),//庫存數量開始
             item_stock_end: Ext.getCmp('item_stock_end').getValue(),//庫存數量結束
-            ignore_stockRdo: Ext.getCmp('ignore_stockRdo').getValue()//補貨中停止販售
+            ignore_stockRdo: Ext.getCmp('ignore_stockRdo').getValue()//庫存為0時是否還能販售
         });
 });
 
@@ -187,7 +187,7 @@ Ext.onReady(function () {
                         margin: '0 0 0 10',
                         fieldLabel: '庫存數量',                
                         value: 0,
-                        minValue: -999999,
+                        minValue: -99999,
                         maxValue: 99999,
                         anchor: '100%',
                         listeners: {
@@ -199,10 +199,20 @@ Ext.onReady(function () {
                             , change: function () {
                                 var start = Ext.getCmp('item_stock_start');
                                 var end = Ext.getCmp('item_stock_end');
-                                if (start.getValue() > end.getValue())
+                                if (start.getValue() > end.getValue()  )
                                 {
                                     end.setValue(start.getValue());
+                                   
                                 }
+                                if (-99999 < start.getValue() && start.getValue() < 99999 && -99999 < end.getValue() && end.getValue() < 99999)
+                                {
+                                    Ext.getCmp('query').setDisabled(false);
+                                }
+                                else
+                                {
+                                    Ext.getCmp('query').setDisabled(true);
+                                }
+                                
                             }
                         }
                     },
@@ -233,6 +243,13 @@ Ext.onReady(function () {
                                 {
                                     end.setValue(start.getValue());
                                 }
+                                if (-99999 < end.getValue() && end.getValue() < 99999 && -99999 < start.getValue() && start.getValue() < 99999)
+                                {
+                                    Ext.getCmp('query').setDisabled(false);
+                                }
+                                else {
+                                    Ext.getCmp('query').setDisabled(true);
+                                }
                             }
                             }
                     }
@@ -244,12 +261,12 @@ Ext.onReady(function () {
                 layout: 'hbox',
                 items: [
                 {
-                    fieldLabel: '補貨中停止販售',
+                    fieldLabel: '庫存為0時是否還能販售',
                     xtype: 'radiogroup',
                     id: 'ignore_stockRdo',
-                    labelWidth: 100,
+                    labelWidth: 150,
                     margin: '0 0 0 10',
-                    width: 200,
+                    width: 260,
                     defaults: {
                         name: 'ignore_stockVal'
                     },
@@ -266,6 +283,8 @@ Ext.onReady(function () {
         buttons: [
                 {
                     text: '查詢',
+                    id: 'query',
+                    //disabled: true,
                     margin: '0 10 0 10',
                     iconCls: 'icon-search',
                     handler: function () {
@@ -301,7 +320,7 @@ Ext.onReady(function () {
                 { header: "品牌名稱", dataIndex: "brand_name", width: 180 },
                 { header: "商品狀態", dataIndex: "product_status_string" },
                 { header: "庫存數量", dataIndex: "item_stock" },
-                { header: "補貨中停止販售 ", dataIndex: "ignore_stock_string" }
+                { header: "庫存為0時是否還能販售 ", dataIndex: "ignore_stock_string",width:160 }
         ],
         tbar: [
         { xtype: 'button', text: '匯出商品庫存報表', margin: '0 0 0 5', iconCls: 'icon-excel', id: 'btnExcel', handler: Export }
@@ -357,7 +376,7 @@ function Comeback() {
     Ext.getCmp('product_status').setValue('10');
     Ext.getCmp('item_stock_start').setValue('0');
     Ext.getCmp('item_stock_end').setValue('0');
-    Ext.getCmp('id1').setValue(true);// 補貨中停止販售
+    Ext.getCmp('id1').setValue(true);// 庫存為0時是否還能販售
 }
 
 /************匯出到Exce************/
