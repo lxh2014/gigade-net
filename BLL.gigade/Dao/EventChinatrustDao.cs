@@ -50,14 +50,27 @@ namespace BLL.gigade.Dao
                  {
                      sbSqlCondition.AppendFormat(" and(ec.event_id like N'%{0}%' or ec.event_name like N'%{0}%') ", query.event_id_name);
                  }
-                 if (query.event_start_time>DateTime.MinValue)
-                 {
-                     sbSqlCondition.AppendFormat(" and ec.event_start_time >='{0}' ", query.event_start_time.ToString("yyyy-MM-dd 00:00:00"));
-                 }
-                 if (query.event_end_time>DateTime.MinValue)
-                 {
-                     sbSqlCondition.AppendFormat(" and ec.event_end_time <='{0}' ", query.event_end_time.ToString("yyyy-MM-dd 23:59:59"));
-                 }
+                 if (query.dateCondition != 0)
+                 { 
+                 if (query.event_start_time > DateTime.MinValue)
+                     {
+                         if (query.event_end_time > DateTime.MinValue)
+                         {
+                             switch (query.dateCondition)
+                             { 
+                                 case 1:
+                                     sbSqlCondition.AppendFormat(" and ec.event_start_time between '{0}' and'{1}' ", query.event_start_time.ToString("yyyy-MM-dd 00:00:00"), query.event_end_time.ToString("yyyy-MM-dd 23:59:59"));
+                                     break;
+                                 case 2:
+                                     sbSqlCondition.AppendFormat(" and ec.event_end_time between '{0}' and'{1}' ", query.event_start_time.ToString("yyyy-MM-dd 00:00:00"), query.event_end_time.ToString("yyyy-MM-dd 23:59:59"));
+                                     break;
+                                 case 3:
+                                     sbSqlCondition.AppendFormat(" and ec.event_update_time between '{0}' and'{1}' ", query.event_start_time.ToString("yyyy-MM-dd 00:00:00"), query.event_end_time.ToString("yyyy-MM-dd 23:59:59"));
+                                     break;
+                             }
+                         }
+                     }
+                 }            
                  totalCount = 0;
                  if (query.IsPage)
                  {
