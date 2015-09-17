@@ -140,9 +140,96 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
     }
 });
 
+var searchform = Ext.create('Ext.form.Panel', {
+    id: 'dockedItem',
+    //xtype: 'toolbar',
+    layout: 'column',
+    border: true,
+    frame: true,
+    dock: 'top',
+    items: [{
+        xtype: 'textfield',
+        fieldLabel: ID_CODE,//排程編號
+        id: 'schedule_id',
+        //name: 'schedule_id',
+        labelWidth: 60
+    }, {
+        xtype: 'textfield',
+        fieldLabel: TIER_NAME,//排程名稱
+        id: 's_schedule_name',
+        margin: '0 0 0 10',
+        labelWidth: 60
+    }, {
+        xtype: 'combobox',
+        fieldLabel: TIME_CONDITION,//時間條件
+        store: searchtypeStore,
+        labelWidth: 60,
+        margin: '0 0 0 10',
+        id: 'search_date_type',
+        name: 'search_date_type',
+        displayField: 'parameterName',
+        valueField: 'ParameterCode',
+        editable: false,
+        queryMode: 'local'
+    }, {
+        xtype: 'datefield',
+        id: 'time_start',
+        name: 'time_start',
+        margin: '0 5px',
+        editable: false,
+        listeners: {    //add by mingwei0727w 2015/09/14 限制時間輸入範圍
+            change: function () {
+                Ext.getCmp("time_end").setMinValue(this.getValue());
+            }
+        }
+    }, {
+        xtype: 'displayfield',
+        value: '~'
+    }, {
+        xtype: 'datefield',
+        id: 'time_end',
+        name: 'time_end',
+        margin: '0 5px',
+        editable: false,
+        listeners: {
+            change: function () {
+                Ext.getCmp("time_start").setMaxValue(this.getValue());
+            }
+        }
+    }, {
+        xtype: 'button',
+        text: QUERY,//查詢
+        id: 'btn_search',
+        handler: Search,
+        margin: '0 0 0 10',
+        iconCls: 'ui-icon ui-icon-search-2'
+    }, {
+        xtype: 'button',
+        text: RESET,//重置
+        id: 'btn_reset',
+        margin: '0 0 0 10',
+        iconCls: 'ui-icon ui-icon-reset',
+        listeners: {
+            click: function () {
+                Ext.getCmp("schedule_id").setValue("");
+                Ext.getCmp("s_schedule_name").setValue("");
+                Ext.getCmp("search_date_type").setValue("");
+                Ext.getCmp("time_start").setValue("");
+                Ext.getCmp("time_end").setValue("");
+            }
+        }
+    }]
+
+})
 
 
 Ext.onReady(function () {
+
+    document.body.onkeydown = function () {
+        if (event.keyCode == 13) {
+            $("#btn_search").click();
+        }
+    };
 
     var tierGrid = Ext.create('Ext.grid.Panel', {
         id: 'tierGrid',
@@ -150,75 +237,7 @@ Ext.onReady(function () {
         width: document.documentElement.clientWidth,
         columnLines: true,
         frame: false,
-        dockedItems: [{
-            id: 'dockedItem',
-            xtype: 'toolbar',
-            layout: 'column',
-            dock: 'top',
-            items: [{
-                xtype: 'textfield',
-                fieldLabel: ID_CODE,//排程編號
-                id: 'schedule_id',
-                //name: 'schedule_id',
-                labelWidth: 60
-            }, {
-                xtype: 'textfield',
-                fieldLabel: TIER_NAME,//排程名稱
-                id: 'schedule_name',
-                labelWidth: 60
-            }, {
-                xtype: 'combobox',
-                fieldLabel: TIME_CONDITION,//時間條件
-                store: searchtypeStore,
-                labelWidth: 60,
-                id: 'search_date_type',
-                name: 'search_date_type',
-                displayField: 'parameterName',
-                valueField: 'ParameterCode',
-                editable: false,
-                queryMode: 'local'
-            }, {
-                xtype: 'datefield',
-                id: 'time_start',
-                name: 'time_start',
-                margin: '0 5px',
-                editable: false,
-                vtype: 'daterange',
-                endDateField: 'time_end'
-            }, {
-                xtype: 'displayfield',
-                value: '~'
-            }, {
-                xtype: 'datefield',
-                id: 'time_end',
-                name: 'time_end',
-                margin: '0 5px',
-                editable: false,
-                vtype: 'daterange',
-                startDateField: 'time_start'
-            }, {
-                xtype: 'button',
-                text: QUERY,//查詢
-                id: 'btn_search',
-                handler: Search,
-                margin: '0 0 0 10',
-                iconCls: 'ui-icon ui-icon-search-2'
-            }, {
-                text: RESET,//重置
-                id: 'btn_reset',
-                margin: '0 0 0 10',
-                iconCls: 'ui-icon ui-icon-reset',
-                listeners: {
-                    click: function () {
-                        Ext.getCmp("schedule_id").setValue("");
-                        Ext.getCmp("schedule_name").setValue("");
-                        Ext.getCmp("search_date_type").setValue("");
-                        Ext.getCmp("time_start").setValue("");
-                        Ext.getCmp("time_end").setValue("");
-                    }
-                }
-            }]
-        }],
+        dockedItems: [searchform],
         tbar: [
            { xtype: 'button', id: 'add', text: ADD, iconCls: 'ui-icon ui-icon-add', handler: onAddClick },//添加
            { xtype: 'button', id: 'edit', text: EDIT, iconCls: 'ui-icon ui-icon-pencil', disabled: true, handler: onEditClick },//編輯
@@ -320,7 +339,7 @@ function Search() {
     tierStore.load({
         params: {
             schedule_id: Ext.getCmp("schedule_id").getValue(),
-            schedule_name: Ext.getCmp("schedule_name").getValue(),
+            schedule_name: Ext.getCmp("s_schedule_name").getValue(),
             SearchType: Ext.getCmp('search_date_type').getValue(),
             start: Ext.getCmp('time_start').getValue(),
             end: Ext.getCmp('time_end').getValue()
