@@ -651,10 +651,7 @@ namespace BLL.gigade.Dao
                 {
                     strcont.AppendFormat("  and pi.item_stock >='{0}' and pi.item_stock <='{1}'  ", query.item_stock_start, query.item_stock_end);
                 }
-                if (1 == 1)//補貨中停止販售
-                {
                     strcont.AppendFormat("and p.ignore_stock = '{0}'", query.ignore_stock);
-                }
                 str.Append(strcont);
 
                 if (query.IsPage)
@@ -663,7 +660,6 @@ namespace BLL.gigade.Dao
                     StringBuilder strcontpage = new StringBuilder();
                     strpage.AppendFormat(" SELECT count(pi.item_id) as totalCount  ");
                     strpage.Append(strcont);
-                    // strpage.AppendFormat(" ");
                     string sql = strpage.ToString();
                     DataTable _dt = _access.getDataTable(sql);
                     if (_dt.Rows.Count > 0)
