@@ -2955,6 +2955,8 @@ WHERE pii.product_id='{0}' ", query.Product_Id);
                 throw new Exception("ProductDao.GetProductType-->" + ex.Message + sbSql.ToString(), ex);
             }
         }
+
+
     }
 }
 

@@ -153,16 +153,16 @@ namespace BLL.gigade.Mgr
           }
       }
 
-      public List<ArrivalNoticeQuery> GetInventoryQueryList(ArrivalNoticeQuery query, out int totalCount)
+      public List<ProductItemQuery> GetInventoryQueryList(ArrivalNoticeQuery query, out int totalCount)
       {
           try
           {
-              List<ArrivalNoticeQuery> store = new List<ArrivalNoticeQuery>();
+              List<ProductItemQuery> store = new List<ProductItemQuery>();
               store = _IArrivalNoticeDao.GetInventoryQueryList(query, out totalCount);
               foreach (var item in store)
               {
-                  item.product_spec = item.spec_title_1;
-                  item.product_spec += string.IsNullOrEmpty(item.spec_title_1) ? item.spec_title_2 : (string.IsNullOrEmpty(item.spec_title_2) ? "" : " / " + item.spec_title_2);
+                  item.product_spec = item.Spec_Name_1;
+                  item.product_spec += string.IsNullOrEmpty(item.Spec_Name_1) ? item.Spec_Name_2 : (string.IsNullOrEmpty(item.Spec_Name_2) ? "" : " / " + item.Spec_Name_2);
                   #region 商品狀態
                   //if (item.product_status == 0)
                   //{

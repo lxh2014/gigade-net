@@ -46,7 +46,6 @@ namespace BLL.gigade.Dao
                     }
                 }
                 sqlWhere.AppendFormat(" order by sa_date desc limit {0},{1}; ", query.Start, query.Limit);
-
                 return _accessMySql.getDataTableForObj<SiteAnalytics>(sql.ToString() + sqlFrom.ToString() + sqlWhere.ToString());
             }
             catch (Exception ex)
@@ -123,7 +122,7 @@ namespace BLL.gigade.Dao
                 {
                     sqlWhere.AppendFormat(" and  saly.sa_date ='{0}' ", query.s_sa_date);
                 }
-                sqlWhere.Append(" order by sa_date asc ");
+                sqlWhere.Append(" order by sa_date desc;");
                 return _accessMySql.getDataTable(sql.ToString() + sqlWhere.ToString());
             }
             catch (Exception ex)

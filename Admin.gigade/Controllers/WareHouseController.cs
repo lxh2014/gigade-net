@@ -9918,9 +9918,9 @@ namespace Admin.gigade.Controllers
 
                      for (int i = 0; i < ipodStore.Count; i++)//通過運送方式保存到字典里
                      {
-                         ipodStore[i].spec = GetProductSpec(ipodStore[i].item_id.ToString());
+                         ipodStore[i].spec = GetProductSpec(ipodStore[i].prod_id.ToString());//--------取值出錯了item_id-----------
                          IupcQuery upc = new IupcQuery();
-                         upc.item_id = ipodStore[i].item_id;
+                         upc.item_id = uint.Parse(ipodStore[i].prod_id);//--------取值出錯了item_id-----------
                          List<IupcQuery> upcStore = new List<IupcQuery>();
                          _IiupcMgr = new IupcMgr(mySqlConnectionString);
                          upcStore = _IiupcMgr.GetIupcByItemID(upc);

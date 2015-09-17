@@ -10,8 +10,7 @@ Ext.define('gigade.SiteAnalyticsList', {
         { name: "sa_create_user", type: "int" },
         { name: "s_sa_create_user", type: "string" },
         { name: "s_sa_date", type: "string" },
-        { name: "s_sa_create_time", type: "string" },
-             
+        { name: "s_sa_create_time", type: "string" },  
         { name: "sa_pageviews", type: "int" },
         { name: "sa_pages_session", type: "string" },
         { name: "sa_bounce_rate", type: "string" },
@@ -203,15 +202,15 @@ onDeleteClick = function () {
             { header: "日索引", dataIndex: 's_sa_date', width: 150, align: 'center' },
             { header: "造訪數", dataIndex: 'sa_session', align: '120', align: 'center' },
             { header: "使用者", dataIndex: 'sa_user', align: '120', align: 'center' },
-            { header: "創建時間", dataIndex: 's_sa_create_time', width: 165, align: 'center' },
-            { header: "創建人", dataIndex: 's_sa_create_user', align: '80', align: 'center' },
-
             { header: "瀏覽量", dataIndex: 'sa_pageviews', width: 50, align: 'center' },
             { header: "單次造訪頁數", dataIndex: 'sa_pages_session', width: 120, align: 'center' },
             { header: "跳出率", dataIndex: 'sa_bounce_rate', align: '120', align: 'center' },
             { header: "平均停留時間", dataIndex: 'sa_avg_session_duration', width: 165, align: 'center' },
-            { header: "異動時間", dataIndex: 'sa_modify_time_query', width: 120, align: 'center' },
-            { header: "異動人員", dataIndex: 'sa_modify_username', width: 120, align: 'center' }
+            { header: "創建人", dataIndex: 's_sa_create_user', align: '80', align: 'center' },
+            { header: "創建時間", dataIndex: 's_sa_create_time', width: 165, align: 'center' },
+            { header: "異動人員", dataIndex: 'sa_modify_username', width: 120, align: 'center' },
+            { header: "異動時間", dataIndex: 'sa_modify_time_query', width: 120, align: 'center' }
+            
         ],
         tbar: [
            { xtype: 'button', text: "新增", id: 'add', iconCls: 'icon-user-add', handler: onAddClick }, '-',
@@ -297,6 +296,4 @@ onDeleteClick = function () {
     });
     ToolAuthority();
    // SiteAnalyticsListStore.load({ params: { start: 0, limit: 25 } });
-
-
 });

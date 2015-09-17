@@ -25,6 +25,10 @@ namespace BLL.gigade.Model
         public DateTime ss_modify_time { get; set; }
         public int ss_modify_user { get; set; }
 
+        //query
+        public string ss_create_username { get; set; }
+        public string ss_modify_username { get; set; }
+
         public DateTime sss_date { get; set; }
         public DateTime ess_date { get; set; }
         public SiteStatistics()
@@ -44,6 +48,9 @@ namespace BLL.gigade.Model
             ss_modify_user = 0;
             sss_date = DateTime.MinValue;
             ess_date = DateTime.MinValue;
+            //query
+            ss_create_username = string.Empty;
+            ss_modify_username = string.Empty;
         }
     }
 }

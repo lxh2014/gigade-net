@@ -78,7 +78,8 @@ Ext.define('Ext.calendar.CalendarPanel', {
      * @cfg {String} monthText
      * Alternate text to use for the 'Month' nav bar button.
      */
-    monthText: new Date().getMonth() + 1 + '月份',
+    //monthText: new Date().getMonth() + 1 + '月份',
+    monthText: new Date().getMonth() + 1 ,
     
     layout: 'card',
 
@@ -240,7 +241,7 @@ Ext.define('Ext.calendar.CalendarPanel', {
         if (this.showMonthView || this.viewCount == 0) {
             this.tbar.items.push({
                 id: this.id + '-tb-month',
-                text: this.monthText,
+                text: this.monthText + '月份',
                 handler: this.onMonthClick,
                 scope: this,
                 toggleGroup: 'tb-views'
@@ -511,14 +512,16 @@ Ext.define('Ext.calendar.CalendarPanel', {
     },
 
     // private
-    onPrevClick: function() {
+    onPrevClick: function () {
+        this.subMonthClick();
         this.startDate = this.layout.activeItem.movePrev();
         this.updateNavState();
         this.fireViewChange();
     },
 
     // private
-    onNextClick: function() {
+    onNextClick: function () {
+        this.addMonthClick();
         this.startDate = this.layout.activeItem.moveNext();
         this.updateNavState();
         this.fireViewChange();
@@ -546,5 +549,30 @@ Ext.define('Ext.calendar.CalendarPanel', {
      */
     getActiveView: function() {
         return this.layout.activeItem;
-    }
+    },
+
+    addMonthClick: function () {
+        var aaa = this.id;
+        var i = document.getElementById("app-calendar-tb-month-btnInnerEl").innerHTML;
+        var length = i.indexOf("月份");
+        i = i.substring(0, length);
+        i = parseInt(i);
+        if (i === 12){
+            i = 0;
+        }
+        i = i + 1;
+        document.getElementById("app-calendar-tb-month-btnInnerEl").innerHTML = i + "月份";
+    },
+
+    subMonthClick: function () {
+        var i = document.getElementById("app-calendar-tb-month-btnInnerEl").innerHTML;
+        var length = i.indexOf("月份");
+        i = i.substring(0, length);
+        i = parseInt(i);
+        if (i === 1){
+            i = 13;
+        }
+        i = i - 1;
+        document.getElementById("app-calendar-tb-month-btnInnerEl").innerHTML = i + "月份";
+}
 });
