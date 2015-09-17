@@ -47,13 +47,32 @@ namespace BLL.gigade.Dao
                 {
                     str.AppendFormat(" and va.article_title like N'%{0}%' ", query.article_title);
                 }
-                if (!string.IsNullOrEmpty(query.time_start))
+                if (query.date != 0)
                 {
-                    str.AppendFormat(" and va.create_time>'{0}' ", query.time_start);
-                }
-                if (!string.IsNullOrEmpty(query.time_end))
-                {
-                    str.AppendFormat(" and va.create_time<'{0}' ", query.time_end);
+                    if (!string.IsNullOrEmpty(query.time_start))
+                    {
+                        if (!string.IsNullOrEmpty(query.time_end))
+                        {
+                            switch (query.date)
+                            {
+                                case 1:
+                                    str.AppendFormat(" and va.create_time between'{0}' and '{1}' ", query.time_start, query.time_end);
+                                    break;
+                                case 2:
+                                    str.AppendFormat(" and va.article_start_time between'{0}' and '{1}' ", query.time_start, query.time_end);
+                                    break;
+                                case 3:
+                                    str.AppendFormat(" and va.article_end_time between'{0}' and '{1}' ", query.time_start, query.time_end);
+                                    break;
+                                case 4:
+                                    str.AppendFormat(" and va.article_show_start_time between'{0}' and '{1}' ", query.time_start, query.time_end);
+                                    break;
+                                case 5:
+                                    str.AppendFormat(" and va.article_show_end_time between'{0}' and '{1}' ", query.time_start, query.time_end);
+                                    break;
+                            }
+                        }
+                    }
                 }
 
                 totalCount = 0;
