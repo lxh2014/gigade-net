@@ -115,6 +115,8 @@ namespace Admin.gigade.Controllers
                         store.Rows[i]["user_name"] = store.Rows[i]["user_name"].ToString().Substring(0, 1) + "**";
                     }
                     store.Rows[i]["user_email"] = store.Rows[i]["user_email"].ToString().Split('@')[0] + "@***";
+                    store.Rows[i]["answer_is_show"] = store.Rows[i]["answer_is_show"].ToString() == "" ? "-1" : store.Rows[i]["answer_is_show"].ToString();
+                    store.Rows[i]["is_show_name"] = store.Rows[i]["is_show_name"].ToString() == "" ? "-1" : store.Rows[i]["is_show_name"].ToString();
                 }
 
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
@@ -144,6 +146,8 @@ namespace Admin.gigade.Controllers
         {
             string json = string.Empty;
             StringBuilder sb = new StringBuilder();
+           
+           
             try
             {
                 DataTable store = new DataTable();
@@ -219,9 +223,9 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("留言回覆", typeof(String));
                 dtHZ.Columns.Add("回覆是否顯示", typeof(String));
                 dtHZ.Columns.Add("商品描述相符度", typeof(String));
-                dtHZ.Columns.Add("客戶服務滿意度", typeof(String));
-                dtHZ.Columns.Add("網站整體服務滿意度", typeof(String));
+                dtHZ.Columns.Add("商品質量滿意度", typeof(String));
                 dtHZ.Columns.Add("配送速度滿意度", typeof(String));
+                dtHZ.Columns.Add("網站整體滿意度", typeof(String));
                 dtHZ.Columns.Add("回覆人", typeof(String));
                 dtHZ.Columns.Add("回覆時間", typeof(String));
                 dtHZ.Columns.Add("狀態", typeof(String));
@@ -229,6 +233,7 @@ namespace Admin.gigade.Controllers
 
                 for (int i = 0; i < store.Rows.Count; i++)
                 {
+                   
                     DataRow dr = dtHZ.NewRow(); 
                     dr[0] = store.Rows[i]["comment_id"];
                     string comment_info = store.Rows[i]["product_name"].ToString();
@@ -266,10 +271,10 @@ namespace Admin.gigade.Controllers
                     else {
                         dr[9] = "";
                     }
-                    dr[10] = Satisfaction(Convert.ToInt32(store.Rows[i]["product_desc"].ToString()));//滿意度
-                    dr[11] = Satisfaction(Convert.ToInt32(store.Rows[i]["seller_server"].ToString()));
-                    dr[12] = Satisfaction(Convert.ToInt32(store.Rows[i]["web_server"].ToString()));
-                    dr[13] = Satisfaction(Convert.ToInt32(store.Rows[i]["logistics_deliver"].ToString()));
+                    dr[10] = Satisfaction(Convert.ToInt32(store.Rows[i]["product_desc"].ToString() == "" ? "0" : store.Rows[i]["product_desc"].ToString()));//滿意度
+                    dr[11] = Satisfaction(Convert.ToInt32(store.Rows[i]["seller_server"].ToString() == "" ? "0" : store.Rows[i]["seller_server"].ToString()));
+                    dr[12] = Satisfaction(Convert.ToInt32(store.Rows[i]["web_server"].ToString() == "" ? "0" : store.Rows[i]["web_server"].ToString()));
+                    dr[13] = Satisfaction(Convert.ToInt32(store.Rows[i]["logistics_deliver"].ToString() == "" ? "0" : store.Rows[i]["logistics_deliver"].ToString()));
                     dr[14] = store.Rows[i]["s_reply_user"];
                     if (!string.IsNullOrEmpty(store.Rows[i]["reply_time"].ToString()))
                     {
@@ -318,6 +323,7 @@ namespace Admin.gigade.Controllers
             }
             catch (Exception ex)
             {
+              
                 Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
@@ -332,6 +338,9 @@ namespace Admin.gigade.Controllers
 
             switch (type)
             {
+                case 0:
+                      Evaluation = "";
+                    break;
                 case 1:
                     Evaluation = "非常不滿意";
                     break;

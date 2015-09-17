@@ -16,6 +16,6 @@ namespace BLL.gigade.Mgr.Impl
        int SaveArrivaleNotice(ArrivalNotice query);
        int UpArrivaleNoticeStatus(ArrivalNotice query);
 
-       List<ProductItemQuery> GetInventoryQueryList(ArrivalNoticeQuery query, out int totalCount); //by yachao1120j 2015-9-10 商品库存查询
+       //List<ProductItemQuery> GetInventoryQueryList(ArrivalNoticeQuery query, out int totalCount); //by yachao1120j 2015-9-10 商品库存查询
     }
 }
