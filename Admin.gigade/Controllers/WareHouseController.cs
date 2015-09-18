@@ -2760,8 +2760,12 @@ namespace Admin.gigade.Controllers
                     {
                         if (_iinvd.Upd(m) > 0 )
                         {
-                            if (Request.Params["iialg"].ToString() == "Y" && _proditemMgr.UpdateItemStock(m.item_id, item_stock) > 0)//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改
-                            {
+                            if (Request.Params["iialg"].ToString() == "Y") 
+                            {// 
+                                if (ia.iarc_id == "DR" || ia.iarc_id == "KR")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
+                                {
+                                    _proditemMgr.UpdateItemStock(m.item_id, item_stock);
+                                }
                                 if (_iagMgr.insertiialg(ia) > 0)
                                 {
                                     jsonStr = "{success:true,msg:0}";//更新成功
@@ -2801,8 +2805,12 @@ namespace Admin.gigade.Controllers
                         {
                             if (_IlocMgr.SetIlocUsed(loc) > 0)
                             {
-                                if (Request.Params["iialg"].ToString() == "Y"&& _proditemMgr.UpdateItemStock(m.item_id, item_stock) > 0)//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改
+                                if (Request.Params["iialg"].ToString() == "Y")
                                 {
+                                    if (ia.iarc_id == "DR" || ia.iarc_id == "KR")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
+                                    {
+                                        _proditemMgr.UpdateItemStock(m.item_id, item_stock);
+                                    }
                                     ia.qty_o = 0;
                                     ia.adj_qty = m.prod_qty;
                                     if (_iagMgr.insertiialg(ia) > 0)
@@ -2826,8 +2834,12 @@ namespace Admin.gigade.Controllers
                         }
                         else
                         {
-                            if (Request.Params["iialg"].ToString() == "Y" && _proditemMgr.UpdateItemStock(m.item_id, item_stock) > 0)//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改
+                            if (Request.Params["iialg"].ToString() == "Y")
                             {
+                                if (ia.iarc_id == "DR" || ia.iarc_id == "KR")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
+                                {
+                                    _proditemMgr.UpdateItemStock(m.item_id, item_stock);
+                                }
                                 ia.qty_o = 0;
                                 ia.adj_qty = m.prod_qty;
                                 if (_iagMgr.insertiialg(ia) > 0)
