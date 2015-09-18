@@ -1949,6 +1949,7 @@
     <Content Include="Scripts\Views\WareHouse\IlocExportInto.js" />
     <Content Include="Scripts\Views\WareHouse\IplasExportEnter.js" />
     <Content Include="Scripts\Views\WareHouse\IplasExportInto.js" />
+    <Content Include="Scripts\Views\WareHouse\IpodCheckNo.js" />
     <Content Include="Scripts\Views\WareHouse\IPodEdit.js" />
     <Content Include="Scripts\Views\WareHouse\IpodList.js" />
     <Content Include="Scripts\Views\WareHouse\IpoEdit.js" />
