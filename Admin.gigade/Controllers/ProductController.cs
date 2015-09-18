@@ -6032,7 +6032,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["ignore_stockRdo"]))
                 {
-                    query.ignore_stock = Convert.ToInt32(Request.Params["ignore_stockRdo"]);//补货中停止贩售
+                    query.ignore_stock = Convert.ToInt32(Request.Params["ignore_stockRdo"]);//庫存為0時是否還能販售
                 }
                 List<ProductItemQuery> list = productitemMgr.GetInventoryQueryList(query, out totalcount);
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
@@ -6101,7 +6101,7 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("品牌名稱", typeof(String));
                 dtHZ.Columns.Add("商品狀態", typeof(String));
                 dtHZ.Columns.Add("庫存數量", typeof(String));
-                dtHZ.Columns.Add("補貨中停止販售", typeof(String));
+                dtHZ.Columns.Add("庫存為0時是否還能販售", typeof(String));
                 List<ProductItemQuery> list = new List<ProductItemQuery>();
                 productitemMgr = new ProductItemMgr(connectionString);
                 list = productitemMgr.GetInventoryQueryList(query, out totalcount);
