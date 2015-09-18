@@ -44,6 +44,7 @@
                    allowDecimals: false,
                    minValue: 0,
                    value: 0,
+                   maxValue: 2147483647,
                    submitValue: true
                },
                {
@@ -53,6 +54,7 @@
                    name: 'ss_click_num',
                    allowBlank: false,
                    allowDecimals: false,
+                   maxValue: 2147483647,
                    minValue: 0,
                    value: 0,
                    submitValue: true
@@ -80,6 +82,7 @@
                    allowBlank: false,
                    submitValue: true,
                    minValue: 0.00,
+                   maxValue: 21474836,
                    value: 0.00
                },
                 {
@@ -88,7 +91,7 @@
                    name: 'ss_newuser_number',
                    id: 'ss_newuser_number',
                    allowDecimals: false,
-                   decimalPrecision: 2,
+                   maxValue: 2147483647,
                    allowBlank: false,
                    submitValue: true,
                    minValue: 0.00,
@@ -102,6 +105,7 @@
                   allowBlank: false,
                   allowDecimals: false,
                   minValue: 0,
+                  maxValue: 2147483647,
                   value: 0,
                   submitValue: true
               },
@@ -113,8 +117,9 @@
                   allowDecimals: false,
                   allowBlank: false,
                   submitValue: true,
-                  minValue: 0.00,
-                  value: 0.00
+                  minValue: 0,
+                  maxValue: 2147483647,
+                  value: 0
               },
                {
                    xtype: 'combobox', //status
