@@ -611,7 +611,15 @@ namespace BLL.gigade.Dao
                     int ID = 0;
                     if (int.TryParse(query.product_id_OR_product_name, out ID))
                     {
-                        strcont.AppendFormat(" and ( p.product_id = '{0}' or pi.item_id = '{1}') ", query.product_id_OR_product_name, query.product_id_OR_product_name);
+                        if (query.product_id_OR_product_name.Length == 6)
+                        {
+                            strcont.AppendFormat("and pi.item_id='{0}'", query.product_id_OR_product_name);
+                        }
+                        else
+                        {
+                            strcont.AppendFormat("and p.product_id='{0}'",query.product_id_OR_product_name);
+                        }
+                        //strcont.AppendFormat(" and ( p.product_id = '{0}' or pi.item_id = '{1}') ", query.product_id_OR_product_name, query.product_id_OR_product_name);
                     }
                     else
                     {
@@ -651,8 +659,8 @@ namespace BLL.gigade.Dao
                 {
                     strcont.AppendFormat("  and pi.item_stock >='{0}' and pi.item_stock <='{1}'  ", query.item_stock_start, query.item_stock_end);
                 }
-                    
-                strcont.AppendFormat("and p.ignore_stock = '{0}'", query.ignore_stock);
+
+                strcont.AppendFormat("and p.ignore_stock = '{0}'", query.ignore_stock);//庫存為0時是否還能販售
                 str.Append(strcont);
 
                 if (query.IsPage)
