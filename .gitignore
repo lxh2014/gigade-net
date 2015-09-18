@@ -46,6 +46,7 @@ x64/
 *.scc
 *.xls
 *.pdf
+*.pubxml
 Web.config
 
 # OS generated files #
