@@ -241,12 +241,13 @@ WHERE dm.deliver_id IN ({0}) and t.export_id='{1}' and od.detail_status in (2,3,
         #region 根據工作代號查找數據
         public List<AseldQuery> GetAseldList(Aseld a)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();//left join iloc ic on i.plas_loc_id=ic.loc_id 
             sb.AppendFormat(@"SELECT seld_id,assg_id,case when ip.loc_id is null then 'YY999999' else ip.loc_id end as sel_loc,CONCAT('(',a.item_id,')',v.brand_name,'-',p.product_name) as description,concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz,ord_qty,out_qty,ord_id,a.item_id,ordd_id,upc_id,i.cde_dt,pe.cde_dt_shp,deliver_id,deliver_code,o.note_order,ic.hash_loc_id 
 FROM aseld a LEFT JOIN iinvd i ON a.item_id=i.item_id 
-left join iloc ic on i.plas_loc_id=ic.loc_id 
+
 LEFT JOIN product_ext pe ON i.item_id = pe.item_id 
 LEFT JOIN iplas ip on a.item_id=ip.item_id 
+left join iloc ic on ip.loc_id=ic.loc_id  
 LEFT JOIN product_item pi ON a.item_id = pi.item_id 
 LEFT JOIN product_spec ps1 ON pi.spec_id_1 = ps1.spec_id
 LEFT JOIN product_spec ps2 ON pi.spec_id_2 = ps2.spec_id
