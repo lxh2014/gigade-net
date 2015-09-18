@@ -5040,6 +5040,7 @@ namespace Admin.gigade.Controllers
             {
                 orderId = orderId;
             }
+            OrderMasterQuery omQuery=new OrderMasterQuery ();
             OrderShowMasterQuery query = new OrderShowMasterQuery();
             string json = string.Empty;
             OrderShowMasterQuery store = new OrderShowMasterQuery();
@@ -5069,6 +5070,8 @@ namespace Admin.gigade.Controllers
                     }
 
                 }
+                omQuery.Order_Id=orderId;
+                store.is_send_product = _orderMasterMgr.IsSendProduct(omQuery);//true可以變更 false不可變更。
                 store.is_vendor_deliver = _orderMasterMgr.IsVendorDeliver(orderId);
                 store.OrderDatePay = CommonFunction.GetNetTime(store.order_date_pay);
                 if (!string.IsNullOrEmpty(store.money_collect_date.ToString()) && store.money_collect_date != 0)
