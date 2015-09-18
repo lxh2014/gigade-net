@@ -611,7 +611,15 @@ namespace BLL.gigade.Dao
                     int ID = 0;
                     if (int.TryParse(query.product_id_OR_product_name, out ID))
                     {
-                        strcont.AppendFormat(" and ( p.product_id = '{0}' or pi.item_id = '{1}') ", query.product_id_OR_product_name, query.product_id_OR_product_name);
+                        if (query.product_id_OR_product_name.Length == 6)
+                        {
+                            strcont.AppendFormat("and pi.item_id='{0}'", query.product_id_OR_product_name);
+                        }
+                        else
+                        {
+                            strcont.AppendFormat("and p.product_id='{0}'",query.product_id_OR_product_name);
+                        }
+                        //strcont.AppendFormat(" and ( p.product_id = '{0}' or pi.item_id = '{1}') ", query.product_id_OR_product_name, query.product_id_OR_product_name);
                     }
                     else
                     {
