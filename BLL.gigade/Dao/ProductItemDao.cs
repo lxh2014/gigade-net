@@ -611,7 +611,15 @@ namespace BLL.gigade.Dao
                     int ID = 0;
                     if (int.TryParse(query.product_id_OR_product_name, out ID))
                     {
-                        strcont.AppendFormat(" and ( p.product_id = '{0}' or pi.item_id = '{1}') ", query.product_id_OR_product_name, query.product_id_OR_product_name);
+                        if (query.product_id_OR_product_name.Length == 6)
+                        {
+                            strcont.AppendFormat("and pi.item_id='{0}'", query.product_id_OR_product_name);
+                        }
+                        else
+                        {
+                            strcont.AppendFormat("and p.product_id='{0}'",query.product_id_OR_product_name);
+                        }
+                        //strcont.AppendFormat(" and ( p.product_id = '{0}' or pi.item_id = '{1}') ", query.product_id_OR_product_name, query.product_id_OR_product_name);
                     }
                     else
                     {
@@ -651,8 +659,8 @@ namespace BLL.gigade.Dao
                 {
                     strcont.AppendFormat("  and pi.item_stock >='{0}' and pi.item_stock <='{1}'  ", query.item_stock_start, query.item_stock_end);
                 }
-                    
-                strcont.AppendFormat("and p.ignore_stock = '{0}'", query.ignore_stock);
+
+                strcont.AppendFormat("and p.ignore_stock = '{0}'", query.ignore_stock);//庫存為0時是否還能販售
                 str.Append(strcont);
 
                 if (query.IsPage)
@@ -676,6 +684,24 @@ namespace BLL.gigade.Dao
             {
                 throw new Exception("ProductItemDao-->GetInventoryQueryList-->" + ex.Message);
             }
+
+        }
+        /**
+         * chaojie1124j 2015/09/17 庫存調整的時候，把商品的庫存也做相應的調整
+         */
+        public  int UpdateItemStock(uint Item_Id, int Item_Stock)
+        { 
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+               strSql.Append("update product_item set ");
+                strSql.AppendFormat("item_stock=item_stock+{0} where item_id={1};", Item_Stock, Item_Id);
+                return _dbAccess.execCommand(strSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->UpdateItemStock" + ex.Message + strSql.ToString(), ex);
+            }  
 
         }
     }

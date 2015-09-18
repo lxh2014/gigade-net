@@ -48,7 +48,7 @@ namespace BLL.gigade.Mgr
                         query.sa_session = Convert.ToInt32(_dt.Rows[i][1].ToString().Replace(',', ' ').Replace(" ", ""));
                         query.sa_user = Convert.ToInt32(_dt.Rows[i][2].ToString().Replace(',', ' ').Replace(" ", ""));
                         query.sa_pageviews = Convert.ToInt32(_dt.Rows[i][3].ToString().Replace(',', ' ').Replace(" ", ""));
-                        query.sa_pages_session = Convert.ToInt32(_dt.Rows[i][4].ToString().Replace(',', ' ').Replace(" ", ""));
+                        query.sa_pages_session = Convert.ToSingle(_dt.Rows[i][4].ToString().Replace(',', ' ').Replace(" ", ""));
                         if (float.TryParse(_dt.Rows[i][5].ToString(), out number))
                         {
                             query.sa_bounce_rate = Convert.ToSingle(_dt.Rows[i][5].ToString());

@@ -129,12 +129,12 @@ var IpodStore = Ext.create('Ext.data.Store', {
     update: function (store, record) {
         //如果編輯的是轉移數量
         //var row_id = e.record.data.row_id;
-        var qty_damaged = record.get("qty_damaged");
+        //var qty_damaged = record.get("qty_damaged");
         var qty_claimed = record.get("qty_claimed");
         var qty_ord = record.get("qty_ord");
-        if (parseInt(qty_damaged) + parseInt(qty_claimed) != parseInt(qty_ord))
+        if (parseInt(qty_claimed) > parseInt(qty_ord))
         {
-            Ext.Msg.alert("錯誤提示", "不允收的量 + 實際收貨量 != 下單採購量,保存失敗！");
+            Ext.Msg.alert("錯誤提示", "允收數量不能大於下單採購量,保存失敗！");
             return false;
         }
 
@@ -447,13 +447,13 @@ var center = Ext.create('Ext.form.Panel', {
                     header: "下單採購量", dataIndex: 'qty_ord', width: 80, align: 'center'
                 },
                 {
-                    header: "庫存", dataIndex: 'item_stock', width: 80, align: 'center'
+                    header: "前台庫存", dataIndex: 'item_stock', width: 80, align: 'center'
                 },
                 //{ header: "是否允許多次收貨", dataIndex: 'bkord_allow', width: 120, align: 'center' },
                 {
-                    header: "不允收的量", dataIndex: 'qty_damaged', flex: 1, align: 'center', editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, allowDecimals: false },
+                    header: "不允收的量", dataIndex: 'qty_damaged', flex: 1, align: 'center', editor: { xtype: 'numberfield', allowBlank: false, minValue: 0,maxValue:99999, allowDecimals: false },
                 },
-                { header: "實際收貨量", dataIndex: 'qty_claimed', flex: 1, align: 'center', editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, allowDecimals: false } },
+                { header: "允收數量", dataIndex: 'qty_claimed', flex: 1, align: 'center', editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, maxValue: 99999, allowDecimals: false } },
                 //{ header: "品項庫存用途", dataIndex: 'promo_invs_flg', flex: 1, align: 'center' },
                 //{ header: "訂貨價格", dataIndex: 'new_cost', flex: 1, align: 'center' },
                 //{ header: "運費", dataIndex: 'freight_price', flex: 1, align: 'center' },
