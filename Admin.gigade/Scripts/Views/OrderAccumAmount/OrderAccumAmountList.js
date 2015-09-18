@@ -65,6 +65,7 @@ var dateStore = Ext.create('Ext.data.Store', {
            { 'txt': '結束時間', 'value': '2' },
            { 'txt': '描述開始時間', 'value': '3' },
            { 'txt': '描述結束時間', 'value': '4' },
+           { 'txt': '修改時間', 'value': '5' },
     ]
 });
 OrderAccumAmountStore.on('beforeload', function () {

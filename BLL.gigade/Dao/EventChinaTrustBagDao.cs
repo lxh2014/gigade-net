@@ -45,28 +45,32 @@ namespace BLL.gigade.Dao
                {
                    sqlWhere.AppendFormat(" and  ecb.bag_name like N'%{0}%' ", query.bag_name);
                }
-               if (query.date == 1)
+               if (query.date !=0)
                {
-                   if (!string.IsNullOrEmpty(query.start_time) )
+                   if (!string.IsNullOrEmpty(query.start_time))
                    {
-                       sqlWhere.AppendFormat("  and  ecb.bag_start_time>='{0}'  ", CommonFunction.DateTimeToString(Convert.ToDateTime(query.start_time)));
+                       if (query.end_time != "")
+                       {
+                           switch (query.date)
+                           { 
+                               case 1:
+                                   sqlWhere.AppendFormat("  and  ecb.bag_start_time between'{0}' and '{1}'  ", CommonFunction.DateTimeToString(Convert.ToDateTime(query.start_time)),CommonFunction.DateTimeToString(Convert.ToDateTime(query.end_time)));
+                                   break;
+                               case 2:
+                                   sqlWhere.AppendFormat("  and  ecb.bag_end_time between'{0}' and '{1}'  ", CommonFunction.DateTimeToString(Convert.ToDateTime(query.start_time)), CommonFunction.DateTimeToString(Convert.ToDateTime(query.end_time)));
+                                   break;
+                               case 3:
+                                   sqlWhere.AppendFormat("  and  ecb.bag_show_start_time between'{0}' and '{1}'  ", CommonFunction.DateTimeToString(Convert.ToDateTime(query.start_time)), CommonFunction.DateTimeToString(Convert.ToDateTime(query.end_time)));
+                                   break;
+                               case 4:
+                                   sqlWhere.AppendFormat("  and  ecb.bag_show_end_time between'{0}' and '{1}'  ", CommonFunction.DateTimeToString(Convert.ToDateTime(query.start_time)), CommonFunction.DateTimeToString(Convert.ToDateTime(query.end_time)));
+                                   break;
+                           }
+                        
+                       }
                    }
-                   if (query.end_time != "")
-                   {
-                       sqlWhere.AppendFormat("  and  ecb.bag_end_time<='{0}'  ", CommonFunction.DateTimeToString(Convert.ToDateTime(query.end_time)));
-                   }
-               }
-               if (query.date == 2)
-               {
-                   if (query.start_time != "")
-                   {
-                       sqlWhere.AppendFormat("  and   ecb.bag_show_start_time>='{0}'  ", CommonFunction.DateTimeToString(Convert.ToDateTime(query.start_time)));
-                   }
-                   if (query.end_time != "")
-                   {
-                       sqlWhere.AppendFormat("  and  ecb.bag_show_end_time<='{0}'  ", CommonFunction.DateTimeToString(Convert.ToDateTime(query.end_time)));
-                   }
-               }
+                  
+               }           
                if (query.IsPage)
                {
                    sqlcount.Append(sqlFrom.ToString()).Append(sqlWhere.ToString());

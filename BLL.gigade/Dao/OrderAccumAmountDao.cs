@@ -69,6 +69,9 @@ namespace BLL.gigade.Dao
                                  case 4:
                                      sqlCondition.AppendFormat(" and  oaa.event_desc_end between '{0}' and '{1}' ", query.event_start_time.ToString("yyyy-MM-dd 00:00:00"), query.event_end_time.ToString("yyyy-MM-dd 23:59:59"));
                                      break;
+                                 case 5:
+                                     sqlCondition.AppendFormat(" and  event_update_time between '{0}' and '{1}' ", query.event_start_time.ToString("yyyy-MM-dd 00:00:00"), query.event_end_time.ToString("yyyy-MM-dd 23:59:59"));
+                                     break;
                              }                            
                          }
                      }                                   
