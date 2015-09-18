@@ -26,7 +26,17 @@ function editFunction(RowID, Store) {
             editable: false,
             disabled: RowID ? true : false,
             allowBlank: false,
-            value: new Date()
+            value: new Date(),
+            listeners: {
+                'select': function () {
+                    var date = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('s_sa_date').getValue()), 'Y-m-d'));
+                    var today = (Ext.htmlEncode(Ext.Date.format(new Date(), 'Y-m-d')));
+                    if (date > today) {
+                        Ext.Msg.alert("提示信息", "當前選擇日期大於今日,請重新選擇");
+                        Ext.getCmp('s_sa_date').setValue(new Date());
+                    }
+                }
+            }
         },
         {
             xtype: 'numberfield',
@@ -65,38 +75,39 @@ function editFunction(RowID, Store) {
             allowDecimals: false
         },
         {
-        xtype: 'numberfield',
-        fieldLabel: '單次造訪頁數',
-        name: 'sa_pages_session',
-        id: 'sa_pages_session',
-        margin: '10 0 10 0',
-        maxValue: 2147483647,
-        minValue: 0,
-        allowBlank: false,
-        hideTrigger: true,
-        allowDecimals: false
-        },
-        {
-            xtype: 'textfield',
-            fieldLabel: '跳出率',
-            name: 'sa_bounce_rate',
-            id: 'sa_bounce_rate',
+            xtype: 'numberfield',
+            fieldLabel: '單次造訪頁數',
+            name: 'sa_pages_session',
+            id: 'sa_pages_session',
             margin: '10 0 10 0',
             maxValue: 2147483647,
             minValue: 0,
             allowBlank: false,
-            hideTrigger:true
+            hideTrigger: true,
+            decimalPrecision: 2
         },
         {
-        xtype: 'textfield',
-        fieldLabel: '平均停留時間',
-        name: 'sa_avg_session_duration',
-        id: 'sa_avg_session_duration',
-        margin: '10 0 10 0',
-        maxValue: 2147483647,
-        minValue: 0,
-        allowBlank: false,
-        hideTrigger:true
+            xtype: 'numberfield',
+            fieldLabel: '跳出率',
+            name: 'sa_bounce_rate',
+            id: 'sa_bounce_rate',
+            margin: '10 0 10 0',
+            maxValue: 100,
+            minValue: 0,
+            allowBlank: false,
+            hideTrigger: true
+        },
+        {
+            xtype: 'numberfield',
+            fieldLabel: '平均停留時間',
+            name: 'sa_avg_session_duration',
+            id: 'sa_avg_session_duration',
+            margin: '10 0 10 0',
+            maxValue: 2147483647,
+            minValue: 0,
+            decimalPrecision: 5,
+            allowBlank: false,
+            hideTrigger: true
         }
         ],
         buttons: [
@@ -106,8 +117,7 @@ function editFunction(RowID, Store) {
             handler: function () {
                 var sa_date = Ext.getCmp("s_sa_date").getValue();
                 var result1 = 0;
-                if(RowID==null)
-                {
+                if (RowID == null) {
                     $.ajax({
                         url: "/SiteManager/CheckSiteAnalytics",
                         data: {
@@ -117,18 +127,17 @@ function editFunction(RowID, Store) {
                         type: 'text',
                         success: function (msg) {
                             if (msg.success == 'true') {
+                                result1++;
                                 Ext.Msg.alert(INFORMATION, '已存在該日索引');
                                 Ext.getCmp("s_sa_date").setValue('');
-                                result1++;
                             }
                         },
                         error: function (msg) {
                             Ext.Msg.alert(INFORMATION, FAILURE);
                         }
                     });
-                } 
-                if(result1==0)
-                {
+                }
+                if (result1 == 0) {
                     var form = this.up('form').getForm();//沿着 ownerCt 查找匹配简单选择器的祖先容器.
                     if (form.isValid()) {//这个函数会调用已经定义的校验规则来验证输入框中的值，如果通过则返回true
                         form.submit({

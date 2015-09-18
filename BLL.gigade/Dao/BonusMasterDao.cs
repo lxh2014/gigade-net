@@ -331,7 +331,7 @@ namespace BLL.gigade.Dao
             StringBuilder strSql = new StringBuilder();
             try
             {
-                strSql.AppendFormat(@"SELECT SUM(master_balance) FROM bonus_master WHERE user_id = {0} AND master_start <= {1} AND master_end >= {1};", br.user_id, Common.CommonFunction.GetPHPTime());
+                strSql.AppendFormat(@"SELECT SUM(master_balance) FROM bonus_master WHERE user_id = {0} AND bonus_type = 1 AND master_start <= {1} AND master_end >= {1};", br.user_id, Common.CommonFunction.GetPHPTime());
                 //判斷查詢出來的sum值是否為空  如果為空則表示沒有可用購物金 則賦值為0反之則使用該用戶的購物金  edit by zhuoqin0830w 2015/09/01
                 if (string.IsNullOrEmpty(_access.getDataTable(strSql.ToString()).Rows[0][0].ToString()))
                 {
@@ -349,23 +349,73 @@ namespace BLL.gigade.Dao
         }
         #endregion
 
-        #region 根據 User_id 和 時間 的倒序查詢出相應的列表   add by zhuoqin0830w 2015/08/24
+        #region 根據 User_id 和 時間 的倒序查詢出相應的列表  購物金  add by zhuoqin0830w 2015/08/24
         /// <summary>
-        /// 根據 User_id 和 時間 的倒序查詢出相應的列表
+        /// 根據 User_id 和 時間 的倒序查詢出相應的列表 購物金
         /// </summary>
         /// <param name="br"></param>
         /// <returns></returns>
-        public List<BonusMaster> GetBonusMasterByEndTime(BonusRecord br)
+        public List<BonusMaster> GetBonusByEndTime(BonusRecord br)
         {
             StringBuilder strSql = new StringBuilder();
             try
             {
-                strSql.AppendFormat(@"SELECT master_id,user_id,type_id,master_total,master_balance,master_note,master_writer,master_start,master_end FROM bonus_master WHERE user_id = {0} AND master_start <= {1} AND master_end >= {1} ORDER BY master_end ASC;", br.user_id, Common.CommonFunction.GetPHPTime());
+                strSql.AppendFormat(@"SELECT master_id,user_id,type_id,master_total,master_balance,master_note,master_writer,master_start,master_end FROM bonus_master WHERE user_id = {0} AND bonus_type = 1 AND master_start <= {1} AND master_end >= {1} ORDER BY master_end ASC;", br.user_id, Common.CommonFunction.GetPHPTime());
                 return _access.getDataTableForObj<BonusMaster>(strSql.ToString());
             }
             catch (Exception ex)
             {
-                throw new Exception("BonusMasterDao-->GetBonusMasterByEndTime(BonusRecord br)-->" + strSql.ToString() + ex.Message, ex);
+                throw new Exception("BonusMasterDao-->GetBonusByEndTime(BonusRecord br)-->" + strSql.ToString() + ex.Message, ex);
+            }
+        }
+        #endregion
+
+        #region 得到 bonus_master 裱中 抵用券 總和  add by zhuoqin0830w 2015/08/24
+        /// <summary>
+        /// 得到 bonus_master 裱中 抵用券 總和
+        /// </summary>
+        /// <param name="br"></param>
+        /// <returns></returns>
+        public int GetSumWelfare(BonusRecord br)
+        {
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+                strSql.AppendFormat(@"SELECT SUM(master_balance) FROM bonus_master WHERE user_id = {0} AND bonus_type = 2 AND master_start <= {1} AND master_end >= {1};", br.user_id, Common.CommonFunction.GetPHPTime());
+                //判斷查詢出來的sum值是否為空  如果為空則表示沒有可用 抵用券 則賦值為0反之則使用該用戶的抵用券  edit by zhuoqin0830w 2015/09/01
+                if (string.IsNullOrEmpty(_access.getDataTable(strSql.ToString()).Rows[0][0].ToString()))
+                {
+                    return 0;
+                }
+                else
+                {
+                    return Convert.ToInt32(_access.getDataTable(strSql.ToString()).Rows[0][0]);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("BonusMasterDao-->GetSumWelfare(BonusRecord br)-->" + strSql.ToString() + ex.Message, ex);
+            }
+        }
+        #endregion
+
+        #region 根據 User_id 和 時間 的倒序查詢出相應的列表  抵用券  add by zhuoqin0830w 2015/08/24
+        /// <summary>
+        /// 根據 User_id 和 時間 的倒序查詢出相應的列表 抵用券
+        /// </summary>
+        /// <param name="br"></param>
+        /// <returns></returns>
+        public List<BonusMaster> GetWelfareByEndTime(BonusRecord br)
+        {
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+                strSql.AppendFormat(@"SELECT master_id,user_id,type_id,master_total,master_balance,master_note,master_writer,master_start,master_end FROM bonus_master WHERE user_id = {0} AND bonus_type = 2 AND master_start <= {1} AND master_end >= {1} ORDER BY master_end ASC;", br.user_id, Common.CommonFunction.GetPHPTime());
+                return _access.getDataTableForObj<BonusMaster>(strSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("BonusMasterDao-->GetWelfareByEndTime(BonusRecord br)-->" + strSql.ToString() + ex.Message, ex);
             }
         }
         #endregion
@@ -381,7 +431,7 @@ namespace BLL.gigade.Dao
             StringBuilder strSql = new StringBuilder();
             try
             {
-                strSql.AppendFormat(@"UPDATE bonus_master SET master_balance = {0},master_updatedate = {1} where master_id = {2};", bm.master_balance, bm.master_updatedate, bm.master_id);
+                strSql.AppendFormat(@"SET sql_safe_updates = 0;UPDATE bonus_master SET master_balance = {0},master_updatedate = {1} where master_id = {2};SET sql_safe_updates = 1;", bm.master_balance, bm.master_updatedate, bm.master_id);
                 return strSql.ToString();
             }
             catch (Exception ex)

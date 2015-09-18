@@ -28,8 +28,8 @@ namespace BLL.gigade.Dao
             totalCount = 0;
             try
             {
-                sql.Append(" select saly.sa_id,saly.sa_date,saly.sa_session,saly.sa_user,saly.sa_create_time,saly.sa_create_user,mu.user_username as 's_sa_create_user',mu1.user_username as sa_modify_username, ");
-                sql.Append("sa_pageviews,sa_pages_session,sa_bounce_rate,sa_avg_session_duration, sa_modify_time");
+                sql.Append(" select saly.sa_id,saly.sa_date,saly.sa_session, saly.sa_create_time,saly.sa_user,saly.sa_create_user,mu.user_username as 's_sa_create_user',mu1.user_username as sa_modify_username, ");
+                sql.Append("sa_pageviews,sa_pages_session,sa_bounce_rate,sa_avg_session_duration,sa_modify_time ");
                 sqlFrom.Append(" from site_analytics saly LEFT JOIN manage_user mu on mu.user_id=saly.sa_create_user   ");
                 sqlFrom.Append("left join manage_user mu1 on mu1.user_id=saly.sa_modify_user");
                 sqlWhere.Append(" where 1=1   ");
@@ -122,7 +122,7 @@ namespace BLL.gigade.Dao
                 {
                     sqlWhere.AppendFormat(" and  saly.sa_date ='{0}' ", query.s_sa_date);
                 }
-                sqlWhere.Append(" order by sa_date asc ");
+                sqlWhere.Append(" order by sa_date desc;");
                 return _accessMySql.getDataTable(sql.ToString() + sqlWhere.ToString());
             }
             catch (Exception ex)
@@ -137,10 +137,8 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                //string sa_date = Convert.ToDateTime(_dt.Rows[i][0]).ToString("yyyy-MM-dd");
                 sql.AppendFormat(" select sa_id from site_analytics where sa_date='{0}'", query.s_sa_date);
                 DataTable _dt = _accessMySql.getDataTable(sql.ToString());
-                //return
                 if (_dt.Rows.Count > 0)
                 {
                     return Convert.ToInt32(_dt.Rows[0][0]);

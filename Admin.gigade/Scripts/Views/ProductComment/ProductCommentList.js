@@ -1,4 +1,13 @@
-﻿var pageSize = 25;
+﻿if(typeof Ext != 'undefined'){  
+ Ext.core.Element.prototype.unselectable = function(){return this;};  
+ Ext.view.TableChunker.metaRowTpl = [  
+ '<tr class="' + Ext.baseCSSPrefix + 'grid-row {addlSelector} {[this.embedRowCls()]}" {[this.embedRowAttr()]}>',  
+'<tpl for="columns">',  
+  '<td class="{cls} ' + Ext.baseCSSPrefix + 'grid-cell ' + Ext.baseCSSPrefix + 'grid-cell-{columnId} {{id}-modified} {{id}-tdCls} {[this.firstOrLastCls(xindex, xcount)]}" {{id}-tdAttr}><div class="' + Ext.baseCSSPrefix + 'grid-cell-inner ' + Ext.baseCSSPrefix + 'unselectable" style="{{id}-style}; text-align: {align};">{{id}}</div></td>',  
+   '</tpl>',  
+   '</tr>'    ];  
+ }
+var pageSize = 25;
 var boolPassword = true;//secretcopy
 var info_type = "users";
 var secret_info = "";
@@ -447,12 +456,12 @@ Ext.onReady(function () {
             enableTextSelection: true,
             stripeRows: false,
             getRowClass: function (record, rowIndex, rowParams, store) {
-                return "x-selectable";
+                return "x-unselectable";
             }
         },
         columns: [
         { header: '編號', dataIndex: 'comment_id', width: 70, align: 'center', align: 'center' },
-        { header: '訂單編號', dataIndex: 'order_id', width: 70, align: 'center', align: 'center' },
+        { header: '訂單編號', dataIndex: 'order_id', width: 100, align: 'center', align: 'center' },
         {
             header: '商品編號', dataIndex: 'product_id', width: 70, align: 'center', align: 'center',
             renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
@@ -467,7 +476,7 @@ Ext.onReady(function () {
             header: '品牌名稱', dataIndex: 'brand_name', width: 200, align: 'center'
         },
         {
-            header: '用戶姓名', dataIndex: 'user_name', width: 100, align: 'center',
+            header: '用戶名稱', dataIndex: 'user_name', width: 100, align: 'center',
             renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {//secretcopy
                 return "<span onclick='SecretLogin(" + record.data.comment_id + "," + record.data.user_id + ",\"" + info_type + "\")'  >" + value + "</span>";
 
@@ -529,25 +538,7 @@ Ext.onReady(function () {
             }
         },
         {
-            header: '客戶服務滿意度', dataIndex: 'seller_server', width: 100, align: 'center',
-            renderer: function (value) {
-                if (value == 1) {
-                    return Ext.String.format('非常不滿意');
-                }
-                else if (value == 2) {
-                    return Ext.String.format('不滿意');
-                }
-                else if (value == 3) {
-                    return Ext.String.format('一般');
-                } else if (value == 4) {
-                    return Ext.String.format('滿意');
-                } else if (value == 5) {
-                    return Ext.String.format('非常滿意');
-                }
-            }
-        },
-        {
-            header: '網站整體服務滿意度', dataIndex: 'web_server', width: 115, align: 'center',
+            header: '商品質量滿意度', dataIndex: 'seller_server', width: 100, align: 'center',
             renderer: function (value) {
                 if (value == 1) {
                     return Ext.String.format('非常不滿意');
@@ -582,6 +573,25 @@ Ext.onReady(function () {
                 }
             }
         },
+        {
+            header: '網站整體滿意度', dataIndex: 'web_server', width: 115, align: 'center',
+            renderer: function (value) {
+                if (value == 1) {
+                    return Ext.String.format('非常不滿意');
+                }
+                else if (value == 2) {
+                    return Ext.String.format('不滿意');
+                }
+                else if (value == 3) {
+                    return Ext.String.format('一般');
+                } else if (value == 4) {
+                    return Ext.String.format('滿意');
+                } else if (value == 5) {
+                    return Ext.String.format('非常滿意');
+                }
+            }
+        },
+    
         //         { name: 's_reply_user', type: "string" },
         //{ name: 's_reply_time', type: "string" },
         { header: '回覆人', dataIndex: 's_reply_user', width: 100, align: 'center' },

@@ -67,6 +67,8 @@ namespace BLL.gigade.Mgr
             SiteStatistics query = new SiteStatistics();
             query.ss_create_time = DateTime.Now;
             query.ss_create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+            query.ss_modify_time = query.ss_create_time;
+            query.ss_modify_user = query.ss_create_user;
             try
             {
                 int total = 0;
@@ -82,7 +84,7 @@ namespace BLL.gigade.Mgr
                         query.ss_newuser_number = Convert.ToInt32(_dt.Rows[i][5]);
                         query.ss_converted_newuser = Convert.ToInt32(_dt.Rows[i][6]);
                         query.ss_sum_order_amount = Convert.ToInt32(_dt.Rows[i][7]);
-                        query.ss_code = _dt.Rows[i][8].ToString();
+                        query.ss_code = _dt.Rows[i][8].ToString().ToUpper();
                         DataTable dt=GetSiteStatisticsList(query, out total);
                         if (dt.Rows.Count == 0)
                         {

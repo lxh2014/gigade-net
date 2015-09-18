@@ -59,7 +59,6 @@ namespace BLL.gigade.Model.Query
             brand_id = 0;
             brand_name = string.Empty;
 
-
             user_name = string.Empty;
             product_name = string.Empty;
             s_create_time = DateTime.MinValue;

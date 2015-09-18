@@ -138,15 +138,53 @@ namespace BLL.gigade.Mgr
         /// </summary>
         /// <param name="bm"></param>
         /// <returns></returns>
-        public List<BonusMaster> GetBonusMasterByEndTime(BonusRecord br)
+        public List<BonusMaster> GetBonusByEndTime(BonusRecord br)
         {
             try
             {
-                return _IBonusMasterDao.GetBonusMasterByEndTime(br);
+                return _IBonusMasterDao.GetBonusByEndTime(br);
             }
             catch (Exception ex)
             {
                 throw new Exception("BonusMasterMgr-->GetBonusMasterByEndTime(BonusRecord br)-->" + ex.Message, ex);
+            }
+        }
+        #endregion
+
+        #region 得到 bonus_master 裱中 抵用卷 總和  add by zhuoqin0830w 2015/08/24
+        /// <summary>
+        /// 得到 bonus_master 裱中 抵用卷 總和
+        /// </summary>
+        /// <param name="br"></param>
+        /// <returns></returns>
+        public int GetSumWelfare(BonusRecord br)
+        {
+            try
+            {
+                return _IBonusMasterDao.GetSumWelfare(br);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("BonusMasterMgr-->GetSumWelfare(BonusRecord br)-->"  + ex.Message, ex);
+            }
+        }
+        #endregion
+
+        #region 根據 User_id 和 時間 的倒序查詢出相應的列表  抵用券  add by zhuoqin0830w 2015/08/24
+        /// <summary>
+        /// 根據 User_id 和 時間 的倒序查詢出相應的列表 抵用券
+        /// </summary>
+        /// <param name="br"></param>
+        /// <returns></returns>
+        public List<BonusMaster> GetWelfareByEndTime(BonusRecord br)
+        {
+            try
+            {
+                return _IBonusMasterDao.GetWelfareByEndTime(br);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("BonusMasterDao-->GetWelfareByEndTime(BonusRecord br)-->"+ex.Message, ex);
             }
         }
         #endregion
@@ -169,8 +207,6 @@ namespace BLL.gigade.Mgr
             }
         }
         #endregion
-
-
 
         //是否有發放購物金  write for cj
         public List<BonusMasterQuery>  IsExtendBonus(BonusMasterQuery query)

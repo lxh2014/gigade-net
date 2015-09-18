@@ -96,9 +96,13 @@ namespace Admin.gigade.Controllers
                 {
                     query.article_title = Request.Params["selcontent"];
                 }
+                if (!string.IsNullOrEmpty(Request.Params["date"]))
+                {
+                    query.date = Convert.ToInt32(Request.Params["date"]);
+                }
                 if (!string.IsNullOrEmpty(Request.Params["time_start"]))
                 {
-                    query.time_start = Request.Params["time_start"];
+                    query.time_start = Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy-MM-dd 00:00:00");
                 }
                 if (!string.IsNullOrEmpty(Request.Params["time_end"]))
                 {
@@ -1228,7 +1232,7 @@ namespace Admin.gigade.Controllers
             string article_id = Request.Params["article_id"];
             string searchContent = Request.Params["searchContent"];
             string start_time = Request.Params["time_start"];
-            string end_time = DateTime.Parse(Request.Params["time_end"]).ToString("yyyy-MM-dd 23:59:59");
+            string end_time = Request.Params["time_end"];
             string vote_status = Request.Params["vote_status"];
             if (!string.IsNullOrEmpty(article_id) && Convert.ToInt32(article_id) != 0)
             {
@@ -1240,11 +1244,11 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(start_time))
             {
-                query.start_time = Convert.ToDateTime(start_time);
+                query.start_time =Convert.ToDateTime(Convert.ToDateTime(start_time).ToString("yyyy-MM-dd 00:00:00"));
             }
             if (!string.IsNullOrEmpty(end_time))
             {
-                query.end_time = Convert.ToDateTime(end_time);
+                query.end_time = Convert.ToDateTime(Convert.ToDateTime(end_time).ToString("yyyy-MM-dd 23:59:59"));
             }
             query.vote_status = -1;
             if (!string.IsNullOrEmpty(vote_status))
@@ -1364,28 +1368,25 @@ namespace Admin.gigade.Controllers
             DataTable dtHZ = new DataTable();
             VoteDetailQuery query = new VoteDetailQuery();
             try
-            {
-                string article_id = Request.Params["article_id"];
-
-                if (Request.Params["article_id"]!="null" && Convert.ToInt32(article_id) != 0)
+            {            
+                if (Request.Params["article_id"]!="null")
                 {
-                    
-                    query.article_id = Convert.ToInt32(article_id);
+                    query.article_id = Convert.ToInt32(Request.Params["article_id"]);
                 }
-                if (Request.Params["searchContent"]!="null")
+                if (!string.IsNullOrEmpty(Request.Params["searchContent"]))
                 {
                     query.searchContent = Request.Params["searchContent"];
                 }
-                if (Request.Params["time_start"]!="null")
+                if (!string.IsNullOrEmpty(Request.Params["time_start"]))
                 {
                     query.start_time = Convert.ToDateTime(Request.Params["time_start"]);
                 }
-                if (Request.Params["time_end"]!="null")
+                if (!string.IsNullOrEmpty(Request.Params["time_end"]))
                 {
                     query.end_time = Convert.ToDateTime(Request.Params["time_end"]);
                 }
-                query.vote_status = -1;
-                if (Request.Params["vote_status"]!="null")
+                //query.vote_status = -1;
+                if (Request.Params["vote_status"] != "null")
                 {
                     query.vote_status = Convert.ToInt32(Request.Params["vote_status"]);
                 }
