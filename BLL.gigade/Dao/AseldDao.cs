@@ -254,7 +254,7 @@ LEFT JOIN product_spec ps2 ON pi.spec_id_2 = ps2.spec_id
 LEFT JOIN product p ON pi.product_id=p.product_id 
 LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id
 LEFT JOIN order_master o ON a.ord_id=o.order_id
-            WHERE assg_id='{0}' and  lcat_id='S'and AND wust_id<>'COM' AND commodity_type='2' and scaned='0' ORDER BY sel_loc,seld_id LIMIT 1;", a.assg_id);
+            WHERE assg_id='{0}' and  lcat_id='S' AND wust_id<>'COM' AND commodity_type='2' and scaned='0' ORDER BY sel_loc,seld_id LIMIT 1;", a.assg_id);
             try
             {
                 return _access.getDataTableForObj<AseldQuery>(sb.ToString());
