@@ -56,8 +56,8 @@ namespace BLL.gigade.Dao.Impl
         ProductItemCustom GetProductArriveDay(ProductItem pi, string type);//查詢和運達天數相關的信息 add by wwei2016w 2015/6/6
         string GetItemInfoByProductIds(string productIds);
         Product GetTaxByItem(uint item_id);//根據item_is查詢稅額類型 add mengjuan0826j 2015/7/2
-        List<ProductItemQuery> GetProductItemByID(ProductItemQuery query);//根據item_id查詢商品規格以及商品的信息add chaojie1124j2015/8/31
-
+        List<ProductItemQuery> GetProductItemByID(ProductItemQuery query);//根據item_id查詢商品規格以及商品的信息add chaojie1124j2015/8/31       
         List<ProductItemQuery> GetInventoryQueryList(ProductItemQuery query, out int totalCount);
+        int UpdateItemStock(uint Item_Id, int Item_Stock);//料位庫存調整的時候，商品庫存也做相應的調整add chaojie1124j2015/9/17
     }
 }
