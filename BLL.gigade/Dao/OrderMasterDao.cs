@@ -1187,10 +1187,15 @@ namespace BLL.gigade.Dao
             StringBuilder sqlCondition = new StringBuilder();
             try
             {
-                sql.Append("select   sum(free_tax)as FreeTax,sum(tax_amount)as SalesAmount,sum(AccountCollectionMoney) as  AccountCollectionMoney, ");
-                sql.Append(" sum(ZPoundage) as ZPoundage ");
-                sql.Append("from (");
-                sql.Append(" select om.order_id,SUM(imr.free_tax)  free_tax ,SUM(imr.tax_amount) tax_amount,oac.account_collection_money+oac.return_collection_money as  AccountCollectionMoney ,oac.poundage++oac.return_poundage as ZPoundage ");
+                //sql.Append("select   sum(free_tax)as FreeTax,sum(tax_amount)as SalesAmount,sum(AccountCollectionMoney) as  AccountCollectionMoney, ");
+                //sql.Append(" sum(ZPoundage) as ZPoundage ");
+                //sql.Append("from (");
+                //sql.Append(" select om.order_id,SUM(imr.free_tax)  free_tax ,SUM(imr.tax_amount) tax_amount,oac.account_collection_money+oac.return_collection_money as  AccountCollectionMoney ,oac.poundage++oac.return_poundage as ZPoundage ");
+
+                sql.Append("      select  sum(IFNULL(free_tax,0))as FreeTax,sum(IFNULL(tax_amount,0))as SalesAmount,sum(IFNULL(AccountCollectionMoney,0)) as  AccountCollectionMoney,  sum(IFNULL(ZPoundage,0)) as ZPoundage  from  ( ");
+                sql.Append(" select SUM( IFNULL(imr.free_tax,0))  free_tax ,  ");
+                sql.Append(" SUM( IFNULL(imr.tax_amount,0)) tax_amount, IFNULL(oac.account_collection_money,0)+IFNULL(oac.return_collection_money,0) as  AccountCollectionMoney ,  ");
+                sql.Append(" IFNULL(oac.poundage,0)+IFNULL(oac.return_poundage,0) as ZPoundage    ");
                 sqlCondition.AppendFormat("  from  order_master om left join order_account_collection oac  on oac.order_id=om.order_id  ");
                 sqlCondition.AppendFormat(" left join invoice_master_record imr  on imr.order_id=om.order_id   and invoice_attribute=1 ");
                 sqlCondition.AppendFormat(" left join t_parametersrc tp on om.order_payment=tp.parameterCode and tp.parameterType='payment' ");
@@ -2060,7 +2065,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("select odm_user_id from order_detail_manager where odm_user_id='{0}' and odm_status=1;",user_id);
+                sql.AppendFormat("select odm_user_id from order_detail_manager where odm_user_id='{0}' and odm_status=1;", user_id);
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)
