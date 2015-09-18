@@ -451,9 +451,9 @@ var center = Ext.create('Ext.form.Panel', {
                 },
                 //{ header: "是否允許多次收貨", dataIndex: 'bkord_allow', width: 120, align: 'center' },
                 {
-                    header: "不允收的量", dataIndex: 'qty_damaged', flex: 1, align: 'center', editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, allowDecimals: false },
+                    header: "不允收的量", dataIndex: 'qty_damaged', flex: 1, align: 'center', editor: { xtype: 'numberfield', allowBlank: false, minValue: 0,maxValue:99999, allowDecimals: false },
                 },
-                { header: "允收數量", dataIndex: 'qty_claimed', flex: 1, align: 'center', editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, allowDecimals: false } },
+                { header: "允收數量", dataIndex: 'qty_claimed', flex: 1, align: 'center', editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, maxValue: 99999, allowDecimals: false } },
                 //{ header: "品項庫存用途", dataIndex: 'promo_invs_flg', flex: 1, align: 'center' },
                 //{ header: "訂貨價格", dataIndex: 'new_cost', flex: 1, align: 'center' },
                 //{ header: "運費", dataIndex: 'freight_price', flex: 1, align: 'center' },
