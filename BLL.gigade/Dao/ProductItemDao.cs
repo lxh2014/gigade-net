@@ -584,5 +584,22 @@ namespace BLL.gigade.Dao
                 throw new Exception("ProductItemDao-->GetProductItemByID" + ex.Message, ex);
             }
         }
+        /**
+         * chaojie1124j 2015/09/17 庫存調整的時候，把商品的庫存也做相應的調整
+         */
+        public  int UpdateItemStock(uint Item_Id, int Item_Stock)
+        { 
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+               strSql.Append("update product_item set ");
+                strSql.AppendFormat("item_stock=item_stock+{0} where item_id={1};", Item_Stock, Item_Id);
+                return _dbAccess.execCommand(strSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->UpdateItemStock" + ex.Message + strSql.ToString(), ex);
+            }  
+        }
     }
 }

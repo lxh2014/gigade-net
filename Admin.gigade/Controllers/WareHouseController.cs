@@ -58,6 +58,7 @@ namespace Admin.gigade.Controllers
         IIpoImplMgr _ipoMgr;
         IIpodImplMgr _ipodMgr;
         private IVendorImplMgr _vendorMgr;
+        IProductItemImplMgr _proditemMgr;
         #region Views
         /// <summary>
         /// 
@@ -2745,16 +2746,21 @@ namespace Admin.gigade.Controllers
                 #endregion
 
                 #region 新增/編輯
+                #region 庫存調整的時候，商品庫存也要調整
+                _proditemMgr = new ProductItemMgr(mySqlConnectionString); 
+                int item_stock = m.prod_qty;
+                #endregion
                 if (_iinvd.IsUpd(m) > 0)
                 {//編輯             
                     ia.qty_o = _iinvd.Selnum(m);
                     ia.adj_qty = m.prod_qty;
+                  
                     m.prod_qty = _iinvd.Selnum(m) + m.prod_qty;
                     if (m.prod_qty >= 0)
                     {
-                        if (_iinvd.Upd(m) > 0)
+                        if (_iinvd.Upd(m) > 0 )
                         {
-                            if (Request.Params["iialg"].ToString() == "Y")
+                            if (Request.Params["iialg"].ToString() == "Y" && _proditemMgr.UpdateItemStock(m.item_id, item_stock) > 0)//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改
                             {
                                 if (_iagMgr.insertiialg(ia) > 0)
                                 {
@@ -2795,7 +2801,7 @@ namespace Admin.gigade.Controllers
                         {
                             if (_IlocMgr.SetIlocUsed(loc) > 0)
                             {
-                                if (Request.Params["iialg"].ToString() == "Y")
+                                if (Request.Params["iialg"].ToString() == "Y"&& _proditemMgr.UpdateItemStock(m.item_id, item_stock) > 0)//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改
                                 {
                                     ia.qty_o = 0;
                                     ia.adj_qty = m.prod_qty;
@@ -2820,7 +2826,7 @@ namespace Admin.gigade.Controllers
                         }
                         else
                         {
-                            if (Request.Params["iialg"].ToString() == "Y")
+                            if (Request.Params["iialg"].ToString() == "Y" && _proditemMgr.UpdateItemStock(m.item_id, item_stock) > 0)//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改
                             {
                                 ia.qty_o = 0;
                                 ia.adj_qty = m.prod_qty;
@@ -7312,13 +7318,19 @@ namespace Admin.gigade.Controllers
                 }
                 int oldsumcount = _iinvd.GetProqtyByItemid(Convert.ToInt32(Icg.item_id));//總庫存
 
+                #region 庫存調整的時候，商品庫存也要調整
+                _proditemMgr = new ProductItemMgr(mySqlConnectionString);
+                int item_stock =0;
+                #endregion
                 if (kucuntype == 1)//表示選擇了加
                 {
                     resultcount = kucuncount + tiaozhengcount;
+                    item_stock = tiaozhengcount;
                 }
                 else//表示選擇了減號
                 {
                     resultcount = kucuncount - tiaozhengcount;
+                    item_stock = -tiaozhengcount;
                 }
 
                 invd.prod_qty = resultcount;//此時為更改后的庫存
@@ -7342,7 +7354,9 @@ namespace Admin.gigade.Controllers
                     Icg.sc_note = Request.Params["remarks"];//備註
                 }
                 _istockMgr = new IstockChangeMgr(mySqlConnectionString);
+               
                 int j = _iinvd.kucunTiaozheng(invd); //更改iloc表中的狀態並且在iialg表中插入數據
+                int k = _proditemMgr.UpdateItemStock(Icg.item_id, item_stock);
                 int newsumcount = _iinvd.GetProqtyByItemid(Convert.ToInt32(Icg.item_id));//總庫存
                 Icg.sc_num_chg = newsumcount - oldsumcount;
                 Icg.sc_num_new = newsumcount;
@@ -7355,7 +7369,7 @@ namespace Admin.gigade.Controllers
                 {
                     results = 1;
                 }
-                if (j > 0 && results > 0)
+                if (j > 0 && results > 0&&k>0)
                 {
                     jsonStr = "{success:true}";
                 }

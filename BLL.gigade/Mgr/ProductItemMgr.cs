@@ -213,5 +213,16 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductItemMgr-->GetProductItemByID" + ex.Message, ex);
             }
         }
+        public int UpdateItemStock(uint Item_Id, int Item_Stock) 
+        {
+            try
+            {
+                return productItemDao.UpdateItemStock(Item_Id, Item_Stock);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemMgr-->UpdateItemStock" + ex.Message, ex);
+            }
+        }
     }
 }
