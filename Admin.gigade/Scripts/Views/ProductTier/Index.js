@@ -377,7 +377,7 @@ function onEditClick() {
     } else if (row.length == 1) {
         addPc.show();
         Ext.getCmp('btnSave').show();
-        Tier_Load(row[0]);
+        Tier_Load(row[0]); 
     }
 }
 
