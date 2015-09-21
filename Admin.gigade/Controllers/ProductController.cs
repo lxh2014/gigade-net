@@ -6022,6 +6022,10 @@ namespace Admin.gigade.Controllers
                 {
                     query.product_status = Convert.ToUInt32(Request.Params["product_status"]);//商品状态
                 }
+                if (!string.IsNullOrEmpty(Request.Params["sale_status"]))
+                {
+                    query.sale_status = Convert.ToUInt32(Request.Params["sale_status"]);//商品販售狀態
+                }
                 if (!string.IsNullOrEmpty(Request.Params["item_stock_start"]))
                 {
                     query.item_stock_start = Convert.ToInt32(Request.Params["item_stock_start"]);//库存数量--开始
@@ -6075,13 +6079,25 @@ namespace Admin.gigade.Controllers
                 {
                     query.product_status = Convert.ToUInt32(Request.Params["product_status"]);//商品状态
                 }
-                if (!string.IsNullOrEmpty(Request.Params["item_stock_start"]))
+                if (!string.IsNullOrEmpty(Request.Params["sale_status"]))
+                {
+                    query.sale_status = Convert.ToUInt32(Request.Params["sale_status"]);//商品販售狀態
+                }
+                if (!string.IsNullOrEmpty(Request.Params["item_stock_start"]) && Request.Params["item_stock_start"] != "null")
                 {
                     query.item_stock_start = Convert.ToInt32(Request.Params["item_stock_start"]);//库存数量--开始
                 }
-                if (!string.IsNullOrEmpty(Request.Params["item_stock_end"]))
+                else 
+                {
+                    query.item_stock_start = 0;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["item_stock_end"]) && Request.Params["item_stock_end"] != "null")
                 {
                     query.item_stock_end = Convert.ToInt32(Request.Params["item_stock_end"]);//库存数量--结束
+                }
+                else
+                {
+                    query.item_stock_end = 0;
                 }
                 if (!string.IsNullOrEmpty(Request.Params["ignore_stockRdo"]))
                 {
@@ -6100,6 +6116,7 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("品牌編號", typeof(String));
                 dtHZ.Columns.Add("品牌名稱", typeof(String));
                 dtHZ.Columns.Add("商品狀態", typeof(String));
+                dtHZ.Columns.Add("商品販售狀態",typeof(String));
                 dtHZ.Columns.Add("庫存數量", typeof(String));
                 dtHZ.Columns.Add("庫存為0時是否還能販售", typeof(String));
                 List<ProductItemQuery> list = new List<ProductItemQuery>();
@@ -6119,8 +6136,9 @@ namespace Admin.gigade.Controllers
                         dr[6] = list[i].brand_id;
                         dr[7] = list[i].brand_name;
                         dr[8] = list[i].product_status_string;
-                        dr[9] = list[i].Item_Stock;
-                        dr[10] = list[i].ignore_stock_string;
+                        dr[9] = list[i].sale_status_string;
+                        dr[10] = list[i].Item_Stock;
+                        dr[11] = list[i].ignore_stock_string;
                         dtHZ.Rows.Add(dr);
                     }
                     string fileName = "product_stock_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";

@@ -1907,6 +1907,7 @@
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeList.js" />
     <Content Include="Scripts\Views\ProductPurchase\SuggestPurchaseList.js" />
     <Content Include="Scripts\Views\ProductSearch\ProductSearchList.js" />
+    <Content Include="Scripts\Views\ProductTier\ExpectTier.js" />
     <Content Include="Scripts\Views\Product\InventoryQueryList.js" />
     <Content Include="Scripts\Views\Product\ProductDetailEdit.js" />
     <Content Include="Scripts\Views\Product\ProductDetailList.js" />
@@ -2258,7 +2259,6 @@
     <Content Include="Scripts\Views\ProductParticulars\ProdnameExtend.js" />
     <Content Include="Scripts\Views\Course\CurriculDetailView.js" />
     <Content Include="Scripts\Views\Course\CurriculuManage.js" />
-    <Content Include="Scripts\Views\ProductTier\ExpectTier.js" />
     <Content Include="Scripts\Views\ProductTier\Index.js" />
     <Content Include="Scripts\Views\Product\CategoryProductMaintain.js" />
     <Content Include="Scripts\Views\Product\CourseDetailItem.js" />

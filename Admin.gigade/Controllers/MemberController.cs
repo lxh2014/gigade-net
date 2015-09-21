@@ -1028,14 +1028,27 @@ namespace Admin.gigade.Controllers
                 query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
                 _userGroupMgr = new VipUserGroupMgr(mySqlConnectionString);
-                if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
-                {
-                    query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
+                string group_id_or_group_name = Request.Params["group_id_or_group_name"];
+                //if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
+                //{
+                //    query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
 
-                }
-                if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
+                //}
+                //if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
+                //{
+                //    query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
+                //}
+                if (!string.IsNullOrEmpty(group_id_or_group_name))
                 {
-                    query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
+                    uint result = 0;
+                    if (uint.TryParse(group_id_or_group_name, out result))
+                    {
+                        query.group_id = result;
+                    }
+                    else
+                    {
+                        query.group_name = group_id_or_group_name;
+                    }                  
                 }
                 System.Net.IPAddress[] addlist = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList;
                 string ip = string.Empty;
