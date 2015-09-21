@@ -138,5 +138,34 @@ namespace BLL.gigade.Dao
                 throw new Exception("VipUserDao-->GetSingleByID-->" + ex.Message + strSql.ToString(), ex);
             }
         }
+        public int AddVipUser(VipUserQuery query)//add by chaojie1124j 添加于2015/9/21用於實現添加會員至群組
+        {
+            query.Replace4MySQL();
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+                strSql.AppendFormat(" insert into vip_user(user_email,user_id,status,group_id,create_id,update_id,createdate,updatedate,source) values('{0}','{1}',1,'{2}',{3},'{4}','{5}','{6}',2);", query.user_email,query.user_id,query.group_id,query.create_id, query.update_id, query.createdate, query.updatedate);
+                return _dbAccess.execCommand(strSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("VipUserDao-->AddVipUser-->" + ex.Message + strSql.ToString(), ex);
+            }
+        }
+
+        public int DeleVipUser(VipUserQuery query)//add by chaojie1124j 添加于2015/9/21用於實現刪除會員至群組
+        {
+            query.Replace4MySQL();
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+                strSql.AppendFormat("DELETE from vip_user where v_id='{0}';", query.v_id);
+                return _dbAccess.execCommand(strSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("VipUserDao-->AddVipUser-->" + ex.Message + strSql.ToString(), ex);
+            }
+        }
     }
 }

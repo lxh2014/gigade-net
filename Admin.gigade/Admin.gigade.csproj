@@ -1892,6 +1892,7 @@
     <Content Include="Scripts\Views\MemberEvent\MemberLevelEdit.js" />
     <Content Include="Scripts\Views\MemberEvent\MemberLevelList.js" />
     <Content Include="Scripts\Views\MemberEvent\MemberLevelWin.js" />
+    <Content Include="Scripts\Views\Member\GroupUserAdd.js" />
     <Content Include="Scripts\Views\Member\ShippingVoucher.js" />
     <Content Include="Scripts\Views\OrderManage\Logistics.js" />
     <Content Include="Scripts\Views\OrderManage\OrderDetailManage.js" />
