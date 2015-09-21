@@ -161,6 +161,7 @@
     <Compile Include="Dao\DesignRequestDao.cs" />
     <Compile Include="Dao\DisableKeywordsDao.cs" />
     <Compile Include="Dao\EdmContentDao.cs" />
+    <Compile Include="Dao\EdmContentNewDao.cs" />
     <Compile Include="Dao\EdmEmailDao.cs" />
     <Compile Include="Dao\EdmGroupDao.cs" />
     <Compile Include="Dao\EdmGroupEmailDao.cs" />
@@ -704,6 +705,7 @@
     <Compile Include="Mgr\DesignRequestMgr.cs" />
     <Compile Include="Mgr\DisableKeywordsMgr.cs" />
     <Compile Include="Mgr\EdmContentMgr.cs" />
+    <Compile Include="Mgr\EdmContentNewMgr.cs" />
     <Compile Include="Mgr\EdmEmailMgr.cs" />
     <Compile Include="Mgr\EdmGroupEmailMgr.cs" />
     <Compile Include="Mgr\EdmGroupMgr.cs" />
