@@ -1,37 +1,38 @@
 ﻿
 var CallidForm;
 var pageSize = 25;
+var rows = '';
 /**********************************************************************群組管理主頁面**************************************************************************************/
 //群組管理Model
-Ext.apply(Ext.form.field.VTypes, {
-    daterange: function (val, field) {
-        var date = field.parseDate(val);
+//Ext.apply(Ext.form.field.VTypes, {
+//    daterange: function (val, field) {
+//        var date = field.parseDate(val);
 
-        if (!date) {
-            return false;
-        }
-        this.dateRangeMax = null;
-        this.dateRangeMin = null;
-        if (field.startDateField && (!this.dateRangeMax || (date.getTime() != this.dateRangeMax.getTime()))) {
-            var start = field.up('form').down('#' + field.startDateField);
-            start.setMaxValue(date);
-            //start.validate();
-            this.dateRangeMax = date;
-        } else if (field.endDateField && (!this.dateRangeMin || (date.getTime() != this.dateRangeMin.getTime()))) {
-            var end = field.up('form').down('#' + field.endDateField);
-            end.setMinValue(date);
-            //end.validate();
-            this.dateRangeMin = date;
-        }
-        /*  
-         * Always return true since we're only using this vtype to set the  
-         * min/max allowed values (these are tested for after the vtype test)  
-         */
-        return true;
-    },
+//        if (!date) {
+//            return false;
+//        }
+//        this.dateRangeMax = null;
+//        this.dateRangeMin = null;
+//        if (field.startDateField && (!this.dateRangeMax || (date.getTime() != this.dateRangeMax.getTime()))) {
+//            var start = field.up('form').down('#' + field.startDateField);
+//            start.setMaxValue(date);
+//            //start.validate();
+//            this.dateRangeMax = date;
+//        } else if (field.endDateField && (!this.dateRangeMin || (date.getTime() != this.dateRangeMin.getTime()))) {
+//            var end = field.up('form').down('#' + field.endDateField);
+//            end.setMinValue(date);
+//            //end.validate();
+//            this.dateRangeMin = date;
+//        }
+//        /*  
+//         * Always return true since we're only using this vtype to set the  
+//         * min/max allowed values (these are tested for after the vtype test)  
+//         */
+//        return true;
+//    },
 
-    daterangeText: '開始時間必須小於結束時間'
-});
+//    daterangeText: '開始時間必須小於結束時間'
+//});
 Ext.define('gigade.VipUserGroup', {
     extend: 'Ext.data.Model',
     fields: [
@@ -266,7 +267,7 @@ Ext.onReady(function () {
           //},
           {
               xtype: "textfield",
-              fieldLabel: "群組編號",
+              fieldLabel: "群組編號/名稱",
               id: 'group_id_or_group_name',
               name: 'group_id_or_group_name',
               allowBlank: false,                           
@@ -280,20 +281,8 @@ Ext.onReady(function () {
                   }
               }
           },
-          //{
-          //    xtype: "textfield",
-          //    fieldLabel: "群組名稱",
-          //    id: 'group_name',
-          //    name: 'group_name',
-          //    allowBlank: false,
-          //    submitValue: true,
-          //    emptyText: '請輸入群組名稱',
-          //    listeners: {
-
-          //    }
-          //},
-
-            {
+          
+          {
                 text: SEARCH,
                 iconCls: 'icon-search',
                 id: 'btnQuery',
@@ -355,6 +344,7 @@ onAddClick = function () {
 
 }
 
+
 /*************************************************************************************編輯*************************************************************************************************/
 onEditClick = function () {
     var row = Ext.getCmp("vugGrid").getSelectionModel().getSelection();
@@ -370,112 +360,141 @@ onEditClick = function () {
 }
 
 /*********************************************************************************人員管理*************************************************************************************************/
-
+var VipUserStore = '';
 memberManage = function () {
-    var VipUserStore = Ext.create('Ext.data.Store', {
-        autoDestroy: true,
-        pageSize: pageSize,
-        model: 'gigade.VipUser',
-        proxy: {
-            type: 'ajax',            
-            url: '/Member/GetVipUserList',
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'totalCount'
-            }
-        },
-        autoLoad: true
-    });
-    VipUserStore.on('beforeload', function () {
-        Ext.apply(VipUserStore.proxy.extraParams, {
-            groupid: Ext.getCmp('vugGrid').getSelectionModel().getSelection()[0].data.group_id
-            //dateOne: Ext.getCmp('dateOne').getValue(),
-            //dateTwo: Ext.getCmp('dateTwo').getValue()
-        })
-    })
-
-    var mmGrid = Ext.create('Ext.grid.Panel', {
-        id: 'mmGrid',
-        store: VipUserStore,
-        width: 800,
-        columnLines: true,
-        frame: true,
-        columns: [
-            { header: "會員編號", dataIndex: 'v_id', width: 150, align: 'center' },
-            { header: "會員名稱", dataIndex: 'user_name', width: 150, align: 'center' },
-            { header: "會員郵箱", dataIndex: 'vuser_email', width: 150, align: 'center' },
-            { header: "狀態", dataIndex: 'status', width: 100, align: 'center' },
-            { header: "建立時間", dataIndex: 'screatedate', width: 150, align: 'center' },
-        ],
-        tbar: [
-            { xtype: 'button', text: '添加', id: 'add', handler: onAddClick },
-            //{ xtype: 'button', text: '編輯', id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
-            //{ xtype: 'button', text: '刪除', id: 'remove', iconCls: 'icon-user-remove', disabled: true, handler: onRemoveClick },
-           
-        ],
-        bbar: Ext.create('Ext.PagingToolbar', {
-            store: VipUserStore,            
+    var row = Ext.getCmp("vugGrid").getSelectionModel().getSelection();
+    //alert(row[0]);
+    if (row.length == 0) {
+        Ext.Msg.alert(INFORMATION, NO_SELECTION);
+    }
+    else if (row.length > 1) {
+        Ext.Msg.alert(INFORMATION, ONE_SELECTION);
+    } else if (row.length == 1) {
+        VipUserStore = Ext.create('Ext.data.Store', {
+            autoDestroy: true,
             pageSize: pageSize,
-            displayInfo: true,
-            displayMsg: NOW_DISPLAY_RECORD + ':{0}-{1}' + TOTAL + ':{2}',
-            emptyMsg: NOTHING_DISPLAY
-        }),
-        listeners: {
-            scrollershow: function (scroller) {// scroller滚动条
-                if (scroller && scroller.scrollEl) {
-                    scroller.createManagedListeners();
-                    scroller.mom(scroller.scrollEl, 'scroll', scroller.onElscroll, scroller);
+            model: 'gigade.VipUser',
+            proxy: {
+                type: 'ajax',
+                url: '/Member/GetVipUserList',
+                reader: {
+                    type: 'json',
+                    root: 'data',
+                    totalProperty: 'totalCount'
                 }
-            }
-        },
-        //selModel: sm
-        
-    });
-    var mmWin = Ext.create('Ext.window.Window', {
-        title: "人員管理",
-        id: "mmWin",
-        iconCls: "icon-user-edit",
-        width: 800,
-        height: 500,
-        layout: 'fit',
-        items: [mmGrid],
-        constrain: true,
-        closeAction: 'destroy',
-        modal: true,
-        resizable: false,
-        labelWidth: 80,
-        //bodyStyle: 'padding:5px 5px 5px 5px',
-        closable: false,
-        tools: [
-            {
-                type: 'close',
-                qtip: "關閉窗口",
-                handler: function (event, toolEl, panel) {
-                    Ext.MessageBox.confirm('提示信息', '是否關閉窗口', function (btn) {
-                        if (btn == "yes") {
-                            Ext.getCmp('mmWin').destroy();
+            },
+            autoLoad: true
+        });
+        VipUserStore.on('beforeload', function () {
+            Ext.apply(VipUserStore.proxy.extraParams, {
+                groupid: Ext.getCmp('vugGrid').getSelectionModel().getSelection()[0].data.group_id
+                //dateOne: Ext.getCmp('dateOne').getValue(),
+                //dateTwo: Ext.getCmp('dateTwo').getValue()
+            })
+        })
+
+        var mmGrid = Ext.create('Ext.grid.Panel', {
+            id: 'mmGrid',
+            store: VipUserStore,
+            width: 800,
+            columnLines: true,
+            frame: true,
+            columns: [
+                { header: "會員編號", dataIndex: 'v_id', width: 80, align: 'center' },
+                { header: "會員名稱", dataIndex: 'user_name', width: 150, align: 'center' },
+                { header: "會員郵箱", dataIndex: 'vuser_email', width: 150, align: 'center' },
+                {
+                    header: "狀態", dataIndex: 'status', width: 100, align: 'center',
+                    renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                        if (value == 1) {
+                            //return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.v_id + ")'><img hidValue='0' id='img" + record.data.v_id + "' src='../../../Content/img/icons/accept.gif'/></a>";
+                            return "<img  id='img' src='../../../Content/img/icons/ok.png'/>";
                         }
                         else {
-                            return false;
+                            //return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.v_id + ")'><img hidValue='1' id='img" + record.data.v_id + "' src='../../../Content/img/icons/drop-no.gif'/></a>";
+                            return "<img  id='img' src='../../../Content/img/icons/cross.gif'/>";
+                        }
+                    }
+                },
+                { header: "建立時間", dataIndex: 'screatedate', width: 150, align: 'center' },
+
+                {
+                    header: "操作", dataIndex: 'v_id', width: 70, align: 'center',
+                    renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                        return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.v_id + ")'>刪除</a>";
+                    }
+
+                }
+            ],
+            tbar: [
+                { xtype: 'button', text: '添加', id: 'add', handler: onAddUserClick },
+                //{ xtype: 'button', text: '編輯', id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
+                //{ xtype: 'button', text: '刪除', id: 'remove', iconCls: 'icon-user-remove', disabled: true, handler: onRemoveClick },
+
+            ],
+            bbar: Ext.create('Ext.PagingToolbar', {
+                store: VipUserStore,
+                pageSize: pageSize,
+                displayInfo: true,
+                displayMsg: NOW_DISPLAY_RECORD + ':{0}-{1}' + TOTAL + ':{2}',
+                emptyMsg: NOTHING_DISPLAY
+            }),
+            listeners: {
+                scrollershow: function (scroller) {// scroller滚动条
+                    if (scroller && scroller.scrollEl) {
+                        scroller.clearManagedListeners();
+                        scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
+
+                    }
+                }
+            },
+            //selModel: sm
+
+        });
+        var mmWin = Ext.create('Ext.window.Window', {
+            title: "人員管理",
+            id: "mmWin",
+            iconCls: "icon-user-edit",
+            width: 800,
+            height: 500,
+            layout: 'fit',
+            items: [mmGrid],
+            constrain: true,
+            closeAction: 'destroy',
+            modal: true,
+            resizable: false,
+            labelWidth: 80,
+            //bodyStyle: 'padding:5px 5px 5px 5px',
+            closable: false,
+            tools: [
+                {
+                    type: 'close',
+                    qtip: "關閉窗口",
+                    handler: function (event, toolEl, panel) {
+                        Ext.MessageBox.confirm('提示信息', '是否關閉窗口', function (btn) {
+                            if (btn == "yes") {
+                                Ext.getCmp('mmWin').destroy();
+                            }
+                            else {
+                                return false;
+                            }
+                        });
+                    }
+                }
+            ],
+            listeners: {
+                'show': function () {
+                    Ext.getCmp("mmGrid").store.loadPage(1, {
+                        params: {
+
                         }
                     });
                 }
             }
-        ],
-        listeners: {
-            'show': function () {
-                    Ext.getCmp("mmGrid").store.loadPage(1,{
-                        params: {
-                                                      
-                        }
-                    });
-              }
-         }
-    });
-    mmWin.show();
+        });
+        mmWin.show();
+    }
 }
-
 
 //function Tomorrow() {
 //    var d;
@@ -510,7 +529,36 @@ function Query() {
     }
     
 }
+/*********************************群組中新增會員****************************************************/
 
+onAddUserClick = function () {
+    rows = Ext.getCmp("vugGrid").getSelectionModel().getSelection();
+    var id = rows[0].data.group_id;
+    addFunction(id, VipUserStore);
+}
 
+/*************************群組中會員刪除****************************/
+function UpdateActive(id) {
+    Ext.Ajax.request({
+        url: "/Member/DeleVipUser",
+        params: {
+            vid: id
+        },
+        success: function (response) {
+            var result = Ext.decode(response.responseText);
+            if (result.success) {
+                Ext.Msg.alert("提示", "刪除成功!");
+                VipUserStore.load();
+            } else
+            {
+                Ext.Msg.alert("提示", "刪除失敗!");
+                VipUserStore.load();
+            }
+        },
+        failure: function (form, action) {
+            Ext.Msg.alert(INFORMATION, "系統出現錯誤!");
+        }
+    });
+}
 
 

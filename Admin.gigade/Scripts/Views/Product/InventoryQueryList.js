@@ -369,7 +369,7 @@ Ext.onReady(function () {
                 { header: "品牌編號", dataIndex: "brand_id" },
                 { header: "品牌名稱", dataIndex: "brand_name", width: 180 },
                 { header: "商品狀態", dataIndex: "product_status_string" },
-                {header:"商品販售狀態",dataIndex:"sale_status_string"},
+                {header:"商品販售狀態",dataIndex:"sale_status_string",width:150},
                 { header: "庫存數量", dataIndex: "item_stock" },
                 { header: "庫存為0時是否還能販售 ", dataIndex: "ignore_stock_string",width:160 }
         ],
