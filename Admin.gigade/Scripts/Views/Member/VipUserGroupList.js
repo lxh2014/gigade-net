@@ -407,7 +407,19 @@ memberManage = function () {
             { header: "會員編號", dataIndex: 'v_id', width: 80, align: 'center' },
             { header: "會員名稱", dataIndex: 'user_name', width: 150, align: 'center' },
             { header: "會員郵箱", dataIndex: 'vuser_email', width: 150, align: 'center' },
-            { header: "狀態", dataIndex: 'status', width: 100, align: 'center' },
+            {
+                header: "狀態", dataIndex: 'status', width: 100, align: 'center', 
+            renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                if (value == 1) {
+                    //return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.v_id + ")'><img hidValue='0' id='img" + record.data.v_id + "' src='../../../Content/img/icons/accept.gif'/></a>";
+                    return "<img  id='img' src='../../../Content/img/icons/ok.png'/>";
+                }
+                else {
+                    //return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.v_id + ")'><img hidValue='1' id='img" + record.data.v_id + "' src='../../../Content/img/icons/drop-no.gif'/></a>";
+                    return "<img  id='img' src='../../../Content/img/icons/cross.gif'/>";
+                }
+            }
+            },
             { header: "建立時間", dataIndex: 'screatedate', width: 150, align: 'center' },
             
             {
@@ -434,8 +446,9 @@ memberManage = function () {
         listeners: {
             scrollershow: function (scroller) {// scroller滚动条
                 if (scroller && scroller.scrollEl) {
-                    scroller.createManagedListeners();
-                    scroller.mom(scroller.scrollEl, 'scroll', scroller.onElscroll, scroller);
+                    scroller.clearManagedListeners();
+                    scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
+                  
                 }
             }
         },

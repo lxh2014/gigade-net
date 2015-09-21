@@ -1,8 +1,8 @@
 ﻿addFunction = function (rows, VipUserStore) {
    // var rowsid = rows.data.group_id;
     //alert(rows);
-    var editFrm = Ext.create('Ext.form.Panel', {
-        id: 'editFrm',
+    var editFrms = Ext.create('Ext.form.Panel', {
+        id: 'editFrms',
         frame: true,
         plain: true,
         constrain: true,
@@ -41,10 +41,12 @@
                                        var result = Ext.decode(response.responseText);
                                        if (result.msg == "99") {
                                            Ext.getCmp("user_name").setValue('<font style="color:red">該用戶已在此群組中!</font>');
+                                           Ext.getCmp("user_id").setValue("");
                                            Ext.getCmp("userid").setValue(0);
                                        }
                                        else if (result.msg == "98") {
                                            Ext.getCmp("user_name").setValue('<font style="color:red">此用戶不存在!</font>');
+                                           Ext.getCmp("user_id").setValue("");
                                            Ext.getCmp("userid").setValue(0);
                                        }
                                        else if (result.msg == "100")
@@ -124,19 +126,19 @@
                                 if (result.success) {
                                     Ext.Msg.alert(INFORMATION, "保存成功! ");
                                     VipUserStore.load();
-                                    editWin.close();
+                                    editWins.close();
                                 }
                                 else {
                                     Ext.Msg.alert(INFORMATION, "保存失敗! ");
                                     VipUserStore.load();
-                                    editWin.close();
+                                    editWins.close();
                                 }
                             },
                             failure: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);
                                 Ext.Msg.alert(INFORMATION, "保存失敗! " + result.msg);
                                 VipUserStore.load();
-                                editWin.close();
+                                editWins.close();
                             }
                         });
 
@@ -145,14 +147,14 @@
             }
         }]
     });
-    var editWin = Ext.create('Ext.window.Window', {
+    var editWins = Ext.create('Ext.window.Window', {
         title: '會員新增',
         iconCls: 'icon-user-edit',
-        id: 'editWin',
+        id: 'editWins',
         width: 400,
         y: 100,
         layout: 'fit',
-        items: [editFrm],
+        items: [editFrms],
         constrain: true,
         closeAction: 'destroy',
         modal: true,
@@ -167,7 +169,7 @@
              handler: function (event, toolEl, panel) {
                  Ext.MessageBox.confirm(CONFIRM, IS_CLOSEFORM, function (btn) {
                      if (btn == "yes") {
-                         Ext.getCmp('editWin').destroy();
+                         Ext.getCmp('editWins').destroy();
                      }
                      else {
                          return false;
@@ -200,7 +202,7 @@
         //    }
         //}
     });
-    editWin.show();
+    editWins.show();
    // initForm(rows);
 }
 //function initForm(row) {
