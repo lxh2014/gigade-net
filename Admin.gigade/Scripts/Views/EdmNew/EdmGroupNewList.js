@@ -108,7 +108,17 @@ Ext.onReady(function () {
             { header: "編號", dataIndex: "group_id" },
             { header: "群組名稱", dataIndex: "group_name" },
             { header: "會員電子報", dataIndex: "is_member_edm" },
-            { header: "是否啟用", dataIndex: "enabled " },
+           // { header: "是否啟用", dataIndex: "enabled " },
+            {
+                header: "是否啟用", dataIndex: 'enabled', align: 'center', hidden: false,
+                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                    if (value) {
+                        return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.group_id + ")'><img hidValue='1' id='img" + record.data.group_id + "' src='../../../Content/img/icons/drop-no.gif'/></a>";
+                    } else {
+                        return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.group_id + ")'><img hidValue='0' id='img" + record.data.group_id + "' src='../../../Content/img/icons/accept.gif'/></a>";
+                    }
+                }
+            }
         ],
         tbar: [
            { xtype: 'button', text: "新增", id: 'add', iconCls: 'ui-icon ui-icon-user-add' },
@@ -161,6 +171,34 @@ function Query(x) {
     Ext.getCmp('EdmGroupNewGrid').store.loadPage(1, {
         params: {
 
+        }
+    });
+}
+
+/*********************啟用/禁用**********************/
+function UpdateActive(id) {
+    var activeValue = $("#img" + id).attr("hidValue");
+    $.ajax({
+        url: "/EdmNewController/UpdateStats",
+        data: {
+            "id": id,
+            "active": activeValue
+        },
+        type: "post",
+        type: 'text',
+        success: function (msg) {
+            //Ext.Msg.alert(INFORMATION, "修改成功!");
+            DisKeyWordsStore.load();
+            if (activeValue == 1) {
+                $("#img" + id).attr("hidValue", 0);
+                $("#img" + id).attr("src", "../../../Content/img/icons/accept.gif");
+            } else {
+                $("#img" + id).attr("hidValue", 1);
+                $("#img" + id).attr("src", "../../../Content/img/icons/drop-no.gif");
+            }
+        },
+        error: function (msg) {
+            Ext.Msg.alert(INFORMATION, FAILURE);
         }
     });
 }
