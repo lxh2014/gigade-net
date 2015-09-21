@@ -1,6 +1,7 @@
 ﻿
 var CallidForm;
 var pageSize = 25;
+var rows = '';
 /**********************************************************************群組管理主頁面**************************************************************************************/
 //群組管理Model
 Ext.apply(Ext.form.field.VTypes, {
@@ -355,6 +356,7 @@ onAddClick = function () {
 
 }
 
+
 /*************************************************************************************編輯*************************************************************************************************/
 onEditClick = function () {
     var row = Ext.getCmp("vugGrid").getSelectionModel().getSelection();
@@ -370,9 +372,9 @@ onEditClick = function () {
 }
 
 /*********************************************************************************人員管理*************************************************************************************************/
-
+var VipUserStore = '';
 memberManage = function () {
-    var VipUserStore = Ext.create('Ext.data.Store', {
+     VipUserStore = Ext.create('Ext.data.Store', {
         autoDestroy: true,
         pageSize: pageSize,
         model: 'gigade.VipUser',
@@ -402,14 +404,22 @@ memberManage = function () {
         columnLines: true,
         frame: true,
         columns: [
-            { header: "會員編號", dataIndex: 'v_id', width: 150, align: 'center' },
+            { header: "會員編號", dataIndex: 'v_id', width: 80, align: 'center' },
             { header: "會員名稱", dataIndex: 'user_name', width: 150, align: 'center' },
             { header: "會員郵箱", dataIndex: 'vuser_email', width: 150, align: 'center' },
             { header: "狀態", dataIndex: 'status', width: 100, align: 'center' },
             { header: "建立時間", dataIndex: 'screatedate', width: 150, align: 'center' },
+            
+            {
+                header: "操作", dataIndex: 'v_id', width: 70, align: 'center',
+                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                    return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.v_id + ")'>刪除</a>";
+                }
+
+            }
         ],
         tbar: [
-            { xtype: 'button', text: '添加', id: 'add', handler: onAddClick },
+            { xtype: 'button', text: '添加', id: 'add', handler: onAddUserClick },
             //{ xtype: 'button', text: '編輯', id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
             //{ xtype: 'button', text: '刪除', id: 'remove', iconCls: 'icon-user-remove', disabled: true, handler: onRemoveClick },
            
@@ -510,7 +520,36 @@ function Query() {
     }
     
 }
+/*********************************群組中新增會員****************************************************/
 
+onAddUserClick = function () {
+    rows = Ext.getCmp("vugGrid").getSelectionModel().getSelection();
+    var id = rows[0].data.group_id;
+    addFunction(id, VipUserStore);
+}
 
+/*************************群組中會員刪除****************************/
+function UpdateActive(id) {
+    Ext.Ajax.request({
+        url: "/Member/DeleVipUser",
+        params: {
+            vid: id
+        },
+        success: function (response) {
+            var result = Ext.decode(response.responseText);
+            if (result.success) {
+                Ext.Msg.alert("提示", "刪除成功!");
+                VipUserStore.load();
+            } else
+            {
+                Ext.Msg.alert("提示", "刪除失敗!");
+                VipUserStore.load();
+            }
+        },
+        failure: function (form, action) {
+            Ext.Msg.alert(INFORMATION, "系統出現錯誤!");
+        }
+    });
+}
 
 
