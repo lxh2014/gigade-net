@@ -1278,13 +1278,17 @@
     <Compile Include="Model\DesignRequest.cs" />
     <Compile Include="Model\DisableKeywords.cs" />
     <Compile Include="Model\EdmContent.cs" />
+    <Compile Include="Model\EdmContentNew.cs" />
     <Compile Include="Model\EdmEmail.cs" />
     <Compile Include="Model\EdmGroup.cs" />
+    <Compile Include="Model\EdmGroupNew.cs" />
     <Compile Include="Model\EdmList.cs" />
     <Compile Include="Model\EdmListConditionMain.cs" />
     <Compile Include="Model\EdmListConditoinSub.cs" />
     <Compile Include="Model\EdmSend.cs" />
     <Compile Include="Model\EdmTest.cs" />
+    <Compile Include="Model\Edm_Subscription.cs" />
+    <Compile Include="Model\Edm_Template.cs" />
     <Compile Include="Model\ElementMap.cs" />
     <Compile Include="Model\EventChinatrust.cs" />
     <Compile Include="Model\EventChinaTrustBag.cs" />
