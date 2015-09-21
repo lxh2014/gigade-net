@@ -1843,7 +1843,11 @@
     <Content Include="Scripts\Views\DispatchingSystem\DesignRequestList.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsEdit.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsList.js" />
-    <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />    <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />    <Content Include="Scripts\Views\EdmS\Edmlist.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
+    <Content Include="Scripts\Views\EdmS\Edmlist.js" />
     <Content Include="Scripts\Views\Edm\BlackList.js" />
     <Content Include="Scripts\Views\Edm\BlackListEdit.js" />
     <Content Include="Scripts\Views\Edm\EdmCancel.js" />
@@ -4377,6 +4381,7 @@
     <Content Include="Views\OrderManage\OrderDetailManage.cshtml" />
     <Content Include="Template\SiteAnalytics\SiteAnalytics.xlsx" />
     <Content Include="Views\EdmNew\Index.cshtml" />
+    <Content Include="Views\EdmNew\EdmContentNew.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
