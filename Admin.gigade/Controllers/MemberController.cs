@@ -32,6 +32,9 @@ namespace Admin.gigade.Controllers
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IUserRecommendIMgr _userrecommendMgr;
         private static readonly string mySqlConnectionString = System.Configuration.ConfigurationManager.AppSettings["MySqlConnectionString"].ToString();
+        string imgServerPath = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server);//"http://192.168.71.159:8080"
+        
+        string defaultImg = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server) + "/product/nopic_50.jpg";
         private IUserLoginLogImplMgr _userloginlog;
         private IUserEdmImplMgr _edmMgr = null;
         private IUsersListImplMgr _uslmpgr;
@@ -1060,6 +1063,15 @@ namespace Admin.gigade.Controllers
                 stores = _userGroupMgr.QueryAll(query, out totalCount);
                 foreach (var item in stores)
                 {
+
+                    if (item.image_name != "")
+                    {
+                        item.image_name = imgServerPath + promoPath + item.image_name;
+                    }
+                    else
+                    {
+                        item.image_name = defaultImg;
+                    }
                     item.screatedate = CommonFunction.GetNetTime(item.createdate).ToString("yyyy/MM/dd");
                     item.list = _userGroupMgr.GetVuserCount(item);
                     item.ip = ip;
