@@ -1,5 +1,6 @@
 ﻿EXECUTE_ONCE = "單次執行";
 EXECUTE_REPEAT = "重複執行";
+EXECUTE_IRREGULAR = '不規律執行'; 
 EVERYDAY = "每日";
 EVERYWEEK = "每週";
 EVERYMONTH = "每月";

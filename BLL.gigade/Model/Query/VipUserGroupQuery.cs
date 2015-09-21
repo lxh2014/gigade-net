@@ -19,6 +19,8 @@ namespace BLL.gigade.Model.Query
         public string update_user { get; set; }
         public bool isSecret;
 
+        public string group_id_or_group_name { get; set; }
+
         public int create_id { get; set; }
         public int update_id { get; set; }
         
@@ -34,6 +36,8 @@ namespace BLL.gigade.Model.Query
             isSecret = true;
             create_id = 0;
             update_id = 0;
+
+            group_id_or_group_name = string.Empty;
         }
     }
 }

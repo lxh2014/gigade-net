@@ -25,10 +25,12 @@ namespace BLL.gigade.Model.Query
         public int ignore_stock { set; get; }/*chaojie1124j添加商品庫存查詢*/
         public string product_spec { set; get; }/*chaojie1124j添加商品庫存查詢*/
         public string ignore_stock_string { set; get; }
+        public string sale_status_string { get; set; }
         public uint product_id { set; get; }
         public uint item_id { set; get; }
         public int item_stock { set; get; }
         public uint product_status { get; set; }
+        public uint sale_status { get; set; }
         public string product_id_OR_product_name { get; set; }
         public string brand_id_OR_brand_name { get; set; }
         public int item_stock_start { get; set; }
@@ -52,6 +54,7 @@ namespace BLL.gigade.Model.Query
             brand_id = 0;
             brand_name = string.Empty;
             product_status_string = string.Empty;
+            sale_status_string = string.Empty;
             ignore_stock = 0;
             product_spec = string.Empty;
             ignore_stock_string = string.Empty;
@@ -59,6 +62,7 @@ namespace BLL.gigade.Model.Query
             item_id = 0;
             item_stock = 0; 
             product_status = 0;
+            sale_status = 0;
             product_id_OR_product_name = string.Empty;
             brand_id_OR_brand_name = string.Empty;
             item_stock_start = 0;
