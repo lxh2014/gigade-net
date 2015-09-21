@@ -1050,6 +1050,7 @@ userEdit = function (o_id) {
 modifyDeliverData = function () {
     var deliverData = Ext.create('Ext.form.Panel', {
         constrain: true,
+        timeout: 90000,
         url: '/OrderManage/ModifyDeliveryData',
         items: [
             {

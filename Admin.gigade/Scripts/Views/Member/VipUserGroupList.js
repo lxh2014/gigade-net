@@ -1,6 +1,7 @@
 ﻿
 var CallidForm;
 var pageSize = 25;
+var rows = '';
 /**********************************************************************群組管理主頁面**************************************************************************************/
 //群組管理Model
 Ext.apply(Ext.form.field.VTypes, {
@@ -32,7 +33,7 @@ Ext.apply(Ext.form.field.VTypes, {
 
     daterangeText: '開始時間必須小於結束時間'
 });
-Ext.define('gigade.Fares', {
+Ext.define('gigade.VipUserGroup', {
     extend: 'Ext.data.Model',
     fields: [
         { name: "group_id", type: "int" },
@@ -51,11 +52,48 @@ Ext.define('gigade.Fares', {
 
     ]
 });
+Ext.define('gigade.VipUser', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: "v_id", type: "int" },
+        { name: "vuser_email", type: "string" },
+        { name: "status", type: "int" },
+        { name: "emp_id", type: "string" },
+        { name: "screatedate", type: "string" },
 
-var FaresStore = Ext.create('Ext.data.Store', {
+
+        { name: "user_id", type: "string" },
+        { name: "user_name", type: "string" }, //用戶名
+        { name: "user_email", type: "string" },
+        { name: "user_password", type: "string" }, //密碼
+        { name: "user_gender", type: "string" }, //性別
+    //        {name: "user_birthday_year", type: "int" }, //年
+    //        {name: "user_birthday_month", type: "int" }, //月
+    //        {name: "user_birthday_day", type: "int" }, //日
+        { name: "birthday", type: "string" },
+        { name: "user_mobile", type: "string" },
+        { name: "user_phone", type: "string" }, //行動電話
+        { name: "user_zip", type: "string" }, //用戶地址
+        { name: "user_address", type: "string" }, //用戶地址
+        { name: "user_phone", type: "string" }, //聯絡電話
+        { name: "reg_date", type: "string" }, //註冊日期
+
+
+        { name: "user_source", type: "string" },
+    //        {name: "user_type",type:"string"},
+        { name: "mytype", type: "string" }, //用戶類別
+        { name: "send_sms_ad", type: "bool" }, //是否接收簡訊廣告
+        { name: "adm_note", type: "string" },//管理員備註
+    { name: "paper_invoice", type: "bool" }
+
+    ]
+});
+
+
+var VipUserGroupStore = Ext.create('Ext.data.Store', {
     autoDestroy: true,
     pageSize: pageSize,
-    model: 'gigade.Fares',
+    model: 'gigade.VipUserGroup',
     proxy: {
         type: 'ajax',
         //url:controller/fangfaming
@@ -68,21 +106,25 @@ var FaresStore = Ext.create('Ext.data.Store', {
     }
     //    autoLoad: true
 });
+
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
-            Ext.getCmp("gdFgroup").down('#edit').setDisabled(selections.length == 0);
-            //            Ext.getCmp("gdFgroup").down('#remove').setDisabled(selections.length == 0);
-            //            Ext.getCmp("gdFgroup").down('#auth').setDisabled(selections.length == 0);
-            //            Ext.getCmp("gdFgroup").down('#callid').setDisabled(selections.length == 0);
+            Ext.getCmp("vugGrid").down('#edit').setDisabled(selections.length == 0);
+            Ext.getCmp("vugGrid").down('#member_Manage').setDisabled(selections.length == 0);
+            //            Ext.getCmp("vugGrid").down('#remove').setDisabled(selections.length == 0);
+            //            Ext.getCmp("vugGrid").down('#auth').setDisabled(selections.length == 0);
+            //            Ext.getCmp("vugGrid").down('#callid').setDisabled(selections.length == 0);
         }
     }
 });
 
-FaresStore.on('beforeload', function () {
-    Ext.apply(FaresStore.proxy.extraParams, {
-        dateOne: Ext.getCmp('dateOne').getValue(),
-        dateTwo: Ext.getCmp('dateTwo').getValue()
+
+VipUserGroupStore.on('beforeload', function () {
+    Ext.apply(VipUserGroupStore.proxy.extraParams, {
+        group_id_or_group_name: Ext.getCmp('group_id_or_group_name').getValue()  
+        //dateOne: Ext.getCmp('dateOne').getValue(),
+        //dateTwo: Ext.getCmp('dateTwo').getValue()
     })
 })
 var DDLStore = Ext.create('Ext.data.Store', {
@@ -100,17 +142,17 @@ var DDLStore = Ext.create('Ext.data.Store', {
 //);
 
 Ext.onReady(function () {
-    var gdFgroup = Ext.create('Ext.grid.Panel', {
-        id: 'gdFgroup',
-        store: FaresStore,
+    var vugGrid = Ext.create('Ext.grid.Panel', {
+        id: 'vugGrid',
+        store: VipUserGroupStore,
         width: document.documentElement.clientWidth,
         columnLines: true,       
         frame: true,
         columns: [
             {
-                header: "名單編號", dataIndex: 'group_id', width: 60, align: 'center'
+                header: "群組編號", dataIndex: 'group_id', width: 60, align: 'center'
             },
-            { header: "名單名稱", dataIndex: 'group_name', width: 150, align: 'center' },
+            { header: "群組名稱", dataIndex: 'group_name', width: 150, align: 'center' },
             { header: "統編", dataIndex: 'tax_id', width: 100, align: 'center' },
             {
                 header: "企業網址", dataIndex: 'ip', width: 100, align: 'center', renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
@@ -130,8 +172,17 @@ Ext.onReady(function () {
                     }
                 }
             },
+            
             {
-                header: "名單數", id: 'count', hidden: true, dataIndex: 'list', width: 100, align: 'center', renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                header: "企業圖片",
+                dataIndex: 'image_name',
+                width: 100,
+                align: 'center',
+                xtype: 'templatecolumn',              
+                tpl: '<img name="tplImg" height=30 width=50 border=0 src="{image_name}" />'
+            },
+            {
+                header: "群組人數", id: 'count', hidden: true, dataIndex: 'list', width: 100, align: 'center', renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     return Ext.String.format('<a href="/Member/VipUserList?id={0}" target="_self">{1}</a>', record.data.group_id, value);
                 }
             },
@@ -148,7 +199,7 @@ Ext.onReady(function () {
 
                 }
             },
-            { header: "註冊贈送購物金額", dataIndex: 'gift_bonus', width: 100, align: 'center' },
+            { header: "註冊贈送購物金額", dataIndex: 'gift_bonus', width: 110, align: 'center' },
             { header: "購物贈送購物金倍率", dataIndex: 'bonus_rate', width: 150, align: 'center' },
             { header: "購物贈送購物金有效天數", dataIndex: 'bonus_expire_day', width: 150, align: 'center' },
             { header: "建立時間", dataIndex: 'screatedate', width: 180, align: 'center' }
@@ -156,72 +207,110 @@ Ext.onReady(function () {
         tbar: [
            { xtype: 'button', text: ADD, id: 'add', hidden: true, iconCls: 'icon-user-add', handler: onAddClick },
            { xtype: 'button', text: EDIT, id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
+           { xtype: 'button', text: '人員管理', id: 'member_Manage', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: memberManage },
            '->',
+          //{
+          //    xtype: "datefield",
+          //    fieldLabel: "建立時間",
+          //    id: 'dateOne',
+          //    name: 'dateOne',
+          //    format: 'Y-m-d',
+          //    allowBlank: false,
+          //    editable: false,             
+          //    submitValue: true,
+          //    value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
+          //    listeners: {
+          //        select: function (a, b, c) {
+          //            var start = Ext.getCmp("dateOne");
+          //            var end = Ext.getCmp("dateTwo");
+          //            if (end.getValue() == null) {
+          //                end.setValue(setNextMonth(start.getValue(), 1));
+          //            }
+          //            else if (end.getValue() < start.getValue()) {
+          //                Ext.Msg.alert(INFORMATION, DATA_TIP);
+          //                end.setValue(setNextMonth(start.getValue(), 1));
+          //            }
+          //            else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
+          //                // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+          //                end.setValue(setNextMonth(start.getValue(), 1));
+          //            }
+          //        }
+          //    }
+          //}, '~', {
+          //    xtype: "datefield",
+          //    format: 'Y-m-d',
+          //    id: 'dateTwo',
+          //    name: 'dateTwo',
+          //    allowBlank: false,
+          //    editable: false,            
+          //    submitValue: true,
+          //    value: Tomorrow(),
+          //    listeners: {
+          //        select: function (a, b, c) {
+          //            var start = Ext.getCmp("dateOne");
+          //            var end = Ext.getCmp("dateTwo");
+          //            if (start.getValue() != "" && start.getValue() != null) {
+          //                if (end.getValue() < start.getValue()) {
+          //                    Ext.Msg.alert(INFORMATION, DATA_TIP);
+          //                    start.setValue(setNextMonth(end.getValue(), -1));
+          //                }
+          //                else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
+          //                    // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+          //                    start.setValue(setNextMonth(end.getValue(), -1));
+          //                }
+          //            }
+          //            else {
+          //                start.setValue(setNextMonth(end.getValue(), -1));
+          //            }
+          //        }
+          //    }
+          //},
           {
-              xtype: "datefield",
-              fieldLabel: "建立時間",
-              id: 'dateOne',
-              name: 'dateOne',
-              format: 'Y-m-d',
-              allowBlank: false,
-              editable: false,             
+              xtype: "textfield",
+              fieldLabel: "群組編號",
+              id: 'group_id_or_group_name',
+              name: 'group_id_or_group_name',
+              allowBlank: false,                           
               submitValue: true,
-              value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
+              emptyText: '請輸入群組編號/名稱',
               listeners: {
-                  select: function (a, b, c) {
-                      var start = Ext.getCmp("dateOne");
-                      var end = Ext.getCmp("dateTwo");
-                      if (end.getValue() == null) {
-                          end.setValue(setNextMonth(start.getValue(), 1));
-                      }
-                      else if (end.getValue() < start.getValue()) {
-                          Ext.Msg.alert(INFORMATION, DATA_TIP);
-                          end.setValue(setNextMonth(start.getValue(), 1));
-                      }
-                      else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                          // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                          end.setValue(setNextMonth(start.getValue(), 1));
-                      }
-                  }
-              }
-          }, '~', {
-              xtype: "datefield",
-              format: 'Y-m-d',
-              id: 'dateTwo',
-              name: 'dateTwo',
-              allowBlank: false,
-              editable: false,            
-              submitValue: true,
-              value: Tomorrow(),
-              listeners: {
-                  select: function (a, b, c) {
-                      var start = Ext.getCmp("dateOne");
-                      var end = Ext.getCmp("dateTwo");
-                      if (start.getValue() != "" && start.getValue() != null) {
-                          if (end.getValue() < start.getValue()) {
-                              Ext.Msg.alert(INFORMATION, DATA_TIP);
-                              start.setValue(setNextMonth(end.getValue(), -1));
-                          }
-                          else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                              // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                              start.setValue(setNextMonth(end.getValue(), -1));
-                          }
-                      }
-                      else {
-                          start.setValue(setNextMonth(end.getValue(), -1));
+                  specialkey: function (field, e) {
+                      if (e.getKey() == e.ENTER) {
+                          Query();
                       }
                   }
               }
           },
+          //{
+          //    xtype: "textfield",
+          //    fieldLabel: "群組名稱",
+          //    id: 'group_name',
+          //    name: 'group_name',
+          //    allowBlank: false,
+          //    submitValue: true,
+          //    emptyText: '請輸入群組名稱',
+          //    listeners: {
+
+          //    }
+          //},
+
             {
                 text: SEARCH,
                 iconCls: 'icon-search',
                 id: 'btnQuery',
-                handler: Query
+                handler: Query,
+                listeners: {
+                    onClick: function () {
+                        if (Ext.getCmp('group_id_or_group_name')=='') {
+                            Ext.Msg.alert('提示信息', '請輸入查詢條件');
+                        }
+                    }
+
+                }
             }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
-            store: FaresStore,
+            store: VipUserGroupStore,
             pageSize: pageSize,
             displayInfo: true,
             displayMsg: NOW_DISPLAY_RECORD + ': {0} - {1}' + TOTAL + ': {2}',
@@ -241,18 +330,18 @@ Ext.onReady(function () {
 
     Ext.create('Ext.container.Viewport', {
         layout: 'fit',
-        items: [gdFgroup],
+        items: [vugGrid],
         renderTo: Ext.getBody(),
         autoScroll: true,
         listeners: {
             resize: function () {
-                gdFgroup.width = document.documentElement.clientWidth;
+                vugGrid.width = document.documentElement.clientWidth;
                 this.doLayout();
             }
         }
     });
     ToolAuthority();
-    // FaresStore.load({ params: { start: 0, limit: 25 } });
+    // VipUserGroupStore.load({ params: { start: 0, limit: 25 } });
     if (document.getElementById("valet_service").value == 1) {
         Ext.getCmp('other').show();
         Ext.getCmp('add').show();
@@ -263,13 +352,14 @@ Ext.onReady(function () {
 onAddClick = function () {
 
     //addWin.show();
-    editFunction(null, FaresStore);
+    editFunction(null, VipUserGroupStore);
 
 }
 
+
 /*************************************************************************************編輯*************************************************************************************************/
 onEditClick = function () {
-    var row = Ext.getCmp("gdFgroup").getSelectionModel().getSelection();
+    var row = Ext.getCmp("vugGrid").getSelectionModel().getSelection();
     //alert(row[0]);
     if (row.length == 0) {
         Ext.Msg.alert(INFORMATION, NO_SELECTION);
@@ -277,38 +367,210 @@ onEditClick = function () {
     else if (row.length > 1) {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
-        editFunction(row[0], FaresStore);
+        editFunction(row[0], VipUserGroupStore);
     }
 }
 
-function Tomorrow() {
-    var d;
-    d = new Date();                             // 创建 Date 对象。                               // 返回日期。
-    d.setDate(d.getDate() + 1);
-    return d;
-}
-setNextMonth = function (source, n) {
-    var s = new Date(source);
-    s.setMonth(s.getMonth() + n);
-    if (n < 0) {
-        s.setHours(0, 0, 0);
+/*********************************************************************************人員管理*************************************************************************************************/
+var VipUserStore = '';
+memberManage = function () {
+    var row = Ext.getCmp("vugGrid").getSelectionModel().getSelection();
+    //alert(row[0]);
+    if (row.length == 0) {
+        Ext.Msg.alert(INFORMATION, NO_SELECTION);
     }
-    else if (n > 0) {
-        s.setHours(23, 59, 59);
+    else if (row.length > 1) {
+        Ext.Msg.alert(INFORMATION, ONE_SELECTION);
+    } else if (row.length == 1) {
+        VipUserStore = Ext.create('Ext.data.Store', {
+            autoDestroy: true,
+            pageSize: pageSize,
+            model: 'gigade.VipUser',
+            proxy: {
+                type: 'ajax',
+                url: '/Member/GetVipUserList',
+                reader: {
+                    type: 'json',
+                    root: 'data',
+                    totalProperty: 'totalCount'
+                }
+            },
+            autoLoad: true
+        });
+        VipUserStore.on('beforeload', function () {
+            Ext.apply(VipUserStore.proxy.extraParams, {
+                groupid: Ext.getCmp('vugGrid').getSelectionModel().getSelection()[0].data.group_id
+                //dateOne: Ext.getCmp('dateOne').getValue(),
+                //dateTwo: Ext.getCmp('dateTwo').getValue()
+            })
+        })
+
+        var mmGrid = Ext.create('Ext.grid.Panel', {
+            id: 'mmGrid',
+            store: VipUserStore,
+            width: 800,
+            columnLines: true,
+            frame: true,
+            columns: [
+                { header: "會員編號", dataIndex: 'v_id', width: 80, align: 'center' },
+                { header: "會員名稱", dataIndex: 'user_name', width: 150, align: 'center' },
+                { header: "會員郵箱", dataIndex: 'vuser_email', width: 150, align: 'center' },
+                {
+                    header: "狀態", dataIndex: 'status', width: 100, align: 'center',
+                    renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                        if (value == 1) {
+                            //return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.v_id + ")'><img hidValue='0' id='img" + record.data.v_id + "' src='../../../Content/img/icons/accept.gif'/></a>";
+                            return "<img  id='img' src='../../../Content/img/icons/ok.png'/>";
+                        }
+                        else {
+                            //return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.v_id + ")'><img hidValue='1' id='img" + record.data.v_id + "' src='../../../Content/img/icons/drop-no.gif'/></a>";
+                            return "<img  id='img' src='../../../Content/img/icons/cross.gif'/>";
+                        }
+                    }
+                },
+                { header: "建立時間", dataIndex: 'screatedate', width: 150, align: 'center' },
+
+                {
+                    header: "操作", dataIndex: 'v_id', width: 70, align: 'center',
+                    renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                        return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.v_id + ")'>刪除</a>";
+                    }
+
+                }
+            ],
+            tbar: [
+                { xtype: 'button', text: '添加', id: 'add', handler: onAddUserClick },
+                //{ xtype: 'button', text: '編輯', id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
+                //{ xtype: 'button', text: '刪除', id: 'remove', iconCls: 'icon-user-remove', disabled: true, handler: onRemoveClick },
+
+            ],
+            bbar: Ext.create('Ext.PagingToolbar', {
+                store: VipUserStore,
+                pageSize: pageSize,
+                displayInfo: true,
+                displayMsg: NOW_DISPLAY_RECORD + ':{0}-{1}' + TOTAL + ':{2}',
+                emptyMsg: NOTHING_DISPLAY
+            }),
+            listeners: {
+                scrollershow: function (scroller) {// scroller滚动条
+                    if (scroller && scroller.scrollEl) {
+                        scroller.clearManagedListeners();
+                        scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
+
+                    }
+                }
+            },
+            //selModel: sm
+
+        });
+        var mmWin = Ext.create('Ext.window.Window', {
+            title: "人員管理",
+            id: "mmWin",
+            iconCls: "icon-user-edit",
+            width: 800,
+            height: 500,
+            layout: 'fit',
+            items: [mmGrid],
+            constrain: true,
+            closeAction: 'destroy',
+            modal: true,
+            resizable: false,
+            labelWidth: 80,
+            //bodyStyle: 'padding:5px 5px 5px 5px',
+            closable: false,
+            tools: [
+                {
+                    type: 'close',
+                    qtip: "關閉窗口",
+                    handler: function (event, toolEl, panel) {
+                        Ext.MessageBox.confirm('提示信息', '是否關閉窗口', function (btn) {
+                            if (btn == "yes") {
+                                Ext.getCmp('mmWin').destroy();
+                            }
+                            else {
+                                return false;
+                            }
+                        });
+                    }
+                }
+            ],
+            listeners: {
+                'show': function () {
+                    Ext.getCmp("mmGrid").store.loadPage(1, {
+                        params: {
+
+                        }
+                    });
+                }
+            }
+        });
+        mmWin.show();
     }
-    return s;
 }
+
+//function Tomorrow() {
+//    var d;
+//    d = new Date();                             // 创建 Date 对象。                               // 返回日期。
+//    d.setDate(d.getDate() + 1);
+//    return d;
+//}
+//setNextMonth = function (source, n) {
+//    var s = new Date(source);
+//    s.setMonth(s.getMonth() + n);
+//    if (n < 0) {
+//        s.setHours(0, 0, 0);
+//    }
+//    else if (n > 0) {
+//        s.setHours(23, 59, 59);
+//    }
+//    return s;
+//}
 function Query() {
+    if (Ext.getCmp('group_id_or_group_name').getValue() == '') {
+        Ext.Msg.alert('提示信息', '請輸入查詢條件');
+    }
+    else {
+        VipUserGroupStore.removeAll();
+        Ext.getCmp("vugGrid").store.loadPage(1, {
+            params: {
+                group_id_or_group_name: Ext.getCmp('group_id_or_group_name').getValue()
+                //dateOne: Ext.getCmp('dateOne').getValue(),
+                //dateTwo: Ext.getCmp('dateTwo').getValue()
+            }
+        });
+    }
+    
+}
+/*********************************群組中新增會員****************************************************/
 
-    FaresStore.removeAll();
-    Ext.getCmp("gdFgroup").store.loadPage(1, {
+onAddUserClick = function () {
+    rows = Ext.getCmp("vugGrid").getSelectionModel().getSelection();
+    var id = rows[0].data.group_id;
+    addFunction(id, VipUserStore);
+}
+
+/*************************群組中會員刪除****************************/
+function UpdateActive(id) {
+    Ext.Ajax.request({
+        url: "/Member/DeleVipUser",
         params: {
-            dateOne: Ext.getCmp('dateOne').getValue(),
-            dateTwo: Ext.getCmp('dateTwo').getValue()
+            vid: id
+        },
+        success: function (response) {
+            var result = Ext.decode(response.responseText);
+            if (result.success) {
+                Ext.Msg.alert("提示", "刪除成功!");
+                VipUserStore.load();
+            } else
+            {
+                Ext.Msg.alert("提示", "刪除失敗!");
+                VipUserStore.load();
+            }
+        },
+        failure: function (form, action) {
+            Ext.Msg.alert(INFORMATION, "系統出現錯誤!");
         }
     });
 }
-
-
 
 

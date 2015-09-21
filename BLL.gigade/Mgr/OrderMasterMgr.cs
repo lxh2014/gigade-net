@@ -976,107 +976,15 @@ set ");
             ArrayList arrList = new ArrayList();
             OrderShowMasterQuery oms = new OrderShowMasterQuery();
             OrderShowMasterQuery newOms = new OrderShowMasterQuery();
-            Serial serial = new Serial();
             try
             {
-                DataTable _dt = _orderMasterDao.CheckDeliveryStatus(om);
-                int i = 0;
-                if (_dt != null)//有數據，看看裏面的status是不是都是==0？執行變更：已出貨不能變更
+                if (IsSendProduct(om))//true可以變更 false不可變更。
                 {
-                    foreach (DataRow item in _dt.Rows)
-                    {
-                        if (Convert.ToInt32(item["delivery_status"]) == 0)
-                        {
-                            i++;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    if (i == _dt.Rows.Count)//都是0，可以變更
-                    {
-                        oms.status_description = "Writer:" + "(" + om.user_id + ")" + om.user_name + "," + "\r\n" + "異動收貨資訊";
-                        oms.status_ipfrom = om.Order_Ipfrom;
-                        oms.StatusCreateDate = DateTime.Now;
-                        oms.order_id = om.Order_Id;
-                        om.mdd = true;
-                        newOms = _orderMasterDao.GetData(om.Order_Id);
-                        string note_order = newOms.note_order;
-                        if (note_order == "")
-                        {
-                            om.note_order = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "更改收件人資訊";
-                        }
-                        else
-                        {
-                            om.note_order = note_order + '/' + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "更改收件人資訊";
-                        }
-                        oms.order_status = newOms.order_status;
-                        arrList.Add(_orderMasterDao.UpOrderMaster(om));//更新order_master
-                        arrList.Add(_orderMasterDao.UpdateDM(om));//更新deliver_master
-                        serial = _serialDao.GetSerialById(29);
-                        oms.serial_id = Convert.ToInt32(serial.Serial_Value) + 1;
-                        serial.Serial_Value = Convert.ToUInt64(oms.serial_id);
-                        arrList.Add(_serialDao.UpdateAutoIncreament(serial));//更新serial表
-                        arrList.Add(_orderMasterDao.InsertOrderMasterStatus(oms));//插入order_master_status表
-                        if (_mysqlDao.ExcuteSqlsThrowException(arrList))
-                        {
-                            json = "{success:true}";
-                            #region 發送郵件
-                            MailHelper mail = new MailHelper();
-                            string body = "付款單號 : " + om.Order_Id + " 已更改收貨人資訊，請重新檢視出貨單<br/>更改時間：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "<br/><br/>以上為系統通知信請勿直接回覆，謝謝！               ";
-                            mail.SendMailAction("zhaopeng0205j@gimg.tw", "收貨人資訊變更", body);
-                            #endregion
-                        }
-                        else
-                        {
-                            json = "{success:false}";
-                        }
-                    }
-                    else
-                    {
-                        json = "{success:true,msg:'1'}";//已出貨，不能更改。
-                    }
+                    json=   ChangeDeliverData(oms, newOms, om);
                 }
                 else
                 {
-                    oms.status_description = "Writer:" + "(" + om.user_id + ")" + om.user_name + "," + "\r\n" + "異動收貨資訊";
-                    oms.status_ipfrom = om.Order_Ipfrom;
-                    oms.StatusCreateDate = DateTime.Now;
-                    oms.order_id = om.Order_Id;
-                    om.mdd = true;
-                    newOms = _orderMasterDao.GetData(om.Order_Id);
-                    string note_order = newOms.note_order;
-                    if (note_order == "")
-                    {
-                        om.note_order = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "更改收件人資訊";
-                    }
-                    else
-                    {
-                        om.note_order = note_order + '/' + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "更改收件人資訊";
-                    }
-                    oms.order_status = newOms.order_status;
-                    arrList.Add(_orderMasterDao.UpOrderMaster(om));//更新order_master
-                    arrList.Add(_orderMasterDao.UpdateDM(om));//更新deliver_master
-                    serial = _serialDao.GetSerialById(29);
-                    oms.serial_id = Convert.ToInt32(serial.Serial_Value) + 1;
-                    serial.Serial_Value = Convert.ToUInt64(oms.serial_id);
-                    arrList.Add(_serialDao.UpdateAutoIncreament(serial));//更新serial表
-                    arrList.Add(_orderMasterDao.InsertOrderMasterStatus(oms));//插入order_master_status表
-                    if (_mysqlDao.ExcuteSqlsThrowException(arrList))
-                    {
-                        json = "{success:true}";
-                        #region 發送郵件
-                        MailHelper mail = new MailHelper();
-                        string body = "付款單號 : " + om.Order_Id + " 已更改收貨人資訊，請重新檢視出貨單<br/>更改時間：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "<br/><br/>以上為系統通知信請勿直接回覆，謝謝！               ";
-                        mail.SendMailAction("zhaopeng0205j@gimg.tw", "收貨人資訊變更", body);
-                        //    mail.SendMailAction
-                        #endregion
-                    }
-                    else
-                    {
-                        json = "{success:false}";
-                    }
+                    json = "{success:true,msg:'1'}";
                 }
                 return json;
             }
@@ -1085,6 +993,86 @@ set ");
                 throw new Exception("OrderMasterMgr-->ModifyDeliveryData-->" + ex.Message, ex);
             }
 
+        }
+
+        public bool IsSendProduct(OrderMasterQuery om)
+        {
+            bool result = false;//已出貨，不能修改  為true時可以變更
+            int i = 0;
+            DataTable _dt = _orderMasterDao.CheckDeliveryStatus(om);
+            if (_dt != null)//有數據，看看裏面的status是不是都是==0？執行變更：已出貨不能變更
+            {
+                foreach (DataRow item in _dt.Rows)
+                {
+                    if (Convert.ToInt32(item["delivery_status"]) == 0)
+                    {
+                        i++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                if (i != _dt.Rows.Count)//不全為0，有已出貨的不能變更
+                {
+                    result = false;
+                }
+                else
+                {
+                    result = true;
+                }
+            }
+            else
+            {
+                result = true;
+            }
+
+            return result;
+        }
+
+        public string ChangeDeliverData(OrderShowMasterQuery oms, OrderShowMasterQuery newOms, OrderMasterQuery om)
+        {
+            string json = string.Empty;
+            ArrayList arrList = new ArrayList();
+            Serial serial = new Serial();
+            oms.status_description = "Writer:" + "(" + om.user_id + ")" + om.user_name + "," + "\r\n" + "異動收貨資訊";
+            oms.status_ipfrom = om.Order_Ipfrom;
+            oms.StatusCreateDate = DateTime.Now;
+            oms.order_id = om.Order_Id;
+            om.mdd = true;
+            newOms = _orderMasterDao.GetData(om.Order_Id);
+            string note_order = newOms.note_order;
+            if (note_order == "")
+            {
+                om.note_order = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "更改收件人資訊";
+            }
+            else
+            {
+                om.note_order = note_order + '/' + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "更改收件人資訊";
+            }
+            oms.order_status = newOms.order_status;
+            arrList.Add(_orderMasterDao.UpOrderMaster(om));//更新order_master
+            arrList.Add(_orderMasterDao.UpdateDM(om));//更新deliver_master
+            serial = _serialDao.GetSerialById(29);
+            oms.serial_id = Convert.ToInt32(serial.Serial_Value) + 1;
+            serial.Serial_Value = Convert.ToUInt64(oms.serial_id);
+            arrList.Add(_serialDao.UpdateAutoIncreament(serial));//更新serial表
+            arrList.Add(_orderMasterDao.InsertOrderMasterStatus(oms));//插入order_master_status表
+            if (_mysqlDao.ExcuteSqlsThrowException(arrList))
+            {
+                json = "{success:true}";
+                #region 發送郵件
+                MailHelper mail = new MailHelper();
+                string body = "付款單號 : " + om.Order_Id + " 已更改收貨人資訊，請重新檢視出貨單<br/>更改時間：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "<br/><br/>以上為系統通知信請勿直接回覆，謝謝！               ";
+                mail.SendMailAction("zhaopeng0205j@gimg.tw", "收貨人資訊變更", body);
+                #endregion
+            }
+            else
+            {
+                json = "{success:false}";
+            }
+
+            return json;
         }
 
         public int VerifySession(uint user_id)

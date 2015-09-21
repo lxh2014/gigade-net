@@ -597,14 +597,16 @@ namespace BLL.gigade.Dao
             {
                 str.AppendFormat("SELECT p.product_id,p.product_name,pi.item_id,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1 ");
                 str.AppendFormat(" ,CONCAT(p.spec_title_2,' ',ps2.spec_name) as Spec_Name_2 ,v.vendor_id,v.vendor_name_full, vb.brand_id ");
-                str.Append(" ,vb.brand_name,tp.parameterName as product_status_string,p.product_status,pi.item_stock,p.ignore_stock  ");
+                str.Append(" ,vb.brand_name,tp1.parameterName as product_status_string,p.product_status,tp2.parameterName as sale_status_string,pi.item_stock,p.ignore_stock  ");
                 strcont.AppendFormat("  from product_item pi ");
                 strcont.AppendFormat(" left JOIN product p on p.product_id=pi.product_id ");
                 strcont.AppendFormat(" INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id ");
                 strcont.AppendFormat(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id ");
                 strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
                 strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
-                strcont.AppendFormat(" inner JOIN t_parametersrc tp on tp.parameterCode=p.product_status and  tp.parameterType='product_status' ");
+                //strcont.AppendFormat(" inner JOIN t_parametersrc tp on tp.parameterCode=p.product_status and  tp.parameterType='product_status' ");
+                strcont.AppendFormat(" inner JOIN (SELECT parameterName,parameterCode from t_parametersrc where parameterType='product_status')  tp1 on tp1.parameterCode=p.product_status  ");
+                strcont.AppendFormat(" INNER JOIN (SELECT parameterName,parameterCode from t_parametersrc where parameterType='sale_status' )  tp2 on tp2.parameterCode=p.sale_status ");
                 strcont.AppendFormat(" where 1=1 ");
                 if (!string.IsNullOrEmpty(query.product_id_OR_product_name))//商品名稱或者商品編號或商品細項編號
                 {
@@ -655,6 +657,10 @@ namespace BLL.gigade.Dao
                 {
                     strcont.AppendFormat("and p.product_status = '{0}'", query.product_status);
                 }
+                if (query.sale_status != 100)//  商品販售狀態  100 代表全部
+                {
+                    strcont.AppendFormat("and p.sale_status = '{0}'", query.sale_status);
+                }
                 if (query.item_stock_start <= query.item_stock_end)//库存数量开始--库存数量结束   
                 {
                     strcont.AppendFormat("  and pi.item_stock >='{0}' and pi.item_stock <='{1}'  ", query.item_stock_start, query.item_stock_end);
@@ -684,6 +690,24 @@ namespace BLL.gigade.Dao
             {
                 throw new Exception("ProductItemDao-->GetInventoryQueryList-->" + ex.Message);
             }
+
+        }
+        /**
+         * chaojie1124j 2015/09/17 庫存調整的時候，把商品的庫存也做相應的調整
+         */
+        public  int UpdateItemStock(uint Item_Id, int Item_Stock)
+        { 
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+               strSql.Append("update product_item set ");
+                strSql.AppendFormat("item_stock=item_stock+{0} where item_id={1};", Item_Stock, Item_Id);
+                return _dbAccess.execCommand(strSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->UpdateItemStock" + ex.Message + strSql.ToString(), ex);
+            }  
 
         }
     }

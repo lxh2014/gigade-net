@@ -1250,6 +1250,11 @@ Ext.onReady(function () {
                             if (result.data.cart_id != 16&&result.data.is_manage_user&& (result.data.order_status == 2 || result.data.order_status == 0)) {
                                 Ext.getCmp('change_info').show();
                             }
+                           // alert(result.data.is_send_product);
+                            if (!result.data.is_send_product)
+                            {   
+                                Ext.getCmp('change_info').setDisabled(true);
+                            }
                             //購買人
                         }
                     }

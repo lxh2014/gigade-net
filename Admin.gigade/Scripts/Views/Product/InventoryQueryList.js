@@ -17,7 +17,9 @@ Ext.define('gridlistIQ', {
         { name: "item_id", type: "int" },//商品細項編號
         { name: "product_spec", type: "string" },//商品規格
         { name: "product_status", type: "int" },//商品狀態
+        {name: "sale_status",type:"int"},//商品販售狀態
         { name: "product_status_string", type: "string" },//商品狀態顯示
+        {name:"sale_status_string",type:"string"},//商品販售狀態顯示
         { name: "vendor_name_full", type: "string" },//供應商名稱
         { name: "vendor_id", type: "int" },//供應商編號
         { name: "brand_id", type: "int" },//品牌編號
@@ -70,6 +72,22 @@ var prodStatusStore = Ext.create('Ext.data.Store', {
     }
 });
 
+//商品販售狀態store
+var prodSale_StatusStore = Ext.create('Ext.data.Store', {
+    model: 'gigade.gridPara',
+    //  autoLoad: true,
+    proxy: {
+        type: 'ajax',
+        url: "/Parameter/QueryPara?paraType=sale_status",//調用查詢商品販售狀態的方法
+        getMethod: function () { return 'get'; },
+        actionMethods: 'post',
+        reader: {
+            type: 'json',
+            root: 'items'
+        }
+    }
+});
+
 //列表頁加載時候得到的數據
 ProductStore.on('beforeload', function () {
     Ext.apply(ProductStore.proxy.extraParams,
@@ -78,6 +96,7 @@ ProductStore.on('beforeload', function () {
             product_id_OR_product_name: Ext.getCmp('product_id_OR_product_name').getValue(),//商品編號或名稱
             brand_id_OR_brand_name: Ext.getCmp('brand_id_OR_brand_name').getValue(),//品牌編號或名稱
             product_status: Ext.getCmp('product_status').getValue(),//商品狀態
+            sale_status:Ext.getCmp('sale_status').getValue(),//商品販售狀態
             item_stock_start: Ext.getCmp('item_stock_start').getValue(),//庫存數量開始
             item_stock_end: Ext.getCmp('item_stock_end').getValue(),//庫存數量結束
             ignore_stockRdo: Ext.getCmp('ignore_stockRdo').getValue()//庫存為0時是否還能販售
@@ -176,6 +195,34 @@ Ext.onReady(function () {
                           }
                       }
                 ]
+            }, {
+                xtype: 'fieldcontainer',
+                layout: 'hbox',
+                items: [
+                    {
+                        xtype: 'combobox',
+                        margin: '0 0 0 10',
+                        fieldLabel: '商品販售狀態',
+                        store: prodSale_StatusStore,
+                        id: 'sale_status',
+                        queryMode: 'local',
+                        displayField: 'parameterName',
+                        valueField: 'parameterCode',
+                        editable: false,
+                        listeners: {
+                            beforerender: function () {
+                                prodSale_StatusStore.load({
+                                    callback: function () {
+                                        prodSale_StatusStore.insert(0, { parameterCode: '100', parameterName: '全部' });
+                                        Ext.getCmp('sale_status').setValue(prodSale_StatusStore.data.items[0].data.parameterCode);
+                                       // alert(prodStatusStore.data.items[0].data.parameterCode);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                ]
+
             },
             {
                 xtype: 'fieldcontainer',
@@ -186,13 +233,14 @@ Ext.onReady(function () {
                         id: 'item_stock_start',
                         margin: '0 0 0 10',
                         fieldLabel: '庫存數量',                
-                        value: 0,
-                      //  emptyText: '0',
+                        //value: 0,
+                        // allowBlank: false,
+                        emptyText:'0',
                         minValue: -99999,
                         maxValue: 99999,
                         anchor: '100%',
                         listeners: {
-                            specialkey: function (field, e) {
+                            specialkey: function (field, e) {//   enter 鍵
                                 if (e.getKey() == Ext.EventObject.ENTER) {
                                     Query();
                                 }
@@ -203,7 +251,7 @@ Ext.onReady(function () {
                                 if (start.getValue() > end.getValue()  )
                                 {
                                     end.setValue(start.getValue());
-                                }
+                                }              
                                 if (-99999 <= start.getValue() && start.getValue() <= 99999 && -99999 <= end.getValue() && end.getValue() <= 99999)
                                 {
                                     Ext.getCmp('query').setDisabled(false);
@@ -227,8 +275,9 @@ Ext.onReady(function () {
                         id: 'item_stock_end',
                         labelWidth: 100,
                         margin: '0 0 0 10', 
-                        value: 0,
-                       // emptyText: '0',
+                        //   value: 0,
+                        //  allowBlank: false,
+                        emptyText: '0',
                         minValue: -999999,
                         maxValue: 99999,
                         listeners: {
@@ -243,7 +292,7 @@ Ext.onReady(function () {
                                 if (start.getValue() > end.getValue())
                                 {
                                     end.setValue(start.getValue());
-                                }
+                                } 
                                 if (-99999 <= end.getValue() && end.getValue() <= 99999 && -99999 <= start.getValue() && start.getValue() <= 99999)
                                 {
                                     Ext.getCmp('query').setDisabled(false);
@@ -320,6 +369,7 @@ Ext.onReady(function () {
                 { header: "品牌編號", dataIndex: "brand_id" },
                 { header: "品牌名稱", dataIndex: "brand_name", width: 180 },
                 { header: "商品狀態", dataIndex: "product_status_string" },
+                {header:"商品販售狀態",dataIndex:"sale_status_string",width:150},
                 { header: "庫存數量", dataIndex: "item_stock" },
                 { header: "庫存為0時是否還能販售 ", dataIndex: "ignore_stock_string",width:160 }
         ],
@@ -375,6 +425,7 @@ function Comeback() {
     Ext.getCmp('product_id_OR_product_name').setValue('');
     Ext.getCmp('brand_id_OR_brand_name').setValue('');
     Ext.getCmp('product_status').setValue('10');
+    Ext.getCmp('sale_status').setValue('100');
     Ext.getCmp('item_stock_start').setValue('0');
     Ext.getCmp('item_stock_end').setValue('0');
     Ext.getCmp('id1').setValue(true);// 庫存為0時是否還能販售
@@ -386,8 +437,9 @@ function Export() {
     var product_id_OR_product_name = Ext.getCmp('product_id_OR_product_name').getValue();
     var brand_id_OR_brand_name = Ext.getCmp('brand_id_OR_brand_name').getValue();
     var product_status = Ext.getCmp('product_status').getValue();
+    var sale_status = Ext.getCmp('sale_status').getValue();
     var item_stock_start = Ext.getCmp('item_stock_start').getValue();
     var item_stock_end = Ext.getCmp('item_stock_end').getValue();
     var ignore_stockRdo = Ext.getCmp('ignore_stockRdo').getValue().ignore_stockVal;
-    window.open("/Product/ExportCSV?vendor_name_full_OR_vendor_id=" + vendor_name_full_OR_vendor_id + "&item_stock_end=" + item_stock_end + "&product_id_OR_product_name=" + product_id_OR_product_name + "&brand_id_OR_brand_name=" + brand_id_OR_brand_name + "&item_stock_start=" + item_stock_start + "&ignore_stockRdo=" + ignore_stockRdo + "&product_status=" + product_status);
+    window.open("/Product/ExportCSV?vendor_name_full_OR_vendor_id=" + vendor_name_full_OR_vendor_id + "&sale_status=" + sale_status + "&item_stock_end=" + item_stock_end + "&product_id_OR_product_name=" + product_id_OR_product_name + "&brand_id_OR_brand_name=" + brand_id_OR_brand_name + "&item_stock_start=" + item_stock_start + "&ignore_stockRdo=" + ignore_stockRdo + "&product_status=" + product_status);
 }

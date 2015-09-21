@@ -156,6 +156,7 @@
     <Compile Include="Controllers\DeliveryStoreController.cs" />
     <Compile Include="Controllers\DispatchingSystemController.cs" />
     <Compile Include="Controllers\EdmController.cs" />
+    <Compile Include="Controllers\EdmNewController.cs" />
     <Compile Include="Controllers\EdmSController.cs" />
     <Compile Include="Controllers\ElementController.cs" />
     <Compile Include="Controllers\EmsController.cs" />
@@ -1842,6 +1843,10 @@
     <Content Include="Scripts\Views\DispatchingSystem\DesignRequestList.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsEdit.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsList.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
     <Content Include="Scripts\Views\EdmS\Edmlist.js" />
     <Content Include="Scripts\Views\Edm\BlackList.js" />
     <Content Include="Scripts\Views\Edm\BlackListEdit.js" />
@@ -1889,6 +1894,7 @@
     <Content Include="Scripts\Views\MemberEvent\MemberLevelEdit.js" />
     <Content Include="Scripts\Views\MemberEvent\MemberLevelList.js" />
     <Content Include="Scripts\Views\MemberEvent\MemberLevelWin.js" />
+    <Content Include="Scripts\Views\Member\GroupUserAdd.js" />
     <Content Include="Scripts\Views\Member\ShippingVoucher.js" />
     <Content Include="Scripts\Views\OrderManage\Logistics.js" />
     <Content Include="Scripts\Views\OrderManage\OrderDetailManage.js" />
@@ -1907,6 +1913,7 @@
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeList.js" />
     <Content Include="Scripts\Views\ProductPurchase\SuggestPurchaseList.js" />
     <Content Include="Scripts\Views\ProductSearch\ProductSearchList.js" />
+    <Content Include="Scripts\Views\ProductTier\ExpectTier.js" />
     <Content Include="Scripts\Views\Product\InventoryQueryList.js" />
     <Content Include="Scripts\Views\Product\ProductDetailEdit.js" />
     <Content Include="Scripts\Views\Product\ProductDetailList.js" />
@@ -2258,7 +2265,6 @@
     <Content Include="Scripts\Views\ProductParticulars\ProdnameExtend.js" />
     <Content Include="Scripts\Views\Course\CurriculDetailView.js" />
     <Content Include="Scripts\Views\Course\CurriculuManage.js" />
-    <Content Include="Scripts\Views\ProductTier\ExpectTier.js" />
     <Content Include="Scripts\Views\ProductTier\Index.js" />
     <Content Include="Scripts\Views\Product\CategoryProductMaintain.js" />
     <Content Include="Scripts\Views\Product\CourseDetailItem.js" />
@@ -4375,6 +4381,8 @@
     <Content Include="Views\OrderManage\OrderDetailManage.cshtml" />
     <Content Include="Template\SiteAnalytics\SiteAnalytics.xlsx" />
     <Content Include="Views\WareHouse\IpodList.cshtml" />
+    <Content Include="Views\EdmNew\Index.cshtml" />
+    <Content Include="Views\EdmNew\EdmContentNew.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

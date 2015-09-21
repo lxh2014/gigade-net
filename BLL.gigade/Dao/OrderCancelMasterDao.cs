@@ -1010,25 +1010,32 @@ namespace BLL.gigade.Dao
 
                 if (_dtHg.Rows.Count > 0)
                 {
-                    sql.AppendFormat(@"insert into  hg_deduct_reverse (merchant_pos,terminal_pos,enc_idno,chk_sum,token,order_id,date,time,code,message,created,modified)");
-                    sql.AppendFormat(@" values('{0}','{1}','{2}','{3}','{4}',", 6601000081, 13999501, _dtHg.Rows[0]["enc_idno"].ToString(), _dtHg.Rows[0]["chk_sum"].ToString(), _dtHg.Rows[0]["token"].ToString());
-                    sql.AppendFormat(@"'{0}','{1}','{2}','{3}','{4}','{5}','{6}');", _dtHg.Rows[0]["order_id"].ToString(), date, time, Code, Message, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                    if (Code == "5000")
-                    {
-                        if (deduct_happygo != 0 && order_id != 0)
-                        {
-                            sql.AppendFormat(@"insert into hg_deduct_refund (enc_idno,chk_sum,transaction_date,");
-                            sql.AppendFormat(@"merchant,terminal,refund_point,category,wallet,note,order_id)");
-                            sql.AppendFormat(@" values('{0}','{1}','{2}','{3}',", _dtHg.Rows[0]["enc_idno"].ToString(), _dtHg.Rows[0]["chk_sum"].ToString(), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), "6601000081");
-                            sql.AppendFormat(@"'{0}','{1}','{2}','{3}',", "13999501", deduct_happygo, "N0699999", "991991");
-                            sql.AppendFormat(@"'{0}','{1}');", "吉甲地台灣好市集訂單編號" + order_id + "歸還點數:" + deduct_happygo + "點", order_id);
+                    // 成功失敗都新增到這個表裡面 hg_deduct_reversal
+                    //////sql.AppendFormat(@"insert into  hg_deduct_reverse (merchant_pos,terminal_pos,enc_idno,chk_sum,token,order_id,date,time,code,message,created,modified)");
+                    //////sql.AppendFormat(@" values('{0}','{1}','{2}','{3}','{4}',", 6601000081, 13999501, _dtHg.Rows[0]["enc_idno"].ToString(), _dtHg.Rows[0]["chk_sum"].ToString(), _dtHg.Rows[0]["token"].ToString());
+                    //////sql.AppendFormat(@"'{0}','{1}','{2}','{3}','{4}','{5}','{6}');", _dtHg.Rows[0]["order_id"].ToString(), date, time, Code, Message, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                    //////if (Code == "5000")
+                    //////{
+                    //////    if (deduct_happygo != 0 && order_id != 0)
+                    //////    {
+                    //////        sql.AppendFormat(@"insert into hg_deduct_refund (enc_idno,chk_sum,transaction_date,");
+                    //////        sql.AppendFormat(@"merchant,terminal,refund_point,category,wallet,note,order_id)");
+                    //////        sql.AppendFormat(@" values('{0}','{1}','{2}','{3}',", _dtHg.Rows[0]["enc_idno"].ToString(), _dtHg.Rows[0]["chk_sum"].ToString(), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), "6601000081");
+                    //////        sql.AppendFormat(@"'{0}','{1}','{2}','{3}',", "13999501", deduct_happygo, "N0699999", "991991");
+                    //////        sql.AppendFormat(@"'{0}','{1}');", "吉甲地台灣好市集訂單編號" + order_id + "歸還點數:" + deduct_happygo + "點", order_id);
 
-                        }
-                        else
-                        {
-                            //扣除HappyGo點數失敗;
-                        }
-                    }
+                    //////    }
+                    //////    else
+                    //////    {
+                    //////        //扣除HappyGo點數失敗;
+                    //////    }
+                    //////}
+                    //////else 
+                    //////{
+                    //////    // insert hg_batch_deduct_refund
+                    //////}
+
+                    //如果失敗還往這張表裡面插入數據 insert hg_batch_deduct_refund
 
                 }
                 return sql.ToString();

@@ -1395,7 +1395,7 @@ namespace Admin.gigade.Controllers
                 string newExcelName = string.Empty;
                 dtHZ.Columns.Add("編號", typeof(String));
                 dtHZ.Columns.Add("活動編號", typeof(String));
-                dtHZ.Columns.Add("文章編號", typeof(String));
+                dtHZ.Columns.Add("文章標題", typeof(String));
                 dtHZ.Columns.Add("會員編號", typeof(String));
                // dtHZ.Columns.Add("Email", typeof(String));
                 dtHZ.Columns.Add("姓名", typeof(String));
