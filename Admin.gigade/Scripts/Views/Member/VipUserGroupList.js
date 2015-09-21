@@ -4,35 +4,35 @@ var pageSize = 25;
 var rows = '';
 /**********************************************************************群組管理主頁面**************************************************************************************/
 //群組管理Model
-Ext.apply(Ext.form.field.VTypes, {
-    daterange: function (val, field) {
-        var date = field.parseDate(val);
+//Ext.apply(Ext.form.field.VTypes, {
+//    daterange: function (val, field) {
+//        var date = field.parseDate(val);
 
-        if (!date) {
-            return false;
-        }
-        this.dateRangeMax = null;
-        this.dateRangeMin = null;
-        if (field.startDateField && (!this.dateRangeMax || (date.getTime() != this.dateRangeMax.getTime()))) {
-            var start = field.up('form').down('#' + field.startDateField);
-            start.setMaxValue(date);
-            //start.validate();
-            this.dateRangeMax = date;
-        } else if (field.endDateField && (!this.dateRangeMin || (date.getTime() != this.dateRangeMin.getTime()))) {
-            var end = field.up('form').down('#' + field.endDateField);
-            end.setMinValue(date);
-            //end.validate();
-            this.dateRangeMin = date;
-        }
-        /*  
-         * Always return true since we're only using this vtype to set the  
-         * min/max allowed values (these are tested for after the vtype test)  
-         */
-        return true;
-    },
+//        if (!date) {
+//            return false;
+//        }
+//        this.dateRangeMax = null;
+//        this.dateRangeMin = null;
+//        if (field.startDateField && (!this.dateRangeMax || (date.getTime() != this.dateRangeMax.getTime()))) {
+//            var start = field.up('form').down('#' + field.startDateField);
+//            start.setMaxValue(date);
+//            //start.validate();
+//            this.dateRangeMax = date;
+//        } else if (field.endDateField && (!this.dateRangeMin || (date.getTime() != this.dateRangeMin.getTime()))) {
+//            var end = field.up('form').down('#' + field.endDateField);
+//            end.setMinValue(date);
+//            //end.validate();
+//            this.dateRangeMin = date;
+//        }
+//        /*  
+//         * Always return true since we're only using this vtype to set the  
+//         * min/max allowed values (these are tested for after the vtype test)  
+//         */
+//        return true;
+//    },
 
-    daterangeText: '開始時間必須小於結束時間'
-});
+//    daterangeText: '開始時間必須小於結束時間'
+//});
 Ext.define('gigade.VipUserGroup', {
     extend: 'Ext.data.Model',
     fields: [
@@ -267,7 +267,7 @@ Ext.onReady(function () {
           //},
           {
               xtype: "textfield",
-              fieldLabel: "群組編號",
+              fieldLabel: "群組編號/名稱",
               id: 'group_id_or_group_name',
               name: 'group_id_or_group_name',
               allowBlank: false,                           
@@ -281,20 +281,8 @@ Ext.onReady(function () {
                   }
               }
           },
-          //{
-          //    xtype: "textfield",
-          //    fieldLabel: "群組名稱",
-          //    id: 'group_name',
-          //    name: 'group_name',
-          //    allowBlank: false,
-          //    submitValue: true,
-          //    emptyText: '請輸入群組名稱',
-          //    listeners: {
-
-          //    }
-          //},
-
-            {
+          
+          {
                 text: SEARCH,
                 iconCls: 'icon-search',
                 id: 'btnQuery',

@@ -1042,6 +1042,7 @@ namespace Admin.gigade.Controllers
                 //{
                 //    query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
                 //}
+                //用於判斷是查詢條件是群組編號/群組名稱
                 if (!string.IsNullOrEmpty(group_id_or_group_name))
                 {
                     uint result = 0;
