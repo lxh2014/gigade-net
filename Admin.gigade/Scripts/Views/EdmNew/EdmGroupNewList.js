@@ -37,7 +37,7 @@ var EdmGroupNewStore = Ext.create('Ext.data.Store', {
 EdmGroupNewStore.on('beforeload', function () {
     Ext.apply(EdmGroupNewStore.proxy.extraParams,
         {
-            //vendor_name_full_OR_vendor_id: Ext.getCmp('vendor_name_full_OR_vendor_id').getValue(),
+             group_name: Ext.getCmp('group_name').getValue(),
             //product_id: Ext.getCmp('product_ids').getValue(),
             //start_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s')),
             //end_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s')),
@@ -148,3 +148,19 @@ Ext.onReady(function () {
     });
 
 })
+
+
+
+
+
+
+
+/*************************************************************************************查询信息*************************************************************************************************/
+
+function Query(x) {
+    Ext.getCmp('EdmGroupNewGrid').store.loadPage(1, {
+        params: {
+
+        }
+    });
+}
