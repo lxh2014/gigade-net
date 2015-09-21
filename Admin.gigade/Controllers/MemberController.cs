@@ -54,6 +54,7 @@ namespace Admin.gigade.Controllers
         private string imgLocalServerPath = ConfigurationManager.AppSettings["imgLocalServerPath"];//aimg.gigade100.com 
         private IConfigImplMgr _configMgr;
         private ShippingVoucherMgr ShippingVoucherMgr;
+        private VipUserMgr _vipuserMgr;
 
 
         #region 會員免運劵發放功能
@@ -1422,6 +1423,149 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
+
+        /// <summary>
+        /// 通過郵箱獲取該用戶的信息
+        /// </summary>
+        /// <returns></returns>
+        public HttpResponseBase GetUserName()
+        {
+            UserQuery user = new UserQuery();
+            List<UserQuery> userList = new List<UserQuery>();
+            string user_email="";
+            uint group_id=0;
+            if (!string.IsNullOrEmpty(Request.Params["Email"]))
+            {
+                user_email = Request.Params["Email"];
+            }
+            if (!string.IsNullOrEmpty(Request.Params["group_id"]))
+            {
+                group_id = uint.Parse(Request.Params["group_id"]);
+            }
+
+
+            _usmpgr = new UsersMgr(mySqlConnectionString);
+            string jsonStr = string.Empty;
+            try
+            {
+
+                userList = _usmpgr.GetUserByEmail(user_email, group_id);
+                if (userList.Count()>0)//查詢到會員
+                {
+                    jsonStr = "{success:true,msg:\"" + 99 + "\"}";//該用戶已在此群組中
+                }
+                else
+                {
+                    userList =_usmpgr.GetUserByEmail(user_email, 0);
+                    if (userList.Count()>0)
+                    {
+                        jsonStr = "{success:true,msg:\"" + 100 + "\",user_id:'" + userList[0].user_id + "',user_name:'" + userList[0].user_name + "'}";//返回json數據
+                    }else{
+                        jsonStr = "{success:true,msg:\"" + 98 + "\"}";//此用戶不存在
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                jsonStr = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(jsonStr);
+            this.Response.End();
+            return this.Response;
+        }
+        /// <summary>
+        /// 新增會員至群組
+        /// </summary>
+        /// <returns></returns>
+        public HttpResponseBase SaveVipUser()
+        {
+            string jsonStr = "";
+            VipUserQuery vip = new VipUserQuery();
+            if (!string.IsNullOrEmpty(Request.Params["usermail"]))
+            {
+                vip.user_email = Request.Params["usermail"];
+            }
+            if (!string.IsNullOrEmpty(Request.Params["user_id"]))
+            {
+                vip.user_id = uint.Parse(Request.Params["user_id"]);
+            }
+            if (!string.IsNullOrEmpty(Request.Params["group_id"]))
+            {
+                vip.group_id = uint.Parse(Request.Params["group_id"]);
+            }
+           
+            vip.create_id = uint.Parse((Session["caller"] as Caller).user_id.ToString());
+            vip.update_id = uint.Parse((Session["caller"] as Caller).user_id.ToString());
+            vip.createdate = uint.Parse(CommonFunction.GetPHPTime().ToString());
+            vip.updatedate = vip.createdate;
+            try
+            {
+                _vipuserMgr = new VipUserMgr(mySqlConnectionString);
+                if (_vipuserMgr.AddVipUser(vip) > 0)
+                {
+                    jsonStr = "{success:true}";
+                }
+                else 
+                {
+                    jsonStr = "{success:false}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                jsonStr = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(jsonStr);
+            this.Response.End();
+            return this.Response;
+        }
+        /// <summary>
+        /// 刪除會員至群組
+        /// </summary>
+        /// <returns></returns>
+        public HttpResponseBase DeleVipUser()
+        {
+            string jsonStr = "";
+            VipUserQuery vip = new VipUserQuery();
+            if (!string.IsNullOrEmpty(Request.Params["vid"]))
+            {
+                vip.v_id = uint.Parse(Request.Params["vid"]);
+            }
+           
+            try
+            {
+                _vipuserMgr = new VipUserMgr(mySqlConnectionString);
+                if (_vipuserMgr.DeleVipUser(vip) > 0)
+                {
+                    jsonStr = "{success:true}";
+                }
+                else
+                {
+                    jsonStr = "{success:false}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                jsonStr = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(jsonStr);
+            this.Response.End();
+            return this.Response;
+        }
         /*修改會員狀態，啟用或者禁用 */
         #region 修改會員狀態，啟用或者禁用
         public JsonResult UpdateUserState()

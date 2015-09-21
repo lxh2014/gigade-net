@@ -134,5 +134,28 @@ namespace BLL.gigade.Mgr
             }
 
         }
+        public int AddVipUser(VipUserQuery query)//add by chaojie1124j 添加于2015/9/21用於實現添加會員至群組
+        {
+            try
+            {
+                return _vipUserDao.AddVipUser(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("VipUserMgr-->AddVipUser-->" + ex.Message, ex);
+            }
+
+        }
+        public int DeleVipUser(VipUserQuery query)//add by chaojie1124j 添加于2015/9/21用於實現刪除會員至群組
+        {
+            try
+            {
+                return _vipUserDao.DeleVipUser(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("VipUserMgr-->DeleVipUser-->" + ex.Message, ex);
+            }
+        }
     }
 }

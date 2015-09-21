@@ -644,19 +644,32 @@ namespace BLL.gigade.Dao
                 throw new Exception("UsersDao.string GetUserIDbyEmail(string email)-->" + ex.Message, ex);
             }
         }
-        //public string UpdateEmail(Users query)
-        //{
-        //    try
-        //    {
-        //        query.Replace4MySQL();
-        //        StringBuilder sql = new StringBuilder();
-        //        sql.AppendFormat(@"update users set user_email='{0}' WHERE user_id={1}", query.user_email, query.user_id);
-        //        return sql.ToString();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("UsersDao.string UpdateEmail(string email)-->" + ex.Message, ex);
-        //    }
-        //}
+        /// <summary>
+        /// add by chaojie1124j 2015/09/18通過群組編號和郵箱判斷此會員
+        /// </summary>
+        /// <param name="mail"></param>
+        /// <param name="group_id"></param>
+        /// <returns></returns>
+        public List<UserQuery> GetUserByEmail(string mail,uint group_id)
+        {
+            List<UserQuery> user = new List<UserQuery>();
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+               
+             
+                sql.AppendFormat(@"select u.user_id,u.user_name from users u left join vip_user v on v.user_id =u.user_id where  u.user_email='{0}' ",mail);
+                if (group_id != 0)
+                {
+                    sql.AppendFormat(" and v.group_id='{0}';", group_id);
+                }
+                return _accessMySql.getDataTableForObj<UserQuery>(sql.ToString());
+              
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("UsersDao->GetUserByEmail-->" + ex.Message+sql.ToString(), ex);
+            }
+        }
     }
 }
