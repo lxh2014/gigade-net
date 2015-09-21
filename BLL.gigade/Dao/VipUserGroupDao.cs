@@ -49,13 +49,21 @@ namespace BLL.gigade.Dao
                 sql.AppendLine(@"from vip_user_group where 1=1 ");
                 sqlcount.AppendFormat(@"select count(group_id) as totalCount from vip_user_group where 1=1 ");
                 //分頁
-                if (query.create_dateOne != 0)
+                //if (query.create_dateOne != 0)
+                //{
+                //    sqlstr.AppendFormat(" and createdate>={0}", query.create_dateOne);
+                //}
+                //if (query.create_dateTwo != 0)
+                //{
+                //    sqlstr.AppendFormat(" and createdate<={0}", query.create_dateTwo);
+                //}
+                if (query.group_id != 0)
                 {
-                    sqlstr.AppendFormat(" and createdate>={0}", query.create_dateOne);
+                    sqlstr.AppendFormat(" and group_id={0}", query.group_id);
                 }
-                if (query.create_dateTwo != 0)
+                if (!string.IsNullOrEmpty(query.group_name))
                 {
-                    sqlstr.AppendFormat(" and createdate<={0}", query.create_dateTwo);
+                    sqlstr.AppendFormat(" and group_name like %{0}%", query.group_name);
                 }
                 totalCount = 0;
                 if (query.IsPage)

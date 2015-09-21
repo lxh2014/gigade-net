@@ -84,5 +84,6 @@ namespace BLL.gigade.Mgr.Impl
         bool IsVendorDeliver(uint order_id);
         string ModifyDeliveryData(OrderMasterQuery om);
         int VerifySession(uint user_id);
+        bool IsSendProduct(OrderMasterQuery om);
     }
 }
