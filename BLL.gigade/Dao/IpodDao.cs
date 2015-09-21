@@ -65,6 +65,71 @@ namespace BLL.gigade.Dao
 
         }
 
+        /// <summary>
+        /// 不符採購單單身列表頁
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="totalcount"></param>
+        /// <returns></returns>
+        public List<IpodQuery> GetIpodListNo(IpodQuery query, out int totalcount)
+        {
+            query.Replace4MySQL();
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sqlJoin = new StringBuilder();
+            StringBuilder sqlCondi = new StringBuilder();
+            StringBuilder sqlWhr = new StringBuilder();
+            try
+            {
+                sql.Append("SELECT ip.po_id,p.parameterName,pi.erp_id,pt.product_name,CONCAT(ps.spec_name,'-',ps2.spec_name) as spec,ip.qty_ord,ip.qty_claimed,qty_damaged,v.vendor_name_full,v.vendor_id FROM ipod ip ");
+                sqlJoin.Append("LEFT JOIN ipo i ON ip.po_id=i.po_id ");
+                sqlJoin.Append("LEFT JOIN (select parameterCode,parameterName from t_parametersrc where parameterType='po_type') p ON i.po_type=p.parameterCode ");
+                sqlJoin.Append("LEFT JOIN product_item pi ON ip.prod_id=pi.item_id ");
+                sqlJoin.Append("LEFT JOIN product pt ON pi.product_id=pt.product_id ");
+                sqlJoin.Append("LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id ");
+                sqlJoin.Append("LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id  ");
+                sqlJoin.Append("LEFT JOIN vendor v ON i.vend_id=v.erp_id where 1=1 ");
+
+                if (!string.IsNullOrEmpty(query.po_type))
+                {
+                    sqlWhr.AppendFormat(" and i.po_type='{0}' ", query.po_type);
+                }
+                if (!string.IsNullOrEmpty(query.Erp_Id))
+                {
+                    sqlWhr.AppendFormat(" and pi.erp_id='{0}' ", query.Erp_Id);
+                }
+                if (query.vendor_id!=0)
+                {
+                    sqlWhr.AppendFormat(" and v.vendor_id={0} ", query.vendor_id);
+                }
+                if (!string.IsNullOrEmpty(query.vendor_name_full))
+                {
+                    sqlWhr.AppendFormat(" and v.vendor_name_full like'%{0}%' ", query.vendor_name_full);
+                }
+                if (query.Check)
+                {
+                    sqlWhr.AppendFormat(" and(qty_ord<>qty_claimed) ", query.po_id);
+                }
+                totalcount = 0;
+                sqlWhr.Append(" order by ip.row_id desc ");
+                if (query.IsPage)
+                {
+                    DataTable _dt = _access.getDataTable("select count(ip.po_id) as totalCount FROM ipod ip " + sqlJoin.ToString()+sqlWhr.ToString());
+                    if (_dt.Rows.Count > 0)
+                    {
+                        totalcount = int.Parse(_dt.Rows[0]["totalCount"].ToString());
+                    }
+                    sqlWhr.AppendFormat(" limit {0},{1} ", query.Start, query.Limit);
+                }
+                sql.Append(sqlJoin).Append(sqlWhr);
+                
+                return _access.getDataTableForObj<IpodQuery>(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IpodDao.GetIpodListNo-->" + ex.Message + sql.ToString(), ex);
+            }
+
+        }
         public List<IpodQuery> GetIpodListExprot(IpodQuery query)
         {
             query.Replace4MySQL();

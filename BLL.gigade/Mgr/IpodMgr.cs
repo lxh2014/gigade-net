@@ -34,6 +34,18 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IpoMgr-->GetIpodList-->" + ex.Message, ex);
             }
         }
+       public List<IpodQuery> GetIpodListNo(IpodQuery query, out int totalcount)
+       {
+           try
+           {
+               return _IpodDao.GetIpodListNo(query, out totalcount);
+           }
+           catch (Exception ex)
+           {
+
+               throw new Exception("IpoMgr-->GetIpodListNo-->" + ex.Message, ex);
+           }
+       }
        public int GetPodID(IpodQuery query)
        {
            try
