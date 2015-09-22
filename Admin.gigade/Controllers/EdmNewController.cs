@@ -19,10 +19,17 @@ namespace Admin.gigade.Controllers
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly string mySqlConnectionString = System.Configuration.ConfigurationManager.AppSettings["MySqlConnectionString"].ToString();
         public EdmGroupNewMgr edmgroupmgr;
+        public EdmTemplateMgr edmtemplatemgr;
         //
         // GET: /EdmNew/
         #region view
+        //電子報類型
         public ActionResult Index()
+        {
+            return View();
+        }
+        //電子報範本
+        public ActionResult EdmTemplate()
         {
             return View();
         }
@@ -151,6 +158,7 @@ namespace Admin.gigade.Controllers
             return Response;
  
         }
+
         #endregion
 
         #endregion
@@ -158,6 +166,27 @@ namespace Admin.gigade.Controllers
         #region 電子報範本
 
         #region  電子報範本列表頁
+
+        public HttpResponseBase GetEdmTemplateList() //add by yachao1120j 2015-9-22
+        {
+            string json = string.Empty;
+            int totalcount = 0;
+            EdmTemplateQuery query = new EdmTemplateQuery();
+            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+            edmtemplatemgr = new EdmTemplateMgr(mySqlConnectionString);
+            List<EdmTemplateQuery> list = edmtemplatemgr.GetEdmTemplateList(query, out totalcount);
+            IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+            timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            timeConverter.DateTimeFormat = "yyyy-MM-dd";
+            json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return Response;
+ 
+        }
+
 
         #endregion
 

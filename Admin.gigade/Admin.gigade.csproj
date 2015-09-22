@@ -1848,6 +1848,8 @@
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmTemplateEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmTemplateList.js" />
     <Content Include="Scripts\Views\EdmS\Edmlist.js" />
     <Content Include="Scripts\Views\Edm\BlackList.js" />
     <Content Include="Scripts\Views\Edm\BlackListEdit.js" />
@@ -4384,6 +4386,7 @@
     <Content Include="Views\WareHouse\IpodList.cshtml" />
     <Content Include="Views\EdmNew\Index.cshtml" />
     <Content Include="Views\EdmNew\EdmContentNew.cshtml" />
+    <Content Include="Views\EdmNew\EdmTemplate.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

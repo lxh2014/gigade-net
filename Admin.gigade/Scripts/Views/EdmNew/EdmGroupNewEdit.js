@@ -98,8 +98,8 @@ editFunction = function (row, store) {
         title: "新增電子報列表",
         id: 'editWin',
         iconCls: "icon-user-add",
-        width: 460,
-        height: 500,
+        width: 360,
+        height: 300,
         layout: 'fit',//布局样式
         items: [editFrm],
         constrain: true, //束縛窗口在框架內
