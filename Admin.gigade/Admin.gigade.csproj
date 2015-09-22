@@ -1844,10 +1844,10 @@
     <Content Include="Scripts\Views\DispatchingSystem\DesignRequestList.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsEdit.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsList.js" />
-    <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
-    <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
     <Content Include="Scripts\Views\EdmS\Edmlist.js" />
     <Content Include="Scripts\Views\Edm\BlackList.js" />
     <Content Include="Scripts\Views\Edm\BlackListEdit.js" />

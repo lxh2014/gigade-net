@@ -1,4 +1,5 @@
-﻿/*
+﻿
+/*
  * Copyright (c)J01 
  * 作   者：yachao1120j
  * CreateTime :2015/9/21
@@ -13,8 +14,10 @@ Ext.define('gridlistEGN', {
         { name: "group_id", type: "int" },//群組編號
         { name: "group_name", type: "string" },//群組名稱
         { name: "is_member_edm", type: "int" },//會員電子報
-        { name: "is_member_edm_string",type:"string" },//會員電子報顯示
+        { name: "is_member_edm_string", type: "string" },//會員電子報顯示
         { name: "enabled", type: "int" },//是否啟用
+        { name: "sort_order", type: "int" },//群組排序。當is_member_edm為True時，該群組會顯示在會員中心的電子報訂閱畫面，此時採用這個值來決定顯示的排序。
+        { name: "description", type: "string" },//群組描述文字
     ],
 });
 
@@ -37,7 +40,7 @@ var EdmGroupNewStore = Ext.create('Ext.data.Store', {//EdmGroupNewStore
 EdmGroupNewStore.on('beforeload', function () {
     Ext.apply(EdmGroupNewStore.proxy.extraParams,
         {
-             group_name: Ext.getCmp('group_name').getValue(),
+           // group_name: Ext.getCmp('group_name').getValue(),
         });
 });
 
@@ -103,9 +106,9 @@ Ext.onReady(function () {
         frame: true,
         flex: 9.4,
         columns: [
-            { header: "編號", dataIndex: "group_id",align:'center'},
-            { header: "群組名稱", dataIndex: "group_name",width:300,align:'center'},
-            { header: "會員電子報", dataIndex: "is_member_edm_string",width:200,align:'center' },
+            { header: "編號", dataIndex: "group_id", align: 'center' },
+            { header: "群組名稱", dataIndex: "group_name", width: 300, align: 'center' },
+            { header: "會員電子報", dataIndex: "is_member_edm_string", width: 200, align: 'center' },
            // { header: "是否啟用", dataIndex: "enabled " },
             {
                 header: "是否啟用", dataIndex: 'enabled', align: 'center', hidden: false,
@@ -119,8 +122,8 @@ Ext.onReady(function () {
             }
         ],
         tbar: [
-           //{ xtype: 'button', text: "新增", id: 'add', iconCls: 'ui-icon ui-icon-user-add' },
-           { xtype: 'button', text: "編輯", id: 'edit', iconCls: 'ui-icon ui-icon-user-edit' },
+           { xtype: 'button', text: "新增", id: 'add', iconCls: 'ui-icon ui-icon-user-add', handler: onAddClick },
+           { xtype: 'button', text: "編輯", id: 'edit', iconCls: 'ui-icon ui-icon-user-edit', handler: onedit },
            '->',
                          {
                              xtype: 'textfield',
@@ -137,13 +140,13 @@ Ext.onReady(function () {
                              }
                          },
                          {
-                    text: '查詢',
-                    // margin: '0 8 0 8',
-                    margin: '0 10 0 10',
-                    iconCls: 'icon-search',
-                    handler: function () {
-                        Query();
-                    }
+                             text: '查詢',
+                             // margin: '0 8 0 8',
+                             margin: '0 10 0 10',
+                             iconCls: 'icon-search',
+                             handler: function () {
+                                 Query();
+                             }
                          },
                          {
                              text: '重置',
@@ -152,10 +155,6 @@ Ext.onReady(function () {
                                  Ext.getCmp('group_name').setValue('');//重置為空
                              }
                          },
-                  
-               
-           { xtype: 'button', text: "新增", id: 'add', iconCls: 'ui-icon ui-icon-user-add', handler: onAddClick },
-           //{ xtype: 'button', text: "編輯", id: 'edit', iconCls: 'ui-icon ui-icon-user-edit', handler: onEditClick }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: EdmGroupNewStore,
@@ -237,4 +236,22 @@ function UpdateActive(id) {
 
 function onAddClick() {
     editFunction(null, EdmGroupNewStore);
+}
+
+
+/*************************************************************************************編輯*************************************************************************************************/
+
+onedit = function () {
+    var row = Ext.getCmp("EdmGroupNewGrid").getSelectionModel().getSelection();
+    if (row.length == 0) {
+        // Ext.Msg.alert(INFORMATION, NO_SELECTION);
+        Ext.Msg.alert("未選中任何行!");
+    }
+    else if (row.length > 1) {
+        // Ext.Msg.alert(INFORMATION, ONE_SELECTION);
+        Ext.Msg.alert("只能选择一行!");
+    } else if (row.length == 1) {
+        //Ext.Msg.alert(row[0].data.name);
+        editFunction(row[0], EdmGroupNewStore);
+    }
 }

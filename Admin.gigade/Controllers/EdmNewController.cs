@@ -36,7 +36,7 @@ namespace Admin.gigade.Controllers
         #region 電子報類型
 
         #region 電子報類型列表頁
-        public HttpResponseBase GetEdmGroupNewList()
+        public HttpResponseBase GetEdmGroupNewList()// add by yachao1120j 2015-9-21
         {
             string json = string.Empty;
             int totalcount = 0;
@@ -96,7 +96,61 @@ namespace Admin.gigade.Controllers
         #endregion
 
         #region 電子報類型新增編輯
+        public HttpResponseBase SaveEdmGroupNewAdd() //add by yachao1120j 2015-9-22
+        {
+            string json = string.Empty;
+            try
+            {
+                EdmGroupNewQuery query = new EdmGroupNewQuery();
+                edmgroupmgr = new EdmGroupNewMgr(mySqlConnectionString);
+               
+                if (!string.IsNullOrEmpty(Request.Params["group_id"]))
+                {
+                    query.group_id = Convert.ToInt32(Request.Params["group_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["group_name"]))
+                {
+                    query.group_name = Request.Params["group_name"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["is_member_edm"]))
+                {
+                    query.is_member_edm = Convert.ToInt32(Request.Params["is_member_edm"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["sort_order"]))
+                {
+                    query.sort_order = Convert.ToInt32(Request.Params["sort_order"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["description"]))
+                {
+                    query.description = Request.Params["description"];
 
+                }
+                int _dt = edmgroupmgr.SaveEdmGroupNewAdd(query);
+
+                if (_dt > 0)
+                {
+                    json = "{success:true}";
+                }
+                else
+                {
+                    json = "{success:false}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return Response;
+ 
+        }
         #endregion
 
         #endregion

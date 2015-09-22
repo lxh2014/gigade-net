@@ -24,7 +24,7 @@ namespace BLL.gigade.Mgr
            _dbAccess = DBFactory.getDBAccess(DBType.MySql, connectionString);
            _edmgroupdao = new EdmGroupNewDao(connectionString);
        }
-       public List<EdmGroupNewQuery> GetEdmGroupNewList(EdmGroupNewQuery query, out int totalCount)
+       public List<EdmGroupNewQuery> GetEdmGroupNewList(EdmGroupNewQuery query, out int totalCount) // add by yachao1120j 2015-9-21
        {
            try
            {
@@ -48,7 +48,7 @@ namespace BLL.gigade.Mgr
                throw new Exception("EdmGroupNewMgr->GetEdmGroupNewList" + ex.Message);
            }
        }
-       public string UpdateStatus(EdmGroupNewQuery query)
+       public string UpdateStatus(EdmGroupNewQuery query)  // add by yachao1120j 2015-9-21
        {
            string josn;
            string sql = "";
@@ -76,6 +76,18 @@ namespace BLL.gigade.Mgr
            catch (Exception ex)
            {
                throw new Exception("EdmGroupNewMgr-->UpdateStatus-->" + ex.Message + sql, ex);
+           }
+       }
+       //判断是新增 还是 编辑 
+       public int SaveEdmGroupNewAdd(EdmGroupNewQuery query)
+       {
+           if (query.group_id == 0)//新增
+           {
+               return _edmgroupdao.EdmGroupNewInsert(query);
+           }
+           else//編輯
+           {
+               return _edmgroupdao.EdmGroupNewUpdate(query);
            }
        }
   

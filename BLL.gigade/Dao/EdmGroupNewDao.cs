@@ -4,10 +4,7 @@ using System.Linq;
 using System.Text;
 using DBAccess;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using BLL.gigade.Common;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
@@ -58,10 +55,10 @@ namespace BLL.gigade.Dao
            {
                throw new Exception("EdmGroupNewDao-->GetEdmGroupNewList-->" + ex.Message);
            }
-       }
+       } // add by yachao1120j 2015-9-21
 
 
-       public string UpdateStatus(EdmGroupNewQuery query)
+       public string UpdateStatus(EdmGroupNewQuery query)  // add by yachao1120j 2015-9-21
        {
            StringBuilder strSql = new StringBuilder();
            try
@@ -73,6 +70,61 @@ namespace BLL.gigade.Dao
            {
                throw new Exception("EdmGroupNewDao-->UpdateStatus-->" + ex.Message + strSql.ToString(), ex);
            }
+       } 
+
+
+       //插入人员信息
+       public int EdmGroupNewInsert(EdmGroupNewQuery query)
+       {
+           StringBuilder sql = new StringBuilder();
+           query.Replace4MySQL();
+           try
+           {
+               sql.Append("insert into edm_group_new (group_name, is_member_edm, sort_order,description)values ");
+               sql.AppendFormat("('{0}','{1}','{2}','{3}')", query.group_name, query.is_member_edm, query.sort_order, query.description);
+
+               return _access.execCommand(sql.ToString());
+           }
+           catch (Exception ex)
+           {
+               throw new Exception("EdmGroupNewDao-->EdmGroupNewInsert-->" + sql.ToString() + ex.Message);
+           }
        }
+       //更新人员信息
+       public int EdmGroupNewUpdate(EdmGroupNewQuery query)
+       {
+           StringBuilder sql = new StringBuilder();
+           query.Replace4MySQL();
+           try
+           {
+               sql.AppendFormat("update edm_group_new set group_name = '{0}', is_member_edm = '{1}', sort_order = '{2}',description='{3}'  where group_id='{4}' ", query.group_name, query.is_member_edm, query.sort_order, query.description,query.group_id);
+               return _access.execCommand(sql.ToString());
+           }
+           catch (Exception ex)
+           {
+               throw new Exception("EdmGroupNewDao-->EdmGroupNewUpdate-->" + sql.ToString() + ex.Message);
+           }
+       }
+
+
+
+       //保存新增信息
+       //public int SaveEdmGroupNewAdd(EdmGroupNewQuery query)  // add by yachao1120j 2015-9-22
+       //{
+       //    StringBuilder sql = new StringBuilder();
+       //    query.Replace4MySQL();
+       //    try
+       //    {
+       //        sql.Append("insert into edm_group_new (group_name, is_member_edm, sort_order,description)values ");
+       //        sql.AppendFormat("('{0}','{1}','{2}','{3}')", query.group_name, query.is_member_edm, query.sort_order, query.description);
+       //        return _access.execCommand(sql.ToString());
+       //    }
+       //    catch (Exception ex)
+       //    {
+       //        throw new Exception("EdmGroupNewDao-->SaveEdmGroupNewAdd" + ex.Message);
+       //    }
+       //}
+
+
     }
 }
