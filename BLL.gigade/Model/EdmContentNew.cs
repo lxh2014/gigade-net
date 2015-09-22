@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BLL.gigade.Model
 {
-    class EdmContentNew:PageBase
+   public  class EdmContentNew:PageBase
     {
         public int content_id { get; set; }//EDM內容代碼，主索引鍵
         public int group_id { get; set; }// EDM群組代碼，決定該EDM屬於哪一個EDM群組
