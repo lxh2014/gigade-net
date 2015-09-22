@@ -169,6 +169,7 @@
     <Compile Include="Dao\EdmListConditionMainDao.cs" />
     <Compile Include="Dao\EdmListConditoinSubDao.cs" />
     <Compile Include="Dao\EdmSendDao.cs" />
+    <Compile Include="Dao\EdmTemplateDao.cs" />
     <Compile Include="Dao\EdmTestDao.cs" />
     <Compile Include="Dao\ElementMapDao.cs" />
     <Compile Include="Dao\EventChinaTrustBagDao.cs" />
@@ -714,6 +715,7 @@
     <Compile Include="Mgr\EdmListConditionMainMgr.cs" />
     <Compile Include="Mgr\EdmListConditoinSubMgr.cs" />
     <Compile Include="Mgr\EdmSendMgr.cs" />
+    <Compile Include="Mgr\EdmTemplateMgr.cs" />
     <Compile Include="Mgr\EdmTestMgr.cs" />
     <Compile Include="Mgr\ElementMapMgr.cs" />
     <Compile Include="Mgr\EventChinaTrustBagMapMgr.cs" />

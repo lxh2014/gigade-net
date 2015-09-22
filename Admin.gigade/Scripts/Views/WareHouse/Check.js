@@ -448,7 +448,7 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
                 }
                 else
                 {
-                   
+                    e.store.load();
                 }
 
             });

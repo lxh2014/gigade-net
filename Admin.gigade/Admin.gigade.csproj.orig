@@ -4383,8 +4383,11 @@
     <Content Include="Views\WareHouse\IpodList.cshtml" />
     <Content Include="Views\EdmNew\Index.cshtml" />
     <Content Include="Views\EdmNew\EdmContentNew.cshtml" />
+<<<<<<< HEAD
     <Content Include="Views\EdmNew\EdmTemplate.cshtml" />
+=======
     <Content Include="Web.config" />
+>>>>>>> a28008a1d8b50dba9bab029b50dd32428e4d2960
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

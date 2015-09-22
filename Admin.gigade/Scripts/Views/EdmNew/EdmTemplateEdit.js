@@ -7,53 +7,54 @@
         autoScroll: true,
         layout: 'anchor',
         labelWidth: 45,
-        url: '/EdmNew/SaveEdmGroupNewAdd',
+        url: '/EdmNew/SaveEdmTemplateAdd',
         defaults: { anchor: "95%", msgTarget: "side" },
         items: [
-            {
-                xtype: 'textfield',
-                fieldLabel: '編號',
-                id: 'group_id',
-                name: 'group_id',
-                hidden:true,
-            }, {
-                xtype: 'textfield',
-                fieldLabel: '群組名稱',
-                id: 'group_name',
-                name: 'group_name',
-            }, {
-                xtype: 'fieldcontainer',
-                combineErrors: true,
-                layout: 'hbox',
-                items: [
-                {
-                    fieldLabel: '會員電子報',
-                    xtype: 'radiogroup',
-                    id: 'is_member_edm',
-                    labelWidth:95,
-                    width: 260,
-                    defaults: {
-                        name: 'ignore_stockVal'
-                    },
-                    columns: 2,
-                    items: [
-                    { id: 'id1', boxLabel: "是", inputValue: '1', checked: true },
-                    { id: 'id2', boxLabel: "否", inputValue: '0' }
-                    ]
-                }
-                ]
-            }, {
-                xtype: 'numberfield',
-                fieldLabel: '排序',
-                id: 'sort_order',
-                name: 'sort_order',
-                minValue:0,
-            }, {
-                xtype: 'textareafield',
-                fieldLabel: '電子報類型描述',
-                id: 'description',
-                name: 'description',
-            },
+             {
+                 xtype: 'displayfield',
+                 fieldLabel: '編號',
+                 id: 'template_id',
+                 name: 'template_id',
+                 
+             }, {
+                 xtype: 'textfield',
+                 fieldLabel: '範本名稱',
+                 id: 'template_name',
+                 name: 'template_name',
+             }, {
+                 xtype: 'textfield',
+                 fieldLabel: '內容編輯網址',
+                 id: 'edit_url',
+                 name: 'edit_url',
+                 
+             }, {
+                 xtype: 'textfield',
+                 fieldLabel: '內容產生網址',
+                 id: 'content_url',
+                 name: 'content_url',
+             }, {
+                 xtype: 'displayfield',
+                 fieldLabel: '建立日期',
+                 id: 'template_createdate',
+                 name: 'template_createdate',
+                 
+             }, {
+                 xtype: 'displayfield',
+                 fieldLabel: '更新日期',
+                 id: 'template_updatedate',
+                 name: 'template_updatedate',
+             }, {
+                 xtype: 'displayfield',
+                 fieldLabel: '建立者',
+                 id: 'template_create_userid',
+                 name: 'template_create_userid',
+                
+             }, {
+                 xtype: 'displayfield',
+                 fieldLabel: '修改者',
+                 id: 'template_update_userid',
+                 name: 'template_update_userid',
+             },
         ],
         buttons: [
             {
@@ -65,11 +66,14 @@
                     if (form.isValid()) {
                         form.submit({
                             params: {
-                                group_id: Ext.htmlEncode(Ext.getCmp('group_id').getValue()),
-                                group_name: Ext.htmlEncode(Ext.getCmp('group_name').getValue()),
-                                is_member_edm: Ext.htmlEncode(Ext.getCmp('is_member_edm').getValue().ignore_stockVal),
-                                sort_order: Ext.htmlEncode(Ext.getCmp('sort_order').getValue()),
-                                description:Ext.htmlEncode(Ext.getCmp('description').getValue()),
+                                template_id: Ext.htmlEncode(Ext.getCmp('template_id').getValue()),
+                                template_name: Ext.htmlEncode(Ext.getCmp('template_name').getValue()),
+                                edit_url: Ext.htmlEncode(Ext.getCmp('edit_url').getValue().ignore_stockVal),
+                                content_url: Ext.htmlEncode(Ext.getCmp('content_url').getValue()),
+                                template_create_userid: Ext.htmlEncode(Ext.getCmp('template_create_userid').getValue()),
+                                template_update_userid: Ext.htmlEncode(Ext.getCmp('template_update_userid').getValue().ignore_stockVal),
+                                template_createdate: Ext.htmlEncode(Ext.getCmp('template_createdate').getValue()),
+                                template_updatedate: Ext.htmlEncode(Ext.getCmp('template_updatedate').getValue()),
                             },
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);
@@ -94,7 +98,7 @@
         ]
     });
     var editWin = Ext.create('Ext.window.Window', {
-        title: "新增電子報列表",
+        title: "新增電子報範本",
         id: 'editWin',
         iconCls: "icon-user-add",
         width: 360,
@@ -127,10 +131,15 @@
         listeners: {
             'show': function () {
                 if (row) {
+                    alert(row);
                     editFrm.getForm().loadRecord(row);
-                    //initRow(row);
                 }
                 else {
+                    Ext.getCmp('template_id').hide();
+                    Ext.getCmp('template_create_userid').hide();
+                    Ext.getCmp('template_update_userid').hide();
+                    Ext.getCmp('template_createdate').hide();
+                    Ext.getCmp('template_updatedate').hide();
                     editFrm.getForm().reset();
                 }
             }
