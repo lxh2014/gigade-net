@@ -4375,9 +4375,6 @@
     <Content Include="Template\AppcategoryImport\t_category.xls" />
     <Content Include="Views\ProductPurchase\RIS.cshtml" />
     <Content Include="Views\WareHouse\Check.cshtml" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Views\Super\Index.cshtml" />
     <Content Include="Views\Product\InventoryQuery.cshtml" />
     <Content Include="Template\SiteStatistics\站臺訪問量統計匯入範本.xlsx" />
@@ -4387,6 +4384,7 @@
     <Content Include="Views\EdmNew\Index.cshtml" />
     <Content Include="Views\EdmNew\EdmContentNew.cshtml" />
     <Content Include="Views\EdmNew\EdmTemplate.cshtml" />
+    <Content Include="Web.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
