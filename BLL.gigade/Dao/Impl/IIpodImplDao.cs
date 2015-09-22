@@ -9,6 +9,7 @@ namespace BLL.gigade.Dao.Impl
     public interface IIpodImplDao
     {
         List<IpodQuery> GetIpodList(IpodQuery query, out int totalcount);
+        List<IpodQuery> GetIpodListNo(IpodQuery query, out int totalcount);
         int GetPodID(IpodQuery query);
         int AddIpod(IpodQuery query);
         int UpdateIpod(IpodQuery query);
