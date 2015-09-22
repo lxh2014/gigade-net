@@ -1,5 +1,4 @@
-﻿//添加按钮的  弹出的Frm框  包含 姓名 性别 年龄 入职部门 入职年份 入职月份 工龄 报名开始日期 报名结束日期 活动开始日期 活动结束日期
-editFunction = function (row, store) {
+﻿editFunction = function (row, store) {
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
         frame: true,
