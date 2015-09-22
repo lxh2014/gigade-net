@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BLL.gigade.Model
 {
-    class Edm_Template:PageBase
+    public class EdmTemplate:PageBase
     {
         public int template_id { get; set; }//EDM範本代碼
         public string template_name { get; set; }//EDM範本名稱
@@ -17,7 +17,7 @@ namespace BLL.gigade.Model
         public int template_create_userid { set; get; }//範本建立者的使用者代碼
         public int template_update_userid { set; get; }//範本更新者的使用者代碼
 
-        public Edm_Template() 
+        public EdmTemplate() 
         {
             template_id = 0;
             template_name = string.Empty;

@@ -695,14 +695,14 @@ namespace BLL.gigade.Dao
         /**
          * chaojie1124j 2015/09/17 庫存調整的時候，把商品的庫存也做相應的調整
          */
-        public  int UpdateItemStock(uint Item_Id, int Item_Stock)
+        public  string UpdateItemStock(ProductItem query)
         { 
             StringBuilder strSql = new StringBuilder();
             try
             {
                strSql.Append("update product_item set ");
-                strSql.AppendFormat("item_stock=item_stock+{0} where item_id={1};", Item_Stock, Item_Id);
-                return _dbAccess.execCommand(strSql.ToString());
+               strSql.AppendFormat("item_stock=item_stock+{0} where item_id={1};", query.Item_Stock, query.Item_Id);
+                return strSql.ToString();
             }
             catch (Exception ex)
             {

@@ -165,6 +165,7 @@
     <Compile Include="Dao\EdmEmailDao.cs" />
     <Compile Include="Dao\EdmGroupDao.cs" />
     <Compile Include="Dao\EdmGroupEmailDao.cs" />
+    <Compile Include="Dao\EdmGroupNewDao.cs" />
     <Compile Include="Dao\EdmListConditionMainDao.cs" />
     <Compile Include="Dao\EdmListConditoinSubDao.cs" />
     <Compile Include="Dao\EdmSendDao.cs" />
@@ -709,6 +710,7 @@
     <Compile Include="Mgr\EdmEmailMgr.cs" />
     <Compile Include="Mgr\EdmGroupEmailMgr.cs" />
     <Compile Include="Mgr\EdmGroupMgr.cs" />
+    <Compile Include="Mgr\EdmGroupNewMgr.cs" />
     <Compile Include="Mgr\EdmListConditionMainMgr.cs" />
     <Compile Include="Mgr\EdmListConditoinSubMgr.cs" />
     <Compile Include="Mgr\EdmSendMgr.cs" />
@@ -1289,8 +1291,8 @@
     <Compile Include="Model\EdmListConditoinSub.cs" />
     <Compile Include="Model\EdmSend.cs" />
     <Compile Include="Model\EdmTest.cs" />
-    <Compile Include="Model\Edm_Subscription.cs" />
-    <Compile Include="Model\Edm_Template.cs" />
+    <Compile Include="Model\EdmSubscription.cs" />
+    <Compile Include="Model\EdmTemplate.cs" />
     <Compile Include="Model\ElementMap.cs" />
     <Compile Include="Model\EventChinatrust.cs" />
     <Compile Include="Model\EventChinaTrustBag.cs" />
@@ -1351,10 +1353,14 @@
     <Compile Include="Model\Query\DisableKeywordsQuery.cs" />
     <Compile Include="Model\Query\EdmEmailQuery.cs" />
     <Compile Include="Model\Query\EdmGroupEmailQuery.cs" />
+    <Compile Include="Model\Query\EdmGroupNewQuery.cs" />
     <Compile Include="Model\Query\EdmListConditoinSubQuery.cs" />
     <Compile Include="Model\Query\EdmListQuery.cs" />
     <Compile Include="Model\Query\EdmSendQuery.cs" />
+    <Compile Include="Model\Query\EdmSubscriptionQuery.cs" />
+    <Compile Include="Model\Query\EdmTemplateQuery.cs" />
     <Compile Include="Model\Query\EdmTestQuery.cs" />
+    <Compile Include="Model\Query\EdmContentNewQuery.cs" />
     <Compile Include="Model\Query\EventChinaTrustBagMapQuery.cs" />
     <Compile Include="Model\Query\EventChinaTrustBagQuery.cs" />
     <Compile Include="Model\Query\EventChinatrustQuery.cs" />

@@ -749,13 +749,12 @@ where pm2.price_master_id={0}", query.price_master_id);
             StringBuilder sb = new StringBuilder();
             try
             {
-                sb.AppendFormat(@"SELECT s.site_name,p.product_id,p.product_name,ip.item_id,pm.product_name as item_name,p.product_status,pm.price_status,ip.item_money,ip.item_cost,ip.event_money,ip.event_cost AS item_event_cost,p.spec_title_1,p.spec_title_2 
-                                  FROM price_master pm
-                                      INNER JOIN product p ON p.product_id = pm.product_id
-                                      LEFT JOIN item_price ip ON ip.price_master_id = pm.price_master_id
-                                      INNER JOIN site s ON s.site_id = pm.site_id
-                                  WHERE pm.price_master_id IN ({0}) 
-                                  ORDER BY pm.product_id asc, ip.item_id ASC", price_master_ids);
+                //添加規格 詳細信息  add by zhuoqin0830w  2015/09/17 s1.spec_name as spec_title_1, s2.spec_name as spec_title_2  INNER JOIN product_item pt ON ip.item_id = pt.item_id LEFT JOIN product_spec s1 on pt.spec_id_1 = s1.spec_id LEFT JOIN product_spec s2 on pt.spec_id_2 = s2.spec_id
+                sb.Append(@"SELECT s.site_name,p.product_id,p.product_name,ip.item_id,pm.product_name as item_name,p.product_status,pm.price_status,ip.item_money,ip.item_cost,ip.event_money,");
+                sb.Append(@"ip.event_cost AS item_event_cost,s1.spec_name as spec_title_1, s2.spec_name as spec_title_2 FROM price_master pm INNER JOIN product p ON p.product_id = pm.product_id ");
+                sb.Append(@"LEFT JOIN item_price ip ON ip.price_master_id = pm.price_master_id INNER JOIN product_item pt ON ip.item_id = pt.item_id LEFT JOIN product_spec s1 on pt.spec_id_1 = s1.spec_id ");
+                sb.Append(@"LEFT JOIN product_spec s2 on pt.spec_id_2 = s2.spec_id INNER JOIN site s ON s.site_id = pm.site_id ");
+                sb.AppendFormat(@"WHERE pm.price_master_id IN ({0}) ORDER BY pm.product_id ASC,ip.item_id ASC;", price_master_ids);
                 return _dbAccess.getDataTableForObj<PriceMasterCustom>(sb.ToString());
             }
             catch (Exception ex)

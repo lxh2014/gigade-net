@@ -2639,6 +2639,10 @@ namespace Admin.gigade.Controllers
                 Iinvd m = new Iinvd();
                 IialgQuery ia = new IialgQuery();
                 Iupc iu = new Iupc();
+                ProductItem proitem = new ProductItem();
+                Caller call = new Caller();
+                call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
+                string path="";
                 _iinvd = new IinvdMgr(mySqlConnectionString);
                 _iagMgr = new IialgMgr(mySqlConnectionString);
                 _IiupcMgr = new IupcMgr(mySqlConnectionString);
@@ -2749,6 +2753,8 @@ namespace Admin.gigade.Controllers
                 #region 庫存調整的時候，商品庫存也要調整
                 _proditemMgr = new ProductItemMgr(mySqlConnectionString); 
                 int item_stock = m.prod_qty;
+                proitem.Item_Stock = item_stock;
+                proitem.Item_Id = m.item_id;
                 #endregion
                 if (_iinvd.IsUpd(m) > 0)
                 {//編輯             
@@ -2764,7 +2770,8 @@ namespace Admin.gigade.Controllers
                             {// 
                                 if (ia.iarc_id == "DR" || ia.iarc_id == "KR")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
                                 {
-                                    _proditemMgr.UpdateItemStock(m.item_id, item_stock);
+                                    path = "/WareHouse/KutiaoAddorReduce";
+                                    _proditemMgr.UpdateItemStock(proitem, path, call);
                                 }
                                 if (_iagMgr.insertiialg(ia) > 0)
                                 {
@@ -2809,7 +2816,8 @@ namespace Admin.gigade.Controllers
                                 {
                                     if (ia.iarc_id == "DR" || ia.iarc_id == "KR")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
                                     {
-                                        _proditemMgr.UpdateItemStock(m.item_id, item_stock);
+                                        path = "/WareHouse/KutiaoAddorReduce";
+                                        _proditemMgr.UpdateItemStock(proitem,path,call);
                                     }
                                     ia.qty_o = 0;
                                     ia.adj_qty = m.prod_qty;
@@ -2838,7 +2846,8 @@ namespace Admin.gigade.Controllers
                             {
                                 if (ia.iarc_id == "DR" || ia.iarc_id == "KR")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
                                 {
-                                    _proditemMgr.UpdateItemStock(m.item_id, item_stock);
+                                    path = "/WareHouse/KutiaoAddorReduce";
+                                    _proditemMgr.UpdateItemStock(proitem, path, call);
                                 }
                                 ia.qty_o = 0;
                                 ia.adj_qty = m.prod_qty;
@@ -7316,6 +7325,7 @@ namespace Admin.gigade.Controllers
             Iinvd invd = new Iinvd();
             iialg iag = new iialg();
             IstockChange Icg = new IstockChange();
+            ProductItem Proitems = new ProductItem();
             int results = 0;
             try
             {
@@ -7327,6 +7337,7 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["item_id"]))//商品細項編號
                 {
                     Icg.item_id = Convert.ToUInt32(Request.Params["item_id"]);
+                    Proitems.Item_Id = Icg.item_id;
                 }
                 int oldsumcount = _iinvd.GetProqtyByItemid(Convert.ToInt32(Icg.item_id));//總庫存
 
@@ -7344,7 +7355,7 @@ namespace Admin.gigade.Controllers
                     resultcount = kucuncount - tiaozhengcount;
                     item_stock = -tiaozhengcount;
                 }
-
+                Proitems.Item_Stock = item_stock;
                 invd.prod_qty = resultcount;//此時為更改后的庫存
                 invd.change_dtim = DateTime.Now;
                 invd.change_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
@@ -7368,7 +7379,10 @@ namespace Admin.gigade.Controllers
                 _istockMgr = new IstockChangeMgr(mySqlConnectionString);
                
                 int j = _iinvd.kucunTiaozheng(invd); //更改iloc表中的狀態並且在iialg表中插入數據
-                int k = _proditemMgr.UpdateItemStock(Icg.item_id, item_stock);
+                string path="/WareHouse/KutiaoAddorReduce";
+                Caller call=new Caller();
+                call=(System.Web.HttpContext.Current.Session["caller"] as Caller);
+                int k = _proditemMgr.UpdateItemStock(Proitems, path, call);
                 int newsumcount = _iinvd.GetProqtyByItemid(Convert.ToInt32(Icg.item_id));//總庫存
                 Icg.sc_num_chg = newsumcount - oldsumcount;
                 Icg.sc_num_new = newsumcount;
@@ -10976,6 +10990,21 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(Request.Params["vendor_name_full"]))
             {
+                string vendorName = Request.Params["vendor_name_full"].ToString();
+                int index1=vendorName.IndexOf('%');
+                int index2=vendorName.IndexOf('_');
+                if (index1 != -1 )
+                {
+                    string start = vendorName.Substring(0, index1);
+                    string end = vendorName.Substring(index1 + 1);
+                    vendorName = start + "/" + "%" + end;
+                }
+                if(index2 != -1)
+                {
+                    string start = vendorName.Substring(0, index2);
+                    string end = vendorName.Substring(index2 + 1);
+                    vendorName = start + "/" + "_" + end;
+                }
                 ipod.vendor_name_full = Request.Params["vendor_name_full"].ToString();
             }
             if (!string.IsNullOrEmpty(Request.Params["check"]))
