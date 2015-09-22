@@ -10976,6 +10976,21 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(Request.Params["vendor_name_full"]))
             {
+                string vendorName = Request.Params["vendor_name_full"].ToString();
+                int index1=vendorName.IndexOf('%');
+                int index2=vendorName.IndexOf('_');
+                if (index1 != -1 )
+                {
+                    string start = vendorName.Substring(0, index1);
+                    string end = vendorName.Substring(index1 + 1);
+                    vendorName = start + "/" + "%" + end;
+                }
+                if(index2 != -1)
+                {
+                    string start = vendorName.Substring(0, index2);
+                    string end = vendorName.Substring(index2 + 1);
+                    vendorName = start + "/" + "_" + end;
+                }
                 ipod.vendor_name_full = Request.Params["vendor_name_full"].ToString();
             }
             if (!string.IsNullOrEmpty(Request.Params["check"]))

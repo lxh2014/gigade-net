@@ -103,20 +103,20 @@ namespace BLL.gigade.Dao
                 }
                 if (!string.IsNullOrEmpty(query.vendor_name_full))
                 {
-                    sqlWhr.AppendFormat(" and v.vendor_name_full like'%{0}%' ", query.vendor_name_full);
+                    sqlWhr.AppendFormat(" and v.vendor_name_full like'%{0}%'ESCAPE '/' ", query.vendor_name_full);
                 }
                 if (query.Check)
                 {
                     sqlWhr.AppendFormat(" and(qty_ord<>qty_claimed) ", query.po_id);
                 }
                 totalcount = 0;
-                sqlWhr.Append(" order by ip.row_id desc ");
+                sqlWhr.Append(" GROUP BY ip.row_id order by ip.row_id desc ");
                 if (query.IsPage)
                 {
-                    DataTable _dt = _access.getDataTable("select count(ip.po_id) as totalCount FROM ipod ip " + sqlJoin.ToString()+sqlWhr.ToString());
+                    DataTable _dt = _access.getDataTable("SELECT count(row_id) FROM (select ip.row_id FROM ipod ip " + sqlJoin.ToString() + sqlWhr.ToString() + ") temp");
                     if (_dt.Rows.Count > 0)
                     {
-                        totalcount = int.Parse(_dt.Rows[0]["totalCount"].ToString());
+                        totalcount = int.Parse(_dt.Rows[0][0].ToString());
                     }
                     sqlWhr.AppendFormat(" limit {0},{1} ", query.Start, query.Limit);
                 }
