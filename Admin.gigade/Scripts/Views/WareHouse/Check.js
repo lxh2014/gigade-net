@@ -125,54 +125,58 @@ var IpodStore = Ext.create('Ext.data.Store', {
         }
     },
 
-    listeners: {
-    update: function (store, record) {
-        //如果編輯的是轉移數量
-        //var row_id = e.record.data.row_id;
-        //var qty_damaged = record.get("qty_damaged");
-        var qty_claimed = record.get("qty_claimed");
-        var qty_ord = record.get("qty_ord");
-        if (parseInt(qty_claimed) > parseInt(qty_ord))
-        {
-            Ext.Msg.alert("錯誤提示", "允收數量不能大於下單採購量,保存失敗！");
-            return false;
-        }
+    //listeners: {
+    //update: function (store, record) {
+    //    //如果編輯的是轉移數量
+    //    //var row_id = e.record.data.row_id;
+    //    var qty_damaged = record.get("qty_damaged");
+    //    var qty_claimed = record.get("qty_claimed");
+    //    var qty_ord = record.get("qty_ord");
+    //    if (parseInt(qty_claimed) == 0 && parseInt(qty_damaged) == 0)
+    //    {
+    //        ;
+    //    }
+    //    else if (parseInt(qty_claimed) > parseInt(qty_ord) )
+    //    {
+    //        Ext.Msg.alert("錯誤提示", "允收數量不能大於下單採購量,保存失敗！");
+    //        return false;
+    //    }
 
-            if (record.isModified('qty_damaged') || record.isModified('qty_claimed')) {
-                Ext.Ajax.request({
-                    url: '/WareHouse/UpdateIpodCheck',
-                    params: {
-                        row_id: record.get("row_id"),
-                        qty_damaged: record.get("qty_damaged"),
-                        qty_claimed: record.get("qty_claimed"),
-                        item_stock: parseInt(record.get("item_stock")) + parseInt(qty_claimed),
+    //        if (record.isModified('qty_damaged') || record.isModified('qty_claimed')) {
+    //            Ext.Ajax.request({
+    //                url: '/WareHouse/UpdateIpodCheck',
+    //                params: {
+    //                    row_id: record.get("row_id"),
+    //                    qty_damaged: record.get("qty_damaged"),
+    //                    qty_claimed: record.get("qty_claimed"),
+    //                    item_stock: parseInt(record.get("item_stock")) + parseInt(qty_claimed),
                         
-                        plst_id:"F"
+    //                    plst_id:"F"
 
-                    },
-                    success: function (response)
-                    {
-                        var res = Ext.decode(response.responseText);
-                        if (res.success)
-                        {
-                            Ext.Msg.alert("提示信息", "驗收成功!");
-                            IpodStore.load();
-                        }
-                        else
-                        {
-                            Ext.Msg.alert("提示信息", "驗收失敗!");
-                            IpodStore.load();
-                        }
-                    },
-                    failure: function () {
+    //                },
+    //                success: function (response)
+    //                {
+    //                    var res = Ext.decode(response.responseText);
+    //                    if (res.success)
+    //                    {
+    //                        Ext.Msg.alert("提示信息", "驗收成功!");
+    //                        IpodStore.load();
+    //                    }
+    //                    else
+    //                    {
+    //                        Ext.Msg.alert("提示信息", "驗收失敗!");
+    //                        IpodStore.load();
+    //                    }
+    //                },
+    //                failure: function () {
 
-                        Ext.Msg.alert("提示信息", "驗收失敗!");
+    //                    Ext.Msg.alert("提示信息", "驗收失敗!");
 
-                    }
-                });
-            }
-        }
-    }
+    //                }
+    //            });
+    //        }
+    //    }
+    //}
 });
 
 
@@ -384,8 +388,75 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
                 return false;
             }
 
-        }
+        },
+        edit: function (e, eOpts)
+        {
+            
+            Ext.Msg.confirm("提示信息", "確認是否保存？", function (btn)
+            {
+                 
+                if (btn == "yes")
+                {
+                    //如果編輯的是轉移數量
+                    //var row_id = e.record.data.row_id;
+                    var qty_damaged = e.record.data.qty_damaged; e.record.data.item_stock
+                    var qty_claimed = e.record.data.qty_claimed;
+                    var qty_ord = e.record.data.qty_ord;
+                    if (parseInt(qty_claimed) == 0 && parseInt(qty_damaged) == 0)
+                    {
+                        ;
+                    }
+                    else if (parseInt(qty_claimed) > parseInt(qty_ord))
+                    {
+                        Ext.Msg.alert("錯誤提示", "允收數量不能大於下單採購量,保存失敗！");
+                        return false;
+                    }
+                    //Ext.Msg.alert("提示", e.originalValues); return false;
+                    //if (record.isModified('qty_damaged') || record.isModified('qty_claimed'))
+                    {
+                        Ext.Ajax.request({
+                            url: '/WareHouse/UpdateIpodCheck',
+                            params: {
+                                row_id: e.record.data.row_id,
+                                qty_damaged: e.record.data.qty_damaged,
+                                qty_claimed: e.record.data.qty_claimed,
+                                item_stock: parseInt(e.record.data.item_stock) + parseInt(qty_claimed),
+
+                                plst_id: "F"
+
+                            },
+                            success: function (response)
+                            {
+                                var res = Ext.decode(response.responseText);
+                                if (res.success)
+                                {
+                                    Ext.Msg.alert("提示信息", "驗收成功!");
+                                    IpodStore.load();
+                                }
+                                else
+                                {
+                                    Ext.Msg.alert("提示信息", "驗收失敗!");
+                                    IpodStore.load();
+                                }
+                            },
+                            failure: function ()
+                            {
+                                Ext.Msg.alert("提示信息", "驗收失敗!");
+                            }
+                        });
+                    }
+                }
+                else
+                {
+                   
+                }
+
+            });
+                        
+        },
+        
     }
+
 });
 Ext.grid.RowEditor.prototype.saveBtnText = "保存";
 Ext.grid.RowEditor.prototype.cancelBtnText = "取消";
@@ -418,7 +489,7 @@ var center = Ext.create('Ext.form.Panel', {
             id: 'detailist',
             autoScroll: true,
             frame: false,
-            height: document.documentElement.clientHeight,
+            height: document.documentElement.clientHeight-15,
             store: IpodStore,
             plugins: [rowEditing],
             columns: [
@@ -451,7 +522,9 @@ var center = Ext.create('Ext.form.Panel', {
                 },
                 //{ header: "是否允許多次收貨", dataIndex: 'bkord_allow', width: 120, align: 'center' },
                 {
-                    header: "不允收的量", dataIndex: 'qty_damaged', flex: 1, align: 'center', editor: { xtype: 'numberfield', allowBlank: false, minValue: 0,maxValue:99999, allowDecimals: false },
+                    header: "不允收的量", dataIndex: 'qty_damaged', flex: 1, align: 'center',
+                    editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, maxValue: 99999, allowDecimals: false }
+
                 },
                 { header: "允收數量", dataIndex: 'qty_claimed', flex: 1, align: 'center', editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, maxValue: 99999, allowDecimals: false } },
                 //{ header: "品項庫存用途", dataIndex: 'promo_invs_flg', flex: 1, align: 'center' },
