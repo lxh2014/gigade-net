@@ -518,16 +518,20 @@ function Query() {
         Ext.Msg.alert('提示信息', '請輸入查詢條件');
     }
     else {
-        VipUserGroupStore.removeAll();
-        Ext.getCmp("vugGrid").store.loadPage(1, {
-            params: {
-                group_id_or_group_name: Ext.getCmp('group_id_or_group_name').getValue()
-                //dateOne: Ext.getCmp('dateOne').getValue(),
-                //dateTwo: Ext.getCmp('dateTwo').getValue()
-            }
-        });
-    }
-    
+        if (Ext.getCmp('group_id_or_group_name').getValue() == 0) {
+            Ext.Msg.alert('提示信息', '請輸入非零字符');
+        }
+        else {
+            VipUserGroupStore.removeAll();
+            Ext.getCmp("vugGrid").store.loadPage(1, {
+                params: {
+                    group_id_or_group_name: Ext.getCmp('group_id_or_group_name').getValue()
+                    //dateOne: Ext.getCmp('dateOne').getValue(),
+                    //dateTwo: Ext.getCmp('dateTwo').getValue()
+                }
+            });
+        }   
+    }    
 }
 /*********************************群組中新增會員****************************************************/
 
