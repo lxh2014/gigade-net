@@ -11,9 +11,9 @@ function editFunction(RowID, Store) {
         plain: true,//不在选项卡栏上显示全部背景。
         layout: 'anchor',
         autoScroll: true,
-        labelWidth: 45,
+        labelWidth: 50,
         url: '/SiteManager/SaveSiteAnalytics',
-        defaults: { anchor: "80%", msgTarget: "side", labelWidth: 80 },//side添加一个错误图标在域的右边，鼠标悬停上面时弹出显示消息。
+        defaults: { anchor: "80%", msgTarget: "side", labelWidth: 100 },//side添加一个错误图标在域的右边，鼠标悬停上面时弹出显示消息。
         //这个布局将子元素的位置与父容器大小进行关联固定. 如果容器大小改变, 所有固定的子项将按各自的anchor 规则自动被重新渲染固定.
         items: [
         {
@@ -92,14 +92,14 @@ function editFunction(RowID, Store) {
             name: 'sa_bounce_rate',
             id: 'sa_bounce_rate',
             margin: '10 0 10 0',
-            maxValue: 100,
+            maxValue: 0.99999999999999,
             minValue: 0,
             allowBlank: false,
             hideTrigger: true
         },
         {
             xtype: 'numberfield',
-            fieldLabel: '平均停留時間',
+            fieldLabel: '平均停留時間(s)',
             name: 'sa_avg_session_duration',
             id: 'sa_avg_session_duration',
             margin: '10 0 10 0',

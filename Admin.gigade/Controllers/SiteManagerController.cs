@@ -562,7 +562,7 @@ namespace Admin.gigade.Controllers
                 _newDt.Columns.Add("瀏覽量", typeof(string));
                 _newDt.Columns.Add("單次造訪頁數", typeof(string));
                 _newDt.Columns.Add("跳出率", typeof(string));
-                _newDt.Columns.Add("平均停留時間", typeof(string));
+                _newDt.Columns.Add("平均停留時間(s)", typeof(string));
 
 
                 for (int i = 0; i < _dt.Rows.Count; i++)
