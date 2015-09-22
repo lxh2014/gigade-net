@@ -20,15 +20,13 @@
                    id: 'user_Mail',
                    name: 'user_Mail',
                    submitValue: true,
-                   regex: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
+                   regex: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/, 
                    listeners: {
                        change: function () {////'blur'
                            var mail = Ext.getCmp("user_Mail");
                            if (mail.isValid()==true)
                            {
-                              // Ext.Msg.alert("提示", row.data.group_id)
-                            
-                
+                              // Ext.Msg.alert("提示", row.data.group_id)                                        
                                var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "請稍等......", removeMask: true });
                                Ext.Ajax.request({
                                    url: "/Member/GetUserName",
@@ -39,25 +37,25 @@
                                    success: function (response) {
                                        myMask.hide();
                                        var result = Ext.decode(response.responseText);
-                                       if (result.msg == "99") {
+                                       if (result.msg == "99") {                                           
                                            Ext.getCmp("user_name").setValue('<font style="color:red">該用戶已在此群組中!</font>');
                                            Ext.getCmp("user_id").setValue("");
-                                           Ext.getCmp("userid").setValue(0);
+                                           Ext.getCmp("userid").setValue(0);                                           
                                        }
-                                       else if (result.msg == "98") {
+                                       else if (result.msg == "98") {                                          
                                            Ext.getCmp("user_name").setValue('<font style="color:red">此用戶不存在!</font>');
                                            Ext.getCmp("user_id").setValue("");
-                                           Ext.getCmp("userid").setValue(0);
+                                           Ext.getCmp("userid").setValue(0);                                          
                                        }
                                        else if (result.msg == "100")
-                                       {
+                                       {                                         
                                            Ext.getCmp("user_name").setValue(result.user_name);
                                            Ext.getCmp("user_id").setValue(result.user_id);
-                                           Ext.getCmp("userid").setValue(result.user_id);
+                                           Ext.getCmp("userid").setValue(result.user_id);  
                                        }
                                        else {
                                            Ext.Msg.alert("提示", "等待超時");
-                                           Ext.getCmp("userid").setValue(0);
+                                           Ext.getCmp("userid").setValue(0);                                          
                                        }
                                    },
                                    failure: function (form, action) {
@@ -69,7 +67,6 @@
                                Ext.getCmp("user_name").setValue('<font style="color:red">沒有此會員信息</font>');
                                Ext.getCmp("userid").setValue(0);
                            }
-
                        }
                    }
                },
@@ -102,16 +99,16 @@
                    fieldLabel: '會員名稱'
                }
         ],
-        buttons: [{
-            formBind: true,
-            disabled: true,
+        buttons: [{           
+            formBind: true,                    
             text: '保存',
             handler: function () {
                 var form = this.up('form').getForm();
                 
                 if (form.isValid()) {
                     var userID = Ext.getCmp('userid').getValue();
-                    if (userID == "0") {
+                    if (userID == "0" || userID == '') {
+                        Ext.Msg.alert('提示信息', '請重新輸入郵箱地址');
                         return false;
                     }
                     else {
@@ -141,7 +138,6 @@
                                 editWins.close();
                             }
                         });
-
                     }
                 }
             }
@@ -176,31 +172,12 @@
                      }
                  });
              }
-         }],
-        //listeners: {
-        //    'show': function () {
-        //        if (row == null) {
-        //            if (document.getElementById("modify_only").value == 1) {
-        //                Ext.getCmp('bonus_rate').show();
-        //                Ext.getCmp('bonus_expire_day').show();
-        //            }
-        //            if (document.getElementById("valet_service").value == 1) {
-        //                Ext.getCmp('gift_bonus').setReadOnly(false);
-        //            }
-        //        }
-        //        else {
-        //            editFrm.getForm().loadRecord(row);
-        //            if (document.getElementById("modify_only").value == 1) {
-        //                Ext.getCmp('bonus_rate').show();
-        //                Ext.getCmp('bonus_expire_day').show();
-        //            }
-        //            if (document.getElementById("valet_service").value == 1) {
-        //                Ext.getCmp('gift_bonus').setReadOnly(false);
-        //            }
-        //        }
-
-        //    }
-        //}
+         }]
+      // listeners: {
+      //     
+      //    }
+      //}
+       
     });
     editWins.show();
    // initForm(rows);
