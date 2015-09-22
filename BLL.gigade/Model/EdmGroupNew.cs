@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BLL.gigade.Model
 {
-    class EdmGroupNew:PageBase
+  public  class EdmGroupNew:PageBase
     {
         public int group_id { get; set; }// 電子報群組代碼
         public string group_name { get; set; }//群組名稱
