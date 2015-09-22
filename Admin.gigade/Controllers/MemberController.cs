@@ -1033,6 +1033,10 @@ namespace Admin.gigade.Controllers
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
                 _userGroupMgr = new VipUserGroupMgr(mySqlConnectionString);
                 string group_id_or_group_name = Request.Params["group_id_or_group_name"];
+                string gName = string.Empty;
+                string gNameSubString = string.Empty;
+                char[] specialChar = {'[','_','%' };
+                int n = 0;
                 //if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
                 //{
                 //    query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
@@ -1042,7 +1046,9 @@ namespace Admin.gigade.Controllers
                 //{
                 //    query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
                 //}
-                //用於判斷是查詢條件是群組編號/群組名稱
+
+                 //用於判斷是查詢條件是群組編號/群組名稱， 
+                 // by zhaozhi0623j，2015/09/22
                 if (!string.IsNullOrEmpty(group_id_or_group_name))
                 {
                     uint result = 0;
@@ -1050,9 +1056,17 @@ namespace Admin.gigade.Controllers
                     {
                         query.group_id = result;
                     }
+                    //查詢條件為群組名稱時，判斷字符串中是否含有"%","_","["  如有為其前方添加轉意符號"\",便於查詢
                     else
                     {
                         query.group_name = group_id_or_group_name;
+                        gName = group_id_or_group_name;
+                        n = gName.IndexOfAny(specialChar);
+                        if (n >= 0) 
+                        {
+                            gNameSubString = gName.Substring(n, gName.Length - n);                            
+                            query.group_name = gName.Replace(gNameSubString, "\\" + gNameSubString);
+                        }      
                     }                  
                 }
                 System.Net.IPAddress[] addlist = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList;
