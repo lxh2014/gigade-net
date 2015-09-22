@@ -31,6 +31,9 @@ namespace BLL.gigade.Model.Query
         public bool Check { get; set; }//驗收不符
         public UInt64 vendor_id { get; set; }
         public string vendor_name_full { get; set; }
+        public string change_username { set; get; }
+        public string create_username { set; get; }
+        public UInt64 productid { get; set; }
         public IpodQuery() 
         {
             row_ids = string.Empty;
@@ -54,6 +57,9 @@ namespace BLL.gigade.Model.Query
             Check = true;
             vendor_id = 0;
             vendor_name_full = string.Empty;
+            create_username = string.Empty;
+            change_username = string.Empty;
+            productid = 0;
         }
 
     }
