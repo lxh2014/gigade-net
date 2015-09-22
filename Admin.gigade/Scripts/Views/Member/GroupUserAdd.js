@@ -65,6 +65,7 @@
                                });
                            } else {
                                Ext.getCmp("user_name").setValue('<font style="color:red">沒有此會員信息</font>');
+                               Ext.getCmp("user_id").setValue("");
                                Ext.getCmp("userid").setValue(0);
                            }
                        }
