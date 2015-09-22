@@ -27,7 +27,7 @@ namespace BLL.gigade.Dao
            totalCount = 0;
            try
            {
-               str.AppendFormat(" select group_id,group_name,is_member_edm,enabled from edm_group_new egn ");
+               str.AppendFormat(" select group_id,group_name,is_member_edm,enabled from edm_group_new egn order by enabled desc, is_member_edm  desc, sort_order  ");
                strcont.AppendFormat(" where 1=1 ");
 
                strcont.AppendFormat(" and egn.group_name like '%{0}%'", query.group_name);
@@ -105,26 +105,5 @@ namespace BLL.gigade.Dao
                throw new Exception("EdmGroupNewDao-->EdmGroupNewUpdate-->" + sql.ToString() + ex.Message);
            }
        }
-
-
-
-       //保存新增信息
-       //public int SaveEdmGroupNewAdd(EdmGroupNewQuery query)  // add by yachao1120j 2015-9-22
-       //{
-       //    StringBuilder sql = new StringBuilder();
-       //    query.Replace4MySQL();
-       //    try
-       //    {
-       //        sql.Append("insert into edm_group_new (group_name, is_member_edm, sort_order,description)values ");
-       //        sql.AppendFormat("('{0}','{1}','{2}','{3}')", query.group_name, query.is_member_edm, query.sort_order, query.description);
-       //        return _access.execCommand(sql.ToString());
-       //    }
-       //    catch (Exception ex)
-       //    {
-       //        throw new Exception("EdmGroupNewDao-->SaveEdmGroupNewAdd" + ex.Message);
-       //    }
-       //}
-
-
     }
 }

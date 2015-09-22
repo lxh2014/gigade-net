@@ -40,7 +40,7 @@ var EdmGroupNewStore = Ext.create('Ext.data.Store', {//EdmGroupNewStore
 EdmGroupNewStore.on('beforeload', function () {
     Ext.apply(EdmGroupNewStore.proxy.extraParams,
         {
-           // group_name: Ext.getCmp('group_name').getValue(),
+            group_name: Ext.getCmp('group_name').getValue(),
         });
 });
 
@@ -55,49 +55,6 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
 
 //列表頁加載
 Ext.onReady(function () {
-    //var searchForm = Ext.create('Ext.form.Panel', {
-    //    id: 'searchForm',
-    //    layout: 'anchor',
-    //    border: 0,
-    //    bodyPadding: 10,
-    //    width: document.documentElement.clientWidth,
-    //    items: [
-    //           {
-    //               xtype: 'fieldcontainer',
-    //               layout: 'hbox',
-    //               items: [
-    //                     {
-    //                         xtype: 'textfield',
-    //                         id: 'group_name',
-    //                         labelWidth: 100,
-    //                         fieldLabel: '群組名稱',
-    //                         margin: '0 0 0 10',
-    //                         listeners: {
-    //                             specialkey: function (field, e) {
-    //                                 if (e.getKey() == Ext.EventObject.ENTER) {
-    //                                     Query();
-    //                                 }
-    //                             }
-    //                         }
-    //                     },
-    //               ]
-    //           },
-    //    ],
-    //    buttonAlign: 'left',
-    //    buttons: [
-    //            {
-    //                text: '查詢',
-    //                // margin: '0 8 0 8',
-    //                margin: '0 10 0 10',
-    //                iconCls: 'icon-search',
-    //                handler: function () {
-    //                    Query();
-    //                }
-    //            },
-    //    ],
-    //});
-
-    //第二個panel
     var EdmGroupNewGrid = Ext.create('Ext.grid.Panel', {
         id: 'EdmGroupNewGrid',
         store: EdmGroupNewStore,
@@ -109,7 +66,6 @@ Ext.onReady(function () {
             { header: "編號", dataIndex: "group_id", align: 'center' },
             { header: "群組名稱", dataIndex: "group_name", width: 300, align: 'center' },
             { header: "會員電子報", dataIndex: "is_member_edm_string", width: 200, align: 'center' },
-           // { header: "是否啟用", dataIndex: "enabled " },
             {
                 header: "是否啟用", dataIndex: 'enabled', align: 'center', hidden: false,
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
@@ -130,7 +86,6 @@ Ext.onReady(function () {
                              id: 'group_name',
                              labelWidth: 100,
                              fieldLabel: '群組名稱',
-                             margin: '0 0 0 2',
                              listeners: {
                                  specialkey: function (field, e) {
                                      if (e.getKey() == Ext.EventObject.ENTER) {
@@ -188,13 +143,6 @@ Ext.onReady(function () {
     });
 
 })
-
-
-
-
-
-
-
 /*************************************************************************************查询信息*************************************************************************************************/
 
 function Query(x) {
