@@ -74,6 +74,7 @@ namespace BLL.gigade.Mgr
        {
            if (query.template_id == 0)//新增
            {
+
                return _edmtemplatedao.EdmTemplateInsert(query);
            }
            else//編輯

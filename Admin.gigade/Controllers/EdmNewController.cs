@@ -232,7 +232,10 @@ namespace Admin.gigade.Controllers
                 EdmTemplateQuery query = new EdmTemplateQuery();
                 edmtemplatemgr = new EdmTemplateMgr(mySqlConnectionString);
 
-             
+                if (!string.IsNullOrEmpty(Request.Params["template_id"]))
+                {
+                    query.template_id = Convert.ToInt32(Request.Params["template_id"]);
+                }
                 if (!string.IsNullOrEmpty(Request.Params["template_name"]))
                 {
                     query.template_name = Request.Params["template_name"];
@@ -246,6 +249,10 @@ namespace Admin.gigade.Controllers
                     query.content_url = Request.Params["content_url"];
                 }
                 query.template_updatedate = System.DateTime.Now;
+                query.template_update_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+                query.template_create_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+
+
                 int _dt = edmtemplatemgr.SaveEdmTemplateAdd(query);
 
                 if (_dt > 0)
