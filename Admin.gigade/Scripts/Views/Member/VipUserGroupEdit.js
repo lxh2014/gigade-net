@@ -164,19 +164,19 @@
                             var result = Ext.decode(action.response.responseText);
                             if (result.success) {
                                 Ext.Msg.alert(INFORMATION, "保存成功! " + result.msg);
-                                FaresStore.load();
+                                VipUserGroupStore.load();
                                 editWin.close();
                             }
                             else {
                                 Ext.Msg.alert(INFORMATION, "保存失敗! " + result.msg);
-                                FaresStore.load();
+                                VipUserGroupStore.load();
                                 editWin.close();
                             }
                         },
                         failure: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
                             Ext.Msg.alert(INFORMATION, "保存失敗! " + result.msg);
-                            FaresStore.load();
+                            VipUserGroupStore.load();
                             editWin.close();
                         }
                     });
