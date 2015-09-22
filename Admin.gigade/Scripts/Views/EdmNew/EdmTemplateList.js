@@ -114,7 +114,7 @@ Ext.onReady(function () {
         renderTo: Ext.getBody(),
         listeners: {
             resize: function () {
-                EdmGroupNewGrid.width = document.documentElement.clientWidth;
+                EdmTemplateGrid.width = document.documentElement.clientWidth;
                 this.doLayout();
             }
         }
