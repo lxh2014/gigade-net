@@ -156,6 +156,8 @@
     <Compile Include="Controllers\DeliveryStoreController.cs" />
     <Compile Include="Controllers\DispatchingSystemController.cs" />
     <Compile Include="Controllers\EdmController.cs" />
+    <Compile Include="Controllers\EdmGroupNewQuery.cs" />
+    <Compile Include="Controllers\EdmNewController.cs" />
     <Compile Include="Controllers\EdmSController.cs" />
     <Compile Include="Controllers\ElementController.cs" />
     <Compile Include="Controllers\EmsController.cs" />
@@ -1843,6 +1845,12 @@
     <Content Include="Scripts\Views\DispatchingSystem\DesignRequestList.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsEdit.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsList.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmTemplateEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmTemplateList.js" />
     <Content Include="Scripts\Views\EdmS\Edmlist.js" />
     <Content Include="Scripts\Views\Edm\BlackList.js" />
     <Content Include="Scripts\Views\Edm\BlackListEdit.js" />
@@ -1890,6 +1898,7 @@
     <Content Include="Scripts\Views\MemberEvent\MemberLevelEdit.js" />
     <Content Include="Scripts\Views\MemberEvent\MemberLevelList.js" />
     <Content Include="Scripts\Views\MemberEvent\MemberLevelWin.js" />
+    <Content Include="Scripts\Views\Member\GroupUserAdd.js" />
     <Content Include="Scripts\Views\Member\ShippingVoucher.js" />
     <Content Include="Scripts\Views\OrderManage\Logistics.js" />
     <Content Include="Scripts\Views\OrderManage\OrderDetailManage.js" />
@@ -4367,14 +4376,16 @@
     <Content Include="Template\AppcategoryImport\t_category.xls" />
     <Content Include="Views\ProductPurchase\RIS.cshtml" />
     <Content Include="Views\WareHouse\Check.cshtml" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Views\Super\Index.cshtml" />
     <Content Include="Views\Product\InventoryQuery.cshtml" />
     <Content Include="Template\SiteStatistics\站臺訪問量統計匯入範本.xlsx" />
     <Content Include="Views\OrderManage\OrderDetailManage.cshtml" />
     <Content Include="Template\SiteAnalytics\SiteAnalytics.xlsx" />
+    <Content Include="Views\WareHouse\IpodList.cshtml" />
+    <Content Include="Views\EdmNew\Index.cshtml" />
+    <Content Include="Views\EdmNew\EdmContentNew.cshtml" />
+    <Content Include="Views\EdmNew\EdmTemplate.cshtml" />
+    <Content Include="Web.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

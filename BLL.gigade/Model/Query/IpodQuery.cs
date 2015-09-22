@@ -25,6 +25,12 @@ namespace BLL.gigade.Model.Query
         public string Erp_Id { get; set; }
         public int item_stock { get; set; } //商品庫存
         public string user_email { get; set; }
+        public string po_type { get; set; }//單別
+        public DateTime start_time { get; set; }
+        public DateTime end_time { get; set; }
+        public bool Check { get; set; }//驗收不符
+        public UInt64 vendor_id { get; set; }
+        public string vendor_name_full { get; set; }
         public IpodQuery() 
         {
             row_ids = string.Empty;
@@ -42,6 +48,12 @@ namespace BLL.gigade.Model.Query
             Erp_Id = string.Empty;
             item_stock = 0;
             user_email = string.Empty;
+            po_type = string.Empty;
+            start_time = DateTime.MinValue;
+            end_time = DateTime.MinValue;
+            Check = true;
+            vendor_id = 0;
+            vendor_name_full = string.Empty;
         }
 
     }

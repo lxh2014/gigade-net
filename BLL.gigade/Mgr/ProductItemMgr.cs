@@ -21,6 +21,7 @@ using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using System.Data;
 using BLL.gigade.Model.Custom;
+using System.Collections;
 
 namespace BLL.gigade.Mgr
 {
@@ -30,12 +31,14 @@ namespace BLL.gigade.Mgr
         private ISerialImplMgr _serialMgr;
         private ProductItemDao productItemDao;
         string connectionStr;
+        IFunctionImplMgr _functionMgr;
         public ProductItemMgr(string connectionStr)
         {
             this.connectionStr = connectionStr;
             _productItemDao = new ProductItemDao(connectionStr);
             _serialMgr = new SerialMgr(connectionStr);
             productItemDao = new ProductItemDao(connectionStr);
+            _functionMgr = new FunctionMgr(connectionStr);
         }
 
         public List<ProductItem> Query(ProductItem query)
@@ -242,11 +245,52 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductItemMgr->GetInventoryQueryList" + ex.Message);
             }
         }
-        public int UpdateItemStock(uint Item_Id, int Item_Stock) 
+        public int UpdateItemStock(ProductItem query,string path,BLL.gigade.Model.Caller user) 
         {
+            Boolean result = false;
             try
             {
-                return productItemDao.UpdateItemStock(Item_Id, Item_Stock);
+                ArrayList aList = new ArrayList();
+                ITableHistoryImplMgr _tableHistoryMgr = new TableHistoryMgr(connectionStr);//實例化歷史記錄的類
+
+                Int64 n_Time = BLL.gigade.Common.CommonFunction.GetPHPTime();
+                Function myFun = new Function();
+                myFun.FunctionCode = path;
+                List<Function> funList = _functionMgr.Query(myFun);
+                int functionid = funList.Count == 0 ? 0 : funList[0].RowId;
+                HistoryBatch batch = new HistoryBatch { functionid = functionid };
+                batch.kuser = user.user_email;
+
+                //獲取歷史記錄SQL
+                string Check = productItemDao.UpdateItemStock(query);
+
+                //獲取修改庫存SQL  
+               
+                ProductItem item = new ProductItem();
+                item = productItemDao.Query(query).Count > 0 ? productItemDao.Query(query)[0] : item;
+
+                batch.batchno = n_Time + "_" + user.user_id + "_" + item.Product_Id;
+                if (item != null)
+                {
+                    item.Item_Stock =  item.Item_Stock +query.Item_Stock;
+                    
+                    aList.Add(Check);
+                    result = _tableHistoryMgr.SaveHistory<ProductItem>(item, batch, aList);
+                }
+
+                ////獲取修改商品Ignore SQL  
+                //string Ignore_Stock = string.Empty;
+                //Product product = new Product();
+                //product = productItemDao.GetTaxByItem(query.Item_Id);
+                //if (product != null)
+                //{
+                //    product.Ignore_Stock = 0;
+                //    aList.Clear();
+                //    aList.Add(Ignore_Stock);
+                //    result = _tableHistoryMgr.SaveHistory<Product>(product, batch, aList);
+                //}
+
+                return 1;
             }
             catch (Exception ex)
             {

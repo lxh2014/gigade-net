@@ -57,5 +57,6 @@ namespace BLL.gigade.Dao.Impl
 
         List<UserQuery> Query(Model.Custom.Users query);
         List<Users> GetUser(Users u);
+        List<UserQuery> GetUserByEmail(string mail, uint group_id);
     }
 }

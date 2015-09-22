@@ -32,6 +32,9 @@ namespace Admin.gigade.Controllers
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IUserRecommendIMgr _userrecommendMgr;
         private static readonly string mySqlConnectionString = System.Configuration.ConfigurationManager.AppSettings["MySqlConnectionString"].ToString();
+        string imgServerPath = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server);//"http://192.168.71.159:8080"
+        
+        string defaultImg = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server) + "/product/nopic_50.jpg";
         private IUserLoginLogImplMgr _userloginlog;
         private IUserEdmImplMgr _edmMgr = null;
         private IUsersListImplMgr _uslmpgr;
@@ -54,6 +57,7 @@ namespace Admin.gigade.Controllers
         private string imgLocalServerPath = ConfigurationManager.AppSettings["imgLocalServerPath"];//aimg.gigade100.com 
         private IConfigImplMgr _configMgr;
         private ShippingVoucherMgr ShippingVoucherMgr;
+        private VipUserMgr _vipuserMgr;
 
 
         #region 會員免運劵發放功能
@@ -1029,6 +1033,10 @@ namespace Admin.gigade.Controllers
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
                 _userGroupMgr = new VipUserGroupMgr(mySqlConnectionString);
                 string group_id_or_group_name = Request.Params["group_id_or_group_name"];
+                string gName = string.Empty;
+                string gNameSubString = string.Empty;
+                char[] specialChar = {'[','_','%' };
+                int n = 0;
                 //if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
                 //{
                 //    query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
@@ -1038,6 +1046,9 @@ namespace Admin.gigade.Controllers
                 //{
                 //    query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
                 //}
+
+                 //用於判斷是查詢條件是群組編號/群組名稱， 
+                 // by zhaozhi0623j，2015/09/22
                 if (!string.IsNullOrEmpty(group_id_or_group_name))
                 {
                     uint result = 0;
@@ -1045,9 +1056,17 @@ namespace Admin.gigade.Controllers
                     {
                         query.group_id = result;
                     }
+                    //查詢條件為群組名稱時，判斷字符串中是否含有"%","_","["  如有為其前方添加轉意符號"\",便於查詢
                     else
                     {
                         query.group_name = group_id_or_group_name;
+                        gName = group_id_or_group_name;
+                        n = gName.IndexOfAny(specialChar);
+                        if (n >= 0) 
+                        {
+                            gNameSubString = gName.Substring(n, gName.Length - n);                            
+                            query.group_name = gName.Replace(gNameSubString, "\\" + gNameSubString);
+                        }      
                     }                  
                 }
                 System.Net.IPAddress[] addlist = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList;
@@ -1059,6 +1078,15 @@ namespace Admin.gigade.Controllers
                 stores = _userGroupMgr.QueryAll(query, out totalCount);
                 foreach (var item in stores)
                 {
+
+                    if (item.image_name != "")
+                    {
+                        item.image_name = imgServerPath + promoPath + item.image_name;
+                    }
+                    else
+                    {
+                        item.image_name = defaultImg;
+                    }
                     item.screatedate = CommonFunction.GetNetTime(item.createdate).ToString("yyyy/MM/dd");
                     item.list = _userGroupMgr.GetVuserCount(item);
                     item.ip = ip;
@@ -1422,6 +1450,149 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
+
+        /// <summary>
+        /// 通過郵箱獲取該用戶的信息
+        /// </summary>
+        /// <returns></returns>
+        public HttpResponseBase GetUserName()
+        {
+            UserQuery user = new UserQuery();
+            List<UserQuery> userList = new List<UserQuery>();
+            string user_email="";
+            uint group_id=0;
+            if (!string.IsNullOrEmpty(Request.Params["Email"]))
+            {
+                user_email = Request.Params["Email"];
+            }
+            if (!string.IsNullOrEmpty(Request.Params["group_id"]))
+            {
+                group_id = uint.Parse(Request.Params["group_id"]);
+            }
+
+
+            _usmpgr = new UsersMgr(mySqlConnectionString);
+            string jsonStr = string.Empty;
+            try
+            {
+
+                userList = _usmpgr.GetUserByEmail(user_email, group_id);
+                if (userList.Count()>0)//查詢到會員
+                {
+                    jsonStr = "{success:true,msg:\"" + 99 + "\"}";//該用戶已在此群組中
+                }
+                else
+                {
+                    userList =_usmpgr.GetUserByEmail(user_email, 0);
+                    if (userList.Count()>0)
+                    {
+                        jsonStr = "{success:true,msg:\"" + 100 + "\",user_id:'" + userList[0].user_id + "',user_name:'" + userList[0].user_name + "'}";//返回json數據
+                    }else{
+                        jsonStr = "{success:true,msg:\"" + 98 + "\"}";//此用戶不存在
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                jsonStr = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(jsonStr);
+            this.Response.End();
+            return this.Response;
+        }
+        /// <summary>
+        /// 新增會員至群組
+        /// </summary>
+        /// <returns></returns>
+        public HttpResponseBase SaveVipUser()
+        {
+            string jsonStr = "";
+            VipUserQuery vip = new VipUserQuery();
+            if (!string.IsNullOrEmpty(Request.Params["usermail"]))
+            {
+                vip.user_email = Request.Params["usermail"];
+            }
+            if (!string.IsNullOrEmpty(Request.Params["user_id"]))
+            {
+                vip.user_id = uint.Parse(Request.Params["user_id"]);
+            }
+            if (!string.IsNullOrEmpty(Request.Params["group_id"]))
+            {
+                vip.group_id = uint.Parse(Request.Params["group_id"]);
+            }
+           
+            vip.create_id = uint.Parse((Session["caller"] as Caller).user_id.ToString());
+            vip.update_id = uint.Parse((Session["caller"] as Caller).user_id.ToString());
+            vip.createdate = uint.Parse(CommonFunction.GetPHPTime().ToString());
+            vip.updatedate = vip.createdate;
+            try
+            {
+                _vipuserMgr = new VipUserMgr(mySqlConnectionString);
+                if (_vipuserMgr.AddVipUser(vip) > 0)
+                {
+                    jsonStr = "{success:true}";
+                }
+                else 
+                {
+                    jsonStr = "{success:false}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                jsonStr = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(jsonStr);
+            this.Response.End();
+            return this.Response;
+        }
+        /// <summary>
+        /// 刪除會員至群組
+        /// </summary>
+        /// <returns></returns>
+        public HttpResponseBase DeleVipUser()
+        {
+            string jsonStr = "";
+            VipUserQuery vip = new VipUserQuery();
+            if (!string.IsNullOrEmpty(Request.Params["vid"]))
+            {
+                vip.v_id = uint.Parse(Request.Params["vid"]);
+            }
+           
+            try
+            {
+                _vipuserMgr = new VipUserMgr(mySqlConnectionString);
+                if (_vipuserMgr.DeleVipUser(vip) > 0)
+                {
+                    jsonStr = "{success:true}";
+                }
+                else
+                {
+                    jsonStr = "{success:false}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                jsonStr = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(jsonStr);
+            this.Response.End();
+            return this.Response;
+        }
         /*修改會員狀態，啟用或者禁用 */
         #region 修改會員狀態，啟用或者禁用
         public JsonResult UpdateUserState()
