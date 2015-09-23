@@ -79,9 +79,9 @@ namespace BLL.gigade.Mgr
                }
                if (!string.IsNullOrEmpty(model.Rows[0]["block_createdate"].ToString()))
                {
-                   logQuery.log_block_start = Convert.ToDateTime(model.Rows[0]["block_createdate"]).ToString("yyyy-MM-dd hh:mm:ss");                        
+                   logQuery.log_block_start = Convert.ToDateTime(model.Rows[0]["block_createdate"]).ToString("yyyy-MM-dd HH:mm:ss");                        
                }
-               logQuery.log_block_end = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");          
+               logQuery.log_block_end = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");          
                if (!string.IsNullOrEmpty(model.Rows[0]["block_reason"].ToString()))
                {
                    logQuery.block_reason = model.Rows[0]["block_reason"].ToString();

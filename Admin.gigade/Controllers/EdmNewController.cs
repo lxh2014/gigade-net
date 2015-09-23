@@ -83,6 +83,10 @@ namespace Admin.gigade.Controllers
                 _emailBlockListMgr = new EmailBlockListMgr(mySqlConnectionString);
                 DataTable store = new DataTable();
                 EmailBlockListQuery query = new EmailBlockListQuery();
+                if (!string.IsNullOrEmpty(Request.Params["email"]))
+                {
+                    query.email_address = Request.Params["email"];
+                }
                 store = _emailBlockListMgr.GetEmailBlockList(query);
                 if (store != null)
                 {

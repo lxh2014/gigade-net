@@ -27,6 +27,11 @@ namespace BLL.gigade.Dao
             {
                 sql.AppendFormat(@"SELECT email_address,block_reason,block_createdate,(SELECT user_username FROM manage_user WHERE manage_user.user_id=email_block_list.block_create_userid ) as user_name from email_block_list where 1=1 ");
                 count.AppendFormat(@"SELECT count(email_address) as totalCount from email_block_list where 1=1 ");
+                if (query.email_address != string.Empty)
+                {
+                    sql.AppendFormat(" AND email_address LIKE N'%{0}%'", query.email_address);
+                    count.AppendFormat(" AND email_address LIKE N'%{0}%'", query.email_address);
+                }
                 if (query.IsPage)
                 {
                     DataTable _dt = _access.getDataTable(count.ToString());
