@@ -4,7 +4,7 @@
  * CreateTime :2015/9/9
  * 商品庫存查詢
  */
-var pageSize = 25;
+var pageSize = 23;
 
 
 // 列表頁的model

@@ -94,7 +94,7 @@
         ]
     });
     var editWin = Ext.create('Ext.window.Window', {
-        title: "新增電子報列表",
+        title: "新增電子報類別",
         id: 'editWin',
         iconCls: "icon-user-add",
         width: 360,
@@ -128,7 +128,6 @@
             'show': function () {
                 if (row) {
                     editFrm.getForm().loadRecord(row);
-                    //initRow(row);
                 }
                 else {
                     editFrm.getForm().reset();
