@@ -170,6 +170,8 @@
     <Compile Include="Dao\EdmSendDao.cs" />
     <Compile Include="Dao\EdmTestDao.cs" />
     <Compile Include="Dao\ElementMapDao.cs" />
+    <Compile Include="Dao\EmailBlockListDao.cs" />
+    <Compile Include="Dao\EmailBlockLogDao.cs" />
     <Compile Include="Dao\EventChinaTrustBagDao.cs" />
     <Compile Include="Dao\EventChinaTrustBagMapDao.cs" />
     <Compile Include="Dao\EventChinatrustDao.cs" />
@@ -714,6 +716,7 @@
     <Compile Include="Mgr\EdmSendMgr.cs" />
     <Compile Include="Mgr\EdmTestMgr.cs" />
     <Compile Include="Mgr\ElementMapMgr.cs" />
+    <Compile Include="Mgr\EmailBlockListMgr.cs" />
     <Compile Include="Mgr\EventChinaTrustBagMapMgr.cs" />
     <Compile Include="Mgr\EventChinaTrustBagMgr.cs" />
     <Compile Include="Mgr\EventChinatrustMgr.cs" />
@@ -1292,6 +1295,8 @@
     <Compile Include="Model\Edm_Subscription.cs" />
     <Compile Include="Model\Edm_Template.cs" />
     <Compile Include="Model\ElementMap.cs" />
+    <Compile Include="Model\EmailBlockList.cs" />
+    <Compile Include="Model\EmailBlockLog.cs" />
     <Compile Include="Model\EventChinatrust.cs" />
     <Compile Include="Model\EventChinaTrustBag.cs" />
     <Compile Include="Model\EventChinaTrustBagMap.cs" />
@@ -1355,6 +1360,8 @@
     <Compile Include="Model\Query\EdmListQuery.cs" />
     <Compile Include="Model\Query\EdmSendQuery.cs" />
     <Compile Include="Model\Query\EdmTestQuery.cs" />
+    <Compile Include="Model\Query\EmailBlockListQuery.cs" />
+    <Compile Include="Model\Query\EmailBlockLogQuery.cs" />
     <Compile Include="Model\Query\EventChinaTrustBagMapQuery.cs" />
     <Compile Include="Model\Query\EventChinaTrustBagQuery.cs" />
     <Compile Include="Model\Query\EventChinatrustQuery.cs" />
