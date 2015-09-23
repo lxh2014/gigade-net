@@ -78,6 +78,7 @@ namespace Admin.gigade.Controllers
         public HttpResponseBase GetEmailBlockList()
         {
             string json = string.Empty;
+
             try
             {
                 _emailBlockListMgr = new EmailBlockListMgr(mySqlConnectionString);
