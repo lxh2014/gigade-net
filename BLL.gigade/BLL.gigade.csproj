@@ -1372,13 +1372,9 @@
     <Compile Include="Model\Query\EdmSubscriptionQuery.cs" />
     <Compile Include="Model\Query\EdmTemplateQuery.cs" />
     <Compile Include="Model\Query\EdmTestQuery.cs" />
-<<<<<<< Updated upstream
     <Compile Include="Model\Query\EdmContentNewQuery.cs" />
     <Compile Include="Model\Query\EmailBlockListQuery.cs" />
     <Compile Include="Model\Query\EmailBlockLogQuery.cs" />
-=======
-    <Compile Include="Model\Query\EmailBlockListQuery.cs" />
->>>>>>> Stashed changes
     <Compile Include="Model\Query\EventChinaTrustBagMapQuery.cs" />
     <Compile Include="Model\Query\EventChinaTrustBagQuery.cs" />
     <Compile Include="Model\Query\EventChinatrustQuery.cs" />
