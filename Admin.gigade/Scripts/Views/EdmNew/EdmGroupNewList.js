@@ -18,7 +18,8 @@ Ext.define('gridlistEGN', {
         { name: "enabled", type: "int" },//是否啟用
         { name: "sort_order", type: "int" },//群組排序。當is_member_edm為True時，該群組會顯示在會員中心的電子報訂閱畫面，此時採用這個值來決定顯示的排序。
         { name: "description", type: "string" },//群組描述文字
-        { name: "group_name_list",type:"string"},
+        { name: "group_name_list", type: "string" },
+        {name:"trial_url",type:"string"},//試閱
     ],
 });
 
@@ -67,6 +68,7 @@ Ext.onReady(function () {
             { header: "編號", dataIndex: "group_id", align: 'center' },
             { header: "群組名稱", dataIndex: "group_name", width: 300, align: 'center' },
             { header: "會員電子報", dataIndex: "is_member_edm_string", width: 200, align: 'center' },
+            {header: "試閱",dataIndex:"trial_url",align:'center',width:120},
             {
                 header: "是否啟用", dataIndex: 'enabled', align: 'center', hidden: false,
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {

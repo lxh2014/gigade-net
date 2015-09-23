@@ -134,6 +134,10 @@ namespace Admin.gigade.Controllers
                 {
                     query.is_member_edm = Convert.ToInt32(Request.Params["is_member_edm"]);
                 }
+                if (!string.IsNullOrEmpty(Request.Params["trial_url"]))
+                {
+                    query.trial_url=Request.Params["trial_url"];
+                }
                 if (!string.IsNullOrEmpty(Request.Params["sort_order"]))
                 {
                     query.sort_order = Convert.ToInt32(Request.Params["sort_order"]);
