@@ -179,13 +179,13 @@ namespace Admin.gigade.Controllers
         //    return Json(new { data = date.ToString("yyyy/MM/dd"), success = isSuccess, errMsg = msg, des = "貨物運達時間", execTime = implementTime.ToString("yyyy/MM/dd"), elapsed = second }, JsonRequestBehavior.AllowGet);
         //}
 
-        public ActionResult ArriveTimeCombo(string itemsIds,string dateTime)
+        public ActionResult ArriveTime(string itemId, string dateTime)
         {
             int msgFlag = 0;
             int isSuccess = 0;
             string msg = "";
             DateTime implementTime = DateTime.Now;
-            DateTime date = GetArriveTimeCombo(dateTime, out msgFlag, itemsIds);///計算得到最晚商品的到達時間
+            DateTime date = GetArriveTimeCombo(dateTime, out msgFlag, itemId);///計算得到最晚商品的到達時間
             switch (msgFlag)
             { 
                 case -1:

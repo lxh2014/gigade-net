@@ -315,6 +315,14 @@ Ext.onReady(function () {
                             {
                                 click: function () {
                                     frm.getForm().reset();
+                                    var datetime1 = new Date();
+                                    datetime1.setFullYear(2000, 1, 1);
+                                    var datetime2 = new Date();
+                                    datetime2.setFullYear(2100, 1, 1);
+                                    Ext.getCmp("time_start").setMinValue(datetime1);
+                                    Ext.getCmp("time_start").setMaxValue(datetime2);
+                                    Ext.getCmp("time_end").setMinValue(datetime1);
+                                    Ext.getCmp("time_end").setMaxValue(datetime2);
                                 }
                             }
                         }
@@ -325,11 +333,15 @@ Ext.onReady(function () {
     });
     ipodStore.on('beforeload', function () {
         Ext.apply(ipodStore.proxy.extraParams, {
-            Potype : Ext.getCmp('Poty').getValue(),
+         Potype : Ext.getCmp('Poty').getValue(),
          erp_id :Ext.getCmp('erp_id').getValue().trim(),
          vendor_id : Ext.getCmp('vendor_id').getValue(),
          check : Ext.getCmp('checkInfoYesOrNo').getValue(),
-         vendor_name_full : Ext.getCmp('vendor_name_full').getValue().trim()
+         vendor_name_full: Ext.getCmp('vendor_name_full').getValue().trim(),
+         product_id : Ext.getCmp('product_id').getValue(),
+         product_name: Ext.getCmp('product_name').getValue(),
+         start_time: Ext.getCmp('time_start').getValue(),
+         end_time : Ext.getCmp('time_end').getValue()
         });
     });
     var gdAccum = Ext.create('Ext.grid.Panel', {
