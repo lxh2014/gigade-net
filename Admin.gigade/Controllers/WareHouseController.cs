@@ -10914,6 +10914,48 @@ namespace Admin.gigade.Controllers
                         ipod.Check = check;
                     }
                 }
+                if (!string.IsNullOrEmpty(Request.Params["product_name"]))
+                {
+                    string product_name = Request.Params["product_name"].ToString();
+                    int index1 = product_name.IndexOf('%');
+                    int index2 = product_name.IndexOf('_');
+                    if (index1 != -1)
+                    {
+                        string start = product_name.Substring(0, index1);
+                        string end = product_name.Substring(index1 + 1);
+                        product_name = start + "/" + "%" + end;
+                    }
+                    if (index2 != -1)
+                    {
+                        string start = product_name.Substring(0, index2);
+                        string end = product_name.Substring(index2 + 1);
+                        product_name = start + "/" + "_" + end;
+                    }
+                    ipod.product_name = product_name;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["product_id"]))
+                {
+                    uint product_id = 0;
+                    if (uint.TryParse(Request.Params["product_id"], out product_id))
+                    {
+                        ipod.product_id = product_id;
+                    }
+                }
+                DateTime date;
+                if (!string.IsNullOrEmpty(Request.Params["start_time"]))
+                {
+                    if(DateTime.TryParse(Request.Params["start_time"].ToString(),out date)){
+                        ipod.start_time = date;
+                    }
+                    
+                }
+                if (!string.IsNullOrEmpty(Request.Params["end_time"]))
+                {
+                    if (DateTime.TryParse(Request.Params["end_time"].ToString(), out date))
+                    {
+                        ipod.end_time =Convert.ToDateTime(date.ToString("yyyy-MM-dd 23:59:59"));
+                    }   
+                }
                 ipod.IsPage = false;
                 _ipodMgr = new IpodMgr(mySqlConnectionString);
                 int totalCount = 0;
@@ -10921,13 +10963,22 @@ namespace Admin.gigade.Controllers
                 DataTable _newDt = new DataTable();
                 _newDt.Columns.Add("採購單別", typeof(string));
                 _newDt.Columns.Add("採購單號", typeof(string));
-                _newDt.Columns.Add("品號", typeof(string));
-                _newDt.Columns.Add("商品名稱", typeof(string));
+                _newDt.Columns.Add("供應商編號", typeof(string));
                 _newDt.Columns.Add("供應商名稱", typeof(string));
+                _newDt.Columns.Add("品號", typeof(string));
+                _newDt.Columns.Add("商品編號", typeof(string));
+                _newDt.Columns.Add("商品六碼", typeof(string));
+                _newDt.Columns.Add("商品名稱", typeof(string));
                 _newDt.Columns.Add("規格", typeof(string));
                 _newDt.Columns.Add("採購數量", typeof(string));
                 _newDt.Columns.Add("允收數量", typeof(string));
                 _newDt.Columns.Add("不允收量", typeof(string));
+                _newDt.Columns.Add("創建時間", typeof(string));
+                _newDt.Columns.Add("創建人", typeof(string));
+                _newDt.Columns.Add("異動時間", typeof(string));
+                _newDt.Columns.Add("異動人", typeof(string));
+
+          
 
                 for (int i = 0; i < ipoStore.Count; i++)
                 {
@@ -10941,6 +10992,15 @@ namespace Admin.gigade.Controllers
                     newRow["採購數量"] = ipoStore[i].qty_ord;
                     newRow["允收數量"] = ipoStore[i].qty_claimed;
                     newRow["不允收量"] = ipoStore[i].qty_damaged;
+
+                    newRow["商品六碼"] = ipoStore[i].item_id;
+                    newRow["商品編號"] = ipoStore[i].productid;
+
+                    newRow["供應商編號"] = ipoStore[i].vendor_id;
+                    newRow["創建時間"] = ipoStore[i].create_dtim.ToString("yyyy-MM-dd HH:mm:ss");
+                    newRow["創建人"] = ipoStore[i].create_username;
+                    newRow["異動時間"] = ipoStore[i].change_dtim.ToString("yyyy-MM-dd HH:mm:ss");
+                    newRow["異動人"] = ipoStore[i].change_username;
 
                     _newDt.Rows.Add(newRow);
                 }
@@ -11014,6 +11074,42 @@ namespace Admin.gigade.Controllers
                 {
                     ipod.Check = check;
                 }
+            }
+            if (!string.IsNullOrEmpty(Request.Params["product_name"]))
+            {
+
+                string product_name = Request.Params["product_name"].ToString();
+                int index1 = product_name.IndexOf('%');
+                int index2 = product_name.IndexOf('_');
+                if (index1 != -1)
+                {
+                    string start = product_name.Substring(0, index1);
+                    string end = product_name.Substring(index1 + 1);
+                    product_name = start + "/" + "%" + end;
+                }
+                if (index2 != -1)
+                {
+                    string start = product_name.Substring(0, index2);
+                    string end = product_name.Substring(index2 + 1);
+                    product_name = start + "/" + "_" + end;
+                }
+                ipod.product_name = product_name;
+            }
+            if (!string.IsNullOrEmpty(Request.Params["product_id"]))
+            {
+                uint product_id = 0;
+                if (uint.TryParse(Request.Params["product_id"], out product_id))
+                {
+                    ipod.product_id = product_id;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request.Params["start_time"]))
+            {
+                ipod.start_time = Convert.ToDateTime(Request.Params["start_time"].ToString());
+            }
+            if (!string.IsNullOrEmpty(Request.Params["end_time"]))
+            {
+                ipod.end_time =Convert.ToDateTime(Convert.ToDateTime(Request.Params["end_time"].ToString()).ToString("yyyy-MM-dd 23:59:59"));
             }
             try
             {

@@ -1320,6 +1320,8 @@
     <Compile Include="Model\FunctionHistory.cs" />
     <Compile Include="Model\EmsDepRelation.cs" />
     <Compile Include="Model\GroupCommitteContact.cs" />
+    <Compile Include="Model\HgBatchAccumulateRefund.cs" />
+    <Compile Include="Model\HGLogin.cs" />
     <Compile Include="Model\Idiffcountbook.cs" />
     <Compile Include="Model\IlocChangeDetail.cs" />
     <Compile Include="Model\InspectionReport.cs" />
@@ -1330,6 +1332,7 @@
     <Compile Include="Model\IwmsRrecord.cs" />
     <Compile Include="Model\LogisticsDetail.cs" />
     <Compile Include="Model\MailSend.cs" />
+    <Compile Include="Model\MailSender.cs" />
     <Compile Include="Model\MemberEvent.cs" />
     <Compile Include="Model\MemberLevel.cs" />
     <Compile Include="Model\OrderDetailManager.cs" />

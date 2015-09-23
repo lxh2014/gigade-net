@@ -401,25 +401,13 @@ memberManage = function () {
             frame: true,
             columns: [
                 { header: "會員編號", dataIndex: 'v_id', width: 80, align: 'center' },
-                { header: "會員名稱", dataIndex: 'user_name', width: 150, align: 'center' },
-                { header: "會員郵箱", dataIndex: 'vuser_email', width: 150, align: 'center' },
-                {
-                    header: "狀態", dataIndex: 'status', width: 100, align: 'center',
-                    renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                        if (value == 1) {
-                            //return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.v_id + ")'><img hidValue='0' id='img" + record.data.v_id + "' src='../../../Content/img/icons/accept.gif'/></a>";
-                            return "<img  id='img' src='../../../Content/img/icons/ok.png'/>";
-                        }
-                        else {
-                            //return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.v_id + ")'><img hidValue='1' id='img" + record.data.v_id + "' src='../../../Content/img/icons/drop-no.gif'/></a>";
-                            return "<img  id='img' src='../../../Content/img/icons/cross.gif'/>";
-                        }
-                    }
-                },
+                { header: "會員名稱", dataIndex: 'user_name', width: 100, align: 'center' },
+                { header: "會員郵箱", dataIndex: 'vuser_email', width: 250, align: 'center' },
+                
                 { header: "建立時間", dataIndex: 'screatedate', width: 150, align: 'center' },
 
                 {
-                    header: "操作", dataIndex: 'v_id', width: 70, align: 'center',
+                    header: "操作", dataIndex: 'v_id', width: 90, align: 'center',
                     renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                         return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.v_id + ")'>刪除</a>";
                     }
@@ -457,7 +445,7 @@ memberManage = function () {
             iconCls: "icon-user-edit",
             width: 800,
             height: 500,
-            layout: 'fit',
+            layout: 'fit',//'fit',
             items: [mmGrid],
             constrain: true,
             closeAction: 'destroy',
@@ -543,26 +531,30 @@ onAddUserClick = function () {
 
 /*************************群組中會員刪除****************************/
 function UpdateActive(id) {
-    Ext.Ajax.request({
-        url: "/Member/DeleVipUser",
-        params: {
-            vid: id
-        },
-        success: function (response) {
-            var result = Ext.decode(response.responseText);
-            if (result.success) {
-                Ext.Msg.alert("提示", "刪除成功!");
-                VipUserStore.load();
-            } else
-            {
-                Ext.Msg.alert("提示", "刪除失敗!");
-                VipUserStore.load();
-            }
-        },
-        failure: function (form, action) {
-            Ext.Msg.alert(INFORMATION, "系統出現錯誤!");
-        }
+    Ext.MessageBox.confirm('確認框', '你確定從此群組中刪除此會員嗎', function (btn) {//Ext对大小写敏感
+        //Ext.MessageBox.alert('提示框', '你刚刚点击了' + btn);
+        if (btn == 'yes') {
+            Ext.Ajax.request({
+                url: "/Member/DeleVipUser",
+                params: {
+                    vid: id
+                },
+                success: function (response) {
+                    var result = Ext.decode(response.responseText);
+                    if (result.success) {
+                        Ext.Msg.alert("提示", "刪除成功!");
+                        VipUserStore.load();
+                    } else {
+                        Ext.Msg.alert("提示", "刪除失敗!");
+                        VipUserStore.load();
+                    }
+                },
+                failure: function (form, action) {
+                    Ext.Msg.alert(INFORMATION, "系統出現錯誤!");
+                }
+            });
+        };
     });
-}
+};
 
 
