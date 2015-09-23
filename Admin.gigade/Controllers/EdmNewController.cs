@@ -319,6 +319,7 @@ namespace Admin.gigade.Controllers
         public HttpResponseBase GetECNList()
         {
             string json = string.Empty;
+
             try
             {
                 EdmContentNew query = new EdmContentNew();
