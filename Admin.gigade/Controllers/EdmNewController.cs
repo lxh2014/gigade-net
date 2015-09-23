@@ -3,13 +3,9 @@ using BLL.gigade.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
-using BLL.gigade.Mgr;
 using BLL.gigade.Mgr.Impl;
-using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using gigadeExcel.Comment;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -51,19 +47,30 @@ namespace Admin.gigade.Controllers
         {
             string json = string.Empty;
             int totalcount = 0;
-            EdmGroupNewQuery query=new EdmGroupNewQuery ();
-            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
-            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
-            edmgroupmgr = new EdmGroupNewMgr(mySqlConnectionString);
-            if (!string.IsNullOrEmpty(Request.Params["group_name"]))
+            try
             {
-                query.group_name = Request.Params["group_name"];
+                EdmGroupNewQuery query = new EdmGroupNewQuery();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                edmgroupmgr = new EdmGroupNewMgr(mySqlConnectionString);
+                if (!string.IsNullOrEmpty(Request.Params["group_name_list"]))
+                {
+                    query.group_name = Request.Params["group_name_list"];
+                }
+                List<EdmGroupNewQuery> list = edmgroupmgr.GetEdmGroupNewList(query, out totalcount);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
             }
-            List<EdmGroupNewQuery> list = edmgroupmgr.GetEdmGroupNewList(query, out totalcount);
-            IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-            timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            timeConverter.DateTimeFormat = "yyyy-MM-dd";
-            json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
             this.Response.Clear();
             this.Response.Write(json);
             this.Response.End();
@@ -134,7 +141,6 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["description"]))
                 {
                     query.description = Request.Params["description"];
-
                 }
                 int _dt = edmgroupmgr.SaveEdmGroupNewAdd(query);
 
@@ -175,15 +181,26 @@ namespace Admin.gigade.Controllers
         {
             string json = string.Empty;
             int totalcount = 0;
-            EdmTemplateQuery query = new EdmTemplateQuery();
-            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
-            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
-            edmtemplatemgr = new EdmTemplateMgr(mySqlConnectionString);
-            List<EdmTemplateQuery> list = edmtemplatemgr.GetEdmTemplateList(query, out totalcount);
-            IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-            timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            timeConverter.DateTimeFormat = "yyyy-MM-dd";
-            json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+            try
+            {
+                EdmTemplateQuery query = new EdmTemplateQuery();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                edmtemplatemgr = new EdmTemplateMgr(mySqlConnectionString);
+                List<EdmTemplateQuery> list = edmtemplatemgr.GetEdmTemplateList(query, out totalcount);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
             this.Response.Clear();
             this.Response.Write(json);
             this.Response.End();

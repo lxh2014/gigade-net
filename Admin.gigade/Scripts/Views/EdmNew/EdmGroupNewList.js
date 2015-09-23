@@ -18,6 +18,7 @@ Ext.define('gridlistEGN', {
         { name: "enabled", type: "int" },//是否啟用
         { name: "sort_order", type: "int" },//群組排序。當is_member_edm為True時，該群組會顯示在會員中心的電子報訂閱畫面，此時採用這個值來決定顯示的排序。
         { name: "description", type: "string" },//群組描述文字
+        { name: "group_name_list",type:"string"},
     ],
 });
 
@@ -40,7 +41,7 @@ var EdmGroupNewStore = Ext.create('Ext.data.Store', {//EdmGroupNewStore
 EdmGroupNewStore.on('beforeload', function () {
     Ext.apply(EdmGroupNewStore.proxy.extraParams,
         {
-            group_name: Ext.getCmp('group_name').getValue(),
+            group_name_list: Ext.getCmp('group_name_list').getValue(),
         });
 });
 
@@ -78,25 +79,39 @@ Ext.onReady(function () {
             }
         ],
         tbar: [
-           { xtype: 'button', text: "新增", id: 'add', iconCls: 'ui-icon ui-icon-user-add', handler: onAddClick },
-           { xtype: 'button', text: "編輯", id: 'edit', iconCls: 'ui-icon ui-icon-user-edit', handler: onedit },
+           {
+               xtype: 'button',
+               text: "新增",
+               id: 'add',
+               iconCls: 'ui-icon ui-icon-user-add',
+               handler: onAddClick
+           },
+           {
+               xtype: 'button',
+               text: "編輯",
+               id: 'edit',
+               iconCls: 'ui-icon ui-icon-user-edit',
+               handler: onedit
+           },
            '->',
-                         {
-                             xtype: 'textfield',
-                             id: 'group_name',
-                             labelWidth: 100,
-                             fieldLabel: '群組名稱',
-                             listeners: {
-                                 specialkey: function (field, e) {
-                                     if (e.getKey() == Ext.EventObject.ENTER) {
-                                         Query();
-                                     }
-                                 }
-                             }
-                         },
+          {
+              xtype: 'textfield',
+              fieldLabel: '群組名稱',
+              labelWidth: 70,
+              width: 180,
+              id: 'group_name_list',
+              name: 'group_name_list',
+              listeners: {
+                  specialkey: function (field, e) {
+                      if (e.getKey() == e.ENTER) {
+                          Query();
+                      }
+                  }
+              }
+          },
+
                          {
                              text: '查詢',
-                             // margin: '0 8 0 8',
                              margin: '0 10 0 10',
                              iconCls: 'icon-search',
                              handler: function () {
@@ -107,7 +122,7 @@ Ext.onReady(function () {
                              text: '重置',
                              iconCls: 'ui-icon ui-icon-reset',
                              handler: function () {
-                                 Ext.getCmp('group_name').setValue('');//重置為空
+                                 Ext.getCmp('group_name_list').setValue('');//重置為空
                              }
                          },
         ],
@@ -148,7 +163,7 @@ Ext.onReady(function () {
 function Query(x) {
     Ext.getCmp('EdmGroupNewGrid').store.loadPage(1, {
         params: {
-
+            group_name: Ext.getCmp('group_name_list').getValue(),
         }
     });
 }
