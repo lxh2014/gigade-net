@@ -10994,7 +10994,7 @@ namespace Admin.gigade.Controllers
                     newRow["不允收量"] = ipoStore[i].qty_damaged;
 
                     newRow["商品六碼"] = ipoStore[i].item_id;
-                    newRow["商品編號"] = ipoStore[i].product_id;
+                    newRow["商品編號"] = ipoStore[i].productid;
 
                     newRow["供應商編號"] = ipoStore[i].vendor_id;
                     newRow["創建時間"] = ipoStore[i].create_dtim.ToString("yyyy-MM-dd HH:mm:ss");
