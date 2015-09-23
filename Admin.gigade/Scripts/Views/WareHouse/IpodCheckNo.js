@@ -333,11 +333,15 @@ Ext.onReady(function () {
     });
     ipodStore.on('beforeload', function () {
         Ext.apply(ipodStore.proxy.extraParams, {
-            Potype : Ext.getCmp('Poty').getValue(),
+         Potype : Ext.getCmp('Poty').getValue(),
          erp_id :Ext.getCmp('erp_id').getValue().trim(),
          vendor_id : Ext.getCmp('vendor_id').getValue(),
          check : Ext.getCmp('checkInfoYesOrNo').getValue(),
-         vendor_name_full : Ext.getCmp('vendor_name_full').getValue().trim()
+         vendor_name_full: Ext.getCmp('vendor_name_full').getValue().trim(),
+         product_id : Ext.getCmp('product_id').getValue(),
+         product_name: Ext.getCmp('product_name').getValue(),
+         start_time: Ext.getCmp('time_start').getValue(),
+         end_time : Ext.getCmp('time_end').getValue()
         });
     });
     var gdAccum = Ext.create('Ext.grid.Panel', {
