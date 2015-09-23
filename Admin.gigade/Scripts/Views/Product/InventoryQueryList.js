@@ -246,13 +246,21 @@ Ext.onReady(function () {
                                 }
                             }
                             , change: function () {
-                                var start = Ext.getCmp('item_stock_start');
+                                //var start = Ext.getCmp('item_stock_start');
+                                //var end = Ext.getCmp('item_stock_end');
+                                var start = Ext.getCmp('item_stock_start').getValue();
                                 var end = Ext.getCmp('item_stock_end');
-                                if (start.getValue() > end.getValue()  )
-                                {
-                                    end.setValue(start.getValue());
-                                }              
-                                if (-99999 <= start.getValue() && start.getValue() <= 99999 && -99999 <= end.getValue() && end.getValue() <= 99999)
+                                if (start > end.getValue()) {
+                                    end.setValue(start);
+
+                                }
+                                //if (start.getValue() > end.getValue()  )
+                                //{
+                                //     end.setValue(start.getValue());
+                                    
+                                //}              
+                                //if (-99999 <= start.getValue() && start.getValue() <= 99999 && -99999 <= end.getValue() && end.getValue() <= 99999 && start.getValue()<=end.getValue())
+                                if (-99999 <= start && start <= 99999 && -99999 <= end.getValue() && end.getValue() <= 99999 && start <= end.getValue())
                                 {
                                     Ext.getCmp('query').setDisabled(false);
                                 }
@@ -267,7 +275,7 @@ Ext.onReady(function () {
                     {
                     xtype: 'displayfield',
                     margin: '2 0 0 8',
-                    value: '~ ~'
+                    value: '~'
                     },
                     {
                         xtype: 'numberfield',
@@ -287,13 +295,23 @@ Ext.onReady(function () {
                                 }
                             }
                             , change: function () {
-                                var start = Ext.getCmp('item_stock_start');
+                                //var start = Ext.getCmp('item_stock_start');
+                                //var end = Ext.getCmp('item_stock_end');
+
+                                var start = Ext.getCmp('item_stock_start').getValue();
                                 var end = Ext.getCmp('item_stock_end');
-                                if (start.getValue() > end.getValue())
+                                if (start > end.getValue())
                                 {
-                                    end.setValue(start.getValue());
-                                } 
-                                if (-99999 <= end.getValue() && end.getValue() <= 99999 && -99999 <= start.getValue() && start.getValue() <= 99999)
+                                    end.setMinValue(start);
+                                }
+                                //if (start.getValue() > end.getValue())
+                                //{
+                                //     end.setValue(start.getValue());
+                                    
+
+                                //} 
+                                //if (-99999 <= end.getValue() && end.getValue() <= 99999 && -99999 <= start.getValue() && start.getValue() <= 99999 && start.getValue()<=end.getValue())
+                                if (-99999 <= end.getValue() && end.getValue() <= 99999 && -99999 <= start && start <= 99999 && start <= end.getValue())
                                 {
                                     Ext.getCmp('query').setDisabled(false);
                                 }
