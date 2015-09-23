@@ -10904,7 +10904,22 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["vendor_name_full"]))
                 {
-                    ipod.vendor_name_full = Request.Params["vendor_name_full"].ToString();
+                    string vendorName = Request.Params["vendor_name_full"].ToString();
+                    int index1 = vendorName.IndexOf('%');
+                    int index2 = vendorName.IndexOf('_');
+                    if (index1 != -1)
+                    {
+                        string start = vendorName.Substring(0, index1);
+                        string end = vendorName.Substring(index1 + 1);
+                        vendorName = start + "/" + "%" + end;
+                    }
+                    if (index2 != -1)
+                    {
+                        string start = vendorName.Substring(0, index2);
+                        string end = vendorName.Substring(index2 + 1);
+                        vendorName = start + "/" + "_" + end;
+                    }
+                    ipod.vendor_name_full = vendorName;
                 }
                 if (!string.IsNullOrEmpty(Request.Params["check"]))
                 {
@@ -10992,10 +11007,8 @@ namespace Admin.gigade.Controllers
                     newRow["採購數量"] = ipoStore[i].qty_ord;
                     newRow["允收數量"] = ipoStore[i].qty_claimed;
                     newRow["不允收量"] = ipoStore[i].qty_damaged;
-
                     newRow["商品六碼"] = ipoStore[i].item_id;
                     newRow["商品編號"] = ipoStore[i].productid;
-
                     newRow["供應商編號"] = ipoStore[i].vendor_id;
                     newRow["創建時間"] = ipoStore[i].create_dtim.ToString("yyyy-MM-dd HH:mm:ss");
                     newRow["創建人"] = ipoStore[i].create_username;
@@ -11065,7 +11078,7 @@ namespace Admin.gigade.Controllers
                     string end = vendorName.Substring(index2 + 1);
                     vendorName = start + "/" + "_" + end;
                 }
-                ipod.vendor_name_full = Request.Params["vendor_name_full"].ToString();
+                ipod.vendor_name_full = vendorName;
             }
             if (!string.IsNullOrEmpty(Request.Params["check"]))
             {
