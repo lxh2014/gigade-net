@@ -239,7 +239,7 @@ unBlockFunction = function (row, store) {
                             if (result.success) {
                                 Ext.Msg.alert(INFORMATION, SUCCESS);
                                 EmailBlockListStore.load();
-                                editWin.close();
+                                unBlockWin.close();
                             }
                             else {
                                 Ext.Msg.alert(INFORMATION, FAILURE);

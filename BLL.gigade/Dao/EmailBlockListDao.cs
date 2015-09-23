@@ -18,6 +18,7 @@ namespace BLL.gigade.Dao
         }
         public DataTable GetEmailBlockList(EmailBlockListQuery query)
         {
+            query.Replace4MySQL();
             StringBuilder sql = new StringBuilder();
             StringBuilder count = new StringBuilder();
             int totalCount = 0;
@@ -70,6 +71,7 @@ namespace BLL.gigade.Dao
 
         public int Add(EmailBlockListQuery query)
         {
+            query.Replace4MySQL();
             StringBuilder sql = new StringBuilder();
             try
             {
@@ -88,6 +90,7 @@ namespace BLL.gigade.Dao
 
         public int Update(EmailBlockListQuery query)
         {
+            query.Replace4MySQL();
             StringBuilder sql = new StringBuilder();
             try
             {
