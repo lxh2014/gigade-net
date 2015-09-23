@@ -27,10 +27,11 @@ namespace BLL.gigade.Dao
            totalCount = 0;
            try
            {
-               str.AppendFormat(" select group_id,group_name,is_member_edm,enabled from edm_group_new egn order by enabled desc, is_member_edm  desc, sort_order  ");
+               str.AppendFormat(" select group_id,group_name,is_member_edm,enabled from edm_group_new egn  ");
                strcont.AppendFormat(" where 1=1 ");
 
                strcont.AppendFormat(" and egn.group_name like '%{0}%'", query.group_name);
+               strcont.Append(" order by enabled desc, is_member_edm  desc, sort_order  ");
 
                str.Append(strcont);
 

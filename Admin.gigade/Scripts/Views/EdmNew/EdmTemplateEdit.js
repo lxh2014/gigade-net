@@ -131,7 +131,6 @@
         listeners: {
             'show': function () {
                 if (row) {
-                    alert(row);
                     editFrm.getForm().loadRecord(row);
                 }
                 else {

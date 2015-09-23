@@ -73,8 +73,8 @@ namespace BLL.gigade.Dao
            query.Replace4MySQL();
            try
            {
-               sql.Append("insert into edm_template (template_name, edit_url, content_url,template_updatedate)values ");
-               sql.AppendFormat("('{0}','{1}','{2}','{3}')", query.template_name, query.edit_url, query.content_url, CommonFunction.DateTimeToString(query.template_updatedate));
+               sql.Append("insert into edm_template (template_name, edit_url, content_url,template_updatedate,template_create_userid,template_update_userid)values ");
+               sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}')", query.template_name, query.edit_url, query.content_url, CommonFunction.DateTimeToString(query.template_updatedate),query.template_create_userid,query.template_update_userid);
 
                return _access.execCommand(sql.ToString());
            }
@@ -90,7 +90,7 @@ namespace BLL.gigade.Dao
            query.Replace4MySQL();
            try
            {
-               sql.AppendFormat("update edm_template set template_name = '{0}', edit_url = '{1}', content_url = '{2}' ", query.template_name, query.edit_url, query.content_url);
+               sql.AppendFormat("update edm_template set template_name = '{0}', edit_url = '{1}', content_url = '{2}',template_create_userid='{3}',template_update_userid='{4}' where   template_id='{5}' ", query.template_name, query.edit_url, query.content_url, query.template_create_userid, query.template_update_userid,query.template_id);
                return _access.execCommand(sql.ToString());
            }
            catch (Exception ex)
