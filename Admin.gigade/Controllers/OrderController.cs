@@ -3265,51 +3265,13 @@ namespace Admin.gigade.Controllers
                         }
                         dr["退貨入帳手續費"] = _dt.Rows[i]["return_poundage"];
                         dr["退貨入帳金額"] = _dt.Rows[i]["return_collection_money"];
-                        int poun = 0;
-                        int coll = 0;
-                        int Rpoun = 0;
-                        int Rcoll = 0;
-                        int totalMoney = 0;
-                        //if (!string.IsNullOrEmpty(_dt.Rows[i]["poundage"].ToString()) && !string.IsNullOrEmpty(_dt.Rows[i]["account_collection_money"].ToString()) && !string.IsNullOrEmpty(_dt.Rows[i]["return_poundage"].ToString()) && !string.IsNullOrEmpty(_dt.Rows[i]["return_collection_money"].ToString()))
-                        //{
-                        //    dr["入帳總額"] = Convert.ToInt32(_dt.Rows[i]["poundage"]) + Convert.ToInt32(_dt.Rows[i]["account_collection_money"]) + Convert.ToInt32(_dt.Rows[i]["return_poundage"]) + Convert.ToInt32(_dt.Rows[i]["return_collection_money"]); ;//D=B+C+M+N
-                        //if (!string.IsNullOrEmpty(dr["訂單應收金額"].ToString()) && !string.IsNullOrEmpty(dr["入帳總額"].ToString()))
-                        //{
-                        //    dr["入帳金額差異"] = Convert.ToInt32(dr["訂單應收金額"].ToString()) - Convert.ToInt32(dr["入帳總額"].ToString());//E=A-D
-                        //}
-                        // }
-                        if (!string.IsNullOrEmpty(_dt.Rows[i]["poundage"].ToString()))
+                        if (!string.IsNullOrEmpty(_dt.Rows[i]["poundage"].ToString()) && !string.IsNullOrEmpty(_dt.Rows[i]["account_collection_money"].ToString()) && !string.IsNullOrEmpty(_dt.Rows[i]["return_poundage"].ToString()) && !string.IsNullOrEmpty(_dt.Rows[i]["return_collection_money"].ToString()))
                         {
-                            if (int.TryParse(_dt.Rows[i]["poundage"].ToString(), out poun))
+                            dr["入帳總額"] = Convert.ToInt32(_dt.Rows[i]["poundage"]) + Convert.ToInt32(_dt.Rows[i]["account_collection_money"]) + Convert.ToInt32(_dt.Rows[i]["return_poundage"]) + Convert.ToInt32(_dt.Rows[i]["return_collection_money"]); ;//D=B+C+M+N
+                            if (!string.IsNullOrEmpty(dr["訂單應收金額"].ToString()) && !string.IsNullOrEmpty(dr["入帳總額"].ToString()))
                             {
-                                totalMoney += poun;
+                                dr["入帳金額差異"] = Convert.ToInt32(dr["訂單應收金額"].ToString()) - Convert.ToInt32(dr["入帳總額"].ToString());//E=A-D
                             }
-                        }
-                        if (!string.IsNullOrEmpty(_dt.Rows[i]["account_collection_money"].ToString()))
-                        {
-                            if (int.TryParse(_dt.Rows[i]["account_collection_money"].ToString(), out coll))
-                            {
-                                totalMoney += coll;
-                            }
-                        }
-                        if (!string.IsNullOrEmpty(_dt.Rows[i]["return_poundage"].ToString()))
-                        {
-                            if (int.TryParse(_dt.Rows[i]["return_poundage"].ToString(), out Rpoun))
-                            {
-                                totalMoney += Rpoun;
-                            }
-                        }
-                        if (!string.IsNullOrEmpty(_dt.Rows[i]["return_collection_money"].ToString()))
-                        {
-                            if (int.TryParse(_dt.Rows[i]["return_collection_money"].ToString(), out Rcoll))
-                            {
-                                totalMoney += Rcoll;
-                            }
-                        }
-                        dr["入帳總額"] = totalMoney;
-                        if (!string.IsNullOrEmpty(dr["訂單應收金額"].ToString()) && !string.IsNullOrEmpty(dr["入帳總額"].ToString()))
-                        {
-                            dr["入帳金額差異"] = Convert.ToInt32(dr["訂單應收金額"].ToString()) - Convert.ToInt32(dr["入帳總額"].ToString());//E=A-D
                         }
                         if (!string.IsNullOrEmpty(_dt.Rows[i]["invoicedate"].ToString()))
                         {
