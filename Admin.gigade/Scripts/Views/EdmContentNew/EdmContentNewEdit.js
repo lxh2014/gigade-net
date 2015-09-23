@@ -8,7 +8,7 @@
         ]
     });
     var EdmGroupNewStore = Ext.create("Ext.data.Store", {
-        autoDestroy: true,
+       autoLoad:true,
         model: 'gigade.edm_group_new',
         proxy: {
             type: 'ajax',
@@ -19,16 +19,65 @@
             }
         }
     });
+ 
 
+    Ext.define('gigade.mailSender', {
+        extend: 'Ext.data.Model',
+        fields: [
+            { name: 'sender_id', type: 'int' },
+            { name: 'sender_email', type: 'string' }
+        ]
+    });
+    var MailSenderStore= Ext.create("Ext.data.Store", {
+        autoLoad: true,
+        model: 'gigade.mailSender',
+        proxy: {
+            type: 'ajax',
+            url: '/EdmNew/GetMailSenderStore',
+            reader: {
+                type: 'json',
+                root: 'data'
+            }
+        }
+    });
+
+    Ext.define('gigade.edm_template', {
+        extend: 'Ext.data.Model',
+        fields: [
+            { name: 'template_id', type: 'int' },
+            { name: 'content_url', type: 'string' }
+        ]
+    });
+    var EdmTemplateStore = Ext.create("Ext.data.Store", {
+        autoLoad: true,
+        model: 'gigade.edm_template',
+        proxy: {
+            type: 'ajax',
+            url: '/EdmNew/GetEdmTemplateStore',
+            reader: {
+                type: 'json',
+                root: 'data'
+            }
+        }
+    });
+
+    var importanceStore = Ext.create('Ext.data.Store', {
+        fields: ['txt', 'value'],
+        data: [
+              { 'txt': '一般', 'value': '0' },
+              { 'txt': '重要', 'value': '1' },
+              { 'txt': '特級', 'value': '2' },
+        ]
+    });
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
         frame: true,
         plain: true,
         constrain: true,
-        autoScroll: true,
+        //autoScroll: true,
         layout: 'anchor',
         labelWidth: 45,
-        url: '/EdmNew/EdmContentNewSave',
+        url: '/EdmNew/SaveEdmContentNew',
         defaults: { anchor: "95%", msgTarget: "side" },
         //////編輯器
         listeners: {
@@ -137,7 +186,7 @@
                                 "destroy": { "url": "/ImageBrowser/Destroy" },
                                 "create": { "url": "/ImageBrowser/Create" },
                                 //  "imageUrl": "http://192.168.16.118/uploads/{0}"
-                                //"imageUrl": document.getElementById('BaseAddress').value + "/" + "" + document.getElementById('path').value + "" + "/" + "{0}"
+                                "imageUrl": document.getElementById('BaseAddress').value + "/" + "" + document.getElementById('path').value + "" + "/" + "{0}"
                             }
                         }
                     });
@@ -148,7 +197,7 @@
         /////編輯器
         items: [
               {
-                  xtype: 'dispalyfield',
+                  xtype: 'displayfield',
                   fieldLabel: '編號',
                   id: 'content_id',
                   name: 'content_id',
@@ -156,26 +205,41 @@
               },
             {
                 xtype: 'combobox',
+                store: MailSenderStore,
+                valueField: 'sender_id',
+                displayField: 'sender_email',
                 fieldLabel: '寄件者',
                 id: 'sender_id',
                 name: 'sender_id',
+                queryModel: 'local',
+                lastQuery: '',
+                editable: false,
+                allowBlank: false,
+             
             },
             {
                 xtype: 'combobox',
-                store: EdmGroupNewStore,
-                valueField: 'group_id',
-                displayField: 'group_name',
-                allowBlank:false,
                 fieldLabel: '電子報類型',
+                store: EdmGroupNewStore,
+                displayField: 'group_name',
+                valueField: 'group_id',
+                allowBlank: false,
+                //lastQuery: '',
                 id: 'group_id',
                 name: 'group_id',
+                editable: false,
+              
             },
             {
                 xtype: 'combobox',
                 fieldLabel: '郵件重要度',
+                store: importanceStore,
+                displayField: 'txt',
+                valueField:'value',
                 id: 'importance',
                 name: 'importance',
-                allowBlank: false
+                value:1,
+                editable: false
             },
             {
                 xtype: 'textfield',
@@ -186,12 +250,15 @@
             },
             {
                 xtype: 'combobox',
-
+                store: EdmTemplateStore,
+                valueField: 'template_id',
+                displayField:'content_url',
                 fieldLabel: '郵件範本',
                 id: 'template_id',
                 name: 'template_id',
                 editable: false,
-                allowBlank: false,
+                lastQuery:'',
+                editable: false,
             },
             {
                 xtype: 'textarea',
@@ -281,10 +348,16 @@
         listeners: {
             'show': function () {
                 if (row) {
+                    Ext.getCmp('sender_id').allowBlank = true;
+                    Ext.getCmp('group_id').allowBlank = true;
+                    Ext.getCmp('template_id').allowBlank = true;
                     editFrm.getForm().loadRecord(row);
                     initRow(row);
                 }
                 else {
+                    Ext.getCmp('sender_id').allowBlank = false;
+                    Ext.getCmp('group_id').allowBlank = false;
+                    Ext.getCmp('template_id').allowBlank = false;
                     editFrm.getForm().reset();
                 }
             }
@@ -292,6 +365,6 @@
     });
     editWin.show();
     function initRow(row) {
-        $('textarea[name=kendoEditor]').data("kendoEditor").value(row.data.template_data);
+       $('textarea[name=kendoEditor]').data("kendoEditor").value(row.data.template_data);
     }
 }

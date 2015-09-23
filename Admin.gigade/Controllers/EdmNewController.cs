@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Configuration;
 
 namespace Admin.gigade.Controllers
 {
@@ -40,6 +41,8 @@ namespace Admin.gigade.Controllers
         //電子報
         public ActionResult EdmContentNew()
         {
+            ViewBag.path = ConfigurationManager.AppSettings["webDavImage"];
+            ViewBag.BaseAddress = ConfigurationManager.AppSettings["webDavBaseAddress"];
             return View();
         }
         #endregion
@@ -304,6 +307,10 @@ namespace Admin.gigade.Controllers
                 int totalCount = 0;
                 _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
                 store = _edmContentNewMgr.GetECNList(query, out totalCount);
+                foreach (var item in store)
+                {
+                    item.template_data = Server.HtmlDecode(Server.HtmlDecode(item.template_data));
+                }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
@@ -343,9 +350,9 @@ namespace Admin.gigade.Controllers
                 {
                     query.group_id = Convert.ToInt32(Request.Params["group_id"]);
                 }
-                if (!string.IsNullOrEmpty(Request.Params["inportance"]))
+                if (!string.IsNullOrEmpty(Request.Params["importance"]))
                 {
-                    query.importance = Convert.ToInt32(Request.Params["inportance"]);
+                    query.importance = Convert.ToInt32(Request.Params["importance"]);
                 }
                 if (!string.IsNullOrEmpty(Request.Params["subject"]))
                 {
@@ -359,6 +366,8 @@ namespace Admin.gigade.Controllers
                 {
                     query.template_data = Request.Params["template_data"];
                 }
+                query.content_create_userid = (Session["caller"] as Caller).user_id;
+                query.content_update_userid= (Session["caller"] as Caller).user_id;
                  json=_edmContentNewMgr.SaveEdmContentNew(query);
             }
             catch (Exception ex)
@@ -402,8 +411,57 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
 
+        public HttpResponseBase GetEdmTemplateStore()
+        {
+            string json = string.Empty;
+            try
+            {
+                List<EdmTemplate> store = new List<EdmTemplate>();
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                store = _edmContentNewMgr.GetEdmTemplateStore();
+                json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
 
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
 
+        public HttpResponseBase GetMailSenderStore()
+        {
+            string json = string.Empty;
+            try
+            {
+                List<MailSender> store = new List<MailSender>();
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                store = _edmContentNewMgr.GetMailSenderStore();
+                json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        
         #endregion
 
         #endregion

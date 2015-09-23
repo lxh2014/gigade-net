@@ -131,28 +131,14 @@ onAddClick = function () {
 
 /*************************************************************************************編輯*************************************************************************************************/
 onEditClick = function () {
-    //var row = Ext.getCmp("gdSites").getSelectionModel().getSelection();
-    //if (row.length == 0) {
-    //    Ext.Msg.alert(INFORMATION, NO_SELECTION);
-    //} else if (row.length > 1) {
-    //    Ext.Msg.alert(INFORMATION, ONE_SELECTION);
-    //} else if (row.length == 1) {
-    //    //editFunction(row[0], EdmContentStore);
-    //    var urlTran = '/Edm/EdmContentAdd?EdmStore=' + row[0].data.content_id;
-    //    var panel = window.parent.parent.Ext.getCmp('ContentPanel');
-    //    var copy = panel.down('#detial');
-    //    if (copy) {
-    //        copy.close();
-    //    }
-    //    copy = panel.add({
-    //        id: 'detial',
-    //        title: '編輯電子報',
-    //        html: window.top.rtnFrame(urlTran),
-    //        closable: true
-    //    });
-    //    panel.setActiveTab(copy);
-    //    panel.doLayout();
-    //}
+    var row = Ext.getCmp("EdmContentNew").getSelectionModel().getSelection();
+    if (row.length == 0) {
+        Ext.Msg.alert("提示信息", "沒有選擇一行");
+    } else if (row.length > 1) {
+        Ext.Msg.alert("提示信息", "只能選擇一行");
+    } else if (row.length == 1) {
+        editFunction(row[0], EdmContentNewStore);
+    }
 }
 
 onStatusClick = function () {
