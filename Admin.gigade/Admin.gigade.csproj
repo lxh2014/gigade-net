@@ -1847,10 +1847,13 @@
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsList.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
+<<<<<<< Updated upstream
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateList.js" />
+=======
+>>>>>>> Stashed changes
     <Content Include="Scripts\Views\EdmNew\EmailBlockEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EmailBlockList.js" />
     <Content Include="Scripts\Views\EdmS\Edmlist.js" />
@@ -4387,8 +4390,11 @@
     <Content Include="Views\WareHouse\IpodList.cshtml" />
     <Content Include="Views\EdmNew\Index.cshtml" />
     <Content Include="Views\EdmNew\EdmContentNew.cshtml" />
+<<<<<<< Updated upstream
     <Content Include="Views\EdmNew\EdmTemplate.cshtml" />
     <Content Include="Web.config" />
+=======
+>>>>>>> Stashed changes
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
