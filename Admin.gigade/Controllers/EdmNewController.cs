@@ -77,7 +77,7 @@ namespace Admin.gigade.Controllers
         #region 擋信名單管理
         public HttpResponseBase GetEmailBlockList()
         {
-            string json = string.Empty;
+            string json = string.Empty;//
 
             try
             {
