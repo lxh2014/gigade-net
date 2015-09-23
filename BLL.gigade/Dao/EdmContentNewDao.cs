@@ -28,8 +28,8 @@ namespace BLL.gigade.Dao
             try
             {
                 sqlCount.AppendFormat("select count(edn.content_id) as countTotal ");
-                sql.AppendFormat("select edn.content_id,`subject`,esl.count,esl.date ");
-                sqlFrom.AppendFormat("from edm_content_new edn LEFT JOIN  (SELECT content_id,COUNT(*) as count,MAX(schedule_date) as date from edm_send_log WHERE test_send=0 GROUP BY content_id)  esl ON edn.content_id=esl.content_id ");
+                sql.AppendFormat("select edn.content_id,edn.group_id,`subject`,esl.count,esl.date,edn.sender_id,edn.importance,edn.template_id,edn.template_data  ");
+                sqlFrom.AppendFormat("from edm_content_new edn LEFT JOIN  (SELECT content_id,COUNT(content_id) as count,MAX(schedule_date) as date from edm_send_log WHERE test_send=0 GROUP BY content_id)  esl ON edn.content_id=esl.content_id ");
                 sqlWhere.AppendFormat(" where 1=1 ");
                 DataTable _dt = _access.getDataTable(sqlCount.ToString() + sqlFrom.ToString() + sqlWhere.ToString());
                 if (_dt!=null&&_dt.Rows.Count > 0)
@@ -46,18 +46,19 @@ namespace BLL.gigade.Dao
 
         }
 
-        //public List<MailSender> GetMailSenderStore()
-        //{
-        //    StringBuilder sql = new StringBuilder();
-        //    try
-        //    {
-        //        sql.Append("select sender_id,sender_email,sender_name from mail_sender");
-        //    }
-        //    catch (Exception ex)
-        //    {
- 
-        //    }
-        //}
+        public List<MailSender> GetMailSenderStore()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.Append("select sender_id,sender_email,sender_name from mail_sender;");
+                return _access.getDataTableForObj<MailSender>(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetECNList-->" + sql.ToString()+ ex.Message, ex);
+            }
+        }
 
         public List<EdmGroupNew> GetEdmGroupNewStore()
         {
@@ -72,14 +73,14 @@ namespace BLL.gigade.Dao
                 throw new Exception("EdmContentNewDao-->GetEdmGroupNewStore-->" + sql.ToString()+ ex.Message, ex);
             }
         }
-        //**將它改為EdmTemplate**//todo
-        public List<EdmGroupNew> GetEdmTemplateStore()
+       
+        public List<EdmTemplate> GetEdmTemplateStore()
         {
             StringBuilder sql = new StringBuilder();
             try
             {
                 sql.Append("select template_id,template_name,edit_url,content_url from edm_template where enabled=1;");
-                return _access.getDataTableForObj<EdmGroupNew>(sql.ToString());
+                return _access.getDataTableForObj<EdmTemplate>(sql.ToString());
             }
             catch (Exception ex)
             {
@@ -92,10 +93,10 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.Append("insert into edm_content_new(group_id,subject,template_id,template_data ");
+                sql.Append("insert into edm_content_new(group_id,`subject`,template_id,template_data, ");
                 sql.Append("importance,sender_id,content_createdate,content_updatedate,content_create_userid,content_update_userid) ");
-                sql.AppendFormat("values('{0}','{1}','{2}','{3}','{4}',",query.group_id,query.subject,query.template_id,query.template_data);
-                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}');", query.importance, query.sender_id, CommonFunction.DateTimeToString(DateTime.Now), CommonFunction.DateTimeToString(DateTime.Now),query.content_create_userid,query.content_update_userid);
+                sql.AppendFormat("values('{0}','{1}','{2}','{3}',",query.group_id,query.subject,query.template_id,query.template_data);
+                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}');", query.importance, query.sender_id, CommonFunction.DateTimeToString(DateTime.Now), CommonFunction.DateTimeToString(DateTime.Now),query.content_create_userid,query.content_update_userid);
                 return _access.execCommand(sql.ToString());
             }
             catch (Exception ex)
@@ -110,7 +111,7 @@ namespace BLL.gigade.Dao
             try
             {
                 sql.AppendFormat("update edm_content_new set group_id='{0}',subject='{1}',template_id='{2}',template_data='{3}',importance='{4}',", query.group_id, query.subject, query.template_id, query.template_data, query.importance);
-                sql.AppendFormat(" sender_id='{0}',content_createdate='{1}',content_updatedate='{2}',content_create_userid='{3}',content_update_userid='{4}' where content_id='{5}';", query.sender_id, CommonFunction.DateTimeToString(DateTime.Now), CommonFunction.DateTimeToString(DateTime.Now), query.content_create_userid, query.content_update_userid,query.content_id);
+                sql.AppendFormat(" sender_id='{0}',content_updatedate='{1}',content_update_userid='{2}' where content_id='{3}';", query.sender_id, CommonFunction.DateTimeToString(DateTime.Now),query.content_update_userid,query.content_id);
                 return _access.execCommand(sql.ToString());
             }
             catch (Exception ex)
