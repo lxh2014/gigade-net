@@ -318,7 +318,7 @@ namespace Admin.gigade.Controllers
         #region 電子報列表
         public HttpResponseBase GetECNList()
         {
-            string json = string.Empty;
+            string json = string.Empty;//
 
             try
             {
