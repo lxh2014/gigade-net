@@ -409,6 +409,7 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
                     else if (parseInt(qty_claimed) > parseInt(qty_ord))
                     {
                         Ext.Msg.alert("錯誤提示", "允收數量不能大於下單採購量,保存失敗！");
+                        IpodStore.load();
                         return false;
                     }
                     //Ext.Msg.alert("提示", e.originalValues); return false;
@@ -442,13 +443,14 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
                             failure: function ()
                             {
                                 Ext.Msg.alert("提示信息", "驗收失敗!");
+                                IpodStore.load();
                             }
                         });
                     }
                 }
                 else
                 {
-                    e.store.load();
+                    IpodStore.load();
                 }
 
             });
