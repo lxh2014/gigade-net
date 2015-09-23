@@ -402,6 +402,7 @@
     <Compile Include="Dao\RedirectGroupDao.cs" />
     <Compile Include="Dao\ReturnMasterDao.cs" />
     <Compile Include="Dao\ScheduleParamerDao.cs" />
+    <Compile Include="Dao\ScheduleServiceDao.cs" />
     <Compile Include="Dao\SecretAccountSetDao.cs" />
     <Compile Include="Dao\SecretInfoLogDao.cs" />
     <Compile Include="Dao\ScheduleItemDao.cs" />
@@ -1147,6 +1148,7 @@
     <Compile Include="Mgr\SalesUserMgr.cs" />
     <Compile Include="Mgr\ScheduleParamerMgr.cs" />
     <Compile Include="Mgr\ScheduleRelationMgr.cs" />
+    <Compile Include="Mgr\ScheduleServiceMgr.cs" />
     <Compile Include="Mgr\SecretAccountSetMgr.cs" />
     <Compile Include="Mgr\SecretInfoLogMgr.cs" />
     <Compile Include="Mgr\SerialMgr.cs" />
@@ -1404,6 +1406,7 @@
     <Compile Include="Model\Query\ScheduleQuery.cs" />
     <Compile Include="Model\OrderAccumAmount.cs" />
     <Compile Include="Model\Query\OrderAccumAmountQuery.cs" />
+    <Compile Include="Model\Query\ScheduleServiceQuery.cs" />
     <Compile Include="Model\Query\SecretAccountSetQuery.cs" />
     <Compile Include="Model\Query\ShippingVoucherQuery.cs" />
     <Compile Include="Model\Query\SphinxExcludeQuery.cs" />
@@ -1573,6 +1576,7 @@
     <Compile Include="Model\RedirectGroup.cs" />
     <Compile Include="Model\ScheduleItem.cs" />
     <Compile Include="Model\ScheduleParamer.cs" />
+    <Compile Include="Model\ScheduleService.cs" />
     <Compile Include="Model\SecretAccountSet.cs" />
     <Compile Include="Model\SecretInfoLog.cs" />
     <Compile Include="Model\ShippingVoucher.cs" />
