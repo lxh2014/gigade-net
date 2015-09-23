@@ -315,6 +315,14 @@ Ext.onReady(function () {
                             {
                                 click: function () {
                                     frm.getForm().reset();
+                                    var datetime1 = new Date();
+                                    datetime1.setFullYear(2000, 1, 1);
+                                    var datetime2 = new Date();
+                                    datetime2.setFullYear(2100, 1, 1);
+                                    Ext.getCmp("time_start").setMinValue(datetime1);
+                                    Ext.getCmp("time_start").setMaxValue(datetime2);
+                                    Ext.getCmp("time_end").setMinValue(datetime1);
+                                    Ext.getCmp("time_end").setMaxValue(datetime2);
                                 }
                             }
                         }
