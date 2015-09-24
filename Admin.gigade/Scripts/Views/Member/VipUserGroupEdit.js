@@ -27,38 +27,33 @@
             maxLength: 25,
             fieldLabel: '名單名稱'
         }, {
+            fieldLabel: '統編',
             xtype: 'textfield',
             name: 'tax_id',
             id: 'tax_id',
             maxLength: 25,
-            submitValue: true,
-            allowBlank: false,
-            fieldLabel: '統編(企業群組必填)'
+            submitValue: false,
+            allowBlank: true                      
         }, {
+            fieldLabel: '企業商品類別',
             xtype: 'textfield',
             name: 'group_category',
             id: 'group_category',
             value: 0,
             maxLength: 9,
-            submitValue: true,
-            allowBlank:false,
-            fieldLabel: '企業商品類別(企業群組必填)',
-            //listeners: {
-            //    afterRender: function (combo) {
-            //        combo.setValue(0);
-            //    }
-            //}
+            submitValue: false,
+            allowBlank: true      
         }, {
+            fieldLabel: '企業英文名稱' ,
             xtype: 'textfield',
             name: 'eng_name',
             id: 'eng_name',
             allowBlank: true,
             maxLength: 10,
-            submitValue: true,
+            submitValue: false,
             regex: /^[A-Za-z]+$/,
             regexText: '只能輸入英文',
-            allowBlank: false,
-            fieldLabel: '企業英文名稱(企業群組必填)'
+            allowBlank: true       
         }, {
             xtype: 'textfield',
             name: 'gift_bonus',
@@ -82,15 +77,15 @@
             fieldLabel: '購物贈送購物金倍率'
         },
         {
-              xtype: 'displayfield',
-              name: 'bonus_expire_day',
-              id: 'bonus_expire_day',
-              allowBlank: true,
-              maxLength: 10,
-              hidden:true,
-              submitValue: true,
-              readOnly: true,
-              fieldLabel: '購物贈送購物金有效天數'
+            xtype: 'displayfield',
+            name: 'bonus_expire_day',
+            id: 'bonus_expire_day',
+            allowBlank: true,
+            maxLength: 10,
+            hidden:true,
+            submitValue: true,
+            readOnly: true,
+            fieldLabel: '購物贈送購物金有效天數'
         },
         {
             xtype: 'filefield',
@@ -119,71 +114,108 @@
             fileUpload: true,
             submitValue: true
         }, {
-            xtype: 'fieldcontainer',
+            xtype: 'radiogroup',
             fieldLabel: '企業員工身份驗證',
-            id: 'validate',
-            defaultType: 'radiofield',
-            submitValue: true,
-            defaults: {
-                flex: 1
-            },
-            layout: 'hbox',
+            //id: 'validate',
+            submitValue: true,                    
             items: [{
                 boxLabel: '否',
                 name: 'check_iden',
                 inputValue: '0',
                 id: 'radio1',
-                checked: true
+                checked: true ,
+                listeners: {
+                    change: function (radio, newValue, oldValue) {                                                            
+                        if (newValue) {
+                            Ext.getCmp("tax_id").allowBlank = true;
+                            Ext.getCmp("group_category").allowBlank = true;
+                            Ext.getCmp("eng_name").allowBlank = true;
+                            Ext.getCmp('tax_id').getEl().first().dom.innerHTML = '統編';
+                            Ext.getCmp('group_category').getEl().first().dom.innerHTML = '企業商品類別';
+                            Ext.getCmp('eng_name').getEl().first().dom.innerHTML = '企業英文名稱';
+                            Ext.getCmp("tax_id").reset();
+                            Ext.getCmp("group_category").reset();
+                            Ext.getCmp("eng_name").reset();
+                        }
+                    }
+                }
+
             }, {
                 boxLabel: '是',
                 name: 'check_iden',
                 inputValue: '1',
-                id: 'radio2'
+                id: 'radio2',
+                listeners: {
+                    change: function (radio, newValue, oldValue) {                    
+                        if (newValue) {
+                            Ext.getCmp("tax_id").allowBlank = false;                            
+                            Ext.getCmp("group_category").allowBlank = false;
+                            Ext.getCmp("eng_name").allowBlank = false;
+                            Ext.getCmp('tax_id').getEl().first().dom.innerHTML = '統編' + ":<font style='color:red'>" +'*' +"</font>";
+                            Ext.getCmp('group_category').getEl().first().dom.innerHTML = '企業商品類別' + ":<font style='color:red'>" + '*' + "</font>";
+                            Ext.getCmp('eng_name').getEl().first().dom.innerHTML = '企業英文名稱' + ":<font style='color:red'>" + '*' + "</font>";
+                            Ext.getCmp("tax_id").reset();
+                            Ext.getCmp("group_category").reset();
+                            Ext.getCmp("eng_name").reset();
+                            //label = Ext.getCmp('no_discount').getEl().parent().parent().first();
+                            //  label.dom.innerHTML = DISCOUNT+(100-newValue)+"%";
+                            //Ext.DomQuery.selectNode('label[for=no_discount]').innerHTML =DISCOUNT+(100-newValue)+ '%';
+                        }
+                    }                 
+                }
             }]
+        }
+        , {
+            xtype: 'displayfield',
+            name: 'info',
+            id: 'info',
+            readOnly: true,
+            
+            fieldLabel: "提示信息",
+            value:"<font style='color:red'>" +  "*  為必填項" + "</font>"
         }],
         buttons: [{
-            formBind: true,
-            disabled: true,
+            //formBind: true,
+            //disabled: false,
+            id:'saveBtn',
             text: '保存',
             handler: function () {
-                var form = this.up('form').getForm();
-                if (form.isValid()) {
-                    form.submit({
-                        params: {
-                            group_id: Ext.htmlEncode(Ext.getCmp('group_id').getValue()),
-                            group_name: Ext.htmlEncode(Ext.getCmp('group_name').getValue()),
-                            tax_id: Ext.htmlEncode(Ext.getCmp('tax_id').getValue()),
-                            group_category: Ext.htmlEncode(Ext.getCmp('group_category').getValue()),
-                            eng_name: Ext.htmlEncode(Ext.getCmp('eng_name').getValue()),
-                            gift_bonus: Ext.htmlEncode(Ext.getCmp('gift_bonus').getValue()),
-                            image_name: Ext.htmlEncode(Ext.getCmp('image_name').getValue()),
-                            radio1: Ext.getCmp('radio1').getValue(),
-                            radio2: Ext.getCmp('radio2').getValue()
-                        },
-                        success: function (form, action) {
-                            var result = Ext.decode(action.response.responseText);
-                            if (result.success) {
-                                Ext.Msg.alert(INFORMATION, "保存成功! " + result.msg);
-                                VipUserGroupStore.load();
-                                editWin.close();
-                            }
-                            else {
-                                Ext.Msg.alert(INFORMATION, "保存失敗! " + result.msg);
-                                VipUserGroupStore.load();
-                                editWin.close();
-                            }
-                        },
-                        failure: function (form, action) {
-                            var result = Ext.decode(action.response.responseText);
+             var form = this.up('form').getForm();
+                form.submit({
+                    params: {
+                        group_id: Ext.htmlEncode(Ext.getCmp('group_id').getValue()),
+                        group_name: Ext.htmlEncode(Ext.getCmp('group_name').getValue()),
+                        tax_id: Ext.htmlEncode(Ext.getCmp('tax_id').getValue()),
+                        group_category: Ext.htmlEncode(Ext.getCmp('group_category').getValue()),
+                        eng_name: Ext.htmlEncode(Ext.getCmp('eng_name').getValue()),
+                        gift_bonus: Ext.htmlEncode(Ext.getCmp('gift_bonus').getValue()),
+                        image_name: Ext.htmlEncode(Ext.getCmp('image_name').getValue()),
+                        radio1: Ext.getCmp('radio1').getValue(),
+                        radio2: Ext.getCmp('radio2').getValue()
+                    },
+                    success: function (form, action) {
+                        var result = Ext.decode(action.response.responseText);
+                        if (result.success) {
+                            Ext.Msg.alert(INFORMATION, "保存成功! " + result.msg);
+                            VipUserGroupStore.load();
+                            editWin.close();
+                        }
+                        else {
                             Ext.Msg.alert(INFORMATION, "保存失敗! " + result.msg);
                             VipUserGroupStore.load();
                             editWin.close();
                         }
-                    });
-
-                }
+                    },
+                    failure: function (form, action) {
+                        var result = Ext.decode(action.response.responseText);
+                        Ext.Msg.alert(INFORMATION, "保存失敗! " + result.msg);
+                        VipUserGroupStore.load();
+                        editWin.close();
+                    }
+                });
 
             }
+            
         }]
     });
     var editWin = Ext.create('Ext.window.Window', {
@@ -217,7 +249,7 @@
              }
          }],
         listeners: {
-            'show': function () {
+            'show': function () {             
                 if (row == null) {
                     if (document.getElementById("modify_only").value == 1) {
                         Ext.getCmp('bonus_rate').show();
@@ -243,9 +275,16 @@
     });
     editWin.show();
     initForm(row);
+    
+    
+   
 }
 function initForm(row) {
     var img = row.data.image_name.toString();
     var imgUrl = img.substring(img.lastIndexOf("\/") + 1);
     Ext.getCmp('image_name').setRawValue(imgUrl);
 }
+
+
+
+
