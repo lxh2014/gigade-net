@@ -45,7 +45,7 @@
         extend: 'Ext.data.Model',
         fields: [
             { name: 'template_id', type: 'int' },
-            { name: 'content_url', type: 'string' }
+            { name: 'edit_url', type: 'string' }
         ]
     });
     var EdmTemplateStore = Ext.create("Ext.data.Store", {
@@ -252,13 +252,24 @@
                 xtype: 'combobox',
                 store: EdmTemplateStore,
                 valueField: 'template_id',
-                displayField:'content_url',
+                displayField: 'edit_url',
                 fieldLabel: '郵件範本',
                 id: 'template_id',
                 name: 'template_id',
                 editable: false,
                 lastQuery:'',
                 editable: false,
+                listeners: {
+                    'select': function () {
+                        Ext.Ajax.request({
+                            url: '/EdmNew/GetEditUrlData',
+                            params: {
+                                edit_url: Ext.getCmp('template_id').getRawValue(),
+                            },
+
+                        });
+                    }
+                }
             },
             {
                 xtype: 'textarea',
