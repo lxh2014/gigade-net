@@ -48,13 +48,27 @@ namespace BLL.gigade.Mgr
               throw new Exception("EdmContentNewMgr-->GetEdmGroupNewStore-->" + ex.Message, ex);
           }
       }
-      
-      //**將它改為EdmTemplate**//todo
+      /// <summary>
+      /// 發件者設定
+      /// </summary>
+      /// <returns></returns>
+      public List<MailSender> GetMailSenderStore()
+      {
+          try
+          {
+              return _edmContentNewDao.GetMailSenderStore();
+          }
+          catch (Exception ex)
+          {
+              throw new Exception("EdmContentNewMgr-->GetMailSenderStore-->" + ex.Message, ex);
+          }
+      }
+    
       /// <summary>
       /// 電子報模版
       /// </summary>
       /// <returns></returns>
-      public List<EdmGroupNew> GetEdmTemplateStore()
+      public List<EdmTemplate> GetEdmTemplateStore()
       {
           try
           {

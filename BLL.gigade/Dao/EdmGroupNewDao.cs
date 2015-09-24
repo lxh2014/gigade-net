@@ -27,7 +27,7 @@ namespace BLL.gigade.Dao
            totalCount = 0;
            try
            {
-               str.AppendFormat(" select group_id,group_name,is_member_edm,enabled from edm_group_new egn  ");
+               str.AppendFormat(" select group_id,group_name,is_member_edm,trial_url,enabled from edm_group_new egn  ");
                strcont.AppendFormat(" where 1=1 ");
 
                strcont.AppendFormat(" and egn.group_name like '%{0}%'", query.group_name);
@@ -81,8 +81,8 @@ namespace BLL.gigade.Dao
            query.Replace4MySQL();
            try
            {
-               sql.Append("insert into edm_group_new (group_name, is_member_edm, sort_order,description)values ");
-               sql.AppendFormat("('{0}','{1}','{2}','{3}')", query.group_name, query.is_member_edm, query.sort_order, query.description);
+               sql.Append("insert into edm_group_new (group_name, is_member_edm,trial_url, sort_order,description)values ");
+               sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}')", query.group_name, query.is_member_edm,query.trial_url, query.sort_order, query.description);
 
                return _access.execCommand(sql.ToString());
            }
@@ -98,7 +98,7 @@ namespace BLL.gigade.Dao
            query.Replace4MySQL();
            try
            {
-               sql.AppendFormat("update edm_group_new set group_name = '{0}', is_member_edm = '{1}', sort_order = '{2}',description='{3}'  where group_id='{4}' ", query.group_name, query.is_member_edm, query.sort_order, query.description,query.group_id);
+               sql.AppendFormat("update edm_group_new set group_name = '{0}', is_member_edm = '{1}', trial_url='{2}',sort_order = '{3}',description='{4}'  where group_id='{5}' ", query.group_name, query.is_member_edm, query.trial_url,query.sort_order, query.description,query.group_id);
                return _access.execCommand(sql.ToString());
            }
            catch (Exception ex)
