@@ -580,7 +580,7 @@ function editFunction(rowID) {
                                                 prod_cate: Ext.htmlEncode(Ext.getCmp('prod_cate').getValue()),
                                                 buy_cate: Ext.htmlEncode(Ext.getCmp('buy_cate').getValue()),
                                                 tax_type: Ext.htmlEncode(Ext.getCmp('tax_type').getValue()),
-                                                erp_id: Ext.htmlEncode(Ext.getCmp("erp_id").getValue()),
+                                                // erp_id: Ext.htmlEncode(Ext.getCmp("erp_id").getValue()),
                                                 conactValues: InsertValues,
                                                 cost_percent: Ext.htmlEncode(Ext.getCmp("cost_percent").getValue()),
                                                 creditcard_1_percent: Ext.htmlEncode(Ext.getCmp("creditcard_1_percent").getValue()),
@@ -630,11 +630,20 @@ function editFunction(rowID) {
                                                         }
                                                     }
                                                 } else {
-                                                    Ext.Msg.alert(INFORMATION, FAILURE);
+                                                    if (result.msg = -1) {
+                                                        Ext.Msg.alert(INFORMATION, "ERP_ID出錯，請聯繫IT人員！");
+                                                    } else {
+                                                        Ext.Msg.alert(INFORMATION, FAILURE);
+                                                    }
                                                 }
                                             },
                                             failure: function (form, action) {
-                                                Ext.Msg.alert(INFORMATION, FAILURE);
+                                                var result = Ext.decode(action.response.responseText);
+                                                if (result.msg == -1) {
+                                                    Ext.Msg.alert(INFORMATION, "ERP_ID出錯，請聯繫IT人員！");
+                                                } else {
+                                                    Ext.Msg.alert(INFORMATION, FAILURE);
+                                                }
                                             }
                                         });
                                     }
@@ -701,7 +710,7 @@ function editFunction(rowID) {
                                         prod_cate: Ext.htmlEncode(Ext.getCmp('prod_cate').getValue()),
                                         buy_cate: Ext.htmlEncode(Ext.getCmp('buy_cate').getValue()),
                                         tax_type: Ext.htmlEncode(Ext.getCmp('tax_type').getValue()),
-                                        erp_id: Ext.htmlEncode(Ext.getCmp("erp_id").getValue()),
+                                        //erp_id: Ext.htmlEncode(Ext.getCmp("erp_id").getValue()),
                                         conactValues: InsertValues,
                                         cost_percent: Ext.htmlEncode(Ext.getCmp("cost_percent").getValue()),
                                         creditcard_1_percent: Ext.htmlEncode(Ext.getCmp("creditcard_1_percent").getValue()),
@@ -751,11 +760,20 @@ function editFunction(rowID) {
                                                 }
                                             }
                                         } else {
-                                            Ext.Msg.alert(INFORMATION, FAILURE);
+                                            if (result.msg = -1) {
+                                                Ext.Msg.alert(INFORMATION, "ERP_ID出錯，請聯繫IT人員！");
+                                            } else {
+                                                Ext.Msg.alert(INFORMATION, FAILURE);
+                                            }
                                         }
                                     },
                                     failure: function (form, action) {
-                                        Ext.Msg.alert(INFORMATION, FAILURE);
+                                        var result = Ext.decode(action.response.responseText);
+                                        if (result.msg == -1) {
+                                            Ext.Msg.alert(INFORMATION, "ERP_ID出錯，請聯繫IT人員！");
+                                        } else {
+                                            Ext.Msg.alert(INFORMATION, FAILURE);
+                                        }
                                     }
                                 });
                             }
@@ -811,7 +829,7 @@ function editFunction(rowID) {
                                 prod_cate: Ext.htmlEncode(Ext.getCmp('prod_cate').getValue()),
                                 buy_cate: Ext.htmlEncode(Ext.getCmp('buy_cate').getValue()),
                                 tax_type: Ext.htmlEncode(Ext.getCmp('tax_type').getValue()),
-                                erp_id: Ext.htmlEncode(Ext.getCmp("erp_id").getValue()),
+                                //erp_id: Ext.htmlEncode(Ext.getCmp("erp_id").getValue()),
                                 conactValues: InsertValues,
                                 cost_percent: Ext.htmlEncode(Ext.getCmp("cost_percent").getValue()),
                                 creditcard_1_percent: Ext.htmlEncode(Ext.getCmp("creditcard_1_percent").getValue()),
@@ -857,11 +875,20 @@ function editFunction(rowID) {
                                         Ext.getCmp('move-next').hide();
                                     }
                                 } else {
-                                    Ext.Msg.alert(INFORMATION, FAILURE);
+                                    if (result.msg = -1) {
+                                        Ext.Msg.alert(INFORMATION, "ERP_ID出錯，請聯繫IT人員！");
+                                    } else {
+                                        Ext.Msg.alert(INFORMATION, FAILURE);
+                                    }
                                 }
                             },
                             failure: function (form, action) {
-                                Ext.Msg.alert(INFORMATION, FAILURE);
+                                var result = Ext.decode(action.response.responseText);
+                                if (result.msg == -1) {
+                                    Ext.Msg.alert(INFORMATION, "ERP_ID出錯，請聯繫IT人員！");
+                                } else {
+                                    Ext.Msg.alert(INFORMATION, FAILURE);
+                                }
                             }
                         });
                     }
@@ -2013,7 +2040,6 @@ function editFunction(rowID) {
                         width: 110,
                         listeners: {
                             "select": function (combo, record) {
-                                var erp_id = Ext.getCmp("erp_id");
                                 var procate = Ext.getCmp("prod_cate");
                                 var buycate = Ext.getCmp("buy_cate");
                                 var tax_type = Ext.getCmp("tax_type");
@@ -2026,11 +2052,6 @@ function editFunction(rowID) {
                                 }
                                 BuyCateStore.removeAll();
                                 comProd = true;
-                                if (procate.getValue() !== 0 && buycate.getValue() !== 0 && buycate.getValue() !== null && tax_type.getValue() !== 0 && tax_type.getValue() !== null) {
-                                    getErpId(procate.getValue(), buycate.getValue(), tax_type.getValue());
-                                } else {
-                                    Ext.getCmp("erp_id").setValue("");
-                                }
                             }
                         }
                     },
@@ -2060,17 +2081,6 @@ function editFunction(rowID) {
                                     });
                                     comProd = false;
                                 }
-                            },
-                            "select": function (combo, record) {
-                                var erp_id = Ext.getCmp("erp_id");
-                                var prod_cate = Ext.getCmp("prod_cate");
-                                var buy_cate = Ext.getCmp("buy_cate");
-                                var tax_type = Ext.getCmp("tax_type");
-                                if (prod_cate.getValue() !== 0 && buy_cate.getValue() !== 0 && buy_cate.getValue() !== null && tax_type.getValue() !== 0 && tax_type.getValue() !== null) {
-                                    getErpId(prod_cate.getValue(), buy_cate.getValue(), tax_type.getValue());
-                                } else {
-                                    Ext.getCmp("erp_id").setValue("");
-                                }
                             }
                         }
                     },
@@ -2089,20 +2099,7 @@ function editFunction(rowID) {
                         forceSelection: false,
                         allowBlank: rowID ? true : false,
                         width: 120,
-                        margins: '0 5 0 5',
-                        listeners: {
-                            "select": function (combo, record) {
-                                var erp_id = Ext.getCmp("erp_id");
-                                var prod_cate = Ext.getCmp("prod_cate");
-                                var buy_cate = Ext.getCmp("buy_cate");
-                                var tax_type = Ext.getCmp("tax_type");
-                                if (prod_cate.getValue() !== 0 && buy_cate.getValue() !== 0 && buy_cate.getValue() !== null && tax_type.getValue() !== 0) {
-                                    getErpId(prod_cate.getValue(), buy_cate.getValue(), tax_type.getValue());
-                                } else {
-                                    Ext.getCmp("erp_id").setValue("");
-                                }
-                            }
-                        }
+                        margins: '0 5 0 5'
                     }
                 ]
             },
@@ -2113,9 +2110,10 @@ function editFunction(rowID) {
                 readOnly: true,
                 name: 'erp_id',
                 labelWidth: 90,
+                hidden: rowID == null ? true : false
                 //minLength: 9,
                 //maxLength: 9,//erp_id長度限定為9
-                allowBlank: false
+                //allowBlank: false
             },
             {
                 xtype: 'fieldcontainer',
@@ -2200,7 +2198,6 @@ function editFunction(rowID) {
                                params: {
                                    vendor_id: VendorID,
                                    delconnect: delconnect,
-
                                    vendor_code: Ext.htmlEncode(Ext.getCmp("vendor_code").getValue()),
                                    vendor_status: Ext.htmlEncode(Ext.getCmp("vendor_status").getValue().vendor_status),
                                    vendor_email: Ext.htmlEncode(Ext.getCmp("vendor_email").getValue()),
@@ -2218,7 +2215,7 @@ function editFunction(rowID) {
                                    prod_cate: Ext.htmlEncode(Ext.getCmp('prod_cate').getValue()),
                                    buy_cate: Ext.htmlEncode(Ext.getCmp('buy_cate').getValue()),
                                    tax_type: Ext.htmlEncode(Ext.getCmp('tax_type').getValue()),
-                                   erp_id: Ext.htmlEncode(Ext.getCmp("erp_id").getValue()),
+                                   // erp_id: Ext.htmlEncode(Ext.getCmp("erp_id").getValue()),
                                    conactValues: InsertValues,
                                    cost_percent: Ext.htmlEncode(Ext.getCmp("cost_percent").getValue()),
                                    creditcard_1_percent: Ext.htmlEncode(Ext.getCmp("creditcard_1_percent").getValue()),
@@ -2262,11 +2259,21 @@ function editFunction(rowID) {
                                            editWin.close();
                                        }
                                    } else {
-                                       Ext.Msg.alert(INFORMATION, FAILURE);
+                                       if (result.msg == -1) {
+                                           Ext.Msg.alert(INFORMATION, "ERP_ID出錯，請聯繫IT人員！");
+                                       } else {
+                                           Ext.Msg.alert(INFORMATION, FAILURE);
+                                       }
                                    }
                                },
                                failure: function (form, action) {
-                                   Ext.Msg.alert(INFORMATION, FAILURE);
+                                   var result = Ext.decode(action.response.responseText);
+                                   if (result.msg == -1) {
+                                       Ext.Msg.alert(INFORMATION, "ERP_ID出錯，請聯繫IT人員！");
+                                   } else {
+                                       Ext.Msg.alert(INFORMATION, FAILURE);
+                                   }
+
                                }
                            });
                        }
@@ -2590,27 +2597,3 @@ function editFunction(rowID) {
     }
 
 }
-
-function getErpId(prod_cate, buy_cate, tax_type) {
-    Ext.Ajax.request({
-        url: '/Vendor/GetErpId',
-        method: 'post',
-        params: {
-            prod_cate: prod_cate,
-            buy_cate: buy_cate,
-            tax_type: tax_type
-        },
-        success: function (msg) {
-            var resMsg = eval("(" + msg.responseText + ")");
-            if (resMsg.success) {
-                Ext.getCmp("erp_id").setValue(resMsg.data);
-            } else {
-                Ext.Msg.alert(INFORMATION, FAILURE);
-            }
-        },
-        failure: function () {
-            Ext.Msg.alert(INFORMATION, FAILURE);
-        }
-    });
-}
-
