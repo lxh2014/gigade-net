@@ -246,15 +246,15 @@ Ext.onReady(function () {
                                 }
                             }
                             , change: function () {
-                                //var start = Ext.getCmp('item_stock_start');
-                                //var end = Ext.getCmp('item_stock_end');
                                 var start = Ext.getCmp('item_stock_start').getValue();
                                 var end = Ext.getCmp('item_stock_end');
-                                if (start > end.getValue()) {
-                                    start = start;
-                                    // end.setValue(start);
-                                    end.setMinValue(start);
-                                }
+                                //var start = Ext.getCmp('item_stock_start').getValue();
+                                //var end = Ext.getCmp('item_stock_end');
+                                //if (start > end.getValue()) {
+                                //    start = start;
+                                //    // end.setValue(start);
+                                //    end.setMinValue(start);
+                                //}
                                 //if (start.getValue() > end.getValue()  )
                                 //{
                                 //     end.setValue(start.getValue());
@@ -296,17 +296,17 @@ Ext.onReady(function () {
                                 }
                             }
                             , change: function () {
-                                //var start = Ext.getCmp('item_stock_start');
-                                //var end = Ext.getCmp('item_stock_end');
-
                                 var start = Ext.getCmp('item_stock_start').getValue();
                                 var end = Ext.getCmp('item_stock_end');
-                                if (start > end.getValue())
-                                {
-                                    start = start;
-                                    end.setMinValue(start);
-                                    //end.setValue(start);
-                                }
+
+                                //var start = Ext.getCmp('item_stock_start').getValue();
+                                //var end = Ext.getCmp('item_stock_end');
+                                //if (start > end.getValue())
+                                //{
+                                //    start = start;
+                                //    end.setMinValue(start);
+                                //    //end.setValue(start);
+                                //}
                                 //if (start.getValue() > end.getValue())
                                 //{
                                 //     end.setValue(start.getValue());
