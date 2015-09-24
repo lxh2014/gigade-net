@@ -81,9 +81,6 @@ namespace BLL.gigade.Dao
            {
                sql.Append("insert into edm_template (template_name, edit_url, content_url,template_createdate,template_updatedate,template_create_userid,template_update_userid)values ");
                sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}')", query.template_name, query.edit_url, query.content_url, CommonFunction.DateTimeToString(query.template_createdate), CommonFunction.DateTimeToString(query.template_updatedate), query.template_create_userid, query.template_update_userid);
-
-     
-
                return _access.execCommand(sql.ToString());
            }
            catch (Exception ex)
