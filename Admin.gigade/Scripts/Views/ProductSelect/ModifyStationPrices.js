@@ -128,7 +128,7 @@ var c_pro_cost_discount = {
 var c_pro_eventcost = {
     header: EVENT_COST, /*colName: 'cost', hidden: true,*/ dataIndex: 'event_cost', width: 80, align: 'center', sortable: false, menuDisabled: true,
     field: { xtype: 'numberfield', allowBlank: false, minValue: 0, regex: /^[0-9]*$/ }  //edit by zhuoqin0830w  2015/03/25
-    
+
 };
 
 var c_pro_eventcost_discount = {
@@ -241,7 +241,7 @@ site.push(m_pro_event_cost_discount);
 site.push(m_pro_pricetype);
 site.push(m_pro_pricetypeid);
 site.push(m_pro_pricemasterid);
-site.push({name:'prepaid',type:'int'});
+site.push({ name: 'prepaid', type: 'int' });
 
 Ext.define('GIGADE.SITEPRODUCT', {
     extend: 'Ext.data.Model',
@@ -348,7 +348,7 @@ Ext.onReady(function () {
                 this.doLayout();
             },
             afterrender: function () {
-               // Ext.getCmp("site_id").setValue(siteStore.data.items[1].data.Site_Id);
+                // Ext.getCmp("site_id").setValue(siteStore.data.items[1].data.Site_Id);
                 if (priceCondition == 2) {
                     Ext.getCmp('newSitePrice').setDisabled(false); //edit by ww0216w 2014/12/1
                 }
@@ -446,7 +446,7 @@ function CreateForm(priceCondition) {
                                     for (var i = 0, j = n_store.getCount() ; i < j; i++) {
                                         var record = n_store.getAt(i);
                                         //edit by zhuoqin0830w  2015/02/27  更改商品活動成本驗算公式使活動價乘以折扣  增加type屬性判斷是否是折扣
-                                        jsonArr.push({ "product_id": record.data.product_id, "cost": record.get('gigade_cost'), "cost_discount": val,"type": "discount" });
+                                        jsonArr.push({ "product_id": record.data.product_id, "cost": record.get('gigade_cost'), "cost_discount": val, "type": "discount" });
                                     }
                                     //edit by zhuoqin0830w  2015/03/03  更改商品活動成本驗算公式使活動價乘以折扣  增加type屬性判斷是否是折扣
                                     ArithmeticalDiscount(n_store, jsonArr, "product_id", "cost", "cost_discount");//計算折扣
@@ -493,14 +493,14 @@ function CreateForm(priceCondition) {
                                         var cost_discount
                                         if (active_cost_discount == null) { cost_discount = 0; }
                                         else { cost_discount = active_cost_discount; }
-                                        jsonArr.push({ "product_id": record.data.product_id, "price": record.get('gigade_price'), "event_price_discount": val, "event_cost_discount": cost_discount, "event_cost": record.data.event_cost, "event_price": record.data.event_price});
+                                        jsonArr.push({ "product_id": record.data.product_id, "price": record.get('gigade_price'), "event_price_discount": val, "event_cost_discount": cost_discount, "event_cost": record.data.event_cost, "event_price": record.data.event_price });
                                     }
                                     ArithmeticalDiscount(n_store, jsonArr, "product_id", "event_price", "event_price_discount");//計算折扣
                                 }
                             }
                         }
                         //活動成本折數
-                    }, active_cost_discount,{
+                    }, active_cost_discount, {
                         id: 'btn_active_cost_discount',
                         xtype: 'button',
                         margin: '0 5 0 5',
@@ -883,7 +883,7 @@ function Save() {
                     "product_id": record.get("product_id"),//商品ID
                     "user_level": Ext.getCmp('user_level').getValue(),//獲取會員等級
                     "product_name": record.get("product_name"),  //商品名稱
-                    "prod_sz":record.get("prod_sz"),
+                    "prod_sz": record.get("prod_sz"),
                     "event_price": record.get("event_price"), //? record.get("event_price"):0,//活動價
                     "event_cost": record.get("event_cost"), //? record.get("event_cost"):0  ,//活動成本
                     "price_at": record.get("price"),//現售價
@@ -904,7 +904,7 @@ function Save() {
                 priceCondition: priceCondition,
                 chkCost: Ext.getCmp("chkCost").getValue() == true ? 0 : 1
             },
-           // timeout: 360000,
+            // timeout: 360000,
             success: function (form, action) {
                 var result = Ext.decode(form.responseText);
                 myMask.hide();
@@ -922,8 +922,6 @@ function Save() {
             }
         });
     });
-
-
 }
 
 //計算折扣
@@ -946,7 +944,10 @@ function ArithmeticalDiscount(store, jsonArr, key, colVal, type) {
 
 //add by wwei0216w 2014/11/27 根據enter進行確認
 function Enter() {
-    document.body.onkeydown = function () {
+    //回車鍵查詢
+    // edit by zhuoqin0830w  2015/09/22  以兼容火狐瀏覽器
+    document.onkeydown = function (event) {
+        e = event ? event : (window.event ? window.event : null);
         var name = event.target.name
         if (event.keyCode == 13) {
             switch (name) {

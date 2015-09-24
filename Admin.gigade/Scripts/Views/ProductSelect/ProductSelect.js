@@ -85,8 +85,11 @@ var radioCondition = {
 }
 
 Ext.onReady(function () {
-    document.body.onkeydown = function () {
-        if (event.keyCode == 13) {
+    //回車鍵查詢
+    // edit by zhuoqin0830w  2015/09/22  以兼容火狐瀏覽器
+    document.onkeydown = function (event) {
+        e = event ? event : (window.event ? window.event : null);
+        if (e.keyCode == 13) {
             $("#btn_search").click();
         }
     };

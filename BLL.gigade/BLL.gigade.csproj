@@ -1226,7 +1226,9 @@
     <Compile Include="Mgr\Work\RepeatWork\MonthWork\MonthWorkWithDay.cs" />
     <Compile Include="Mgr\Work\RepeatWork\MonthWork\MonthWorkWithWeek.cs" />
     <Compile Include="Mgr\Work\RepeatWork\RepeatWork.cs" />
+    <Compile Include="Mgr\Work\RepeatWork\SpecialWork\SpecialWeekWork.cs" />
     <Compile Include="Mgr\Work\RepeatWork\WeekWork.cs" />
+    <Compile Include="Mgr\Work\SpecialWork.cs" />
     <Compile Include="Mgr\Work\Work.cs" />
     <Compile Include="Mgr\ZipMgr.cs" />
     <Compile Include="Model\Announce.cs" />
