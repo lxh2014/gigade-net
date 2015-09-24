@@ -442,8 +442,7 @@ namespace Admin.gigade.Controllers
             }
             catch (Exception ex)
             {
-                
-                throw;
+                throw new Exception(" EdmListConditionMainMgr-->SetQueryValue " + ex.Message, ex); ;
             }
            
         }
