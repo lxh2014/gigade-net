@@ -67,7 +67,7 @@ Ext.onReady(function () {
              { header: "內容產生網址", dataIndex: "content_url", width: 200, align: 'center' },
              { header: "建立者", dataIndex: "template_create_user", width: 80, align: 'center' },
             { header: "修改者", dataIndex: "template_update_user", width: 80, align: 'center' },
-             { header: "更新時間", dataIndex: "template_updatedate", width: 140, align: 'center' },
+             { header: "更新時間", dataIndex: "template_updatedate", width: 140, align: 'center'},
              {
                  header: "是否啟用", dataIndex: 'enabled', align: 'center', hidden: false,
                  renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {

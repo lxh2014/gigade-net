@@ -8,7 +8,7 @@
         id: 'editFrm',
         frame: true,
         plain: true,
-        defaultType: 'textfield',
+        defaultType: 'textfield', 
         layout: 'anchor',
         labelWidth: 120,
         url: '/WareHouse/InsertIinvd',

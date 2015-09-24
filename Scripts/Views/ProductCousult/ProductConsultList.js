@@ -552,13 +552,14 @@ Ext.onReady(function () {
                         text: RESET,
                         width: 100,
                         height: 25,
-                        margin: "5 0 0 0",
+                        margin: "5 0 0 5",
+                        iconCls: 'ui-icon ui-icon-reset',
                         id: 'btn_reset',
                         listeners: {
                             click: function () {
                                 Ext.getCmp("productName").setValue("");
-                                Ext.getCmp("ddlSel").setValue(1);
-                                Ext.getCmp("huifu").setValue(null);
+                                Ext.getCmp("ddlSel").reset();
+                                Ext.getCmp("huifu").reset();
                                 Ext.getCmp("timestart").setValue("");
                                 Ext.getCmp("timeend").setValue("");
                                 //Ext.getCmp("shopClass").setValue(null);
@@ -613,7 +614,7 @@ Ext.onReady(function () {
                 header: '商品館別', dataIndex: 'prod_classify', width: 5, align: 'center', hidden: true
             },
              {
-                 header: '用戶郵箱', dataIndex: 'user_email', width: 10, align: 'center', hidden: true
+                 header: '用戶郵箱', dataIndex: 'user_email', width: 100, align: 'center', //hidden: true
              },
 
               {

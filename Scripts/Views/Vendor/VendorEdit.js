@@ -270,8 +270,8 @@ function editFunction(rowID) {
             { value: '負責人' },
             { value: '業務窗口' },
             { value: '圖/文窗口' },
-            { value: '出貨負責窗口' },
-            { value: '帳務連絡窗口' },
+            { value: '出貨窗口' },
+            { value: '賬務窗口' },
             { value: '客服窗口' }
         ]
     });
@@ -309,7 +309,7 @@ function editFunction(rowID) {
         clicksToEdit: 1,
         listeners: {
             beforeedit: function (e, eOpts) {
-                if (e.record.data.contact_type === "出貨聯絡窗口") {
+                if (e.record.data.contact_type === "出貨窗口") {
                     if (e.rowIdx === 0 && e.colIdx === 1) {
                         return false;
                     }
@@ -2381,7 +2381,7 @@ function editFunction(rowID) {
         if (ContactStore.getCount() < 5) {
             if (ContactStore.getCount() === 0) {
                 ContactStore.add({
-                    contact_type: '出貨聯絡窗口',
+                    contact_type: '出貨窗口',
                     contact_name: '',
                     contact_phone1: '',
                     contact_phone2: '',
@@ -2534,7 +2534,7 @@ function editFunction(rowID) {
         if (row.data.contact_type_1 !== 0) {
             ContactStore.removeAll();
             ContactStore.add({
-                contact_type: '出貨聯絡窗口',
+                contact_type: '出貨窗口',
                 contact_name: row.data.contact_name_1,
                 contact_phone1: row.data.contact_phone_1_1,
                 contact_phone2: row.data.contact_phone_2_1,

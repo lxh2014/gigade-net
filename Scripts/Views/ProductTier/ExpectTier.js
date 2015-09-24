@@ -11,7 +11,8 @@ var pcStore = Ext.create('Ext.data.Store', {
         //{ "id": "1", "name": "出貨一次" },
         //{ "id": "2", "name": "重複出貨" }]
         { "id": "1", "name": EXECUTE_ONCE },//單次執行
-        { "id": "2", "name": EXECUTE_REPEAT }]// edit by wwei0216w 2015/5/20 重複執行
+        { "id": "2", "name": EXECUTE_REPEAT },
+        { "id": "3", "name": EXECUTE_IRREGULAR }]// edit by wwei0216w 2015/5/20 重複執行
 });
 
 
@@ -23,6 +24,45 @@ var runStore = Ext.create('Ext.data.Store', {
         { "runtype": "2W", "runname": EVERYWEEK },//每週
         { "runtype": "2M", "runname": EVERYMONTH }]//每月
 });
+
+//不規律執行（每週）
+var irregularStore = Ext.create('Ext.data.Store', {
+    fields: ['irregulartype', 'irregularname'],
+    data: [{ "irregulartype": "w", "irregularname": EVERYWEEK }]
+});
+
+
+//不規律執行zhou
+var startWeeksStore = Ext.create('Ext.data.Store', {
+    fields: ['abbr', 'name'],
+    autoDestroy: true,
+    autoLoad: false,
+    data: [
+        { abbr: "1", name: MONDAY },//星期一
+        { abbr: "2", name: TUESDAY },//星期二
+        { abbr: "3", name: WEDNESDAY },//星期三
+        { abbr: "4", name: THURSDAY },//星期四
+        { abbr: "5", name: FRIDAY },//星期五
+        { abbr: "6", name: SATURADY },//星期六
+        { abbr: "7", name: SUNDAY }]//星期日
+});
+
+//不規律執行zhou
+var endWeeksStore = Ext.create('Ext.data.Store', {
+    fields: ['abbr', 'name'],
+    autoDestroy: true,
+    autoLoad: false,
+    data: [
+        { abbr: "1", name: MONDAY },//星期一
+        { abbr: "2", name: TUESDAY },//星期二
+        { abbr: "3", name: WEDNESDAY },//星期三
+        { abbr: "4", name: THURSDAY },//星期四
+        { abbr: "5", name: FRIDAY },//星期五
+        { abbr: "6", name: SATURADY },//星期六
+        { abbr: "7", name: SUNDAY }]//星期日
+});
+
+
 
 //第幾周
 var onweeksStore = Ext.create('Ext.data.Store', {
@@ -104,6 +144,118 @@ var gxGrid = Ext.create('Ext.grid.Panel', {
         }]
 });
 
+Ext.define('GIGADE.irregularTier', {
+    extend: 'Ext.data.Model',
+    fields: [
+                { name: 'schedule_id', type: 'int' },
+                { name: 'schedule_name', type: 'string' },
+                { name: 'type', type: 'int' },
+                { name: 'week_day', type: 'string' },
+                { name: 'repeat_count', type: 'int' },
+                { name: 'duration_start', type: 'string' },
+                { name: 'desc', type: 'string' }]
+
+});
+
+var irregulartimeStore = Ext.create('Ext.data.Store', {
+    model: 'GIGADE.irregularTier',
+    //pageSize: pageSize,
+    proxy: {
+        type: 'ajax',
+        url: '/ProductTier/GetTiers',
+        actionMethods: 'post',
+        reader: {
+            type: 'json',
+            root: 'item',
+            totalProperty: 'totalCount'
+        }
+    }
+});
+
+irregularGrid = Ext.create('Ext.grid.Panel', {
+    plugins: [{ ptype: 'cellediting' }],
+    //title: '不規則排程設置',
+    store: irregulartimeStore,
+    margin: '',
+    id: ' irregularGrid',
+    width: 450,
+    height: 150,
+    columns: [
+        { xtype: 'rownumberer', width: 25, align: 'center' },
+        {
+            text: '', menuDisabled: true, width: 40, align: 'center', xtype: 'actioncolumn',
+            icon: '../../../Content/img/icons/cross.gif',
+            handler: function (grid, rowIndex, colIndex) {
+                irregularStore.removeAt(rowIndex);
+            }
+        }, {
+            text: '星期(開始)', dataIndex: 'week_day_start', width: 86, align: 'right', menuDisabled: true, sortable: false,
+            editor: {
+                xtype: 'combobox',
+                queryMode: 'local',
+                editable: false,
+                store: startWeeksStore,
+                displayField: 'name',
+                valueField: 'abbr',
+                //listeners: {
+                //    'select': function (combo, records, eOpts) {
+                //        var row = irregularGrid.getSelectionModel().getSelection();
+                //        var row2 = records;
+                //    }
+                //    //'change':function (newValue, oldValue, eOpts){
+                //    //    var a = newValue;
+                //    //    var b = oldValue;
+                //    //    var c = eOpts;
+                //    //}
+                    
+                //}
+            }
+        }, {
+            text: '幾點(開始)', dataIndex: 'startHour', width: 56, align: 'left', menuDisabled: true, sortable: false,
+            editor: {
+                xtype: 'numberfield',
+                allowBlank: false,
+                value:0,
+                minValue: 0
+            }
+        }, {
+            text: '星期(結束)', dataIndex: 'week_day_end', width: 86, align: 'right', menuDisabled: true, sortable: false,
+            editor: {
+                xtype: 'combobox',
+                id: 'week_day_end',
+                queryMode: 'local',
+                displayField: 'name',
+                valueField: 'abbr',
+                store: endWeeksStore,
+                editable: false,
+                allowBlank: false
+
+            }
+        }, {
+            text: '幾點(結束)', dataIndex: 'endHour', width: 56, align: 'left', menuDisabled: true, sortable: false,
+            editor: {
+                xtype: 'numberfield',
+                allowBlank: false,
+                value: 0,
+                minValue: 0
+            }
+        }, {
+            text: '執行時間(天后)', dataIndex: 'executeDays', width: 90, flex: 1, align: 'center', menuDisabled: true, sortable: false,
+            editor: {
+                xtype: 'numberfield',
+                allowBlank: false,
+                minValue: 0
+            }
+        }],
+    tbar: [{
+        text: '新增', handler: function () {
+            irregularGrid.getStore().add({});
+        }
+    }]
+});
+
+
+
 
 var pcFrm = Ext.create('Ext.form.Panel', {
     id: 'pcFrm',
@@ -129,17 +281,28 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                 change: function (chose) {
                     Ext.getCmp('mst').setText("");
                     Ext.getCmp('ms').setText("");
-                    if (Ext.getCmp('pc_type').getValue() == 2) {
-                        Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
-                        Ext.getCmp('pcFrm').down('#pl').setDisabled(false);
-                        //Ext.getCmp('pcFrm').down('#mtpl').setDisabled(false);
-                        Ext.getCmp('pcFrm').down('#cxsj').setDisabled(false);
-                    } else {
-                        Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
-                        //Ext.getCmp('pcFrm').down('#mtpl').setDisabled(true);
-                        Ext.getCmp('pcFrm').down('#cxsj').setDisabled(true);
-                        Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(false);
+                    switch (Ext.getCmp('pc_type').getValue()) {
+
+                        case '1':
+                            Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
+                            Ext.getCmp('pcFrm').down('#cxsj').setDisabled(true);
+                            Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(false);
+                            Ext.getCmp('pcFrm').down('#bglzx').setDisabled(true);
+                            break;
+                        case '2':
+                            Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
+                            Ext.getCmp('pcFrm').down('#pl').setDisabled(false);
+                            Ext.getCmp('pcFrm').down('#cxsj').setDisabled(false);
+                            Ext.getCmp('pcFrm').down('#bglzx').setDisabled(true);
+                            break;
+                        case '3':
+                            Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
+                            Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
+                            Ext.getCmp('pcFrm').down('#cxsj').setDisabled(true);
+                            Ext.getCmp('pcFrm').down('#bglzx').setDisabled(false);
+                            break;
                     }
+
                 }
             }
         }, {
@@ -843,6 +1006,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                id: 'cs_time',
                listeners: {
                    change: function () {
+                       Ext.getCmp("ce_time").setMinValue(this.getValue());
                        if (Ext.getCmp('noendtime').checked) {
                            messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
                            Ext.getCmp('mst').setText(messagestime);
@@ -863,6 +1027,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                id: 'ce_time',
                listeners: {
                    change: function () {
+                       Ext.getCmp("cs_time").setMaxValue(this.getValue());
                        if (Ext.getCmp('noendtime').checked) {
                            messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + '。';
                            Ext.getCmp('mst').setText(messagestime);
@@ -883,6 +1048,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                    change: function (chack) {
                        if (chack.checked) {
                            Ext.getCmp('ce_time').setDisabled(true);
+                           Ext.getCmp("ce_time").setValue('');
                            messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
                            Ext.getCmp('mst').setText(messagestime);
                        } else {
@@ -893,6 +1059,29 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                    }
                }
            }]
+       }, {
+           xtype: 'fieldset',
+           title: '不規律執行',//不規律執行
+           id: 'bglzx',
+           layout: 'column',
+           padding: '10 10 10 10',
+           disabled: true,
+           items: [{
+               xtype: 'combobox',
+               fieldLabel: '執行于',//執行于(每週)
+               allowBlank: false,
+               id: 'irregularwhen',
+               displayField: 'irregularname',
+               valueField: 'irregulartype',
+               labelWidth: 54,
+               width: 150,
+               margin: '10 10 15 10',
+               editable: false,
+               value: 'w',
+               store: irregularStore
+           },
+           irregularGrid
+           ]
        }, {
            xtype: 'container',
            layout: 'column',
@@ -920,28 +1109,32 @@ var pcFrm = Ext.create('Ext.form.Panel', {
         //formBind: true,
         //disabled: true,
         handler: function () {
-            var form = this.up('form').getForm();
-            if (form.isValid()) {
-                form.submit({
-                    params: getParams(),
-                    success: function (form, action) {
-                        var result = Ext.decode(action.response.responseText);
-                        if (result.success) {
-                            addPc.hide();
-                            tierStore.load();
-                            Ext.Msg.alert(INFORMATION, SAVE_SUCCESS);
+            var parames = getParams();
+            if (parames.error) {
+                Ext.Msg.alert(INFORMATION, parames.msg);
+            }
+            else {
+                var form = this.up('form').getForm();
+                if (form.isValid()) {
+                    form.submit({
+                        params: parames,
+                        success: function (form, action) {
+                            var result = Ext.decode(action.response.responseText);
+                            if (result.success) {
+                                addPc.hide();
+                                tierStore.load();
+                                Ext.Msg.alert(INFORMATION, SAVE_SUCCESS);
+                            }
+                        },
+                        failure: function () {
+                            Ext.Msg.alert(INFORMATION, FAILURE);
                         }
-                    },
-                    failure: function () {
-                        Ext.Msg.alert(INFORMATION, FAILURE);
-                    }
-                });
+                    });
+                }
             }
         }
     }]
 });
-
-
 
 var addPc = Ext.create('Ext.window.Window', {
     title: SCHEDULE_CONFIG,//排成設定
@@ -1030,6 +1223,13 @@ function Tier_Load(record) {
             Ext.getCmp('pc_type').setValue(1)
             Ext.getCmp('datatime').setRawValue(record.data.duration_start);
             break;
+
+
+        case 3:
+            //irregulartimeStore.load();
+            irregulartimeStoreLoad(record);
+            break;
+
     }
 
     var desces = record.data.desc.split("。");
@@ -1042,11 +1242,38 @@ function Tier_Load(record) {
     Ext.getCmp('ms').setText(ms);
     Ext.getCmp('mst').setText(mst);
 
+
+}
+
+///特殊排程值設置
+function irregulartimeStoreLoad(record) {
+    irregulartimeStore.removeAll();
+    if (record.data.type == 3){
+        Ext.getCmp('pc_type').setValue(record.data.type);
+    }
+
+    var dateValue = record.data.desc.split(',');
+    var weekValue = record.data.week_day.split(',');
+    for (var i = 0; i < weekValue.length; i++) {
+        var temp = i / 2;
+        if (i % 2 == 0) {
+            //var temp = i;
+            irregulartimeStore.add({
+                week_day_start: parseInt((weekValue[i] / 24), 10)+1,
+                startHour: parseInt((weekValue[i] % 24), 10),
+                week_day_end: parseInt((weekValue[i + 1] / 24), 10) + 1,
+                endHour: parseInt((weekValue[i + 1] % 24), 10),
+                executeDays: dateValue[temp]
+            });
+        }
+    }
 }
 
 
 function getParams() {
     var params = new Object();
+    params.error = false;
+    params.msg = "";
     var pc_type = params['type'] = Ext.getCmp('pc_type').getValue();
     if (Ext.getCmp('schedule_id_win').getValue() != "") {
         params.schedule_id = Ext.getCmp('schedule_id_win').getValue();
@@ -1086,26 +1313,7 @@ function getParams() {
                     }
                     break;
             }
-            //var zxycradio = Ext.getCmp('zxycradio');
-            //if (zxycradio.checked) {
-            //    params.day_type = 1;
-            //    params.start_time = Ext.String.format('{0}:{1}:{2}',
-            //        Ext.getCmp('ro_hou').getValue(),
-            //        Ext.getCmp('ro_min').getValue(),
-            //        Ext.getCmp('ro_sen').getValue());
-            //} else {
-            //    params.day_type = 2;
-            //    params.repeat_hours = Ext.getCmp('cfnh').getValue();
-            //    params.time_type = Ext.getCmp('cfhms').getValue();
-            //    params.start_time = Ext.String.format('{0}:{1}:{2}',
-            //        Ext.getCmp('s_hour').getValue(),
-            //        Ext.getCmp('s_min').getValue(),
-            //        Ext.getCmp('s_sen').getValue());
-            //    params.end_time = Ext.String.format('{0}:{1}:{2}',
-            //        Ext.getCmp('e_hour').getValue(),
-            //        Ext.getCmp('e_min').getValue(),
-            //        Ext.getCmp('e_sen').getValue());
-            //}
+
             params.duration_start = Ext.getCmp('cs_time').getValue();
 
             if (!Ext.getCmp('noendtime').checked) {
@@ -1114,6 +1322,39 @@ function getParams() {
             break;
         case '1':
             params.duration_start = Ext.getCmp('datatime').getValue();
+            break;
+
+        case '3':
+            //Ext.each(irregulartimeStore.data.items, function () {
+            //    irregulartimeStore.push(this.data);
+            //});
+            //var data = irregulartimeStore;
+            params.week_day = "";
+            params.desc = "";
+            var source = irregulartimeStore.data;///獲得不規則排程的store
+            //var beginDay = source.items[0].data.week_day_start;///獲得頭數據的開始天數
+            //beginDay = (beginDay - 1) * 24 + source.items[0].data.startHour///獲得頭數據的小時數
+            for (var i = 0; i < source.items.length; i++)
+            {
+
+                params.week_day += (source.items[i].data.week_day_start - 1) * 24 + source.items[i].data.startHour + ",";
+                if (i > 0)
+                {
+                    var tempStart = (source.items[i].data.week_day_start - 1) * 24 + source.items[i].data.startHour;
+                    var lastTempEnd = (source.items[i - 1].data.week_day_end - 1) * 24 + source.items[i - 1].data.endHour;
+                    if (tempStart < lastTempEnd)
+                    {
+                        params.error = true;
+                        params.msg = "第" + i + "行開始時間必須大於上一行結束時間";
+                        break;
+                    }
+                }
+                params.week_day += (source.items[i].data.week_day_end - 1) * 24 + source.items[i].data.endHour + ",";
+                params.desc += source.items[i].data.executeDays + ",";
+            }
+            //params.week_day = beginDay + "," + params.week_day;
+            params.week_day = params.week_day.substring(0, params.week_day.length - 1);
+            params.desc = params.desc.substring(0, params.desc.length - 1);
             break;
     }
 
