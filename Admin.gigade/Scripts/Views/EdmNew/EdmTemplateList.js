@@ -4,7 +4,7 @@
  * CreateTime :2015/9/22
  * 電子報範本
  */
-var pageSize = 25;
+var pageSize = 23;
 
 //列表頁的model
 Ext.define('gridlistET', {
@@ -58,13 +58,14 @@ Ext.onReady(function () {
         frame: true,
         flex: 9.4,
         columns: [
+            new Ext.grid.RowNumberer(),//自動顯示行號
              { header: "編號", dataIndex: "template_id", align: 'center' },
-            { header: "範本名稱", dataIndex: "template_name", width: 300, align: 'center' },
+            { header: "範本名稱", dataIndex: "template_name", width: 200, align: 'center' },
             { header: "內容編輯網址", dataIndex: "edit_url", width: 200, align: 'center' },
              { header: "內容產生網址", dataIndex: "content_url", width: 200, align: 'center' },
-             { header: "建立者", dataIndex: "template_create_userid", width: 300, align: 'center' },
-            { header: "修改者", dataIndex: "template_update_userid", width: 200, align: 'center' },
-             { header: "更新時間", dataIndex: "template_updatedate", width: 200, align: 'center' },
+             { header: "建立者", dataIndex: "template_create_userid", width: 80, align: 'center' },
+            { header: "修改者", dataIndex: "template_update_userid", width: 80, align: 'center' },
+             { header: "更新時間", dataIndex: "template_updatedate", width: 140, align: 'center' },
              {
                  header: "是否啟用", dataIndex: 'enabled', align: 'center', hidden: false,
                  renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {

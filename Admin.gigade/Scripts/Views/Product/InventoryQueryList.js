@@ -4,7 +4,7 @@
  * CreateTime :2015/9/9
  * 商品庫存查詢
  */
-var pageSize = 23;
+var pageSize = 20;
 
 
 // 列表頁的model
@@ -251,8 +251,9 @@ Ext.onReady(function () {
                                 var start = Ext.getCmp('item_stock_start').getValue();
                                 var end = Ext.getCmp('item_stock_end');
                                 if (start > end.getValue()) {
-                                    end.setValue(start);
-
+                                    start = start;
+                                    // end.setValue(start);
+                                    end.setMinValue(start);
                                 }
                                 //if (start.getValue() > end.getValue()  )
                                 //{
@@ -302,7 +303,9 @@ Ext.onReady(function () {
                                 var end = Ext.getCmp('item_stock_end');
                                 if (start > end.getValue())
                                 {
+                                    start = start;
                                     end.setMinValue(start);
+                                    //end.setValue(start);
                                 }
                                 //if (start.getValue() > end.getValue())
                                 //{

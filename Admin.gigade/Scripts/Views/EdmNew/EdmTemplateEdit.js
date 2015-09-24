@@ -21,17 +21,24 @@
                  fieldLabel: '範本名稱',
                  id: 'template_name',
                  name: 'template_name',
+                 allowBlank: false
              }, {
                  xtype: 'textfield',
                  fieldLabel: '內容編輯網址',
                  id: 'edit_url',
                  name: 'edit_url',
+                 allowBlank: false,
+                 submitValue: true,
+                 vtype: 'url',
                  
              }, {
                  xtype: 'textfield',
                  fieldLabel: '內容產生網址',
                  id: 'content_url',
                  name: 'content_url',
+                 allowBlank: false,
+                 submitValue: true,
+                 vtype: 'url',
              }, {
                  xtype: 'displayfield',
                  fieldLabel: '建立日期',

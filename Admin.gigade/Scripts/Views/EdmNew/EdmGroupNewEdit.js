@@ -21,6 +21,7 @@
                 fieldLabel: '群組名稱',
                 id: 'group_name',
                 name: 'group_name',
+                allowBlank: false
             }, {
                 xtype: 'fieldcontainer',
                 combineErrors: true,
@@ -47,17 +48,22 @@
                 fieldLabel: '試閱',
                 id: 'trial_url',
                 name: 'trial_url',
+                allowBlank: false,
+                submitValue: true,
+                vtype: 'url',
             }, {
                 xtype: 'numberfield',
                 fieldLabel: '排序',
                 id: 'sort_order',
                 name: 'sort_order',
-                minValue:0,
+                minValue: 0,
+                allowBlank: false
             }, {
                 xtype: 'textareafield',
                 fieldLabel: '電子報類型描述',
                 id: 'description',
                 name: 'description',
+                allowBlank: false
             },
         ],
         buttons: [
