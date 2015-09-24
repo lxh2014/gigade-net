@@ -31,7 +31,7 @@
                     fieldLabel: '會員電子報',
                     xtype: 'radiogroup',
                     id: 'is_member_edm',
-                    labelWidth:95,
+                    labelWidth:100,
                     width: 260,
                     defaults: {
                         name: 'ignore_stockVal'
