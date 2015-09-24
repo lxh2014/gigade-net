@@ -11,9 +11,10 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Configuration;
-using System.Data;
-
-namespace Admin.gigade.Controllers
+using System.Net;
+using System.IO;
+using System.Text;
+using System.Data;namespace Admin.gigade.Controllers
 {
     public class EdmNewController : Controller
     {
@@ -23,8 +24,11 @@ namespace Admin.gigade.Controllers
         private static EdmContentNewMgr _edmContentNewMgr;
         public EdmGroupNewMgr edmgroupmgr;
         public EdmTemplateMgr edmtemplatemgr;        //
-        public EmailBlockListMgr _emailBlockListMgr;
-        // GET: /EdmNew/
+        public EmailBlockListMgr _emailBlockListMgr;        HttpWebRequest httpReq;
+        HttpWebResponse httpResp;
+        string strBuff = "";
+        char[] cbuffer = new char[256];
+        int byteRead = 0;        // GET: /EdmNew/
         #region view
         //電子報類型
         public ActionResult Index()
@@ -325,7 +329,7 @@ namespace Admin.gigade.Controllers
         #region 電子報列表
         public HttpResponseBase GetECNList()
         {
-            string json = string.Empty;//
+            string json = string.Empty;
 
             try
             {
@@ -491,6 +495,61 @@ namespace Admin.gigade.Controllers
         }
 
         
+        #endregion
+
+        #region edit_url
+        public HttpResponseBase GetEditUrlData()
+        {
+            string json = string.Empty;
+            try
+            {
+                #region 獲取edit_url
+                string url = "http://net2005/DocSys/DocLogin/MainMenu.aspx";
+                Uri httpURL = new Uri(url);
+                //HttpWebRequest类继承于WebRequest，并没有自己的构造函数，需通过WebRequest的Creat方法 建立，并进行强制的类型转换
+                httpReq = (HttpWebRequest)WebRequest.Create(httpURL);
+                //通过HttpWebRequest的GetResponse()方法建立HttpWebResponse,强制类型转换
+
+                httpResp = (HttpWebResponse)httpReq.GetResponse();
+                //GetResponseStream()方法获取HTTP响应的数据流,并尝试取得URL中所指定的网页内容
+                //若成功取得网页的内容，则以System.IO.Stream形式返回，若失败则产生ProtoclViolationException错 误。在此正确的做法应将以下的代码放到一个try块中处理。这里简单处理
+                Stream respStream = httpResp.GetResponseStream();
+                //返回的内容是Stream形式的，所以可以利用StreamReader类获取GetResponseStream的内容，并以
+
+                //StreamReader类的Read方法依次读取网页源程序代码每一行的内容，直至行尾（读取的编码格式：UTF8）
+                StreamReader respStreamReader = new StreamReader(respStream, Encoding.UTF8);
+                byteRead = respStreamReader.Read(cbuffer, 0, 256);
+                while (byteRead != 0)
+                {
+                    string strResp = new string(cbuffer, 0, byteRead);
+                    strBuff = strBuff + strResp;
+                    byteRead = respStreamReader.Read(cbuffer, 0, 256);
+                }
+                respStream.Close();
+                json = strBuff;
+                #endregion
+                #region 獲取content_url
+
+                #endregion
+                #region 將content_url中的佔位符替換為edit_url中的內容
+
+                #endregion
+
+
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
         #endregion
 
         #endregion

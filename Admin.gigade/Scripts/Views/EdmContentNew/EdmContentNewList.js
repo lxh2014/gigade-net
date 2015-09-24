@@ -87,7 +87,7 @@ Ext.onReady(function () {
         tbar: [
         { xtype: 'button', text:'新增', id: 'add', hidden: false, iconCls: 'icon-user-add',   handler: onAddClick },
         { xtype: 'button', text: '編輯', id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
-        { xtype: 'button', text: "前往發送", id: 'goSend', hidden: false,disabled: true },
+        { xtype: 'button', text: "前往發送", id: 'goSend', hidden: false,disabled: true,handler: onGoSendClick  },
         { xtype: 'button', text: "報表", id: 'report', hidden: false, disabled: true, },
  
         ],
@@ -140,7 +140,16 @@ onEditClick = function () {
         editFunction(row[0], EdmContentNewStore);
     }
 }
-
+onGoSendClick = function () {
+    var row = Ext.getCmp("EdmContentNew").getSelectionModel().getSelection();
+    if (row.length == 0) {
+        Ext.Msg.alert("提示信息", "沒有選擇一行");
+    } else if (row.length > 1) {
+        Ext.Msg.alert("提示信息", "只能選擇一行");
+    } else if (row.length == 1) {
+        sendFunction(row[0], EdmContentNewStore);
+    }
+}
 onStatusClick = function () {
     var row = Ext.getCmp("EdmContentNew").getSelectionModel().getSelection();
     statusFunction(row[0], EdmContentNewStore);
