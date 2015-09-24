@@ -51,7 +51,13 @@ namespace BLL.gigade.Mgr
                         query.sa_pages_session = Convert.ToSingle(_dt.Rows[i][4].ToString().Replace(',', ' ').Replace(" ", ""));
                         if (float.TryParse(_dt.Rows[i][5].ToString(), out number))
                         {
-                            query.sa_bounce_rate = Convert.ToSingle(_dt.Rows[i][5].ToString());
+                            if (number < 1)
+                            {
+                                query.sa_bounce_rate = Convert.ToSingle(_dt.Rows[i][5].ToString());
+                            }
+                            else {
+                                return json = "{success:'false'}"; 
+                            }
                         }
                         if (float.TryParse(_dt.Rows[i][6].ToString(), out number))
                         {

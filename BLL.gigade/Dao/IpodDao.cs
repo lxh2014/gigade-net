@@ -65,6 +65,86 @@ namespace BLL.gigade.Dao
 
         }
 
+        /// <summary>
+        /// 不符採購單單身列表頁
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="totalcount"></param>
+        /// <returns></returns>
+        public List<IpodQuery> GetIpodListNo(IpodQuery query, out int totalcount)
+        {
+            query.Replace4MySQL();
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sqlJoin = new StringBuilder();
+            StringBuilder sqlCondi = new StringBuilder();
+            StringBuilder sqlWhr = new StringBuilder();
+            try
+            {
+                sql.Append("SELECT ip.po_id,p.parameterName,pi.erp_id,pt.product_name,CONCAT(ps.spec_name,'-',ps2.spec_name) as spec,ip.qty_ord,ip.qty_claimed,qty_damaged,v.vendor_name_full,v.vendor_id,");
+                sql.Append("pt.product_id as productid,pi.item_id,mu.user_username as create_username,mu1.user_username as change_username,ip.create_dtim,ip.change_dtim   FROM ipod ip ");
+                sqlJoin.Append("LEFT JOIN ipo i ON ip.po_id=i.po_id ");
+                sqlJoin.Append("LEFT JOIN (select parameterCode,parameterName from t_parametersrc where parameterType='po_type') p ON i.po_type=p.parameterCode ");
+                sqlJoin.Append("LEFT JOIN product_item pi ON ip.prod_id=pi.item_id ");
+                sqlJoin.Append("LEFT JOIN product pt ON pi.product_id=pt.product_id ");
+                sqlJoin.Append("LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id ");
+                sqlJoin.Append("LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id  ");
+                sqlJoin.Append("LEFT JOIN vendor v ON i.vend_id=v.erp_id ");
+                sqlJoin.AppendFormat("LEFT JOIN manage_user mu on mu.user_id=ip.create_user ");
+                sqlJoin.Append("left join manage_user mu1 on mu1.user_id=ip.change_user where 1=1 ");
+
+                if (!string.IsNullOrEmpty(query.po_type))
+                {
+                    sqlWhr.AppendFormat(" and i.po_type='{0}' ", query.po_type);
+                }
+                if (!string.IsNullOrEmpty(query.Erp_Id))
+                {
+                    sqlWhr.AppendFormat(" and pi.erp_id='{0}' ", query.Erp_Id);
+                }
+                if (query.vendor_id!=0)
+                {
+                    sqlWhr.AppendFormat(" and v.vendor_id={0} ", query.vendor_id);
+                }
+                if (!string.IsNullOrEmpty(query.vendor_name_full))
+                {
+                    sqlWhr.AppendFormat(" and v.vendor_name_full like'%{0}%'ESCAPE '/' ", query.vendor_name_full);
+                }
+                if (query.Check)
+                {
+                    sqlWhr.AppendFormat(" and(qty_ord<>qty_claimed) ", query.po_id);
+                }
+                if (!string.IsNullOrEmpty(query.product_name))
+                {
+                    sqlWhr.AppendFormat(" and pt.product_name like'%{0}%'ESCAPE '/' ", query.product_name);
+                }
+                if (query.product_id != 0)
+                {
+                    sqlWhr.AppendFormat(" and pt.product_id={0} ", query.product_id);
+                }
+                if(query.start_time!=DateTime.MinValue &&query.end_time!=DateTime.MinValue)
+                {
+                    sqlWhr.AppendFormat(" and ip.create_dtim between '{0}'and'{1}'",Common.CommonFunction.DateTimeToString(query.start_time),Common.CommonFunction.DateTimeToString(query.end_time));
+                }
+                totalcount = 0;
+                sqlWhr.Append(" GROUP BY ip.row_id order by ip.row_id desc ");
+                if (query.IsPage)
+                {
+                    DataTable _dt = _access.getDataTable("SELECT count(row_id) FROM (select ip.row_id FROM ipod ip " + sqlJoin.ToString() + sqlWhr.ToString() + ") temp");
+                    if (_dt.Rows.Count > 0)
+                    {
+                        totalcount = int.Parse(_dt.Rows[0][0].ToString());
+                    }
+                    sqlWhr.AppendFormat(" limit {0},{1} ", query.Start, query.Limit);
+                }
+                sql.Append(sqlJoin).Append(sqlWhr);
+                
+                return _access.getDataTableForObj<IpodQuery>(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IpodDao.GetIpodListNo-->" + ex.Message + sql.ToString(), ex);
+            }
+
+        }
         public List<IpodQuery> GetIpodListExprot(IpodQuery query)
         {
             query.Replace4MySQL();

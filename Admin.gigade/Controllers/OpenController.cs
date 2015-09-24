@@ -112,80 +112,80 @@ namespace Admin.gigade.Controllers
         }
 
 
-        public ActionResult ArriveTime(uint itemId,string dateTime)
-        {
-            //add by wwei0216w 2015/5/25
-            int days = 0;
-            int Deliver_Days = 0;
-            int isSuccess = 1;
-            bool isSchedule = true;
-            DateTime implementTime = DateTime.Now;
-            DateTime date = DateTime.MinValue;
-            string msg = "";
-            DateTime dtTime = DateTime.Now;
-            if (!string.IsNullOrEmpty(dateTime))
-            {
-                if (!DateTime.TryParse(dateTime, out dtTime))
-                {
-                    isSuccess = 0;
-                    msg = "Time Exception!";
-                    return Json(new { data = date.ToString("yyyy-MM-dd"), success = isSuccess, errMsg = msg, des = "貨物運達時間", execTime = implementTime.ToString("yyyy/MM/dd"), elapsed = 0 }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            try
-            {
-                _srMgr = new ScheduleRelationMgr(connectionString);
-                ProductItemCustom pi = new ProductItemCustom();
-                IProductItemImplMgr _productItemMgr = new ProductItemMgr(connectionString);
-                IOrderDetailImplMgr _orderDetailMgr = new OrderDetailMgr(connectionString);
-                IProductImplMgr _pMgr = new ProductMgr(connectionString);
-                pi = _productItemMgr.GetProductArriveDay(new ProductItem { Item_Id = itemId},"item");
-                Deliver_Days = _pMgr.GetDefaultArriveDays(new Product { Product_Id = pi.Product_Id });///獲取出貨時間
+        //public ActionResult ArriveTime(uint itemId,string dateTime)
+        //{
+        //    //add by wwei0216w 2015/5/25
+        //    int days = 0;
+        //    int Deliver_Days = 0;
+        //    int isSuccess = 1;
+        //    bool isSchedule = true;
+        //    DateTime implementTime = DateTime.Now;
+        //    DateTime date = DateTime.MinValue;
+        //    string msg = "";
+        //    DateTime dtTime = DateTime.Now;
+        //    if (!string.IsNullOrEmpty(dateTime))
+        //    {
+        //        if (!DateTime.TryParse(dateTime, out dtTime))
+        //        {
+        //            isSuccess = 0;
+        //            msg = "Time Exception!";
+        //            return Json(new { data = date.ToString("yyyy-MM-dd"), success = isSuccess, errMsg = msg, des = "貨物運達時間", execTime = implementTime.ToString("yyyy/MM/dd"), elapsed = 0 }, JsonRequestBehavior.AllowGet);
+        //        }
+        //    }
+        //    try
+        //    {
+        //        _srMgr = new ScheduleRelationMgr(connectionString);
+        //        ProductItemCustom pi = new ProductItemCustom();
+        //        IProductItemImplMgr _productItemMgr = new ProductItemMgr(connectionString);
+        //        IOrderDetailImplMgr _orderDetailMgr = new OrderDetailMgr(connectionString);
+        //        IProductImplMgr _pMgr = new ProductMgr(connectionString);
+        //        pi = _productItemMgr.GetProductArriveDay(new ProductItem { Item_Id = itemId},"item");
+        //        Deliver_Days = _pMgr.GetDefaultArriveDays(new Product { Product_Id = pi.Product_Id });///獲取出貨時間
 
-                if(pi==null || pi.Product_Id==0)
-                {
-                    isSuccess = 0;
-                    msg = "不存在該itemId";
-                    return Json(new { data = date.ToString("yyyy-MM-dd"), success = isSuccess, errMsg = msg, des = "貨物運達時間", execTime = implementTime.ToString("yyyy/MM/dd"), elapsed = 0 }, JsonRequestBehavior.AllowGet);
-                }
-                days = pi.Arrive_Days + Deliver_Days ;///計算運達天數
-                date = _srMgr.GetRecentlyTime(Convert.ToInt32(pi.Product_Id), "product");///調用GetRecentlyTime()方法 獲得最近出貨時間
-                DateTime payDay = dtTime == null ? implementTime : (DateTime)dtTime;///將時間賦值
-                //edit by wwei0216w 2015/6/2 添加item_stock > 0 的判斷,如果 item_stock > 0 則不適用排程的時間,啟用當前時間作為基礎時間
+        //        if(pi==null || pi.Product_Id==0)
+        //        {
+        //            isSuccess = 0;
+        //            msg = "不存在該itemId";
+        //            return Json(new { data = date.ToString("yyyy-MM-dd"), success = isSuccess, errMsg = msg, des = "貨物運達時間", execTime = implementTime.ToString("yyyy/MM/dd"), elapsed = 0 }, JsonRequestBehavior.AllowGet);
+        //        }
+        //        days = pi.Arrive_Days + Deliver_Days ;///計算運達天數
+        //        date = _srMgr.GetRecentlyTime(Convert.ToInt32(pi.Product_Id), "product");///調用GetRecentlyTime()方法 獲得最近出貨時間
+        //        DateTime payDay = dtTime == null ? implementTime : (DateTime)dtTime;///將時間賦值
+        //        //edit by wwei0216w 2015/6/2 添加item_stock > 0 的判斷,如果 item_stock > 0 則不適用排程的時間,啟用當前時間作為基礎時間
 
-                long tsDate = CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss")) - (CommonFunction.GetPHPTime(date.ToString("yyyy/MM/dd hh:mm:ss"))+10800);
-                ///獲得的最近出貨時間默認為12:00 加上10800 代碼再加3小時 代表 15：00 作為一天是否有效的標準判斷
-                if (date == DateTime.MinValue || date == null || tsDate > 0)///如果得到的最近出貨天數  為最小時間   或者   小于當前時間
-                {
-                    isSchedule = false;
-                    date = payDay;///則按下單時間開始計算到貨日期
-                }
+        //        long tsDate = CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss")) - (CommonFunction.GetPHPTime(date.ToString("yyyy/MM/dd hh:mm:ss"))+10800);
+        //        ///獲得的最近出貨時間默認為12:00 加上10800 代碼再加3小時 代表 15：00 作為一天是否有效的標準判斷
+        //        if (date == DateTime.MinValue || date == null || tsDate > 0)///如果得到的最近出貨天數  為最小時間   或者   小于當前時間
+        //        {
+        //            isSchedule = false;
+        //            date = payDay;///則按下單時間開始計算到貨日期
+        //        }
 
 
-                date = restDay(date, payDay, days,isSchedule);///計算具體到貨日期
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                isSuccess = 0;
-                msg = ex.Message;
-            }
-            DateTime functionEndTime = DateTime.Now;
-            TimeSpan ts = functionEndTime - implementTime;//獲得方法開始和結束的時間
-            double second = ts.TotalMilliseconds;//方法執行的時間
-            return Json(new { data = date.ToString("yyyy/MM/dd"), success = isSuccess, errMsg = msg, des = "貨物運達時間", execTime = implementTime.ToString("yyyy/MM/dd"), elapsed = second }, JsonRequestBehavior.AllowGet);
-        }
+        //        date = restDay(date, payDay, days,isSchedule);///計算具體到貨日期
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+        //        logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+        //        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+        //        log.Error(logMessage);
+        //        isSuccess = 0;
+        //        msg = ex.Message;
+        //    }
+        //    DateTime functionEndTime = DateTime.Now;
+        //    TimeSpan ts = functionEndTime - implementTime;//獲得方法開始和結束的時間
+        //    double second = ts.TotalMilliseconds;//方法執行的時間
+        //    return Json(new { data = date.ToString("yyyy/MM/dd"), success = isSuccess, errMsg = msg, des = "貨物運達時間", execTime = implementTime.ToString("yyyy/MM/dd"), elapsed = second }, JsonRequestBehavior.AllowGet);
+        //}
 
-        public ActionResult ArriveTimeCombo(string dateTime, params uint[] productIds)
+        public ActionResult ArriveTime(string itemId, string dateTime)
         {
             int msgFlag = 0;
             int isSuccess = 0;
             string msg = "";
             DateTime implementTime = DateTime.Now;
-            DateTime date = GetArriveTimeCombo(dateTime, out msgFlag, productIds);///計算得到最晚商品的到達時間
+            DateTime date = GetArriveTimeCombo(dateTime, out msgFlag, itemId);///計算得到最晚商品的到達時間
             switch (msgFlag)
             { 
                 case -1:
@@ -198,11 +198,11 @@ namespace Admin.gigade.Controllers
                     break;
                 case -3:
                     isSuccess = 0;
-                    msg = "異常!傳輸入的productIds至少要有一個值";
+                    msg = "異常!傳輸入的itemIds至少要有一個值";
                     break;
                 case -4:
                     isSuccess = 0;
-                    msg = "異常!請確認傳入productIds的有效性!";
+                    msg = "異常!請確認傳入itemIds的有效性!";
                     break;
                 case 1:
                     isSuccess=1;
@@ -219,7 +219,7 @@ namespace Admin.gigade.Controllers
             return Json(new { data = date.ToString("yyyy/MM/dd"), success = isSuccess, errMsg = msg, des = "貨物運達時間", execTime = implementTime.ToString("yyyy/MM/dd"), elapsed = second }, JsonRequestBehavior.AllowGet);
         }
 
-        private DateTime GetArriveTimeCombo(string dateTime,out int msgFlag, params uint[] productIds)
+        private DateTime GetArriveTimeCombo(string dateTime,out int msgFlag, string itemIds = "")
         {
             /*定義變量*/
             DateTime lastDateTime = DateTime.Now;///變量,用於保存最晚商品到達時間
@@ -259,18 +259,23 @@ namespace Admin.gigade.Controllers
                 }
 
                 payDay = dtTime == null ? implementTime : (DateTime)dtTime;///得到下單時間
-                if (productIds == null || productIds.Length == 0)
+
+
+                string[] itemIdsArray = itemIds.Split(',');
+                if (itemIds == "" || itemIdsArray.Length==0)
                 {
                     msgFlag = -3;
                     return DateTime.Now;
                 }
 
-                foreach (uint i in productIds)
+                foreach (string i in itemIdsArray)
                 {
-                    pi = _productItemMgr.GetProductArriveDay(new ProductItem { Product_Id = i }, "product");///獲得prdocut_item中的array_days
-                    if (pi != null)
+                    //pi = _productItemMgr.GetProductArriveDay(new ProductItem { Product_Id = i }, "product");///獲得prdocut_item中的array_days
+                   
+                    if (i != null)
                     {
                         itemIdFlag = 1;
+                        pi = _productItemMgr.GetProductArriveDay(new ProductItem { Item_Id = Convert.ToUInt32(i) }, "item");//得到product_item中的出貨天數
                         deliver_Days = _pMgr.GetDefaultArriveDays(new Product { Product_Id = pi.Product_Id });///獲取供應商所對應的出貨天數
                         days = pi.Arrive_Days + deliver_Days;///獲得貨物運輸途中所需要的天數
                         date = _srMgr.GetRecentlyTime(Convert.ToInt32(pi.Product_Id), "product");///調用GetRecentlyTime()方法 獲得最近出貨時間
@@ -281,13 +286,13 @@ namespace Admin.gigade.Controllers
                             isSchedule = false;
                             date = payDay;///則按下單時間開始計算到貨日期
                         }
-                        TimeSpan ts = date - payDay;
-                        expendDay = ts.Days + days;
+                        TimeSpan ts = date - payDay; ///預計出貨天數 - 下單時間(中間購買者要等的時間)
+                        expendDay = ts.Days + days;///(總共用戶要等的天數)
                         if (expendDay > diffDay)
                         {
                             diffDay = expendDay;
-                            lastDateTime = date;
-                            numDays = days;
+                            lastDateTime = date;///最終確定的出貨時間
+                            numDays = days;///運輸天數
                         }
                     }
                 }

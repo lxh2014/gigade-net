@@ -248,5 +248,16 @@ namespace BLL.gigade.Mgr
                 throw new Exception("UsersMgr-->GetUser-->" + ex.Message, ex);
             }
         }
+        public List<UserQuery> GetUserByEmail(string mail, uint group_id)
+        {
+            try
+            {
+                return _usersDao.GetUserByEmail(mail, group_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("UsersMgr-->GetUserByEmail-->" + ex.Message, ex);
+            }
+        }
     }
 }

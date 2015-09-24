@@ -4,7 +4,7 @@
  * CreateTime :2015/9/9
  * 商品庫存查詢
  */
-var pageSize = 25;
+var pageSize = 20;
 
 
 // 列表頁的model
@@ -246,13 +246,22 @@ Ext.onReady(function () {
                                 }
                             }
                             , change: function () {
-                                var start = Ext.getCmp('item_stock_start');
+                                //var start = Ext.getCmp('item_stock_start');
+                                //var end = Ext.getCmp('item_stock_end');
+                                var start = Ext.getCmp('item_stock_start').getValue();
                                 var end = Ext.getCmp('item_stock_end');
-                                if (start.getValue() > end.getValue()  )
-                                {
-                                    end.setValue(start.getValue());
-                                }              
-                                if (-99999 <= start.getValue() && start.getValue() <= 99999 && -99999 <= end.getValue() && end.getValue() <= 99999)
+                                if (start > end.getValue()) {
+                                    start = start;
+                                    // end.setValue(start);
+                                    end.setMinValue(start);
+                                }
+                                //if (start.getValue() > end.getValue()  )
+                                //{
+                                //     end.setValue(start.getValue());
+                                    
+                                //}              
+                                //if (-99999 <= start.getValue() && start.getValue() <= 99999 && -99999 <= end.getValue() && end.getValue() <= 99999 && start.getValue()<=end.getValue())
+                                if (-99999 <= start && start <= 99999 && -99999 <= end.getValue() && end.getValue() <= 99999 && start <= end.getValue())
                                 {
                                     Ext.getCmp('query').setDisabled(false);
                                 }
@@ -267,7 +276,7 @@ Ext.onReady(function () {
                     {
                     xtype: 'displayfield',
                     margin: '2 0 0 8',
-                    value: '~ ~'
+                    value: '~'
                     },
                     {
                         xtype: 'numberfield',
@@ -287,13 +296,25 @@ Ext.onReady(function () {
                                 }
                             }
                             , change: function () {
-                                var start = Ext.getCmp('item_stock_start');
+                                //var start = Ext.getCmp('item_stock_start');
+                                //var end = Ext.getCmp('item_stock_end');
+
+                                var start = Ext.getCmp('item_stock_start').getValue();
                                 var end = Ext.getCmp('item_stock_end');
-                                if (start.getValue() > end.getValue())
+                                if (start > end.getValue())
                                 {
-                                    end.setValue(start.getValue());
-                                } 
-                                if (-99999 <= end.getValue() && end.getValue() <= 99999 && -99999 <= start.getValue() && start.getValue() <= 99999)
+                                    start = start;
+                                    end.setMinValue(start);
+                                    //end.setValue(start);
+                                }
+                                //if (start.getValue() > end.getValue())
+                                //{
+                                //     end.setValue(start.getValue());
+                                    
+
+                                //} 
+                                //if (-99999 <= end.getValue() && end.getValue() <= 99999 && -99999 <= start.getValue() && start.getValue() <= 99999 && start.getValue()<=end.getValue())
+                                if (-99999 <= end.getValue() && end.getValue() <= 99999 && -99999 <= start && start <= 99999 && start <= end.getValue())
                                 {
                                     Ext.getCmp('query').setDisabled(false);
                                 }
@@ -360,18 +381,19 @@ Ext.onReady(function () {
         frame: true,
         flex: 9.4,
         columns: [
-               { header: '商品編號', dataIndex: 'product_id' },
-                { header: '商品名稱', dataIndex: 'product_name', width: 200 },//product_id
-                { header: '商品細項編號', dataIndex: 'item_id' },
-                { header: '商品規格', dataIndex: 'product_spec' },
-                { header: '供應商編號', dataIndex: 'vendor_id' },
-                { header: "供應商名稱", dataIndex: "vendor_name_full", width: 180 },
-                { header: "品牌編號", dataIndex: "brand_id" },
-                { header: "品牌名稱", dataIndex: "brand_name", width: 180 },
-                { header: "商品狀態", dataIndex: "product_status_string" },
-                {header:"商品販售狀態",dataIndex:"sale_status_string"},
-                { header: "庫存數量", dataIndex: "item_stock" },
-                { header: "庫存為0時是否還能販售 ", dataIndex: "ignore_stock_string",width:160 }
+                 { header: '供應商編號', dataIndex: 'vendor_id',width:80,align:'center'},
+                 { header: "供應商名稱", dataIndex: "vendor_name_full", width: 150, align: 'center' },
+                 { header: "品牌編號", dataIndex: "brand_id", width: 80, align: 'center' },
+                { header: "品牌名稱", dataIndex: "brand_name", width: 150, align: 'center' },
+                { header: '商品編號', dataIndex: 'product_id', width: 80, align: 'center' },
+                { header: '商品名稱', dataIndex: 'product_name', width: 180, align: 'center' },
+                { header: '商品細項編號', dataIndex: 'item_id', align: 'center' },
+                { header: '商品規格', dataIndex: 'product_spec', width: 120, align: 'center' },
+                { header: "商品狀態", dataIndex: "product_status_string", align: 'center' },
+                { header: "商品販售狀態", dataIndex: "sale_status_string", width: 180, align: 'center' },
+                { header: "庫存為0時是否還能販售 ", dataIndex: "ignore_stock_string", width: 150, align: 'center' },
+                { header: "庫存數量", dataIndex: "item_stock", align: 'center' }
+                
         ],
         tbar: [
         { xtype: 'button', text: '匯出商品庫存報表', margin: '0 0 0 5', iconCls: 'icon-excel', id: 'btnExcel', handler: Export }
