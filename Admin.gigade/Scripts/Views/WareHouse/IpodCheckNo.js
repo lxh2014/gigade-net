@@ -157,7 +157,7 @@ Ext.onReady(function () {
                          labelWidth: 70,
                          allowDecimals: false,
                          maxValue:4294967295,
-                         minValue: 0,
+                         minValue: 1,
                          margin: '5 0 0 5',
                          hideTrigger: true,
                          listeners: {
