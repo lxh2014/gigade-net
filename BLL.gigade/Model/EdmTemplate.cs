@@ -16,13 +16,14 @@ namespace BLL.gigade.Model
         public DateTime template_updatedate { get; set; }//範本更新時間
         public int template_create_userid { set; get; }//範本建立者的使用者代碼
         public int template_update_userid { set; get; }//範本更新者的使用者代碼
-
+        public string user_username { get; set; }
         public EdmTemplate() 
         {
             template_id = 0;
             template_name = string.Empty;
             edit_url = string.Empty;
             content_url = string.Empty;
+            user_username = string.Empty;
             enabled = 0;
             template_createdate = DateTime.Now;
             template_updatedate = DateTime.Now;

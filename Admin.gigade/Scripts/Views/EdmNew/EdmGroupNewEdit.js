@@ -21,6 +21,7 @@
                 fieldLabel: '群組名稱',
                 id: 'group_name',
                 name: 'group_name',
+                allowBlank: false
             }, {
                 xtype: 'fieldcontainer',
                 combineErrors: true,
@@ -43,16 +44,26 @@
                 }
                 ]
             }, {
+                xtype: 'textfield',
+                fieldLabel: '試閱',
+                id: 'trial_url',
+                name: 'trial_url',
+                allowBlank: false,
+                submitValue: true,
+                vtype: 'url',
+            }, {
                 xtype: 'numberfield',
                 fieldLabel: '排序',
                 id: 'sort_order',
                 name: 'sort_order',
-                minValue:0,
+                minValue: 0,
+                allowBlank: false
             }, {
                 xtype: 'textareafield',
                 fieldLabel: '電子報類型描述',
                 id: 'description',
                 name: 'description',
+                allowBlank: false
             },
         ],
         buttons: [
@@ -68,6 +79,7 @@
                                 group_id: Ext.htmlEncode(Ext.getCmp('group_id').getValue()),
                                 group_name: Ext.htmlEncode(Ext.getCmp('group_name').getValue()),
                                 is_member_edm: Ext.htmlEncode(Ext.getCmp('is_member_edm').getValue().ignore_stockVal),
+                                trial_url: Ext.htmlEncode(Ext.getCmp('trial_url').getValue()),
                                 sort_order: Ext.htmlEncode(Ext.getCmp('sort_order').getValue()),
                                 description:Ext.htmlEncode(Ext.getCmp('description').getValue()),
                             },

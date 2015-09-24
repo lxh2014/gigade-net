@@ -27,7 +27,9 @@ namespace BLL.gigade.Dao
            totalCount = 0;
            try
            {
-               str.AppendFormat(" select template_id,template_name,edit_url,content_url,enabled,template_create_userid,template_update_userid,template_updatedate from edm_template  order by enabled desc, template_name  ");
+               str.AppendFormat(" select et.template_id,et.template_name,et.edit_url,et.content_url,et.enabled,mu.user_username,mu.user_username,et.template_updatedate from edm_template et  ");
+               str.Append(" LEFT JOIN manage_user mu on mu.user_id=et.template_create_userid ");
+               str.Append(" order by enabled desc, template_name ");
                str.Append(strcont);
                if (query.IsPage)
                {
