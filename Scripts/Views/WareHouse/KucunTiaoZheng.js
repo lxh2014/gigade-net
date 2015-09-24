@@ -237,65 +237,70 @@ Ext.onReady(function () {
                         submitValue: false,
                         name: 'ktloc_id',
                         listeners: {
-                            blur: function () {
-                                KucunTiaozhengStore.removeAll();
-                                Ext.getCmp("KucunTiaozhengGrid").store.loadPage(1, {
-                                    params: {
-                                        prod_id: Ext.getCmp('item_id').getValue(),
-                                        sloc_id: Ext.getCmp('ktloc_id').getValue()
-                                    }
-                                });
-                                if (Ext.getCmp('ktloc_id').getValue().trim() == null || Ext.getCmp('ktloc_id').getValue().trim() == "" || Ext.getCmp('item_name').getValue().trim() == "沒有該商品信息！") {
-                                    Ext.Msg.alert(INFORMATION, "請先輸入正確的料位!");
-                                }
-                                else {
-                                    if (Ext.getCmp('item_id').getValue() == null || Ext.getCmp('item_id').getValue().trim() == "") {//根據料位找到其對應的item_id 然後查找其他信息
-                                        Ext.Ajax.request({
-                                            url: "/WareHouse/GetProductInfoByLocId",//判斷item_id和loc_id的關係
+                                specialkey: function (field, e) {
+                                    if (e.getKey() == Ext.EventObject.ENTER) {
+                                        KucunTiaozhengStore.removeAll();
+                                        Ext.getCmp("KucunTiaozhengGrid").store.loadPage(1, {
                                             params: {
-                                              loc_id: Ext.getCmp('ktloc_id').getValue()
-                                            },
-                                            success: function (response) {
-                                                var result = Ext.decode(response.responseText);
-                                                if (result.success)
-                                                {
-                                                    Ext.getCmp("item_id").setValue(result.item_id);
-                                                    Ext.getCmp("item_name").setValue(result.msg);
-                                                    Ext.getCmp("mode_type").setValue("主料位:" + Ext.getCmp('ktloc_id').getValue());
-                                                    Ext.Ajax.request({
-                                                        url: "/WareHouse/AboutItemidLocid",//判斷item_id和loc_id的關係
-                                                        params: {
-                                                            titem_id: Ext.getCmp('item_id').getValue(),
-                                                            tloc_id: Ext.getCmp('ktloc_id').getValue()
-                                                        },
-                                                        success: function (response) {
-                                                            var result = Ext.decode(response.responseText);
-                                                            if (result.msg == 0) {
-                                                                Ext.Msg.alert(INFORMATION, "細項編號和庫調料位不對應!");
-                                                            }
+                                                prod_id: Ext.getCmp('item_id').getValue(),
+                                                sloc_id: Ext.getCmp('ktloc_id').getValue()
+                                            }
+                                        });
+                                        if (Ext.getCmp('ktloc_id').getValue().trim() == null || Ext.getCmp('ktloc_id').getValue().trim() == "" || Ext.getCmp('item_name').getValue().trim() == "沒有該商品信息！") {
+                                            Ext.Msg.alert(INFORMATION, "請先輸入正確的料位!");
+                                        }
+                                        else {
+                                            if (Ext.getCmp('item_id').getValue() == null || Ext.getCmp('item_id').getValue().trim() == "") {//根據料位找到其對應的item_id 然後查找其他信息
+                                                Ext.Ajax.request({
+                                                    url: "/WareHouse/GetProductInfoByLocId",//判斷item_id和loc_id的關係
+                                                    params: {
+                                                        loc_id: Ext.getCmp('ktloc_id').getValue()
+                                                    },
+                                                    success: function (response) {
+                                                        var result = Ext.decode(response.responseText);
+                                                        if (result.success) {
+                                                            Ext.getCmp("item_id").setValue(result.item_id);
+                                                            Ext.getCmp("item_name").setValue(result.msg);
+                                                            Ext.getCmp("mode_type").setValue("主料位:" + Ext.getCmp('ktloc_id').getValue());
+                                                            Ext.Ajax.request({
+                                                                url: "/WareHouse/AboutItemidLocid",//判斷item_id和loc_id的關係
+                                                                params: {
+                                                                    titem_id: Ext.getCmp('item_id').getValue(),
+                                                                    tloc_id: Ext.getCmp('ktloc_id').getValue()
+                                                                },
+                                                                success: function (response) {
+                                                                    var result = Ext.decode(response.responseText);
+                                                                    if (result.msg == 0) {
+                                                                        Ext.Msg.alert(INFORMATION, "細項編號和庫調料位不對應!");
+                                                                    }
+                                                                }
+                                                            });
                                                         }
-                                                    });
-                                                }
+                                                    }
+                                                });
                                             }
-                                        });
-                                    }
-                                    else {
-                                        Ext.Ajax.request({
-                                            url: "/WareHouse/AboutItemidLocid",//判斷item_id和loc_id的關係
-                                            params: {
-                                                titem_id: Ext.getCmp('item_id').getValue(),
-                                                tloc_id: Ext.getCmp('ktloc_id').getValue()
-                                            },
-                                            success: function (response) {
-                                                var result = Ext.decode(response.responseText);
-                                                if (result.msg == 0) {
-                                                    Ext.Msg.alert(INFORMATION, "細項編號和庫調料位不對應!");
-                                                }
+                                            else {
+                                                Ext.Ajax.request({
+                                                    url: "/WareHouse/AboutItemidLocid",//判斷item_id和loc_id的關係
+                                                    params: {
+                                                        titem_id: Ext.getCmp('item_id').getValue(),
+                                                        tloc_id: Ext.getCmp('ktloc_id').getValue()
+                                                    },
+                                                    success: function (response) {
+                                                        var result = Ext.decode(response.responseText);
+                                                        if (result.msg == 0) {
+                                                            Ext.Msg.alert(INFORMATION, "細項編號和庫調料位不對應!");
+                                                        }
+                                                    }
+                                                });
                                             }
-                                        });
+                                        }
                                     }
                                 }
-                            }
+                            //}
+                           // blur: function () {
+                              
+                            //}
                         }
                     },
                     {
@@ -354,6 +359,7 @@ Ext.onReady(function () {
                                 Ext.getCmp('item_name').setValue("");
                                 Ext.getCmp('mode_type').setValue("");
                                 Ext.getCmp('remarks').setValue("");
+                                Ext.getCmp('po_id').setValue("");
                                 KucunTiaozhengStore.removeAll();
                                 Ext.getCmp("KucunTiaozhengGrid").down('#add_new_message').setDisabled(true);
                             }
