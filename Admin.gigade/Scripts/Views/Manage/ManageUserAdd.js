@@ -250,6 +250,7 @@ ChangePwdFunction = function (rowID) {
         iconCls: 'icon-user-edit',
         iconCls: row ? "icon-user-edit" : "icon-user-add",
         layout: 'fit',
+        y:300,
         constrain: true,
         closeAction: 'destroy',
         modal: true,
