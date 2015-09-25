@@ -353,6 +353,16 @@ Ext.onReady(function () {
 
     });
     ipodStore.on('beforeload', function () {
+        var start_time = Ext.getCmp('time_start').getValue();
+        var end_time = Ext.getCmp('time_end').getValue();
+        if (start_time == null && end_time != null) {
+            Ext.Msg.alert("提示", "請把創建時間補充完整");
+            return false;
+        }
+        if (start_time != null && end_time == null) {
+            Ext.Msg.alert("提示", "請把創建時間補充完整");
+            return false;
+        }
         Ext.apply(ipodStore.proxy.extraParams, {
          Potype : Ext.getCmp('Poty').getValue(),
          erp_id :Ext.getCmp('erp_id').getValue().trim(),
