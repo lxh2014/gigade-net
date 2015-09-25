@@ -1,4 +1,4 @@
-﻿var pageSize = 24;
+﻿var pageSize = 25;
 Ext.define('gigade.Ipod', {
     extend: 'Ext.data.Model',
     fields: [
@@ -418,10 +418,18 @@ outExcel = function () {
     var product_id = Ext.getCmp('product_id').getValue();
     var product_name = Ext.getCmp('product_name').getValue();
     var start_time = Ext.getCmp('time_start').getValue();
+    var end_time = Ext.getCmp('time_end').getValue();
+    if (start_time == null && end_time != null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
+    if (start_time != null && end_time == null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
     if (start_time!=null) {
         start_time= Ext.htmlEncode(Ext.Date.format(new Date(start_time), 'Y-m-d 00:00:00'));
     }
-    var end_time = Ext.getCmp('time_end').getValue();
     if(end_time!=null){
         end_time = Ext.htmlEncode(Ext.Date.format(new Date(end_time), 'Y-m-d 00:00:00'));
     }
