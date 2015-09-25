@@ -86,6 +86,14 @@ function Query() {
     var product_name = Ext.getCmp('product_name').getValue();
     var start_time = Ext.getCmp('time_start').getValue();
     var end_time = Ext.getCmp('time_end').getValue();
+    if (start_time == null && end_time != null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
+    if (start_time != null && end_time == null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
     //if (falg == 0) {
     //    Ext.Msg.alert("提示", "請輸入查詢條件");
     //    return false;
@@ -257,7 +265,7 @@ Ext.onReady(function () {
                          id: 'time_start',
                          name: 'time_start',
                          margin: '5 0 0 5',
-                         format: 'Y-m-d 00:00:00',
+                         format: 'Y-m-d',
                          editable: false,
                          listeners: {
                               select: function () {
@@ -286,7 +294,7 @@ Ext.onReady(function () {
                             id: 'time_end',
                             name: 'time_end',
                             margin: '5 0 0 5',
-                            format: 'Y-m-d 23:59:59',
+                            format: 'Y-m-d',
                             editable: false,
                             listeners: {
                                 select: function () {
