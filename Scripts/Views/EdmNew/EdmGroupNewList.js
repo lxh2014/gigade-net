@@ -5,7 +5,7 @@
  * CreateTime :2015/9/21
  * 電子報列表
  */
-var pageSize = 23;
+var pageSize = 25;
 
 //列表頁的model
 Ext.define('gridlistEGN', {
@@ -69,7 +69,7 @@ Ext.onReady(function () {
             { header: "編號", dataIndex: "group_id", align: 'center' },
             { header: "群組名稱", dataIndex: "group_name", width: 300, align: 'center' },
             { header: "會員電子報", dataIndex: "is_member_edm_string", width: 200, align: 'center' },
-            {header: "試閱",dataIndex:"trial_url",align:'center',width:120},
+            {header: "試閱",dataIndex:"trial_url",align:'center',width:150},
             {
                 header: "是否啟用", dataIndex: 'enabled', align: 'center', hidden: false,
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {

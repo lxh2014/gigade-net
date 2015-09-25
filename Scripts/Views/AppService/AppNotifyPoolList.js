@@ -27,9 +27,6 @@ Ext.define('gigade.AppNotifyPoolModel', {
                 { type: 'string', name: 'notifytime' }]
 });
 
-
-
-
 //加載Grid數據源
 var gridShow = Ext.create('Ext.data.Store', {
     model: 'gigade.AppNotifyPoolModel',
@@ -42,6 +39,7 @@ var gridShow = Ext.create('Ext.data.Store', {
         reader: { type: 'json', root: 'data', totalProperty: 'totalCount' }
     }
 });
+
 //數據源BeforeLoad
 gridShow.on("beforeload", function () {
     gridShow.removeAll();
@@ -54,13 +52,12 @@ gridShow.on("beforeload", function () {
         Ext.Msg.alert(INFORMATION, SEARCHNULLTEXT);
         return false;
     }
-    Ext.apply(gridShow.proxy.extraParams,
-             {
-                 timestart: timestartvalue,
-                 timestartend: timestartendvalue,
-                 timeendstart: timeendstartvalue,
-                 timeendend: timeendendvalue
-             });
+    Ext.apply(gridShow.proxy.extraParams, {
+        timestart: timestartvalue,
+        timestartend: timestartendvalue,
+        timeendstart: timeendstartvalue,
+        timeendend: timeendendvalue
+    });
 });
 
 //查詢按鈕事件
@@ -85,6 +82,7 @@ function btnSearchFn() {
         }
     });
 }
+
 //定義開始時間container
 var starttimecon = Ext.create('Ext.container.Container', {
     layout: {
@@ -127,6 +125,7 @@ var starttimecon = Ext.create('Ext.container.Container', {
         }
     }]
 });
+
 //定義結束時間container
 var endtimecon = Ext.create('Ext.container.Container', {
     layout: {
@@ -169,14 +168,18 @@ var endtimecon = Ext.create('Ext.container.Container', {
         }
     }]
 });
+
 //加載到頁面上面
 Ext.onReady(function () {
-    //回撤鍵查詢
-    document.body.onkeydown = function () {
-        if (event.keyCode == 13) {
+    //回車鍵查詢
+    // edit by zhuoqin0830w  2015/09/22  以兼容火狐瀏覽器
+    document.onkeydown = function (event) {
+        e = event ? event : (window.event ? window.event : null);
+        if (e.keyCode == 13) {
             $("#btnSearch").click();
         }
     };
+
     //創建人員查詢列表
     var GShow = Ext.create('Ext.grid.Panel', {
         id: 'ShowGrid',
@@ -243,15 +246,14 @@ Ext.onReady(function () {
             displayMsg: NOW_DISPLAY_RECORD + ': {0} - {1}' + TOTAL + ': {2}',
             emptyMsg: NOTHING_DISPLAY
         },
-        tbar: [
-           {
-               xtype: 'button',
-               labelWidth: 50,
-               text: ADDBTN,
-               iconCls: 'ui-icon ui-icon-user-add',
-               xtype: 'button',
-               handler: btnAdd
-           }
+        tbar: [{
+            xtype: 'button',
+            labelWidth: 50,
+            text: ADDBTN,
+            iconCls: 'ui-icon ui-icon-user-add',
+            xtype: 'button',
+            handler: btnAdd
+        }
         ],
         listeners: {
             scrollershow: function (scroller) {
@@ -262,6 +264,7 @@ Ext.onReady(function () {
             }
         }
     })
+
     Ext.create('Ext.container.Viewport', {
         layout: 'fit',
         items: [GShow],
@@ -276,6 +279,7 @@ Ext.onReady(function () {
     });
     ToolAuthority();
 });
+
 //添加信息
 function btnAdd() {
     SaveReport(null);

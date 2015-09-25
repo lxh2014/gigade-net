@@ -38,7 +38,8 @@
                     },
                     columns: 2,
                     items: [
-                    { id: 'id1', boxLabel: "是", inputValue: '1', checked: true },
+                        { id: 'id1', boxLabel: "是", inputValue: '1', checked: true},
+                    //{ id: 'id1', boxLabel: "是", inputValue: '1' },
                     { id: 'id2', boxLabel: "否", inputValue: '0' }
                     ]
                 }
@@ -117,7 +118,6 @@
         closeAction: 'destroy',
         modal: true,
         resizable: false,//false 禁止調整windows窗體的大小
-        // reaizable:true,// true  允許調整windows窗體的大小
         labelWidth: 60,
         bodyStyle: 'padding:5px 5px 5px 5px',
         closable: false,
@@ -139,10 +139,21 @@
         listeners: {
             'show': function () {
                 if (row) {
+                    if (row.data.is_member_edm_string.trim().length==0) {
+                        Ext.getCmp("id1").setValue(false);
+                        Ext.getCmp("id2").setValue(true);
+                    } else
+                    {
+                        Ext.getCmp("id1").setValue(true);
+                        Ext.getCmp("id2").setValue(false);
+                    }
                     editFrm.getForm().loadRecord(row);
+                   
                 }
                 else {
+                    
                     editFrm.getForm().reset();
+                   
                 }
             }
         }
