@@ -38,6 +38,19 @@ var ipodStore = Ext.create('Ext.data.Store', {
             
         }
     }
+    ,
+    listeners: {
+        load: function (store)
+        {
+            var count = store.getCount();
+            if (count == 0) {
+                Ext.getCmp('outExcel').setDisabled(true);
+            }
+            else {
+                Ext.getCmp('outExcel').setDisabled(false);
+            }
+        }
+    }
 });
 
 Ext.define("gigade.parameter", {
@@ -95,7 +108,7 @@ function Query() {
                     end_time : end_time
                 }
             });
-    } 
+    }
 }
 Ext.onReady(function () {
     var frm = Ext.create('Ext.form.Panel', {
@@ -357,7 +370,7 @@ Ext.onReady(function () {
             { header: "供應商名稱", dataIndex: 'vendor_name_full', width: 170, align: 'center' },
             { header: "品號", dataIndex: 'Erp_Id', width: 110, align: 'center' },
             { header: "商品編號", dataIndex: 'productid', width: 65, align: 'center' },
-            { header: "商品六碼", dataIndex: 'item_id', width: 65, align: 'center' },
+            { header: "商品細項編號", dataIndex: 'item_id', width: 80, align: 'center' },
             { header: "商品名稱", dataIndex: 'product_name', width: 250, align: 'center' },
             { header: "規格", dataIndex: 'spec', width: 130, align: 'center' },
             { header: "採購數量", dataIndex: 'qty_ord', width: 65, align: 'center' },
