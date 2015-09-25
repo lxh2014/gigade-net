@@ -1851,6 +1851,8 @@
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateList.js" />
+    <Content Include="Scripts\Views\EdmNew\EmailBlockEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EmailBlockList.js" />
     <Content Include="Scripts\Views\EdmS\Edmlist.js" />
     <Content Include="Scripts\Views\Edm\BlackList.js" />
     <Content Include="Scripts\Views\Edm\BlackListEdit.js" />
@@ -1985,6 +1987,7 @@
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-rtl-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\resources\Readme.md" />
+    <None Include="Properties\PublishProfiles\7596.pubxml" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all-vsdoc.js" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all.min.intellisense.js" />
     <Content Include="Scripts\kendo\2014.2.716\kendo.all.min.js" />
@@ -4385,9 +4388,8 @@
     <Content Include="Views\EdmNew\Index.cshtml" />
     <Content Include="Views\EdmNew\EdmContentNew.cshtml" />
     <Content Include="Views\EdmNew\EdmTemplate.cshtml" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
+    <Content Include="Web.config" />
+    <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

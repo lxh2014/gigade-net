@@ -17,6 +17,7 @@ namespace BLL.gigade.Model
         public DateTime group_updatedate { get; set; }
         public int group_create_userid { get; set; }
         public int group_update_userid { get; set; }
+        public string trial_url { get; set; }
 
         public EdmGroupNew()
         {
@@ -30,6 +31,7 @@ namespace BLL.gigade.Model
             group_updatedate= DateTime.Now;
             group_create_userid=0;
             group_update_userid=0;
+            trial_url = string.Empty;
         }
     }
 

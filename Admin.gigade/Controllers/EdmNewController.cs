@@ -3,17 +3,15 @@ using BLL.gigade.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
-using BLL.gigade.Mgr;
 using BLL.gigade.Mgr.Impl;
-using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using gigadeExcel.Comment;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Configuration;
+using System.Data;
 
 namespace Admin.gigade.Controllers
 {
@@ -25,6 +23,7 @@ namespace Admin.gigade.Controllers
         private static EdmContentNewMgr _edmContentNewMgr;
         public EdmGroupNewMgr edmgroupmgr;
         public EdmTemplateMgr edmtemplatemgr;        //
+        public EmailBlockListMgr _emailBlockListMgr;
         // GET: /EdmNew/
         #region view
         //電子報類型
@@ -40,6 +39,13 @@ namespace Admin.gigade.Controllers
         //電子報
         public ActionResult EdmContentNew()
         {
+            ViewBag.path = ConfigurationManager.AppSettings["webDavImage"];
+            ViewBag.BaseAddress = ConfigurationManager.AppSettings["webDavBaseAddress"];
+            return View();
+        }
+        //擋信名單
+        public ActionResult EmailBlockList()
+        {
             return View();
         }
         #endregion
@@ -51,19 +57,30 @@ namespace Admin.gigade.Controllers
         {
             string json = string.Empty;
             int totalcount = 0;
-            EdmGroupNewQuery query=new EdmGroupNewQuery ();
-            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
-            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
-            edmgroupmgr = new EdmGroupNewMgr(mySqlConnectionString);
-            if (!string.IsNullOrEmpty(Request.Params["group_name"]))
+            try
             {
-                query.group_name = Request.Params["group_name"];
+                EdmGroupNewQuery query = new EdmGroupNewQuery();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                edmgroupmgr = new EdmGroupNewMgr(mySqlConnectionString);
+                if (!string.IsNullOrEmpty(Request.Params["group_name_list"]))
+                {
+                    query.group_name = Request.Params["group_name_list"];
+                }
+                List<EdmGroupNewQuery> list = edmgroupmgr.GetEdmGroupNewList(query, out totalcount);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
             }
-            List<EdmGroupNewQuery> list = edmgroupmgr.GetEdmGroupNewList(query, out totalcount);
-            IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-            timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            timeConverter.DateTimeFormat = "yyyy-MM-dd";
-            json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
             this.Response.Clear();
             this.Response.Write(json);
             this.Response.End();
@@ -127,6 +144,10 @@ namespace Admin.gigade.Controllers
                 {
                     query.is_member_edm = Convert.ToInt32(Request.Params["is_member_edm"]);
                 }
+                if (!string.IsNullOrEmpty(Request.Params["trial_url"]))
+                {
+                    query.trial_url=Request.Params["trial_url"];
+                }
                 if (!string.IsNullOrEmpty(Request.Params["sort_order"]))
                 {
                     query.sort_order = Convert.ToInt32(Request.Params["sort_order"]);
@@ -134,7 +155,6 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["description"]))
                 {
                     query.description = Request.Params["description"];
-
                 }
                 int _dt = edmgroupmgr.SaveEdmGroupNewAdd(query);
 
@@ -175,15 +195,26 @@ namespace Admin.gigade.Controllers
         {
             string json = string.Empty;
             int totalcount = 0;
-            EdmTemplateQuery query = new EdmTemplateQuery();
-            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
-            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
-            edmtemplatemgr = new EdmTemplateMgr(mySqlConnectionString);
-            List<EdmTemplateQuery> list = edmtemplatemgr.GetEdmTemplateList(query, out totalcount);
-            IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-            timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            timeConverter.DateTimeFormat = "yyyy-MM-dd";
-            json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+            try
+            {
+                EdmTemplateQuery query = new EdmTemplateQuery();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                edmtemplatemgr = new EdmTemplateMgr(mySqlConnectionString);
+                List<EdmTemplateQuery> list = edmtemplatemgr.GetEdmTemplateList(query, out totalcount);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
             this.Response.Clear();
             this.Response.Write(json);
             this.Response.End();
@@ -294,7 +325,8 @@ namespace Admin.gigade.Controllers
         #region 電子報列表
         public HttpResponseBase GetECNList()
         {
-            string json = string.Empty;
+            string json = string.Empty;//
+
             try
             {
                 EdmContentNew query = new EdmContentNew();
@@ -304,6 +336,10 @@ namespace Admin.gigade.Controllers
                 int totalCount = 0;
                 _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
                 store = _edmContentNewMgr.GetECNList(query, out totalCount);
+                foreach (var item in store)
+                {
+                    item.template_data = Server.HtmlDecode(Server.HtmlDecode(item.template_data));
+                }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
@@ -343,9 +379,9 @@ namespace Admin.gigade.Controllers
                 {
                     query.group_id = Convert.ToInt32(Request.Params["group_id"]);
                 }
-                if (!string.IsNullOrEmpty(Request.Params["inportance"]))
+                if (!string.IsNullOrEmpty(Request.Params["importance"]))
                 {
-                    query.importance = Convert.ToInt32(Request.Params["inportance"]);
+                    query.importance = Convert.ToInt32(Request.Params["importance"]);
                 }
                 if (!string.IsNullOrEmpty(Request.Params["subject"]))
                 {
@@ -359,6 +395,8 @@ namespace Admin.gigade.Controllers
                 {
                     query.template_data = Request.Params["template_data"];
                 }
+                query.content_create_userid = (Session["caller"] as Caller).user_id;
+                query.content_update_userid= (Session["caller"] as Caller).user_id;
                  json=_edmContentNewMgr.SaveEdmContentNew(query);
             }
             catch (Exception ex)
@@ -402,13 +440,192 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
 
+        public HttpResponseBase GetEdmTemplateStore()
+        {
+            string json = string.Empty;
+            try
+            {
+                List<EdmTemplate> store = new List<EdmTemplate>();
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                store = _edmContentNewMgr.GetEdmTemplateStore();
+                json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
 
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
 
+        public HttpResponseBase GetMailSenderStore()
+        {
+            string json = string.Empty;
+            try
+            {
+                List<MailSender> store = new List<MailSender>();
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                store = _edmContentNewMgr.GetMailSenderStore();
+                json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        
         #endregion
 
         #endregion
 
         #region 擋信名單管理
+        public HttpResponseBase GetEmailBlockList()
+        {
+            string json = string.Empty;
+            try
+            {
+                _emailBlockListMgr = new EmailBlockListMgr(mySqlConnectionString);
+                DataTable store = new DataTable();
+                EmailBlockListQuery query = new EmailBlockListQuery();
+                if (!string.IsNullOrEmpty(Request.Params["email"]))
+                {
+                    query.email_address = Request.Params["email"];
+                }
+                store = _emailBlockListMgr.GetEmailBlockList(query);
+                if (store != null)
+                {
+                    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                    timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                    json = "{success:true" + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        public HttpResponseBase AddorEdit()
+        {
+            string json = string.Empty;
+            _emailBlockListMgr = new EmailBlockListMgr(mySqlConnectionString);
+            try
+            {
+                EmailBlockListQuery query = new EmailBlockListQuery();
+                query.block_update_userid = Convert.ToInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString());
+                if (!string.IsNullOrEmpty(Request.Params["reason"]))
+                {
+                    query.block_reason = Request.Params["reason"].ToString().Replace("\\", "\\\\"); ;
+                    query.block_create_userid = query.block_update_userid;
+                    if (!string.IsNullOrEmpty(Request.Params["email_address"]))
+                    {
+                        query.email_address = Request.Params["email_address"].ToString().Replace("\\", "\\\\"); ;
+                    }
+                    int i = _emailBlockListMgr.Add(query);
+                    if (i > 0)
+                    {
+                        json = "{success:true}";
+                    }
+                    else if (i == -1)
+                    {
+                        json = "{success:false,msg:\'0\'}"; //郵箱已添加過
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(Request.Params["block_reason"]))
+                    {
+                        query.block_reason = Request.Params["block_reason"].ToString().Replace("\\", "\\\\"); ;
+                    }
+                    if (!string.IsNullOrEmpty(Request.Params["email_address"]))
+                    {
+                        query.email_address = Request.Params["email_address"].ToString();
+                    }
+                    int i = _emailBlockListMgr.Update(query);
+                    if (i > 0)
+                    {
+                        json = "{success:true}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        public HttpResponseBase UnBlock()
+        {
+            string json = string.Empty;
+            bool result = false;
+            try
+            {
+                _emailBlockListMgr = new EmailBlockListMgr(mySqlConnectionString);
+                EmailBlockLogQuery query = new EmailBlockLogQuery();
+                if (!string.IsNullOrEmpty(Request.Params["email_address"]))
+                {
+                    query.email_address = Request.Params["email_address"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["unblock_reason"]))
+                {
+                    query.unblock_reason = Request.Params["unblock_reason"].ToString().Replace("\\", "\\\\"); ;
+                }
+                query.unblock_create_userid = Convert.ToInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString());
+                result = _emailBlockListMgr.UnBlock(query);
+                if (result)
+                {
+                    json = "{success:true}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+
+
 
         #endregion
 

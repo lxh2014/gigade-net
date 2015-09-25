@@ -22,7 +22,6 @@ Ext.define('gigade.particularsHistory', {
         { name: 'Incr_value', type: 'string' }]//(保存期限)修改后值
 });
 
-
 //價格異動記錄 model
 Ext.define('gigade.priceHistory', {
     extend: 'Ext.data.Model',
@@ -48,7 +47,6 @@ Ext.define('gigade.priceHistory', {
         { name: '', type: '' },
         { name: '', type: '' }]
 });
-
 
 //商品細項管理資料記錄
 var particularsHistoryStore = Ext.create('Ext.data.Store', {
@@ -89,7 +87,6 @@ var searchComboxStore = Ext.create('Ext.data.Store', {
     ]
 });
 
-
 //品牌Model
 Ext.define("gigade.Brand", {
     extend: 'Ext.data.Model',
@@ -97,8 +94,6 @@ Ext.define("gigade.Brand", {
         { name: "brand_id", type: "string" },
         { name: "brand_name", type: "string" }]
 });
-
-
 
 //品牌store
 var brandStore = Ext.create('Ext.data.Store', {
@@ -117,12 +112,12 @@ var brandStore = Ext.create('Ext.data.Store', {
     }
 });
 
-
-
 Ext.onReady(function () {
-
-    document.body.onkeydown = function () {
-        if (event.keyCode == 13) {
+    //回車鍵查詢
+    // edit by zhuoqin0830w  2015/09/22  以兼容火狐瀏覽器
+    document.onkeydown = function (event) {
+        e = event ? event : (window.event ? window.event : null);
+        if (e.keyCode == 13) {
             $("#search").click();
         }
     };
@@ -250,7 +245,6 @@ Ext.onReady(function () {
         }]
     })
 
-
     var priceHistoryGrid = Ext.create('Ext.grid.Panel', {
         id: 'priceHistoryGrid',
         store: priceHistoryStore,
@@ -298,14 +292,11 @@ Ext.onReady(function () {
 
 })
 
-
 function search() {
-
     if (!Ext.getCmp('brand_id').getValue() && !Ext.getCmp('productID_5').getValue() && !Ext.getCmp('productID_6').getValue() && !Ext.getCmp('time_start').getValue() && !Ext.getCmp('time_end').getValue()) {
         Ext.Msg.alert(INFORMATION, PLEASE_INPUT_QUERY_CONDITION);//請輸入查詢條件
         return;
     }
-
     if (Ext.getCmp('time_start').getValue() && Ext.getCmp('time_end').getValue()) {
         if (Ext.getCmp('time_start').getValue().getTime() >= Ext.getCmp('time_end').getValue().getTime()) {
             Ext.Msg.alert(INFORMATION, PLEASE_INPUT_TRUE_DATE_WAIT_AREA);//請輸入正確的時間區域
@@ -350,12 +341,10 @@ function search() {
 }
 
 function outexcel() {
-
     if (!Ext.getCmp('brand_id').getValue() && !Ext.getCmp('productID_5').getValue() && !Ext.getCmp('productID_6').getValue() && !Ext.getCmp('time_start').getValue() && !Ext.getCmp('time_end').getValue()) {
         Ext.Msg.alert(INFORMATION, PLEASE_INPUT_QUERY_CONDITION);//請輸入查詢條件
         return;
     }
-
     if (Ext.getCmp('time_start').getValue() && Ext.getCmp('time_end').getValue()) {
         if (Ext.getCmp('time_start').getValue().getTime() >= Ext.getCmp('time_end').getValue().getTime()) {
             Ext.Msg.alert(INFORMATION, PLEASE_INPUT_TRUE_DATE_WAIT_AREA);//請輸入正確的時間區域
@@ -365,7 +354,6 @@ function outexcel() {
 
     Ext.getCmp('productID_5').setValue(Ext.getCmp('productID_5').getValue().replace(/\s+/g, ','));
     Ext.getCmp('productID_6').setValue(Ext.getCmp('productID_6').getValue().replace(/\s+/g, ','));
-
 
     var contentType = Ext.getCmp('contentType').getValue();
     var brand_id = Ext.getCmp('brand_id').getValue();

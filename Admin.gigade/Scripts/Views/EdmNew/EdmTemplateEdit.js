@@ -21,17 +21,24 @@
                  fieldLabel: '範本名稱',
                  id: 'template_name',
                  name: 'template_name',
+                 allowBlank: false
              }, {
                  xtype: 'textfield',
                  fieldLabel: '內容編輯網址',
                  id: 'edit_url',
                  name: 'edit_url',
+                 allowBlank: false,
+                 submitValue: true,
+                 vtype: 'url',
                  
              }, {
                  xtype: 'textfield',
                  fieldLabel: '內容產生網址',
                  id: 'content_url',
                  name: 'content_url',
+                 allowBlank: false,
+                 submitValue: true,
+                 vtype: 'url',
              }, {
                  xtype: 'displayfield',
                  fieldLabel: '建立日期',
@@ -43,17 +50,18 @@
                  fieldLabel: '更新日期',
                  id: 'template_updatedate',
                  name: 'template_updatedate',
+                 
              }, {
                  xtype: 'displayfield',
                  fieldLabel: '建立者',
-                 id: 'template_create_userid',
-                 name: 'template_create_userid',
+                 id: 'template_create_user',
+                 name: 'template_create_user',
                 
              }, {
                  xtype: 'displayfield',
                  fieldLabel: '修改者',
-                 id: 'template_update_userid',
-                 name: 'template_update_userid',
+                 id: 'template_update_user',
+                 name: 'template_update_user',
              },
         ],
         buttons: [
@@ -70,8 +78,8 @@
                                 template_name: Ext.htmlEncode(Ext.getCmp('template_name').getValue()),
                                 edit_url: Ext.htmlEncode(Ext.getCmp('edit_url').getValue().ignore_stockVal),
                                 content_url: Ext.htmlEncode(Ext.getCmp('content_url').getValue()),
-                                template_create_userid: Ext.htmlEncode(Ext.getCmp('template_create_userid').getValue()),
-                                template_update_userid: Ext.htmlEncode(Ext.getCmp('template_update_userid').getValue().ignore_stockVal),
+                                template_create_user: Ext.htmlEncode(Ext.getCmp('template_create_user').getValue()),
+                                template_update_user: Ext.htmlEncode(Ext.getCmp('template_update_user').getValue().ignore_stockVal),
                                 template_createdate: Ext.htmlEncode(Ext.getCmp('template_createdate').getValue()),
                                 template_updatedate: Ext.htmlEncode(Ext.getCmp('template_updatedate').getValue()),
                             },
@@ -135,8 +143,8 @@
                 }
                 else {
                     Ext.getCmp('template_id').hide();
-                    Ext.getCmp('template_create_userid').hide();
-                    Ext.getCmp('template_update_userid').hide();
+                    Ext.getCmp('template_create_user').hide();
+                    Ext.getCmp('template_update_user').hide();
                     Ext.getCmp('template_createdate').hide();
                     Ext.getCmp('template_updatedate').hide();
                     editFrm.getForm().reset();

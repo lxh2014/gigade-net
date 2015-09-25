@@ -71,6 +71,9 @@ namespace BLL.gigade.Model.Query
         //add by zhuoqin0830w  2015/06/30  失格商品篩選
         public int off_grade { get; set; }
 
+         //add by guodong1130w 2015/09/16 預購商品篩選
+        public int purchase_in_advance { get; set; }
+
         public QueryVerifyCondition()
         {
             product_name = string.Empty;
@@ -105,6 +108,8 @@ namespace BLL.gigade.Model.Query
             brand_ids = string.Empty;
             //add by zhuoqin0830w  2015/06/30  失格商品篩選
             off_grade = 0;
+            //add by guodong1130w 2015/09/16 預購商品篩選
+            purchase_in_advance = 0;
         }
     }
 }
