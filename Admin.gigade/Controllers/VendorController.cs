@@ -768,7 +768,7 @@ namespace Admin.gigade.Controllers
                     {
                         venQuery.invoice_address = "";
                     }
-                   
+
                     if (!string.IsNullOrEmpty(Request.Params["pm"].ToString()))
                     {
                         venQuery.product_manage = Convert.ToUInt32(Request.Params["pm"].ToString());
@@ -2294,6 +2294,36 @@ namespace Admin.gigade.Controllers
             return type;
         }
         #endregion
+
+
+        public string ContactTypeToStr(string contacttype)
+        {
+            string typestr = string.Empty;
+
+            switch (contacttype)
+            {
+                case "1":
+                    typestr = "負責人";
+                    break;
+                case "2":
+                    typestr = "業務窗口";
+                    break;
+                case "3":
+                    typestr = "圖/文窗口";
+                    break;
+                case "4":
+                    typestr = "出貨負責窗口";
+                    break;
+                case "5":
+                    typestr = "帳務連絡窗口";
+                    break;
+                case "6":
+                    typestr = "客服窗口";
+                    break;
+            }
+            return typestr;
+        }
+        #endregion
         #endregion
 
 
@@ -2593,108 +2623,24 @@ namespace Admin.gigade.Controllers
                     dr[37] = dr_v["contact_email_1"].ToString();
 
                     //dr[31] = dr_v["contact_type_2"].ToString();
-                    switch (dr_v["contact_type_2"].ToString())
-                    {
-                        case "1":
-                            dr[38] = "負責人";
-                            break;
-                        case "2":
-                            dr[38] = "業務窗口";
-                            break;
-                        case "3":
-                            dr[38] = "圖/文窗口";
-                            break;
-                        case "4":
-                            dr[38] = "出貨窗口";
-                            break;
-                        case "5":
-                            dr[38] = "賬務窗口";
-                            break;
-                        case "6":
-                            dr[38] = "客服窗口";
-                            break;
-                    }
+                    dr[38] = ContactTypeToStr(dr_v["contact_type_2"].ToString());
                     dr[39] = dr_v["contact_name_2"].ToString();
                     dr[40] = dr_v["contact_phone_1_2"].ToString();
                     dr[41] = dr_v["contact_mobile_2"].ToString();
                     dr[42] = dr_v["contact_email_2"].ToString();
 
-                    //dr[36] = dr_v["contact_type_3"].ToString();
-                    switch (dr_v["contact_type_3"].ToString())
-                    {
-                        case "1":
-                            dr[43] = "負責人";
-                            break;
-                        case "2":
-                            dr[43] = "業務窗口";
-                            break;
-                        case "3":
-                            dr[43] = "圖/文窗口";
-                            break;
-                        case "4":
-                            dr[43] = "出貨窗口";
-                            break;
-                        case "5":
-                            dr[43] = "賬務窗口";
-                            break;
-                        case "6":
-                            dr[43] = "客服窗口";
-                            break;
-                    }
+                    dr[43] = ContactTypeToStr(dr_v["contact_type_3"].ToString());
+                                        
                     dr[44] = dr_v["contact_name_3"].ToString();
                     dr[45] = dr_v["contact_phone_1_3"].ToString();
                     dr[46] = dr_v["contact_mobile_3"].ToString();
                     dr[47] = dr_v["contact_email_3"].ToString();
-
-                    //dr[41] = dr_v["contact_type_4"].ToString();
-                    switch (dr_v["contact_type_4"].ToString())
-                    {
-                        case "1":
-                            dr[48] = "負責人";
-                            break;
-                        case "2":
-                            dr[48] = "業務窗口";
-                            break;
-                        case "3":
-                            dr[48] = "圖/文窗口";
-                            break;
-                        case "4":
-                            dr[48] = "出貨窗口";
-                            break;
-                        case "5":
-                            dr[48] = "賬務窗口";
-                            break;
-                        case "6":
-                            dr[48] = "客服窗口";
-                            break;
-                    }
+                    dr[48] = ContactTypeToStr(dr_v["contact_type_4"].ToString());
                     dr[49] = dr_v["contact_name_4"].ToString();
                     dr[50] = dr_v["contact_phone_1_4"].ToString();
                     dr[51] = dr_v["contact_mobile_4"].ToString();
                     dr[52] = dr_v["contact_email_4"].ToString();
-
-                    //dr[46] = dr_v["contact_type_5"].ToString();
-                    switch (dr_v["contact_type_5"].ToString())
-                    {
-                        case "1":
-                            dr[53] = "負責人";
-                            break;
-                        case "2":
-                            dr[53] = "業務窗口";
-                            break;
-                        case "3":
-                            dr[53] = "圖/文窗口";
-                            break;
-                        case "4":
-                            dr[53] = "出貨窗口";
-                            break;
-                        case "5":
-                            dr[53] = "賬務窗口";
-                            break;
-                        case "6":
-                            dr[53] = "客服窗口";
-                            break;
-                    }
+                    dr[53] = ContactTypeToStr(dr_v["contact_type_5"].ToString());
                     dr[54] = dr_v["contact_name_5"].ToString();
                     dr[55] = dr_v["contact_phone_1_5"].ToString();
                     dr[56] = dr_v["contact_mobile_5"].ToString();
@@ -2744,7 +2690,6 @@ namespace Admin.gigade.Controllers
 
         }
 
-        #endregion
         #endregion
 
         #region 獲取供應商品牌列表數據 HttpResponseBase GetVendorBrandList()
