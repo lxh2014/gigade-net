@@ -1705,9 +1705,8 @@ namespace gigadeExcel.Comment
                         table.Columns.Add(column);
                     }
 
-                    //最后一列的标号  即总的行数
-                    //int rowCount = sheet.LastRowNum;
-                    for (int i = (sheet.FirstRowNum + 1); i < sheet.LastRowNum; i++)
+                    //行號從1開始；第一行為表頭
+                    for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++)
                     {
                         IRow row = sheet.GetRow(i);
                         DataRow dataRow = table.NewRow();
