@@ -1411,10 +1411,11 @@
     <Compile Include="Model\Query\PromoShareConditionQuery.cs" />
     <Compile Include="Model\Query\PromoShareConditionTypeQuery.cs" />
     <Compile Include="Model\Query\PromoShareMasterQuery.cs" />
+    <Compile Include="Model\Query\ScheduleConfigQuery.cs" />
     <Compile Include="Model\Query\ScheduleQuery.cs" />
     <Compile Include="Model\OrderAccumAmount.cs" />
     <Compile Include="Model\Query\OrderAccumAmountQuery.cs" />
-    <Compile Include="Model\Query\ScheduleServiceQuery.cs" />
+    <Compile Include="Model\Query\ScheduleMasterQuery.cs" />
     <Compile Include="Model\Query\SecretAccountSetQuery.cs" />
     <Compile Include="Model\Query\ShippingVoucherQuery.cs" />
     <Compile Include="Model\Query\SphinxExcludeQuery.cs" />
@@ -1434,6 +1435,8 @@
     <Compile Include="Model\Query\VoteEventQuery.cs" />
     <Compile Include="Model\Query\VoteMessageQuery.cs" />
     <Compile Include="Model\Query\ZipQuery.cs" />
+    <Compile Include="Model\Query\SchedulePeriodQuery.cs" />
+    <Compile Include="Model\Query\ScheduleLogQuery.cs" />
     <Compile Include="Model\RecommendedProductAttribute.cs" />
     <Compile Include="Model\RecommendedRroductAttributeTemp.cs" />
     <Compile Include="Model\Schedule.cs" />
@@ -1582,9 +1585,10 @@
     <Compile Include="Model\Redirect.cs" />
     <Compile Include="Model\RedirectClick.cs" />
     <Compile Include="Model\RedirectGroup.cs" />
+    <Compile Include="Model\ScheduleConfig.cs" />
     <Compile Include="Model\ScheduleItem.cs" />
     <Compile Include="Model\ScheduleParamer.cs" />
-    <Compile Include="Model\ScheduleService.cs" />
+    <Compile Include="Model\ScheduleMaster.cs" />
     <Compile Include="Model\SecretAccountSet.cs" />
     <Compile Include="Model\SecretInfoLog.cs" />
     <Compile Include="Model\ShippingVoucher.cs" />
@@ -1814,6 +1818,8 @@
     <Compile Include="Model\Zip.cs" />
     <Compile Include="Model\OrderMasterStatus.cs" />
     <Compile Include="Dao\ParametersrcXmlDao.cs" />
+    <Compile Include="Model\SchedulePeriod.cs" />
+    <Compile Include="Model\ScheduleLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\TrialPicture.cs" />
     <Compile Include="Model\TrialRecord.cs" />
