@@ -156,7 +156,6 @@
     <Compile Include="Controllers\DeliveryStoreController.cs" />
     <Compile Include="Controllers\DispatchingSystemController.cs" />
     <Compile Include="Controllers\EdmController.cs" />
-    <Compile Include="Controllers\EdmGroupNewQuery.cs" />
     <Compile Include="Controllers\EdmNewController.cs" />
     <Compile Include="Controllers\EdmSController.cs" />
     <Compile Include="Controllers\ElementController.cs" />
