@@ -270,8 +270,8 @@ function editFunction(rowID) {
             { value: '負責人' },
             { value: '業務窗口' },
             { value: '圖/文窗口' },
-            { value: '出貨窗口' },
-            { value: '賬務窗口' },
+            { value: '出貨負責窗口' },
+            { value: '帳務連絡窗口' },
             { value: '客服窗口' }
         ]
     });
