@@ -117,7 +117,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
             //            Ext.getCmp("vugGrid").down('#callid').setDisabled(selections.length == 0);
         }
     }
-});
+}); 
 
 
 VipUserGroupStore.on('beforeload', function () {

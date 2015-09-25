@@ -31,7 +31,6 @@ namespace BLL.gigade.Dao
         private IDBAccess _dbAccess;
         private Common.MySqlHelper mysqlHelp;
         UserHistoryDao _userhistoryDao = new UserHistoryDao("");
-        VendorCateSetDao _vendorcatedao = new VendorCateSetDao("");
         SmsDao _smsdao = new SmsDao("");
         SerialDao _serialDao = new SerialDao("");
         private string connStr;
@@ -41,6 +40,7 @@ namespace BLL.gigade.Dao
             _dbAccess = DBFactory.getDBAccess(DBType.MySql, connectionStr);
             connStr = connectionStr;
             mysqlHelp = new Common.MySqlHelper(connectionStr);
+            _serialDao = new SerialDao(connectionStr);
         }
 
         #region 獲取供應商列表+List<VendorQuery> Query(VendorQuery query, ref int totalCount)
@@ -186,7 +186,7 @@ namespace BLL.gigade.Dao
                 strSql.Append("contact_type_3,contact_name_3,contact_phone_1_3,contact_phone_2_3,contact_mobile_3,contact_email_3,contact_type_4,contact_name_4,contact_phone_1_4,");
                 strSql.Append("contact_phone_2_4,contact_mobile_4,contact_email_4,contact_type_5,contact_name_5,contact_phone_1_5,contact_phone_2_5,contact_mobile_5,contact_email_5,");
                 strSql.Append("cost_percent,creditcard_1_percent,creditcard_3_percent,sales_limit,bonus_percent,agreement_createdate,agreement_start,agreement_end,checkout_type,");
-                strSql.Append("checkout_other,bank_code,bank_name,bank_number,bank_account,freight_low_limit,freight_low_money,freight_normal_limit,freight_normal_money,");
+                strSql.Append("checkout_other,bank_code,bank_name,bank_number,bank_account,freight_low_limit,freight_low_money,freight_normal_limit,freight_normal_money,erp_id,");
                 strSql.Append("freight_return_low_money,freight_return_normal_money,vendor_note,vendor_confirm_code,vendor_login_attempts,assist,dispatch,product_mode,");//新增字段kuser、kdate保存供應商建立信息 add by shuangshuang0420j 20150624 10:15
                 strSql.Append("product_manage,gigade_bunus_percent,gigade_bunus_threshold,procurement_days,self_send_days,stuff_ware_days,dispatch_days,vendor_type,kuser,kdate from vendor where 1=1");//新增字段procurement_days,self_send_days,stuff_ware_days,dispatch_days add by shuangshuang0420j 20150323 10:15
                 if (query.vendor_id != 0)
@@ -350,6 +350,7 @@ namespace BLL.gigade.Dao
         {
             model.Replace4MySQL();
             int i = 0;
+            StringBuilder sql = new StringBuilder();
             MySqlCommand mySqlCmd = new MySqlCommand();
             MySqlConnection mySqlConn = new MySqlConnection(connStr);
             try
@@ -363,14 +364,14 @@ namespace BLL.gigade.Dao
                 mySqlCmd.CommandType = System.Data.CommandType.Text;
 
                 #region 獲取vendor_id
-
-                #endregion
-
                 mySqlCmd.CommandText = _serialDao.Update(10);
+                sql.Append(mySqlCmd.CommandText);
                 model.vendor_id = Convert.ToUInt32(mySqlCmd.ExecuteScalar());
+                #endregion
 
                 #region 獲取vendor_code
                 mySqlCmd.CommandText = "select max(vendor_code)as vendor_code from vendor;";
+                sql.Append(mySqlCmd.CommandText);
                 string tempCode = mySqlCmd.ExecuteScalar().ToString();
                 int nowYear = Convert.ToInt32(DateTime.Today.Year.ToString().Substring(2));
                 int nowDays = DateTime.Today.DayOfYear;
@@ -393,18 +394,47 @@ namespace BLL.gigade.Dao
 
                 model.content = ReturnHistoryCon(model).ToString();
 
+                #region 獲取erp_id
+                if (!string.IsNullOrEmpty(model.prod_cate) && !string.IsNullOrEmpty(model.buy_cate)
+                   && !string.IsNullOrEmpty(model.tax_type)
+                   && model.buy_cate.StartsWith(model.prod_cate))
+                {
+                    //獲取serial_id;
+                    Serial serModel = _serialDao.GetSerialById(77);
+                    if (serModel == null)
+                    {
+                        serModel = new Serial();
+                        serModel.Serial_id = 77;
+                        serModel.Serial_Value = 500;//默認從500開始
+                        mySqlCmd.CommandText = _serialDao.InsertStr(serModel);
+                        sql.Append(mySqlCmd.CommandText);
+                        i += mySqlCmd.ExecuteNonQuery();
+                    }
+                    mySqlCmd.CommandText = _serialDao.Update(77);//77代表erp_id的serial
+                    sql.Append(mySqlCmd.CommandText);
+                    model.serial = mySqlCmd.ExecuteScalar().ToString();
+                    if (!string.IsNullOrEmpty(model.serial))
+                    {
+                        model.erp_id = model.buy_cate + CommonFunction.Supply(model.serial, "0", 5) + model.tax_type;
+
+                        if (IsExitErpID(model.erp_id) > 0)
+                        {
+                            i = -1;
+                            return i;
+                        }
+                    }
+                }
+                #endregion
+
                 #region 處理vendor表
                 mySqlCmd.CommandText = InsertVendor(model);
+                sql.Append(mySqlCmd.CommandText);
                 i += mySqlCmd.ExecuteNonQuery();
                 #endregion
-
-                #region 處理VendorCateSet表
-                mySqlCmd.CommandText = _vendorcatedao.SaveSql(model);
-                i += mySqlCmd.ExecuteNonQuery();
-                #endregion
-
+               
                 #region 處理userhistory表
                 mySqlCmd.CommandText = _userhistoryDao.Save(model);
+                sql.Append(mySqlCmd.CommandText);
                 i += mySqlCmd.ExecuteNonQuery();
                 #endregion
 
@@ -414,7 +444,7 @@ namespace BLL.gigade.Dao
             catch (Exception ex)
             {
                 mySqlCmd.Transaction.Rollback();
-                throw new Exception("VendorDao-->Add-->" + ex.Message, ex);
+                throw new Exception("VendorDao-->Add-->" + ex.Message + sql.ToString(), ex);
             }
             finally
             {
@@ -553,6 +583,26 @@ namespace BLL.gigade.Dao
             {
                 int total = 0;
                 strSql.AppendFormat(" select count(vendor_id) as total from vendor where  vendor_email ='{0}'", email);
+                DataTable _dt = _dbAccess.getDataTable(strSql.ToString());
+                if (_dt.Rows.Count > 0)
+                {
+                    total = Convert.ToInt32(_dt.Rows[0]["total"].ToString());
+                }
+                return total;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(" vendorDao-->IsExitEmail-->" + ex.Message + strSql.ToString(), ex);
+            }
+        }
+
+        public int IsExitErpID(string erp_id)
+        {
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+                int total = 0;
+                strSql.AppendFormat(" select count(vendor_id) as total from vendor where  erp_id ='{0}'", erp_id);
                 DataTable _dt = _dbAccess.getDataTable(strSql.ToString());
                 if (_dt.Rows.Count > 0)
                 {

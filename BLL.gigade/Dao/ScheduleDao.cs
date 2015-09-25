@@ -33,13 +33,13 @@ namespace BLL.gigade.Dao
             try
             {
                 sb.AppendFormat(@"INSERT INTO `schedule`  (schedule_name,`type`,`execute_type`,`day_type`,`month_type`,`date_value`,`repeat_count`,
-                `repeat_hours`,`time_type`,`week_day`,`start_time`,`end_time`,`duration_start`,`duration_end`,`desc`,create_user,create_date)
-                VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}',{13},'{14}','{15}','{16}');",
+                `repeat_hours`,`time_type`,`week_day`,`start_time`,`end_time`,`duration_start`,`duration_end`,`desc`,create_user,create_date,trigger_time,execute_days)
+                VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}',{13},'{14}','{15}','{16}','{17}','{18}');",
                  s.schedule_name, s.type, s.execute_type, s.day_type, s.month_type, s.date_value, s.repeat_count, s.repeat_hours, s.time_type,
                  s.week_day, s.start_time.ToString("HH:mm:ss"), s.end_time.ToString("HH:mm:ss"),
                  s.duration_start.ToString("yyyy-MM-dd"),
                  s.duration_end == DateTime.MinValue ? "null" : "'" + s.duration_end.ToString("yyyy-MM-dd") + "'",
-                 s.desc, s.create_user, s.create_date.ToString("yyyy-MM-dd HH:mm:ss"));
+                 s.desc, s.create_user, s.create_date.ToString("yyyy-MM-dd HH:mm:ss"),s.trigger_time,s.execute_days);
                 return _dbAccess.execCommand(sb.ToString());
             }
             catch (Exception ex)
@@ -57,14 +57,14 @@ namespace BLL.gigade.Dao
             string sqlStr = string.Format(@"update `schedule` set  `type`='{0}',`execute_type`='{1}',`day_type`='{2}',`month_type`='{3}',`date_value`='{4}',
                 `repeat_count`='{5}',`repeat_hours`='{6}',`time_type`='{7}',`week_day`='{8}',
                 `start_time`='{9}',`end_time`='{10}',`duration_start`='{11}',`duration_end`={12},schedule_name='{13}',
-                `desc`='{14}',create_user={15},create_date='{16}' WHERE schedule_id = {17}",
+                `desc`='{14}',create_user={15},create_date='{16}',trigger_time='{17}',execute_days='{18}'  WHERE schedule_id = {19}",
                 schedule.type, schedule.execute_type, schedule.day_type, schedule.month_type, schedule.date_value,
                 schedule.repeat_count, schedule.repeat_hours,
                 schedule.time_type, schedule.week_day, schedule.start_time.ToString("HH:mm:ss"), schedule.end_time.ToString("HH:mm:ss"),
                 schedule.duration_start.ToString("yyyy-MM-dd"),
                 schedule.duration_end == DateTime.MinValue ? "null" : "'" + schedule.duration_end.ToString("yyyy-MM-dd") + "'",
                 schedule.schedule_name, schedule.desc, schedule.create_user,
-                schedule.create_date.ToString("yyyy-MM-dd HH:mm:ss"), schedule.schedule_id);
+                schedule.create_date.ToString("yyyy-MM-dd HH:mm:ss"),schedule.trigger_time,schedule.execute_days,schedule.schedule_id);
 
             return _dbAccess.execCommand(sqlStr);
         }
@@ -81,7 +81,7 @@ namespace BLL.gigade.Dao
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append(@"SELECT s.schedule_name,s.schedule_id,s.TYPE,s.execute_type,s.month_type,s.day_type,s.date_value,s.time_type,s.repeat_count,s.repeat_hours,s.week_day,
-                    s.start_time,s.end_time,s.duration_start,s.duration_end,s.`desc`,m.user_username AS create_user_name, create_date 
+                    s.start_time,s.end_time,s.duration_start,s.duration_end,s.`desc`,m.user_username AS create_user_name, create_date,trigger_time,execute_days 
                     FROM `schedule` s 
                 LEFT JOIN manage_user m ON s.create_user=m.user_id  
             WHERE 1=1");

@@ -47,7 +47,7 @@ namespace BLL.gigade.Dao.Impl
         /// <param name="brandId"></param>
         /// <returns></returns>
         uint QueryMaxSort(uint brandId);
-        int TempMove2Pro(string product,string courseProduct, string proItem,string courDetItem, string selPro, string priceMaster, string itemPrice, ArrayList sqls);
+        int TempMove2Pro(string product, string courseProduct, string proItem, string courDetItem, string selPro, string priceMaster, string itemPrice, ArrayList sqls);
         bool ProductMigration(string product, ArrayList priceMasters, ArrayList items, ArrayList itemPrices, ArrayList sqls, ArrayList specs);
         List<Model.Custom.QueryandVerifyCustom> QueryandVerify(Model.Query.QueryVerifyCondition qcCon, ref int total);
         /// <summary>
@@ -62,11 +62,11 @@ namespace BLL.gigade.Dao.Impl
         List<Model.Custom.QueryandVerifyCustom> GetProductInfoByID(string productID); //add 2014/08/25 wangwei0216w
         Model.Custom.ProductDetailsCustom ProductDetail(Model.Product query);
         string Delete(uint product_id);
-        Model.Custom.OrderComboAddCustom OrderQuery(Model.Product query, uint user_level,uint user_id,uint site_id);
+        Model.Custom.OrderComboAddCustom OrderQuery(Model.Product query, uint user_level, uint user_id, uint site_id);
         int QueryClassId(int pid);
         List<Model.Custom.ProductItemCustom> GetStockInfo(Model.Query.QueryVerifyCondition query); //add by wangwei0216w 2014/10/20
 
-        List<Model.Custom.ProductDetailsCustom> GetAllProList(Model.Query.ProductQuery query,  out int totalCount);
+        List<Model.Custom.ProductDetailsCustom> GetAllProList(Model.Query.ProductQuery query, out int totalCount);
 
         #region 與供應商商品相關
         /// <summary>
@@ -94,7 +94,7 @@ namespace BLL.gigade.Dao.Impl
         /// <returns>List集合</returns>
         string UpdateSaleStatusBatch(Int64 nowTime);
 
-        string UpdateSaleStatusByCondition(Int64 nowTime, Product p);   
+        string UpdateSaleStatusByCondition(Int64 nowTime, Product p);
 
         //add by wwei0216w 2015/1/28
         /// <summary>
@@ -146,5 +146,13 @@ namespace BLL.gigade.Dao.Impl
         /// <returns>成功 OR 失敗</returns>
         bool UpdateOff_Grade(uint product_id, int off_grade);//add by wwei0216w 2015/6/24
         int GetProductType(Product query);
+
+        /// <summary>
+        /// 預購商品導出  guodong1130w 2015/09/17 添加
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="totalCount"></param>
+        /// <returns></returns>
+        List<Model.Custom.QueryandVerifyCustom> QueryForPurchase_in_advance(Model.Query.QueryVerifyCondition query, out int totalCount);
     }
 }

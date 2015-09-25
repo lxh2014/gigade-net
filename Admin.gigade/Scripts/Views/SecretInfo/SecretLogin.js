@@ -211,12 +211,10 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                     if (urlType == "/Manage/ManageUser/changePwd ") {//彈出修改密碼窗口
                         ChangePwdFunction(relatedID);
                     }
-                    if (urlType == "/Member/UsersListIndex/EditEmail")
-                    {
+                    else if (urlType == "/Member/UsersListIndex/EditEmail") {
                         editEmailFunction(relatedID, edit_UserStore);
                     }
-                    if (urlType == "/OrderManage/ModifyDeliverData")
-                    {
+                    else if (urlType == "/OrderManage/ModifyDeliverData") {
                         modifyDeliverData();
                     }
                     else {

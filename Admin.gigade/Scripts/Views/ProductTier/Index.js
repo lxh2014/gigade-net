@@ -1,28 +1,28 @@
-﻿
-var pageSize = 30;
+﻿var pageSize = 30;
 var schedule_id = 0;//排程id
 Ext.define('GIGADE.Tier', {
     extend: 'Ext.data.Model',
-    fields: [
-                { name: 'schedule_id', type: 'int' },
-                { name: 'schedule_name', type: 'string' },
-                { name: 'type', type: 'int' },
-                { name: 'execute_type', type: 'string' },
-                { name: 'day_type', type: 'int' },
-                { name: 'month_type', type: 'int' },
-                { name: 'date_value', type: 'int' },
-                { name: 'repeat_count', type: 'int' },
-                { name: 'repeat_hours', type: 'int' },
-                { name: 'time_type', type: 'int' },
-                { name: 'week_day', type: 'string' },
-                { name: 'start_time', type: 'string' },
-                { name: 'end_time', type: 'string' },
-                { name: 'duration_start', type: 'string' },
-                { name: 'duration_end', type: 'string' },
-                { name: 'desc', type: 'string' },
-                { name: 'create_user', type: 'int' },
-                { name: 'create_user_name', type: 'string' },
-                { name: 'create_date', type: 'string' }]
+    fields: [{ name: 'schedule_id', type: 'int' },
+        { name: 'schedule_name', type: 'string' },
+        { name: 'type', type: 'int' },
+        { name: 'execute_type', type: 'string' },
+        { name: 'day_type', type: 'int' },
+        { name: 'month_type', type: 'int' },
+        { name: 'date_value', type: 'int' },
+        { name: 'repeat_count', type: 'int' },
+        { name: 'repeat_hours', type: 'int' },
+        { name: 'time_type', type: 'int' },
+        { name: 'week_day', type: 'string' },
+        { name: 'start_time', type: 'string' },
+        { name: 'end_time', type: 'string' },
+        { name: 'duration_start', type: 'string' },
+        { name: 'duration_end', type: 'string' },
+        { name: 'desc', type: 'string' },
+        { name: 'create_user', type: 'int' },
+        { name: 'create_user_name', type: 'string' },
+        { name: 'create_date', type: 'string' },
+        { name: 'execute_days', type: 'string' },
+        { name: 'trigger_time', type: 'string' }]
 });
 
 var tierStore = Ext.create('Ext.data.Store', {
@@ -39,7 +39,6 @@ var tierStore = Ext.create('Ext.data.Store', {
         }
     }
 });
-
 
 var searchtypeStore = Ext.create('Ext.data.Store', {
     fields: ["ParameterCode", "parameterName"],
@@ -83,8 +82,6 @@ var keyStore = Ext.create('Ext.data.Store', {
     autoLoad: true
 });
 
-
-
 ///獲取value信息
 var valueStore = Ext.create('Ext.data.Store', {
     fields: ['ParameterCode', 'parameterName'],
@@ -101,8 +98,7 @@ var valueStore = Ext.create('Ext.data.Store', {
 
 //對應Grid
 var relevantStore = Ext.create('Ext.data.Store', {
-    fields: [
-        { name: 'id', type: 'int' },
+    fields: [{ name: 'id', type: 'int' },
         { name: 'schedule_Id', type: 'int' },
         { name: 'item_name', type: 'string' },
         { name: 'type', type: 'int' },
@@ -128,7 +124,6 @@ var relevantStore = Ext.create('Ext.data.Store', {
     },
     autoLoad: false
 });
-
 
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
@@ -222,14 +217,20 @@ var searchform = Ext.create('Ext.form.Panel', {
 
 })
 
-
 Ext.onReady(function () {
-
-    document.body.onkeydown = function () {
-        if (event.keyCode == 13) {
+    //document.body.onkeydown = function () {
+    //    if (e.which == 13) {
+    //        $("#btn_search").click();
+    //    }
+    //};
+    ///edit by wwei0216w  /*該版本兼容火狐之前不兼容*/
+    document.onkeydown = function (event) {
+        e = event ? event : (window.event ? window.event : null);
+        if (e.keyCode == 13) {
+            //执行的方法 
             $("#btn_search").click();
         }
-    };
+    }
 
     var tierGrid = Ext.create('Ext.grid.Panel', {
         id: 'tierGrid',
@@ -262,10 +263,11 @@ Ext.onReady(function () {
             {
                 header: SCHEDULE_TYPE, dataIndex: 'type', width: 99, align: 'left', menuDisabled: true, sortable: false, renderer: function (value) {//排程類型
                     if (value == '1') {
-                        //return '出貨一次';
-                        return EXECUTE_ONCE; //edit by wwei0216w
-                    } else {
+                        return EXECUTE_ONCE;
+                    } if (value == '2') {
                         return EXECUTE_REPEAT;
+                    } if (value == '3') {
+                        return EXECUTE_IRREGULAR;
                     }
                 }
             },
@@ -286,8 +288,7 @@ Ext.onReady(function () {
             { header: END_EDIT_USER, dataIndex: 'create_user_name', width: 80, align: 'left', menuDisabled: true, sortable: false },//最后創建人 2015.08.24
             { header: BEGIN_TIME, hidden: true, dataIndex: 'duration_start', width: 120, align: 'left', renderer: Ext.util.Format.dateRenderer('Y/m/d'), menuDisabled: true, sortable: false },//開始時間
             { header: END_TIME, hidden: true, dataIndex: 'duration_end', width: 120, align: 'left', renderer: Ext.util.Format.dateRenderer('Y/m/d'), menuDisabled: true, sortable: false },//結束時間
-        { header: DESCRIBE, dataIndex: 'desc', width: 500, align: 'left', menuDisabled: true, sortable: false, flex: 1 }],//描述
-
+            { header: DESCRIBE, dataIndex: 'desc', width: 500, align: 'left', menuDisabled: true, sortable: false, flex: 1 }],//描述
         listeners: {
             //itemdblclick: onDoubleClick,
             scrollershow: function (scroller) {
@@ -315,7 +316,6 @@ Ext.onReady(function () {
     });
     tierStore.load();
 })
-
 
 RelationDetail = Ext.create('Ext.window.Window', {
     title: RELEVANCE_DETAILS,//關係詳情
@@ -359,6 +359,7 @@ function showRelationDetail(rec) {
 
 function onAddClick() {
     pcFrm.getForm().reset();
+    irregulartimeStore.removeAll();
     Ext.getCmp('gxGrid').hide();
     Ext.getCmp('mst').setText("");
     Ext.getCmp('ms').setText("");
@@ -377,7 +378,7 @@ function onEditClick() {
     } else if (row.length == 1) {
         addPc.show();
         Ext.getCmp('btnSave').show();
-        Tier_Load(row[0]); 
+        Tier_Load(row[0]);
     }
 }
 
@@ -405,7 +406,7 @@ function onRemoveClick() {
                             Ext.Msg.alert(INFORMATION, SUCCESS);
                         }
                         else
-                            Ext.Msg.alert(INFORMATION, FAILURE);
+                            Ext.Msg.alert(INFORMATION, DELETEFAILURE);
                     },
                     failure: function () {
                         Ext.Msg.alert(INFORMATION, FAILURE);
@@ -423,7 +424,6 @@ var smRe = Ext.create('Ext.selection.CheckboxModel', {
         }
     }
 });
-
 
 var relevantGrid = Ext.create('Ext.grid.Panel', {
     plugins: [{ ptype: 'cellediting' }],
@@ -559,7 +559,6 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                     }
                 }
 
-
                 for (var i = 0; i < relevantStore.data.length; i++) { //查找新增數據
                     var item = relevantStore.data.items[i];
                     if (item.data.id == 0) {
@@ -569,7 +568,6 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                         upDataStore[upDataStore.length] = item;
                     }
                 }
-
 
                 if (!upDataStore.length) {
                     myMask.hide();
@@ -622,7 +620,6 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
     }]
 })
 
-
 var reWindow = Ext.create('Ext.window.Window', {
     title: PARALLELISM_INFORMATION_CONFIG,//對應信息設定
     id: 'reWindow',
@@ -635,7 +632,6 @@ var reWindow = Ext.create('Ext.window.Window', {
     resizable: true,
     autoScroll: true
 });
-
 
 function onRelevantClick() {
     var row = Ext.getCmp("tierGrid").getSelectionModel().getSelection();
