@@ -58,7 +58,6 @@ namespace Admin.gigade.Controllers
         private ICallerImplMgr mgr;
         private IVendorLoginListImplMgr _Ivendorloginlist;
         private ParameterMgr paraMgr;
-        private IVendorCateSetImplMgr _vencatesetMgr;
         private GroupCallerMgr gcMgr;
         private IFgroupImplMgr fgMgr;
         private IManageUserImplMgr muMgr;
@@ -214,7 +213,7 @@ namespace Admin.gigade.Controllers
                     if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
                     {
                         query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
-                    }                  
+                    }
                     stores = _vendorMgr.Query(query, ref totalCount);
                 }
                 else
@@ -769,14 +768,7 @@ namespace Admin.gigade.Controllers
                     {
                         venQuery.invoice_address = "";
                     }
-                    if (!string.IsNullOrEmpty(Request.Params["erp_id"].ToString()))
-                    {
-                        venQuery.erp_id = Request.Params["erp_id"].ToString();
-                    }
-                    else
-                    {
-                        venQuery.erp_id = "";
-                    }
+
                     if (!string.IsNullOrEmpty(Request.Params["pm"].ToString()))
                     {
                         venQuery.product_manage = Convert.ToUInt32(Request.Params["pm"].ToString());
@@ -1047,12 +1039,6 @@ namespace Admin.gigade.Controllers
                     {
                         venQuery.tax_type = "";
                     }
-                    venQuery.serial = GetSerial(new VendorCateSet
-                    {
-                        cate_code_big = venQuery.prod_cate,
-                        cate_code_middle = venQuery.buy_cate,
-                        tax_type = venQuery.tax_type
-                    });
                     #endregion
 
                     #region   //對聯絡人的 信息處理
@@ -1153,11 +1139,11 @@ namespace Admin.gigade.Controllers
                         venQuery.vendor_status = Convert.ToUInt32(Request.Params["vendor_status"].ToString());
                         if (oldven.vendor_status != venQuery.vendor_status)
                         {//1:啟用2：停用3：失格
-                           // update_log.AppendFormat("vendor_status:{0}:{1}:供應商狀態#", oldven.vendor_status, venQuery.vendor_status);
+                            // update_log.AppendFormat("vendor_status:{0}:{1}:供應商狀態#", oldven.vendor_status, venQuery.vendor_status);
                             TableChangeLog item = new TableChangeLog();
                             item.change_field = "vendor_status";
                             item.old_value = oldven.vendor_status.ToString();
-                            item.new_value = venQuery.vendor_status.ToString();                         
+                            item.new_value = venQuery.vendor_status.ToString();
                             item.field_ch_name = "供應商狀態";
                             list.Add(item);
                         }
@@ -1184,7 +1170,7 @@ namespace Admin.gigade.Controllers
                     }
                     if (oldven.vendor_type != venQuery.vendor_type)
                     {
-                       // update_log.AppendFormat("vendor_type:{0}:{1}:供應商類型#", oldven.vendor_type, venQuery.vendor_type);
+                        // update_log.AppendFormat("vendor_type:{0}:{1}:供應商類型#", oldven.vendor_type, venQuery.vendor_type);
                         TableChangeLog item = new TableChangeLog();
                         item.change_field = "vendor_type";
                         item.old_value = oldven.vendor_type;
@@ -1227,7 +1213,7 @@ namespace Admin.gigade.Controllers
                                     venQuery.vendor_email = Request.Params["vendor_email"].ToString().ToLower();
                                     if (oldven.vendor_email != venQuery.vendor_email)
                                     {
-                                       // update_log.AppendFormat("vendor_email:{0}:{1}:公司Email#", oldven.vendor_email, venQuery.vendor_email);
+                                        // update_log.AppendFormat("vendor_email:{0}:{1}:公司Email#", oldven.vendor_email, venQuery.vendor_email);
                                         TableChangeLog item = new TableChangeLog();
                                         item.change_field = "vendor_email";
                                         item.old_value = oldven.vendor_email;
@@ -1285,7 +1271,7 @@ namespace Admin.gigade.Controllers
                         venQuery.vendor_invoice = Request.Params["vendor_invoice"].ToString();
                         if (oldven.vendor_invoice != venQuery.vendor_invoice)
                         {
-                           // update_log.AppendFormat("vendor_invoice:{0}:{1}:統一編號#", oldven.vendor_invoice, venQuery.vendor_invoice);
+                            // update_log.AppendFormat("vendor_invoice:{0}:{1}:統一編號#", oldven.vendor_invoice, venQuery.vendor_invoice);
                             TableChangeLog item = new TableChangeLog();
                             item.change_field = "vendor_invoice";
                             item.old_value = oldven.vendor_invoice;
@@ -1321,7 +1307,7 @@ namespace Admin.gigade.Controllers
                         venQuery.company_fax = Request.Params["company_fax"].ToString();
                         if (oldven.company_fax != venQuery.company_fax)
                         {
-                           // update_log.AppendFormat("company_fax:{0}:{1}:公司傳真#", oldven.company_fax, venQuery.company_fax);
+                            // update_log.AppendFormat("company_fax:{0}:{1}:公司傳真#", oldven.company_fax, venQuery.company_fax);
                             TableChangeLog item = new TableChangeLog();
                             item.change_field = "company_fax";
                             item.old_value = oldven.company_fax;
@@ -1382,15 +1368,7 @@ namespace Admin.gigade.Controllers
                         item.field_ch_name = "發票地址";
                         list.Add(item);
                     }
-                    if (!string.IsNullOrEmpty(Request.Params["erp_id"].ToString()))
-                    {
-                        venQuery.erp_id = Request.Params["erp_id"].ToString();
-                    }
-                    else
-                    {
-                        venQuery.erp_id = oldven.erp_id;
-                    }
-
+                    venQuery.erp_id = oldven.erp_id;
                     if (uint.TryParse(Request.Params["cost_percent"].ToString(), out isUint))
                     {
                         venQuery.cost_percent = Convert.ToUInt32(Request.Params["cost_percent"].ToString());
@@ -1452,7 +1430,7 @@ namespace Admin.gigade.Controllers
                         venQuery.agreement_start = Convert.ToUInt32(CommonFunction.GetPHPTime(Request.Params["agreement_start"].ToString()));
                         if (oldven.agreement_start != venQuery.agreement_start)
                         {
-                           // update_log.AppendFormat("agreement_start:{0}:{1}:合約開始日#", CommonFunction.GetNetTime(oldven.agreement_start).ToShortDateString(), CommonFunction.GetNetTime(venQuery.agreement_start).ToShortDateString());
+                            // update_log.AppendFormat("agreement_start:{0}:{1}:合約開始日#", CommonFunction.GetNetTime(oldven.agreement_start).ToShortDateString(), CommonFunction.GetNetTime(venQuery.agreement_start).ToShortDateString());
                             TableChangeLog item = new TableChangeLog();
                             item.change_field = "agreement_start";
                             item.old_value = CommonFunction.GetNetTime(oldven.agreement_start).ToShortDateString();
@@ -1470,7 +1448,7 @@ namespace Admin.gigade.Controllers
                         venQuery.agreement_end = Convert.ToUInt32(CommonFunction.GetPHPTime(Request.Params["agreement_end"].ToString()));
                         if (oldven.agreement_end != venQuery.agreement_end)
                         {
-                           // update_log.AppendFormat("agreement_end:{0}:{1}:合約結束日#", CommonFunction.GetNetTime(oldven.agreement_end).ToShortDateString(), CommonFunction.GetNetTime(venQuery.agreement_end).ToShortDateString());
+                            // update_log.AppendFormat("agreement_end:{0}:{1}:合約結束日#", CommonFunction.GetNetTime(oldven.agreement_end).ToShortDateString(), CommonFunction.GetNetTime(venQuery.agreement_end).ToShortDateString());
                             TableChangeLog item = new TableChangeLog();
                             item.change_field = "agreement_end";
                             item.old_value = CommonFunction.GetNetTime(oldven.agreement_end).ToShortDateString();
@@ -1543,7 +1521,7 @@ namespace Admin.gigade.Controllers
                         venQuery.bank_number = Request.Params["bank_number"].ToString();
                         if (oldven.bank_number != venQuery.bank_number)
                         {
-                           // update_log.AppendFormat("bank_number:{0}:{1}:銀行賬號#", oldven.bank_number, venQuery.bank_number);
+                            // update_log.AppendFormat("bank_number:{0}:{1}:銀行賬號#", oldven.bank_number, venQuery.bank_number);
                             TableChangeLog item = new TableChangeLog();
                             item.change_field = "bank_number";
                             item.old_value = oldven.bank_number;
@@ -1707,7 +1685,7 @@ namespace Admin.gigade.Controllers
                         venQuery.stuff_ware_days = Convert.ToInt32(Request.Params["stuff_ware_days"].ToString());
                         if (oldven.stuff_ware_days != venQuery.stuff_ware_days)
                         {
-                           // update_log.AppendFormat("stuff_ware_days:{0}:{1}:寄倉出貨天數#", oldven.stuff_ware_days, venQuery.stuff_ware_days);
+                            // update_log.AppendFormat("stuff_ware_days:{0}:{1}:寄倉出貨天數#", oldven.stuff_ware_days, venQuery.stuff_ware_days);
                             TableChangeLog item = new TableChangeLog();
                             item.change_field = "stuff_ware_days";
                             item.old_value = oldven.stuff_ware_days.ToString();
@@ -1725,7 +1703,7 @@ namespace Admin.gigade.Controllers
                         venQuery.dispatch_days = Convert.ToInt32(Request.Params["dispatch_days"].ToString());
                         if (oldven.dispatch_days != venQuery.dispatch_days)
                         {
-                           // update_log.AppendFormat("dispatch_days:{0}:{1}:調度出貨天數#", oldven.dispatch_days, venQuery.dispatch_days);
+                            // update_log.AppendFormat("dispatch_days:{0}:{1}:調度出貨天數#", oldven.dispatch_days, venQuery.dispatch_days);
                             TableChangeLog item = new TableChangeLog();
                             item.change_field = "dispatch_days";
                             item.old_value = oldven.dispatch_days.ToString();
@@ -1755,7 +1733,7 @@ namespace Admin.gigade.Controllers
                     }
                     if (oldven.product_manage != venQuery.product_manage)
                     {
-                       // update_log.AppendFormat("product_manage:{0}:{1}:管理人員#", oldven.product_manage, venQuery.product_manage);
+                        // update_log.AppendFormat("product_manage:{0}:{1}:管理人員#", oldven.product_manage, venQuery.product_manage);
                         TableChangeLog item = new TableChangeLog();
                         item.change_field = "product_manage";
                         item.old_value = oldven.product_manage.ToString();
@@ -1965,33 +1943,33 @@ namespace Admin.gigade.Controllers
 
                                 if (oldven.contact_type_1 != venQuery.contact_type_1)
                                 {
-                                   // update_log.AppendFormat("contact_type_1:{0}:{1}:第一聯絡人類型#", oldven.contact_type_1, venQuery.contact_type_1);
-                                    list.Add(new TableChangeLog() { change_field = "contact_type_1", old_value = oldven.contact_type_1.ToString(), new_value = venQuery.contact_type_1.ToString(), field_ch_name = "第一聯絡人類型" });                                                                                                                                                                        
-                                if (oldven.contact_name_1 != venQuery.contact_name_1)
-                                {
-                                   // update_log.AppendFormat("contact_name_1:{0}:{1}:第一聯絡人姓名#", oldven.contact_name_1, venQuery.contact_name_1);
-                                    list.Add(new TableChangeLog() { change_field = "contact_name_1", old_value = oldven.contact_name_1, new_value = venQuery.contact_name_1, field_ch_name = "第一聯絡人姓名" });
-                                }
-                                if (oldven.contact_phone_1_1 != venQuery.contact_phone_1_1)
-                                {
-                                    //update_log.AppendFormat("contact_phone_1_1:{0}:{1}:第一聯絡人電話一#", oldven.contact_phone_1_1, venQuery.contact_phone_1_1);
-                                    list.Add(new TableChangeLog() { change_field = "contact_phone_1_1", old_value = oldven.contact_phone_1_1, new_value = venQuery.contact_phone_1_1, field_ch_name = "第一聯絡人電話一" });
-                                }
-                                if (oldven.contact_phone_2_1 != venQuery.contact_phone_2_1)
-                                {
-                                   // update_log.AppendFormat("contact_phone_2_1:{0}:{1}:第一聯絡人電話二#", oldven.contact_phone_2_1, venQuery.contact_phone_2_1);
-                                    list.Add(new TableChangeLog() { change_field = "contact_phone_2_1", old_value = oldven.contact_phone_2_1, new_value = venQuery.contact_phone_2_1, field_ch_name = "第一聯絡人電話二" });
-                                }
-                                if (oldven.contact_mobile_1 != venQuery.contact_mobile_1)
-                                {
-                                   // update_log.AppendFormat("contact_mobile_1:{0}:{1}:第一聯絡人手機號碼#", oldven.contact_mobile_1, venQuery.contact_mobile_1);
-                                    list.Add(new TableChangeLog() { change_field = "contact_mobile_1", old_value = oldven.contact_mobile_1, new_value = venQuery.contact_mobile_1, field_ch_name = "第一聯絡人手機號碼" });
-                                }
-                                if (oldven.contact_email_1 != venQuery.contact_email_1)
-                                {
-                                    //update_log.AppendFormat("contact_email_1:{0}:{1}:第一聯絡人郵箱#", oldven.contact_email_1, venQuery.contact_email_1);
-                                    list.Add(new TableChangeLog() { change_field = "contact_email_1", old_value = oldven.contact_email_1, new_value = venQuery.contact_email_1, field_ch_name = "第一聯絡人郵箱" });
-                                }
+                                    // update_log.AppendFormat("contact_type_1:{0}:{1}:第一聯絡人類型#", oldven.contact_type_1, venQuery.contact_type_1);
+                                    list.Add(new TableChangeLog() { change_field = "contact_type_1", old_value = oldven.contact_type_1.ToString(), new_value = venQuery.contact_type_1.ToString(), field_ch_name = "第一聯絡人類型" });
+                                    if (oldven.contact_name_1 != venQuery.contact_name_1)
+                                    {
+                                        // update_log.AppendFormat("contact_name_1:{0}:{1}:第一聯絡人姓名#", oldven.contact_name_1, venQuery.contact_name_1);
+                                        list.Add(new TableChangeLog() { change_field = "contact_name_1", old_value = oldven.contact_name_1, new_value = venQuery.contact_name_1, field_ch_name = "第一聯絡人姓名" });
+                                    }
+                                    if (oldven.contact_phone_1_1 != venQuery.contact_phone_1_1)
+                                    {
+                                        //update_log.AppendFormat("contact_phone_1_1:{0}:{1}:第一聯絡人電話一#", oldven.contact_phone_1_1, venQuery.contact_phone_1_1);
+                                        list.Add(new TableChangeLog() { change_field = "contact_phone_1_1", old_value = oldven.contact_phone_1_1, new_value = venQuery.contact_phone_1_1, field_ch_name = "第一聯絡人電話一" });
+                                    }
+                                    if (oldven.contact_phone_2_1 != venQuery.contact_phone_2_1)
+                                    {
+                                        // update_log.AppendFormat("contact_phone_2_1:{0}:{1}:第一聯絡人電話二#", oldven.contact_phone_2_1, venQuery.contact_phone_2_1);
+                                        list.Add(new TableChangeLog() { change_field = "contact_phone_2_1", old_value = oldven.contact_phone_2_1, new_value = venQuery.contact_phone_2_1, field_ch_name = "第一聯絡人電話二" });
+                                    }
+                                    if (oldven.contact_mobile_1 != venQuery.contact_mobile_1)
+                                    {
+                                        // update_log.AppendFormat("contact_mobile_1:{0}:{1}:第一聯絡人手機號碼#", oldven.contact_mobile_1, venQuery.contact_mobile_1);
+                                        list.Add(new TableChangeLog() { change_field = "contact_mobile_1", old_value = oldven.contact_mobile_1, new_value = venQuery.contact_mobile_1, field_ch_name = "第一聯絡人手機號碼" });
+                                    }
+                                    if (oldven.contact_email_1 != venQuery.contact_email_1)
+                                    {
+                                        //update_log.AppendFormat("contact_email_1:{0}:{1}:第一聯絡人郵箱#", oldven.contact_email_1, venQuery.contact_email_1);
+                                        list.Add(new TableChangeLog() { change_field = "contact_email_1", old_value = oldven.contact_email_1, new_value = venQuery.contact_email_1, field_ch_name = "第一聯絡人郵箱" });
+                                    }
                                 }
                             }
                         }
@@ -2010,13 +1988,13 @@ namespace Admin.gigade.Controllers
 
                                 if (oldven.contact_type_2 != venQuery.contact_type_2)
                                 {
-                                   // update_log.AppendFormat("contact_type_2:{0}:{1}:第二聯絡人類型#", oldven.contact_type_2, venQuery.contact_type_2);
-                                    list.Add(new TableChangeLog() { change_field = "contact_type_2", old_value = oldven.contact_type_2.ToString(), new_value = venQuery.contact_type_2.ToString(), field_ch_name = "第二聯絡人類型" });                                
+                                    // update_log.AppendFormat("contact_type_2:{0}:{1}:第二聯絡人類型#", oldven.contact_type_2, venQuery.contact_type_2);
+                                    list.Add(new TableChangeLog() { change_field = "contact_type_2", old_value = oldven.contact_type_2.ToString(), new_value = venQuery.contact_type_2.ToString(), field_ch_name = "第二聯絡人類型" });
                                 }
                                 if (oldven.contact_name_2 != venQuery.contact_name_2)
                                 {
                                     //update_log.AppendFormat("contact_name_2:{0}:{1}:第二聯絡人姓名#", oldven.contact_name_2, venQuery.contact_name_2);
-                                    list.Add(new TableChangeLog() { change_field = "contact_name_2", old_value = oldven.contact_name_2, new_value = venQuery.contact_name_2, field_ch_name = "第二聯絡人姓名" });                                                                                                                    
+                                    list.Add(new TableChangeLog() { change_field = "contact_name_2", old_value = oldven.contact_name_2, new_value = venQuery.contact_name_2, field_ch_name = "第二聯絡人姓名" });
                                 }
                                 if (oldven.contact_phone_1_2 != venQuery.contact_phone_1_2)
                                 {
@@ -2030,12 +2008,12 @@ namespace Admin.gigade.Controllers
                                 }
                                 if (oldven.contact_mobile_2 != venQuery.contact_mobile_2)
                                 {
-                                   // update_log.AppendFormat("contact_mobile_2:{0}:{1}:第二聯絡人手機號碼#", oldven.contact_mobile_2, venQuery.contact_mobile_2);
+                                    // update_log.AppendFormat("contact_mobile_2:{0}:{1}:第二聯絡人手機號碼#", oldven.contact_mobile_2, venQuery.contact_mobile_2);
                                     list.Add(new TableChangeLog() { change_field = "contact_mobile_2", old_value = oldven.contact_mobile_2, new_value = venQuery.contact_mobile_2, field_ch_name = "第二聯絡人手機號碼" });
                                 }
                                 if (oldven.contact_email_2 != venQuery.contact_email_2)
                                 {
-                                   // update_log.AppendFormat("contact_email_2:{0}:{1}:第二聯絡人郵箱#", oldven.contact_email_2, venQuery.contact_email_2);
+                                    // update_log.AppendFormat("contact_email_2:{0}:{1}:第二聯絡人郵箱#", oldven.contact_email_2, venQuery.contact_email_2);
                                     list.Add(new TableChangeLog() { change_field = "contact_email_2", old_value = oldven.contact_email_2, new_value = venQuery.contact_email_2, field_ch_name = "第二聯絡人郵箱" });
                                 }
                             }
@@ -2051,7 +2029,7 @@ namespace Admin.gigade.Controllers
                                 venQuery.contact_phone_1_3 = contact1[2];
                                 venQuery.contact_phone_2_3 = contact1[3];
                                 venQuery.contact_mobile_3 = contact1[4];
-                                venQuery.contact_email_3 = contact1[5].ToLower();                            
+                                venQuery.contact_email_3 = contact1[5].ToLower();
                                 if (oldven.contact_type_3 != venQuery.contact_type_3)
                                 {
                                     //update_log.AppendFormat("contact_type_3:{0}:{1}:第三聯絡人類型#", oldven.contact_type_3, venQuery.contact_type_3);
@@ -2064,22 +2042,22 @@ namespace Admin.gigade.Controllers
                                 }
                                 if (oldven.contact_phone_1_3 != venQuery.contact_phone_1_3)
                                 {
-                                   // update_log.AppendFormat("contact_phone_1_3:{0}:{1}:第三聯絡人電話一#", oldven.contact_phone_1_3, venQuery.contact_phone_1_3);
+                                    // update_log.AppendFormat("contact_phone_1_3:{0}:{1}:第三聯絡人電話一#", oldven.contact_phone_1_3, venQuery.contact_phone_1_3);
                                     list.Add(new TableChangeLog() { change_field = "contact_phone_1_3", old_value = oldven.contact_phone_1_3, new_value = venQuery.contact_phone_1_3, field_ch_name = "第三聯絡人電話一" });
                                 }
                                 if (oldven.contact_phone_2_3 != venQuery.contact_phone_2_3)
                                 {
-                                   // update_log.AppendFormat("contact_phone_2_3:{0}:{1}:第三聯絡人電話二#", oldven.contact_phone_2_3, venQuery.contact_phone_2_3);
+                                    // update_log.AppendFormat("contact_phone_2_3:{0}:{1}:第三聯絡人電話二#", oldven.contact_phone_2_3, venQuery.contact_phone_2_3);
                                     list.Add(new TableChangeLog() { change_field = "contact_phone_2_3", old_value = oldven.contact_phone_2_3, new_value = venQuery.contact_phone_2_3, field_ch_name = "第三聯絡人電話二" });
                                 }
                                 if (oldven.contact_mobile_3 != venQuery.contact_mobile_3)
                                 {
-                                  //  update_log.AppendFormat("contact_mobile_3:{0}:{1}:第三聯絡人手機號碼#", oldven.contact_mobile_3, venQuery.contact_mobile_3);
+                                    //  update_log.AppendFormat("contact_mobile_3:{0}:{1}:第三聯絡人手機號碼#", oldven.contact_mobile_3, venQuery.contact_mobile_3);
                                     list.Add(new TableChangeLog() { change_field = "contact_mobile_3", old_value = oldven.contact_mobile_3, new_value = venQuery.contact_mobile_3, field_ch_name = "第三聯絡人手機號碼" });
                                 }
                                 if (oldven.contact_email_3 != venQuery.contact_email_3)
                                 {
-                                   // update_log.AppendFormat("contact_email_3:{0}:{1}:第三聯絡人郵箱#", oldven.contact_email_3, venQuery.contact_email_3);
+                                    // update_log.AppendFormat("contact_email_3:{0}:{1}:第三聯絡人郵箱#", oldven.contact_email_3, venQuery.contact_email_3);
                                     list.Add(new TableChangeLog() { change_field = "contact_email_3", old_value = oldven.contact_email_3, new_value = venQuery.contact_email_3, field_ch_name = "第三聯絡人郵箱" });
                                 }
                             }
@@ -2103,7 +2081,7 @@ namespace Admin.gigade.Controllers
                                 }
                                 if (oldven.contact_name_4 != venQuery.contact_name_4)
                                 {
-                                   // update_log.AppendFormat("contact_name_4:{0}:{1}:第四聯絡人姓名#", oldven.contact_name_4, venQuery.contact_name_4);
+                                    // update_log.AppendFormat("contact_name_4:{0}:{1}:第四聯絡人姓名#", oldven.contact_name_4, venQuery.contact_name_4);
                                     list.Add(new TableChangeLog() { change_field = "contact_name_4", old_value = oldven.contact_name_4, new_value = venQuery.contact_name_4, field_ch_name = "第四聯絡人姓名" });
                                 }
                                 if (oldven.contact_phone_1_4 != venQuery.contact_phone_1_4)
@@ -2113,17 +2091,17 @@ namespace Admin.gigade.Controllers
                                 }
                                 if (oldven.contact_phone_2_4 != venQuery.contact_phone_2_4)
                                 {
-                                   // update_log.AppendFormat("contact_phone_2_4:{0}:{1}:第四聯絡人電話二#", oldven.contact_phone_2_4, venQuery.contact_phone_2_4);
+                                    // update_log.AppendFormat("contact_phone_2_4:{0}:{1}:第四聯絡人電話二#", oldven.contact_phone_2_4, venQuery.contact_phone_2_4);
                                     list.Add(new TableChangeLog() { change_field = "contact_phone_2_4", old_value = oldven.contact_phone_2_4, new_value = venQuery.contact_phone_2_4, field_ch_name = "第四聯絡人電話二" });
                                 }
                                 if (oldven.contact_mobile_4 != venQuery.contact_mobile_4)
                                 {
-                                   // update_log.AppendFormat("contact_mobile_4:{0}:{1}:第四聯絡人手機號碼#", oldven.contact_mobile_4, venQuery.contact_mobile_4);
+                                    // update_log.AppendFormat("contact_mobile_4:{0}:{1}:第四聯絡人手機號碼#", oldven.contact_mobile_4, venQuery.contact_mobile_4);
                                     list.Add(new TableChangeLog() { change_field = "contact_mobile_4", old_value = oldven.contact_mobile_4, new_value = venQuery.contact_mobile_4, field_ch_name = "第四聯絡人手機號碼" });
                                 }
                                 if (oldven.contact_email_4 != venQuery.contact_email_4)
                                 {
-                                   // update_log.AppendFormat("contact_email_4:{0}:{1}:第四聯絡人郵箱#", oldven.contact_email_4, venQuery.contact_email_4);
+                                    // update_log.AppendFormat("contact_email_4:{0}:{1}:第四聯絡人郵箱#", oldven.contact_email_4, venQuery.contact_email_4);
                                     list.Add(new TableChangeLog() { change_field = "contact_email_4", old_value = oldven.contact_email_4, new_value = venQuery.contact_email_4, field_ch_name = "第四聯絡人郵箱" });
                                 }
                             }
@@ -2139,7 +2117,7 @@ namespace Admin.gigade.Controllers
                                 venQuery.contact_phone_1_5 = contact1[2];
                                 venQuery.contact_phone_2_5 = contact1[3];
                                 venQuery.contact_mobile_5 = contact1[4];
-                                venQuery.contact_email_5 = contact1[5].ToLower();                                
+                                venQuery.contact_email_5 = contact1[5].ToLower();
                                 if (oldven.contact_type_5 != venQuery.contact_type_5)
                                 {
                                     //update_log.AppendFormat("contact_type_5:{0}:{1}:第五聯絡人類型#", oldven.contact_type_5, venQuery.contact_type_5);
@@ -2147,17 +2125,17 @@ namespace Admin.gigade.Controllers
                                 }
                                 if (oldven.contact_name_5 != venQuery.contact_name_5)
                                 {
-                                   // update_log.AppendFormat("contact_name_5:{0}:{1}:第五聯絡人姓名#", oldven.contact_name_5, venQuery.contact_name_5);
+                                    // update_log.AppendFormat("contact_name_5:{0}:{1}:第五聯絡人姓名#", oldven.contact_name_5, venQuery.contact_name_5);
                                     list.Add(new TableChangeLog() { change_field = "contact_name_5", old_value = oldven.contact_name_5, new_value = venQuery.contact_name_5, field_ch_name = "第五聯絡人姓名" });
                                 }
                                 if (oldven.contact_phone_1_5 != venQuery.contact_phone_1_5)
                                 {
-                                   // update_log.AppendFormat("contact_phone_1_5:{0}:{1}:第五聯絡人電話一#", oldven.contact_phone_1_5, venQuery.contact_phone_1_5);
+                                    // update_log.AppendFormat("contact_phone_1_5:{0}:{1}:第五聯絡人電話一#", oldven.contact_phone_1_5, venQuery.contact_phone_1_5);
                                     list.Add(new TableChangeLog() { change_field = "contact_phone_1_5", old_value = oldven.contact_phone_1_5, new_value = venQuery.contact_phone_1_5, field_ch_name = "第五聯絡人電話一" });
                                 }
                                 if (oldven.contact_phone_2_5 != venQuery.contact_phone_2_5)
                                 {
-                                   // update_log.AppendFormat("contact_phone_2_5:{0}:{1}:第五聯絡人電話二#", oldven.contact_phone_2_5, venQuery.contact_phone_2_5);
+                                    // update_log.AppendFormat("contact_phone_2_5:{0}:{1}:第五聯絡人電話二#", oldven.contact_phone_2_5, venQuery.contact_phone_2_5);
                                     list.Add(new TableChangeLog() { change_field = "contact_phone_2_5", old_value = oldven.contact_phone_2_5, new_value = venQuery.contact_phone_2_5, field_ch_name = "第五聯絡人電話二" });
                                 }
                                 if (oldven.contact_mobile_5 != venQuery.contact_mobile_5)
@@ -2220,15 +2198,16 @@ namespace Admin.gigade.Controllers
                 {
                     venQuery.product_manage = Convert.ToUInt32(Request.Params["pm"]);
                 }
-                if (!string.IsNullOrEmpty(Request.Params["erp_id"]))
-                {
-                    venQuery.erp_id = Request.Params["erp_id"];
-                }
-                if (_vendorMgr.Add(venQuery) > 0)
+                int result = _vendorMgr.Add(venQuery);
+                if (result > 0)
                 {
 
                     jsonStr = "{success:true}";
 
+                }
+                else if (result == -1)
+                {
+                    jsonStr = "{success:false,msg:-1}";
                 }
             }
             catch (Exception ex)
@@ -2251,7 +2230,7 @@ namespace Admin.gigade.Controllers
         /// </summary>
         /// <returns></returns>
         [CustomHandleError]
-        public HttpResponseBase VendorEdit(VendorQuery venQuery, List<TableChangeLog>list)
+        public HttpResponseBase VendorEdit(VendorQuery venQuery, List<TableChangeLog> list)
         {
             string jsonStr = "{success:false}";
             _vendorMgr = new VendorMgr(connectionString);
@@ -2313,6 +2292,36 @@ namespace Admin.gigade.Controllers
                     break;
             }
             return type;
+        }
+        #endregion
+
+
+        public string ContactTypeToStr(string contacttype)
+        {
+            string typestr = string.Empty;
+
+            switch (contacttype)
+            {
+                case "1":
+                    typestr = "負責人";
+                    break;
+                case "2":
+                    typestr = "業務窗口";
+                    break;
+                case "3":
+                    typestr = "圖/文窗口";
+                    break;
+                case "4":
+                    typestr = "出貨負責窗口";
+                    break;
+                case "5":
+                    typestr = "帳務連絡窗口";
+                    break;
+                case "6":
+                    typestr = "客服窗口";
+                    break;
+            }
+            return typestr;
         }
         #endregion
         #endregion
@@ -2424,7 +2433,7 @@ namespace Admin.gigade.Controllers
             }
             DataTable dt = new DataTable();
             dt = _vendorMgr.GetVendorDetail(sqlwhere);
-            
+
             DataTable dtHZ = new DataTable();
             dtHZ.Columns.Add("供應商編號", typeof(String));
             dtHZ.Columns.Add("供應商編碼", typeof(String));
@@ -2491,7 +2500,7 @@ namespace Admin.gigade.Controllers
             dtHZ.Columns.Add("第五聯絡手機", typeof(String));
             dtHZ.Columns.Add("第五聯絡Mail", typeof(String));
 
-           
+
             dtHZ.Columns.Add("備註", typeof(String));
             try
             {
@@ -2504,7 +2513,7 @@ namespace Admin.gigade.Controllers
                 //               ,"自出出貨天數","寄倉出貨天數","調度出貨天數","調度倉模式","備註"
                 //              };                                      
                 string filename = "供應商列表_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
-                newCsvName = Server.MapPath(excelPath) + filename;               
+                newCsvName = Server.MapPath(excelPath) + filename;
                 foreach (DataRow dr in dt.Rows)
                 {
                     dr["company_address"] = CommonFunction.ZipAddress(dr["company_zip"].ToString()) + " " + dr["company_address"].ToString();
@@ -2607,125 +2616,41 @@ namespace Admin.gigade.Controllers
                     dr[32] = dr_v["dispatch_days"].ToString();
                     dr[33] = dr_v["vendor_mode"].ToString();
 
-                    
+
                     dr[34] = dr_v["contact_name_1"].ToString();
                     dr[35] = dr_v["contact_phone_1_1"].ToString();
                     dr[36] = dr_v["contact_mobile_1"].ToString();
                     dr[37] = dr_v["contact_email_1"].ToString();
- 
+
                     //dr[31] = dr_v["contact_type_2"].ToString();
-                    switch (dr_v["contact_type_2"].ToString())
-                    { 
-                        case "1":
-                            dr[38] = "負責人";
-                            break;
-                        case "2":
-                            dr[38] = "業務窗口";
-                            break;
-                        case "3":
-                            dr[38] = "圖/文窗口";
-                            break;
-                        case "4":
-                            dr[38] = "出貨窗口";
-                            break;
-                        case "5":
-                            dr[38] = "賬務窗口";
-                            break;
-                        case "6":
-                            dr[38] = "客服窗口";
-                            break;
-                    }
+                    dr[38] = ContactTypeToStr(dr_v["contact_type_2"].ToString());
                     dr[39] = dr_v["contact_name_2"].ToString();
                     dr[40] = dr_v["contact_phone_1_2"].ToString();
                     dr[41] = dr_v["contact_mobile_2"].ToString();
                     dr[42] = dr_v["contact_email_2"].ToString();
 
-                    //dr[36] = dr_v["contact_type_3"].ToString();
-                    switch (dr_v["contact_type_3"].ToString())
-                    {
-                        case "1":
-                            dr[43] = "負責人";
-                            break;
-                        case "2":
-                            dr[43] = "業務窗口";
-                            break;
-                        case "3":
-                            dr[43] = "圖/文窗口";
-                            break;
-                        case "4":
-                            dr[43] = "出貨窗口";
-                            break;
-                        case "5":
-                            dr[43] = "賬務窗口";
-                            break;
-                        case "6":
-                            dr[43] = "客服窗口";
-                            break;
-                    }
+                    dr[43] = ContactTypeToStr(dr_v["contact_type_3"].ToString());
+                                        
                     dr[44] = dr_v["contact_name_3"].ToString();
                     dr[45] = dr_v["contact_phone_1_3"].ToString();
                     dr[46] = dr_v["contact_mobile_3"].ToString();
                     dr[47] = dr_v["contact_email_3"].ToString();
-
-                    //dr[41] = dr_v["contact_type_4"].ToString();
-                    switch (dr_v["contact_type_4"].ToString())
-                    {
-                        case "1":
-                            dr[48] = "負責人";
-                            break;
-                        case "2":
-                            dr[48] = "業務窗口";
-                            break;
-                        case "3":
-                            dr[48] = "圖/文窗口";
-                            break;
-                        case "4":
-                            dr[48] = "出貨窗口";
-                            break;
-                        case "5":
-                            dr[48] = "賬務窗口";
-                            break;
-                        case "6":
-                            dr[48] = "客服窗口";
-                            break;
-                    }
+                    dr[48] = ContactTypeToStr(dr_v["contact_type_4"].ToString());
                     dr[49] = dr_v["contact_name_4"].ToString();
                     dr[50] = dr_v["contact_phone_1_4"].ToString();
                     dr[51] = dr_v["contact_mobile_4"].ToString();
                     dr[52] = dr_v["contact_email_4"].ToString();
-
-                    //dr[46] = dr_v["contact_type_5"].ToString();
-                    switch (dr_v["contact_type_5"].ToString())
-                    {
-                        case "1":
-                            dr[53] = "負責人";
-                            break;
-                        case "2":
-                            dr[53] = "業務窗口";
-                            break;
-                        case "3":
-                            dr[53] = "圖/文窗口";
-                            break;
-                        case "4":
-                            dr[53] = "出貨窗口";
-                            break;
-                        case "5":
-                            dr[53] = "賬務窗口";
-                            break;
-                        case "6":
-                            dr[53] = "客服窗口";
-                            break;
-                    }
+                    dr[53] = ContactTypeToStr(dr_v["contact_type_5"].ToString());
                     dr[54] = dr_v["contact_name_5"].ToString();
                     dr[55] = dr_v["contact_phone_1_5"].ToString();
                     dr[56] = dr_v["contact_mobile_5"].ToString();
                     dr[57] = dr_v["contact_email_5"].ToString();
 
-                  
+
                     dr[58] = dr_v["vendor_note"].ToString();
                     dtHZ.Rows.Add(dr);
                 }
-               
+
 
                 dt.Columns.Remove("company_zip");
                 dt.Columns.Remove("invoice_zip");
@@ -2765,7 +2690,6 @@ namespace Admin.gigade.Controllers
 
         }
 
-        #endregion
         #endregion
 
         #region 獲取供應商品牌列表數據 HttpResponseBase GetVendorBrandList()
@@ -4233,73 +4157,6 @@ namespace Admin.gigade.Controllers
             this.Response.Write(json);
             this.Response.End();
             return this.Response;
-        }
-        #endregion
-
-        #region 修改erp_id +string GetErpId() +string GetSerial(VendorCateSet vcs)
-
-        public string GetErpId()
-        {
-            string json = "{success:false}";
-            try
-            {
-                VendorCateSet vcs = new VendorCateSet();
-                if (!string.IsNullOrEmpty(Request.Form["prod_cate"]))
-                {
-                    vcs.cate_code_big = Request.Form["prod_cate"];
-                }
-                if (!string.IsNullOrEmpty(Request.Form["buy_cate"]))
-                {
-                    vcs.cate_code_middle = Request.Form["buy_cate"];
-                }
-                if (!string.IsNullOrEmpty(Request.Form["tax_type"]))
-                {
-                    vcs.tax_type = Request.Form["tax_type"];
-                }
-
-                json = "{success:true,data:\"" + vcs.cate_code_middle + GetSerial(vcs) + vcs.tax_type + "\"}";
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return json;
-        }
-
-
-        public string GetSerial(VendorCateSet vcs)
-        {
-            string serival = string.Empty;
-            try
-            {
-                _vencatesetMgr = new VendorCateSetMgr(connectionString);
-                serival = _vencatesetMgr.GetMaxCodeSerial(vcs);
-                string source = string.Empty;
-                if (serival == "0" || serival == "")
-                {
-                    source = "1";
-                }
-                else
-                {
-                    source = (int.Parse(serival) + 1).ToString();
-                }
-                serival = CommonFunction.Supply(source, "0", 5);
-
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-            }
-            return serival;
         }
         #endregion
 

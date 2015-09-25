@@ -2,17 +2,16 @@
 var PRODUCT_ID, OLD_PRODUCT_ID = '';
 var messages = '';
 var messagesrep = '';
+var irrmessages = '';
 var messagestime = '';
 
 //排程類型store
 var pcStore = Ext.create('Ext.data.Store', {
     fields: ['id', 'name'],
     data: [
-        //{ "id": "1", "name": "出貨一次" },
-        //{ "id": "2", "name": "重複出貨" }]
         { "id": "1", "name": EXECUTE_ONCE },//單次執行
         { "id": "2", "name": EXECUTE_REPEAT },
-        { "id": "3", "name": EXECUTE_IRREGULAR }]// edit by wwei0216w 2015/5/20 重複執行
+        { "id": "3", "name": EXECUTE_IRREGULAR }]//不规律執行
 });
 
 
@@ -32,7 +31,7 @@ var irregularStore = Ext.create('Ext.data.Store', {
 });
 
 
-//不規律執行zhou
+//不規律執行startWeeks
 var startWeeksStore = Ext.create('Ext.data.Store', {
     fields: ['abbr', 'name'],
     autoDestroy: true,
@@ -47,7 +46,7 @@ var startWeeksStore = Ext.create('Ext.data.Store', {
         { abbr: "7", name: SUNDAY }]//星期日
 });
 
-//不規律執行zhou
+//不規律執行endWeeks
 var endWeeksStore = Ext.create('Ext.data.Store', {
     fields: ['abbr', 'name'],
     autoDestroy: true,
@@ -150,7 +149,9 @@ Ext.define('GIGADE.irregularTier', {
                 { name: 'schedule_id', type: 'int' },
                 { name: 'schedule_name', type: 'string' },
                 { name: 'type', type: 'int' },
-                { name: 'week_day', type: 'string' },
+                { name: 'execute_days', type: 'string' },
+                { name: 'trigger_time', type: 'string' },
+                //{ name: 'week_day', type: 'string' },
                 { name: 'repeat_count', type: 'int' },
                 { name: 'duration_start', type: 'string' },
                 { name: 'desc', type: 'string' }]
@@ -169,87 +170,121 @@ var irregulartimeStore = Ext.create('Ext.data.Store', {
             root: 'item',
             totalProperty: 'totalCount'
         }
+    },
+    listeners: {
+        datachanged: function () {
+            irrmessages = SCHEDULE_DIVIDE_INTO + irregulartimeStore.count() + PART_EXECUTE + '。';
+            Ext.getCmp('pcFrm').down('#irrms').setText(irrmessages);
+        }
     }
 });
 
 irregularGrid = Ext.create('Ext.grid.Panel', {
     plugins: [{ ptype: 'cellediting' }],
-    //title: '不規則排程設置',
+    disabled: true,
     store: irregulartimeStore,
-    margin: '',
-    id: ' irregularGrid',
-    width: 450,
+    margin: '0 0 0 10',
+    id: 'irregularGrid',
+    width: 550,
     height: 150,
     columns: [
         { xtype: 'rownumberer', width: 25, align: 'center' },
         {
-            text: '', menuDisabled: true, width: 40, align: 'center', xtype: 'actioncolumn',
+            text: '', menuDisabled: true, width: 35, align: 'center', xtype: 'actioncolumn',
             icon: '../../../Content/img/icons/cross.gif',
             handler: function (grid, rowIndex, colIndex) {
-                irregularStore.removeAt(rowIndex);
+                irregulartimeStore.removeAt(rowIndex);
             }
         }, {
-            text: '星期(開始)', dataIndex: 'week_day_start', width: 86, align: 'right', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'combobox',
-                queryMode: 'local',
-                editable: false,
-                store: startWeeksStore,
-                displayField: 'name',
-                valueField: 'abbr',
-                //listeners: {
-                //    'select': function (combo, records, eOpts) {
-                //        var row = irregularGrid.getSelectionModel().getSelection();
-                //        var row2 = records;
-                //    }
-                //    //'change':function (newValue, oldValue, eOpts){
-                //    //    var a = newValue;
-                //    //    var b = oldValue;
-                //    //    var c = eOpts;
-                //    //}
-                    
-                //}
-            }
-        }, {
-            text: '幾點(開始)', dataIndex: 'startHour', width: 56, align: 'left', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'numberfield',
-                allowBlank: false,
-                value:0,
-                minValue: 0
-            }
-        }, {
-            text: '星期(結束)', dataIndex: 'week_day_end', width: 86, align: 'right', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'combobox',
-                id: 'week_day_end',
-                queryMode: 'local',
-                displayField: 'name',
-                valueField: 'abbr',
-                store: endWeeksStore,
-                editable: false,
-                allowBlank: false
 
-            }
+            text: IRR_START_TIME, menuDisabled: true, sortable: false, columns: [{
+                text: WEEK, dataIndex: 'trigger_days_start', width: 65, align: 'right', menuDisabled: true, sortable: false,
+                editor: {
+                    xtype: 'combobox',
+                    queryMode: 'local',
+                    id: 'sw_combx',
+                    editable: false,
+                    allowBlank: false,
+                    store: startWeeksStore,
+                    displayField: 'name',
+                    valueField: 'abbr'
+                },
+                renderer: function (val) {
+                    var record = startWeeksStore.findRecord('abbr', val);
+                    if (record) {
+                        return record.data.name;
+                    }
+                    return val ? val : '';
+                }
+            }, {
+                text: HOURS, dataIndex: 'startHour', width: 67, align: 'left', menuDisabled: true, sortable: false,
+                editor: {
+                    xtype: 'numberfield',
+                    allowBlank: false,
+                    minValue: 0,
+                    maxValue: 23
+                },
+                renderer: function (val) {
+                    if (val == 0) {
+                        return val + '0:00';
+                    }
+                    return val ? val + ':00' : '';
+                }
+            }]
         }, {
-            text: '幾點(結束)', dataIndex: 'endHour', width: 56, align: 'left', menuDisabled: true, sortable: false,
+            text: IRR_END_TIME, menuDisabled: true, sortable: false, columns: [{
+                text: WEEK, dataIndex: 'trigger_days_end', width: 67, align: 'right', menuDisabled: true, sortable: false,
+                editor: {
+                    xtype: 'combobox',
+                    id: 'week_day_end',
+                    queryMode: 'local',
+                    displayField: 'name',
+                    valueField: 'abbr',
+                    store: endWeeksStore,
+                    emptyText: '请选择',
+                    value: 3,
+                    editable: false,
+                    allowBlank: false
+                },
+                renderer: function (val) {
+                    var record = endWeeksStore.findRecord('abbr', val);
+                    if (record) {
+                        return record.data.name;
+                    }
+                    return val ? val : '';
+                }
+            }, {
+                text: HOURS, dataIndex: 'endHour', width: 67, align: 'left', menuDisabled: true, sortable: false,
+                editor: {
+                    xtype: 'numberfield',
+                    allowBlank: false,
+                    minValue: 0,
+                    maxValue: 23
+                },
+                renderer: function (val) {
+                    if (val == 0) {
+                        return val + '0:00';
+                    }
+                    return val ? val + ':00' : '';
+                }
+            }]
+        }, {
+            text: EXECUTE_AFTERDAYS, dataIndex: 'executeDays', flex: 1, align: 'center', menuDisabled: true, sortable: false,
             editor: {
                 xtype: 'numberfield',
                 allowBlank: false,
-                value: 0,
-                minValue: 0
-            }
-        }, {
-            text: '執行時間(天后)', dataIndex: 'executeDays', width: 90, flex: 1, align: 'center', menuDisabled: true, sortable: false,
-            editor: {
-                xtype: 'numberfield',
-                allowBlank: false,
-                minValue: 0
+                minValue: 1
             }
         }],
     tbar: [{
-        text: '新增', handler: function () {
-            irregularGrid.getStore().add({});
+        text: INSERT, handler: function () {
+            irregularGrid.getStore().add({
+                trigger_days_start: 1,
+                startHour: 0,
+                trigger_days_end: 1,
+                endHour: 0,
+                executeDays: 1
+            });
         }
     }]
 });
@@ -288,18 +323,21 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                             Ext.getCmp('pcFrm').down('#cxsj').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(false);
                             Ext.getCmp('pcFrm').down('#bglzx').setDisabled(true);
+                            Ext.getCmp('irregularGrid').setDisabled(true);
                             break;
                         case '2':
                             Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#pl').setDisabled(false);
                             Ext.getCmp('pcFrm').down('#cxsj').setDisabled(false);
                             Ext.getCmp('pcFrm').down('#bglzx').setDisabled(true);
+                            Ext.getCmp('irregularGrid').setDisabled(true);
                             break;
                         case '3':
                             Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
-                            Ext.getCmp('pcFrm').down('#cxsj').setDisabled(true);
+                            Ext.getCmp('pcFrm').down('#cxsj').setDisabled(false);
                             Ext.getCmp('pcFrm').down('#bglzx').setDisabled(false);
+                            Ext.getCmp('irregularGrid').setDisabled(false);
                             break;
                     }
 
@@ -1009,9 +1047,11 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                        Ext.getCmp("ce_time").setMinValue(this.getValue());
                        if (Ext.getCmp('noendtime').checked) {
                            messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
+                           Ext.getCmp('mst').setText('');
                            Ext.getCmp('mst').setText(messagestime);
                        } else {
                            messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
+                           Ext.getCmp('mst').setText('');
                            Ext.getCmp('mst').setText(messagestime);
                        }
                    }
@@ -1030,9 +1070,11 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                        Ext.getCmp("cs_time").setMaxValue(this.getValue());
                        if (Ext.getCmp('noendtime').checked) {
                            messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + '。';
+                           Ext.getCmp('mst').setText('');
                            Ext.getCmp('mst').setText(messagestime);
                        } else {
                            messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d ') + '。';
+                           Ext.getCmp('mst').setText('');
                            Ext.getCmp('mst').setText(messagestime);
                        }
                    }
@@ -1050,10 +1092,12 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                            Ext.getCmp('ce_time').setDisabled(true);
                            Ext.getCmp("ce_time").setValue('');
                            messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
+                           Ext.getCmp('mst').setText('');
                            Ext.getCmp('mst').setText(messagestime);
                        } else {
                            Ext.getCmp('ce_time').setDisabled(false);
                            messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
+                           Ext.getCmp('mst').setText('');
                            Ext.getCmp('mst').setText(messagestime);
                        }
                    }
@@ -1079,9 +1123,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                editable: false,
                value: 'w',
                store: irregularStore
-           },
-           irregularGrid
-           ]
+           }, irregularGrid]
        }, {
            xtype: 'container',
            layout: 'column',
@@ -1097,6 +1139,11 @@ var pcFrm = Ext.create('Ext.form.Panel', {
               //    id: 'mscf',
               //    text: messagesrep
               //},
+              {
+                  xtype: 'label',
+                  id: 'irrms',
+                  text: irrmessages
+              },
              {
                  xtype: 'label',
                  id: 'mst',
@@ -1150,6 +1197,7 @@ var addPc = Ext.create('Ext.window.Window', {
     padding: '5 5 5 5'
 });
 
+//排程加载
 function Tier_Load(record) {
     Ext.getCmp('schedule_id_win').setValue(record.data.schedule_id);
     Ext.getCmp('schedule_name').setValue(record.data.schedule_name);
@@ -1220,13 +1268,23 @@ function Tier_Load(record) {
             break;
 
         case 1:
-            Ext.getCmp('pc_type').setValue(1)
+            Ext.getCmp('pc_type').setValue(1);
             Ext.getCmp('datatime').setRawValue(record.data.duration_start);
             break;
 
 
         case 3:
-            //irregulartimeStore.load();
+            Ext.getCmp('pc_type').setValue(3);
+
+            Ext.getCmp('cs_time').setRawValue(record.data.duration_start);
+
+            if (record.data.duration_end == "0001/01/01" || record.data.duration_end == "") {
+                Ext.getCmp('noendtime').setValue(true);
+                Ext.getCmp('ce_time').setRawValue("");
+            } else {
+                Ext.getCmp('noendtime').setValue(false);
+                Ext.getCmp('ce_time').setRawValue(record.data.duration_end);
+            }
             irregulartimeStoreLoad(record);
             break;
 
@@ -1239,37 +1297,41 @@ function Tier_Load(record) {
     } else {
         var mst = desces[1] + '。';
     }
-    Ext.getCmp('ms').setText(ms);
-    Ext.getCmp('mst').setText(mst);
 
-
+    if (record.data.type == 3) {
+        Ext.getCmp('ms').setText('');
+        Ext.getCmp('irrms').setText(ms);
+        Ext.getCmp('mst').setText(mst);
+    } else {
+        Ext.getCmp('ms').setText(ms);
+        Ext.getCmp('irrms').setText('');
+        Ext.getCmp('mst').setText(mst);
+    }
 }
 
 ///特殊排程值設置
 function irregulartimeStoreLoad(record) {
     irregulartimeStore.removeAll();
-    if (record.data.type == 3){
-        Ext.getCmp('pc_type').setValue(record.data.type);
-    }
 
-    var dateValue = record.data.desc.split(',');
-    var weekValue = record.data.week_day.split(',');
-    for (var i = 0; i < weekValue.length; i++) {
+    var triggerValue = record.data.trigger_time.split(',');
+    var executeValue = record.data.execute_days.split(',');
+
+    for (var i = 0; i < triggerValue.length; i++) {
         var temp = i / 2;
         if (i % 2 == 0) {
             //var temp = i;
             irregulartimeStore.add({
-                week_day_start: parseInt((weekValue[i] / 24), 10)+1,
-                startHour: parseInt((weekValue[i] % 24), 10),
-                week_day_end: parseInt((weekValue[i + 1] / 24), 10) + 1,
-                endHour: parseInt((weekValue[i + 1] % 24), 10),
-                executeDays: dateValue[temp]
+                trigger_days_start: parseInt((triggerValue[i] / 24), 10) + 1,
+                startHour: parseInt((triggerValue[i] % 24), 10),
+                trigger_days_end: parseInt((triggerValue[i + 1] / 24), 10) + 1,
+                endHour: parseInt((triggerValue[i + 1] % 24), 10),
+                executeDays: executeValue[temp]
             });
         }
     }
 }
 
-
+//获取排程数据
 function getParams() {
     var params = new Object();
     params.error = false;
@@ -1282,7 +1344,7 @@ function getParams() {
     }
 
     params.schedule_name = Ext.getCmp('schedule_name').getValue();
-    params.desc = Ext.getCmp('ms').text + Ext.getCmp('mst').text;
+    params.desc = Ext.getCmp('ms').text + Ext.getCmp('irrms').text + Ext.getCmp('mst').text;
 
     switch (pc_type) {
         case '2':
@@ -1328,33 +1390,51 @@ function getParams() {
             //Ext.each(irregulartimeStore.data.items, function () {
             //    irregulartimeStore.push(this.data);
             //});
-            //var data = irregulartimeStore;
-            params.week_day = "";
-            params.desc = "";
+            params.execute_days = "";///執行時間
+            params.trigger_time = "";///觸發時間
             var source = irregulartimeStore.data;///獲得不規則排程的store
             //var beginDay = source.items[0].data.week_day_start;///獲得頭數據的開始天數
             //beginDay = (beginDay - 1) * 24 + source.items[0].data.startHour///獲得頭數據的小時數
-            for (var i = 0; i < source.items.length; i++)
-            {
+            for (var i = 0; i < source.items.length; i++) {     ///循环遍歷panel中的數據
+                var startTemp = source.items[i].data.trigger_days_start;///獲得開始時間
+                var endTemp = source.items[i].data.trigger_days_end;///獲得結束時間
+                if (isNaN(endTemp)) {       ///判斷結束時間格式是否正確
+                    params.error = true;
+                    params.msg = THEENDTIMEERROR;
+                    break;
+                }
 
-                params.week_day += (source.items[i].data.week_day_start - 1) * 24 + source.items[i].data.startHour + ",";
-                if (i > 0)
+                startTemp = (startTemp - 1) * 24 + source.items[i].data.startHour;
+                endTemp = (endTemp - 1) * 24 + source.items[i].data.endHour;
+                if (endTemp <= startTemp) ///判斷每行的開始時間是否大於結束時間
                 {
-                    var tempStart = (source.items[i].data.week_day_start - 1) * 24 + source.items[i].data.startHour;
-                    var lastTempEnd = (source.items[i - 1].data.week_day_end - 1) * 24 + source.items[i - 1].data.endHour;
-                    if (tempStart < lastTempEnd)
-                    {
+                    params.error = true;
+                    params.msg = ROWERROR;
+                    break;
+                }
+                params.trigger_time += (source.items[i].data.trigger_days_start - 1) * 24 + source.items[i].data.startHour + ",";
+                if (i > 0) {
+                    var tempStart = (source.items[i].data.trigger_days_start - 1) * 24 + source.items[i].data.startHour;
+                    var lastTempEnd = (source.items[i - 1].data.trigger_days_end - 1) * 24 + source.items[i - 1].data.endHour;
+                    if (tempStart < lastTempEnd || tempStart == lastTempEnd || isNaN(tempStart)) {
                         params.error = true;
-                        params.msg = "第" + i + "行開始時間必須大於上一行結束時間";
+                        params.msg = THE + (i + 1) + LASTROWENDERROR;
                         break;
                     }
                 }
-                params.week_day += (source.items[i].data.week_day_end - 1) * 24 + source.items[i].data.endHour + ",";
-                params.desc += source.items[i].data.executeDays + ",";
+                params.trigger_time += (source.items[i].data.trigger_days_end - 1) * 24 + source.items[i].data.endHour + ",";
+                params.execute_days += source.items[i].data.executeDays + ",";
             }
             //params.week_day = beginDay + "," + params.week_day;
-            params.week_day = params.week_day.substring(0, params.week_day.length - 1);
-            params.desc = params.desc.substring(0, params.desc.length - 1);
+            params.execute_days = params.execute_days.substring(0, params.execute_days.length - 1);
+            params.trigger_time = params.trigger_time.substring(0, params.trigger_time.length - 1);
+
+            params.duration_start = Ext.getCmp('cs_time').getValue();
+
+            if (!Ext.getCmp('noendtime').checked) {
+                params.duration_end = Ext.getCmp('ce_time').getValue();
+            }
+
             break;
     }
 

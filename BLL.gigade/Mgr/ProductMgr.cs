@@ -330,9 +330,9 @@ namespace BLL.gigade.Mgr
                 product_id = _productDao.TempMove2Pro(movePro, moveCourProd, moveItem, moveCourDetaItem, selItem, priceMaster, itemPrice, sqls);
                 //把商品推薦屬性臨時表中的數據moveto商品推薦屬性表中,然後刪除商品推薦臨時表 通過product_id指定商品推薦屬性對應的商品
                 #region 推薦商品屬性插入recommended_product_attribute表中做記錄
-                if (_rProductAttribute.ExsitInTemp(writerId, int.Parse(product_Id),combo_type) > 0)//判斷臨時表中是否存在 product_Id為傳入的productId
+                if (_rProductAttribute.ExsitInTemp(writerId, int.Parse(product_Id), combo_type) > 0)//判斷臨時表中是否存在 product_Id為傳入的productId
                 {
-                    DataTable _dt = _rProductAttribute.GetTempList(writerId, int.Parse(product_Id),combo_type);
+                    DataTable _dt = _rProductAttribute.GetTempList(writerId, int.Parse(product_Id), combo_type);
                     RecommendedProductAttribute rPA = new RecommendedProductAttribute();
                     rPA.product_id = Convert.ToUInt32(product_id);
                     rPA.time_start = 0;
@@ -344,14 +344,14 @@ namespace BLL.gigade.Mgr
                     {
                         if (_rProductAttribute.Update(rPA) > 0)
                         {
-                            _rProductAttribute.DeleteTemp(writerId, int.Parse(product_Id),combo_type);//刪除臨時表中的數據
+                            _rProductAttribute.DeleteTemp(writerId, int.Parse(product_Id), combo_type);//刪除臨時表中的數據
                         }
                     }
                     else
                     {
                         if (_rProductAttribute.Save(rPA) > 0)
                         {
-                            _rProductAttribute.DeleteTemp(writerId, int.Parse(product_Id),combo_type);//刪除臨時表中的數據
+                            _rProductAttribute.DeleteTemp(writerId, int.Parse(product_Id), combo_type);//刪除臨時表中的數據
                         }
                     }
                 }
@@ -373,12 +373,12 @@ namespace BLL.gigade.Mgr
                 ItemPriceTempMgr itemPriceTempMgr = new ItemPriceTempMgr("");
                 string itemPrice = itemPriceTempMgr.Move2ItemPrice();
                 sqls.Add(itemPriceTempMgr.Delete(product_Id, combo_type, writerId));
-                product_id= _productDao.TempMove2Pro(movePro, "", "", "", selPrice, priceMaster, itemPrice, sqls);
+                product_id = _productDao.TempMove2Pro(movePro, "", "", "", selPrice, priceMaster, itemPrice, sqls);
                 //把商品推薦屬性臨時表中的數據moveto商品推薦屬性表中,然後刪除商品推薦臨時表 通過product_id指定商品推薦屬性對應的商品
                 #region 推薦商品屬性插入recommended_product_attribute表中做記錄
-                if (_rProductAttribute.ExsitInTemp(writerId, int.Parse(product_Id),combo_type) > 0)//判斷臨時表中是否存在 product_Id為傳入的productId
+                if (_rProductAttribute.ExsitInTemp(writerId, int.Parse(product_Id), combo_type) > 0)//判斷臨時表中是否存在 product_Id為傳入的productId
                 {
-                    DataTable _dt = _rProductAttribute.GetTempList(writerId, int.Parse(product_Id),combo_type);
+                    DataTable _dt = _rProductAttribute.GetTempList(writerId, int.Parse(product_Id), combo_type);
                     RecommendedProductAttribute rPA = new RecommendedProductAttribute();
                     rPA.product_id = Convert.ToUInt32(product_id);
                     rPA.time_start = 0;
@@ -390,14 +390,14 @@ namespace BLL.gigade.Mgr
                     {
                         if (_rProductAttribute.Update(rPA) > 0)
                         {
-                            _rProductAttribute.DeleteTemp(writerId, int.Parse(product_Id),combo_type);//刪除臨時表中的數據
+                            _rProductAttribute.DeleteTemp(writerId, int.Parse(product_Id), combo_type);//刪除臨時表中的數據
                         }
                     }
                     else
                     {
                         if (_rProductAttribute.Save(rPA) > 0)
                         {
-                            _rProductAttribute.DeleteTemp(writerId, int.Parse(product_Id),combo_type);//刪除臨時表中的數據
+                            _rProductAttribute.DeleteTemp(writerId, int.Parse(product_Id), combo_type);//刪除臨時表中的數據
                         }
                     }
                 }
@@ -579,8 +579,72 @@ namespace BLL.gigade.Mgr
                             p.product_status_str = listTemp2.parameterName;
                         }
                     }
-                   
                     return ExcelHelperXhf.ExportExcel(listPirce, columns);
+                case 5: //預購商品匯出
+                    int totalYugou = 0;
+                    List<QueryandVerifyCustom> itemsYugou = _productDao.QueryForPurchase_in_advance(query, out totalYugou);
+                    DataTable dtnewYuGuo = new DataTable();//保存沒有過期的
+                    DataTable dtoldYuGuo = new DataTable();//保存過期的
+                    //產生列
+                    dtnewYuGuo.Columns.Add("商品編號", typeof(String));
+                    dtnewYuGuo.Columns.Add("商品名稱", typeof(String));
+                    dtnewYuGuo.Columns.Add("品牌名稱", typeof(String));
+                    dtnewYuGuo.Columns.Add("供應商名稱", typeof(String));
+                    dtnewYuGuo.Columns.Add("商品類型", typeof(String));
+                    dtnewYuGuo.Columns.Add("預購商品開始時間", typeof(String));
+                    dtnewYuGuo.Columns.Add("預購商品結束時間", typeof(String));
+                    dtnewYuGuo.Columns.Add("預計出貨時間", typeof(String));
+                    dtnewYuGuo.Columns.Add("排程設定", typeof(String));
+                    dtnewYuGuo.Columns.Add("庫存數", typeof(String));
+                    dtnewYuGuo.Columns.Add("未出貨數量", typeof(String));
+                    //複製
+                   dtoldYuGuo= dtnewYuGuo.Clone();
+                   foreach (QueryandVerifyCustom qcustom in itemsYugou)
+                   {
+                       string endtime=qcustom.purchase_in_advance_end_time;
+                       if (DateTime.Parse(endtime == "" ? DateTime.Now.AddDays(1).ToString() : endtime) > DateTime.Now)
+                       {
+                           DataRow newrow = dtnewYuGuo.NewRow();
+                           newrow[0] = qcustom.product_id;
+                           newrow[1] = qcustom.product_name;
+                           newrow[2] = qcustom.brand_name;
+                           newrow[3] = qcustom.vendor_name_full;
+                           newrow[4] = qcustom.combination;
+                           newrow[5] = qcustom.purchase_in_advance_start_time;
+                           newrow[6] = qcustom.purchase_in_advance_end_time;
+                           newrow[7] = qcustom.expect_time_time;
+                           newrow[8] = qcustom.schedule_name;
+                           newrow[9] = qcustom.Item_Stock;
+                           newrow[10] = qcustom.bnum;
+                           dtnewYuGuo.Rows.Add(newrow);
+                       }
+                       else 
+                       {
+                           DataRow oldrow = dtoldYuGuo.NewRow();
+                           oldrow[0] = qcustom.product_id;
+                           oldrow[1] = qcustom.product_name;
+                           oldrow[2] = qcustom.brand_name;
+                           oldrow[3] = qcustom.vendor_name_full;
+                           oldrow[4] = qcustom.combination;
+                           oldrow[5] = qcustom.purchase_in_advance_start_time;
+                           oldrow[6] = qcustom.purchase_in_advance_end_time;
+                           oldrow[7] = qcustom.expect_time_time;
+                           oldrow[8] = qcustom.schedule_name;
+                           oldrow[9] = qcustom.Item_Stock;
+                           oldrow[10] = qcustom.bnum;
+                           dtoldYuGuo.Rows.Add(oldrow);
+                       }
+                   }
+                   List<string> NameList = new List<string>();
+                   NameList.Add("有效期內的預購商品");
+                   NameList.Add("過期的預購商品");
+                   List<DataTable> Elist = new List<DataTable>();
+                   Elist.Add(dtnewYuGuo);
+                   Elist.Add(dtoldYuGuo);
+                   List<bool> comName = new List<bool>();
+                   comName.Add(true);
+                   comName.Add(true);
+                   return ExcelHelperXhf.ExportDTNoColumnsBySdy(Elist, NameList, comName);
                 default:
                     throw new Exception("unaccepted exportFlag!!!");
             }

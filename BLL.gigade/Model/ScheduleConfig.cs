@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace BLL.gigade.Model
+{
+    public class ScheduleConfig : PageBase
+    {
+        public int rowid { get; set; }
+        public int schedule_id { get; set; } //排程代碼
+        public string parameterCode { get; set; } //排程名稱
+        public string value { get; set; }
+        public string description { get; set; }
+        public int create_user { get; set; }
+        public int create_time { get; set; }
+        public int change_user { get; set; }
+        public int change_time { get; set; }
+
+        public ScheduleConfig()
+        {
+            rowid = 0;
+            schedule_id = 0;
+            parameterCode = string.Empty;
+            value = string.Empty;
+            description = string.Empty;
+            create_user = 0;
+            create_time = 0;
+            change_user = 0;
+            change_time = 0;
+
+        }
+    }
+}
