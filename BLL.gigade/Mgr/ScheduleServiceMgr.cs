@@ -11,6 +11,7 @@ namespace BLL.gigade.Mgr
     public class ScheduleServiceMgr
     {
         private ScheduleServiceDao _secheduleServiceDao;
+        string xmlPath = System.Configuration.ConfigurationManager.AppSettings["SiteConfig"];//
         public ScheduleServiceMgr(string connectionString)
         {
             try
@@ -86,16 +87,34 @@ namespace BLL.gigade.Mgr
                 throw new Exception("SecheduleServiceMgr-->UpdateSchedulePeriod-->" + ex.Message, ex);
             }
         }
-        public bool ExeScheduleService(string api)
+        public bool ExeScheduleService(string api, List<ScheduleConfigQuery> store_config)
         {
             bool result = false;
             try
             {
                 if(!string.IsNullOrEmpty(api))
                 {
-                    //api=System.Net.Dns.GetHostAddresses(System.Net.Dns.GetHostName())[2].ToString()+"/"+api;
-                    api = "http://localhost:11804/" + api;
+                    string path = System.Web.HttpContext.Current.Server.MapPath(xmlPath);
+                    SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+                    BLL.gigade.Model.SiteConfig NETDoMain_Name = _siteConfigMgr.GetConfigByName("NETDoMain_Name");
 
+                    api = "http://" + NETDoMain_Name.Value + "/" + api;
+                    for (int i=0;i<store_config.Count;i++ )
+                    {
+                        if (!string.IsNullOrEmpty(store_config[i].parameterCode.Trim()) && !string.IsNullOrEmpty(store_config[i].value.Trim()))
+                        {
+                            if (i == 0)
+                            {
+                                api = api + "?" ;
+                            }
+                            else
+                            {
+                                api = api + "&";
+                            }
+                            api = api + store_config[i].parameterCode.Trim() + "=" + store_config[i].value.Trim();
+                        }
+                    }
+                    
                     HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(api);
                     httpRequest.Timeout = 2000;
                     httpRequest.Method = "GET";
