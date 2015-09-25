@@ -527,7 +527,6 @@
     <Compile Include="Dao\Impl\IUsersListImplDao.cs" />
     <Compile Include="Dao\Impl\IVendorBrandImplDao.cs" />
     <Compile Include="Dao\Impl\IVendorBrandSetImplDao.cs" />
-    <Compile Include="Dao\Impl\IVendorCateSetImplDao.cs" />
     <Compile Include="Dao\Impl\IVendorImplDao.cs" />
     <Compile Include="Dao\Impl\IVendorLoginListImplDao.cs" />
     <Compile Include="Dao\Impl\IVGroupCallerImplDao.cs" />
@@ -646,7 +645,6 @@
     <Compile Include="Dao\VendorAccountMonthDao.cs" />
     <Compile Include="Dao\VendorBrandDao.cs" />
     <Compile Include="Dao\VendorBrandSetDao.cs" />
-    <Compile Include="Dao\VendorCateSetDao.cs" />
     <Compile Include="Dao\VendorDao.cs" />
     <Compile Include="Dao\VendorLoginListDao.cs" />
     <Compile Include="Dao\VendorProductTagSetDao.cs" />
@@ -1068,7 +1066,6 @@
     <Compile Include="Mgr\ItemPriceMgr.cs" />
     <Compile Include="Mgr\ItemPriceTempMgr.cs" />
     <Compile Include="Mgr\ItemPriceTsMgr.cs" />
-    <Compile Include="Mgr\Impl\IVendorCateSetImplMgr.cs" />
     <Compile Include="Mgr\LogInLogeMgr.cs" />
     <Compile Include="Mgr\CallerMgr.cs" />
     <Compile Include="Mgr\OrderDetailMgr.cs" />
@@ -1196,7 +1193,6 @@
     <Compile Include="Mgr\VendorAccountMonthMgr.cs" />
     <Compile Include="Mgr\VendorBrandMgr.cs" />
     <Compile Include="Mgr\VendorBrandSetMgr.cs" />
-    <Compile Include="Mgr\VendorCateSetMgr.cs" />
     <Compile Include="Mgr\VendorLoginListMgr.cs" />
     <Compile Include="Mgr\VendorMgr.cs" />
     <Compile Include="Mgr\VendorProductTagSetMgr.cs" />
@@ -1797,7 +1793,6 @@
     <Compile Include="Model\VendorAccountMonth.cs" />
     <Compile Include="Model\VendorBrand.cs" />
     <Compile Include="Model\VendorBrandSet.cs" />
-    <Compile Include="Model\VendorCateSet.cs" />
     <Compile Include="Model\VendorLogin.cs" />
     <Compile Include="Model\VendorProductTagSet.cs" />
     <Compile Include="Model\Vgroup.cs" />

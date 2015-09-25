@@ -27,5 +27,6 @@ namespace BLL.gigade.Dao.Impl
 
         string UpdateAutoIncreament(Serial serial);
         int Insert(Serial serial);
+        string InsertStr(Serial serial);
     }
 }
