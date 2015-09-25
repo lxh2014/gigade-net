@@ -5,7 +5,7 @@
  * CreateTime :2015/9/21
  * 電子報列表
  */
-var pageSize = 23;
+var pageSize = 25;
 
 //列表頁的model
 Ext.define('gridlistEGN', {

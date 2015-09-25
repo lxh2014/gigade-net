@@ -4,7 +4,7 @@
  * CreateTime :2015/9/22
  * 電子報範本
  */
-var pageSize = 23;
+var pageSize = 25;
 
 //列表頁的model
 Ext.define('gridlistET', {
