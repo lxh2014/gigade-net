@@ -10990,7 +10990,7 @@ namespace Admin.gigade.Controllers
                 _newDt.Columns.Add("供應商名稱", typeof(string));
                 _newDt.Columns.Add("品號", typeof(string));
                 _newDt.Columns.Add("商品編號", typeof(string));
-                _newDt.Columns.Add("商品六碼", typeof(string));
+                _newDt.Columns.Add("商品細項編號", typeof(string));
                 _newDt.Columns.Add("商品名稱", typeof(string));
                 _newDt.Columns.Add("規格", typeof(string));
                 _newDt.Columns.Add("採購數量", typeof(string));
@@ -11015,7 +11015,7 @@ namespace Admin.gigade.Controllers
                     newRow["採購數量"] = ipoStore[i].qty_ord;
                     newRow["允收數量"] = ipoStore[i].qty_claimed;
                     newRow["不允收量"] = ipoStore[i].qty_damaged;
-                    newRow["商品六碼"] = ipoStore[i].item_id;
+                    newRow["商品細項編號"] = ipoStore[i].item_id;
                     newRow["商品編號"] = ipoStore[i].productid;
                     newRow["供應商編號"] = ipoStore[i].vendor_id;
                     newRow["創建時間"] = ipoStore[i].create_dtim.ToString("yyyy-MM-dd HH:mm:ss");
