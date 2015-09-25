@@ -1,5 +1,4 @@
-﻿
-var pageSize = 15;
+﻿var pageSize = 15;
 
 var pro = [
     { name: 'product_image', type: 'string' },
@@ -8,6 +7,7 @@ var pro = [
     { name: 'product_name', type: 'string' },
     { name: 'prod_sz', type: 'string' }
 ];
+
 pro.push({ name: 'combination', type: 'string' });
 pro.push({ name: 'price_type', type: 'string' });//add by hufeng0813w 2014/06/18 Reason:商品列表中加上價格類型
 pro.push({ name: 'combination_id', type: 'string' });
@@ -31,7 +31,8 @@ pro.push({ name: 'create_channel', type: 'string' });
 pro.push({ name: 'Prod_Classify', type: 'int' });
 //添加是否失格  add  by zhuoqin0830w 2015/06/30
 pro.push({ name: 'off_grade', type: 'int' });
-
+//添加預購商品 guodong1130w 2015/9/16添加
+pro.push({ name: 'purchase_in_advance', type: 'int' });
 //2015/08/12
 pro.push({ name: 'itemIds', type: 'string' });
 
@@ -39,6 +40,7 @@ Ext.define('GIGADE.PRODUCT', {
     extend: 'Ext.data.Model',
     fields: pro
 });
+
 var p_store = Ext.create('Ext.data.Store', {
     pageSize: pageSize,
     model: 'GIGADE.PRODUCT',
@@ -53,6 +55,7 @@ var p_store = Ext.create('Ext.data.Store', {
         }
     }
 });
+
 p_store.on("beforeload", function () {
     Ext.apply(p_store.proxy.extraParams, {
         brand_id: Ext.getCmp('brand_id') ? Ext.getCmp('brand_id').getValue() : '',
@@ -75,7 +78,9 @@ p_store.on("beforeload", function () {
         price_status: Ext.getCmp('price_status') ? Ext.getCmp('price_status').getValue() : '',
         stockStatus: Ext.getCmp('stockStatus') ? Ext.getCmp('stockStatus').getValue() : '',//庫存類型
         //添加失格商品 查詢條件 
-        off_grade: Ext.getCmp("off_grade").getValue() ? 1 : 0
+        off_grade: Ext.getCmp("off_grade").getValue() ? 1 : 0,
+        //添加預購商品 查詢條件guodong1130w 2015/9/16添加
+        purchase_in_advance: Ext.getCmp('purchase_in_advance').getValue() ? 1 : 0
     });
 });
 
@@ -102,12 +107,14 @@ site.push(m_CanDo);
 site.push(m_prod_classify);
 //添加是否失格  add  by zhuoqin0830w 2015/06/30
 site.push(off_grade);
-
+//添加預購商品 guodong1130w 2015/9/16添加
+site.push(m_purchase_in_advance);
 
 Ext.define('GIGADE.SITEPRODUCT', {
     extend: 'Ext.data.Model',
     fields: site
 });
+
 var s_store = Ext.create('Ext.data.Store', {
     pageSize: pageSize,
     model: 'GIGADE.SITEPRODUCT',
@@ -122,6 +129,7 @@ var s_store = Ext.create('Ext.data.Store', {
         }
     }
 });
+
 s_store.on("beforeload", function () {
     Ext.apply(s_store.proxy.extraParams, {
         brand_id: Ext.getCmp('brand_id') ? Ext.getCmp('brand_id').getValue() : '',
@@ -143,7 +151,9 @@ s_store.on("beforeload", function () {
         user_level: Ext.getCmp('user_level') ? Ext.getCmp('user_level').getValue() : '',
         price_status: Ext.getCmp('price_status') ? Ext.getCmp('price_status').getValue() : '',
         stockStatus: Ext.getCmp('stockStatus') ? Ext.getCmp('stockStatus').getValue() : '',//庫存類型
-        off_grade: Ext.getCmp("off_grade").getValue() ? 1 : 0
+        off_grade: Ext.getCmp("off_grade").getValue() ? 1 : 0,
+        //添加預購商品 查詢條件guodong1130w 2015/9/16添加
+        purchase_in_advance: Ext.getCmp('purchase_in_advance').getValue() ? 1 : 0
     });
 });
 
@@ -204,6 +214,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
     },
     storeColNameForHide: 'CanSel'
 });
+
 var site_sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
@@ -277,6 +288,7 @@ var UnShelveStore = Ext.create('Ext.data.Store', {
         }
     }
 });
+
 //下架不販售備註欄位Store  add by zhuoqin0830w  2015/06/25
 var UnShelveSellStore = Ext.create('Ext.data.Store', {
     id: 'UnShelveSellStore',
@@ -292,6 +304,7 @@ var UnShelveSellStore = Ext.create('Ext.data.Store', {
         }
     }
 });
+
 //上架備註欄位Store  add by zhuoqin0830w  2015/06/25
 var PutAwayStore = Ext.create('Ext.data.Store', {
     id: 'PutAwayStore',
@@ -309,8 +322,11 @@ var PutAwayStore = Ext.create('Ext.data.Store', {
 });
 
 Ext.onReady(function () {
-    document.body.onkeydown = function () {
-        if (event.keyCode == 13) {
+    //回車鍵查詢
+    // edit by zhuoqin0830w  2015/09/22  以兼容火狐瀏覽器
+    document.onkeydown = function (event) {
+        e = event ? event : (window.event ? window.event : null);
+        if (e.keyCode == 13) {
             $("#btn_search").click();
         }
     };
@@ -332,22 +348,29 @@ Ext.onReady(function () {
                 layout: 'hbox',
                 anchor: '100%',
                 margin: '0 0',
-                items: [brand, stockStatus]
-            }, category, {
-                xtype: 'fieldcontainer',
-                layout: 'hbox',
-                anchor: '100%',
-                items: [type, pro_status, product_type]
-            }, freight_mode_tax, start_end, {
-                xtype: 'container',
-                layout: 'hbox',
-                items: [key_query, {//edit by zhuoqin0830w  2015/06/30 添加失格查詢欄位
+                items: [brand, stockStatus,
+                {//edit by guodong1130w  2015/09/16 添加預購商品查詢欄位
                     xtype: 'checkbox',
                     margin: '0 0 0 10',
-                    boxLabel: QUALIFICATION_LOSE,
-                    id: 'off_grade'
+                    boxLabel: PURCHASE_IN_ADVANCE_LABLE,
+                    id: 'purchase_in_advance'
                 }]
-            }]
+            }
+           , category, {
+               xtype: 'fieldcontainer',
+               layout: 'hbox',
+               anchor: '100%',
+               items: [type, pro_status, product_type]
+           }, freight_mode_tax, start_end, {
+               xtype: 'container',
+               layout: 'hbox',
+               items: [key_query, {//edit by zhuoqin0830w  2015/06/30 添加失格查詢欄位
+                   xtype: 'checkbox',
+                   margin: '0 0 0 10',
+                   boxLabel: QUALIFICATION_LOSE,
+                   id: 'off_grade'
+               }]
+           }]
         }, {
             xtype: 'panel',
             columnWidth: .30,
@@ -407,6 +430,12 @@ Ext.onReady(function () {
                 scale: 'small',
                 width: 130,
                 handler: function () { exportProduct(2); }
+            }, {
+                text: PURCHASE_IN_ADVANCE_DATA_OUT,
+                id: "ygdata",
+                scale: 'small',
+                width: 130,
+                handler: function () { exportProduct(5); }
             }, '-', {
                 text: PRODUCT_PRICE_OUT,
                 id: "jgdata",
@@ -422,14 +451,22 @@ Ext.onReady(function () {
             }],
             listeners: {
                 activate: function (e) {
+                    var purchase_in_advance = Ext.htmlEncode(Ext.getCmp('purchase_in_advance').getValue() ? 1 : 0);//添加預購商品 guodong1130w 2015/9/16添加
                     if (Ext.getCmp('proGrid').isVisible()) {
                         e.items.get("kcdata").enable();
                         e.items.get("spdata").enable();
+                        if (purchase_in_advance == 1) {
+                            e.items.get("ygdata").enable();
+                        }
+                        else {
+                            e.items.get("ygdata").disable();
+                        }
                         e.items.get("jgdata").disable();
                         e.items.get("spxxdata").disable();
                     } else {
                         e.items.get("kcdata").disable();
                         e.items.get("spdata").disable();
+                        e.items.get("ygdata").disable();
                         e.items.get("jgdata").enable();
                         e.items.get("spxxdata").enable();
                     }
@@ -481,6 +518,7 @@ Ext.onReady(function () {
         '->',
         { text: ' ' }
     ];
+
     //把你要的column PUSH進去
     var proColumns = new Array();
     proColumns.push(c_pro_copy); //複製
@@ -531,6 +569,7 @@ Ext.onReady(function () {
             }
         }
     });
+
     //價格列表的column add by hufeng0813w 2014/06/18
     var siteColumns = new Array();
     siteColumns.push(c_pro_copy);
@@ -786,6 +825,7 @@ onUpClick = function () {
         }).show();
     }
 }
+
 //下架不販售
 onDonoCilck = function () {
     var rows;
@@ -879,6 +919,7 @@ onDonoCilck = function () {
         }).show();
     }
 }
+
 //下架
 onDownClick = function () {
     var rows;
@@ -1010,6 +1051,7 @@ onDownClick = function () {
         }).show();
     }
 }
+
 //刪除
 onDeleteClick = function () {
     var rows;
@@ -1052,6 +1094,7 @@ onDeleteClick = function () {
         });
     }
 }
+
 //取消申請
 onCanCelClick = function () {
     var rows;
@@ -1181,9 +1224,10 @@ onExport = function () {
     var key = Ext.getCmp('key').getValue() ? Ext.htmlEncode(Ext.getCmp('key').getValue()) : '';
     //add by zhuoqin0830w 2015/07/22
     var off_grade = Ext.htmlEncode(Ext.getCmp("off_grade").getValue() ? 1 : 0); //失格商品查詢
+    var purchase_in_advance = Ext.htmlEncode(Ext.getCmp('purchase_in_advance').getValue() ? 1 : 0);//添加預購商品 guodong1130w 2015/9/16添加
 
     if (brand_id == "" && comboProCate_hide == "" && comboFrontCage_hide == "" && combination == 0 && product_status == -1
-        && product_freight_set == 0 && product_mode == 0 && tax_type == 0 & date_type == "" && time_start == "" && time_end == "" && key == "" && off_grade == 0) {
+        && product_freight_set == 0 && product_mode == 0 && tax_type == 0 & date_type == "" && time_start == "" && time_end == "" && key == "" && off_grade == 0 && purchase_in_advance == 0) {
         Ext.Msg.alert(INFORMATION, SEARCH_CONDITION);
         return;
     }
@@ -1200,7 +1244,8 @@ onExport = function () {
         + "&time_start=" + time_start
         + "&time_end=" + time_end
         + "&key=" + key
-        + "&off_grade=" + off_grade;
+        + "&off_grade=" + off_grade
+        + "&purchase_in_advance=" + purchase_in_advance;
 
     window.open("ProductList/ExportProductItemMap?" + queryString);
 }
@@ -1218,11 +1263,15 @@ function exportProduct(exprotFlag) {
     var time_start = Ext.getCmp('time_start').getValue() ? Ext.getCmp('time_start').rawValue : '';
     var time_end = Ext.getCmp('time_end').getValue() ? Ext.getCmp('time_end').rawValue : '';
     var key = Ext.getCmp('key').getValue() ? Ext.htmlEncode(Ext.getCmp('key').getValue()) : '';
-    var stockstatus = Ext.getCmp('stockStatus') ? Ext.getCmp('stockStatus').getValue() : ''  //edti by wwei0216w 2014/12/27 添加庫存分類
+    var stockstatus = Ext.getCmp('stockStatus') ? Ext.getCmp('stockStatus').getValue() : '';  //edti by wwei0216w 2014/12/27 添加庫存分類
+    var purchase_in_advance = Ext.getCmp('purchase_in_advance').getValue() ? 1 : 0;//添加預購商品 guodong1130w 2015/9/16添加
     var price_check = false;
     switch (exprotFlag) {
         case 1:
         case 2:
+            price_check = false;
+            break;
+        case 5:
             price_check = false;
             break;
         case 3:
@@ -1244,7 +1293,7 @@ function exportProduct(exprotFlag) {
     var off_grade = Ext.getCmp("off_grade").getValue() ? 1 : 0;  //失格商品查詢
 
     if (brand_id == "" && comboProCate_hide == "" && comboFrontCage_hide == "" && combination == 0 && product_status == -1
-        && product_freight_set == 0 && product_mode == 0 && tax_type == 0 & date_type == "" && time_start == "" && time_end == "" && key == "" && off_grade == 0) {
+        && product_freight_set == 0 && product_mode == 0 && tax_type == 0 & date_type == "" && time_start == "" && time_end == "" && key == "" && off_grade == 0 && purchase_in_advance == 0) {
         Ext.Msg.alert(INFORMATION, SEARCH_CONDITION);
         return;
     }
@@ -1279,7 +1328,8 @@ function exportProduct(exprotFlag) {
         exportFlag: exprotFlag,
         StockStatus: stockstatus,
         cols: cols,
-        off_grade: off_grade   //add by zhuoqin0830w 2015/07/22
+        off_grade: off_grade,   //add by zhuoqin0830w 2015/07/22
+        purchase_in_advance: purchase_in_advance //add by guodong1130w 2015/9/16
     });
 
 

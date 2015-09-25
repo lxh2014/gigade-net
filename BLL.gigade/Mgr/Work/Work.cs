@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BLL.gigade.Model;
 
+
 namespace Working
 {
     class Work:IWork
@@ -25,6 +26,9 @@ namespace Working
                     break;
                 case 2:
                     this.work = new RepeatWork(freightSetTime);
+                    break; 
+                case 3:
+                    this.work = new SpecialWork(freightSetTime);
                     break;
                 default:
                     throw new Exception("unaccepted type");
