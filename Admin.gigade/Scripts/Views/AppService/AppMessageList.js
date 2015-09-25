@@ -34,6 +34,7 @@ Ext.define('gigade.AppMessage', {
         { name: "need_login" }
     ]
 });
+
 //頁面store
 var AppMessageStore = Ext.create('Ext.data.Store', {
     autoDestroy: true,
@@ -50,8 +51,8 @@ var AppMessageStore = Ext.create('Ext.data.Store', {
             totalProperty: 'totalCount'
         }
     }
-    //    autoLoad: true
 });
+
 //適用平臺下拉框store
 var FitOsStore = Ext.create('Ext.data.Store', {
     fields: ['ParameterCode', 'parameterName'],
@@ -67,6 +68,7 @@ var FitOsStore = Ext.create('Ext.data.Store', {
         }
     }
 });
+
 //顯示類別store
 var DisplayTypeStore = Ext.create('Ext.data.Store', {
     fields: ['parameterCode', 'parameterName'],
@@ -75,6 +77,7 @@ var DisplayTypeStore = Ext.create('Ext.data.Store', {
          { parameterCode: '1', parameterName: YES },//是
     ]
 });
+
 //進行分頁查詢的時候附帶上查詢條件
 AppMessageStore.on("beforeload", function () {
     var timestartvalue = Ext.getCmp('msg_start_first').getValue();
@@ -93,6 +96,7 @@ AppMessageStore.on("beforeload", function () {
         msg_end_second: timeendendvalue
     });
 });
+
 //查詢數據
 function Query(x) {
     Ext.getCmp("AppMessageList").store.loadPage(1, {
@@ -103,11 +107,15 @@ function Query(x) {
 }
 
 Ext.onReady(function () {
-    document.body.onkeydown = function () {
-        if (event.keyCode == 13) {
+    //回車鍵查詢
+    // edit by zhuoqin0830w  2015/09/22  以兼容火狐瀏覽器
+    document.onkeydown = function (event) {
+        e = event ? event : (window.event ? window.event : null);
+        if (e.keyCode == 13) {
             $("#btnQuery").click();
         }
     };
+
     var AppMessageList = Ext.create('Ext.grid.Panel', {
         id: 'AppMessageList',
         store: AppMessageStore,
@@ -129,91 +137,90 @@ Ext.onReady(function () {
         dockedItems: [{
             dock: 'top',
             xtype: 'toolbar',
-            items: [
-                 {
-                     xtype: 'datefield',
-                     format: 'Y-m-d',
-                     id: 'msg_start_first',
-                     fieldLabel: MSG_START_TIME,//開始時間
-                     labelWidth: 60,
-                     width: 200,
-                     editable: false,
-                     listeners: {
-                         change: function () {
-                             Ext.getCmp("msg_start_second").setMinValue(this.getValue());
-                             Ext.getCmp("msg_end_first").setMinValue(this.getValue());
-                             Ext.getCmp("msg_end_second").setMinValue(this.getValue());
-                         }
-                     }
-                 }, {
-                     xtype: 'displayfield',
-                     value: '~ ',
-                     id: 'blp_start',
-                     disabled: true,
-                     margin: '0 5 0 5'
-                 }, {
-                     xtype: 'datefield',
-                     format: 'Y-m-d',
-                     id: 'msg_start_second',
-                     labelWidth: 60,
-                     editable: false,
-                     listeners: {
-                         change: function () {
-                             Ext.getCmp("msg_start_first").setMaxValue(this.getValue());
-                         }
-                     }
-                 }, {
-                     xtype: 'datefield',
-                     format: 'Y-m-d',
-                     id: 'msg_end_first',
-                     fieldLabel: MSG_END_TIME,
-                     labelWidth: 60,
-                     width: 200,
-                     editable: false,
-                     listeners: {
-                         change: function () {
-                             Ext.getCmp("msg_end_second").setMinValue(this.getValue());
-                         }
-                     }
-                 }, {
-                     xtype: 'displayfield',
-                     value: '~ ',
-                     id: 'blp_end',
-                     disabled: true,
-                     margin: '0 5 0 5'
-                 }, {
-                     xtype: 'datefield',
-                     format: 'Y-m-d',
-                     id: 'msg_end_second',
-                     labelWidth: 60,
-                     editable: false,
-                     listeners: {
-                         change: function () {
-                             Ext.getCmp("msg_start_first").setMaxValue(this.getValue());
-                             Ext.getCmp("msg_start_second").setMaxValue(this.getValue());
-                             Ext.getCmp("msg_end_first").setMaxValue(this.getValue());
-                         }
-                     }
-                 }, {
-                     xtype: 'button',
-                     text: QUERY,//查詢
-                     iconCls: 'icon-search',
-                     id: 'btnQuery',
-                     handler: Query
-                 }, {
-                     xtype: 'button',
-                     text: RESET,//重置
-                     iconCls: 'ui-icon ui-icon-reset',
-                     id: 'btn_reset',
-                     listeners: {
-                         click: function () {
-                             Ext.getCmp('msg_start_first').reset();
-                             Ext.getCmp('msg_start_second').reset();
-                             Ext.getCmp('msg_end_first').reset();
-                             Ext.getCmp('msg_end_second').reset();
-                         }
-                     }
-                 }
+            items: [{
+                xtype: 'datefield',
+                format: 'Y-m-d',
+                id: 'msg_start_first',
+                fieldLabel: MSG_START_TIME,//開始時間
+                labelWidth: 60,
+                width: 200,
+                editable: false,
+                listeners: {
+                    change: function () {
+                        Ext.getCmp("msg_start_second").setMinValue(this.getValue());
+                        Ext.getCmp("msg_end_first").setMinValue(this.getValue());
+                        Ext.getCmp("msg_end_second").setMinValue(this.getValue());
+                    }
+                }
+            }, {
+                xtype: 'displayfield',
+                value: '~ ',
+                id: 'blp_start',
+                disabled: true,
+                margin: '0 5 0 5'
+            }, {
+                xtype: 'datefield',
+                format: 'Y-m-d',
+                id: 'msg_start_second',
+                labelWidth: 60,
+                editable: false,
+                listeners: {
+                    change: function () {
+                        Ext.getCmp("msg_start_first").setMaxValue(this.getValue());
+                    }
+                }
+            }, {
+                xtype: 'datefield',
+                format: 'Y-m-d',
+                id: 'msg_end_first',
+                fieldLabel: MSG_END_TIME,
+                labelWidth: 60,
+                width: 200,
+                editable: false,
+                listeners: {
+                    change: function () {
+                        Ext.getCmp("msg_end_second").setMinValue(this.getValue());
+                    }
+                }
+            }, {
+                xtype: 'displayfield',
+                value: '~ ',
+                id: 'blp_end',
+                disabled: true,
+                margin: '0 5 0 5'
+            }, {
+                xtype: 'datefield',
+                format: 'Y-m-d',
+                id: 'msg_end_second',
+                labelWidth: 60,
+                editable: false,
+                listeners: {
+                    change: function () {
+                        Ext.getCmp("msg_start_first").setMaxValue(this.getValue());
+                        Ext.getCmp("msg_start_second").setMaxValue(this.getValue());
+                        Ext.getCmp("msg_end_first").setMaxValue(this.getValue());
+                    }
+                }
+            }, {
+                xtype: 'button',
+                text: QUERY,//查詢
+                iconCls: 'icon-search',
+                id: 'btnQuery',
+                handler: Query
+            }, {
+                xtype: 'button',
+                text: RESET,//重置
+                iconCls: 'ui-icon ui-icon-reset',
+                id: 'btn_reset',
+                listeners: {
+                    click: function () {
+                        Ext.getCmp('msg_start_first').reset();
+                        Ext.getCmp('msg_start_second').reset();
+                        Ext.getCmp('msg_end_first').reset();
+                        Ext.getCmp('msg_end_second').reset();
+                    }
+                }
+            }
             ]
         }],
         tbar: [
@@ -249,8 +256,8 @@ Ext.onReady(function () {
         }
     });
     ToolAuthority();
-    //AppMessageStore.load({ params: { start: 0, limit: 25 } });
 });
+
 function onAddClick() {
     pcFrm.getForm().reset();
     addPc.show();

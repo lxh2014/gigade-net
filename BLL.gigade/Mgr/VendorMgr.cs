@@ -236,13 +236,7 @@ namespace BLL.gigade.Mgr
 
                 throw new Exception("VendorDao-->Update-->" + ex.Message, ex);
             }
-
-
         }
-
-
-
-
 
         public string QueryContanct(Vendor query)
         {
