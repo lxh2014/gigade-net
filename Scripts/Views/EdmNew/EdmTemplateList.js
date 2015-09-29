@@ -170,12 +170,10 @@ function onAddClick() {
 onedit = function () {
     var row = Ext.getCmp("EdmTemplateGrid").getSelectionModel().getSelection();
     if (row.length == 0) {
-        // Ext.Msg.alert(INFORMATION, NO_SELECTION);
-        Ext.Msg.alert("未選中任何行!");
+         Ext.Msg.alert(INFORMATION, NO_SELECTION);
     }
     else if (row.length > 1) {
-        // Ext.Msg.alert(INFORMATION, ONE_SELECTION);
-        Ext.Msg.alert("只能选择一行!");
+         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
         //Ext.Msg.alert(row[0].data.name);
         editFunction(row[0], EdmTemplateStore);
