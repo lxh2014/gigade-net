@@ -602,7 +602,7 @@ function vugQuery() {
 function mmQuery() {
     if (!Ext.getCmp('searchtype').getValue() == 0) {
         var searchType = Ext.getCmp('searchtype').getValue();
-        if (Ext.getCmp('searchcontent').getValue() == '') {
+        if (Ext.getCmp('searchcontent').getValue().trim() == '') {
             Ext.Msg.alert('提示信息', '請輸入查詢內容');
         }
         else {
@@ -610,13 +610,13 @@ function mmQuery() {
             Ext.getCmp("mmGrid").store.loadPage(1, {
                 params: {
                     serchs: Ext.getCmp('searchtype').getValue(),
-                    serchcontent: Ext.getCmp('searchcontent').getValue(),
+                    serchcontent: Ext.getCmp('searchcontent').getValue().trim(),
                 }
             });
         }
     }
     else {
-        if (Ext.getCmp('searchcontent').getValue() == '') {
+        if (Ext.getCmp('searchcontent').getValue().trim() == '') {
             VipUserStore.removeAll();
             Ext.getCmp("mmGrid").store.loadPage(1, {
                 params: {
@@ -625,7 +625,7 @@ function mmQuery() {
             });
         }
         else {
-            Ext.Msg.alert('提示信息','請輸入查詢類型')
+            Ext.Msg.alert('提示信息','請輸入查詢類別')
         }
        
     }
