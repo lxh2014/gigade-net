@@ -15,20 +15,24 @@ namespace BLL.gigade.Dao
    public  class EdmTemplateDao
     {
        private IDBAccess _access;
+       private IDBAccess _dbAccess;
        public EdmTemplateDao(string connectionString)
         {
             _access = DBFactory.getDBAccess(DBType.MySql, connectionString);
+            _dbAccess = DBFactory.getDBAccess(DBType.MySql, connectionString);
         }
 
        public List<EdmTemplateQuery> GetEdmTemplateList(EdmTemplateQuery query, out int totalCount)
        {
+           query.Replace4MySQL();
            StringBuilder str = new StringBuilder();
            StringBuilder strcont = new StringBuilder();
            totalCount = 0;
            try
            {
-               str.AppendFormat(" select et.template_id,et.template_name,et.edit_url,et.content_url,et.enabled,mu.user_username,mu.user_username,et.template_updatedate from edm_template et  ");
-               str.Append(" LEFT JOIN manage_user mu on mu.user_id=et.template_create_userid ");
+               str.AppendFormat(" select et.template_id,et.template_name,et.edit_url,et.content_url,et.enabled,mu1.user_username as template_create_user,mu2.user_username as template_update_user,et.template_updatedate from edm_template et  ");
+               str.Append(" LEFT JOIN manage_user mu1 on mu1.user_id=et.template_create_userid  ");
+               str.Append(" LEFT JOIN manage_user mu2 on mu2.user_id=et.template_update_userid ");
                str.Append(" order by enabled desc, template_name ");
                str.Append(strcont);
                if (query.IsPage)
@@ -92,7 +96,7 @@ namespace BLL.gigade.Dao
            query.Replace4MySQL();
            try
            {
-               sql.AppendFormat("update edm_template set template_name = '{0}', edit_url = '{1}', content_url = '{2}',template_create_userid='{3}',template_update_userid='{4}' where   template_id='{5}' ", query.template_name, query.edit_url, query.content_url, query.template_create_userid, query.template_update_userid,query.template_id);
+               sql.AppendFormat("update edm_template set template_name = '{0}', edit_url = '{1}', content_url = '{2}',template_update_userid='{3}'  where   template_id='{4}' ", query.template_name, query.edit_url, query.content_url,query.template_update_userid,query.template_id);
                return _access.execCommand(sql.ToString());
            }
            catch (Exception ex)

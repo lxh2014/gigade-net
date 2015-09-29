@@ -1,5 +1,4 @@
-﻿
-var pageSize = 10;
+﻿var pageSize = 10;
 var clientHeight = document.documentElement.clientHeight;
 var clientWidth = document.documentElement.clientWidth;
 //列选择模式
@@ -35,7 +34,6 @@ Ext.define('GIGADE.REPLACEVERIFY', {
     ]
 });
 
-
 var replaceListStore = Ext.create("Ext.data.Store", {
     model: 'GIGADE.REPLACEVERIFY',
     autoLoad: false,
@@ -51,9 +49,7 @@ var replaceListStore = Ext.create("Ext.data.Store", {
     }
 });
 
-
 replaceListStore.on('beforeload', function () {
-
     var brandId = Ext.getCmp("brand_id").getValue() == null ? 0 : Ext.getCmp("brand_id").getValue();
     var cateType = Ext.getCmp('comboProCate_hide').getValue();
     var frontCateType = !Number(Ext.getCmp('comboFrontCage_hide').getValue()) ? 0 : Ext.getCmp('comboFrontCage_hide').getValue();
@@ -61,7 +57,6 @@ replaceListStore.on('beforeload', function () {
     var productStatus = Ext.getCmp("product_status").getValue() == null ? -1 : Ext.getCmp("product_status").getValue();
     var dataType = Ext.getCmp("date_type").getValue();
     var key = Ext.htmlEncode(Ext.getCmp("key").getValue());
-
     var queryCondition = "{brand_id:'" + brandId + "',cate_id:'" + cateType + "',";
     queryCondition += "category_id:'" + frontCateType + "',combination:'" + productType + "',";
     queryCondition += "product_status:'" + productStatus + "',date_type:'" + dataType + "',";
@@ -73,9 +68,6 @@ replaceListStore.on('beforeload', function () {
             time_end: Ext.getCmp("time_end").getValue()
         });
 });
-
-
-
 
 var proColumns = c_pro_base;
 proColumns.push(c_pro_kuser);            //建立人
@@ -103,8 +95,11 @@ function searchShow() {
 }
 
 Ext.onReady(function () {
-    document.body.onkeydown = function () {
-        if (event.keyCode == 13) {
+    //回車鍵查詢
+    // edit by zhuoqin0830w  2015/09/22  以兼容火狐瀏覽器
+    document.onkeydown = function (event) {
+        e = event ? event : (window.event ? window.event : null);
+        if (e.keyCode == 13) {
             $("#btnSearch").click();
         }
     };
@@ -191,7 +186,6 @@ Ext.onReady(function () {
         })
     });
 
-
     Ext.create('Ext.Viewport', {
         layout: 'anchor',
         border: false,
@@ -215,10 +209,7 @@ Ext.onReady(function () {
                 ToolAuthorityQuery(function () {
                     //window.setTimeout(searchShow, 1000);
                 });
-
-
             }
         }
     });
-
 });

@@ -706,6 +706,8 @@ var m_create_channel = { name: 'create_channel', type: 'string' };
 var m_prod_classify = { name: 'Prod_Classify', type: 'int' };
 //添加是否失格  add  by zhuoqin0830w 2015/06/30
 var off_grade = { name: 'off_grade', type: 'int' };
+//添加預購商品 guodong1130w 2015/9/16添加
+var m_purchase_in_advance = { name: 'purchase_in_advance',type:'int' }
 
 
 /*******************GRID COLUMNS***********************/

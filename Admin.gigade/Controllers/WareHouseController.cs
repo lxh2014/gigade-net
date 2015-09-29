@@ -8277,6 +8277,10 @@ namespace Admin.gigade.Controllers
             {
                 ipo.end_time = Convert.ToDateTime(Request.Params["end_time"].ToString());
             }
+            if (!string.IsNullOrEmpty(Request.Params["freight"]))
+            {
+               ipo.freight = Convert.ToInt32(Request.Params["freight"].ToString());
+            }
             //變更的時候記得把匯出也修改了獲取條件是同時的
             try
             {
@@ -8284,27 +8288,27 @@ namespace Admin.gigade.Controllers
                 _ipoMgr = new IpoMgr(mySqlConnectionString);
                 int totalCount = 0;
                 store = _ipoMgr.GetIpoList(ipo, out  totalCount);
-                if (!string.IsNullOrEmpty(Request.Params["freight"]))
-                {
-                    if (Request.Params["freight"].ToString() != "0")
-                    {
-                        totalCount = 0;
-                        _ipodMgr = new IpodMgr(mySqlConnectionString);
-                        List<IpoQuery> newstore = new List<IpoQuery>();
-                        foreach (IpoQuery item in store)
-                        {
-                            if (!string.IsNullOrEmpty(item.po_id))
-                            {
-                                if (_ipodMgr.GetIpodfreight(item.po_id, Convert.ToInt32(Request.Params["freight"].ToString())))
-                                {
-                                    newstore.Add(item);
-                                    totalCount++;
-                                }
-                            }
-                        }
-                        store = newstore;
-                    }
-                }
+                //if (!string.IsNullOrEmpty(Request.Params["freight"]))
+                //{
+                //    if (Request.Params["freight"].ToString() != "0")
+                //    {
+                //        totalCount = 0;
+                //        _ipodMgr = new IpodMgr(mySqlConnectionString);
+                //        List<IpoQuery> newstore = new List<IpoQuery>();
+                //        foreach (IpoQuery item in store)
+                //        {
+                //            if (!string.IsNullOrEmpty(item.po_id))
+                //            {
+                //                if (_ipodMgr.GetIpodfreight(item.po_id, Convert.ToInt32(Request.Params["freight"].ToString())))
+                //                {
+                //                    newstore.Add(item);
+                //                    totalCount++;
+                //                }
+                //            }
+                //        }
+                //        store = newstore;
+                //    }
+                //}
 
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式    ,totalCount:" + totalCount + " 
@@ -9897,31 +9901,35 @@ namespace Admin.gigade.Controllers
             {
                 ipo.end_time = Convert.ToDateTime(Request.Params["end_time"].ToString());
             }
+            if (!string.IsNullOrEmpty(Request.Params["freight"]))
+            {
+                ipo.freight = Convert.ToInt32(Request.Params["freight"].ToString());
+            }
             List<IpodQuery> ipodStore = new List<IpodQuery>();
             List<IpoQuery> ipoStore = new List<IpoQuery>();
             _ipoMgr = new IpoMgr(mySqlConnectionString);
             int totalCount = 0;
             ipo.IsPage = false;
             ipoStore = _ipoMgr.GetIpoList(ipo, out  totalCount);
-            if (!string.IsNullOrEmpty(Request.Params["freight"]))
-            {
-                if (Request.Params["freight"].ToString() != "0")
-                {
-                    _ipodMgr = new IpodMgr(mySqlConnectionString);
-                    List<IpoQuery> newstore = new List<IpoQuery>();
-                    foreach (IpoQuery item in ipoStore)
-                    {
-                        if (!string.IsNullOrEmpty(item.po_id))
-                        {
-                            if (_ipodMgr.GetIpodfreight(item.po_id, Convert.ToInt32(Request.Params["freight"].ToString())))
-                            {
-                                newstore.Add(item);
-                            }
-                        }
-                    }
-                    ipoStore = newstore;
-                }
-            }
+            //if (!string.IsNullOrEmpty(Request.Params["freight"]))
+            //{
+            //    if (Request.Params["freight"].ToString() != "0")
+            //    {
+            //        _ipodMgr = new IpodMgr(mySqlConnectionString);
+            //        List<IpoQuery> newstore = new List<IpoQuery>();
+            //        foreach (IpoQuery item in ipoStore)
+            //        {
+            //            if (!string.IsNullOrEmpty(item.po_id))
+            //            {
+            //                if (_ipodMgr.GetIpodfreight(item.po_id, Convert.ToInt32(Request.Params["freight"].ToString())))
+            //                {
+            //                    newstore.Add(item);
+            //                }
+            //            }
+            //        }
+            //        ipoStore = newstore;
+            //    }
+            //}
             try
             {
                 #region 採購單匯出
@@ -10982,7 +10990,7 @@ namespace Admin.gigade.Controllers
                 _newDt.Columns.Add("供應商名稱", typeof(string));
                 _newDt.Columns.Add("品號", typeof(string));
                 _newDt.Columns.Add("商品編號", typeof(string));
-                _newDt.Columns.Add("商品六碼", typeof(string));
+                _newDt.Columns.Add("商品細項編號", typeof(string));
                 _newDt.Columns.Add("商品名稱", typeof(string));
                 _newDt.Columns.Add("規格", typeof(string));
                 _newDt.Columns.Add("採購數量", typeof(string));
@@ -11007,7 +11015,7 @@ namespace Admin.gigade.Controllers
                     newRow["採購數量"] = ipoStore[i].qty_ord;
                     newRow["允收數量"] = ipoStore[i].qty_claimed;
                     newRow["不允收量"] = ipoStore[i].qty_damaged;
-                    newRow["商品六碼"] = ipoStore[i].item_id;
+                    newRow["商品細項編號"] = ipoStore[i].item_id;
                     newRow["商品編號"] = ipoStore[i].productid;
                     newRow["供應商編號"] = ipoStore[i].vendor_id;
                     newRow["創建時間"] = ipoStore[i].create_dtim.ToString("yyyy-MM-dd HH:mm:ss");
