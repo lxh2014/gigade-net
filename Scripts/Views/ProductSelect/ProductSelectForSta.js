@@ -1,5 +1,4 @@
-﻿
-var pageSize = 15;
+﻿var pageSize = 15;
 
 var pro = [
     { name: 'product_image', type: 'string' },
@@ -8,6 +7,7 @@ var pro = [
     { name: 'product_name', type: 'string' },
     { name: 'prod_sz', type: 'string' }
 ];
+
 pro.push({ name: 'combination', type: 'string' });
 pro.push({ name: 'price_type', type: 'string' });
 pro.push({ name: 'combination_id', type: 'string' });
@@ -73,11 +73,13 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
 
 //查詢按鈕
 Ext.onReady(function () {
-    var tools = [
-    { id: "tools", name: "tools", text: QUANTITY_INSERT_SITE_PRICE, type: 'tbar', iconCls: 'icon-edit', disabled: false, handler: onAddClick }//批量新增站臺價
-    ];
-    document.body.onkeydown = function () {
-        if (event.keyCode == 13) {
+    //批量新增站臺價
+    var tools = [{ id: "tools", name: "tools", text: QUANTITY_INSERT_SITE_PRICE, type: 'tbar', iconCls: 'icon-edit', disabled: false, handler: onAddClick }];
+    //回車鍵查詢
+    // edit by zhuoqin0830w  2015/09/22  以兼容火狐瀏覽器
+    document.onkeydown = function (event) {
+        e = event ? event : (window.event ? window.event : null);
+        if (e.keyCode == 13) {
             $("#btn_search").click();
         }
     };
@@ -130,9 +132,6 @@ Ext.onReady(function () {
         }]
     });
 
-
-
-
     var proColumns = new Array();
     proColumns = proColumns.concat(c_pro_base);
     proColumns.push(c_pro_type);
@@ -145,7 +144,6 @@ Ext.onReady(function () {
     proColumns.push(c_pro_create);
     proColumns.push(c_pro_start);
     proColumns.push(c_pro_end);
-
 
     var proGrid = Ext.create('Ext.grid.Panel', {
         hidden: true,
@@ -176,9 +174,6 @@ Ext.onReady(function () {
         }
     });
 
-
-
-
     //整個容器
     Ext.create('Ext.Viewport', {
         layout: 'anchor',
@@ -201,18 +196,19 @@ Ext.onReady(function () {
     });
 });
 
-
 function Search() {
     Ext.getCmp('key').setValue(Ext.getCmp('key').getValue().replace(/\s+/g, ','));
     Ext.getCmp('tools').setDisabled(false);//add 2014/08/27
     Ext.getCmp('proGrid').show();
     p_store.loadPage(1);
 }
+
 function addDateType() {
     if (DateStore.getCount() == 1) {
         DateStore.add(r_create, r_start, r_end);
     }
 }
+
 function storeLoad() {
     p_store.load();
 }

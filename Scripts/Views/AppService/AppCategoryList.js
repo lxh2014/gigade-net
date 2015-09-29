@@ -28,6 +28,7 @@ Ext.define('gigade.AppCategory', {
         { name: "property", type: "string" },//屬性
     ]
 });
+
 //頁面顯示數據
 var AppCategoryStore = Ext.create('Ext.data.Store', {
     autoDestroy: true,
@@ -44,8 +45,8 @@ var AppCategoryStore = Ext.create('Ext.data.Store', {
             totalProperty: 'totalCount'
         }
     }
-    //    autoLoad: true
 });
+
 //查詢時所用的參數，在分頁的情況下可以附帶出查詢條件進行查詢
 AppCategoryStore.on("beforeload", function () {
     var category = Ext.getCmp('category').getValue();
@@ -66,6 +67,7 @@ AppCategoryStore.on("beforeload", function () {
         product_id: product_id
     });
 });
+
 //館別store
 var ShopClassStore = Ext.create('Ext.data.Store', {
     fields: ['ParameterCode', 'parameterName'],
@@ -81,6 +83,7 @@ var ShopClassStore = Ext.create('Ext.data.Store', {
         }
     }
 });
+
 //分類一store
 var Category1Store = Ext.create('Ext.data.Store', {
     fields: ['ParameterCode', 'parameterName'],
@@ -96,6 +99,7 @@ var Category1Store = Ext.create('Ext.data.Store', {
         }
     }
 });
+
 //分類二store
 var Category2Store = Ext.create('Ext.data.Store', {
     fields: ['ParameterCode', 'parameterName'],
@@ -111,6 +115,7 @@ var Category2Store = Ext.create('Ext.data.Store', {
         }
     }
 });
+
 //分類三store
 var Category3Store = Ext.create('Ext.data.Store', {
     fields: ['ParameterCode', 'parameterName'],
@@ -126,6 +131,7 @@ var Category3Store = Ext.create('Ext.data.Store', {
         }
     }
 });
+
 //刪除數據，根據選擇的行數判斷刪除按鈕是否被disabled
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
@@ -134,6 +140,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
         }
     }
 });
+
 //查詢按鈕所觸發的事件
 function Query(x) {
     Ext.getCmp("AppCategoryList").store.loadPage(1, {
@@ -142,6 +149,7 @@ function Query(x) {
         }
     });
 }
+
 //匯入Excel的格式驗證
 Ext.apply(Ext.form.field.VTypes, {
     excelFilter: function (val, field) {
@@ -156,13 +164,17 @@ Ext.apply(Ext.form.field.VTypes, {
     },
     excelFilterText: IMPORT_TYPE_ERROR,
 });
+
 Ext.onReady(function () {
-    //回撤鍵查詢
-    document.body.onkeydown = function () {
-        if (event.keyCode == 13) {
+    //回車鍵查詢
+    // edit by zhuoqin0830w  2015/09/22  以兼容火狐瀏覽器
+    document.onkeydown = function (event) {
+        e = event ? event : (window.event ? window.event : null);
+        if (e.keyCode == 13) {
             $("#btnQuery").click();
         }
     };
+
     //頁面數據顯示
     var AppCategoryList = Ext.create('Ext.grid.Panel', {
         id: 'AppCategoryList',
@@ -500,4 +512,3 @@ function onInsertExcelClick() {
     excelFrm.getForm().reset();
     addExcel.show();
 }
-

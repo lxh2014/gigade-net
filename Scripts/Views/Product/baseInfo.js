@@ -6,6 +6,7 @@ var isChange = false;
 var SAVEPANEL, COURSEPANEL;
 var productInfo;///add by wwei0216w 定義一個productInfo 用來存儲查詢到的商品信息,以便其他代碼調用
 
+
 //品牌Model
 Ext.define("gigade.Brand", {
     extend: 'Ext.data.Model',
@@ -331,6 +332,7 @@ Ext.onReady(function () {
                         Ext.getCmp('blp').setDisabled(false);
                         Ext.getCmp('purchase_in_advance_end').setDisabled(false);
                         Ext.getCmp('e_time').setDisabled(false);
+                        Ext.getCmp('e_time').allowBlank = false;
                     } else {
                         Ext.getCmp('purchase_in_advance_start').setDisabled(true);
                         Ext.getCmp('blp').setDisabled(true);
@@ -375,11 +377,21 @@ Ext.onReady(function () {
                 disabledMin: true,
                 disabledSec: true,
                 disabled: true,
+                editable: false,
                 format: 'Y-m-d H:i:s',
                 id: 'e_time',
                 fieldLabel: EXPECT_TIME,
                 labelWidth: 80,
-                margin: '0 8 0 15'
+                margin: '0 8 0 15',
+                listeners: {
+                    select: function (a, b, c) {
+                        var purchase_in_advance_end = Ext.getCmp("purchase_in_advance_end");
+                        if (b < purchase_in_advance_end.getValue()) {
+                            Ext.getCmp("e_time").setValue(new Date().getDate() + 2);
+                            Ext.Msg.alert(PROMPT, EXPECT_TIME_IS_ERROR);
+                        }
+                    }
+                }
             }]
         }, {
             xtype: 'panel',
