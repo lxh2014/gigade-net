@@ -46,7 +46,7 @@
                 ]
             }, {
                 xtype: 'textfield',
-                fieldLabel: '試閱',
+                fieldLabel: '試閱連接',
                 id: 'trial_url',
                 name: 'trial_url',
                 allowBlank: false,
@@ -107,7 +107,7 @@
         ]
     });
     var editWin = Ext.create('Ext.window.Window', {
-        title: "新增電子報類別",
+        title: "新增電子報類型",
         id: 'editWin',
         iconCls: "icon-user-add",
         width: 360,

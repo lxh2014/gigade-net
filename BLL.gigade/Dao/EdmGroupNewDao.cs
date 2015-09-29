@@ -57,8 +57,6 @@ namespace BLL.gigade.Dao
                throw new Exception("EdmGroupNewDao-->GetEdmGroupNewList-->" + ex.Message);
            }
        } // add by yachao1120j 2015-9-21
-
-
        public string UpdateStatus(EdmGroupNewQuery query)  // add by yachao1120j 2015-9-21
        {
            StringBuilder strSql = new StringBuilder();
@@ -72,9 +70,7 @@ namespace BLL.gigade.Dao
                throw new Exception("EdmGroupNewDao-->UpdateStatus-->" + ex.Message + strSql.ToString(), ex);
            }
        } 
-
-
-       //插入人员信息
+       //插入信息
        public int EdmGroupNewInsert(EdmGroupNewQuery query)
        {
            StringBuilder sql = new StringBuilder();
@@ -91,7 +87,7 @@ namespace BLL.gigade.Dao
                throw new Exception("EdmGroupNewDao-->EdmGroupNewInsert-->" + sql.ToString() + ex.Message);
            }
        }
-       //更新人员信息
+       //更新信息
        public int EdmGroupNewUpdate(EdmGroupNewQuery query)
        {
            StringBuilder sql = new StringBuilder();

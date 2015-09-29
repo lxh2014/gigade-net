@@ -21,7 +21,6 @@ namespace BLL.gigade.Dao
             _access = DBFactory.getDBAccess(DBType.MySql, connectionString);
             _dbAccess = DBFactory.getDBAccess(DBType.MySql, connectionString);
         }
-
        public List<EdmTemplateQuery> GetEdmTemplateList(EdmTemplateQuery query, out int totalCount)
        {
            query.Replace4MySQL();
@@ -57,7 +56,6 @@ namespace BLL.gigade.Dao
                throw new Exception("EdmTemplateDao-->GetEdmTemplateList-->" + ex.Message);
            }
        }
-
        public string UpdateStats_ET(EdmTemplateQuery query)  // add by yachao1120j 2015-9-22
        {
            StringBuilder strSql = new StringBuilder();
@@ -71,8 +69,7 @@ namespace BLL.gigade.Dao
                throw new Exception("EdmTemplateDao-->UpdateStats_ET-->" + ex.Message + strSql.ToString(), ex);
            }
        }
-
-       //插入人员信息
+       //插入信息
        public int EdmTemplateInsert(EdmTemplateQuery query)
        {
            StringBuilder sql = new StringBuilder();
