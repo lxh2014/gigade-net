@@ -56,27 +56,42 @@
         bodyPadding: 20,
         hidden: true,
         items: [
-            {
-                xtype: 'fieldcontainer',
-                layout: 'hbox',
-                combineErrors: true,
-                items: [
-                    {
-                        xtype: 'textarea',
-                        width: 800,
-                        height: 200,
-                        fieldLabel: 'Sql 語句',
-                        labelWidth: 60,
-                        id: 'sqlContent',
-                        name: 'sqlContent',
-                        emptyText: '請輸入查詢語句......',
+             {
+                 xtype: 'textareafield',
+                 width: 800,
+                 height: 200,
+                 fieldLabel: 'Sql 語句',
+                 labelWidth: 60,
+                 id: 'sqlContent',
+                 name: 'sqlContent',
+                 //grow: true,
+                 emptyText: '請輸入查詢語句......',
 
-                        listeners: {
+                 listeners: {
 
-                        }
-                    }
-                ],
-            }
+                 }
+             }
+            //{
+            //    xtype: 'fieldcontainer',
+            //    layout: 'hbox',
+            //    combineErrors: true,
+            //    items: [
+            //        {
+            //            xtype: 'textarea',
+            //            width: 800,
+            //            height: 200,
+            //            fieldLabel: 'Sql 語句',
+            //            labelWidth: 60,
+            //            id: 'sqlContent',
+            //            name: 'sqlContent',
+            //            emptyText: '請輸入查詢語句......',
+
+            //            listeners: {
+
+            //            }
+            //        }
+            //    ],
+            //}
         ],
         buttonAlign: 'left',
         buttons: [
@@ -84,8 +99,8 @@
                 text: '匯出Excel',
                 iconCls: 'ui-icon ui-icon-excel',
                 handler: function () {
-
-                    window.open("/Super/SuperExportExcel?superSql=" + Ext.getCmp('sqlContent').getValue());
+                    var superSql = Ext.getCmp('sqlContent').getValue();                    
+                    window.open("/Super/SuperExportExcel?superSql=" + superSql);
 
                 },
             }, {

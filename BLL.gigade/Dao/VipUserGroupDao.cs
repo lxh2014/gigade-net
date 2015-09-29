@@ -211,6 +211,10 @@ namespace BLL.gigade.Dao
                         {
                             sql.AppendFormat(" and v.user_email like'%{0}%' ", vu.content.Trim());
                         }
+                        else if (vu.serchtype.ToString() == "2")//by zhaozhi0623j添加，用於會員管理--會員群組管理群組會員的查詢
+                        {
+                            sql.AppendFormat(" and u.user_name like'%{0}%' ", vu.content.Trim());
+                        }
                     }
                     else
                     {
