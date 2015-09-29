@@ -122,11 +122,34 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
 
 VipUserGroupStore.on('beforeload', function () {
     Ext.apply(VipUserGroupStore.proxy.extraParams, {
-        group_id_or_group_name: Ext.getCmp('group_id_or_group_name').getValue()  
+        group_id_or_group_name: Ext.getCmp('group_id_or_group_name').getValue()
         //dateOne: Ext.getCmp('dateOne').getValue(),
         //dateTwo: Ext.getCmp('dateTwo').getValue()
     })
-})
+});
+
+var VipUserStore = Ext.create('Ext.data.Store', {
+    autoDestroy: false,
+    pageSize: pageSize,
+    model: 'gigade.VipUser',
+    proxy: {
+        type: 'ajax',
+        url: '/Member/GetVipUserList',
+        reader: {
+            type: 'json',
+            root: 'data',
+            totalProperty: 'totalCount'
+        }
+    },
+    autoLoad: true
+});
+VipUserStore.on('beforeload', function () {
+    Ext.apply(VipUserStore.proxy.extraParams, {
+        groupid: Ext.getCmp('vugGrid').getSelectionModel().getSelection()[0].data.group_id
+        //dateOne: Ext.getCmp('dateOne').getValue(),
+        //dateTwo: Ext.getCmp('dateTwo').getValue()
+    })
+});
 var DDLStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
@@ -136,12 +159,19 @@ var DDLStore = Ext.create('Ext.data.Store', {
         { "txt": "手機號碼", "value": "3" }
     ]
 });
-
+var typeStore = Ext.create('Ext.data.Store', {
+    fields: ['txt', 'value'],
+    data:[
+        { "txt": "會員郵箱", "value": "1" },
+        { "txt": "會員名稱", "value": "2" }        
+        ]
+})
 //var vipUserTpl = new Ext.XTemplate(
 //    '<a href="/VipUserGroup/VipUserGroupAddList?id={group_id}">{list}</a>'
 //);
 
 Ext.onReady(function () {
+   
     var vugGrid = Ext.create('Ext.grid.Panel', {
         id: 'vugGrid',
         store: VipUserGroupStore,
@@ -276,7 +306,7 @@ Ext.onReady(function () {
               listeners: {
                   specialkey: function (field, e) {
                       if (e.getKey() == e.ENTER) {
-                          Query();
+                          vugQuery();
                       }
                   }
               }
@@ -286,7 +316,7 @@ Ext.onReady(function () {
                 text: SEARCH,
                 iconCls: 'icon-search',
                 id: 'btnQuery',
-                handler: Query,
+                handler: vugQuery,
                 listeners: {
                     onClick: function () {
                         if (Ext.getCmp('group_id_or_group_name')=='') {
@@ -360,7 +390,7 @@ onEditClick = function () {
 }
 
 /*********************************************************************************人員管理*************************************************************************************************/
-var VipUserStore = '';
+
 memberManage = function () {
     var row = Ext.getCmp("vugGrid").getSelectionModel().getSelection();
     //alert(row[0]);
@@ -370,29 +400,7 @@ memberManage = function () {
     else if (row.length > 1) {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
-        VipUserStore = Ext.create('Ext.data.Store', {
-            autoDestroy: true,
-            pageSize: pageSize,
-            model: 'gigade.VipUser',
-            proxy: {
-                type: 'ajax',
-                url: '/Member/GetVipUserList',
-                reader: {
-                    type: 'json',
-                    root: 'data',
-                    totalProperty: 'totalCount'
-                }
-            },
-            autoLoad: true
-        });
-        VipUserStore.on('beforeload', function () {
-            Ext.apply(VipUserStore.proxy.extraParams, {
-                groupid: Ext.getCmp('vugGrid').getSelectionModel().getSelection()[0].data.group_id
-                //dateOne: Ext.getCmp('dateOne').getValue(),
-                //dateTwo: Ext.getCmp('dateTwo').getValue()
-            })
-        })
-
+        
         var mmGrid = Ext.create('Ext.grid.Panel', {
             id: 'mmGrid',
             store: VipUserStore,
@@ -415,10 +423,76 @@ memberManage = function () {
                 }
             ],
             tbar: [
-                { xtype: 'button', text: '添加', id: 'add', handler: onAddUserClick },
+                { xtype: 'button', iconCls: 'icon-user-add', text: '添加', id: 'add', handler: onAddUserClick },
                 //{ xtype: 'button', text: '編輯', id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
                 //{ xtype: 'button', text: '刪除', id: 'remove', iconCls: 'icon-user-remove', disabled: true, handler: onRemoveClick },
+                '->',
+                {
+                    xtype: 'combobox',
+                    editable: false,
+                    margin: "0 5 0 0",
+                    fieldLabel: '查詢類別', 
+                    labelWidth: 60,
+                    id: 'searchtype',
+                    store: typeStore,
+                    queryMode: 'local',
+                    submitValue: true,
+                    displayField: 'txt',
+                    valueField: 'value',
+                    emptyText: '請選擇',
+                    value: 0,
+                    listeners: {
+                        specialkey: function (field, e) {
+                            if (e.getKey() == e.ENTER) {
+                                mmQuery();
+                            }
+                        },
+                        change: function () {
+                            if (Ext.getCmp("searchtype").getValue() != 0) {
+                                if (Ext.getCmp("searchcontent").getValue() == '') {
+                                    Ext.getCmp('mmQueryBtn').setDisabled(true);//不可用
+                                }
+                                Ext.getCmp('searchcontent').allowBlank = false;                             
+                                Ext.getCmp('resetBtn').setDisabled(false);//不可用
+                                //Ext.getCmp('searchcontent').setHidden(false);
+                            }
+                        }
+                    }
+                },
+                    {
+                        xtype: 'textfield',
+                        margin: "0 5 0 0",
+                        fieldLabel: '查詢內容',
+                        labelWidth: 60,
+                        id: 'searchcontent',
+                        name: 'searchcontent',
+                        emptyText: '請輸入查詢內容',
+                        allowBlank: true,
+                        //hidden: true,
+                        listeners: {
+                            specialkey: function (field, e) {
+                                if (e.getKey() == e.ENTER) {
+                                    mmQuery();
+                                }
+                            },
+                            change: function () {
+                                if (Ext.getCmp("searchcontent").getValue() != '') {
+                                    Ext.getCmp('mmQueryBtn').setDisabled(false);//可用
+                                    
+                                }
+                            }
+                        }
+                    },
+                    { xtype: 'button', text: '查詢', id: 'mmQueryBtn', iconCls: 'icon-search', disabled: false, handler: mmQuery },
+                    {
+                        xtype: 'button', text: '重置', id: 'resetBtn', iconCls: 'ui-icon ui-icon-reset', disabled: true, handler: function () {
+                            Ext.getCmp('searchtype').reset();
+                            Ext.getCmp('searchcontent').reset();
+                            Ext.getCmp('mmQueryBtn').setDisabled(false);
 
+                        }
+                    },
+               
             ],
             bbar: Ext.create('Ext.PagingToolbar', {
                 store: VipUserStore,
@@ -462,9 +536,11 @@ memberManage = function () {
                         Ext.MessageBox.confirm('提示信息', '是否關閉窗口', function (btn) {
                             if (btn == "yes") {
                                 Ext.getCmp('mmWin').destroy();
+                                VipUserStore.load();
                             }
                             else {
                                 return false;
+                               
                             }
                         });
                     }
@@ -501,7 +577,8 @@ memberManage = function () {
 //    }
 //    return s;
 //}
-function Query() {
+/*********************************會員群組查詢****************************************************/
+function vugQuery() {
     if (Ext.getCmp('group_id_or_group_name').getValue() == '') {
         Ext.Msg.alert('提示信息', '請輸入查詢條件');
     }
@@ -520,6 +597,38 @@ function Query() {
             });
         }   
     }    
+}
+/*********************************群組人員信息中查詢會員****************************************************/
+function mmQuery() {
+    if (!Ext.getCmp('searchtype').getValue() == 0) {
+        var searchType = Ext.getCmp('searchtype').getValue();
+        if (Ext.getCmp('searchcontent').getValue() == '') {
+            Ext.Msg.alert('提示信息', '請輸入查詢內容');
+        }
+        else {
+            VipUserStore.removeAll();
+            Ext.getCmp("mmGrid").store.loadPage(1, {
+                params: {
+                    serchs: Ext.getCmp('searchtype').getValue(),
+                    serchcontent: Ext.getCmp('searchcontent').getValue(),
+                }
+            });
+        }
+    }
+    else {
+        if (Ext.getCmp('searchcontent').getValue() == '') {
+            VipUserStore.removeAll();
+            Ext.getCmp("mmGrid").store.loadPage(1, {
+                params: {
+                    serchcontent: ''
+                }
+            });
+        }
+        else {
+            Ext.Msg.alert('提示信息','請輸入查詢類型')
+        }
+       
+    }
 }
 /*********************************群組中新增會員****************************************************/
 
