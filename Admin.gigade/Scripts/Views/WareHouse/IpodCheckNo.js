@@ -1,4 +1,4 @@
-﻿var pageSize = 24;
+﻿var pageSize = 25;
 Ext.define('gigade.Ipod', {
     extend: 'Ext.data.Model',
     fields: [
@@ -86,6 +86,14 @@ function Query() {
     var product_name = Ext.getCmp('product_name').getValue();
     var start_time = Ext.getCmp('time_start').getValue();
     var end_time = Ext.getCmp('time_end').getValue();
+    if (start_time == null && end_time != null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
+    if (start_time != null && end_time == null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
     //if (falg == 0) {
     //    Ext.Msg.alert("提示", "請輸入查詢條件");
     //    return false;
@@ -257,7 +265,7 @@ Ext.onReady(function () {
                          id: 'time_start',
                          name: 'time_start',
                          margin: '5 0 0 5',
-                         format: 'Y-m-d 00:00:00',
+                         format: 'Y-m-d',
                          editable: false,
                          listeners: {
                               select: function () {
@@ -286,7 +294,7 @@ Ext.onReady(function () {
                             id: 'time_end',
                             name: 'time_end',
                             margin: '5 0 0 5',
-                            format: 'Y-m-d 23:59:59',
+                            format: 'Y-m-d',
                             editable: false,
                             listeners: {
                                 select: function () {
@@ -345,6 +353,16 @@ Ext.onReady(function () {
 
     });
     ipodStore.on('beforeload', function () {
+        var start_time = Ext.getCmp('time_start').getValue();
+        var end_time = Ext.getCmp('time_end').getValue();
+        if (start_time == null && end_time != null) {
+            Ext.Msg.alert("提示", "請把創建時間補充完整");
+            return false;
+        }
+        if (start_time != null && end_time == null) {
+            Ext.Msg.alert("提示", "請把創建時間補充完整");
+            return false;
+        }
         Ext.apply(ipodStore.proxy.extraParams, {
          Potype : Ext.getCmp('Poty').getValue(),
          erp_id :Ext.getCmp('erp_id').getValue().trim(),
@@ -410,10 +428,18 @@ outExcel = function () {
     var product_id = Ext.getCmp('product_id').getValue();
     var product_name = Ext.getCmp('product_name').getValue();
     var start_time = Ext.getCmp('time_start').getValue();
+    var end_time = Ext.getCmp('time_end').getValue();
+    if (start_time == null && end_time != null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
+    if (start_time != null && end_time == null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
     if (start_time!=null) {
         start_time= Ext.htmlEncode(Ext.Date.format(new Date(start_time), 'Y-m-d 00:00:00'));
     }
-    var end_time = Ext.getCmp('time_end').getValue();
     if(end_time!=null){
         end_time = Ext.htmlEncode(Ext.Date.format(new Date(end_time), 'Y-m-d 00:00:00'));
     }
