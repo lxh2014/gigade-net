@@ -1295,6 +1295,7 @@
     <Compile Include="Model\EdmListConditionMain.cs" />
     <Compile Include="Model\EdmListConditoinSub.cs" />
     <Compile Include="Model\EdmSend.cs" />
+    <Compile Include="Model\EdmSendLog.cs" />
     <Compile Include="Model\EdmTest.cs" />
     <Compile Include="Model\EdmSubscription.cs" />
     <Compile Include="Model\EdmTemplate.cs" />
@@ -1334,6 +1335,7 @@
     <Compile Include="Model\ItemIpoCreateLog.cs" />
     <Compile Include="Model\IwmsRrecord.cs" />
     <Compile Include="Model\LogisticsDetail.cs" />
+    <Compile Include="Model\MailRequest.cs" />
     <Compile Include="Model\MailSend.cs" />
     <Compile Include="Model\MailSender.cs" />
     <Compile Include="Model\MemberEvent.cs" />

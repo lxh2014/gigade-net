@@ -16,6 +16,8 @@ Ext.define('gigade.EdmContentNew', {
     { name: "schedule_date", type: "string" },
     { name: "count", type: "int" },
     { name: "date", type: "string" },
+    { name: "sender_email", type: "string" },
+    { name: "sender_name", type: "string" },
     ]
 });
 EdmContentNewStore = Ext.create('Ext.data.Store', {
@@ -32,11 +34,29 @@ EdmContentNewStore = Ext.create('Ext.data.Store', {
         }
     }
 });
-
+Ext.define('gigade.edm_group_new2', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: 'group_id', type: 'int' },
+        { name: 'group_name', type: 'string' }
+    ]
+});
+var EdmGroupNewStore2 = Ext.create("Ext.data.Store", {
+    autoLoad: true,
+    model: 'gigade.edm_group_new2',
+    proxy: {
+        type: 'ajax',
+        url: '/EdmNew/GetEdmGroupNewStore',
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
 EdmContentNewStore.on('beforeload', function () {
     Ext.apply(EdmContentNewStore.proxy.extraParams,
     {
-       
+       group_id:Ext.getCmp('search_group_name').getValue(),
     });
 });
 
@@ -89,7 +109,14 @@ Ext.onReady(function () {
         { xtype: 'button', text: '編輯', id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
         { xtype: 'button', text: "前往發送", id: 'goSend', hidden: false,disabled: true,handler: onGoSendClick  },
         { xtype: 'button', text: "報表", id: 'report', hidden: false, disabled: true, },
- 
+         '->',
+         {
+             xtype: 'combobox', fieldLabel: '電子報類型', id: 'search_group_name', store: EdmGroupNewStore2, displayField: 'group_name',
+             valueField: 'group_id',editable:false,
+         },
+         {
+             xtype:'button',text:'查詢',handler:Search
+         },
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: EdmContentNewStore,
@@ -186,6 +213,21 @@ onRemoveClick = function () {
     //        }
     //    });
     //}
+}
+
+function Search() {
+    EdmContentNewStore.removeAll();
+    var group_id = Ext.getCmp('search_group_name').getValue();
+    if (group_id == "" || group_id == null) {
+        Ext.Msg.alert("提示信息", '請選擇查詢條件！');
+    }
+    else {
+        Ext.getCmp("EdmContentNew").store.loadPage(1, {
+            params: {
+                group_id: Ext.getCmp('search_group_name').getValue(),
+            }
+        });
+    }
 }
 
 

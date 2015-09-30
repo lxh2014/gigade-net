@@ -22,6 +22,9 @@ namespace BLL.gigade.Model
 
        public Int64 count { get; set; }
         public DateTime date { get; set; }
+
+        public string sender_name { get; set; }
+        public string sender_email { get; set; }
         public EdmContentNew()
         {
             content_id = 0;
@@ -37,7 +40,8 @@ namespace BLL.gigade.Model
             content_update_userid = 0;
             date = DateTime.MinValue;
             count = 0;
-
+            sender_email = string.Empty;
+            sender_name = string.Empty;
         }
     }
 }

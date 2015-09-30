@@ -201,7 +201,7 @@
                   fieldLabel: '編號',
                   id: 'content_id',
                   name: 'content_id',
-                  //hidden: true
+                  hidden: true
               },
             {
                 xtype: 'combobox',
@@ -215,6 +215,7 @@
                 lastQuery: '',
                 editable: false,
                 allowBlank: false,
+                lastQuery: '',
              
             },
             {
@@ -228,6 +229,7 @@
                 id: 'group_id',
                 name: 'group_id',
                 editable: false,
+                lastQuery: '',
               
             },
             {
@@ -239,7 +241,8 @@
                 id: 'importance',
                 name: 'importance',
                 value:1,
-                editable: false
+                editable: false,
+                lastQuery: '',
             },
             {
                 xtype: 'textfield',
@@ -266,7 +269,20 @@
                             params: {
                                 edit_url: Ext.getCmp('template_id').getRawValue(),
                             },
+                            success: function (form, action) {
 
+                                //alert(form.responseText);
+                               //   myMask.hide();
+                               // var result = Ext.decode(form.responseText);
+                                //if (result.success) {
+                                // var text = Ext.util.Format.htmlDecode(Ext.getCmp('kendoEditor').getValue());
+                                var text = "";
+                                $('textarea[name=kendoEditor]').data("kendoEditor").value(Ext.util.Format.htmlDecode(form.responseText));
+                               // }
+                            },
+                            failure: function () {
+                                alert(123);
+                            }
                         });
                     }
                 }
