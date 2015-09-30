@@ -46,6 +46,7 @@ Ext.define('Ext.calendar.form.field.CalendarCombo', {
     getListItemTpl: function(displayField) {
         return '<div class="x-combo-list-item ext-color-{' + Ext.calendar.data.CalendarMappings.CalendarId.name +
                 '}"><div class="ext-cal-picker-icon">&#160;</div>{' + displayField + '}</div>';
+        //return '<div class="ext-cal-picker-icon">&#160;</div>{' + displayField + '}</div>';
     },
     
     // private
@@ -55,9 +56,9 @@ Ext.define('Ext.calendar.form.field.CalendarCombo', {
         this.wrap = this.el.down('.x-form-text-wrap');
         this.wrap.addCls('ext-calendar-picker');
         
-        this.icon = Ext.core.DomHelper.append(this.wrap, {
-            tag: 'div', cls: 'ext-cal-picker-icon ext-cal-picker-mainicon'
-        });
+        //this.icon = Ext.core.DomHelper.append(this.wrap, {
+        //    tag: 'div', cls: 'ext-cal-picker-icon ext-cal-picker-mainicon'
+        //});
     },
     
     /* @private
@@ -76,14 +77,15 @@ Ext.define('Ext.calendar.form.field.CalendarCombo', {
     },
     
     // inherited docs
-    setValue: function(value) {
+    setValue: function (value) {
         if (!value && this.store.getCount() > 0) {
             // ensure that a valid value is always set if possible
             value = this.store.getAt(0).data[Ext.calendar.data.CalendarMappings.CalendarId.name];
         }
         
         if (this.wrap && value) {
-            var currentClass = this.getStyleClass(this.getValue()),
+            //var currentClass = this.getStyleClass(this.getValue()),
+            var currentClass;
                 newClass = this.getStyleClass(value);
             
             this.wrap.replaceCls(currentClass, newClass);
