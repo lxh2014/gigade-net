@@ -34,7 +34,7 @@ namespace BLL.gigade.Mgr
                {
                    if (item.is_member_edm == 0) 
                    {
-                       item.is_member_edm_string = " ";
+                       item.is_member_edm_string = "";
                    }
                    if (item.is_member_edm == 1)
                    {

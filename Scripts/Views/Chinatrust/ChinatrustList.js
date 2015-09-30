@@ -62,20 +62,38 @@ var DDLStore = Ext.create('Ext.data.Store', {
         { "txt": "禁用", "value": "0" }
     ]
 });
+var DateStore = Ext.create('Ext.data.Store', {
+    fields: ['date', 'dvalue'],
+    data: [
+        { "date": "全部日期", "dvalue": "0" },
+        { "date": "活動開始時間", "dvalue": "1" },
+        { "date": "活動結束時間", "dvalue": "2" },
+        { "date": "修改時間", "dvalue": "3" }
+    ]
+});
 EventChinatrustStore.on('beforeload', function () {
 
     Ext.apply(EventChinatrustStore.proxy.extraParams, {
         event_active: Ext.getCmp('ddlSel').getValue(),
         event_search: Ext.getCmp('event_id_name').getValue(),
         TimeStart: Ext.getCmp('start_time').getValue(),//課程開始時間
-        TimeEnd: Ext.getCmp('end_time').getValue()//課程結束時間
+        TimeEnd: Ext.getCmp('end_time').getValue(),//課程結束時間
+        date: Ext.getCmp('date').getValue()
     })
 
 });
 function Query(x) {
     EventChinatrustStore.removeAll();
-    Ext.getCmp("EventChinatrust").store.loadPage(1);
-
+    if ((Ext.getCmp('start_time').getValue() == null && Ext.getCmp('end_time').getValue() == null) && Ext.getCmp('date').getValue() != 0)
+    {
+        Ext.Msg.alert(INFORMATION, '請選擇日期');
+    }
+    else if ((Ext.getCmp('start_time').getValue() != null || Ext.getCmp('end_time').getValue() != null) && Ext.getCmp('date').getValue() == 0) {
+        Ext.Msg.alert(INFORMATION, '請選擇日期條件');
+    }
+    else {
+        Ext.getCmp("EventChinatrust").store.loadPage(1);
+    }
 }
 
 Ext.onReady(function () {
@@ -126,12 +144,26 @@ Ext.onReady(function () {
                  combineErrors: true,
                  layout: 'hbox',
                  items: [
-                       {
-                           xtype: 'label',
-                           width: 74,
-                           margin: '1 5 0 5 ',
-                           text: '活動時間:'
+                       //{
+                       //    xtype: 'label',
+                       //    width: 74,
+                       //    margin: '1 5 0 5 ',
+                       //    text: '活動時間:'
 
+                       //},
+                       {
+                           xtype: 'combobox',
+                           editable: false,
+                           fieldLabel: "日期條件",
+                           labelWidth: 90,
+                           width: 220,
+                           margin: '0 5 0 5 ',
+                           id: 'date',
+                           store: DateStore,
+                           displayField: 'date',
+                           valueField: 'dvalue',
+                           value: '0'
+                           //emptyText:'請選擇'
                        },
                        {
                            xtype: "datefield",
@@ -139,8 +171,9 @@ Ext.onReady(function () {
                            margin: '0 0 0 5',
                            id: 'start_time',
                            name: 'start_time',
-                           format: 'Y-m-d 00:00:00',
-                           value: Tomorrow(1 - new Date().getDate()),
+                           format: 'Y-m-d',
+                           width: 110,
+                          // value: Tomorrow(1 - new Date().getDate()),
                            listeners: {
                                select: function (a, b, c) {
                                    var start = Ext.getCmp("start_time");
@@ -180,15 +213,18 @@ Ext.onReady(function () {
                            editable: false,
                            id: 'end_time',
                            name: 'end_time',
-                           format: 'Y-m-d 23:59:59',
-                           value: Tomorrow(0),
-                           
+                           format: 'Y-m-d',
+                           //value: Tomorrow(0),
+                           width: 110,
                            listeners: {
                                select: function (a, b, c) {
                                    var start = Ext.getCmp("start_time");
                                    var end = Ext.getCmp("end_time");
-                                   var s_date = new Date(start.getValue());
-
+                                   var s_date = new Date(end.getValue());
+                                   if (start.getValue() == null)
+                                   {
+                                       Ext.getCmp("start_time").setValue(new Date(s_date.setMonth(s_date.getMonth() - 1)));
+                                   }
                                    /*搜索條件限制在一個月之內
                                    var data1 = Date.parse(start.getValue());
                                    var data2 = Date.parse(end.getValue());
@@ -237,8 +273,9 @@ Ext.onReady(function () {
                               click: function () {
                                   Ext.getCmp('event_id_name').setValue("");//訂單 / 細項 / 課程編號
                                   Ext.getCmp('ddlSel').setValue("-1");//狀態
-                                  Ext.getCmp('start_time').setValue(Tomorrow(1 - new Date().getDate()));//開始時間--time_start--delivery_date
-                                  Ext.getCmp('end_time').setValue(Tomorrow(0));//結束時間--time_end--delivery_date
+                                  Ext.getCmp('start_time').reset();//開始時間--time_start--delivery_date
+                                  Ext.getCmp('end_time').reset();//結束時間--time_end--delivery_date
+                                  Ext.getCmp('date').reset();
                               }
                           }
                       }
