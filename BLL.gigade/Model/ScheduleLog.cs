@@ -8,7 +8,7 @@ namespace BLL.gigade.Model
     public class ScheduleLog : PageBase
     {
         public int rowid { get; set; }
-        public int schedule_id { get; set; }  //Schedule_Master表rowid
+        public string schedule_code { get; set; } //排程代碼
         public int schedule_period_id { get; set; }//Schedule_Period表rowid
         public int create_user { get; set; }
         public int create_time { get; set; }
@@ -19,7 +19,7 @@ namespace BLL.gigade.Model
         public ScheduleLog()
         {
             rowid = 0;
-            schedule_id = 0;
+            schedule_code = string.Empty;
             schedule_period_id = 0;
             create_user = 0;
             create_time = 0;

@@ -1926,6 +1926,7 @@
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsList.js" />
     <Content Include="Scripts\Views\Redirect\RedirectView.js" />
     <Content Include="Scripts\Views\ReportManagement\OderMessageSearch.js" />
+    <Content Include="Scripts\Views\ScheduleService\ScheduleService.js" />
     <Content Include="Scripts\Views\SecretInfo\SecretResetPwd.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverMasterList.js" />
     <Content Include="Scripts\Views\Service\OrderQuestionAdd.js" />
@@ -1949,6 +1950,8 @@
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryEdit.js" />
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryList.js" />
     <Content Include="Scripts\Views\Vendor\VendorChangeLog.js" />
+    <Content Include="Scripts\Views\Vendor\VendorChild.js" />
+    <Content Include="Scripts\Views\Vendor\VendorDetail.js" />
     <Content Include="Scripts\Views\VipUserGroup\edit.js" />
     <Content Include="Scripts\Views\VipUserGroup\GCCInfo.js" />
     <Content Include="Scripts\Views\VipUserGroup\list.js" />
@@ -4390,6 +4393,8 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
+    <Content Include="Views\ScheduleService\Index.cshtml" />
+    <Content Include="Views\Vendor\VendorDetails.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
