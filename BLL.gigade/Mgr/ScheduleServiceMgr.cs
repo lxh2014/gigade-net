@@ -37,6 +37,18 @@ namespace BLL.gigade.Mgr
                 throw new Exception("SecheduleServiceMgr-->GetExeScheduleMasterList-->" + ex.Message, ex);
             }
         }
+        public ScheduleMasterQuery GetExeScheduleMaster(ScheduleMasterQuery query)
+        {
+            try
+            {
+                return _secheduleServiceDao.GetExeScheduleMaster(query);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("SecheduleServiceMgr-->GetExeScheduleMaster-->" + ex.Message, ex);
+            }
+        }
         public List<ScheduleConfigQuery> GetScheduleConfig(ScheduleConfigQuery query)
         {
             try
@@ -87,32 +99,15 @@ namespace BLL.gigade.Mgr
                 throw new Exception("SecheduleServiceMgr-->UpdateSchedulePeriod-->" + ex.Message, ex);
             }
         }
-        public bool ExeScheduleService(string api, List<ScheduleConfigQuery> store_config)
+        public bool ExeScheduleService(string api)
         {
             bool result = false;
             try
             {
                 if(!string.IsNullOrEmpty(api))
                 {
-                    //api = "http://" + NETDoMain_Name.Value + "/" + api;
-                    for (int i=0;i<store_config.Count;i++ )
-                    {
-                        if (!string.IsNullOrEmpty(store_config[i].parameterCode.Trim()) && !string.IsNullOrEmpty(store_config[i].value.Trim()))
-                        {
-                            if (i == 0)
-                            {
-                                api = api + "?" ;
-                            }
-                            else
-                            {
-                                api = api + "&";
-                            }
-                            api = api + store_config[i].parameterCode.Trim() + "=" + store_config[i].value.Trim();
-                        }
-                    }
-                    
                     HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(api);
-                    httpRequest.Timeout = 10000;
+                    //httpRequest.Timeout = 10000;
                     httpRequest.Method = "GET";
                     HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
                     System.IO.StreamReader sr = new System.IO.StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
@@ -140,7 +135,7 @@ namespace BLL.gigade.Mgr
                 throw new Exception("SecheduleServiceMgr-->AddScheduleLog-->" + ex.Message, ex);
             }
         }
-        public int GetNext_Execute_Time(int schedule_code, out int schedule_period_id)
+        public int GetNext_Execute_Time(string schedule_code, out int schedule_period_id)
         {
             try
             {
