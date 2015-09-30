@@ -1949,6 +1949,8 @@
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryEdit.js" />
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryList.js" />
     <Content Include="Scripts\Views\Vendor\VendorChangeLog.js" />
+    <Content Include="Scripts\Views\Vendor\VendorChild.js" />
+    <Content Include="Scripts\Views\Vendor\VendorDetail.js" />
     <Content Include="Scripts\Views\VipUserGroup\edit.js" />
     <Content Include="Scripts\Views\VipUserGroup\GCCInfo.js" />
     <Content Include="Scripts\Views\VipUserGroup\list.js" />
@@ -4388,6 +4390,7 @@
     <Content Include="Views\EdmNew\EdmTemplate.cshtml" />
     <Content Include="Web.config" />
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
+    <Content Include="Views\Vendor\VendorDetails.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

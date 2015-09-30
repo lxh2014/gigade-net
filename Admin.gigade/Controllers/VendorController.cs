@@ -90,6 +90,11 @@ namespace Admin.gigade.Controllers
             ViewBag.vendorCsvPath = excelPath;
             return View();
         }
+        public ActionResult VendorDetails()
+        {
+            ViewBag.Vendor_id = Request.QueryString["Vendor_id"] ?? "";//獲取付款單號
+            return View();
+        }
         public ActionResult VendorBrandList()
         {
             return View();
@@ -3523,7 +3528,55 @@ namespace Admin.gigade.Controllers
 
             return json;
         }
-
+        /*****************chaojie1124j********************/
+        public HttpResponseBase GetZip()
+        {
+            Zip zip = new Zip();
+            List<Zip> zipList = new List<Zip>();
+            int resultzip = 0;
+            if (!string.IsNullOrEmpty(Request.Params["big_code"]))
+            {
+               zip.bigcode = Request.Params["big_code"];
+               resultzip = 1;
+            }
+             if (!string.IsNullOrEmpty(Request.Params["c_midcode"]))
+            {
+                zip.middlecode=Request.Params["c_midcode"];
+                resultzip = 1;
+            }
+             if (!string.IsNullOrEmpty(Request.Params["c_zipcode"]))
+            {
+                zip.zipcode =Request.Params["c_zipcode"];
+                resultzip = 1;
+            }
+           
+            string jsonStr = string.Empty;
+            try
+            {
+                zMgr = new ZipMgr(connectionString);
+                zipList = zMgr.GetZipList(zip);
+                if (zipList.Count > 0&& resultzip>0)
+                {
+                    jsonStr = "{success:true,msg:\"" + zipList[0].big +"  "+ zipList[0].middle +"  "+ zipList[0].zipcode + "/" + zipList[0].small + "\"}";
+                }
+                else
+                {
+                    jsonStr = "{success:true,msg:\"" + 100 + "\"}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                jsonStr = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(jsonStr);
+            this.Response.End();
+            return this.Response;
+        }
         /// <summary>
         ///從後台獲取區域地址
         /// </summary>
@@ -3850,6 +3903,110 @@ namespace Admin.gigade.Controllers
             }
 
             return json;
+        }
+        public HttpResponseBase QueryContactTable()
+        {
+            _vendorMgr = new VendorMgr(connectionString);
+            DataTable _dt = new DataTable();
+            _dt.Columns.Add("contact_type", typeof(string));
+            _dt.Columns.Add("contact_name", typeof(string));
+            _dt.Columns.Add("contact_phone1", typeof(string));
+            _dt.Columns.Add("contact_phone2", typeof(string));
+            _dt.Columns.Add("contact_mobile", typeof(string));
+            _dt.Columns.Add("contact_email", typeof(string));
+            string json = string.Empty;
+            #region 字典保存出貨窗口
+            Dictionary<uint, string> ContactType = new Dictionary<uint, string>();
+            ContactType.Add(1, "負責人");
+            ContactType.Add(2, "業務窗口");
+            ContactType.Add(3, "圖/文窗口");
+            ContactType.Add(4, "出貨窗口");
+            ContactType.Add(5, "賬務窗口");
+            ContactType.Add(6, "客服窗口");
+            #endregion
+            Vendor ven = new Vendor();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["vendor_id"]))
+                {
+                   
+                    ven.vendor_id = Convert.ToUInt32(Request.QueryString["vendor_id"]);
+                    ven = _vendorMgr.GetSingle(ven);
+                    
+                }
+                if (ContactType.Keys.Contains(ven.contact_type_1))
+                {
+                    DataRow row = _dt.NewRow();
+                    row["contact_type"] = ContactType[ven.contact_type_1];
+                    row["contact_name"] = ven.contact_name_1;
+                    row["contact_phone1"] = ven.contact_phone_1_1;
+                    row["contact_phone2"] = ven.contact_phone_2_1;
+                    row["contact_mobile"] = ven.contact_mobile_1;
+                    row["contact_email"] = ven.contact_email_1;
+                    _dt.Rows.Add(row);
+                }
+                if (ContactType.Keys.Contains(ven.contact_type_2))
+                {
+                    DataRow row = _dt.NewRow();
+                    row["contact_type"] = ContactType[ven.contact_type_2];
+                    row["contact_name"] = ven.contact_name_2;
+                    row["contact_phone1"] = ven.contact_phone_1_2;
+                    row["contact_phone2"] = ven.contact_phone_2_2;
+                    row["contact_mobile"] = ven.contact_mobile_2;
+                    row["contact_email"] = ven.contact_email_2;
+                    _dt.Rows.Add(row);
+                }
+                if (ContactType.Keys.Contains(ven.contact_type_3))
+                {
+                    DataRow row = _dt.NewRow();
+                    row["contact_type"] = ContactType[ven.contact_type_3];
+                    row["contact_name"] = ven.contact_name_3;
+                    row["contact_phone1"] = ven.contact_phone_1_3;
+                    row["contact_phone2"] = ven.contact_phone_2_3;
+                    row["contact_mobile"] = ven.contact_mobile_3;
+                    row["contact_email"] = ven.contact_email_3;
+                    _dt.Rows.Add(row);
+                }
+                if (ContactType.Keys.Contains(ven.contact_type_4))
+                {
+                    DataRow row = _dt.NewRow();
+                    row["contact_type"] = ContactType[ven.contact_type_4];
+                    row["contact_name"] = ven.contact_name_4;
+                    row["contact_phone1"] = ven.contact_phone_1_4;
+                    row["contact_phone2"] = ven.contact_phone_2_4;
+                    row["contact_mobile"] = ven.contact_mobile_4;
+                    row["contact_email"] = ven.contact_email_4;
+                    _dt.Rows.Add(row);
+                }
+                if (ContactType.Keys.Contains(ven.contact_type_5))
+                {
+                    DataRow row = _dt.NewRow();
+                    row["contact_type"] = ContactType[ven.contact_type_5];
+                    row["contact_name"] = ven.contact_name_5;
+                    row["contact_phone1"] = ven.contact_phone_1_5;
+                    row["contact_phone2"] = ven.contact_phone_2_5;
+                    row["contact_mobile"] = ven.contact_mobile_5;
+                    row["contact_email"] = ven.contact_email_5;
+                    _dt.Rows.Add(row);
+                }
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,'msg':'user',data:" + JsonConvert.SerializeObject(_dt, Formatting.Indented, timeConverter) + "}";//返回json數據
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
+
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
         }
         #endregion
 

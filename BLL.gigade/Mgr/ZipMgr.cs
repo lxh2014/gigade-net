@@ -146,6 +146,17 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ZipMgr-->GetZipList-->" + ex.Message, ex);
             }
         }
+        public List<Zip> GetZipList(Zip query)
+        {
+            try
+            {
+                return _zipDao.GetZipList(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ZipMgr-->GetZipList-->" + ex.Message, ex);
+            }
+        }
         #endregion
     }
 }
