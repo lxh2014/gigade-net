@@ -263,6 +263,7 @@ namespace BLL.gigade.Model.Custom
         public int sale_status_id { get; set; }
 
         public string itemIds { get; set; }/// add by wwei0216w2015/8/12
+        public string remark { get; set; }//添加商品上下架備註欄位 add by mingwei0727w 2015/09/25
         public QueryandVerifyCustom()
         {
              //_imgsrc =string.Empty;
@@ -333,6 +334,7 @@ namespace BLL.gigade.Model.Custom
             erp_id = string.Empty;
             vendor_name_simple = string.Empty;
             Prod_Classify = 0;//添加館別欄位  eidt  by zhuoqin0830w 2015/03/05
+            remark = string.Empty;//添加商品上下架備註欄位 add by mingwei0727w 2015/09/25
             bag_check_money = 0; //寄倉費
             combination_id = 0;
             off_grade = 0;

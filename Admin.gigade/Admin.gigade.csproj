@@ -4388,7 +4388,9 @@
     <Content Include="Views\EdmNew\Index.cshtml" />
     <Content Include="Views\EdmNew\EdmContentNew.cshtml" />
     <Content Include="Views\EdmNew\EdmTemplate.cshtml" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
     <Content Include="Views\Vendor\VendorDetails.cshtml" />
     <None Include="Web.Debug.config">
