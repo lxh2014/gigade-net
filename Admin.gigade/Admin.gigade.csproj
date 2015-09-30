@@ -1927,6 +1927,7 @@
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsList.js" />
     <Content Include="Scripts\Views\Redirect\RedirectView.js" />
     <Content Include="Scripts\Views\ReportManagement\OderMessageSearch.js" />
+    <Content Include="Scripts\Views\ScheduleService\ScheduleService.js" />
     <Content Include="Scripts\Views\SecretInfo\SecretResetPwd.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverMasterList.js" />
     <Content Include="Scripts\Views\Service\OrderQuestionAdd.js" />
@@ -4389,6 +4390,7 @@
     <Content Include="Views\EdmNew\EdmTemplate.cshtml" />
     <Content Include="Web.config" />
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
+    <Content Include="Views\ScheduleService\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -11,7 +11,7 @@ namespace BLL.gigade.Mgr
     public class ScheduleServiceMgr
     {
         private ScheduleServiceDao _secheduleServiceDao;
-        string xmlPath = System.Configuration.ConfigurationManager.AppSettings["SiteConfig"];//
+        
         public ScheduleServiceMgr(string connectionString)
         {
             try
@@ -94,11 +94,7 @@ namespace BLL.gigade.Mgr
             {
                 if(!string.IsNullOrEmpty(api))
                 {
-                    string path = System.Web.HttpContext.Current.Server.MapPath(xmlPath);
-                    SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
-                    BLL.gigade.Model.SiteConfig NETDoMain_Name = _siteConfigMgr.GetConfigByName("NETDoMain_Name");
-
-                    api = "http://" + NETDoMain_Name.Value + "/" + api;
+                    //api = "http://" + NETDoMain_Name.Value + "/" + api;
                     for (int i=0;i<store_config.Count;i++ )
                     {
                         if (!string.IsNullOrEmpty(store_config[i].parameterCode.Trim()) && !string.IsNullOrEmpty(store_config[i].value.Trim()))
@@ -116,10 +112,11 @@ namespace BLL.gigade.Mgr
                     }
                     
                     HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(api);
-                    httpRequest.Timeout = 2000;
+                    httpRequest.Timeout = 10000;
                     httpRequest.Method = "GET";
                     HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
-
+                    System.IO.StreamReader sr = new System.IO.StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
+                    string html = sr.ReadToEnd();
                     result = true;
                 }
                 return result;
@@ -143,28 +140,28 @@ namespace BLL.gigade.Mgr
                 throw new Exception("SecheduleServiceMgr-->AddScheduleLog-->" + ex.Message, ex);
             }
         }
-        public int GetNext_Execute_Time(int schedule_id, out int schedule_period_id)
+        public int GetNext_Execute_Time(int schedule_code, out int schedule_period_id)
         {
             try
             {
                 int time = 0;
                 schedule_period_id = 0;
-                List<SchedulePeriodQuery> store = _secheduleServiceDao.GetSchedulePeriodBySchedule(schedule_id);
+                List<SchedulePeriodQuery> store = _secheduleServiceDao.GetSchedulePeriodBySchedule(schedule_code);
                 foreach(SchedulePeriodQuery item in store)
                 {
-                    if (item.current_nums >= item.limit_nums)
+                    if (item.current_nums >= item.limit_nums && item.limit_nums!=0)
                     {
                         continue;
                     }
                     int begin_datetime = item.begin_datetime;
                     int now = (int)Common.CommonFunction.GetPHPTime();
-                    if (item.period_type=="year")
+                    if (item.period_type== 1)
                     {
-                        if (item.year > 0)
+                        if (item.period_nums > 0)
                         {
                             while (begin_datetime < now)
                             {
-                                begin_datetime = (int)Common.CommonFunction.GetPHPTime(Common.CommonFunction.GetNetTime(begin_datetime).AddMonths(item.year).ToString());
+                                begin_datetime = (int)Common.CommonFunction.GetPHPTime(Common.CommonFunction.GetNetTime(begin_datetime).AddMonths((int)item.period_nums).ToString());
                             }
                             if (time > begin_datetime || time==0)
                             {
@@ -174,13 +171,13 @@ namespace BLL.gigade.Mgr
                         }
                         
                     }
-                    else if (item.period_type=="month")
+                    else if (item.period_type== 2)
                     {
-                        if (item.month > 0)
+                        if (item.period_nums > 0)
                         {
                             while (begin_datetime < now)
                             {
-                                    begin_datetime = (int)Common.CommonFunction.GetPHPTime(Common.CommonFunction.GetNetTime(begin_datetime).AddMonths(item.month).ToString());
+                                begin_datetime = (int)Common.CommonFunction.GetPHPTime(Common.CommonFunction.GetNetTime(begin_datetime).AddMonths((int)item.period_nums).ToString());
                                 
                             }
                             if (time > begin_datetime || time == 0)
@@ -190,13 +187,13 @@ namespace BLL.gigade.Mgr
                             }
                         }
                     }
-                    else if (item.period_type=="week")
+                    else if (item.period_type== 3)
                     {
-                        if (item.week > 0)
+                        if (item.period_nums > 0)
                         {
                             while (begin_datetime < now)
                             {
-                                    begin_datetime = (int)Common.CommonFunction.GetPHPTime(Common.CommonFunction.GetNetTime(begin_datetime).AddDays(item.week*7).ToString());
+                                begin_datetime = (int)Common.CommonFunction.GetPHPTime(Common.CommonFunction.GetNetTime(begin_datetime).AddDays((int)item.period_nums * 7).ToString());
                                
                             }
                             if (time > begin_datetime || time == 0)
@@ -207,13 +204,13 @@ namespace BLL.gigade.Mgr
                         }
 
                     }
-                    else if (item.period_type=="day")
+                    else if (item.period_type== 4)
                     {
-                        if (item.day > 0)
+                        if (item.period_nums > 0)
                         {
                             while (begin_datetime < now)
                             {
-                                    begin_datetime = (int)Common.CommonFunction.GetPHPTime(Common.CommonFunction.GetNetTime(begin_datetime).AddDays(item.day).ToString());
+                                begin_datetime = (int)Common.CommonFunction.GetPHPTime(Common.CommonFunction.GetNetTime(begin_datetime).AddDays((int)item.period_nums).ToString());
                                 
                             }
                             if (time > begin_datetime || time == 0)
@@ -223,13 +220,13 @@ namespace BLL.gigade.Mgr
                             }
                         }
                     }
-                    else if (item.period_type=="hour")
+                    else if (item.period_type== 5)
                     {
-                        if (item.hour > 0)
+                        if (item.period_nums > 0)
                         {
                             while (begin_datetime < now)
                             {
-                                    begin_datetime = (int)Common.CommonFunction.GetPHPTime(Common.CommonFunction.GetNetTime(begin_datetime).AddHours(item.hour).ToString());
+                                begin_datetime = (int)Common.CommonFunction.GetPHPTime(Common.CommonFunction.GetNetTime(begin_datetime).AddHours((int)item.period_nums).ToString());
                                 
                             }
                             if (time > begin_datetime || time == 0)
@@ -239,13 +236,13 @@ namespace BLL.gigade.Mgr
                             }
                         }
                     }
-                    else if (item.period_type=="minute")
+                    else if (item.period_type== 6)
                     {
-                        if (item.minute > 0)
+                        if (item.period_nums > 0)
                         {
                             while (begin_datetime < now)
                             {
-                                    begin_datetime = (int)Common.CommonFunction.GetPHPTime(Common.CommonFunction.GetNetTime(begin_datetime).AddMinutes(item.minute).ToString());
+                                begin_datetime = (int)Common.CommonFunction.GetPHPTime(Common.CommonFunction.GetNetTime(begin_datetime).AddMinutes((int)item.period_nums).ToString());
                                 
                             }
                             if (time > begin_datetime || time == 0)
