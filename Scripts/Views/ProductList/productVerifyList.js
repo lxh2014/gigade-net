@@ -1,6 +1,4 @@
-﻿
-
-var pageSize = 25;
+﻿var pageSize = 25;
 
 var type_apply = Ext.create('Ext.form.FieldContainer', {
     layout: 'hbox',
@@ -40,7 +38,6 @@ var type_apply = Ext.create('Ext.form.FieldContainer', {
     }]
 });
 
-
 var columns = c_pro_base_byproduct;
 columns.push(c_pro_kuser);          //建立人
 columns.push(c_pro_type);           //商品類型
@@ -54,7 +51,6 @@ columns.push(c_pro_askfordate);     //申請時間
 columns.push(c_pro_start);          //售價
 columns.push(c_pro_end);            //活動價
 columns.push(c_pro_up_now);          //審核后即刻上架
-
 
 //待審核商品MODEL
 Ext.define('GIGADE.WAITVERIFY', {
@@ -103,20 +99,18 @@ var waitVerifyStore = Ext.create("Ext.data.Store", {
 });
 
 waitVerifyStore.on("beforeload", function () {
-    Ext.apply(waitVerifyStore.proxy.extraParams,
-             {
-                 brand_id: Ext.getCmp("brand_id").getValue(),
-                 cate_id: Ext.getCmp('comboProCate_hide').getValue(),
-                 category_id: Ext.getCmp('comboFrontCage_hide').getValue(),
-                 combination: Ext.getCmp("combination").getValue(),
-                 prev_status: Ext.getCmp('prev_status').getValue(),    //申請類型
-                 date_type: Ext.getCmp("date_type").getValue(),
-                 time_start: Ext.getCmp("time_start").getValue(),
-                 time_end: Ext.getCmp("time_end").getValue(),
-                 key: Ext.htmlEncode(Ext.getCmp("key").getValue())
-             });
+    Ext.apply(waitVerifyStore.proxy.extraParams, {
+        brand_id: Ext.getCmp("brand_id").getValue(),
+        cate_id: Ext.getCmp('comboProCate_hide').getValue(),
+        category_id: Ext.getCmp('comboFrontCage_hide').getValue(),
+        combination: Ext.getCmp("combination").getValue(),
+        prev_status: Ext.getCmp('prev_status').getValue(),    //申請類型
+        date_type: Ext.getCmp("date_type").getValue(),
+        time_start: Ext.getCmp("time_start").getValue(),
+        time_end: Ext.getCmp("time_end").getValue(),
+        key: Ext.htmlEncode(Ext.getCmp("key").getValue())
+    });
 });
-
 
 var back = function (row, reason, functionid) {
     var result = '';
@@ -150,7 +144,6 @@ var back = function (row, reason, functionid) {
 
 //核可
 var btnPassOnClick = function () {
-
     var myMask = new Ext.LoadMask(Ext.getBody(), {
         msg: 'Loading...'
     });
@@ -226,7 +219,6 @@ var query = function () {
     waitVerifyStore.loadPage(1);
 }
 
-
 //添加日期類型
 function addDateType() {
     if (DateStore.getCount() == 1) {
@@ -235,8 +227,11 @@ function addDateType() {
 }
 
 Ext.onReady(function () {
-    document.body.onkeydown = function () {
-        if (event.keyCode == 13) {
+    //回車鍵查詢
+    // edit by zhuoqin0830w  2015/09/22  以兼容火狐瀏覽器
+    document.onkeydown = function (event) {
+        e = event ? event : (window.event ? window.event : null);
+        if (e.keyCode == 13) {
             $("#btnSearch").click();
         }
     };
@@ -277,7 +272,6 @@ Ext.onReady(function () {
             }
         }]
     });
-
 
     //列选择模式
     var sm = Ext.create('Ext.selection.CheckboxModel', {
@@ -416,4 +410,3 @@ Ext.onReady(function () {
         }
     });
 });
-

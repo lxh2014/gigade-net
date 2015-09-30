@@ -17,5 +17,6 @@
 	<column key="product_end_time">下架時間</column>
   <!--add by zhuoqin0830w  2015/03/10  添加商品資料匯出中館別欄位-->
   <column key="prod_classify">館別</column>
-	
+  <!--add by mingwei0727w  2015/09/24  添加商品資料匯出上下架備註-->
+  <column key="remark">最新上架備註</column>
 </root>

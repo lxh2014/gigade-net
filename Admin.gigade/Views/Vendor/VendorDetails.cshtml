@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "VendorDetails";
+}@using BLL.gigade.Common
+@using BLL.gigade.Model
+@{
+    string Vendorid = ViewBag.Vendor_id;
+  }
+<script src="../../Scripts/Common/ToolAuthority.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+
+<script src="../../Scripts/Views/Vendor/VendorDetail.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+<script src="../../Scripts/Views/Vendor/VendorChild.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
+
+
+
+<img id="imgTip" style="position: absolute; border: solid 1px #ccc; padding: 3px; z-index: 500; width: 400px; height: 400px; background-color: #eee; display: none"
+    class="clsImg" src="" />
+
+
+@Html.Hidden("Vendor_id", Vendorid)
+@Html.Partial("Loading")

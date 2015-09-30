@@ -70,7 +70,7 @@ namespace Admin.gigade.Controllers
                 List<EdmGroupNewQuery> list = edmgroupmgr.GetEdmGroupNewList(query, out totalcount);
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                timeConverter.DateTimeFormat = "yyyy-MM-dd";
+               // timeConverter.DateTimeFormat = "yyyy-MM-dd";
                 json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
             }
             catch (Exception ex)
@@ -204,7 +204,7 @@ namespace Admin.gigade.Controllers
                 List<EdmTemplateQuery> list = edmtemplatemgr.GetEdmTemplateList(query, out totalcount);
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                timeConverter.DateTimeFormat = "yyyy-MM-dd";
+               // timeConverter.DateTimeFormat = "yyyy-MM-dd ";
                 json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
             }
             catch (Exception ex)
@@ -283,7 +283,11 @@ namespace Admin.gigade.Controllers
                 {
                     query.content_url = Request.Params["content_url"];
                 }
-                query.template_updatedate = System.DateTime.Now;
+                //if (!string.IsNullOrEmpty(Request.Params["template_createdate"]))
+                //{
+                //    query.template_createdate = Convert.ToDateTime(Request.Params["template_createdate"]);
+                //}
+                //query.template_updatedate = System.DateTime.Now;
                 query.template_update_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 query.template_create_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
 
