@@ -1,6 +1,11 @@
 ﻿EXECUTE_ONCE = "單次執行";
 EXECUTE_REPEAT = "重複執行";
+EXECUTE_IRREGULAR = '不規律執行';
 EVERYDAY = "每日";
+ROWERROR = "每行開始時間必須大於結束時間"
+THEENDTIMEERROR = "結束時間必須填寫!";//add by wwei0216w 2015/09/23
+THE = "第";
+LASTROWENDERROR = "行開始時間必須大於上一行結束時間";
 EVERYWEEK = "每週";
 EVERYMONTH = "每月";
 WEEK_ONE = "第一週";
@@ -78,3 +83,14 @@ NON_DATA_HAVE_EDIT = "沒有數據被修改";
 DELETE_UNUSUAL = "刪除異常";
 PARALLELISM_INFORMATION_CONFIG = "對應信息設定";
 VALUE = "值";
+
+DELETEFAILURE = '无法删除已在使用中的排程，请重新选择';
+
+//ADD 2015.09.23
+IRR_START_TIME = '开始时间';
+IRR_END_TIME = '结束时间';
+WEEK = '日期';
+HOURS = '时间';
+EXECUTE_AFTERDAYS = '執行時間(多少天后)';
+SCHEDULE_DIVIDE_INTO = '排程将分为';
+PART_EXECUTE = '段执行';

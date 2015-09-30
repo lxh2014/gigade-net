@@ -7,26 +7,48 @@ Ext.define('gigade.OrderDetailManage', {
     { name: 'odm_user_name', type: 'string' },
     { name: 'odm_status', type: 'int' },
     { name: 'odm_createdate', type: 'string' },
-    { name: 'odm_createuser', type: 'int' }
+    { name: 'odm_createuser', type: 'int' },
+       { name: 'user_username', type: 'string' },
+    
     ]
 });
 
 var ManageStatusStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
-        { "txt": "---不限---", "value": "0" },
+        { "txt": "不限", "value": "-1" },
         { "txt": "啟用", "value": "1" },
-        { "txt": "未啟用", "value": "1" }
+        { "txt": "未啟用", "value": "0" }
+    ]
+});
+//獲取用戶
+Ext.define('ManageUser', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: "user_id", type: "int" },
+        { name: "user_username", type: "string" }
     ]
 });
 
+var ManageUserStore = Ext.create('Ext.data.Store', {
+    model: 'ManageUser',
+    autoLoad: true,
+    proxy: {
+        type: 'ajax',
+        url: "/OrderManage/ManageUserStore",
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
 var OrderDetailManageStore = Ext.create('Ext.data.Store', {
     autoDestroy: true,
     pageSize: pageSize,
     model: 'gigade.OrderDetailManage',
     proxy: {
         type: 'ajax',
-        url: '/OrderManage/OrderDetailManage',
+        url: '/OrderManage/GetODMList',
         reader: {
             type: 'json',
             root: 'data',
@@ -37,7 +59,7 @@ var OrderDetailManageStore = Ext.create('Ext.data.Store', {
 OrderDetailManageStore.on('beforeload', function () {
     Ext.apply(OrderDetailManageStore.proxy.extraParams,
     {
-       // starttime: Ext.getCmp('start').getValue(),
+        odm_status: Ext.getCmp('status').getValue(),
     });
 });
 
@@ -52,12 +74,12 @@ Ext.onReady(function () {
         columns: [
             { header: "編號", dataIndex: 'odm_id', width: 100, align: 'center', hidden: true },
             { header: "姓名", dataIndex: 'odm_user_name', width: 150, align: 'center' },
-            { header: "創建人", dataIndex: 'odm_createuser', width: 150, align: 'center' },
+            { header: "創建人", dataIndex: 'user_username', width: 150, align: 'center' },
             { header: "創建時間", dataIndex: 'odm_createdate', width: 150, align: 'center' },
             {
                 header: "狀態", dataIndex: 'odm_status', align: 'center', hidden: false,
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    if (value) {
+                    if (value==0) {
                         return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.odm_id + ")'><img hidValue='1' id='img" + record.data.odm_id + "' src='../../../Content/img/icons/drop-no.gif'/></a>";
                     } else {
                         return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.odm_id + ")'><img hidValue='0' id='img" + record.data.odm_id + "' src='../../../Content/img/icons/accept.gif'/></a>";
@@ -79,11 +101,13 @@ Ext.onReady(function () {
             fieldLabel: '狀態',
             store: ManageStatusStore,
             id: 'status',
-            valueField: 'status',
+            displayField: 'txt',
+            valueField: 'value',
             editable: false,
-            labelWidth: 110,
-            width: 250,
-            displayField: 'txt'
+            labelWidth:60,
+            width: 180,
+            displayField: 'txt',
+            value:-1,
         },     
         {
             xtype: 'button',
@@ -120,30 +144,33 @@ Ext.onReady(function () {
             }
         }
     });
+    //OrderDetailManageStore.load({ params: { start: 0, limit: 25 } });
 })
+
 var addClick = function () {
     var AddFrm = Ext.create('Ext.form.Panel', {
         id: 'AddFrm',
         frame: true,
         plain: true,
-        defaultType: 'textfield',
-        layout: 'anchor',
-        autoScroll: true,
+        layout: 'anchor',     
         labelWidth: 45,
-        url: '/OrderManage/AddOrderManage',
+        url: '/OrderManage/InsertODM',
         defaults: { anchor: "95%", msgTarget: "side", labelWidth: 120 },
         items: [
-        {
-            xtype: 'combobox',
-            fieldLabel: '選擇管理員',
-            store: ManageStatusStore,
-            id: 'manage_user',
-            valueField: 'manage_user',
-            editable: false,
-            labelWidth: 110,
-            width: 250,
-            displayField: 'txt'
-        } 
+            {
+                xtype: 'combobox',
+                fieldLabel: "選擇管理員",
+                labelWidth: 110,
+                id: 'manage_user',
+                name: 'manage_user',
+                width: 400,
+                store: ManageUserStore,
+                emptyText: '請選擇',
+                allowBlank: false,             
+                editable:false,              
+                displayField: 'user_username',
+                valueField: 'user_id'
+            }
         ],
         buttons: [{
             text: SAVE,
@@ -154,25 +181,25 @@ var addClick = function () {
                 if (form.isValid()) {
                     form.submit({
                         params: {
-                            manage_user: Ext.htmlEncode(Ext.getCmp("manage_user").getValue())
+                            odm_user_id: Ext.htmlEncode(Ext.getCmp("manage_user").getValue()),
+                            odm_user_name: Ext.htmlEncode(Ext.getCmp("manage_user").getRawValue())
                         },
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
                             if (result.success) {
                                 if (result.msg == 1) {
                                     Ext.Msg.alert(INFORMATION, "請不要重複添加!");
-                                    editWin1.close();
                                 }
                                 else {
                                     Ext.Msg.alert(INFORMATION, "添加成功!");
                                     OrderDetailManageStore.load();
-                                    editWin1.close();
+                                    AddWin.close();
                                 }
                             }
                             else {
                                 Ext.Msg.alert(INFORMATION, FAILURE);
                             }
-                        },
+                        }, 
                         failure: function () {
                             Ext.Msg.alert(INFORMATION, FAILURE);
                         }
@@ -219,35 +246,24 @@ var addClick = function () {
 
 function Query(x) {
     OrderDetailManageStore.removeAll();
-    var text = Ext.getCmp('keyWord').getValue();
-    var start = Ext.getCmp('start').getValue();
-    var end = Ext.getCmp('end').getValue();
-    if (text == '' && (start == null || end == null)) {
-        Ext.Msg.alert(INFORMATION, '請選擇查詢條件');
-    }
-    else {
-        Ext.getCmp("gdList").store.loadPage(1, {
-            params: {
-                starttime: Ext.getCmp('start').getValue(),
-                endtime: Ext.getCmp('end').getValue(),
-                text: Ext.getCmp('keyWord').getValue()
-            }
-        });
-    }
+    Ext.getCmp("gdList").store.loadPage(1, {
+        params: {
+            odm_status:Ext.getCmp('status').getValue(),
+        }
+    });
 }
 /*********************啟用/禁用**********************/
 function UpdateActive(id) {
     var activeValue = $("#img" + id).attr("hidValue");
     $.ajax({
-        url: "/OrderManage/UpdateStats",
+        url: "/OrderManage/UpODMStatus",
         data: {
-            "id": id,
+            "odm_id": id,
             "active": activeValue
         },
         type: "post",
         type: 'text',
         success: function (msg) {
-            //Ext.Msg.alert(INFORMATION, "修改成功!");
             OrderDetailManageStore.load();
             if (activeValue == 1) {
                 $("#img" + id).attr("hidValue", 0);

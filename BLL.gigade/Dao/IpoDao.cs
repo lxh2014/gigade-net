@@ -51,6 +51,19 @@ namespace BLL.gigade.Dao
                 {
                     sqlCondi.AppendFormat(" and i.create_dtim <= '{0}'", Common.CommonFunction.DateTimeToString(query.end_time));
                 }
+                //常溫or冷凍
+                if (query.freight != 0)
+                {
+                    sqlCondi.AppendFormat(@" and i.po_id in (
+                                            select DISTINCT ipod.po_id 
+                                            FROM ipod                
+                                            left join product_item pi on pi.item_id=ipod.prod_id  
+                                             inner join product p on pi.product_id=p.product_id        
+                                            left join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set             
+                                            left join iplas ipl on ipl.item_id=ipod.prod_id
+                                            LEFT JOIN manage_user mu on mu.user_id=ipod.change_user 
+                                             WHERE dfsm.delivery_freight_set = '{0}' )", query.freight);
+                }
                 totalcount = 0;
                 sqlCondi.Append(" order by i.row_id desc ");
                 if (query.IsPage)

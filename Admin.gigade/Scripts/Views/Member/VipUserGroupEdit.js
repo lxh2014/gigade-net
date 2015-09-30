@@ -127,15 +127,30 @@
                 listeners: {
                     change: function (radio, newValue, oldValue) {                                                            
                         if (newValue) {
-                            Ext.getCmp("tax_id").allowBlank = true;
-                            Ext.getCmp("group_category").allowBlank = true;
-                            Ext.getCmp("eng_name").allowBlank = true;
-                            Ext.getCmp('tax_id').getEl().first().dom.innerHTML = '統編';
-                            Ext.getCmp('group_category').getEl().first().dom.innerHTML = '企業商品類別';
-                            Ext.getCmp('eng_name').getEl().first().dom.innerHTML = '企業英文名稱';
-                            Ext.getCmp("tax_id").reset();
-                            Ext.getCmp("group_category").reset();
-                            Ext.getCmp("eng_name").reset();
+                            var tax = Ext.getCmp("tax_id");
+                            var group = Ext.getCmp("group_category");
+                            var eng = Ext.getCmp("eng_name");
+
+                            tax.allowBlank = true;
+                            group.allowBlank = true;
+                            eng.allowBlank = true;
+
+                            tax.getEl().first().dom.innerHTML = '統編:';
+                            group.getEl().first().dom.innerHTML = '企業商品類別:';
+                            eng.getEl().first().dom.innerHTML = '企業英文名稱:';
+                           
+                            if (tax.getValue() == '') {
+                                tax.setValue(' ');
+                                tax.setValue('');
+                            }
+                            if (group.getValue() == '') {
+                                group.setValue(' ');
+                                group.setValue('');
+                            }
+                            if (eng.getValue() == '') {
+                                eng.setValue(' ');
+                                eng.setValue('');
+                            }                           
                         }
                     }
                 }
@@ -148,15 +163,30 @@
                 listeners: {
                     change: function (radio, newValue, oldValue) {                    
                         if (newValue) {
-                            Ext.getCmp("tax_id").allowBlank = false;                            
-                            Ext.getCmp("group_category").allowBlank = false;
-                            Ext.getCmp("eng_name").allowBlank = false;
-                            Ext.getCmp('tax_id').getEl().first().dom.innerHTML = '統編' + ":<font style='color:red'>" +'*' +"</font>";
-                            Ext.getCmp('group_category').getEl().first().dom.innerHTML = '企業商品類別' + ":<font style='color:red'>" + '*' + "</font>";
-                            Ext.getCmp('eng_name').getEl().first().dom.innerHTML = '企業英文名稱' + ":<font style='color:red'>" + '*' + "</font>";
-                            Ext.getCmp("tax_id").reset();
-                            Ext.getCmp("group_category").reset();
-                            Ext.getCmp("eng_name").reset();
+                            var tax = Ext.getCmp("tax_id");
+                            var group = Ext.getCmp("group_category");
+                            var eng = Ext.getCmp("eng_name");
+
+                            tax.allowBlank = false;
+                            group.allowBlank = false;
+                            eng.allowBlank = false;
+
+                            tax.getEl().first().dom.innerHTML = '統編' + ":<font style='color:red'>" + '  *' + "</font>";
+                            group.getEl().first().dom.innerHTML = '企業商品類別' + ":<font style='color:red'>" + '  *' + "</font>";
+                            eng.getEl().first().dom.innerHTML = '企業英文名稱' + ":<font style='color:red'>" + '  *' + "</font>";
+
+                            if (tax.getValue() == '') {
+                                tax.setValue(' ');
+                                tax.setValue('');
+                            }
+                            if (group.getValue() == '') {
+                                group.setValue(' ');
+                                group.setValue('');
+                            }
+                            if (eng.getValue() == '') {
+                                eng.setValue(' ');
+                                eng.setValue('');
+                            }
                             //label = Ext.getCmp('no_discount').getEl().parent().parent().first();
                             //  label.dom.innerHTML = DISCOUNT+(100-newValue)+"%";
                             //Ext.DomQuery.selectNode('label[for=no_discount]').innerHTML =DISCOUNT+(100-newValue)+ '%';
@@ -175,7 +205,7 @@
             value:"<font style='color:red'>" +  "*  為必填項" + "</font>"
         }],
         buttons: [{
-            //formBind: true,
+            formBind: true,
             //disabled: false,
             id:'saveBtn',
             text: '保存',
