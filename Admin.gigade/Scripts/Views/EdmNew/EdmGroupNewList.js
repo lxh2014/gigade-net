@@ -106,7 +106,7 @@ Ext.onReady(function () {
               name: 'group_name_list',
               allowBlank: false,
               submitValue: true,
-              emptyText:'群組編號',
+              emptyText:'群組名稱',
               listeners: {
                   specialkey: function (field, e) {
                       if (e.getKey() == e.ENTER) {
