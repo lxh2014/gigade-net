@@ -34,10 +34,18 @@ namespace Admin.gigade.Controllers
         {
             string json = string.Empty;
             List<EdmListConditionMain> store = new List<EdmListConditionMain>();
+            EdmListConditionMain item = new EdmListConditionMain();
+        
             _edmlistmainMgr = new EdmListConditionMainMgr(sqlConnectionString);
             try
             {
+            
                 store = _edmlistmainMgr.GetConditionList();
+                item.elcm_id = 0;
+                item.elcm_name = "無";
+                store.Add(item);
+                store.Insert(0, item);
+              //  store.Insert(0,
                 json = "{success:true" + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented) + "}";
             }
             catch (Exception ex)
