@@ -4427,6 +4427,7 @@
     <Folder Include="Views\PromotionsAmountDiscount\" />
     <Folder Include="Views\PromotionsBonusSerialHistory\" />
     <Folder Include="Views\PromotionsBonusSerial\" />
+    <Folder Include="Views\ScheduleService\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\index.cshtml" />

@@ -19,7 +19,6 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
-
         /// <summary>
         /// 獲取需要執行的排程列表；
         /// </summary>
