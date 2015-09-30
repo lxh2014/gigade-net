@@ -1,4 +1,4 @@
-﻿
+﻿var winDetail;
 Ext.Loader.setConfig({ enabled: true });
 Ext.Loader.setPath('Ext.ux', '/Scripts/Ext4.0/ux');
 Ext.require([
