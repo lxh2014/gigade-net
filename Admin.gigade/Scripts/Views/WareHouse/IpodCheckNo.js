@@ -1,4 +1,4 @@
-﻿var pageSize = 24;
+﻿var pageSize = 25;
 Ext.define('gigade.Ipod', {
     extend: 'Ext.data.Model',
     fields: [
@@ -38,6 +38,19 @@ var ipodStore = Ext.create('Ext.data.Store', {
             
         }
     }
+    ,
+    listeners: {
+        load: function (store)
+        {
+            var count = store.getCount();
+            if (count == 0) {
+                Ext.getCmp('outExcel').setDisabled(true);
+            }
+            else {
+                Ext.getCmp('outExcel').setDisabled(false);
+            }
+        }
+    }
 });
 
 Ext.define("gigade.parameter", {
@@ -73,6 +86,14 @@ function Query() {
     var product_name = Ext.getCmp('product_name').getValue();
     var start_time = Ext.getCmp('time_start').getValue();
     var end_time = Ext.getCmp('time_end').getValue();
+    if (start_time == null && end_time != null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
+    if (start_time != null && end_time == null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
     //if (falg == 0) {
     //    Ext.Msg.alert("提示", "請輸入查詢條件");
     //    return false;
@@ -95,7 +116,7 @@ function Query() {
                     end_time : end_time
                 }
             });
-    } 
+    }
 }
 Ext.onReady(function () {
     var frm = Ext.create('Ext.form.Panel', {
@@ -244,7 +265,7 @@ Ext.onReady(function () {
                          id: 'time_start',
                          name: 'time_start',
                          margin: '5 0 0 5',
-                         format: 'Y-m-d 00:00:00',
+                         format: 'Y-m-d',
                          editable: false,
                          listeners: {
                               select: function () {
@@ -273,7 +294,7 @@ Ext.onReady(function () {
                             id: 'time_end',
                             name: 'time_end',
                             margin: '5 0 0 5',
-                            format: 'Y-m-d 23:59:59',
+                            format: 'Y-m-d',
                             editable: false,
                             listeners: {
                                 select: function () {
@@ -332,6 +353,16 @@ Ext.onReady(function () {
 
     });
     ipodStore.on('beforeload', function () {
+        var start_time = Ext.getCmp('time_start').getValue();
+        var end_time = Ext.getCmp('time_end').getValue();
+        if (start_time == null && end_time != null) {
+            Ext.Msg.alert("提示", "請把創建時間補充完整");
+            return false;
+        }
+        if (start_time != null && end_time == null) {
+            Ext.Msg.alert("提示", "請把創建時間補充完整");
+            return false;
+        }
         Ext.apply(ipodStore.proxy.extraParams, {
          Potype : Ext.getCmp('Poty').getValue(),
          erp_id :Ext.getCmp('erp_id').getValue().trim(),
@@ -357,7 +388,7 @@ Ext.onReady(function () {
             { header: "供應商名稱", dataIndex: 'vendor_name_full', width: 170, align: 'center' },
             { header: "品號", dataIndex: 'Erp_Id', width: 110, align: 'center' },
             { header: "商品編號", dataIndex: 'productid', width: 65, align: 'center' },
-            { header: "商品六碼", dataIndex: 'item_id', width: 65, align: 'center' },
+            { header: "商品細項編號", dataIndex: 'item_id', width: 80, align: 'center' },
             { header: "商品名稱", dataIndex: 'product_name', width: 250, align: 'center' },
             { header: "規格", dataIndex: 'spec', width: 130, align: 'center' },
             { header: "採購數量", dataIndex: 'qty_ord', width: 65, align: 'center' },
@@ -397,10 +428,18 @@ outExcel = function () {
     var product_id = Ext.getCmp('product_id').getValue();
     var product_name = Ext.getCmp('product_name').getValue();
     var start_time = Ext.getCmp('time_start').getValue();
+    var end_time = Ext.getCmp('time_end').getValue();
+    if (start_time == null && end_time != null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
+    if (start_time != null && end_time == null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
     if (start_time!=null) {
         start_time= Ext.htmlEncode(Ext.Date.format(new Date(start_time), 'Y-m-d 00:00:00'));
     }
-    var end_time = Ext.getCmp('time_end').getValue();
     if(end_time!=null){
         end_time = Ext.htmlEncode(Ext.Date.format(new Date(end_time), 'Y-m-d 00:00:00'));
     }

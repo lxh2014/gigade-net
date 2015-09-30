@@ -33,14 +33,14 @@ namespace BLL.gigade.Dao
         public Serial GetSerialById(int serialId)
         {
             StringBuilder strSql = new StringBuilder("select serial_id,serial_value,serial_description from serial");
-            strSql.AppendFormat(" where serial_id={0}", serialId);
+            strSql.AppendFormat(" where serial_id={0} ;", serialId);
             return _dbAccess.getSinggleObj<Serial>(strSql.ToString());
         }
 
         public int Update(Serial serial)
         {
             StringBuilder strSql = new StringBuilder("update serial set ");
-            strSql.AppendFormat("serial_value={0} where serial_id={1}", serial.Serial_Value, serial.Serial_id);
+            strSql.AppendFormat("serial_value={0} where serial_id={1} ;", serial.Serial_Value, serial.Serial_id);
             return _dbAccess.execCommand(strSql.ToString());
         }
 
@@ -66,12 +66,26 @@ namespace BLL.gigade.Dao
             StringBuilder strSql = new StringBuilder();
             try
             {
-                strSql.AppendFormat("insert into serial(serial_value,serial_id)values('{0}','{1}')", serial.Serial_Value, serial.Serial_id);
+                strSql.AppendFormat("insert into serial(serial_value,serial_id)values('{0}','{1}') ;", serial.Serial_Value, serial.Serial_id);
                 return _dbAccess.execCommand(strSql.ToString());
             }
             catch (Exception ex)
             {
                 throw new Exception("SerialDao.Insert-->" + ex.Message + strSql.ToString(), ex);
+            }
+        }
+        public string InsertStr(Serial serial)
+        {
+
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+                strSql.AppendFormat("insert into serial(serial_value,serial_id)values('{0}','{1}');", serial.Serial_Value, serial.Serial_id);
+                return strSql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("SerialDao.InsertStr-->" + ex.Message + strSql.ToString(), ex);
             }
         }
     }

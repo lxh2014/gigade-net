@@ -136,7 +136,7 @@ namespace BLL.gigade.Dao
                 strSql.AppendFormat(",cate_id='{0}',fortune_quota={1},fortune_freight={2},shortage={3},price_type={4}", product.Cate_Id, product.Fortune_Quota, product.Fortune_Freight, product.Shortage, product.Price_type);
                 strSql.AppendFormat(",show_listprice={0},expect_msg='{1}',process_type={2},show_in_deliver={3},prepaid={4},product_type={5},prod_name='{6}', prod_sz='{7}',prod_classify={8} ",
                     product.show_listprice, product.expect_msg, product.Process_Type, product.Show_In_Deliver, product.Prepaid, product.Product_Type, product.Prod_Name, product.Prod_Sz, product.Prod_Classify);//新增Process_Type ，Show_In_Deliver，Prepaid，Product_Type四個欄位 edit by xiangwang0413w 2014/09/26
-                strSql.AppendFormat(",deliver_days={0},min_purchase_amount={1},safe_stock_amount={2},extra_days={3},product_alt='{4}',purchase_in_advance={5},purchase_in_advance_start = {6},purchase_in_advance_end={7}", product.Deliver_Days, product.Min_Purchase_Amount, product.Safe_Stock_Amount, product.Extra_Days, product.Product_alt,product.purchase_in_advance,product.purchase_in_advance_start,product.purchase_in_advance_end);// add by zhuoqin0830w 新增5個修改欄位  2015/03/17
+                strSql.AppendFormat(",deliver_days={0},min_purchase_amount={1},safe_stock_amount={2},extra_days={3},product_alt='{4}',purchase_in_advance={5},purchase_in_advance_start = {6},purchase_in_advance_end={7}", product.Deliver_Days, product.Min_Purchase_Amount, product.Safe_Stock_Amount, product.Extra_Days, product.Product_alt, product.purchase_in_advance, product.purchase_in_advance_start, product.purchase_in_advance_end);// add by zhuoqin0830w 新增5個修改欄位  2015/03/17
                 strSql.AppendFormat(" where product_id={0};SET sql_safe_updates = 1;", product.Product_Id);
                 ///add by wwei0216w 2015/7/30 添加預購3欄位
                 //strSql.Append(pmDao.UpdateProductName(product.Prod_Sz,product.Product_Id.ToString()));
@@ -691,6 +691,11 @@ namespace BLL.gigade.Dao
                 {
                     strCondition.AppendFormat(" and a.cate_id='{0}'", query.cate_id);
                 }
+                //add by guodong1130w 2015/09/17 預購商品
+                if (query.purchase_in_advance != 0)
+                {
+                        strCondition.AppendFormat(" and a.purchase_in_advance={0}  ", query.purchase_in_advance);
+                }
                 if (query.category_id != 0)
                 {
                     //edit by hjiajun1211w 2014/08/08 父商品查詢
@@ -748,7 +753,7 @@ namespace BLL.gigade.Dao
                 StringBuilder strCols = new StringBuilder("select  a.product_id,b.brand_name,a.product_image,a.prod_sz,a.combination AS combination_id,a.product_spec AS product_spec_id,");
                 strCols.Append("a.product_price_list,a.sale_status AS sale_status_id,v.vendor_name_full,v.vendor_name_simple,v.erp_id,a.product_status as product_status_id,a.user_id, a.create_channel,a.prepaid,a.bag_check_money,a.off_grade ");//添加 失格欄位 a.off_grade  add by zhuoqin0830w  2015/06/30
                 //add by wangwei 2014/9/29 添加a.create_channel字段
-
+                strCols.Append(",a.purchase_in_advance_start,a.purchase_in_advance_end,a.expect_time ");//添加預購商品開始時間 ,結束時間 guodong1130w 2015/9/16
                 StringBuilder strTbls = new StringBuilder("from product a left join vendor_brand b on a.brand_id=b.brand_id ");
                 //strTbls.Append("left join (select parametercode,parametername from t_parametersrc where parametertype='combo_type') c on a.combination=c.parametercode ");
                 //strTbls.Append("left join (select parametercode,parametername from t_parametersrc where parametertype='product_spec') d on a.product_spec=d.parametercode ");
@@ -826,6 +831,11 @@ namespace BLL.gigade.Dao
                 if (query.off_grade != 0)
                 {
                     strCondition.AppendFormat(" and a.off_grade={0} ", query.off_grade);
+                }
+                //add by guodong1130w 2015/09/17 預購商品
+                if (query.purchase_in_advance != 0)
+                {
+                    strCondition.AppendFormat(" and a.purchase_in_advance={0}  ", query.purchase_in_advance);
                 }
                 if (!string.IsNullOrEmpty(query.date_type))
                 {
@@ -974,6 +984,164 @@ namespace BLL.gigade.Dao
             catch (Exception ex)
             {
                 throw new Exception("ProductDao.QueryByProSite-->" + ex.Message, ex);
+            }
+        }
+        /// <summary>
+        /// 預購商品導出  guodong1130w 2015/09/17 添加
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="totalCount"></param>
+        /// <returns></returns>
+        public List<Model.Custom.QueryandVerifyCustom> QueryForPurchase_in_advance(Model.Query.QueryVerifyCondition query, out int totalCount)
+        {
+            try
+            {
+                var regex = new Regex("^[0-9,]+$");
+                query.Replace4MySQL();
+                StringBuilder strCols = new StringBuilder("select  a.product_id,b.brand_name,v.vendor_name_full,a.combination AS combination_id");
+                strCols.Append(",a.purchase_in_advance_start,a.purchase_in_advance_end,a.expect_time,pi.item_stock,sum(odetail.buy_num) as bnum,sdule.schedule_name  ");
+                StringBuilder strTbls = new StringBuilder("from product a left join vendor_brand b on a.brand_id=b.brand_id ");
+                strTbls.Append(" LEFT JOIN vendor v ON v.vendor_id = b.vendor_id ");
+                //連接查出未出貨數量
+                strTbls.Append(" LEFT JOIN product_item pi ON pi.product_id = a.product_id ");
+                strTbls.Append(" LEFT JOIN order_detail odetail ON odetail.item_id = pi.item_id ");
+                strTbls.Append(" LEFT JOIN order_slave oslave ON oslave.slave_id = odetail.slave_id ");
+                strTbls.Append(" LEFT JOIN order_master omaster ON omaster.order_id = oslave.order_id  and order_status = 2");
+                strTbls.Append(" LEFT JOIN deliver_master dmaster ON dmaster.order_id = omaster.order_id AND dmaster.delivery_status in (0,1,2,3) ");
+                //關聯查出排成名稱
+                strTbls.Append(" LEFT JOIN schedule_relation srelation on srelation.relation_id=a.product_id and srelation.relation_table='product' ");
+                strTbls.Append(" LEFT JOIN schedule sdule on sdule.schedule_id=srelation.schedule_id ");
+                StringBuilder strCondition = new StringBuilder(" WHERE 1=1 ");
+                if (query.brand_id != 0)
+                {
+                    strCondition.AppendFormat(" and a.brand_id={0}", query.brand_id);
+                }
+
+                //庫存分類 edit by xiangwang0413w 2014/11/24 
+                if (query.StockStatus != 0)// 1.庫存為0還可販售 2.補貨中停止販售 3.庫存數<1
+                {
+                    switch (query.StockStatus)
+                    {
+                        case 1://1.庫存為0還可販售
+                            strCondition.Append(" and a.combination=1 and  a.ignore_stock=1 ");
+                            break;
+                        case 2:
+                            strCondition.Append(" and a.shortage=1");//2.補貨中停止販售
+                            break;
+                        case 3:
+                            strCondition.Append(" and a.combination=1 and a.product_id in (select distinct product_id from product_item pi where item_stock <1 and pi.product_id=a.product_id)");//3.庫存數<1
+                            break;
+                        default:
+                            throw new Exception("unaccepted StockStatus");
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(query.cate_id))
+                {
+                    strCondition.AppendFormat(" and a.cate_id in ('{0}')", GetStrbyCate_id(query.cate_id));
+                }
+                if (query.category_id != 0)
+                {//父商品查詢
+                    IProductCategoryImplDao pcDao = new ProductCategoryDao(connStr);
+                    List<Model.ProductCategory> category = pcDao.QueryAll(new ProductCategory());
+                    string str = string.Empty;
+                    GetAllCategory_id(category, query.category_id, ref str);
+                    strTbls.AppendFormat(" inner join (select distinct product_id from product_category_set where category_id in({0})) j on a.product_id=j.product_id ", str);
+                }
+                if (query.combination != 0)
+                {
+                    strCondition.AppendFormat(" and a.combination={0}", query.combination);
+                }
+                if (query.product_status != -1)
+                {
+                    strCondition.AppendFormat(" and a.product_status={0}", query.product_status);
+                }
+                if (query.product_type != -1)
+                {
+                    strCondition.AppendFormat(" and a.product_type={0}", query.product_type);
+                }
+                if (query.freight != 0)
+                {
+                    strCondition.AppendFormat(" and a.product_freight_set={0}", query.freight);
+                }
+                if (query.mode != 0)
+                {
+                    strCondition.AppendFormat(" and a.product_mode={0}", query.mode);
+                }
+                if (query.tax_type != 0)
+                {
+                    strCondition.AppendFormat(" and a.tax_type={0}", query.tax_type);
+                }
+                //  已買斷商品的篩選功能
+                if (query.Prepaid != -1)
+                {
+                    strCondition.AppendFormat(" and a.prepaid={0}", query.Prepaid);
+                }
+                //  失格商品篩選
+                if (query.off_grade != 0)
+                {
+                    strCondition.AppendFormat(" and a.off_grade={0} ", query.off_grade);
+                }
+                //預購商品
+                if (query.purchase_in_advance != 0)
+                {
+                    strCondition.AppendFormat(" and a.purchase_in_advance={0}  ", query.purchase_in_advance);
+                }
+                if (!string.IsNullOrEmpty(query.date_type))
+                {
+                    CheckCondition(query, "a", strCondition);
+                }
+                strCols.Append(",a.product_name ");
+
+
+                if (!string.IsNullOrEmpty(query.name_number))
+                {
+                    strCondition.AppendFormat(regex.IsMatch(query.name_number) ? " and (a.product_id in ({0}) or a.product_name like '%{0}%' or a.product_id in (select distinct product_id from product_item where item_id in({0})))" : " and a.product_name like '%{0}%'", query.name_number); //add by zhuoqin0830w   2015/03/30 添加商品細項編號
+                }
+
+                if (!query.IsPage)//匯出時不匯出大於10000的商品
+                {
+                    strCondition.Append(" and a.product_id > 10000");
+                }
+
+                //添加 按鈕選擇值的查詢條件  
+                if (query.priceCondition == 2)
+                {
+                    strTbls.Append("left join price_master l on a.product_id=l.product_id and l.site_id= 1 and l.user_level=1 and l.user_id=0 and (l.product_id=l.child_id or l.child_id=0) ");
+                    strCondition.AppendFormat(" and ((a.combination not in(0,1) and a.price_type <>2) or (a.combination = 1 and l.same_price =1))");
+                }
+                string strCount = "select count(a.product_id) as totalCount " + strTbls.ToString() + strCondition.ToString();
+                System.Data.DataTable _dt = _dbAccess.getDataTable(strCount);
+                totalCount = 0;
+                if (_dt != null && _dt.Rows.Count > 0)
+                {
+                    totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
+                }
+
+                strCols.Append(" ,GROUP_CONCAT(pi.item_id) AS itemIds ");
+                strCondition.Append(" GROUP BY a.product_id ");
+                strCondition.Append(" order by a.product_id desc ");
+                if (query.IsPage)
+                {
+                    strCondition.AppendFormat(" limit {0},{1}", query.Start, query.Limit);
+                }
+
+                IParametersrcImplDao _parameterDao = new ParametersrcDao(connStr);
+                List<Parametersrc> parameterList = _parameterDao.QueryParametersrcByTypes("Combo_Type", "product_spec", "product_status", "sale_status", "UserLevel", "price_status", "product_freight", "product_mode", "Price_Type");
+                List<Model.Custom.QueryandVerifyCustom> list = _dbAccess.getDataTableForObj<Model.Custom.QueryandVerifyCustom>(strCols.ToString() + strTbls.ToString() + strCondition.ToString());
+                foreach (QueryandVerifyCustom q in list)
+                {
+                    var alist = parameterList.Find(m => m.ParameterType == "Combo_Type" && m.ParameterCode == q.combination_id.ToString());
+                    if (alist != null)
+                    {
+                        q.combination = alist.parameterName;
+                    }
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductDao.QueryForPurchase_in_advance-->" + ex.Message, ex);
             }
         }
 
@@ -2955,8 +3123,6 @@ WHERE pii.product_id='{0}' ", query.Product_Id);
                 throw new Exception("ProductDao.GetProductType-->" + ex.Message + sbSql.ToString(), ex);
             }
         }
-
-
     }
 }
 

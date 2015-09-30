@@ -80,7 +80,11 @@ namespace BLL.gigade.Dao
             try
             {
                   StringBuilder sql = new StringBuilder();
-                  sql.AppendFormat(@"SELECT elcm_id from edm_list_condition_main WHERE elcm_name='{0}'; ", name);
+                  sql.AppendFormat(@"SELECT elcm_id from edm_list_condition_main WHERE 1=1 ");
+                  if (name.Length > 0)
+                  {
+                      sql.AppendFormat(@"and elcm_name='{0}'; ", name);
+                  }
                   EdmListConditionMain model=_dbAccess.getSinggleObj<EdmListConditionMain>(sql.ToString());
                   return model;
             }
@@ -246,5 +250,28 @@ namespace BLL.gigade.Dao
                 throw new Exception(" EdmListConditionMainDao-->SaveListInfo " + ex.Message, ex);
             }
         }
+
+        /// <summary>
+        /// EDM電子報發送使用
+        /// </summary>
+        /// <param name="q"></param>
+        /// <returns></returns>
+        //public DataTable GetEmail(EdmListConditoinSubQuery q)
+        //{
+        //    q.Replace4MySQL();
+        //    StringBuilder sql = new StringBuilder();
+        //    try
+        //    {
+        //        if (q.elcm_name != string.Empty)
+        //        {
+        //            sql.AppendFormat(@"INSERT INTO edm_list_condition_main (elcm_creator_id, elcm_name, elcm_created) VALUES ('{0}', '{1}', '{2}')", q.elcm_creator_id, q.elcm_name, CommonFunction.DateTimeToString(q.elcm_created));
+        //        }
+        //        return _dbAccess.getDataTable(sql.ToString());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(" EdmListConditionMainDao-->SaveListInfo " + ex.Message, ex);
+        //    }
+        //}
     }
 }
