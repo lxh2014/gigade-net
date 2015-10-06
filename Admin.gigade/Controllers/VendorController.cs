@@ -3557,7 +3557,7 @@ namespace Admin.gigade.Controllers
                 zipList = zMgr.GetZipList(zip);
                 if (zipList.Count > 0&& resultzip>0)
                 {
-                    jsonStr = "{success:true,msg:\"" + zipList[0].big +"  "+ zipList[0].middle +"  "+ zipList[0].zipcode + "/" + zipList[0].small + "\"}";
+                    jsonStr = "{success:true,msg:\"" + zipList[0].big +"  "+ zipList[0].middle +"  "+ zipList[0].zipcode + "/" + zipList[0].small.Trim() + "\"}";
                 }
                 else
                 {
