@@ -7,6 +7,8 @@ using BLL.gigade.Common;
 using BLL.gigade.Mgr;
 using BLL.gigade.Mgr.Impl;
 using BLL.gigade.Model.Query;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Admin.gigade.Controllers
 {
@@ -308,6 +310,103 @@ namespace Admin.gigade.Controllers
             }
             sbHtml.Append("</table>");
             return sbHtml.ToString();
+
+        }
+
+        public HttpResponseBase GetScheduleMasterList()
+        {
+            string json = string.Empty;
+            int totalcount = 0;
+            try
+            {
+                ScheduleMasterQuery query = new ScheduleMasterQuery();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+                List<ScheduleMasterQuery> list = _secheduleServiceMgr.GetScheduleMasterList(query);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                // timeConverter.DateTimeFormat = "yyyy-MM-dd ";
+                json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return Response;
+ 
+        }
+
+        public HttpResponseBase GetScheduleConfigList()
+        {
+            string json = string.Empty;
+            ScheduleConfigQuery query = new ScheduleConfigQuery();
+            if (!string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                query.schedule_code = Request.Params["schedule_code"];
+            }
+            try
+            {
+                List<ScheduleConfigQuery> ipodStore = new List<ScheduleConfigQuery>();
+                _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+                ipodStore = _secheduleServiceMgr.GetScheduleConfigList(query);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,data:" + JsonConvert.SerializeObject(ipodStore, Formatting.Indented, timeConverter) + "}";//返回json數據
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+
+        }// 獲取 config數據
+
+        public HttpResponseBase GetSchedulePeriodList()// 獲取period數據
+        {
+            string json = string.Empty;
+            SchedulePeriodQuery query = new SchedulePeriodQuery();
+            if (!string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                query.schedule_code = Request.Params["schedule_code"];
+            }
+            try
+            {
+                List<SchedulePeriodQuery> ipodStore = new List<SchedulePeriodQuery>();
+                _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+                ipodStore = _secheduleServiceMgr.GetSchedulePeriodList(query);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,data:" + JsonConvert.SerializeObject(ipodStore, Formatting.Indented, timeConverter) + "}";//返回json數據
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
 
         }
 

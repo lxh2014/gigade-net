@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using BLL.gigade.Common;
 using BLL.gigade.Dao;
 using BLL.gigade.Model.Query;
 
@@ -37,6 +38,81 @@ namespace BLL.gigade.Mgr
                 throw new Exception("SecheduleServiceMgr-->GetExeScheduleMasterList-->" + ex.Message, ex);
             }
         }
+
+        public List<ScheduleMasterQuery> GetScheduleMasterList(ScheduleMasterQuery query) // master 
+        {
+            try
+            {
+                List<ScheduleMasterQuery> store = new List<ScheduleMasterQuery>();
+                store = _secheduleServiceDao.GetScheduleMasterList(query);
+                foreach (var item in store)
+                {
+                    if (item.schedule_state == 0)
+                    {
+                        item.sschedule_state = "停用";
+                    }
+                    if (item.schedule_state == 1)
+                    {
+                        item.sschedule_state = "啟用";
+                    }
+                    item.show_previous_execute_time = CommonFunction.GetNetTime(item.previous_execute_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                    item.show_next_execute_time = CommonFunction.GetNetTime(item.next_execute_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                    item.show_create_time = CommonFunction.GetNetTime(item.create_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                    item.show_change_time = CommonFunction.GetNetTime(item.change_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                }
+                return store;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("SecheduleServiceMgr-->GetScheduleMasterList-->" + ex.Message, ex);
+            }
+        }
+
+        public List<ScheduleConfigQuery> GetScheduleConfigList(ScheduleConfigQuery query)// config 
+        {
+            try
+            {
+                List<ScheduleConfigQuery> store = new List<ScheduleConfigQuery>();
+                store = _secheduleServiceDao.GetScheduleConfigList(query);
+                foreach (var item in store)
+                {
+                    item.show_create_time = CommonFunction.GetNetTime(item.create_time).ToString("yyyy-MM-dd  HH:mm:ss ");
+                    item.show_change_time = CommonFunction.GetNetTime(item.change_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                }
+                return store;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("SecheduleServiceMgr-->GetScheduleConfigList-->" + ex.Message, ex);
+            }
+        }
+
+        public List<SchedulePeriodQuery> GetSchedulePeriodList(SchedulePeriodQuery query)// period 
+        {
+            try
+            {
+                List<SchedulePeriodQuery> store = new List<SchedulePeriodQuery>();
+                store = _secheduleServiceDao.GetSchedulePeriodList(query);
+                foreach (var item in store)
+                {
+                    item.show_create_time = CommonFunction.GetNetTime(item.create_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                    item.show_change_time = CommonFunction.GetNetTime(item.change_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                    item.show_begin_datetime = CommonFunction.GetNetTime(item.begin_datetime).ToString("yyyy-MM-dd HH:mm:ss ");
+                }
+                return store;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("SecheduleServiceMgr-->GetSchedulePeriodList-->" + ex.Message, ex);
+            }
+        }
+
         public ScheduleMasterQuery GetExeScheduleMaster(ScheduleMasterQuery query)
         {
             try
