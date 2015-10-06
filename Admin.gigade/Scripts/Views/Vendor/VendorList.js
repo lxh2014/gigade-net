@@ -988,7 +988,7 @@ function showDetail(Vendor_id) {
                     constrain: true,
                     modal: true,
                     resizable: false,
-                    height: document.documentElement.clientHeight * 565 / 783,
+                    height: document.documentElement.clientHeight * 565 / 683,
                     width: 800,
                     autoScroll: false,
                     layout: 'fit',
