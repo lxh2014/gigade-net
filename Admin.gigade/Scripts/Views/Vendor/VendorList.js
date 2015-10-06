@@ -968,27 +968,39 @@ function unLock() {
         }
     }
 }
-
 /**********************************顯示供應商詳細信息*****************************************/
 function showDetail(Vendor_id) {
-   // productId = 15382;//product_id
-    if (winDetail == undefined) {
-        winDetail = Ext.create('Ext.window.Window', {
-            title: '供應商詳細信息',
-            constrain: true,
-            modal: true,
-            resizable: false,
-            height: document.documentElement.clientHeight * 565 / 783,
-            width: 800,
-            autoScroll: false,
-            layout: 'fit',
-            html: "<iframe scrolling='no' frameborder=0 width=100% height=100% src='/Vendor/VendorDetails?Vendor_id=" + Vendor_id + "'></iframe>",
-            listeners: {
-                close: function (e) {
-                    winDetail = undefined;
-                    tabs = new Array();
-                }
+    var secret_type = '20';
+    var url = "/Vendor/VendorDetails?Vendor_id=" + Vendor_id;
+    var ralated_id = Vendor_id;
+    var info_id = Vendor_id;
+    boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+    if (boolPassword != "-1") {
+        if (boolPassword) {
+            SecretLoginFun(secret_type, ralated_id, true, false, true, url);//先彈出驗證框，關閉時在彈出顯示框
+            //SecretLoginFun(secret_type, ralated_id, false, true, false, url);//直接彈出顯示框
+        }
+        else {
+            // productId = 15382;//product_id
+            if (winDetail == undefined) {
+                winDetail = Ext.create('Ext.window.Window', {
+                    title: '供應商詳細信息',
+                    constrain: true,
+                    modal: true,
+                    resizable: false,
+                    height: document.documentElement.clientHeight * 565 / 783,
+                    width: 800,
+                    autoScroll: false,
+                    layout: 'fit',
+                    html: "<iframe scrolling='no' frameborder=0 width=100% height=100% src='/Vendor/VendorDetails?Vendor_id=" + Vendor_id + "'></iframe>",
+                    listeners: {
+                        close: function (e) {
+                            winDetail = undefined;
+                            tabs = new Array();
+                        }
+                    }
+                }).show();
             }
-        }).show();
+        }
     }
 }
