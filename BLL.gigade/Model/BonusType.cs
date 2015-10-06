@@ -7,7 +7,12 @@ namespace BLL.gigade.Model
 {
     public class BonusType
     {
-        public int type_id;
+        public uint type_id;
         public string type_description;
+        public BonusType()
+        {
+            type_id = 0;
+            type_description = string.Empty;
+        }
     }
 }

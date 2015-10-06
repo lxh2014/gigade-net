@@ -13,6 +13,7 @@ namespace BLL.gigade.Dao.Impl
         int GetUserBonus(int user_id);
         List<BonusMasterQuery> BonusTypeStore();
         List<BonusMasterQuery> GetBonusMasterList(BonusMasterQuery query, ref int totalCount);
+        DataTable GetBonusMasterList(BonusMasterQuery query);
         int CheckBonusMasterStatus(BonusMasterQuery query, DateTime now, int master_id = 1);
         string InsertBonusMaster(BonusMasterQuery store);
         bool UpdateBonusMaster(BonusMasterQuery store);

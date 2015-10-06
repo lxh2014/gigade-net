@@ -55,6 +55,17 @@ namespace BLL.gigade.Mgr
             }
         }
 
+        public DataTable GetBonusMasterList(BonusMasterQuery query)
+        {
+            try
+            {
+                return _IBonusMasterDao.GetBonusMasterList(query); 
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("BonusMasterMgr-->GetBonusMasterList-->" + ex.Message, ex);
+            }
+        }
         public bool BonusMasterAdd(List<BonusMasterQuery> list)
         {
             Serial serial = new Serial();

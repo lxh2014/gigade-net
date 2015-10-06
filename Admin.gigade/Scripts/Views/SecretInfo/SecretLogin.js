@@ -217,6 +217,9 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                     else if (urlType == "/OrderManage/ModifyDeliverData") {
                         modifyDeliverData();
                     }
+                    else if (urlType.substring(0, 21) == "/Vendor/VendorDetails") {
+                        showDetail(relatedID);
+                    }
                     else {
                         editFunction(relatedID);
                     }

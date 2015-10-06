@@ -33,7 +33,7 @@ namespace Admin.gigade.Controllers
         private IUserRecommendIMgr _userrecommendMgr;
         private static readonly string mySqlConnectionString = System.Configuration.ConfigurationManager.AppSettings["MySqlConnectionString"].ToString();
         string imgServerPath = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server);//"http://192.168.71.159:8080"
-        
+
         string defaultImg = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server) + "/product/nopic_50.jpg";
         private IUserLoginLogImplMgr _userloginlog;
         private IUserEdmImplMgr _edmMgr = null;
@@ -191,6 +191,7 @@ namespace Admin.gigade.Controllers
         public ActionResult BonusSearch()
         {
             ViewBag.user_id = Convert.ToInt32(Request.Params["uid"]);
+            ViewBag.bonus_type = Convert.ToInt32(Request.Params["bonus_type"]);
             return View();
         }
         #endregion
@@ -835,7 +836,7 @@ namespace Admin.gigade.Controllers
                     query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
 
                 }
-                if (!string.IsNullOrEmpty(Request.Params["dateTwo"])) 
+                if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
                 {
                     query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
 
@@ -1035,7 +1036,7 @@ namespace Admin.gigade.Controllers
                 string group_id_or_group_name = Request.Params["group_id_or_group_name"];
                 string gName = string.Empty;
                 string gNameSubString = string.Empty;
-                char[] specialChar = {'[','_','%' };
+                char[] specialChar = { '[', '_', '%' };
                 int n = 0;
                 //if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
                 //{
@@ -1047,8 +1048,8 @@ namespace Admin.gigade.Controllers
                 //    query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
                 //}
 
-                 //用於判斷是查詢條件是群組編號/群組名稱， 
-                 // by zhaozhi0623j，2015/09/22
+                //用於判斷是查詢條件是群組編號/群組名稱， 
+                // by zhaozhi0623j，2015/09/22
                 if (!string.IsNullOrEmpty(group_id_or_group_name))
                 {
                     uint result = 0;
@@ -1062,12 +1063,12 @@ namespace Admin.gigade.Controllers
                         query.group_name = group_id_or_group_name;
                         gName = group_id_or_group_name;
                         n = gName.IndexOfAny(specialChar);
-                        if (n >= 0) 
+                        if (n >= 0)
                         {
-                            gNameSubString = gName.Substring(n, gName.Length - n);                            
+                            gNameSubString = gName.Substring(n, gName.Length - n);
                             query.group_name = gName.Replace(gNameSubString, "\\" + gNameSubString);
-                        }      
-                    }                  
+                        }
+                    }
                 }
                 System.Net.IPAddress[] addlist = System.Net.Dns.GetHostByName(System.Net.Dns.GetHostName()).AddressList;
                 string ip = string.Empty;
@@ -1459,8 +1460,8 @@ namespace Admin.gigade.Controllers
         {
             UserQuery user = new UserQuery();
             List<UserQuery> userList = new List<UserQuery>();
-            string user_email="";
-            uint group_id=0;
+            string user_email = "";
+            uint group_id = 0;
             if (!string.IsNullOrEmpty(Request.Params["Email"]))
             {
                 user_email = Request.Params["Email"];
@@ -1477,17 +1478,19 @@ namespace Admin.gigade.Controllers
             {
 
                 userList = _usmpgr.GetUserByEmail(user_email, group_id);
-                if (userList.Count()>0)//查詢到會員
+                if (userList.Count() > 0)//查詢到會員
                 {
                     jsonStr = "{success:true,msg:\"" + 99 + "\"}";//該用戶已在此群組中
                 }
                 else
                 {
-                    userList =_usmpgr.GetUserByEmail(user_email, 0);
-                    if (userList.Count()>0)
+                    userList = _usmpgr.GetUserByEmail(user_email, 0);
+                    if (userList.Count() > 0)
                     {
                         jsonStr = "{success:true,msg:\"" + 100 + "\",user_id:'" + userList[0].user_id + "',user_name:'" + userList[0].user_name + "'}";//返回json數據
-                    }else{
+                    }
+                    else
+                    {
                         jsonStr = "{success:true,msg:\"" + 98 + "\"}";//此用戶不存在
                     }
                 }
@@ -1525,7 +1528,7 @@ namespace Admin.gigade.Controllers
             {
                 vip.group_id = uint.Parse(Request.Params["group_id"]);
             }
-           
+
             vip.create_id = uint.Parse((Session["caller"] as Caller).user_id.ToString());
             vip.update_id = uint.Parse((Session["caller"] as Caller).user_id.ToString());
             vip.createdate = uint.Parse(CommonFunction.GetPHPTime().ToString());
@@ -1537,7 +1540,7 @@ namespace Admin.gigade.Controllers
                 {
                     jsonStr = "{success:true}";
                 }
-                else 
+                else
                 {
                     jsonStr = "{success:false}";
                 }
@@ -1567,7 +1570,7 @@ namespace Admin.gigade.Controllers
             {
                 vip.v_id = uint.Parse(Request.Params["vid"]);
             }
-           
+
             try
             {
                 _vipuserMgr = new VipUserMgr(mySqlConnectionString);
@@ -1924,6 +1927,35 @@ namespace Admin.gigade.Controllers
                     {
                         item.userLevel = pa.parameterName;
                     }
+                    #region 購物金欄位修改 add by yafeng0715j 20150924
+                    BonusMasterMgr bmMgr = new BonusMasterMgr(mySqlConnectionString);
+                    BonusMasterQuery bmQuery = new BonusMasterQuery();
+                    bmQuery.user_id = item.user_id;
+                    bmQuery.bonus_type = 1;
+                    DataTable table = bmMgr.GetBonusMasterList(bmQuery);
+                    uint master_total = 0;
+                    int master_balance = 0;
+                    if (table.Rows[0][0].ToString() != "")
+                    {
+                        master_total = Convert.ToUInt32(table.Rows[0][0]);
+                        master_balance = Convert.ToInt32(table.Rows[0][1]);
+                    }
+                    item.bonus_type = 1;
+                    item.bonus_typename = string.Format("購物金(剩餘{0}/總{1})", master_balance, master_total);
+
+                    master_total = 0;
+                    master_balance = 0;
+                    bmQuery.bonus_type = 2;
+                    table = bmMgr.GetBonusMasterList(bmQuery);
+                    if (table.Rows[0][0].ToString() != "")
+                    {
+                        master_total = Convert.ToUInt32(table.Rows[0][0]);
+                        master_balance = Convert.ToInt32(table.Rows[0][1]);
+                    }
+                    item.bonus_type1 = 2;
+                    item.bonus_typenamequan = string.Format("抵用券(剩餘{0}/總{1})", master_balance, master_total);
+                    #endregion
+
                 }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
@@ -2049,7 +2081,7 @@ namespace Admin.gigade.Controllers
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
                 json = "{success:false,error:\"" + BLL.gigade.Common.CommonFunction.MySqlException(ex) + "\"}";
-              
+
             }
             this.Response.Clear();
             this.Response.Write(json);
@@ -2307,6 +2339,37 @@ namespace Admin.gigade.Controllers
         #endregion
 
         #region 會員管理 會員列表->購物金查詢+HttpResponseBase BonusSearchList()
+        public HttpResponseBase BonusTypeList()
+        {
+            DataTable table = new DataTable();
+            string json = string.Empty;
+            try
+            {
+                BonusTypeMgr bonusTypeMgr = new BonusTypeMgr(mySqlConnectionString);
+                table = bonusTypeMgr.GetBonusTypeList();
+                DataRow row = table.NewRow();
+                row[0] = 0;
+                row[1] = "全部";
+                table.Rows.InsertAt(row, 0);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                //listUser是准备转换的对象
+                json = "{data:" + JsonConvert.SerializeObject(table, Formatting.Indented, timeConverter) + "}";//返回json數據
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
         public HttpResponseBase BonusSearchList()
         {
             List<BonusMasterQuery> stores = new List<BonusMasterQuery>();
@@ -2315,20 +2378,57 @@ namespace Admin.gigade.Controllers
             try
             {
                 BonusMasterQuery query = new BonusMasterQuery();
-
+                UInt32 uint32 = 0;
                 query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
-                try
+                if (UInt32.TryParse(Request.Params["uid"], out uint32))
                 {
-                    int id = Convert.ToInt32(Request.Params["uid"]);
-                    query.user_id = Convert.ToUInt32(id);
+                    query.user_id = uint32;
                 }
-                catch
+                bool status = true;
+                if (bool.TryParse(Request.Params["use"], out status))
                 {
-
+                    query.use = status;
+                }
+                if (bool.TryParse(Request.Params["using"], out status))
+                {
+                    query.useing = status;
+                }
+                if (bool.TryParse(Request.Params["used"], out status))
+                {
+                    query.used = status;
+                }
+                if (bool.TryParse(Request.Params["usings"], out status))
+                {
+                    query.useings = status;
+                }
+                if (bool.TryParse(Request.Params["useds"], out status))
+                {
+                    query.useds = status;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["userNameMail"]))
+                {
+                    query.user_name = Request.Params["userNameMail"];
+                    query.user_email = query.user_name;
+                }
+                DateTime dt;
+                if (DateTime.TryParse(Request.Params["timestart"], out dt))
+                {
+                    query.smaster_start =Convert.ToDateTime(dt.ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (DateTime.TryParse(Request.Params["timeend"], out dt))
+                {
+                    query.smaster_end = Convert.ToDateTime(dt.ToString("yyyy-MM-dd 23:59:59")); ;
                 }
 
-
+                if (UInt32.TryParse(Request.Params["bonus_type"], out uint32))
+                {
+                    query.bonus_type = uint32;
+                }
+                if (UInt32.TryParse(Request.Params["type_id"], out uint32))
+                {
+                    query.type_id = uint32;
+                }
                 _uslmpgr = new UsersListMgr(mySqlConnectionString);
                 int totalCount = 0;
                 stores = _uslmpgr.bQuery(query, out totalCount);
@@ -2344,7 +2444,6 @@ namespace Admin.gigade.Controllers
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 //listUser是准备转换的对象
-
                 json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(stores, Formatting.Indented, timeConverter) + "}";//返回json數據
 
             }

@@ -99,20 +99,14 @@ namespace Admin.gigade.Controllers
                 
                 if (product_id != "")
                 {
-                    list = list.FindAll(m => m.key1 == 1);// || m.key2 == 1 || m.key3 == 1
+                    ///eidt by wwei0216w 2018/9/27 添加對schedule_name的判斷,防止錯誤數據造成 排程選中時的空白選項
+                    list = list.FindAll(m => m.key1 == 1&& m.schedule_name!="");
                     if (list.Count > 0)
                     {
-                        list = list.FindAll(m => m.value1 == vendor_id);//|| m.value2 == vendor_id || m.value3 == vendor_id
+                        list = list.FindAll(m => m.value1 == vendor_id);
                     }
                 }
-                //foreach (ScheduleItemCustom sic in list)
-                //{
-                //    ScheduleItemCustom s = new ScheduleItemCustom();
-                //    s.desc = sic.desc;
-                //    s.schedule_Id = sic.schedule_Id;
-                //    s.schedule_name = sic.schedule_name;
-                //    resultList.Add(s);
-                //}
+
                 resultList.AddRange(list);
                 IsoDateTimeConverter iso = new IsoDateTimeConverter() { DateTimeFormat = "yyyy/MM/dd" };
                 return Content(JsonConvert.SerializeObject(resultList, Formatting.None, iso));

@@ -58,14 +58,17 @@ namespace Working
                 triggerTime = GetTime(duration_start, sourceDate);///獲得觸發時間
 
                 int NumTrigger = IsTriggerByWeek(sourceDate, triggerTime);/*找出所對應執行時間的索引*/
-
+                int EndTime = 0;///所處時間段的結束時間
+                EndTime = NumTrigger > 0 ? Convert.ToInt32(sourceDate[NumTrigger * 2 - 1]) : -1;
                 int ExecuteTime = GetExecuteTime(NumTrigger - 1);///得到執行時間
                 int ExecuteTimeHour = ExecuteTime * 24;///將執行時間換成小時
 
                 //int diffHour = ((int)triggerTime.DayOfWeek-1)*24 - triggerTime.Hour;///將觸發事件換成小時
                 /*每一個區間值記錄了各自第一天的執行時間,第二天的...就要相應的減1.所以要減去時間差*/
-                triggerTime = triggerTime.AddHours(ExecuteTimeHour - GetDiffDay(triggerTime));///計算出 最近出貨時間
-                if (triggerTime > duration_end)
+
+                int _diffDayHour = ExecuteTimeHour + GetDiffDay(triggerTime, EndTime);///計算出要加的時間差
+                triggerTime = triggerTime.AddHours(_diffDayHour);///計算出 最近出貨時間
+                if (triggerTime > duration_end)///如果計算出的時間 大於排程的有效結束時間,則最近出貨時間賦予最小值
                 {
                     triggerTime = DateTime.MinValue;
                 }
@@ -79,15 +82,12 @@ namespace Working
             return triggerTime;///返回最後時間
         }
 
-        private int GetDiffDay(DateTime triggerDt)
+        private int GetDiffDay(DateTime triggerDt,int endTimeHour)
         {
+            if (endTimeHour == -1)
+                return 0;
             int temp = ((int)triggerDt.DayOfWeek - 1) * 24 + triggerDt.Hour;
-            temp = temp - excuteStart;
-            if (temp > 0)
-            {
-                return temp;
-            }
-            return 0;
+            return endTimeHour - temp;
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace Working
                     if (i % 2 == 0)
                     {
                         tempValue++;
-                        if (dtNowHour >= Convert.ToInt32(executeInfo[i]) && dtNowHour < Convert.ToInt32(executeInfo[i + 1]))
+                        if (dtNowHour >= Convert.ToInt32(executeInfo[i]) && dtNowHour <= Convert.ToInt32(executeInfo[i + 1]))
                         {
                             excuteStart = Convert.ToInt32(executeInfo[i]);
                             return tempValue;
