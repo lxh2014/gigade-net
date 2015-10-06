@@ -21,14 +21,26 @@ namespace BLL.gigade.Dao
               {
                   sql.AppendFormat("SELECT * FROM `schedule_master` WHERE schedule_state = '{0}' AND  next_execute_time<='{1}' and next_execute_time > 0 ;", query.schedule_state, Common.CommonFunction.GetPHPTime(DateTime.Now.ToString()));
 
-                  System.Data.DataTable _dt = _access.getDataTable(sql.ToString());
-
                   return _access.getDataTableForObj<ScheduleMasterQuery>(sql.ToString());
               }
               catch (Exception ex)
               {
-
                   throw new Exception("ScheduleServiceDao-->GetExeScheduleMasterList-->" + ex.Message, ex);
+              }
+          }
+          public ScheduleMasterQuery GetExeScheduleMaster(ScheduleMasterQuery query)
+          {
+              StringBuilder sql = new StringBuilder();
+              try
+              {
+                  sql.AppendFormat("SELECT * FROM `schedule_master` WHERE schedule_code = '{0}';", query.schedule_code);
+
+                  return _access.getSinggleObj<ScheduleMasterQuery>(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+
+                  throw new Exception("ScheduleServiceDao-->GetExeScheduleMaster-->" + ex.Message, ex);
               }
           }
           public List<ScheduleConfigQuery> GetScheduleConfig(ScheduleConfigQuery query)
@@ -41,7 +53,6 @@ namespace BLL.gigade.Dao
               }
               catch (Exception ex)
               {
-
                   throw new Exception("ScheduleServiceDao-->GetScheduleConfig-->" + ex.Message, ex);
               }
           }
@@ -60,7 +71,7 @@ namespace BLL.gigade.Dao
                   throw new Exception("ScheduleServiceDao-->GetSchedulePeriod-->" + ex.Message, ex);
               }
           }
-          public List<SchedulePeriodQuery> GetSchedulePeriodBySchedule(int schedule_code)
+          public List<SchedulePeriodQuery> GetSchedulePeriodBySchedule(string schedule_code)
           {
               StringBuilder sql = new StringBuilder();
               try
@@ -126,7 +137,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               StringBuilder sql = new StringBuilder();
               try
               {
-                  sql.AppendFormat(@"INSERT INTO `schedule_log` ( `schedule_code`, `schedule_period_id`, `create_user`, `create_time`, `state`, `request_cost`, `ipfrom`) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}');", query.schedule_code, query.schedule_period_id, query.create_user, Common.CommonFunction.GetPHPTime(), query.state, query.request_cost, query.ipfrom);
+                  sql.AppendFormat(@"INSERT INTO `schedule_log` ( `schedule_code`,  `create_user`, `create_time`, `ipfrom`) VALUES ('{0}', '{1}', '{2}', '{3}');", query.schedule_code, query.create_user, Common.CommonFunction.GetPHPTime(), query.ipfrom);
                   return _access.execCommand(sql.ToString());
               }
               catch (Exception ex)

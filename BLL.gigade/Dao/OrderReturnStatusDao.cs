@@ -353,8 +353,8 @@ namespace BLL.gigade.Dao
                         #region hg_batch_accumulate_refund
                         hgBatch.order_id = query.order_id;
                         hgBatch.head = "B";
-                        //hgBatch.card_no = ""; 未知 暫定
-                        //hgBatch.card_checksum = "";未知 暫定
+                        hgBatch.card_no = ""; 
+                        hgBatch.card_checksum = ""; 
                         hgBatch.category_id = "N0699999";
                         hgBatch.wallet = "991991"; 
                         hgBatch.enc_idno = hgLogin.enc_idno;
@@ -1141,5 +1141,18 @@ namespace BLL.gigade.Dao
                 throw new Exception("OrderReturnStatusDao-->GetHGLoginData-->" + sql.ToString() + ex.Message, ex);
             }
         }
+
+        //public DataTable HgDeduct(uint order_id)
+        //{
+        //    StringBuilder sql = new StringBuilder();
+        //    try
+        //    {
+        //        sql.AppendFormat("select ");
+        //    }
+        //    catch (Exception ex)
+        //    {
+ 
+        //    }
+        //}
     }
 }
