@@ -49,7 +49,11 @@ Ext.define('gigade.Users', {
     { name: "redirect_name", type: "string" },
     { name: "redirect_url", type: "string" },
     { name: "paper_invoice", type: "bool" },
-    { name: "ml_code", type: "string" }
+    { name: "ml_code", type: "string" },
+    { name: "bonus_typename", type: "string" }, 
+    { name: "bonus_typenamequan", type: "string" },
+    { name: "bonus_type", type: "string" },
+    { name: "bonus_type1", type: "string" }
     ]
 });
 
@@ -231,8 +235,13 @@ var channelTpl = new Ext.XTemplate(
 );
 
 var channelTpl2 = new Ext.XTemplate(//Gwjserch
-'<a href="/Member/BonusSearch?uid={user_id}">' + "購物金" + '</a>'
+'<a href="/Member/BonusSearch?uid={user_id}&bonus_type={bonus_type}">' + "{bonus_typename}" + '</a>'
 );
+
+var channelTpl3 = new Ext.XTemplate(//Gwjserch
+'<a href="/Member/BonusSearch?uid={user_id}&bonus_type={bonus_type1}">' + "{bonus_typenamequan}" + '</a>'
+);
+
 Ext.onReady(function () {
     var gdUser = Ext.create('Ext.grid.Panel', {
         id: 'gdUser',
@@ -249,7 +258,7 @@ Ext.onReady(function () {
                 return "<span onclick='SecretLogin(" + record.data.user_id + "," + record.data.user_id + ",\"" + info_type + "\")'  >" + value + "</span>";
             }
         },
-        { header: "會員等級", dataIndex: 'ml_code', width: 100, align: 'center' },
+        { header: "會員等級", dataIndex: 'ml_code', width: 55, align: 'center' },
         {
             header: "信箱",
             dataIndex: 'user_email',
@@ -265,8 +274,8 @@ Ext.onReady(function () {
                 return "<span onclick='SecretLogin(" + record.data.user_id + "," + record.data.user_id + ",\"" + info_type + "\")'  >" + value + "</span>";
             }
         },
-        { header: "狀態", dataIndex: 'user_status', width: 60, align: 'center', renderer: showstatus },
-        { header: "註冊日期", dataIndex: 'reg_date', width: 140, align: 'center' },
+        { header: "狀態", dataIndex: 'user_status', width: 50, align: 'center', renderer: showstatus },
+        { header: "註冊日期", dataIndex: 'reg_date', width: 120, align: 'center' },
         { header: "驗證碼", dataIndex: 'user_actkey', width: 80, align: 'center' },
         { header: "r_id", dataIndex: 's_id', width: 25, align: 'center', hidden: true },
         { header: "source_trace", dataIndex: 'source_trace', width: 100, align: 'center', hidden: true },
@@ -274,7 +283,7 @@ Ext.onReady(function () {
         { header: "redirect_name", dataIndex: 'redirect_name', width: 100, align: 'center', hidden: true },
         { header: "是否是的", dataIndex: 'send_sms_ad', width: 100, align: 'center', hidden: true },
         { header: "來源", dataIndex: 'user_company_id', width: 100, align: 'center' },
-        { header: "外網來源", dataIndex: 'user_source', width: 100, align: 'center' }, //有電話會員等
+        { header: "外網來源", dataIndex: 'user_source', width: 70, align: 'center' }, //有電話會員等
         {
             header: "站內連結",
             dataIndex: 'source_trace',
@@ -288,7 +297,8 @@ Ext.onReady(function () {
                 }
             }
         },
-        { header: "購物金", xtype: 'templatecolumn', width: 80, tpl: channelTpl2, align: 'center' },
+        { header: "購物金", xtype: 'templatecolumn', width: 140, tpl: channelTpl2, align: 'center' },
+        { header: "抵用券", xtype: 'templatecolumn', width: 140, tpl: channelTpl3, align: 'center' },
         { header: "帳號開通", dataIndex: 'user_status', width: 100, align: 'center', renderer: show_user_status }, //基本搞定
         //{//經東亞與阿鴻確認,此功能已棄用,數據庫表已刪除
         //    header: "銷售賬號",
