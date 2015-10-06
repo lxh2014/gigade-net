@@ -126,3 +126,7 @@ ACCUMULATED_BONUS = "返還購物金";
 
 //add by zhuoqin0830w 2015/08/26
 TOTAL_PRICE_ISNULL = "總價必須為正數！";
+
+//add by zhuoqin0830w  2015/09/08
+ONLYONE_BONUS_OR_WELFARE = "購物金和抵用券只能擇一使用!";
+BOUNS_OR_WELFARE_IS_NO_PRICE = "不能大於該商品的售價！";

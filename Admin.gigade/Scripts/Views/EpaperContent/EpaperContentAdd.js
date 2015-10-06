@@ -170,6 +170,7 @@ Ext.onReady(function () {
                         },
                         success: function (form, action) {
                             var result = Ext.decode(form.responseText);
+
                             if (result.success) {
                                 Ext.getCmp("epaper_id").setValue(result.data.epaper_id);
                                 Ext.getCmp("user_username").setValue(result.data.user_username);
@@ -185,7 +186,7 @@ Ext.onReady(function () {
                                 Ext.getCmp("epaperUpdateDate").setValue(result.data.epaperUpdateDate);
                                 Ext.getCmp("epaper_ipfrom").setValue(result.data.epaper_ipfrom);
                                 Ext.getCmp("fb_description").setValue(result.data.fb_description);
-                                $('textarea[name=kendoEditor]').data("kendoEditor").value(result.data.epaper_content);
+                                $('textarea[name=kendoEditor]').data("kendoEditor").value(result.data.epaper_content.replace(/>\s*<map/g, '><map'));
                                 if (result.data.epaper_status == 0) {
                                     Ext.getCmp('new').setValue(true);
                                 }
@@ -551,7 +552,7 @@ Ext.onReady(function () {
     });
 
     function initRow(row) {
-        $('textarea[name=kendoEditor]').data("kendoEditor").value(row.data.epaper_content);
+        $('textarea[name=kendoEditor]').data("kendoEditor").value(row.data.epaper_content.replace(/>\s*<map/g, '><map'));
         switch (row.data.epaper_status) {
             case 0:
                 Ext.getCmp('new').setValue(true);

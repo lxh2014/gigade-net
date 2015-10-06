@@ -1156,6 +1156,10 @@ var pcFrm = Ext.create('Ext.form.Panel', {
         //formBind: true,
         //disabled: true,
         handler: function () {
+            var myMask = new Ext.LoadMask(Ext.getBody(), {
+                msg: 'Loading...'
+            });
+            myMask.show();
             var parames = getParams();
             if (parames.error) {
                 Ext.Msg.alert(INFORMATION, parames.msg);
@@ -1171,10 +1175,12 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                                 addPc.hide();
                                 tierStore.load();
                                 Ext.Msg.alert(INFORMATION, SAVE_SUCCESS);
+                                myMask.hide();
                             }
                         },
                         failure: function () {
                             Ext.Msg.alert(INFORMATION, FAILURE);
+                            myMask.hide();
                         }
                     });
                 }
@@ -1395,15 +1401,28 @@ function getParams() {
             var source = irregulartimeStore.data;///獲得不規則排程的store
             //var beginDay = source.items[0].data.week_day_start;///獲得頭數據的開始天數
             //beginDay = (beginDay - 1) * 24 + source.items[0].data.startHour///獲得頭數據的小時數
+            if (source.items.length == 0) {
+                params.error = true;
+                params.msg = "數據不能為空";
+                break;
+            }
             for (var i = 0; i < source.items.length; i++) {     ///循环遍歷panel中的數據
                 var startTemp = source.items[i].data.trigger_days_start;///獲得開始時間
                 var endTemp = source.items[i].data.trigger_days_end;///獲得結束時間
+                //var falgTemp = startTemp + (source.items[i].data.executeDays *24);//觸發開始時間+執行時間 用於比較結果是否大於 觸發結束時間 大於 則確認執行時間處於合理範圍
+
                 if (isNaN(endTemp)) {       ///判斷結束時間格式是否正確
                     params.error = true;
                     params.msg = THEENDTIMEERROR;
                     break;
                 }
 
+                //if (falgTemp < endTemp) {
+                //    params.error = true;
+                //    params.msg = THE + (i + 1) + "觸發時間必須處於合理範圍";
+                //    break;
+                //}
+                  
                 startTemp = (startTemp - 1) * 24 + source.items[i].data.startHour;
                 endTemp = (endTemp - 1) * 24 + source.items[i].data.endHour;
                 if (endTemp <= startTemp) ///判斷每行的開始時間是否大於結束時間

@@ -41,6 +41,13 @@
   <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="4" parameterName="商品售完或不再販售" remark="" kdate="" kuser="" used="" sort=""  topValue="2"/>
   <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="5" parameterName="新品上架" remark="" kdate="" kuser="" used="" sort=""  topValue="3"/>
   <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="6" parameterName="供應商通知" remark="" kdate="" kuser="" used="" sort=""  topValue="3"/>
+  <!--add by mingwei0727w  2015/09/27  上下架相關需求新增 新增備註原因: 新增申請狀態-->
+  <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="7" parameterName="贈品" remark="" kdate="" kuser="" used="" sort=""  topValue="1"/>
+  <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="8" parameterName="新品下架" remark="" kdate="" kuser="" used="" sort=""  topValue="1"/>
+  <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="9" parameterName="出貨方式轉換，新建品號" remark="" kdate="" kuser="" used="" sort=""  topValue="2"/>
+  <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="10" parameterName="即期品上架" remark="" kdate="" kuser="" used="" sort=""  topValue="3"/>
+  <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="11" parameterName="贈品" remark="" kdate="" kuser="" used="" sort=""  topValue="3"/>
+  <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="12" parameterName="出貨方式轉換，新建品號" remark="" kdate="" kuser="" used="" sort=""  topValue="3"/>
 </ParameterSrc>
 
 
