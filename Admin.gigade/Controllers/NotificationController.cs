@@ -13,7 +13,9 @@ using BLL.gigade.Model.Query;
 using BLL.gigade.Model.Custom;
 using System.IO;
 using System.Xml;
-
+using gigadeExcel.Comment;
+using System.Data;
+using BLL.gigade.Common;
 
 namespace Admin.gigade.Controllers
 {
@@ -40,7 +42,7 @@ namespace Admin.gigade.Controllers
         private IUsersImplMgr _userMgr;
         private IVendorBrandImplMgr _vendorBrandMgr;
         private ISiteConfigImplMgr _siteConfigMgr;
-
+        private IProductRemoveReasonImplMgr _proRemoveMgr;
 
         public ActionResult Index()
         {
@@ -811,7 +813,7 @@ namespace Admin.gigade.Controllers
                 //加上商品前後綴
                 _prodnameExtendMgr.AddProductExtentName(caller);
                 //去掉商品前後綴
-                _prodnameExtendMgr.ResetExtendName(caller,product_id);
+                _prodnameExtendMgr.ResetExtendName(caller, product_id);
                 //記錄服務執行的結束時間
                 DateTime dt_End = DateTime.Now;
                 Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
@@ -823,7 +825,7 @@ namespace Admin.gigade.Controllers
                 return 1;
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
@@ -876,7 +878,7 @@ namespace Admin.gigade.Controllers
         /// </summary>
         private void WriterInfo(string functionName, string startRunInfo, string endRunInfo)
         {
-            XmlDocument xmldoc ;
+            XmlDocument xmldoc;
             XmlElement xmlelem;
             try
             {
@@ -920,8 +922,8 @@ namespace Admin.gigade.Controllers
                 }
                 else
                 {
-                    XmlDeclaration xmldecl; 
-                    xmldecl = xmldoc.CreateXmlDeclaration("1.0", "gb2312", null); 
+                    XmlDeclaration xmldecl;
+                    xmldecl = xmldoc.CreateXmlDeclaration("1.0", "gb2312", null);
                     xmldoc.AppendChild(xmldecl);
                     xmlelem = xmldoc.CreateElement("", "InformationRecord", "");
                     xmldoc.AppendChild(xmlelem);//加入另外一个元素
@@ -938,5 +940,199 @@ namespace Admin.gigade.Controllers
             }
         }
 
+
+        #region 設定有關商品自動下架等功能
+        public string SetProductRmoveDown()
+        {
+            int resultone = 0;
+            int resulttwo = 0;
+            int resultthree = 0;
+            try
+            {
+                _proRemoveMgr = new ProductRemoveReasonMgr(connectionString);
+
+                ProductRemoveReason prr = new ProductRemoveReason();
+                ProductRemoveReason prrtwo = new ProductRemoveReason();
+                Product pt = new Product();
+                ProductStatusHistory psh = new ProductStatusHistory();
+
+                #region 往临时表中插入数据/或者更新数据  sql可以统一执行
+                //獲取到上架商品庫存<=0,並且排除掉庫存為0可販賣機暫停售賣的商品
+                DataTable _dt = _proRemoveMgr.GetStockLessThanZero();
+                //获取到临时表中的数据
+                DataTable _dttwo = _proRemoveMgr.GetProductRemoveReasonList();
+                //判断临时表是否存在,如果不存在,则插入数据
+                StringBuilder str = new StringBuilder();
+                if (_dt.Rows.Count > 0)
+                {
+                    for (int i = 0; i < _dt.Rows.Count; i++)
+                    {
+                        DataRow[] dr = _dttwo.Select("item_id=" + _dt.Rows[i]["item_id"]);
+                        if (dr.Length <= 0)//小于等于0  无需处理编辑数据,因为获取的库存都是等于或者小于0的
+                        {
+                            prr.create_name = "system";
+                            prr.create_time = Convert.ToInt32(CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(DateTime.Now)));
+                            prr.item_id = Convert.ToUInt32(_dt.Rows[i]["item_id"]);
+                            prr.product_num = Convert.ToInt32(_dt.Rows[i]["item_stock"]);
+                            str.AppendFormat(_proRemoveMgr.InsertProductRemoveReason(prr));
+                        }
+                    }
+                }
+                //获取出临时表中要删除的数据 
+                DataTable _dtthree = _proRemoveMgr.GetDeleteProductRemoveReasonList();
+                if (str.ToString().Length > 0)
+                {
+                    resultone = _proRemoveMgr.ProductRemoveReasonTransact(str.ToString());
+                }
+                else
+                {
+                    resultone = 1;
+                }
+                #endregion
+
+                #region 缺货商品下架
+                DataTable _dtNew = _proRemoveMgr.GetStockMsg();
+                StringBuilder strsql = new StringBuilder();
+                if (_dtNew.Rows.Count > 0)
+                {
+                    for (int j = 0; j < _dtNew.Rows.Count; j++)
+                    {
+                        int time = Convert.ToInt32(_dtNew.Rows[j]["create_time"]);
+                        DateTime dttime = CommonFunction.GetNetTime(time);
+                        TimeSpan ts = DateTime.Now - dttime;
+                        prrtwo.item_id = Convert.ToUInt32(_dtNew.Rows[j]["item_id"]);
+                        pt.Product_Id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
+                        pt.Product_Status = 7;//7为缺货系统下架
+                        psh.product_id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
+                        psh.user_id = 2;
+                        psh.create_time = DateTime.Now;
+                        psh.type = 9;//缺货系统下架
+                        psh.product_status = 7;
+                        psh.remark = "系统账号插入";
+                        if (ts.Days >= (_dtNew.Rows[j]["outofstock_days_stopselling"] == "" ? 0 : Convert.ToInt32(_dtNew.Rows[j]["outofstock_days_stopselling"])))//表示可以下架,执行下架工作
+                        {
+                            //改变product表中商品的状态
+                            //strsql.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
+                            //网记录表中插入一条数据
+                            strsql.AppendFormat(_proRemoveMgr.InsertIntoProductStatusHistory(psh));
+                            //删除临时表中的数据
+                            strsql.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prrtwo));
+                        }
+                    }
+                }
+                if (strsql.ToString().Length > 0)
+                {
+                    resulttwo = _proRemoveMgr.ProductRemoveReasonTransact(strsql.ToString());
+                }
+                else
+                {
+                    resulttwo = 1;
+                }
+                #endregion
+
+                #region 缺货商品状态改为申请审核
+                DataTable _dtOutofStock = _proRemoveMgr.GetOutofStockMsg();
+                StringBuilder strslqmsg = new StringBuilder();
+                StringBuilder strslqmsgtwo = new StringBuilder();
+                if (_dtOutofStock.Rows.Count > 0)
+                {
+                    for (int z = 0; z < _dtOutofStock.Rows.Count; z++)
+                    {
+                        if (Convert.ToInt32(_dtOutofStock.Rows[z]["item_stock"]) > 0)
+                        {
+                            pt.Product_Id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);
+                            pt.Product_Status = 1;//1表示申请审核
+                            _proRemoveMgr.UpdateProductStatus(pt);
+                            psh.product_id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);
+                            psh.user_id = 2;
+                            psh.create_time = DateTime.Now;
+                            psh.type = 1;//1表示申请审核
+                            psh.product_status = 1;//申请审核
+                            psh.remark = "系统账号插入";
+                            //strslqmsg.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
+                            strslqmsg.AppendFormat(_proRemoveMgr.InsertIntoProductStatusHistory(psh));
+                        }
+                        prr.item_id = Convert.ToUInt32(_dtOutofStock.Rows[z]["item_id"]);//根据item_id删除数据
+                        strslqmsgtwo.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prr));
+                    }
+                }
+
+                if (strslqmsg.ToString().Length > 0)
+                {
+                    resultthree = _proRemoveMgr.ProductRemoveReasonTransact(strslqmsg.ToString());
+                }
+                else
+                {
+                    resultthree = 1;
+                }
+                #endregion
+
+                if (resultone > 0 && resulttwo > 0 && resultthree > 0)
+                {
+                    DataTable _excelMsg = _proRemoveMgr.GetStockMsg();
+                    ExeclProductRmoveDownMsg(_excelMsg);
+                    return "{success:true}";
+                }
+                else
+                {
+                    return "{success:false}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                return "{success:false}";
+            }
+        }
+        #endregion
+
+        public void ExeclProductRmoveDownMsg(DataTable _dtMsg)
+        {
+            try
+            {
+                #region 要汇出的excel结构
+                List<string> NameList = new List<string>();
+                List<DataTable> Elist = new List<DataTable>();
+                List<bool> comName = new List<bool>();
+                DataTable _dtExeclone = new DataTable();
+                _dtExeclone.Columns.Add("细项编号");
+                _dtExeclone.Columns.Add("商品状态");
+                _dtExeclone.Columns.Add("库存为0是否贩售");
+                _dtExeclone.Columns.Add("暂停贩卖商品");
+                _dtExeclone.Columns.Add("缺货日期");
+                _dtExeclone.Columns.Add("缺货停售天数");
+                for (int w = 0; w < _dtMsg.Rows.Count; w++)
+                {
+                    DataRow drMsg = _dtExeclone.NewRow();
+                    drMsg["细项编号"] = _dtMsg.Rows[w]["item_id"];
+                    drMsg["商品状态"] = _dtMsg.Rows[w]["product_status"];
+                    drMsg["库存为0是否贩售"] = _dtMsg.Rows[w]["shortage"] == "0" ? "是" : "否";
+                    drMsg["暂停贩卖商品"] = _dtMsg.Rows[w]["ignore_stock"] == "0" ? "是" : "否";
+                    drMsg["缺货日期"] = _dtMsg.Rows[w]["new_time"];
+                    drMsg["缺货停售天数"] = _dtMsg.Rows[w]["outofstock_days_stopselling"];
+                    _dtExeclone.Rows.Add(drMsg);
+                }
+                NameList.Add("临时表相关信息");
+                Elist.Add(_dtExeclone);
+                comName.Add(true);
+                //string fileName = "D:\\系统下架处理信息" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                //ExcelHelperXhf.ExportDTtoExcel(_dtExeclone, "系统下架处理信息", fileName);
+                string fileName = "系统下架处理信息" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                MemoryStream ms = ExcelHelperXhf.ExportDTNoColumnsBySdy(Elist, NameList, comName);
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                Response.BinaryWrite(ms.ToArray());
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+        }
     }
 }

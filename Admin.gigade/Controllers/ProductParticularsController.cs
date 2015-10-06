@@ -223,23 +223,33 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        #region 有效期限對照表  add by  zhuoqin0830w 2015/05/19
+        #region 有效期限對照表  add by  zhuoqin0830w  創建日期：2015/05/19  修改日期：2015/09/29  修改原因：將使用 xml 資料庫 改為使用 db 數據庫
 
-        #region 獲取 ParticularsSrc.xml 文檔的信息  + QueryParticularsSrc()
+        #region 獲取 ParticularsSrc 的信息  + QueryParticularsSrc()
         /// <summary>
-        /// 獲取 ParticularsSrc.xml 文檔的信息
+        /// 獲取 ParticularsSrc 的信息
         /// </summary>
         /// <returns></returns>
         public ActionResult QueryParticularsSrc()
         {
             JsonResult json = null;
+            //對 db 數據庫 和 xml 資料庫 進行區分  其中 particularsSrcType = 1 表示使用 db 數據庫  particularsSrcType = 2 表示 使用 xml 資料庫
+            int particularsSrcType = 1;  //人為 定義
             try
             {
-                string path = Server.MapPath("../XML/ParticularsSrc.xml");
-                if (System.IO.File.Exists(path))
+                _particularsSrcMgr = new ParticularsSrcMgr(connectionString, particularsSrcType);
+                switch (particularsSrcType)
                 {
-                    _particularsSrcMgr = new ParticularsSrcMgr(path);
-                    json = Json(_particularsSrcMgr.GetParticularsSrc());
+                    case 1: //使用 db 數據庫
+                        json = Json(_particularsSrcMgr.GetParticularsSrc());
+                        break;
+                    case 2://使用 xml 資料庫
+                        string path = Server.MapPath("../XML/ParticularsSrc.xml");
+                        if (System.IO.File.Exists(path))
+                        {
+                            json = Json(_particularsSrcMgr.GetParticularsSrc());
+                        }
+                        break;
                 }
             }
             catch (Exception ex)
@@ -253,25 +263,31 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        #region 刪除 ParticularsSrc.xml 文檔里的 相關信息  + DeleteNode()
+        #region 新增 和 修改 ParticularsSrc 里的 相關信息  + SaveNode(string particularsNode)
         /// <summary>
-        /// 刪除 ParticularsSrc.xml 文檔里的 相關信息
+        /// 新增 和 修改 ParticularsSrc 里的 相關信息
         /// </summary>
         /// <returns></returns>
-        public ActionResult DeleteNode()
+        public ActionResult SaveNode(string particularsNode)
         {
             bool result = false;
+            int particularsSrcType = 1;  //人為 定義
             try
             {
-                string particularsName = Request.Form["particularsName"].Trim(',');
-                if (particularsName.Length != 0)
+                List<ParticularsSrc> particularsSrc = JsonConvert.DeserializeObject<List<ParticularsSrc>>(particularsNode);//將前臺信息序列化
+                _particularsSrcMgr = new ParticularsSrcMgr(connectionString, particularsSrcType);
+                switch (particularsSrcType)
                 {
-                    string path = Server.MapPath("../XML/ParticularsSrc.xml");
-                    if (System.IO.File.Exists(path))
-                    {
-                        _particularsSrcMgr = new ParticularsSrcMgr(path);
-                        result = _particularsSrcMgr.DeleteNode(particularsName);
-                    }
+                    case 1: //使用 db 數據庫
+                        result = _particularsSrcMgr.SaveNode(particularsSrc, connectionString);
+                        break;
+                    case 2://使用 xml 資料庫
+                        string path = Server.MapPath("../XML/ParticularsSrc.xml");
+                        if (System.IO.File.Exists(path))
+                        {
+                            result = _particularsSrcMgr.SaveNode(particularsSrc, connectionString);
+                        }
+                        break;
                 }
             }
             catch (Exception ex)
@@ -285,23 +301,37 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        #region 新增 和 修改 ParticularsSrc.xml 文檔里的 相關信息  + SaveNode(string particularsNode, int condition, string value)
+        #region  刪除 ParticularsSrc 里的 相關信息  + DeleteNode()
         /// <summary>
-        /// 新增 和 修改 ParticularsSrc.xml 文檔里的 相關信息
+        /// 刪除 ParticularsSrc  里的 相關信息
         /// </summary>
         /// <returns></returns>
-        public ActionResult SaveNode(string particularsNode)
+        public ActionResult DeleteNode()
         {
             bool result = false;
+            int particularsSrcType = 1;  //人為 定義
             try
             {
-                List<ParticularsSrc> particularsSrc = JsonConvert.DeserializeObject<List<ParticularsSrc>>(particularsNode);//將前臺信息序列化
-                string path = Server.MapPath("../XML/ParticularsSrc.xml");
-                if (System.IO.File.Exists(path))
+                string particularsName = particularsSrcType == 1 ? Request.Form["Rowid"].Trim(',') : Request.Form["particularsName"].Trim(',');
+                _particularsSrcMgr = new ParticularsSrcMgr(connectionString, particularsSrcType);
+
+                if (particularsName.Length != 0)
                 {
-                    _particularsSrcMgr = new ParticularsSrcMgr(path);
-                    result = _particularsSrcMgr.SaveNode(particularsSrc, connectionString);
+                    switch (particularsSrcType)
+                    {
+                        case 1: //使用 db 數據庫
+                            result = _particularsSrcMgr.DeleteNode(particularsName);
+                            break;
+                        case 2://使用 xml 資料庫
+                            string path = Server.MapPath("../XML/ParticularsSrc.xml");
+                            if (System.IO.File.Exists(path))
+                            {
+                                result = _particularsSrcMgr.DeleteNode(particularsName);
+                            }
+                            break;
+                    }
                 }
+
             }
             catch (Exception ex)
             {
