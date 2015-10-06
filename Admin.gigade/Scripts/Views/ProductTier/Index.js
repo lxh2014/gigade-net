@@ -362,6 +362,7 @@ function onAddClick() {
     irregulartimeStore.removeAll();
     Ext.getCmp('gxGrid').hide();
     Ext.getCmp('mst').setText("");
+    Ext.getCmp('irrms').setText("");
     Ext.getCmp('ms').setText("");
     addPc.show();
     Ext.getCmp('btnSave').show();
@@ -603,6 +604,11 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                         var res = Ext.decode(response.responseText);
                         if (res) {
                             Ext.Msg.alert(INFORMATION, SUCCESS);
+                            relevantStore.load({///add by wwei0216w 添加store加載,防止新增對應關係-->直接刪除 后導致的全部數據都被刪除
+                                params: {
+                                    schedule_id: schedule_id
+                                }
+                            })
                         } else {
                             Ext.Msg.alert(INFORMATION, DELETE_UNUSUAL);//刪除異常
                         }

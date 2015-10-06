@@ -78,7 +78,13 @@ namespace BLL.gigade.Mgr
             try
             {
                 var _scheduleRelation = _scheduleRelationDao.Query(new ScheduleRelation { relation_id = relationId, relation_table = relationType }).FirstOrDefault();
+                //_scheduleRelation = new ScheduleRelation();
                 if (_scheduleRelation == null) return DateTime.MinValue;
+                //_scheduleRelation.schedule.type = 3;
+                //_scheduleRelation.schedule.duration_start = Convert.ToDateTime("2015-09-01");
+                //_scheduleRelation.schedule.duration_end = Convert.ToDateTime("2015-10-30");
+                //_scheduleRelation.schedule.execute_days = "1,1,3";
+                //_scheduleRelation.schedule.trigger_time = "0,49,50,119,120,167";
                 Work work = new Work(_scheduleRelation.schedule);
                 return work.CurrentExecuteDate();
             }

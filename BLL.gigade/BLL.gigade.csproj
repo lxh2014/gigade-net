@@ -235,6 +235,7 @@
     <Compile Include="Dao\Impl\IOrderPaymentHncbImplDao.cs" />
     <Compile Include="Dao\Impl\IParticularsSrcImplDao.cs" />
     <Compile Include="Dao\Impl\IProductOrderTempImplDao.cs" />
+    <Compile Include="Dao\Impl\IProductRemoveReasonImplDao.cs" />
     <Compile Include="Dao\Impl\IScheduleItemImplDao.cs" />
     <Compile Include="Dao\Impl\IScheduleRelationImplDao.cs" />
     <Compile Include="Dao\Impl\IUserForbidImplDao.cs" />
@@ -262,6 +263,7 @@
     <Compile Include="Dao\OrderPaymentHncbDao.cs" />
     <Compile Include="Dao\ParticularsSrcDao.cs" />
     <Compile Include="Dao\ProductOrderTempDao.cs" />
+    <Compile Include="Dao\ProductRemoveReasonDao.cs" />
     <Compile Include="Dao\ProductSearchDao.cs" />
     <Compile Include="Dao\PromoShareConditionDao.cs" />
     <Compile Include="Dao\PromoShareConditionTypeDao.cs" />
@@ -768,6 +770,7 @@
     <Compile Include="Mgr\Impl\IPageErrorLogMgr.cs" />
     <Compile Include="Mgr\Impl\IParticularsSrcImplMgr.cs" />
     <Compile Include="Mgr\Impl\IProductOrderTempImplMgr.cs" />
+    <Compile Include="Mgr\Impl\IProductRemoveReasonImplMgr.cs" />
     <Compile Include="Mgr\Impl\IScheduleItemImplMgr.cs" />
     <Compile Include="Mgr\Impl\IScheduleRelationImplMgr.cs" />
     <Compile Include="Mgr\Impl\IUserForbidImplMgr.cs" />
@@ -795,6 +798,7 @@
     <Compile Include="Mgr\ProductClickMgr.cs" />
     <Compile Include="Mgr\ParticularsSrcMgr.cs" />
     <Compile Include="Mgr\ProductOrderTempMgr.cs" />
+    <Compile Include="Mgr\ProductRemoveReasonMgr.cs" />
     <Compile Include="Mgr\ProductSearchMgr.cs" />
     <Compile Include="Mgr\PromoShareConditionMgr.cs" />
     <Compile Include="Mgr\PromoShareConditionTypeMgr.cs" />
@@ -1295,6 +1299,7 @@
     <Compile Include="Model\EdmListConditionMain.cs" />
     <Compile Include="Model\EdmListConditoinSub.cs" />
     <Compile Include="Model\EdmSend.cs" />
+    <Compile Include="Model\EdmSendLog.cs" />
     <Compile Include="Model\EdmTest.cs" />
     <Compile Include="Model\EdmSubscription.cs" />
     <Compile Include="Model\EdmTemplate.cs" />
@@ -1334,6 +1339,7 @@
     <Compile Include="Model\ItemIpoCreateLog.cs" />
     <Compile Include="Model\IwmsRrecord.cs" />
     <Compile Include="Model\LogisticsDetail.cs" />
+    <Compile Include="Model\MailRequest.cs" />
     <Compile Include="Model\MailSend.cs" />
     <Compile Include="Model\MailSender.cs" />
     <Compile Include="Model\MemberEvent.cs" />
@@ -1346,6 +1352,7 @@
     <Compile Include="Model\ProductCategoryBrand.cs" />
     <Compile Include="Model\ProductClick.cs" />
     <Compile Include="Model\ParticularsSrc.cs" />
+    <Compile Include="Model\ProductRemoveReason.cs" />
     <Compile Include="Model\PromoShareCondition.cs" />
     <Compile Include="Model\PromoShareConditionType.cs" />
     <Compile Include="Model\PromoShareMaster.cs" />

@@ -15,8 +15,8 @@ namespace WindowsService
         private System.ComponentModel.IContainer components = null;
         private bool servicePaused = false;//服務是否停止
         private System.Timers.Timer time;//計時器
-        Thread thread, thread2;
-        int preSuCount = 0, saleCount = 0;
+        Thread thread, thread2, thread3;
+        int preSuCount = 0, saleCount = 0, productCount = 0;
         public Service()
         {
             InitializeComponent();
@@ -36,7 +36,7 @@ namespace WindowsService
                 time = new System.Timers.Timer(1000 * 59);//設置定時重複發送的時間                time.Enabled = true;
                 time.Elapsed += this.Elapsed;
                 time.Start();
-            }         
+            }
         }
 
         /// <summary>
@@ -48,6 +48,7 @@ namespace WindowsService
             TimeSpan saleTime1 = DateTime.MinValue.TimeOfDay;
             TimeSpan saleTime2 = DateTime.MinValue.TimeOfDay;
             TimeSpan preSuTime = TimeSpan.Parse(ConfigurationManager.AppSettings["PreSuTime"]);
+            TimeSpan productTimes = TimeSpan.Parse(ConfigurationManager.AppSettings["StockTime"]);
             ///販售狀態一天需要執行兩次,所以更改關於時間的獲得方式
             ///設置獲取的為一個存儲時間的字符串時間之間用','分割
             string saleTimes = ConfigurationManager.AppSettings["SaleTime"];
@@ -71,8 +72,8 @@ namespace WindowsService
             }
             if ((now - preSuTime).Minutes > 5) preSuCount = 0;
             if ((now - saleTime1).Minutes > 5) saleCount = 0;
-
-            if (preSuCount == 0 && (now - preSuTime).Minutes == 0 && (now - preSuTime).Hours==0)
+            if ((now - productTimes).Minutes > 5) productCount = 0;
+            if (preSuCount == 0 && (now - preSuTime).Minutes == 0 && (now - preSuTime).Hours == 0)
             {
                 thread = new Thread(CallNameExtend);
                 thread.Start();
@@ -85,6 +86,14 @@ namespace WindowsService
                 thread2.Start();
                 saleCount++;
             }
+
+            if (productCount == 0 && (now - productTimes).Minutes == 0 && (now - productTimes).Hours == 0)
+            {
+                thread3 = new Thread(ProductStock);
+                thread3.Start();
+                productCount++;
+            }
+
             //if (saleCount == 0 && (now - saleTime).Minutes == 0 && (now - saleTime).Hours == 0)
             //{
             //    thread2 = new Thread(CallSaleStatues);
@@ -133,9 +142,9 @@ namespace WindowsService
         {
             try
             {
-            string PreSuStrUrl = ConfigurationManager.AppSettings["PreSuStrUrl"];
-            HttpPost(PreSuStrUrl);
-        }
+                string PreSuStrUrl = ConfigurationManager.AppSettings["PreSuStrUrl"];
+                HttpPost(PreSuStrUrl);
+            }
             finally
             {
                 thread.Abort();
@@ -146,15 +155,27 @@ namespace WindowsService
         {
             try
             {
-            string SaleStrUrl = ConfigurationManager.AppSettings["SaleStrUrl"];
-            HttpPost(SaleStrUrl);
-        }
+                string SaleStrUrl = ConfigurationManager.AppSettings["SaleStrUrl"];
+                HttpPost(SaleStrUrl);
+            }
             finally
             {
                 thread2.Abort();
             }
         }
 
+        public void ProductStock()
+        {
+            try
+            {
+                string productTimes = ConfigurationManager.AppSettings["ProductStockUrl"];
+                HttpPost(productTimes);
+            }
+            finally
+            {
+                thread3.Abort();
+            }
+        }
         /// <summary>
         /// 發起的post請求
         /// </summary>

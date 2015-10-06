@@ -97,3 +97,6 @@ NOMESSAGEINFOOFSITE = "不存在修改站臺相關信息或要修改站臺已在
 
 /*guodong1130w添加*/
 SAVEWRONGMESSAGE = "若有保存期限、允出天數、允收天數請勾選有效期控制"
+
+//add by zhuoqin0830w  2015/09/30
+SAME_PARTICULARSVALID = "存在相同的有效天數！請確認后再操作！";

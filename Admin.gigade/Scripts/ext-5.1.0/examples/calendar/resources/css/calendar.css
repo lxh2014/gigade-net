@@ -615,7 +615,7 @@ td.ext-cal-dtitle-today div {
 }
 
 .ext-calendar-picker .x-form-text {
-    padding-left: 23px;
+    padding-left: 0px;
 }
 .ext-calendar-picker .x-combo-list-item {
     padding-left: 24px;

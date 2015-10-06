@@ -126,13 +126,13 @@ var currentRow = 0;
 Ext.define('GIGADE.XMLStore', {
     extend: 'Ext.data.Model',
     idProperty: 'particularsName',
-    fields: [
-          { type: 'string', name: 'particularsName' },
-          { type: 'int', name: 'particularsValid' },
-          { type: 'int', name: 'particularsCollect' },
-          { type: 'int', name: 'particularsCome' },
-          { type: 'int', name: 'oldCollect' },
-          { type: 'int', name: 'oldCome' }]
+    fields: [{ type: 'int', name: 'Rowid' },
+        { type: 'string', name: 'particularsName' },
+        { type: 'int', name: 'particularsValid' },
+        { type: 'int', name: 'particularsCollect' },
+        { type: 'int', name: 'particularsCome' },
+        { type: 'int', name: 'oldCollect' },
+        { type: 'int', name: 'oldCome' }]
 });
 
 //加載Grid數據源  add by zhuoqin0830w 2015/05/19
@@ -433,13 +433,12 @@ Ext.onReady(function () {
 
                         var particulars = [];
                         var upDataStore = particularsStore.getUpdatedRecords();//僅獲得修改后的行 add by wwei0216w 2015/6/24
-                        var sumday=0;
+                        var sumday = 0;
                         for (var i = 0, j = upDataStore.length ; i < j; i++) {
                             var record = upDataStore[i];
                             //2015/09/09 guodong1130w增加有效期控制判斷
                             sumday = record.get("Cde_dt_shp") + record.get("Cde_dt_var") + record.get("Cde_dt_incr");
-                            if (sumday > 0 && record.get("Pwy_dte_ctl_bool") == false)
-                            {
+                            if (sumday > 0 && record.get("Pwy_dte_ctl_bool") == false) {
                                 Ext.Msg.alert(INFORMATION, SAVEWRONGMESSAGE);
                                 myMask.hide();
                                 return;
@@ -468,8 +467,7 @@ Ext.onReady(function () {
                         }
                         particulars = JSON.stringify(particulars);
                         if (particulars == "[]") {
-                            if (particularsStore.count()>0)
-                            {
+                            if (particularsStore.count() > 0) {
                                 Ext.Msg.alert(INFORMATION, SUCCESS)
                             }
                             myMask.hide();
@@ -529,31 +527,44 @@ function showParticulars() {
         plugins: [cellEditingByXML],
         frame: false,
         columns: [
-            { header: THIS_NAME, dataIndex: 'particularsName', width: 70, align: 'center', hidden: true },//名稱
-            { header: SEQUENCE_NUMBER, xtype: 'rownumberer', width: 46, align: 'center' },//序號
-            {
-                text: EFFECTIVE_DAY, dataIndex: 'particularsValid', width: 120, align: 'center', sortable: false, menuDisabled: true,//有效天數
-                editor: {
-                    xtype: 'numberfield',
-                    allowBlank: false,
-                    minValue: 1
+        { header: THIS_NAME, dataIndex: 'particularsName', width: 70, align: 'center', hidden: true },//名稱
+        { header: SEQUENCE_NUMBER, xtype: 'rownumberer', width: 46, align: 'center' },//序號
+        {
+            text: EFFECTIVE_DAY, dataIndex: 'particularsValid', width: 120, align: 'center', sortable: false, menuDisabled: true,//有效天數
+            editor: {
+                xtype: 'numberfield',
+                allowBlank: false,
+                minValue: 1,
+                listeners: {
+                    blur: function (a, b) {
+                        for (var i = 0, j = XMLStore.totalCount; i < j; i++) {
+                            if (a.value == XMLStore.data.items[i].data.particularsValid) {
+                                Ext.Msg.alert(INFORMATION, SAME_PARTICULARSVALID);
+                                a.setValue("0");
+                                return;
+                            }
+                        }
+                    }
                 }
-            }, {
-                text: ALLOW_SELL_DAY, dataIndex: 'particularsCome', colName: 'particularsCome', width: 120, align: 'center', hidden: true, menuDisabled: true, sortable: false,//允出天數
-                editor: {
-                    xtype: 'numberfield',
-                    allowBlank: false,
-                    minValue: 1
-                }
-            },
-           {
-               text: ALLOW_PURCHASE_DAY, dataIndex: 'particularsCollect', colName: 'particularsCollect', width: 120, align: 'center', hidden: true, menuDisabled: true, sortable: false,//允收天數
-               editor: {
-                   xtype: 'numberfield',
-                   allowBlank: false,
-                   minValue: 1
-               }
-           }],
+            }
+        }, {
+            text: ALLOW_SELL_DAY, dataIndex: 'particularsCome', colName: 'particularsCome', width: 120, align: 'center', hidden: true, menuDisabled: true, sortable: false,//允出天數
+            editor: {
+                xtype: 'numberfield',
+                allowBlank: false,
+                minValue: 1
+            }
+        },
+        {
+            text: ALLOW_PURCHASE_DAY, dataIndex: 'particularsCollect', colName: 'particularsCollect', width: 120, align: 'center', hidden: true, menuDisabled: true, sortable: false,//允收天數
+            editor: {
+                xtype: 'numberfield',
+                allowBlank: false,
+                minValue: 1
+            }
+        },
+        //參數表編號
+        { header: THIS_NAME, dataIndex: 'Rowid', width: 70, align: 'center', hidden: true }],
         listeners: {
             //是否可顯示
             viewready: function () {
@@ -620,7 +631,8 @@ function showParticulars() {
                         if (updateStore.length) {
                             for (var i = 0, j = updateStore.length; i < j; i++) {
                                 var data = updateStore[i];
-                                particularsNode += "{particularsName:'" + data.get('particularsName');
+                                particularsNode += "{Rowid:'" + data.get('Rowid');
+                                particularsNode += "',particularsName:'" + data.get('particularsName');
                                 particularsNode += "',particularsValid:'" + data.get('particularsValid');
                                 particularsNode += "',particularsCollect:'" + data.get('particularsCollect');
                                 particularsNode += "',particularsCome:'" + data.get('particularsCome');
@@ -632,7 +644,8 @@ function showParticulars() {
                             for (var i = 0, j = addStore.length; i < j; i++) {
                                 var data = addStore[i];
                                 if (data.get('particularsValid') != 0 && data.get('particularsCollect') != 0 && data.get('particularsCome') != 0) {
-                                    particularsNode += "{particularsName:'" + "null";
+                                    particularsNode += "{Rowid:'" + data.get('Rowid');
+                                    particularsNode += "',particularsName:'" + "null";
                                     particularsNode += "',particularsValid:'" + data.get('particularsValid');
                                     particularsNode += "',particularsCollect:'" + data.get('particularsCollect');
                                     particularsNode += "',particularsCome:'" + data.get('particularsCome') + "'}";
@@ -684,13 +697,26 @@ function showParticulars() {
         id: 'ExpiryWin',
         height: document.documentElement.clientHeight * 600 / 783,
         width: 450,
-        closeAction: 'destroy',
+        //closeAction: 'destroy',
         modal: true,
         layout: 'fit',
         items: [ShowExpiry],
-        closable: true,
+        closable: false,
+        tools: [{
+            type: 'close',
+            qtip: '關閉',
+            handler: function (event, toolEl, panel) {
+                ExpiryWin.destroy();
+                XMLStore.load();
+            }
+        }]
+        //closable: true,
+        //listeners: {
+        //    beforerender: function () { XMLStore.load(); }
+        //}
     }).show();
 }
+
 //添加Grid行 add by zhuoqin0830w  2015/05/19 
 function addTr() {
     XMLStore.add({
