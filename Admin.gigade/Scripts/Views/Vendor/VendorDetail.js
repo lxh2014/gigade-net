@@ -188,13 +188,13 @@ function createForm() {
                                      xtype: 'displayfield',
                                      id: 'cob_ccity_a',
                                      name: 'cob_ccity_a',
-                                     width: 160
+                                     width: 140
                                  },
                                 {
                                     id: 'company_address',
                                     xtype: 'displayfield',
-                                    width: 60,
-                                    name: 'company_address'
+                                    name: 'company_address',
+                                    width: 500
                                 }
                             ], style: { borderBottom: '1px solid #ced9e7' }
                         },
@@ -203,8 +203,7 @@ function createForm() {
                             layout: 'column',
                             margin: '5 8 5 15',
                             defaults: {
-                                width: 300,
-                                labelWidth: 80
+                                hideLabel: true
                             },
                             items: [
                                 {
@@ -217,12 +216,12 @@ function createForm() {
                                      xtype: 'displayfield',
                                      id: 'cob_ccity_ai',
                                      name: 'cob_ccity_ai',
-                                     width: 160
+                                     width: 140
                                 },
                                 {
                                     id: 'invoice_address',
                                     xtype: 'displayfield',
-                                    width: 60,
+                                    width: 500,
                                     name: 'invoice_address'
                                 }
                             ], style: { borderBottom: '1px solid #ced9e7' }
@@ -761,7 +760,7 @@ function createForm() {
                                     Ext.Msg.alert(INFORMATION, "系統出現錯誤!");
                                 }
                             });
-                            Ext.getCmp('company_address').setValue(result.data[0].company_address);
+                            Ext.getCmp('company_address').setValue(result.data[0].company_address.trim());
                             Ext.Ajax.request({
                                 url: "/Vendor/GetZip",
                                 params: {
@@ -784,7 +783,7 @@ function createForm() {
                                     Ext.Msg.alert(INFORMATION, "系統出現錯誤!");
                                 }
                             });
-                            Ext.getCmp('invoice_address').setValue(result.data[0].invoice_address);
+                            Ext.getCmp('invoice_address').setValue(result.data[0].invoice_address.trim());
                             Ext.getCmp('cost_percent').setValue(result.data[0].cost_percent);
                             Ext.getCmp('procurement_days').setValue(result.data[0].procurement_days);
                             Ext.getCmp('self_send_days').setValue(result.data[0].self_send_days);
