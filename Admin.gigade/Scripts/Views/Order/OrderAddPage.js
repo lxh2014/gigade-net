@@ -1,4 +1,10 @@
-﻿var myPanel;
+﻿/*  
+ * 
+ * 文件名称：OrderAddPage.js 
+ * 摘    要：訂單輸入頁面
+ * 
+ */
+var myPanel;
 var currentCol = 0;
 var currentRow = 0;
 //var combChannel;
@@ -2650,7 +2656,7 @@ Ext.onReady(function () {
         layout: 'anchor',
         items: [myPanel, orderGrid],
         renderTo: Ext.getBody(),
-        autoScroll: false,
+        autoScroll: true,//edit by zhuoqin0830w  添加頁面滾動條  ahon 說需要更改  2015/09/24 11:38
         listeners: {
             resize: function () {
                 orderGrid.width = document.documentElement.clientWidth;

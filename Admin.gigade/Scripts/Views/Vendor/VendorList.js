@@ -1,5 +1,4 @@
-﻿
-
+﻿var winDetail;
 Ext.Loader.setConfig({ enabled: true });
 Ext.Loader.setPath('Ext.ux', '/Scripts/Ext4.0/ux');
 Ext.require([
@@ -397,7 +396,12 @@ Ext.onReady(function () {
         columnLines: true,
         frame: true,
         columns: [
-            { header: "供應商編號", dataIndex: 'vendor_id', width: 90, align: 'center' },
+            {
+                header: "供應商編號", dataIndex: 'vendor_id', width: 90, align: 'center',
+                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                    return '<a href="#"  style="color:black" onclick="javascript:showDetail(' + record.data.vendor_id + ')">' + record.data.vendor_id + '</a>'
+                }
+            },
             { header: "供應商編碼", dataIndex: 'vendor_code', width: 90, align: 'center' },
             {
                 header: "供應商名稱", dataIndex: 'vendor_name_full', width: 150, align: 'center',
@@ -961,6 +965,42 @@ function unLock() {
             editGradeWin.show();
 
 
+        }
+    }
+}
+/**********************************顯示供應商詳細信息*****************************************/
+function showDetail(Vendor_id) {
+    var secret_type = '20';
+    var url = "/Vendor/VendorDetails?Vendor_id=" + Vendor_id;
+    var ralated_id = Vendor_id;
+    var info_id = Vendor_id;
+    boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+    if (boolPassword != "-1") {
+        if (boolPassword) {
+            SecretLoginFun(secret_type, ralated_id, true, false, true, url);//先彈出驗證框，關閉時在彈出顯示框
+            //SecretLoginFun(secret_type, ralated_id, false, true, false, url);//直接彈出顯示框
+        }
+        else {
+            // productId = 15382;//product_id
+            if (winDetail == undefined) {
+                winDetail = Ext.create('Ext.window.Window', {
+                    title: '供應商詳細信息',
+                    constrain: true,
+                    modal: true,
+                    resizable: false,
+                    height: document.documentElement.clientHeight * 565 / 683,
+                    width: 800,
+                    autoScroll: false,
+                    layout: 'fit',
+                    html: "<iframe scrolling='no' frameborder=0 width=100% height=100% src='/Vendor/VendorDetails?Vendor_id=" + Vendor_id + "'></iframe>",
+                    listeners: {
+                        close: function (e) {
+                            winDetail = undefined;
+                            tabs = new Array();
+                        }
+                    }
+                }).show();
+            }
         }
     }
 }

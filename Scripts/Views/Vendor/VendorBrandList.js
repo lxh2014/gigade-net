@@ -154,7 +154,7 @@ Ext.onReady(function () {
         columnLines: true,
         frame: true,
         columns: [
-            { header: "流水號", dataIndex: 'Brand_Id', width: 60, align: 'center' },
+            { header: "品牌編號", dataIndex: 'Brand_Id', width: 80, align: 'center' },
             { header: "館別", dataIndex: 'class_name', width: 200, align: 'center' },
             {
                 header: "供應商", dataIndex: 'vendor_name_simple', width: 150, align: 'center',

@@ -230,7 +230,7 @@ Ext.onReady(function () {
                             Ext.getCmp("editve").setValue(result.data.info_epaper_id);
                             Ext.getCmp("edm_dis").setValue(result.data.content_priority);
                             Ext.getCmp("content_title").setValue(result.data.content_title);
-                            $('textarea[name=kendoEditor]').data("kendoEditor").value(result.data.content_body);
+                            $('textarea[name=kendoEditor]').data("kendoEditor").value(result.data.content_body.replace(/>\s*<map/g, '><map'));
                             if (result.data.content_body.indexOf('訂閱/解訂電子報') >= 0) {
                                 number = -1;
                                 Ext.getCmp('check').setValue(true);
@@ -416,7 +416,7 @@ Ext.onReady(function () {
                             epaper_id: Ext.htmlEncode(Ext.getCmp('editve').getValue()),
                             edm_dis: Ext.htmlEncode(Ext.getCmp('edm_dis').getValue()),
                             content_title: Ext.htmlEncode(Ext.getCmp('content_title').getValue()),
-                            kendoEditor: Ext.getCmp('kendoEditor').getValue()
+                            kendoEditor: Ext.getCmp('kendoEditor').getValue().replace(/>\s*<map/g, '><map')
                         },
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
@@ -457,15 +457,6 @@ Ext.onReady(function () {
 
                             }
                             else {
-                                //Ext.MessageBox.confirm('提示信息', '保存失敗,是否關閉？', function (btn) {
-                                //    if (btn == "yes") {
-                                //        window.parent.Ext.getCmp('ContentPanel').activeTab.close();
-                                //    }
-                                //    //else {
-                                //    //    Ext.getCmp('editFrm').getForm().reset();
-                                //    //    $('textarea[name=kendoEditor]').data("kendoEditor").value('');
-                                //    //}
-                                //});
                                 ExtMsg.alert("提示信息", "保存失敗!");
                             }
                         },
@@ -547,7 +538,7 @@ var LoadEpaperContent = function () {
                 var result = Ext.decode(form.responseText);
                 if (result.success) {
                     var epaperContent = result.data.epaper_content;
-                    $('textarea[name=kendoEditor]').data("kendoEditor").value(Ext.util.Format.htmlDecode(epaperContent));
+                    $('textarea[name=kendoEditor]').data("kendoEditor").value(Ext.util.Format.htmlDecode(epaperContent).replace(/>\s*<map/g, '><map'));
                 }
                 else {
                     if (result.msg == '0') {
@@ -591,7 +582,7 @@ var LoadEpaperContent = function () {
 var checked = function () {
     if (Ext.getCmp('check').checked) {
         number += 1;
-        var text = Ext.util.Format.htmlDecode(Ext.getCmp('kendoEditor').getValue());
+        var text = Ext.util.Format.htmlDecode(Ext.getCmp('kendoEditor').getValue()).replace(/>\s*<map/g, '><map');
         text += "<p style=" + "text-align:center;" + "><font size=" + "2" + "><font color=" + "#666666" + "><a href=" +
             "https://www.gigade100.com/member/mb_newsletter.php" + " target=" + "_blank" + ">訂閱/解訂電子報</a></font></font></p><p> &nbsp;</p><p> &nbsp;</p>";
         Ext.getCmp('check').setDisabled(true);
@@ -599,4 +590,4 @@ var checked = function () {
             $('textarea[name=kendoEditor]').data("kendoEditor").value(text);
         }
     }
-}
+} 

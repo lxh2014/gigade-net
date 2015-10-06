@@ -57,20 +57,43 @@ var DDLStore = Ext.create('Ext.data.Store', {
         { "txt": "禁用", "value": "0" }
     ]
 });
+var dateStore = Ext.create('Ext.data.Store', {
+    fields: ['txt', 'value'],
+    data: [
+           { 'txt': '所有日期', 'value': '0' },
+           { 'txt': '開始時間', 'value': '1' },
+           { 'txt': '結束時間', 'value': '2' },
+           { 'txt': '描述開始時間', 'value': '3' },
+           { 'txt': '描述結束時間', 'value': '4' },
+           { 'txt': '修改時間', 'value': '5' },
+    ]
+});
 OrderAccumAmountStore.on('beforeload', function () {
 
     Ext.apply(OrderAccumAmountStore.proxy.extraParams, {
         event_status: Ext.getCmp('ddlSel').getValue(),
         event_search: Ext.getCmp('o_id').getValue(),
         TimeStart: Ext.getCmp('start_time').getValue(),//課程開始時間
-        TimeEnd: Ext.getCmp('end_time').getValue()//課程結束時間
+        TimeEnd: Ext.getCmp('end_time').getValue(),//課程結束時間
+        date: Ext.getCmp('date').getValue()
     })
 
 });
 function Query(x) {
     OrderAccumAmountStore.removeAll();
-    Ext.getCmp("OrderAccumAmount").store.loadPage(1);
+    var TimeStart = Ext.getCmp('start_time').getValue();//課程開始時間
+    var TimeEnd = Ext.getCmp('end_time').getValue();//課程結束時間
+    var date = Ext.getCmp('date').getValue();
 
+    if (date != 0 && (TimeStart == null || TimeEnd == null)) {
+        Ext.Msg.alert(INFORMATION, '請選擇日期範圍');
+    }
+    else if (date == 0 && (TimeStart != null && TimeEnd != null)) {
+        Ext.Msg.alert(INFORMATION, '請選擇日期條件');
+    }
+    else {
+        Ext.getCmp("OrderAccumAmount").store.loadPage(1);
+    }
 }
 
 Ext.onReady(function () {
@@ -106,7 +129,9 @@ Ext.onReady(function () {
                                xtype: 'combobox',
                                editable: false,
                                fieldLabel: "狀態",
-                               labelWidth: 30,
+                               margin: '0 0 0 17',
+                               labelWidth: 55,
+                               width:180,
                                id: 'ddlSel',
                                store: DDLStore,
                                displayField: 'txt',
@@ -122,20 +147,27 @@ Ext.onReady(function () {
                  layout: 'hbox',
                  items: [
                        {
-                           xtype: 'label',
-                           width: 74,
+                           xtype: 'combobox',
+                           id: 'date',
+                           store: dateStore,
+                           fieldLabel: '查詢日期',
+                           labelWidth: 90,
                            margin: '0 5px',
-                           text: '活動時間'
-
+                           editable: false,
+                           width: 200,
+                           displayField: 'txt',
+                           valueField: 'value',
+                           value: '0',
                        },
                        {
-                           xtype: "datetimefield",
+                           xtype: "datefield",
                            margin: '0 5,0,5',
                            editable: false,
+                           width:110,
                            id: 'start_time',
                            name: 'start_time',
-                           format: 'Y-m-d 00:00:00',
-                           value: Tomorrow(1 - new Date().getDate()),
+                           format: 'Y-m-d ',
+                          // value: Tomorrow(1 - new Date().getDate()),
                            listeners: {
                                select: function (a, b, c) {
                                    var start = Ext.getCmp("start_time");
@@ -172,13 +204,14 @@ Ext.onReady(function () {
                        },
                        {
 
-                           xtype: "datetimefield",
+                           xtype: "datefield",
                            margin: '0 5,0,5',
                            editable: false,
                            id: 'end_time',
                            name: 'end_time',
-                           format: 'Y-m-d 23:59:59',
-                           value: Tomorrow(0),
+                           width: 110,
+                           format: 'Y-m-d',
+                          // value: Tomorrow(0),
                            listeners: {
                                select: function (a, b, c) {
                                    var start = Ext.getCmp("start_time");
@@ -218,7 +251,7 @@ Ext.onReady(function () {
                   items: [
                       {
                           xtype: 'button',
-                          margin: '0 8 0 8',
+                          margin: '3 8 0 8',
                           iconCls: 'icon-search',
                           text: "查詢",
                           handler: Query
@@ -226,14 +259,16 @@ Ext.onReady(function () {
                       {
                           xtype: 'button',
                           text: '重置',
+                          margin: '3 8 0 0',
                           id: 'btn_reset',
                           iconCls: 'ui-icon ui-icon-reset',
                           listeners: {
                               click: function () {
-                                  Ext.getCmp('o_id').setValue("");//訂單 / 細項 / 課程編號
-                                  Ext.getCmp('ddlSel').setValue("-1");//狀態
-                                  Ext.getCmp('start_time').setValue(Tomorrow(1 - new Date().getDate()));//開始時間--time_start--delivery_date
-                                  Ext.getCmp('end_time').setValue(Tomorrow(0));//結束時間--time_end--delivery_date
+                                  Ext.getCmp('o_id').reset();//訂單 / 細項 / 課程編號
+                                  Ext.getCmp('ddlSel').reset();//狀態
+                                  Ext.getCmp('start_time').reset();//開始時間--time_start--delivery_date
+                                  Ext.getCmp('end_time').reset();//結束時間--time_end--delivery_date
+                                  Ext.getCmp('date').reset();
                               }
                           }
                       }

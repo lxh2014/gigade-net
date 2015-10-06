@@ -45,7 +45,7 @@
         extend: 'Ext.data.Model',
         fields: [
             { name: 'template_id', type: 'int' },
-            { name: 'content_url', type: 'string' }
+            { name: 'edit_url', type: 'string' }
         ]
     });
     var EdmTemplateStore = Ext.create("Ext.data.Store", {
@@ -201,7 +201,7 @@
                   fieldLabel: '編號',
                   id: 'content_id',
                   name: 'content_id',
-                  //hidden: true
+                  hidden: true
               },
             {
                 xtype: 'combobox',
@@ -215,6 +215,7 @@
                 lastQuery: '',
                 editable: false,
                 allowBlank: false,
+                lastQuery: '',
              
             },
             {
@@ -228,6 +229,7 @@
                 id: 'group_id',
                 name: 'group_id',
                 editable: false,
+                lastQuery: '',
               
             },
             {
@@ -239,7 +241,8 @@
                 id: 'importance',
                 name: 'importance',
                 value:1,
-                editable: false
+                editable: false,
+                lastQuery: '',
             },
             {
                 xtype: 'textfield',
@@ -252,13 +255,37 @@
                 xtype: 'combobox',
                 store: EdmTemplateStore,
                 valueField: 'template_id',
-                displayField:'content_url',
+                displayField: 'edit_url',
                 fieldLabel: '郵件範本',
                 id: 'template_id',
                 name: 'template_id',
                 editable: false,
                 lastQuery:'',
                 editable: false,
+                listeners: {
+                    'select': function () {
+                        Ext.Ajax.request({
+                            url: '/EdmNew/GetEditUrlData',
+                            params: {
+                                edit_url: Ext.getCmp('template_id').getRawValue(),
+                            },
+                            success: function (form, action) {
+
+                                //alert(form.responseText);
+                               //   myMask.hide();
+                               // var result = Ext.decode(form.responseText);
+                                //if (result.success) {
+                                // var text = Ext.util.Format.htmlDecode(Ext.getCmp('kendoEditor').getValue());
+                                var text = "";
+                                $('textarea[name=kendoEditor]').data("kendoEditor").value(Ext.util.Format.htmlDecode(form.responseText));
+                               // }
+                            },
+                            failure: function () {
+                                alert(123);
+                            }
+                        });
+                    }
+                }
             },
             {
                 xtype: 'textarea',

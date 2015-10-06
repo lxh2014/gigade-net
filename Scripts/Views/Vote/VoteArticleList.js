@@ -23,8 +23,8 @@ Ext.define('gigade.VoteArticle', {
         { name: 'product_name', type: 'string' },//
         { name: 'vote_count', type: 'int' },
         { name: 'reception_count', type: 'int' },
-          { name: 'article_sort', type: 'int' },
-              { name: 'prod_link', type: 'string' },
+        { name: 'article_sort', type: 'int' },
+        { name: 'prod_link', type: 'string' },
         { name: 'name', type: 'string' },
         { name: 'article_start_time', type: 'string' },
         { name: 'article_end_time', type: 'string' },
@@ -67,7 +67,18 @@ var DDRStore = Ext.create('Ext.data.Store', {
         }
     }
 });
-
+var dateStore = Ext.create('Ext.data.Store', {
+    fields: ['txt', 'value'],
+    data: [
+           { 'txt': '所有日期', 'value': '0' },
+           { 'txt': '文章創建時間', 'value': '1'},
+           { 'txt': '文章開始時間', 'value': '2' },
+           { 'txt': '文章結束時間', 'value': '3' },
+           { 'txt': '顯示開始時間', 'value': '4' },
+           { 'txt': '顯示結束時間', 'value': '5' }
+    ]
+}
+);
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
@@ -77,29 +88,47 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
 });
 VoteArticle.on('beforeload', function () {
     Ext.apply(VoteArticle.proxy.extraParams, {
-            ddlSel: Ext.getCmp('ddlSel').getValue(),
-            selcontent: Ext.getCmp('selcontent').getValue(),
-            time_start: Ext.Date.format(Ext.getCmp('time_start').getValue(), 'Y-m-d H:i:s'),
-            time_end: Ext.Date.format(Ext.getCmp('time_end').getValue(), 'Y-m-d H:i:s')
+        ddlSel: Ext.getCmp('ddlSel').getValue(),
+        selcontent: Ext.getCmp('selcontent').getValue(),
+        date:Ext.getCmp('date').getValue(),
+        time_start: Ext.getCmp('time_start').getValue(),
+        time_end: Ext.getCmp('time_end').getValue()
     });
 });
 //勾選框
 function Query(x) {
     VoteArticle.removeAll();
-    Ext.getCmp("gdFgroup").store.loadPage(1);
+    var date = Ext.getCmp('date').getValue();
+    var time_start = Ext.getCmp('time_start').getValue();
+    var time_end = Ext.getCmp('time_end').getValue();
+    var ddlSel= Ext.getCmp('ddlSel').getValue();
+    var selcontent = Ext.getCmp('selcontent').getValue();
+    if (ddlSel == null && selcontent == "" && date == null && time_start == null && time_end == null) {
+        Ext.Msg.alert(INFORMATION, '請選擇查詢條件');
+    }
+    else if (date != 0 && (time_start == null || time_end == null)) {
+        Ext.Msg.alert(INFORMATION, '請選擇日期範圍');
+    }
+    else if ((date == 0||date == null) && (time_start != null && time_end != null)) {
+        Ext.Msg.alert(INFORMATION, '請選擇日期條件');
+    }
+    else {
+        Ext.getCmp("gdFgroup").store.loadPage(1);
+    }
 }
 Ext.onReady(function () {
     var frm = Ext.create('Ext.form.Panel', {
         id: 'frm',
         layout: 'anchor',
-        height: 80,
+        flex: 1.5,
+        //height: 100,
         border: 0,
         bodyPadding: 10,
         width: document.documentElement.clientWidth,
         items: [
             {
                 xtype: 'fieldcontainer',
-                combineErrors: true,
+                //combineErrors: true,
                 layout: 'hbox',
                 items: [
                     {
@@ -140,43 +169,43 @@ Ext.onReady(function () {
                                 }
                             }
                         }
+                    }                
+                ]
+            },
+            {
+                xtype: 'fieldcontainer',
+                layout: 'hbox',
+                items: [
+                    {
+                        xtype: 'combobox',
+                        id: 'date',
+                        store: dateStore,
+                        fieldLabel: '查詢日期',
+                        editable: false,
+                        labelWidth: 60,
+                        displayField: 'txt',
+                        valueField: 'value',
+                       // emptyText:'請選擇..'
+                        value:0
                     },
                     {
-                        xtype: 'datetimefield',
-                        fieldLabel: "開始時間",
-                        labelWidth: 60,
-                            width: 210,
+                        xtype: 'datefield',
+                        margin: '0 0 0 10',
+                        width: 110,
                         id: 'time_start',
-                        name: 'time_start',
-                        margin: '0 0 0 20',
-                        format: 'Y-m-d 00:00:00',
+                        format: 'Y-m-d',                       
                         editable: false,
-                        value: Tomorrow(1 - new Date().getDate()),//new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate(), 0, 0, 0),
                         listeners: {
-                            select: function () {
-                                var startTime = Ext.getCmp("time_start");
-                                var endTime = Ext.getCmp("time_end");
-                                var s_date = new Date(startTime.getValue());
-
-                                var data1 = Date.parse(startTime.getValue());
-                                var data2 = Date.parse(endTime.getValue());
-                                var datadiff = data2 - data1;
-                                var time = 31 * 24 * 60 * 60 * 1000;
-                                //if (endTime.getValue() < startTime.getValue()) {
-                                //    Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間!");
-                                //    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                //    //startTime.setValue(new Date(endTime.getValue()));
-
-                                //}
-                                //else
-                                if (datadiff < 0 || datadiff > time) {
-                                    Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                                    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                    //startTime.setValue(new Date(endTime.getValue()));
+                            select: function (a, b, c) {
+                                var start = Ext.getCmp("time_start");
+                                var end = Ext.getCmp("time_end");
+                                if (end.getValue() == null) {
+                                    end.setValue(setNextMonth(start.getValue(), 1));
                                 }
-                                else {
-                                    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                }
+                                else if (end.getValue() < start.getValue()) {
+                                    Ext.Msg.alert(INFORMATION, DATA_TIP);
+                                    end.setValue(setNextMonth(start.getValue(), 1));
+                                }   
                             },
                             specialkey: function (field, e) {
                                 if (e.getKey() == Ext.EventObject.ENTER) {
@@ -184,42 +213,29 @@ Ext.onReady(function () {
                                 }
                             }
                         }
-                       
                     },
                     {
-                        xtype: 'datetimefield',
-                        fieldLabel: "結束時間",
-                        labelWidth: 60,
-                        width: 210,
+                        xtype: 'displayfield',
+                        margin: '0 5 0 5',
+                        value: '~',
+                    },
+                    {
+                        xtype: 'datefield',
                         id: 'time_end',
-                        name: 'time_end',
-                        margin: '0 0 0 20',
-                        format: 'Y-m-d 23:59:59',
+                        format: 'Y-m-d',
+                        width: 110,
                         editable: false,
-                        value: Tomorrow(0),
                         listeners: {
-                            select: function () {
-                                var startTime = Ext.getCmp("time_start");
-                                var endTime = Ext.getCmp("time_end");
-                                var s_date = new Date(startTime.getValue());
-
-
-                                var data1 = Date.parse(startTime.getValue());
-                                var data2 = Date.parse(endTime.getValue());
-                                var datadiff = data2 - data1;
-                                var time = 31 * 24 * 60 * 60 * 1000;
-                                if (endTime.getValue() < startTime.getValue()) {
-                                    Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間!");
-                                    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                    //endTime.setValue(new Date(startTime.getValue()));
-
+                            select: function (a, b, c) {
+                                var start = Ext.getCmp("time_start");
+                                var end = Ext.getCmp("time_end");
+                                if (start.getValue() == null) {
+                                    start.setValue(setNextMonth(end.getValue(), -1));
                                 }
-                                else if (datadiff < 0 || datadiff > time) {
-                                    Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                                    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                    //endTime.setValue(new Date(startTime.getValue()));
-                                }
-                                
+                                else if (end.getValue() < start.getValue()) {
+                                    Ext.Msg.alert(INFORMATION, DATA_TIP);
+                                    start.setValue(setNextMonth(end.getValue(), -1));
+                                }                              
                             },
                             specialkey: function (field, e) {
                                 if (e.getKey() == Ext.EventObject.ENTER) {
@@ -249,10 +265,11 @@ Ext.onReady(function () {
                         iconCls: 'ui-icon ui-icon-reset',
                         listeners: {
                             click: function () {
-                                Ext.getCmp('ddlSel').setValue(0);//查詢條件
-                                Ext.getCmp('selcontent').setValue(null);//查詢條件
-                                Ext.getCmp('time_start').setValue(Tomorrow(1 - new Date().getDate()));
-                                Ext.getCmp('time_end').setValue(Tomorrow(0));
+                                Ext.getCmp('ddlSel').reset();//查詢條件
+                                Ext.getCmp('selcontent').reset();//查詢條件
+                                Ext.getCmp('time_start').reset()
+                                Ext.getCmp('time_end').reset();
+                                Ext.getCmp('date').reset();
 
                             }
                         }
@@ -264,7 +281,7 @@ Ext.onReady(function () {
     var gdFgroup = Ext.create('Ext.grid.Panel', {
         id: 'gdFgroup',
         store: VoteArticle,
-        flex: 9.4,
+        flex: 8.5,
         columnLines: true,
         frame: true,
         viewConfig: {
@@ -298,7 +315,7 @@ Ext.onReady(function () {
                { header: "排序", dataIndex: 'article_sort', width: 100, align: 'center' },
             { header: "前台顯示投票數量", dataIndex: 'vote_count', width: 100, align: 'center' },
             { header: "實際投票數量", dataIndex: 'reception_count', width: 100, align: 'center' },
-            { header: "創建人", dataIndex: 'creat_name', width: 80, align: 'center',hidden:true },
+            { header: "創建人", dataIndex: 'creat_name', width: 80, align: 'center', hidden: true },
             { header: "創建時間", dataIndex: 'create_time', width: 150, align: 'center' },
                { header: "文章開始時間", dataIndex: 'article_start_time', width: 150, align: 'center' },
                   { header: "文章結束時間", dataIndex: 'article_end_time', width: 150, align: 'center' },
@@ -348,7 +365,7 @@ Ext.onReady(function () {
         layout: 'vbox',//fit
         items: [frm, gdFgroup],
         renderTo: Ext.getBody(),
-     //   autoScroll: true,
+        //   autoScroll: true,
         listeners: {
             resize: function () {
                 gdFgroup.width = document.documentElement.clientWidth;
@@ -392,7 +409,7 @@ onEditClick = function (question_id, order_id) {
 function Tomorrow(s) {
     var d;
     d = new Date();                             // 创建 Date 对象。                               // 返回日期。
-        d.setDate(d.getDate() + s);
+    d.setDate(d.getDate() + s);
     return d;
 }
 /*********************啟用/禁用**********************/
@@ -421,5 +438,16 @@ function UpdateActive(id) {
             Ext.Msg.alert(INFORMATION, FAILURE);
         }
     });
+}
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }
 

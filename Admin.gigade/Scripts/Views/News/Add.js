@@ -137,11 +137,11 @@ editFunction = function (row, store) {
                 fieldLabel: '編號',
                 id: 'news_id',
                 name: 'news_id',
-                hidden:true
+                hidden: true
             },
             {
                 xtype: 'displayfield',
-                fieldLabel:'上稿者',
+                fieldLabel: '上稿者',
                 id: 'user_username',
                 name: 'user_username',
                 hidden: true
@@ -151,15 +151,15 @@ editFunction = function (row, store) {
                 fieldLabel: '標題',
                 id: 'news_title',
                 name: 'news_title',
-                allowBlank:false
+                allowBlank: false
             },
             {
                 xtype: 'numberfield',
                 fieldLabel: '排序',
                 id: 'news_sort',
-                name:'news_sort',
+                name: 'news_sort',
                 minValue: 0,
-                value:0,
+                value: 0,
                 allowBlank: false
             },
             {
@@ -171,8 +171,8 @@ editFunction = function (row, store) {
                 editable: false,
                 allowBlank: false,
                 value: Tomorrow(),
-                listeners:{
-                    select:function(){
+                listeners: {
+                    select: function () {
                         var Month = new Date(this.getValue()).getMonth() + 1;
                         Ext.getCmp("s_news_show_end").setValue(new Date(new Date(this.getValue()).setMonth(Month)));
                     }
@@ -184,9 +184,9 @@ editFunction = function (row, store) {
                 fieldLabel: '下線時間',
                 id: 's_news_show_end',
                 name: 's_news_show_end',
-                format:'Y-m-d H:i:s',
+                format: 'Y-m-d H:i:s',
                 allowBlank: false,
-               editable:false,
+                editable: false,
                 value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
                 listeners: {
                     select: function (a, b, c) {
@@ -210,12 +210,12 @@ editFunction = function (row, store) {
             },
             {
                 xtype: 'radiogroup',
-                id:'news_status',
-                name:'news_status',
+                id: 'news_status',
+                name: 'news_status',
                 fieldLabel: '最新消息狀態',
                 defaultType: 'radiofield',
-                height:50,
-                hidden:true,
+                height: 50,
+                hidden: true,
                 defaults: {
                     flex: 1,
                     name: 'news_status',
@@ -227,7 +227,7 @@ editFunction = function (row, store) {
                         boxLabel: '新建立',
                         id: 'new',
                         inputValue: 0,
-                        checked:true
+                        checked: true
                     },
                       {
                           boxLabel: '顯示',
@@ -273,7 +273,7 @@ editFunction = function (row, store) {
                 formBind: true,
                 disabled: true,
                 text: '直接上稿',
-                id:'direct',
+                id: 'direct',
                 handler: function () {
                     if (Ext.htmlEncode(Ext.getCmp('kendoEditor').getValue()) == "") {
                         Ext.Msg.alert("提示信息", '請輸入活動頁面內容');
@@ -298,7 +298,7 @@ editFunction = function (row, store) {
                                     //s_news_updatedate: Ext.htmlEncode(Ext.getCmp('s_news_updatedate').getValue()),
                                     //news_ipfrom: Ext.htmlEncode(Ext.getCmp('news_ipfrom').getValue())
                                 },
-                                success: function (form, action) {                                   
+                                success: function (form, action) {
                                     var result = Ext.decode(action.response.responseText);
                                     if (result.success) {
                                         Ext.Msg.alert(INFORMATION, "保存成功! ");
@@ -380,7 +380,7 @@ editFunction = function (row, store) {
         constrain: true,
         closeAction: 'destroy',
         modal: true,
-      //  resizable: false,
+        //  resizable: false,
         labelWidth: 60,
         bodyStyle: 'padding:5px 5px 5px 5px',
         closable: false,
@@ -402,8 +402,7 @@ editFunction = function (row, store) {
         ],
         listeners: {
             'beforerender': function () {
-                if (row)
-                {
+                if (row) {
                     Ext.getCmp('news_id').hidden = false;
                     Ext.getCmp('user_username').hidden = false;
                     Ext.getCmp('news_status').hidden = false;
@@ -426,15 +425,13 @@ editFunction = function (row, store) {
     });
     editWin.show();
 
-    function initRow(row)
-    {
-        $('textarea[name=kendoEditor]').data("kendoEditor").value(row.data.news_content);
-        switch (row.data.news_status)
-        {
+    function initRow(row) {
+        $('textarea[name=kendoEditor]').data("kendoEditor").value(row.data.news_content.replace(/>\s*<map/g, '><map'));
+        switch (row.data.news_status) {
             case 0:
                 Ext.getCmp('new').setValue(true);
                 break;
-            case 1 :
+            case 1:
                 Ext.getCmp('show').setValue(true);
                 break;
             case 2:
