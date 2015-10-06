@@ -122,7 +122,7 @@ namespace BLL.gigade.Dao
                 }
                 if(query.start_time!=DateTime.MinValue &&query.end_time!=DateTime.MinValue)
                 {
-                    sqlWhr.AppendFormat(" and ip.create_dtim between '{0}'and'{1}'",Common.CommonFunction.DateTimeToString(query.start_time),Common.CommonFunction.DateTimeToString(query.end_time));
+                    sqlWhr.AppendFormat(" and ip.change_dtim between '{0}'and'{1}'", Common.CommonFunction.DateTimeToString(query.start_time), Common.CommonFunction.DateTimeToString(query.end_time));
                 }
                 totalcount = 0;
                 sqlWhr.Append(" GROUP BY ip.row_id order by ip.row_id desc ");

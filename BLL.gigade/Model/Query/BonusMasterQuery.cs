@@ -24,6 +24,13 @@ namespace BLL.gigade.Model.Query
         public int record_id { get; set; }
         public string masterid { get; set; }
         public string usebonus { get; set; }
+
+        public bool use { get; set; }  //尚未開通
+        public bool useing { get; set; }  //未使用
+        public bool used { get; set; }  // 已過期 
+        public bool useings { get; set; }  //尚餘點數
+        public bool useds { get; set; }  // 已用完 
+        public string user_email { get; set; }//會員郵箱
         public BonusMasterQuery()
         {
             user_name = string.Empty;
@@ -39,6 +46,12 @@ namespace BLL.gigade.Model.Query
             master_type = 0;
             writer = string.Empty;
             master_status = 0;
+            use = false;
+            useing = false;
+            used = false;
+            useings = false;
+            useds = false;
+            user_email = string.Empty;
         }
     }
 }

@@ -16,6 +16,7 @@ Ext.define('gigade.Gwj', {
         { name: "master_id", type: "string" },
         { name: "now_time", type: "int" },
         { name: "user_name", type: "string" },
+        { name: "user_email", type: "string" },
         { name: "type_description", type: "string" },
         { name: "master_total", type: "int" },
         { name: "master_balance", type: "int" },
@@ -31,7 +32,6 @@ Ext.define('gigade.Gwj', {
 });
 
 var BonusStore = Ext.create('Ext.data.Store', {
-    //  autoDestroy: true,
     pageSize: pageSize,
     model: 'gigade.Gwj',
     proxy: {
@@ -43,14 +43,45 @@ var BonusStore = Ext.create('Ext.data.Store', {
             totalProperty: 'totalCount'
         }
     }
-    //,
-    //autoLoad: true
 });
+//發送類型Model
+Ext.define('gigade.sendType', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: "type_id", type: "int" },
+        { name: "type_description", type: "string" }
+    ]
+});
+var TypeStore = Ext.create('Ext.data.Store', {
+    fields: ['txt', 'value'],
+    data: [
+        { "txt": "全部", "value": "0" },
+        { "txt": "購物金", "value": "1" },
+        { "txt": "抵用券", "value": "2" }
+    ]
+});
+
+var sendTypeStore = Ext.create('Ext.data.Store', {
+    model: 'gigade.sendType',
+    autoLoad: true,
+    proxy: {
+        type: 'ajax',
+        url: '/Member/BonusTypeList',
+        reader: {
+            type: 'json',
+            root: 'data',
+        }
+    }
+});
+
 //頁面加載時判斷是否有數據
 BonusStore.on('load', function (store, records, options) {
-    var totalcount = records.length;
-    if (totalcount == 0) {
-        Ext.MessageBox.alert(INFORMATION, "～搜尋不到資料～");
+    var uid = document.getElementById("userid").value;
+    if (uid != 0) {
+        var totalcount = records.length;
+        if (totalcount == 0) {
+            Ext.MessageBox.alert(INFORMATION, "～搜尋不到資料～");
+        }
     }
 });
 
@@ -59,7 +90,7 @@ Ext.define('gigade.ManageUser', {
     extend: 'Ext.data.Model',
     fields: [
         { name: "name", type: "string" },
-        { name: "callid", type: "string"}]
+        { name: "callid", type: "string" }]
 });
 
 var ManageUserStore = Ext.create('Ext.data.Store', {
@@ -84,37 +115,434 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
 });
 
 BonusStore.on('beforeload', function () {
+    var start_time = Ext.getCmp('time_start_create').getValue();
+    var end_time = Ext.getCmp('time_end_create').getValue();
+    if (start_time == null && end_time != null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
+    if (start_time != null && end_time == null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
+    //var falg = 0;
+    //if (Ext.getCmp('use').getValue()) { falg++; } 
+    //if (Ext.getCmp('using').getValue()) {falg++; }
+    //if (Ext.getCmp('used').getValue()) {falg++;}
+    //if (Ext.getCmp('usings').getValue()) {  falg++; }
+    //if (Ext.getCmp('useds').getValue()) { falg++; }
+    //if (start_time != null && end_time != null) { falg++; }
+    //if (Ext.getCmp('user_id_list').getValue() != null) { falg++; } 
+    //if (Ext.getCmp('mailName').getValue().trim() != "") { falg++; }
+    //if (Ext.getCmp('ddlSel').getValue() != 0) { falg++; }
+    //if (Ext.getCmp('ddlSelsend').getValue() != 0) { falg++; }
+    //if (falg == 0) {
+    //    Ext.Msg.alert("提示", "請輸入或選擇查詢條件");
+    //    return false;
+    //}
     Ext.apply(BonusStore.proxy.extraParams, {
-        uid: document.getElementById("userid").value
+        uid: Ext.getCmp('user_id_list').getValue(),
+        userNameMail: Ext.getCmp('mailName').getValue(),
+        timestart: Ext.getCmp('time_start_create').getValue(),
+        timeend: Ext.getCmp('time_end_create').getValue(),
+        bonus_type: Ext.getCmp('ddlSel').getValue(),
+        type_id: Ext.getCmp('ddlSelsend').getValue(),
+        use: Ext.getCmp('use').getValue(),
+        using: Ext.getCmp('using').getValue(),
+        used: Ext.getCmp('used').getValue(),
+        usings: Ext.getCmp('usings').getValue(),
+        useds: Ext.getCmp('useds').getValue(),
     });
 });
 
 
 Ext.onReady(function () {
+    var frm = Ext.create('Ext.form.Panel', {
+        id: 'frm',
+        layout: 'anchor',//anchor固定
+        height: 170,
+        border: 0,
+        bodyPadding: 0,
+        width: document.documentElement.clientWidth,
+        items: [
+                {
+                    xtype: 'fieldcontainer',
+                    combineErrors: true,
+                    layout: 'hbox',
+                    items: [
+                        {
+                            xtype: 'label',
+                            forId: 'myFieldId',
+                            text: '狀態:',
+                            margin: '5 0 0 5'
+                        },
+                        {
+                            xtype: 'checkbox',
+                            boxLabel: "尚未開通",
+                            id: 'use',
+                            name: 'use',
+                            margin: '5 0 0 5',
+                            //listeners: {
+                            //    change: function (obj) {
+                            //        if (obj.checked) {
+                            //            Ext.getCmp('using').setDisabled(true),
+                            //            Ext.getCmp('used').setDisabled(true),
+                            //            Ext.getCmp('usings').setDisabled(true),
+                            //            Ext.getCmp('useds').setDisabled(true)
+
+                            //            Ext.getCmp('using').reset(),
+                            //            Ext.getCmp('used').reset(),
+                            //            Ext.getCmp('usings').reset(),
+                            //            Ext.getCmp('useds').reset()
+                            //        }
+                            //        else {
+                            //            Ext.getCmp('using').setDisabled(false),
+                            //            Ext.getCmp('used').setDisabled(false),
+                            //            Ext.getCmp('usings').setDisabled(false),
+                            //            Ext.getCmp('useds').setDisabled(false)
+                            //        }
+                            //    }
+                            //}
+                        },
+                        {
+                            xtype: 'checkbox',
+                            boxLabel: "未使用",
+                            id: 'using',
+                            name: 'using',
+                            margin: '5 0 0 5',
+                            //listeners: {
+                            //    change: function (obj) {
+                            //        if (obj.checked) {
+                            //            //Ext.getCmp('use').setDisabled(true),
+                            //            Ext.getCmp('usings').setDisabled(true),
+                            //            Ext.getCmp('useds').setDisabled(true)
+
+                            //            //Ext.getCmp('use').reset(),
+                            //            Ext.getCmp('usings').reset(),
+                            //            Ext.getCmp('useds').reset()
+                            //        }
+                            //        else {
+                            //            if (!Ext.getCmp('used').checked) {
+                            //                //Ext.getCmp('use').setDisabled(false),
+                            //                Ext.getCmp('usings').setDisabled(false),
+                            //                Ext.getCmp('useds').setDisabled(false)
+                            //            }
+                            //            else {
+                            //                Ext.getCmp('usings').setDisabled(false),
+                            //                Ext.getCmp('useds').setDisabled(false)
+                            //            }
+
+                            //        }
+                            //    }
+                            //}
+                        },
+                        {
+                            xtype: 'checkbox',
+                            boxLabel: "已過期",
+                            id: 'used',
+                            name: 'used'
+                            , margin: '5 0 0 5',
+                            //listeners: {
+                            //    change: function (obj) {
+                            //        if (obj.checked) {
+                            //            Ext.getCmp('use').setDisabled(true),
+                            //            //Ext.getCmp('usings').setDisabled(true),
+                            //            //Ext.getCmp('useds').setDisabled(true)
+
+                            //            Ext.getCmp('use').reset()
+                            //            //Ext.getCmp('usings').reset(),
+                            //            //Ext.getCmp('useds').reset()
+                            //        }
+                            //        else {
+                            //            if (!Ext.getCmp('using').checked) {
+                            //                Ext.getCmp('use').setDisabled(false)
+                            //                //Ext.getCmp('usings').setDisabled(false),
+                            //                //Ext.getCmp('useds').setDisabled(false)
+                            //            }
+                            //            if (Ext.getCmp('useds').checked) {
+                            //                Ext.getCmp('use').setDisabled(true)
+                            //            }
+
+                            //        }
+                            //    }
+                            //}
+                        },
+                         {
+                             xtype: 'checkbox',
+                             boxLabel: "尚餘點數",
+                             id: 'usings',
+                             name: 'using',
+                             margin: '5 0 0 5',
+                             //listeners: {
+                             //    change: function (obj) {
+                             //        if (obj.checked) {
+                             //            Ext.getCmp('useds').setDisabled(true)
+                             //            Ext.getCmp('useds').reset()
+                             //        }
+                             //        else {
+                             //            Ext.getCmp('useds').setDisabled(false);
+                             //        }
+                             //    }
+                             //}
+                         },
+                        {
+                            xtype: 'checkbox',
+                            boxLabel: "已用完",
+                            id: 'useds',
+                            name: 'useds'
+                            , margin: '5 0 0 5',
+                            //listeners: {
+                            //    change: function (obj) {
+                            //        if (obj.checked) {
+                            //            Ext.getCmp('use').setDisabled(true),
+                            //            Ext.getCmp('using').setDisabled(true),
+                            //            Ext.getCmp('usings').setDisabled(true),
+
+                            //            Ext.getCmp('using').reset(),
+                            //            Ext.getCmp('use').reset(),
+                            //            Ext.getCmp('usings').reset()
+                            //        }
+                            //        else {
+                            //            Ext.getCmp('using').setDisabled(false);
+                            //            Ext.getCmp('use').setDisabled(false);
+                            //            Ext.getCmp('usings').setDisabled(false);
+                            //        }
+                            //        if (Ext.getCmp('used').checked) {
+                            //            Ext.getCmp('use').setDisabled(true);
+                            //        }
+                            //    }
+                            //}
+                        }
+                    ]
+                },
+
+                {
+                    xtype: 'fieldcontainer',
+                    combineErrors: true,
+                    layout: 'hbox',
+                    margin: '0 0 0 0',
+                    items: [
+                        {
+                            xtype: 'datefield',
+                            fieldLabel: "發放日期",
+                            labelWidth: 60,
+                            width: 210,
+                            id: 'time_start_create',
+                            name: 'time_start_create',
+                            margin: '5 0 0 5',
+                            format: 'Y-m-d',
+                            editable: false,
+                            listeners: {
+                                select: function () {
+                                    if (Ext.getCmp("time_start_create").getValue() != null) {
+                                        Ext.getCmp("time_end_create").setMinValue(Ext.getCmp("time_start_create").getValue());
+                                    }
+                                }
+                                  , specialkey: function (field, e) {
+                                      if (e.getKey() == Ext.EventObject.ENTER) {
+                                          Query();
+                                      }
+                                  }
+                            }
+                        },
+                        {
+                            xtype: 'label',
+                            forId: 'myFieldId',
+                            text: '~',
+                            margin: '5 0 0 5'
+                        },
+                        {
+                            xtype: 'datefield',
+                            width: 145,
+                            id: 'time_end_create',
+                            name: 'time_end_create',
+                            margin: '5 0 0 6',
+                            format: 'Y-m-d',
+                            editable: false,
+                            listeners: {
+                                select: function () {
+                                    if (Ext.getCmp("time_end_create").getValue() != null) {
+                                        Ext.getCmp("time_start_create").setMaxValue(Ext.getCmp("time_end_create").getValue());
+                                    }
+                                }
+                                , specialkey: function (field, e) {
+                                    if (e.getKey() == Ext.EventObject.ENTER) {
+                                        Query();
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                 {
+                     xtype: 'fieldcontainer',
+                     combineErrors: true,
+                     layout: 'hbox',
+                     items: [
+                     {
+                         xtype: 'numberfield',
+                         fieldLabel: "會員編號",
+                         name: 'user_id_list',
+                         id: 'user_id_list',
+                         minValue: 0,
+                         labelWidth: 60,
+                         maxValue: 2147483647,
+                         hideTrigger: true,
+                         allowDecimals: false,
+                         margin: '5 0 0 5',
+                         listeners: {
+                             specialkey: function (field, e) {
+                                 if (e.getKey() == Ext.EventObject.ENTER) {
+                                     Query();
+                                 }
+                             }
+                         }
+                     },
+                     {
+                         xtype: 'textfield',
+                         allowBlank: true,
+                         fieldLabel: "用戶名Mail/用戶名",
+                         margin: '5 0 0 5',
+                         labelWidth: 110,
+                         width: 270,
+                         id: 'mailName',
+                         name: 'mailName',
+                         listeners: {
+                             specialkey: function (field, e) {
+                                 if (e.getKey() == Ext.EventObject.ENTER) {
+                                     Query();
+                                 }
+                             }
+                         }
+                     }
+                     ]
+                 },
+                {
+                    xtype: 'fieldcontainer',
+                    combineErrors: true,
+                    layout: 'hbox',
+                    margin: '0 0 0 0',
+                    items: [
+                        {
+                            xtype: 'combobox',
+                            fieldLabel: "類型",
+                            margin: '5 0 0 5',
+                            editable: false,//阻止直接在表单项的文本框中输入字符
+                            id: 'ddlSel',
+                            name: 'ddlSel',
+                            store: TypeStore,
+                            displayField: 'txt',
+                            valueField: 'value',
+                            labelWidth: 50,
+                            width: 130,
+                            value: 0,
+                            queryMode: 'local',//請求數據模式，local：读取本地数据 remote：读取远程数据
+                            lastQuery: ''//匹配字符串的值用于过滤store。删除这个属性来强制重新查询。
+                            , listeners: {
+                                specialkey: function (field, e) {
+                                    if (e.getKey() == Ext.EventObject.ENTER) {
+                                        Query();
+                                    }
+                                }
+                            }
+                        },
+                            {
+                                xtype: 'combobox',
+                                fieldLabel: "發放類型",
+                                margin: '5 0 0 5',
+                                editable: true,//阻止直接在表单项的文本框中输入字符
+                                id: 'ddlSelsend',
+                                name: 'ddlSelsend',
+                                store: sendTypeStore,
+                                displayField: 'type_description',
+                                valueField: 'type_id',
+                                typeAhead: true,
+                                forceSelection: true,//时，所选择的值限制在一个列表中的值，false时，允许用户设置任意的文本字段。
+                                labelWidth: 60,
+                                width: 355,
+                                value: 0,
+                                queryMode: 'local',//請求數據模式，local：读取本地数据 remote：读取远程数据   ,
+                                listeners: {
+                                    specialkey: function (field, e) {
+                                        if (e.getKey() == Ext.EventObject.ENTER) {
+                                            Query();
+                                        }
+                                    }
+                                }
+                            }
+                    ]
+                },
+
+                {
+                    xtype: 'fieldcontainer',
+                    combineErrors: true,//如果设置为 true, 则 field 容器自动将其包含的所有属性域的校验错误组合为单个错误信息, 并显示到 配置的 msgTarget 上. 默认值 false.
+                    layout: 'hbox',
+                    margin: '10 0 0 0',
+                    items:
+                     [
+                        {
+                            xtype: 'button',
+                            margin: '0 10 0 10',
+                            iconCls: 'icon-search',
+                            text: "查詢",
+                            handler: Query
+                        },
+                        {
+                            xtype: 'button',
+                            text: '重置',
+                            id: 'btn_reset',
+                            iconCls: 'ui-icon ui-icon-reset',
+                            listeners:
+                            {
+                                click: function () {
+                                    frm.getForm().reset();
+                                    if (document.getElementById("userid").value != 0) {
+                                        Ext.getCmp('user_id_list').setValue(document.getElementById("userid").value);
+                                        Ext.getCmp('ddlSel').setValue(document.getElementById("bonusType").value);
+                                    }
+                                    var datetime1 = new Date();
+                                    datetime1.setFullYear(2000, 1, 1);
+                                    var datetime2 = new Date();
+                                    datetime2.setFullYear(2100, 1, 1);
+                                    Ext.getCmp("time_end_create").setMinValue(datetime1);
+                                    Ext.getCmp("time_end_create").setMaxValue(datetime2);
+                                    Ext.getCmp("time_start_create").setMinValue(datetime1);
+                                    Ext.getCmp("time_start_create").setMaxValue(datetime2);
+                                }
+                            }
+                        }
+                     ]
+                }
+        ]
+
+    });
+
     var gdGwj = Ext.create('Ext.grid.Panel', {
         id: 'gdGwj',
         store: BonusStore,
         width: document.documentElement.clientWidth,
         columnLines: true,
+        flex: 1.8,
         frame: true,
         columns: [
-            { header: "購物金編號", dataIndex: 'master_id', width: 100, align: 'center' },
-            { header: "會員編號", dataIndex: 'user_id', width: 100, align: 'center' },
-            { header: "用戶名", dataIndex: 'user_name', width: 100, align: 'center', hidden: true },
-            { header: "摘要", dataIndex: 'type_description', width: 100, align: 'center' },
-            { header: "總額", dataIndex: 'master_total', width: 100, align: 'center' },
-            { header: "結餘", dataIndex: 'master_balance', width: 100, align: 'center' },
+            { header: "購物金編號", dataIndex: 'master_id', width: 80, align: 'center' },
+            { header: "會員編號", dataIndex: 'user_id', width: 70, align: 'center' },
+            { header: "用戶名", dataIndex: 'user_name', width: 70, align: 'center', hidden: false },
+            { header: "用戶名Mail", dataIndex: 'user_email', width: 200, align: 'center' },
+            { header: "發放類型", dataIndex: 'type_description', width: 120, align: 'center' },
+            { header: "總額", dataIndex: 'master_total', width: 70, align: 'center' },
+            { header: "結餘", dataIndex: 'master_balance', width: 70, align: 'center' },
             //{ header: "NowTime", dataIndex: 'now_time', width: 120, align: 'center', hidden: true }, //, hidden: true 
-            {header: "開始日", dataIndex: 'smaster_start', width: 120, align: 'center' },
-            { header: "結束日", dataIndex: 'smaster_end', width: 120, align: 'center' },
-            { header: "發放日", dataIndex: 'smaster_createtime', width: 120, align: 'center' },
+            { header: "開始日期", dataIndex: 'smaster_start', width: 120, align: 'center' },
+            { header: "結束日期", dataIndex: 'smaster_end', width: 120, align: 'center' },
+            { header: "發放日期", dataIndex: 'smaster_createtime', width: 120, align: 'center' },
             { header: "狀態 ", dataIndex: 'now_time', width: 100, align: 'center', renderer: showbonus_status },
             { header: "類型", dataIndex: 'bonus_type', width: 100, align: 'center', renderer: showbonus_type },
             { header: "備註 ", dataIndex: 'master_note', width: 100, align: 'center' }
         ],
         tbar: [
-            { xtype: 'button', text: EDIT, id: 'edit', iconCls: 'icon-user-edit', handler: onEditClick },
-            '->',
+            { xtype: 'button', text: EDIT, id: 'edit', iconCls: 'icon-user-edit', handler: onEditClick, hidden: true, disabled: true },
+            //'->',
             {
                 xtype: "button",
                 text: "返回會員查詢列表",
@@ -144,8 +572,8 @@ Ext.onReady(function () {
     });
 
     Ext.create('Ext.container.Viewport', {
-        layout: 'fit',
-        items: [gdGwj],
+        layout: 'vbox',
+        items: [frm, gdGwj],
         renderTo: Ext.getBody(),
         autoScroll: true,
         listeners: {
@@ -156,10 +584,19 @@ Ext.onReady(function () {
         }
     });
 
+    if (document.getElementById("userid").value != 0) {
+        Ext.getCmp('user_id_list').setValue(document.getElementById("userid").value);
+        Ext.getCmp('ddlSel').setValue(document.getElementById("bonusType").value);
+        Ext.getCmp('edit').show();
+    }
+    else {
+        Ext.getCmp('goback').hide();
+    }
+    if (document.getElementById("userid").value != 0) {
+        BonusStore.load({ params: { start: 0, limit: 25 } });
+    }
     ToolAuthority();
-    BonusStore.load({ params: { start: 0, limit: 25} });
 });
-
 function showbonus_type(val) {
     switch (val) {
         case "1":
@@ -174,19 +611,63 @@ function showbonus_type(val) {
     }
 }
 
-function showbonus_status(value, cellmeta, record, rowIndex, columnIndex, store) {
-
-    if (value < record.data.master_start ) {
-        return "尚未開通";
-    } else if (value > record.data.master_end) {
-        return "已過期";
-    } else if (record.data.master_total <= record.data.master_balance) {
-        return "未使用";
-    } else if (record.data.master_balance > 0) {
-        return "尚餘點數";
-    } else {
-        return "已用完";
+function showbonus_status(value, cellmeta, record, rowIndex, columnIndex, store)
+{
+    //if (Ext.getCmp('use').getValue()) {
+    //    return "尚未開通";
+    //} else if (Ext.getCmp('used').getValue()) {
+    //    return "已過期";
+    //} else if (Ext.getCmp('using').getValue()) {
+    //    return "未使用";
+    //} else if (Ext.getCmp('usings').getValue()) {
+    //    return "尚餘點數";
+    //} else if (Ext.getCmp('useds').getValue()) {
+    //    return "已用完";
+    //}
+    //else {
+    if (!Ext.getCmp('use').getValue() && !Ext.getCmp('used').getValue() && !Ext.getCmp('using').getValue() && !Ext.getCmp('usings').getValue() && !Ext.getCmp('useds').getValue()) {
+        if (value > record.data.master_end) {
+            return "已過期";
+        }
+        if (value < record.data.master_start) {
+            return "尚未開通";
+        }
+        if (record.data.master_total <= record.data.master_balance) {
+            return "未使用";
+        }
+        if (record.data.master_balance > 0) {
+            return "尚餘點數";
+        }
+        if (record.data.master_balance == 0) {
+            return "已用完";
+        }
     }
+    else {
+        if (value > record.data.master_end) {
+            if (Ext.getCmp('used').getValue()) {
+                return "已過期";
+            }
+        }
+        if (value < record.data.master_start) {
+            if (Ext.getCmp('use').getValue()) {
+                return "尚未開通";
+            }   
+        }
+        if (record.data.master_total <= record.data.master_balance) {
+            if (Ext.getCmp('using').getValue())
+            {
+                return "未使用";
+            }  
+        }
+        if (record.data.master_balance > 0) {
+            return "尚餘點數";
+        }
+        if (record.data.master_balance == 0) {
+            return "已用完";
+        }
+    }
+
+    //}
     //    switch (val) {
     //        case "1":
     //            return "尚未開通";
@@ -262,5 +743,52 @@ onRemoveClick = function () {
                 });
             }
         });
+    }
+}
+function Query() {
+    var start_time = Ext.getCmp('time_start_create').getValue();
+    var end_time = Ext.getCmp('time_end_create').getValue();
+    if (start_time == null && end_time != null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
+    if (start_time != null && end_time == null) {
+        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        return false;
+    }
+    var falg = 0;
+    if (Ext.getCmp('use').getValue()) { falg++; }
+    if (Ext.getCmp('using').getValue()) { falg++; }
+    if (Ext.getCmp('used').getValue()) { falg++; }
+    if (Ext.getCmp('usings').getValue()) { falg++; }
+    if (Ext.getCmp('useds').getValue()) { falg++; }
+    if (start_time != null && end_time != null) { falg++; }
+    if (Ext.getCmp('user_id_list').getValue() != null) { falg++; }
+    if (Ext.getCmp('mailName').getValue().trim() != "") { falg++; }
+    if (Ext.getCmp('ddlSel').getValue() != 0) { falg++; }
+    if (Ext.getCmp('ddlSelsend').getValue() != 0) { falg++; }
+    if (falg == 0) {
+        Ext.Msg.alert("提示", "請輸入或選擇查詢條件");
+        return false;
+    }
+    var form = Ext.getCmp('frm').getForm();
+    if (form.isValid()) {
+        BonusStore.removeAll();
+        Ext.getCmp("gdGwj").store.loadPage(1,
+             {
+                 params: {
+                     uid: Ext.getCmp('user_id_list').getValue(),
+                     userNameMail: Ext.getCmp('mailName').getValue(),
+                     timestart: Ext.getCmp('time_start_create').getValue(),
+                     timeend: Ext.getCmp('time_end_create').getValue(),
+                     bonus_type: Ext.getCmp('ddlSel').getValue(),
+                     type_id: Ext.getCmp('ddlSelsend').getValue(),
+                     use: Ext.getCmp('use').getValue(),
+                     using: Ext.getCmp('using').getValue(),
+                     used: Ext.getCmp('used').getValue(),
+                     usings: Ext.getCmp('usings').getValue(),
+                     useds: Ext.getCmp('useds').getValue()
+                 }
+             });
     }
 }
