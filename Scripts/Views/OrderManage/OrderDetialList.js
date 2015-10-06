@@ -537,11 +537,11 @@ Ext.onReady(function () {
                 panel.doLayout();
             }
         },
-        { xtype: 'button', text: "取消整筆訂單", id: 'return_All_Order', disabled: true, handler: onReturnALLOrderClick },
-        { xtype: 'button', text: "退貨", id: 'return', disabled: true, handler: onReturnClick },
-        { xtype: 'button', text: "等待付款", id: 'wait', disabled: true, handler: onWaitClick },
-        { xtype: 'button', text: "轉自取", id: 'change', disabled: true, handler: onChangePayment_cash },
-        { xtype: 'button', text: "轉黑貓貨到付款", id: 't_cat', disabled: true, handler: onChangePayment_cat }
+        { xtype: 'button', text: "取消整筆訂單", id: 'return_All_Order', hidden: true, disabled: true, handler: onReturnALLOrderClick },
+        { xtype: 'button', text: "退貨", id: 'return', disabled: true,hidden:true, handler: onReturnClick },
+        { xtype: 'button', text: "等待付款", id: 'wait', disabled: true, hidden:true,handler: onWaitClick },
+        { xtype: 'button', text: "轉自取", id: 'change', disabled: true,hidden:true, handler: onChangePayment_cash },
+        { xtype: 'button', text: "轉黑貓貨到付款", id: 't_cat', disabled: true,hidden:true, handler: onChangePayment_cat }
         ],
         //bbar: Ext.create('Ext.PagingToolbar', {
         //    store: orderListStore,
@@ -1204,25 +1204,56 @@ Ext.onReady(function () {
                                 Ext.getCmp('wait').setDisabled(true);
                             }
                             statusname = result.data.order_status_str;
-                            var is_vendor_deliver = result.data.is_vendor_deliver;
-                            if (result.data.order_status == 0 || result.data.order_status == 2)
-                            {
-                                if (result.data.is_vendor_deliver == false) {
-                                    Ext.getCmp('change').setDisabled(false);
-                                }
-                                if (result.data.order_status == 0)
-                                {
-                                    if (result.data.is_vendor_deliver == false) {
-                                        Ext.getCmp('t_cat').setDisabled(false);
-                                    }
+                            var is_vendor_deliver = result.data.is_vendor_deliver;  
+                            if (result.data.is_manage_user) {
+                                Ext.getCmp('t_cat').show();
+                                Ext.getCmp('change').show();
+                                Ext.getCmp('return').show();
+                                Ext.getCmp('return_All_Order').show();
+                                Ext.getCmp('wait').show();
+                                switch (result.data.order_status) {
+                                    case 0:
+                                        if (result.data.is_vendor_deliver == false) {
+                                            Ext.getCmp('change').setDisabled(false);
+                                            Ext.getCmp('t_cat').setDisabled(false);
+                                        }
+                                        Ext.getCmp('return_All_Order').setDisabled(false);
+                                        break;
+                                    case 1:
+                                        Ext.getCmp('wait').setDisabled(false);
+                                        Ext.getCmp('return_All_Order').setDisabled(false);
+                                        break;
+                                    case 2:
+                                        Ext.getCmp('wait').setDisabled(false);
+                                        if (result.data.is_vendor_deliver == false) {
+                                            Ext.getCmp('change').setDisabled(false);
+                                        }
+                                        Ext.getCmp('return_All_Order').setDisabled(false);
+                                        break;
+                                    case 10:
+                                        Ext.getCmp('wait').setDisabled(false);
+                                        Ext.getCmp('return_All_Order').setDisabled(false);
+                                        break;
+                                    case 20:
+                                        Ext.getCmp('return_All_Order').setDisabled(false);
+                                        Ext.getCmp('wait').setDisabled(false);
+                                        break;
+                                    default:
+                                        Ext.getCmp("orderListGrid").down('#return_All_Order').setDisabled(true);
+                                        Ext.getCmp('t_cat').setDisabled(true);
+                                        Ext.getCmp('change').setDisabled(true);
+                                        Ext.getCmp('return').setDisabled(true);
+                                        Ext.getCmp('wait').setDisabled(true);
+                                        break;
                                 }
                             }
-                            else {
-                                Ext.getCmp('change').setDisabled(true);
-                                Ext.getCmp('t_cat').setDisabled(true);
-                            }
-                            if (result.data.cart_id != 16 && (result.data.order_status == 2 || result.data.order_status == 0)) {
+                            if (result.data.cart_id != 16&&result.data.is_manage_user&& (result.data.order_status == 2 || result.data.order_status == 0)) {
                                 Ext.getCmp('change_info').show();
+                            }
+                           // alert(result.data.is_send_product);
+                            if (!result.data.is_send_product)
+                            {   
+                                Ext.getCmp('change_info').setDisabled(true);
                             }
                             //購買人
                         }

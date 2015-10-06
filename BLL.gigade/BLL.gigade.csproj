@@ -527,7 +527,6 @@
     <Compile Include="Dao\Impl\IUsersListImplDao.cs" />
     <Compile Include="Dao\Impl\IVendorBrandImplDao.cs" />
     <Compile Include="Dao\Impl\IVendorBrandSetImplDao.cs" />
-    <Compile Include="Dao\Impl\IVendorCateSetImplDao.cs" />
     <Compile Include="Dao\Impl\IVendorImplDao.cs" />
     <Compile Include="Dao\Impl\IVendorLoginListImplDao.cs" />
     <Compile Include="Dao\Impl\IVGroupCallerImplDao.cs" />
@@ -646,7 +645,6 @@
     <Compile Include="Dao\VendorAccountMonthDao.cs" />
     <Compile Include="Dao\VendorBrandDao.cs" />
     <Compile Include="Dao\VendorBrandSetDao.cs" />
-    <Compile Include="Dao\VendorCateSetDao.cs" />
     <Compile Include="Dao\VendorDao.cs" />
     <Compile Include="Dao\VendorLoginListDao.cs" />
     <Compile Include="Dao\VendorProductTagSetDao.cs" />
@@ -1068,7 +1066,6 @@
     <Compile Include="Mgr\ItemPriceMgr.cs" />
     <Compile Include="Mgr\ItemPriceTempMgr.cs" />
     <Compile Include="Mgr\ItemPriceTsMgr.cs" />
-    <Compile Include="Mgr\Impl\IVendorCateSetImplMgr.cs" />
     <Compile Include="Mgr\LogInLogeMgr.cs" />
     <Compile Include="Mgr\CallerMgr.cs" />
     <Compile Include="Mgr\OrderDetailMgr.cs" />
@@ -1196,7 +1193,6 @@
     <Compile Include="Mgr\VendorAccountMonthMgr.cs" />
     <Compile Include="Mgr\VendorBrandMgr.cs" />
     <Compile Include="Mgr\VendorBrandSetMgr.cs" />
-    <Compile Include="Mgr\VendorCateSetMgr.cs" />
     <Compile Include="Mgr\VendorLoginListMgr.cs" />
     <Compile Include="Mgr\VendorMgr.cs" />
     <Compile Include="Mgr\VendorProductTagSetMgr.cs" />
@@ -1226,7 +1222,9 @@
     <Compile Include="Mgr\Work\RepeatWork\MonthWork\MonthWorkWithDay.cs" />
     <Compile Include="Mgr\Work\RepeatWork\MonthWork\MonthWorkWithWeek.cs" />
     <Compile Include="Mgr\Work\RepeatWork\RepeatWork.cs" />
+    <Compile Include="Mgr\Work\RepeatWork\SpecialWork\SpecialWeekWork.cs" />
     <Compile Include="Mgr\Work\RepeatWork\WeekWork.cs" />
+    <Compile Include="Mgr\Work\SpecialWork.cs" />
     <Compile Include="Mgr\Work\Work.cs" />
     <Compile Include="Mgr\ZipMgr.cs" />
     <Compile Include="Model\Announce.cs" />
@@ -1297,6 +1295,7 @@
     <Compile Include="Model\EdmListConditionMain.cs" />
     <Compile Include="Model\EdmListConditoinSub.cs" />
     <Compile Include="Model\EdmSend.cs" />
+    <Compile Include="Model\EdmSendLog.cs" />
     <Compile Include="Model\EdmTest.cs" />
     <Compile Include="Model\EdmSubscription.cs" />
     <Compile Include="Model\EdmTemplate.cs" />
@@ -1336,6 +1335,7 @@
     <Compile Include="Model\ItemIpoCreateLog.cs" />
     <Compile Include="Model\IwmsRrecord.cs" />
     <Compile Include="Model\LogisticsDetail.cs" />
+    <Compile Include="Model\MailRequest.cs" />
     <Compile Include="Model\MailSend.cs" />
     <Compile Include="Model\MailSender.cs" />
     <Compile Include="Model\MemberEvent.cs" />
@@ -1413,10 +1413,11 @@
     <Compile Include="Model\Query\PromoShareConditionQuery.cs" />
     <Compile Include="Model\Query\PromoShareConditionTypeQuery.cs" />
     <Compile Include="Model\Query\PromoShareMasterQuery.cs" />
+    <Compile Include="Model\Query\ScheduleConfigQuery.cs" />
     <Compile Include="Model\Query\ScheduleQuery.cs" />
     <Compile Include="Model\OrderAccumAmount.cs" />
     <Compile Include="Model\Query\OrderAccumAmountQuery.cs" />
-    <Compile Include="Model\Query\ScheduleServiceQuery.cs" />
+    <Compile Include="Model\Query\ScheduleMasterQuery.cs" />
     <Compile Include="Model\Query\SecretAccountSetQuery.cs" />
     <Compile Include="Model\Query\ShippingVoucherQuery.cs" />
     <Compile Include="Model\Query\SphinxExcludeQuery.cs" />
@@ -1436,6 +1437,8 @@
     <Compile Include="Model\Query\VoteEventQuery.cs" />
     <Compile Include="Model\Query\VoteMessageQuery.cs" />
     <Compile Include="Model\Query\ZipQuery.cs" />
+    <Compile Include="Model\Query\SchedulePeriodQuery.cs" />
+    <Compile Include="Model\Query\ScheduleLogQuery.cs" />
     <Compile Include="Model\RecommendedProductAttribute.cs" />
     <Compile Include="Model\RecommendedRroductAttributeTemp.cs" />
     <Compile Include="Model\Schedule.cs" />
@@ -1584,9 +1587,10 @@
     <Compile Include="Model\Redirect.cs" />
     <Compile Include="Model\RedirectClick.cs" />
     <Compile Include="Model\RedirectGroup.cs" />
+    <Compile Include="Model\ScheduleConfig.cs" />
     <Compile Include="Model\ScheduleItem.cs" />
     <Compile Include="Model\ScheduleParamer.cs" />
-    <Compile Include="Model\ScheduleService.cs" />
+    <Compile Include="Model\ScheduleMaster.cs" />
     <Compile Include="Model\SecretAccountSet.cs" />
     <Compile Include="Model\SecretInfoLog.cs" />
     <Compile Include="Model\ShippingVoucher.cs" />
@@ -1795,7 +1799,6 @@
     <Compile Include="Model\VendorAccountMonth.cs" />
     <Compile Include="Model\VendorBrand.cs" />
     <Compile Include="Model\VendorBrandSet.cs" />
-    <Compile Include="Model\VendorCateSet.cs" />
     <Compile Include="Model\VendorLogin.cs" />
     <Compile Include="Model\VendorProductTagSet.cs" />
     <Compile Include="Model\Vgroup.cs" />
@@ -1817,6 +1820,8 @@
     <Compile Include="Model\Zip.cs" />
     <Compile Include="Model\OrderMasterStatus.cs" />
     <Compile Include="Dao\ParametersrcXmlDao.cs" />
+    <Compile Include="Model\SchedulePeriod.cs" />
+    <Compile Include="Model\ScheduleLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\TrialPicture.cs" />
     <Compile Include="Model\TrialRecord.cs" />

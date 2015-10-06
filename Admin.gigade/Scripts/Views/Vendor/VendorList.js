@@ -1,5 +1,4 @@
-﻿
-
+﻿var winDetail;
 Ext.Loader.setConfig({ enabled: true });
 Ext.Loader.setPath('Ext.ux', '/Scripts/Ext4.0/ux');
 Ext.require([
@@ -397,7 +396,12 @@ Ext.onReady(function () {
         columnLines: true,
         frame: true,
         columns: [
-            { header: "供應商編號", dataIndex: 'vendor_id', width: 90, align: 'center' },
+            {
+                header: "供應商編號", dataIndex: 'vendor_id', width: 90, align: 'center',
+                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                    return '<a href="#"  style="color:black" onclick="javascript:showDetail(' + record.data.vendor_id + ')">' + record.data.vendor_id + '</a>'
+                }
+            },
             { header: "供應商編碼", dataIndex: 'vendor_code', width: 90, align: 'center' },
             {
                 header: "供應商名稱", dataIndex: 'vendor_name_full', width: 150, align: 'center',
@@ -962,5 +966,29 @@ function unLock() {
 
 
         }
+    }
+}
+
+/**********************************顯示供應商詳細信息*****************************************/
+function showDetail(Vendor_id) {
+   // productId = 15382;//product_id
+    if (winDetail == undefined) {
+        winDetail = Ext.create('Ext.window.Window', {
+            title: '供應商詳細信息',
+            constrain: true,
+            modal: true,
+            resizable: false,
+            height: document.documentElement.clientHeight * 565 / 783,
+            width: 800,
+            autoScroll: false,
+            layout: 'fit',
+            html: "<iframe scrolling='no' frameborder=0 width=100% height=100% src='/Vendor/VendorDetails?Vendor_id=" + Vendor_id + "'></iframe>",
+            listeners: {
+                close: function (e) {
+                    winDetail = undefined;
+                    tabs = new Array();
+                }
+            }
+        }).show();
     }
 }

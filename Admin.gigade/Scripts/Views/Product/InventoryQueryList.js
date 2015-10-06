@@ -258,7 +258,6 @@ Ext.onReady(function () {
                                 //if (start.getValue() > end.getValue()  )
                                 //{
                                 //     end.setValue(start.getValue());
-                                    
                                 //}              
                                 //if (-99999 <= start.getValue() && start.getValue() <= 99999 && -99999 <= end.getValue() && end.getValue() <= 99999 && start.getValue()<=end.getValue())
                                 if (-99999 <= start && start <= 99999 && -99999 <= end.getValue() && end.getValue() <= 99999 && start <= end.getValue())

@@ -11,7 +11,6 @@
 * 修改備註 : 
 */
 
-
 var pageSize = 25;
 /*************站臺管理主頁面開始*************/
 //上架版本Model
@@ -28,6 +27,7 @@ Ext.define('gigade.AppVersions', {
         { name: "releasedateQuery", type: "string" }//上架日
     ]
 });
+
 //上架版本數據源
 var AppVersionsStore = Ext.create('Ext.data.Store', {
     autoDestroy: true,
@@ -43,6 +43,7 @@ var AppVersionsStore = Ext.create('Ext.data.Store', {
         }
     }
 });
+
 //數據源加載前事件
 AppVersionsStore.on('beforeload', function () {
     AppVersionsStore.removeAll();
@@ -57,6 +58,7 @@ AppVersionsStore.on('beforeload', function () {
             cmbdriver: cmbdrivervalue
         });
 });
+
 //創建多選
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
@@ -65,6 +67,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
         }
     }
 });
+
 //查詢事件
 function Query(x) {
     AppVersionsStore.removeAll();
@@ -80,16 +83,18 @@ function Query(x) {
         }
     });
 }
+
 //平台數據模型
 var driverModel = Ext.create('Ext.data.Store', {
     fields: [{ type: 'int', name: 'drivervalue' },
-                { type: 'string', name: 'drivername' }
+        { type: 'string', name: 'drivername' }
     ],
     data: [
         { "drivervalue": "0", "drivername": "ios" },
         { "drivervalue": "1", "drivername": "android" }
     ]
 });
+
 //平臺數據下拉列表框
 var SelectDriver = Ext.create('Ext.form.ComboBox', {
     fieldLabel: DRIVERTEXT,
@@ -109,14 +114,16 @@ var SelectDriver = Ext.create('Ext.form.ComboBox', {
     width: 150
 });
 
-
 Ext.onReady(function () {
-    //回撤鍵查詢
-    document.body.onkeydown = function () {
-        if (event.keyCode == 13) {
+    //回車鍵查詢
+    // edit by zhuoqin0830w  2015/09/22  以兼容火狐瀏覽器
+    document.onkeydown = function (event) {
+        e = event ? event : (window.event ? window.event : null);
+        if (e.keyCode == 13) {
             $("#btnQuery").click();
         }
     };
+
     //建立列表
     var GShow = Ext.create('Ext.grid.Panel', {
         id: 'AppVersionsList',
@@ -159,8 +166,7 @@ Ext.onReady(function () {
                      iconCls: 'ui-icon ui-icon-search-2',
                      id: 'btnQuery',
                      handler: Query
-                 },
-                 {
+                 }, {
                      xtype: 'button',
                      text: REPEATBTN,
                      id: 'btn_reset',
@@ -173,24 +179,23 @@ Ext.onReady(function () {
                  }
             ]
         }],
-        tbar: [
-            {
-                xtype: 'button',
-                labelWidth: 50,
-                text: ADDBTN,
-                iconCls: 'ui-icon ui-icon-user-add',
-                xtype: 'button',
-                handler: btnAdd
-            }, {
-                xtype: 'button',
-                labelWidth: 50,
-                id: 'DeleteBtn',
-                text: DELETEBTN,
-                disabled: true,
-                iconCls: 'ui-icon ui-icon-user-delete',
-                xtype: 'button',
-                handler: btnDelete
-            }
+        tbar: [{
+            xtype: 'button',
+            labelWidth: 50,
+            text: ADDBTN,
+            iconCls: 'ui-icon ui-icon-user-add',
+            xtype: 'button',
+            handler: btnAdd
+        }, {
+            xtype: 'button',
+            labelWidth: 50,
+            id: 'DeleteBtn',
+            text: DELETEBTN,
+            disabled: true,
+            iconCls: 'ui-icon ui-icon-user-delete',
+            xtype: 'button',
+            handler: btnDelete
+        }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: AppVersionsStore,
@@ -208,6 +213,7 @@ Ext.onReady(function () {
             }
         }
     });
+
     Ext.create('Ext.container.Viewport', {
         layout: 'fit',
         items: [GShow],
@@ -264,5 +270,3 @@ function btnDelete() {
 function btnAdd() {
     SaveReport(null);
 }
-
-

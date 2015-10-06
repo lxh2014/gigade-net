@@ -12,6 +12,7 @@ namespace BLL.gigade.Model.Query
         public string user_username { set; get; }
         public DateTime start_time { get; set; }
         public DateTime end_time { get; set; }
+        public int freight { get; set; }
         public IpoQuery() 
         {
             vendor_name_simple = string.Empty;
@@ -19,6 +20,7 @@ namespace BLL.gigade.Model.Query
             user_username = string.Empty;
             start_time = DateTime.MinValue;
             end_time = DateTime.MinValue;
+            freight = 0;
         }
     }
 }

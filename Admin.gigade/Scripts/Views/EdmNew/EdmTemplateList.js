@@ -4,7 +4,7 @@
  * CreateTime :2015/9/22
  * 電子報範本
  */
-var pageSize = 23;
+var pageSize = 25;
 
 //列表頁的model
 Ext.define('gridlistET', {
@@ -15,9 +15,17 @@ Ext.define('gridlistET', {
         { name: "edit_url", type: "string" },//EDM編輯者，選擇該範本後，用來給編輯者提供該範本相關資料的網頁
         { name: "content_url", type: "string" },//最終用來產出EDM內容的網頁，會被程式呼叫，以便取得EDM郵件內容。產出的內容會用來寫入到mail_request的body欄位
         { name: "enabled", type: "int" },//是否啟用
+<<<<<<< HEAD
         { name: "template_create_userid", type: "int" },//建立者
         { name: "template_update_userid", type: "int" },//修改者
         { name: "template_createdate",type:"string" },//建立日期
+=======
+        { name: "template_create_userid", type: "int" },//建立者id
+        { name: "template_update_userid", type: "int" },//修改者id
+        { name: "template_create_user", type: "string" },//顯示建立者
+        { name: "template_update_user",type:"string" },//顯示修改者
+        { name: "template_createdate",type:"datetime" },//建立日期
+>>>>>>> c66b7a9f22802bc31c7412ed0b91ca9f64942696
         { name: "template_updatedate",type:"datetime" },//更新時間
     ],
 });
@@ -63,9 +71,9 @@ Ext.onReady(function () {
             { header: "範本名稱", dataIndex: "template_name", width: 200, align: 'center' },
             { header: "內容編輯網址", dataIndex: "edit_url", width: 200, align: 'center' },
              { header: "內容產生網址", dataIndex: "content_url", width: 200, align: 'center' },
-             { header: "建立者", dataIndex: "template_create_userid", width: 80, align: 'center' },
-            { header: "修改者", dataIndex: "template_update_userid", width: 80, align: 'center' },
-             { header: "更新時間", dataIndex: "template_updatedate", width: 140, align: 'center' },
+             { header: "建立者", dataIndex: "template_create_user", width: 80, align: 'center' },
+            { header: "修改者", dataIndex: "template_update_user", width: 80, align: 'center' },
+             { header: "更新時間", dataIndex: "template_updatedate", width: 140, align: 'center'},
              {
                  header: "是否啟用", dataIndex: 'enabled', align: 'center', hidden: false,
                  renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
@@ -168,12 +176,10 @@ function onAddClick() {
 onedit = function () {
     var row = Ext.getCmp("EdmTemplateGrid").getSelectionModel().getSelection();
     if (row.length == 0) {
-        // Ext.Msg.alert(INFORMATION, NO_SELECTION);
-        Ext.Msg.alert("未選中任何行!");
+         Ext.Msg.alert(INFORMATION, NO_SELECTION);
     }
     else if (row.length > 1) {
-        // Ext.Msg.alert(INFORMATION, ONE_SELECTION);
-        Ext.Msg.alert("只能选择一行!");
+         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
         //Ext.Msg.alert(row[0].data.name);
         editFunction(row[0], EdmTemplateStore);
