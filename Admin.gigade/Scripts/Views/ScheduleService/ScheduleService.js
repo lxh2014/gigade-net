@@ -35,7 +35,7 @@ var ScheduleStore = Ext.create('Ext.data.Store', {
     proxy: {
         type: 'ajax',
 
-       // url: '/EdmNew/GetEdmTemplateList',
+        url: '/ScheduleService/GetMasterList',
 
         reader: {
             type: 'json',
@@ -166,18 +166,18 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
         }, ]
     }],
     columns: [                      //顯示master
-        { header: 'schedule_code', dataIndex: 'schedule_code', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-         { header: 'schedule_name', dataIndex: 'schedule_name', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-          { header: 'schedule_api', dataIndex: 'schedule_api', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-      { header: 'schedule_description', dataIndex: 'schedule_description', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-      { header: 'schedule_state', dataIndex: 'schedule_state', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-       { header: 'previous_execute_time', dataIndex: 'previous_execute_time', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-         { header: 'next_execute_time', dataIndex: 'next_execute_time', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-          { header: 'schedule_period_id', dataIndex: 'schedule_period_id', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-           { header: 'create_user', dataIndex: 'create_user', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-            { header: 'create_time', dataIndex: 'create_time', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-             { header: 'change_user', dataIndex: 'change_user', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-            { header: 'change_time', dataIndex: 'change_time', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+        { header: '排程Code', dataIndex: 'schedule_code', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+         { header: '排程名稱', dataIndex: 'schedule_name', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+          { header: 'contriller/action', dataIndex: 'schedule_api', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+      { header: '排程描述', dataIndex: 'schedule_description', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+      { header: '0表示停用，1表示啟用', dataIndex: 'schedule_state', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+       { header: '上次執行時間', dataIndex: 'previous_execute_time', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+         { header: '下次執行時間', dataIndex: 'next_execute_time', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+          { header: 'schedule_period表主鍵', dataIndex: 'schedule_period_id', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+           { header: '創建人', dataIndex: 'create_user', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+            { header: '創建時間', dataIndex: 'create_time', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+             { header: '修改人', dataIndex: 'change_user', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+            { header: '修改時間', dataIndex: 'change_time', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
     ],
 
     bbar: Ext.create('Ext.PagingToolbar', {
@@ -225,7 +225,7 @@ var center = Ext.create('Ext.form.Panel', {
                 {
                     xtype: 'container',
                     autoScroll: true,
-                    defaults: { margin: '0 5 5 10', labelWidth: 60, autoScroll: true, width: 1150 },
+                    defaults: { margin: '0 5 5 10', labelWidth: 60, autoScroll: true, width: 1210 },
                     items: [
                        {
                            flex: 3.0,
@@ -239,14 +239,14 @@ var center = Ext.create('Ext.form.Panel', {
                            store: Schedule_CPL_Store,
                            columns: [
                                { header: '序號', xtype: 'rownumberer', width: 46, align: 'center' },
-                               { header: 'schedule_code', dataIndex: 'schedule_code', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                { header: 'parameterCode', dataIndex: 'parameterCode', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                               { header: 'value', dataIndex: 'value', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                               { header: 'descptrion', dataIndex: 'descptrion', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                               { header: 'create_user', dataIndex: 'create_user', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                              { header: 'create_time', dataIndex: 'create_time', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                               { header: 'change_user', dataIndex: 'change_user', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                               { header: 'change_time', dataIndex: 'change_time', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                               { header: '排程Code', dataIndex: 'schedule_code', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                                { header: '參數碼', dataIndex: 'parameterCode', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                               { header: '參數值', dataIndex: 'value', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                               { header: '參數作用', dataIndex: 'descptrion', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                               { header: '創建人', dataIndex: 'create_user', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                              { header: '創建時間', dataIndex: 'create_time', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                               { header: '修改人', dataIndex: 'change_user', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                               { header: '修改時間', dataIndex: 'change_time', align: 'center', flex: 1, menuDisabled: true, sortable: false },
                            ],
                            tbar: [
                                {
@@ -274,14 +274,16 @@ var center = Ext.create('Ext.form.Panel', {
                             store: Schedule_CPL_Store,
                             columns: [
                                 { header: '序號', xtype: 'rownumberer', width: 46, align: 'center' },
-                                { header: 'schedule_code', dataIndex: 'schedule_code', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                 { header: 'parameterCode', dataIndex: 'parameterCode', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                { header: 'value', dataIndex: 'value', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                { header: 'descptrion', dataIndex: 'descptrion', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                { header: 'create_user', dataIndex: 'create_user', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                               { header: 'create_time', dataIndex: 'create_time', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                { header: 'change_user', dataIndex: 'change_user', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                { header: 'change_time', dataIndex: 'change_time', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                                { header: '排程Code', dataIndex: 'schedule_code', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                                 { header: '執行頻率方式', dataIndex: 'period_type', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                                { header: '執行頻率的倍數', dataIndex: 'period_nums', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                                { header: '啟用時間', dataIndex: 'begin_datetime', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                                { header: '當前已執行次數', dataIndex: 'current_nums', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                               { header: '次數限制', dataIndex: 'limit_nums', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                               { header: '創建人', dataIndex: 'create_user', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                              { header: '創建時間', dataIndex: 'create_time', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                               { header: '修改人', dataIndex: 'change_user', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                               { header: '修改時間', dataIndex: 'change_time', align: 'center', flex: 1, menuDisabled: true, sortable: false },
                             ],
                             tbar: [
                                 {
@@ -471,9 +473,13 @@ function Search() {
 
    // Ext.getCmp('grid_event_id').setValue(Ext.getCmp('grid_event_id').getValue().replace(/\s+/g, ","));
     // if (!Ext.getCmp('grid_event_id').isValid()) return;
+    //ScheduleStore.removeAll();
+    //ScheduleStore.loadPage(1);
+    Ext.getCmp('masterGiftList').store.loadPage(1, {
+        params: {
 
-    ScheduleStore.removeAll();
-    ScheduleStore.loadPage(1);
+        }
+    });
 }
 
 
