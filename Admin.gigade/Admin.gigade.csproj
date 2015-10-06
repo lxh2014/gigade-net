@@ -235,6 +235,7 @@
     <Compile Include="Controllers\PromotionsUserController.cs" />
     <Compile Include="Controllers\RedirectController.cs" />
     <Compile Include="Controllers\ReportManagementController.cs" />
+    <Compile Include="Controllers\ScheduleServiceController.cs" />
     <Compile Include="Controllers\ScheduleParamerController.cs" />
     <Compile Include="Controllers\SecretInfoController.cs" />
     <Compile Include="Controllers\SendProductController.cs" />
@@ -1843,10 +1844,15 @@
     <Content Include="Scripts\Views\DispatchingSystem\DesignRequestList.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsEdit.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsList.js" />
-    <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
-    <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmSend.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmTemplateEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmTemplateList.js" />
+    <Content Include="Scripts\Views\EdmNew\EmailBlockEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EmailBlockList.js" />
     <Content Include="Scripts\Views\EdmS\Edmlist.js" />
     <Content Include="Scripts\Views\Edm\BlackList.js" />
     <Content Include="Scripts\Views\Edm\BlackListEdit.js" />
@@ -1921,6 +1927,7 @@
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsList.js" />
     <Content Include="Scripts\Views\Redirect\RedirectView.js" />
     <Content Include="Scripts\Views\ReportManagement\OderMessageSearch.js" />
+    <Content Include="Scripts\Views\ScheduleService\ScheduleService.js" />
     <Content Include="Scripts\Views\SecretInfo\SecretResetPwd.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverMasterList.js" />
     <Content Include="Scripts\Views\Service\OrderQuestionAdd.js" />
@@ -1944,6 +1951,8 @@
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryEdit.js" />
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryList.js" />
     <Content Include="Scripts\Views\Vendor\VendorChangeLog.js" />
+    <Content Include="Scripts\Views\Vendor\VendorChild.js" />
+    <Content Include="Scripts\Views\Vendor\VendorDetail.js" />
     <Content Include="Scripts\Views\VipUserGroup\edit.js" />
     <Content Include="Scripts\Views\VipUserGroup\GCCInfo.js" />
     <Content Include="Scripts\Views\VipUserGroup\list.js" />
@@ -1981,6 +1990,7 @@
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-rtl-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\resources\Readme.md" />
+    <None Include="Properties\PublishProfiles\gigade.pubxml" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all-vsdoc.js" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all.min.intellisense.js" />
     <Content Include="Scripts\kendo\2014.2.716\kendo.all.min.js" />
@@ -3893,7 +3903,6 @@
     <Content Include="Scripts\kindeditor\asp.net\upload_json.ashx" />
     <Content Include="Content\kendo\2014.2.716\images\kendoui.ttf" />
     <Content Include="Content\kendo\2014.2.716\images\kendoui.woff" />
-    <None Include="Properties\PublishProfiles\config1.pubxml" />
     <Content Include="Scripts\kendo\2014.2.716\jquery.min.map" />
     <Content Include="Scripts\kendo\2014.2.716\kendo.all.min.js.map" />
     <Content Include="Scripts\kendo\2014.2.716\kendo.angular.min.js.map" />
@@ -4372,9 +4381,6 @@
     <Content Include="Template\AppcategoryImport\t_category.xls" />
     <Content Include="Views\ProductPurchase\RIS.cshtml" />
     <Content Include="Views\WareHouse\Check.cshtml" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Views\Super\Index.cshtml" />
     <Content Include="Views\Product\InventoryQuery.cshtml" />
     <Content Include="Template\SiteStatistics\站臺訪問量統計匯入範本.xlsx" />
@@ -4383,6 +4389,13 @@
     <Content Include="Views\WareHouse\IpodList.cshtml" />
     <Content Include="Views\EdmNew\Index.cshtml" />
     <Content Include="Views\EdmNew\EdmContentNew.cshtml" />
+    <Content Include="Views\EdmNew\EdmTemplate.cshtml" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
+    <Content Include="Views\ScheduleService\Index.cshtml" />
+    <Content Include="Views\Vendor\VendorDetails.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

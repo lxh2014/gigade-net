@@ -6107,18 +6107,18 @@ namespace Admin.gigade.Controllers
                 int totalcount = 0;
                 query.IsPage = false;
                 string newExcelName = string.Empty;
-                dtHZ.Columns.Add("商品編號", typeof(String));
-                dtHZ.Columns.Add("商品名稱", typeof(String));
-                dtHZ.Columns.Add("商品細項編號", typeof(String));
-                dtHZ.Columns.Add("商品規格", typeof(String));
                 dtHZ.Columns.Add("供應商編號", typeof(String));
                 dtHZ.Columns.Add("供應商名稱", typeof(String));
                 dtHZ.Columns.Add("品牌編號", typeof(String));
                 dtHZ.Columns.Add("品牌名稱", typeof(String));
+                dtHZ.Columns.Add("商品編號", typeof(String));
+                dtHZ.Columns.Add("商品名稱", typeof(String));
+                dtHZ.Columns.Add("商品細項編號", typeof(String));
+                dtHZ.Columns.Add("商品規格", typeof(String));
                 dtHZ.Columns.Add("商品狀態", typeof(String));
-                dtHZ.Columns.Add("商品販售狀態",typeof(String));
-                dtHZ.Columns.Add("庫存數量", typeof(String));
+                dtHZ.Columns.Add("商品販售狀態", typeof(String));
                 dtHZ.Columns.Add("庫存為0時是否還能販售", typeof(String));
+                dtHZ.Columns.Add("庫存數量", typeof(String));
                 List<ProductItemQuery> list = new List<ProductItemQuery>();
                 productitemMgr = new ProductItemMgr(connectionString);
                 list = productitemMgr.GetInventoryQueryList(query, out totalcount);
@@ -6127,18 +6127,19 @@ namespace Admin.gigade.Controllers
                     for (int i = 0; i < list.Count; i++)
                     {
                         DataRow dr = dtHZ.NewRow();
-                        dr[0] = list[i].Product_Id;
-                        dr[1] = list[i].product_name;
-                        dr[2] = list[i].Item_Id;
-                        dr[3] = list[i].product_spec;
-                        dr[4] = list[i].vendor_id;
-                        dr[5] = list[i].vendor_name_full;
-                        dr[6] = list[i].brand_id;
-                        dr[7] = list[i].brand_name;
+
+                        dr[0] = list[i].vendor_id;
+                        dr[1] = list[i].vendor_name_full;
+                        dr[2] = list[i].brand_id;
+                        dr[3] = list[i].brand_name;
+                        dr[4] = list[i].Product_Id;
+                        dr[5] = list[i].product_name;
+                        dr[6] = list[i].Item_Id;
+                        dr[7] = list[i].product_spec;
                         dr[8] = list[i].product_status_string;
                         dr[9] = list[i].sale_status_string;
-                        dr[10] = list[i].Item_Stock;
-                        dr[11] = list[i].ignore_stock_string;
+                        dr[10] = list[i].ignore_stock_string;
+                        dr[11] = list[i].Item_Stock;
                         dtHZ.Rows.Add(dr);
                     }
                     string fileName = "product_stock_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";

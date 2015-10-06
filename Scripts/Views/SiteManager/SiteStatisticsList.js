@@ -18,9 +18,9 @@ Ext.define('gigade.SiteStatistics', {
         { name: "ss_date", type: "string" },
         { name: "ss_code", type: "string" },
         { name: "ss_create_time", type: "string" },
-        { name: "ss_create_user", type: "string" },
+        { name: "ss_create_username", type: "string" },
         { name: "ss_modify_time", type: "string" },
-        { name: "ss_modify_user", type: "string" }
+        { name: "ss_modify_username", type: "string" }
     ]
 });
 
@@ -128,26 +128,28 @@ Ext.onReady(function ()
                          defaultListConfig: {              //取消loading的Mask
                              loadMask: false,
                              loadingHeight: 70,
-                             minWidth: 70,
+                             minWidth: 30,
                              maxHeight: 300,
                              shadow: "sides"
                          },
                          id: 's_code',
-                         margin: '0 5px',
+                         margin: '0 0',
                          store: scodeStore,
-                         displayField: 'parameterName',
+                         displayField: 'parameterCode',
                          valueField: 'parameterCode',
                          typeAhead: true,
                          forceSelection: false,
                          queryMode: 'local',
                          allowBlank: true,
                          emptyText: '請選擇',
-                         value:''
+                         value: '',
+                         labelWidth:60
                      },
                      {
                          xtype: 'displayfield',
                          fieldLabel: '查詢日期',
-                         margin: '0 0 0 5'
+                         margin: '0 0 0 5',
+                         labelWidth: 60
                      },
                     {
                         xtype: 'datefield',
@@ -169,7 +171,7 @@ Ext.onReady(function ()
                         xtype: 'datefield',
                         id: 'enddate',
                         name: 'enddate',
-                        margin: '0 5px',
+                        margin: '0 5',
                         editable: false,
                         value: new Date(),
                         format: 'Y/m/d',
@@ -181,7 +183,7 @@ Ext.onReady(function ()
                         id: 'ImportExcel',
                         width: 400,
                         labelWidth:70,
-                        anchor: '100%',
+                        anchor: '80%',
                         name: 'ImportExcel',
                         fieldLabel: '匯入Excel',
                         buttonText: '選擇Excel...'
@@ -189,7 +191,7 @@ Ext.onReady(function ()
                     {
                         xtype: 'displayfield',
                         margin:'0 0 0 10',
-                        value: '<a href="/Template/SiteStatistics/廣告成效匯入範本.xlsx">範例下載</a>'
+                        value: '<a href="/Template/SiteStatistics/站臺訪問量統計匯入範本.xlsx">範例下載</a>'
                     },
                     {
                         xtype: 'button',
@@ -245,22 +247,21 @@ Ext.onReady(function ()
             { header: "點閱數", dataIndex: 'ss_click_num', width: 100, align: 'center' },
             { header: "點閱率", dataIndex: 'ss_click_through', width: 80, align: 'center' },
             { header: "費用", dataIndex: 'ss_cost', width: 60, align: 'center' },
-            //{ header: "預算", dataIndex: 'ss_budget', width: 150, align: 'center' },
-            //{ header: "有效點閱數", dataIndex: 'ss_effect_num', width: 80, align: 'center' },
-            //{ header: "平均排名", dataIndex: 'ss_rank', width: 100, align: 'center' },
             { header: "新會員數", dataIndex: 'ss_newuser_number', width: 150, align: 'center' },
             { header: "實際轉換", dataIndex: 'ss_converted_newuser', width: 80, align: 'center' },
             { header: "訂單金額", dataIndex: 'ss_sum_order_amount', width: 100, align: 'center' },
             {
-                header: "時間", dataIndex: 'ss_date', width: 110, align: 'center',
+                header: "日期", dataIndex: 'ss_date', width: 110, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store)
                 {
                     return value.substr(0, 10);
                 }
             },
             { header: "廠家代碼", dataIndex: 'ss_code', width: 150, align: 'center' },
+            { header: "創建人員", dataIndex: 'ss_create_username', width: 60, align: 'center' },
             { header: "創建時間", dataIndex: 'ss_create_time', width: 150, align: 'center' },
-            //{ header: "創建人", dataIndex: 'ss_create_user', width: 100, align: 'center' },
+            { header: "異動人員", dataIndex: 'ss_modify_username', width: 60, align: 'center' },
+            { header: "異動時間", dataIndex: 'ss_modify_time', width: 150, align: 'center' },
             {
                 header: "刪除", dataIndex: 'ss_create_user', width: 100, align: 'center',id:'delete',hidden:true,
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store)
@@ -415,7 +416,6 @@ function Tomorrow(month)
 {
     var d;
     d = new Date();                             // 创建 Date 对象。
-    //d.setDate(d.getDate() + days);
     d.setMonth(d.getMonth() - 1);
     return d;
 }

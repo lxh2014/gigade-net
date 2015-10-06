@@ -172,7 +172,7 @@ onDeleteClick = function () {
                             },
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);
-                                if (result.success) {
+                                if (result.success=='true') {
                                     Ext.Msg.alert("提示信息", "匯入成功");
                                     SiteAnalyticsListStore.load();
                                 }
@@ -205,7 +205,7 @@ onDeleteClick = function () {
             { header: "瀏覽量", dataIndex: 'sa_pageviews', width: 50, align: 'center' },
             { header: "單次造訪頁數", dataIndex: 'sa_pages_session', width: 120, align: 'center' },
             { header: "跳出率", dataIndex: 'sa_bounce_rate', align: '120', align: 'center' },
-            { header: "平均停留時間", dataIndex: 'sa_avg_session_duration', width: 165, align: 'center' },
+            { header: "平均停留時間(s)", dataIndex: 'sa_avg_session_duration', width: 165, align: 'center' },
             { header: "創建人", dataIndex: 's_sa_create_user', align: '80', align: 'center' },
             { header: "創建時間", dataIndex: 's_sa_create_time', width: 165, align: 'center' },
             { header: "異動人員", dataIndex: 'sa_modify_username', width: 120, align: 'center' },

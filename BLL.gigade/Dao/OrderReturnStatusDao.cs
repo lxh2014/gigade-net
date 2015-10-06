@@ -336,6 +336,8 @@ namespace BLL.gigade.Dao
             {
                 arrList.Add(CouldReturn(query));
                 arrList.Add(UpOrderReturnMaster(query));
+                HgBatchAccumulateRefund hgBatch = new HgBatchAccumulateRefund();
+                HGLogin hgLogin = GetHGLoginData(query.order_id);
                 OrderMaster om = _ordermasterdao.GetOrderMasterByOrderId4Change(Convert.ToInt32(query.ors_order_id));
                 DataTable _returnDt = GetReturnId(query);
                 DataTable odli = _orderDetailDao.OrderDetailTable(Convert.ToUInt32(query.return_id),0);
@@ -345,6 +347,28 @@ namespace BLL.gigade.Dao
                 MySqlConnection mySqlConn = new MySqlConnection(connStr);
                 if (odli != null)
                 {
+                    #region hg個字段賦值
+                    if (hgLogin != null)
+                    {
+                        #region hg_batch_accumulate_refund
+                        hgBatch.order_id = query.order_id;
+                        hgBatch.head = "B";
+                        hgBatch.card_no = ""; 
+                        hgBatch.card_checksum = ""; 
+                        hgBatch.category_id = "N0699999";
+                        hgBatch.wallet = "991991"; 
+                        hgBatch.enc_idno = hgLogin.enc_idno;
+                        hgBatch.checksum = hgLogin.chk_sum;
+                        hgBatch.transaction_time = hgLogin.transaction_time;
+                        hgBatch.merchant_pos = hgLogin.merchant_pos;
+                        hgBatch.terminal_pos = hgLogin.terminal_pos;
+                        hgBatch.refund_point = om.Deduct_Happygo;
+                        hgBatch.order_note = om.Note_Order;
+                        hgBatch.batch_status = 0;
+                        hgBatch.billing_checked = 0;
+                        #endregion
+                    }
+                    #endregion
                     int paymoney = 0;
                     int returnmoney = 0;
                     int deductbonus = 0;
@@ -367,7 +391,7 @@ namespace BLL.gigade.Dao
                     }
                     returnmoney += paymoney - (deductbonus + deductcash + deduct_happygo_money);//計算應退還的money
                     #endregion
-                    #region   // 判斷是否有付款
+                    #region 判斷是否有付款
                     if (om.Money_Collect_Date > 0 && om.Order_Amount > 0 && returnmoney > 0)
                     {
                         #region 新增退款單
@@ -398,7 +422,11 @@ namespace BLL.gigade.Dao
                         //扣除給予會員的hg點數
                         if (accumulated_happygo > 0)
                         {
-                            Deduct_User_Happy_Go(accumulated_happygo, om.Order_Id);
+                         
+                            //插入hg_batch_accumulate_refund
+                           // Deduct_User_Happy_Go(accumulated_happygo, om.Order_Id);
+                             arrList.Add(hg_batch_accumulate_refund(hgBatch));
+
                         }
                     }
                     #endregion
@@ -414,7 +442,9 @@ namespace BLL.gigade.Dao
                         //扣除給予會員的hg點數
                         if (accumulated_happygo > 0)
                         {
-                            Deduct_User_Happy_Go(accumulated_happygo, om.Order_Id);
+                            //插入hg_batch_accumulate_refund
+                          //  Deduct_User_Happy_Go(accumulated_happygo, om.Order_Id);
+                            arrList.Add(hg_batch_accumulate_refund(hgBatch));
                         }
                     }
                     #endregion
@@ -424,7 +454,9 @@ namespace BLL.gigade.Dao
                     #region 判斷退回購買扣抵的hp點數  判斷是否要退回購物金
                     if (deduct_happygo > 0)
                     {
-                        Deduct_Refund(om, 0, 0, deduct_happygo, omQuery);
+                        //插入hg_deduct_refund
+                      //  Deduct_Refund(om, 0, 0, deduct_happygo, omQuery);
+                        arrList.Add(hg_batch_deduct_refund(hgBatch));
                     }
                     if (deductbonus > 0)
                     {
@@ -441,7 +473,7 @@ namespace BLL.gigade.Dao
                         }
                     }
                     DataTable _dt2 = GetTotalCount(om.Order_Id, 2);
-                    #region   //2.0活動筆數
+                    #region  更改推薦
                     if (Convert.ToInt32(_dt2.Rows[0][0]) == 0)
                     {
                         List<UserRecommend> usRecommandLi = _userRecommendDao.QueryByOrderId(om.Order_Id);
@@ -457,7 +489,6 @@ namespace BLL.gigade.Dao
                         }
                     }
                     #endregion
-
                     if (_mySqlDao.ExcuteSqlsThrowException(arrList))
                     {
                         return true;
@@ -1045,5 +1076,83 @@ namespace BLL.gigade.Dao
                 throw new Exception("OrderReturnStatusDao-->UpdateORM-->" + sql.ToString() + ex.Message, ex);
             }
         }
+
+        public string hg_batch_accumulate_refund(HgBatchAccumulateRefund query)
+        {
+            StringBuilder sql = new StringBuilder();
+
+            try
+            {
+                sql.AppendFormat("insert into hg_batch_accumulate_refund(order_id,head,card_no,card_checksum,enc_idno,");
+                sql.AppendFormat("checksum,merchant_pos,terminal_pos,refund_point,category_id, ");
+                sql.AppendFormat("order_note,wallet,batch_import_time,batch_error_code,batch_status,");
+                sql.AppendFormat("created_time,modified_time,billing_checked)");
+                sql.AppendFormat("values('{0}','{1}','{2}','{3}','{4}',", query.order_id, query.head, query.card_no, query.card_checksum, query.enc_idno);
+                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',",query.checksum,query.merchant_pos,query.terminal_pos,query.refund_point,query.category_id);
+                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',",query.order_note,query.wallet,query.batch_import_time,query.batch_error_code,query.batch_status);
+                sql.AppendFormat("'{0}','{1}','{2}');",CommonFunction.GetPHPTime(),CommonFunction.GetPHPTime(),query.billing_checked);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderReturnStatusDao-->hg_batch_accumulate_refund-->" + sql.ToString() + ex.Message, ex);
+            }
+
+            return sql.ToString();
+        }
+        /// <summary>
+        /// hg_batch_deduct_refund表，hg_batch_accumulate_refund表結構一模一樣
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public string hg_batch_deduct_refund(HgBatchAccumulateRefund query)
+        {
+            StringBuilder sql = new StringBuilder();
+
+            try
+            {
+                sql.AppendFormat("insert into hg_batch_deduct_refund(order_id,head,card_no,card_checksum,enc_idno,");
+                sql.AppendFormat("checksum,merchant_pos,terminal_pos,refund_point,category_id, ");
+                sql.AppendFormat("order_note,wallet,batch_import_time,batch_error_code,batch_status,");
+                sql.AppendFormat("created_time,modified_time,billing_checked)");
+                sql.AppendFormat("values('{0}','{1}','{2}','{3}','{4}',", query.order_id, query.head, query.card_no, query.card_checksum, query.enc_idno);
+                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',", query.checksum, query.merchant_pos, query.terminal_pos, query.refund_point, query.category_id);
+                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',", query.order_note, query.wallet, query.batch_import_time, query.batch_error_code, query.batch_status);
+                sql.AppendFormat("'{0}','{1}','{2}');", CommonFunction.GetPHPTime(), CommonFunction.GetPHPTime(), query.billing_checked);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderReturnStatusDao-->hg_batch_deduct_refund-->" + sql.ToString() + ex.Message, ex);
+            }
+
+            return sql.ToString();
+        }
+
+        public HGLogin GetHGLoginData(uint order_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.Append("select order_id,merchant_pos,terminal_pos,response_code,response_message,");
+                sql.AppendFormat("enc_idno,chk_sum,remain_point,token,mask_name,mask_id,transaction_time,createdAt  from hg_login where order_id='{0}';",order_id);
+                return _access.getSinggleObj<HGLogin>(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderReturnStatusDao-->GetHGLoginData-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        //public DataTable HgDeduct(uint order_id)
+        //{
+        //    StringBuilder sql = new StringBuilder();
+        //    try
+        //    {
+        //        sql.AppendFormat("select ");
+        //    }
+        //    catch (Exception ex)
+        //    {
+ 
+        //    }
+        //}
     }
 }

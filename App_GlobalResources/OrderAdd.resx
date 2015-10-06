@@ -159,4 +159,7 @@
   <data name="SINGLE_SPEC_PRICE_WRONG" xml:space="preserve">
     <value>此單一商品規格價格數據錯誤，請重新選擇。</value>
   </data>
+  <data name="WELFARE_PRICE_NULL" xml:space="preserve">
+    <value>可使用抵用券的金額不足！請確認后再輸入~</value>
+  </data>
 </root>

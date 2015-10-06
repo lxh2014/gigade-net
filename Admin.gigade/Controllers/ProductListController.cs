@@ -149,6 +149,9 @@ namespace Admin.gigade.Controllers
                 //add by zhuoqin0830w 2015/07/22  失格商品匯出
                 query.off_grade = int.Parse(Request["off_grade"]);
 
+                //添加預購商品 guodong1130w 2015/9/16添加
+                query.purchase_in_advance = int.Parse(Request["purchase_in_advance"]);
+
                 #region 站台條件(暫設)
                 query.site_id = 1;
                 query.user_level = 1;
@@ -217,6 +220,9 @@ namespace Admin.gigade.Controllers
                         break;
                     case 4:
                         xmlPath = "../XML/ItemPrice.xml";
+                        break;
+                    case 5://預購商品匯出  （沒有這個XML只是使用公用方法以防報錯）guodong1130w 2015/9/21
+                        xmlPath = "../XML/ProductInfo.xml";
                         break;
                 }
 
@@ -1279,6 +1285,11 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Form["off_grade"]))
                 {
                     query.off_grade = int.Parse(Request.Form["off_grade"]);
+                }
+                //add by guodong1130w 2015/09/16 預購商品篩選
+                if (!string.IsNullOrEmpty(Request.Form["purchase_in_advance"]))
+                {
+                    query.purchase_in_advance = int.Parse(Request.Form["purchase_in_advance"]);
                 }
                 #endregion
 

@@ -41,7 +41,7 @@ namespace BLL.gigade.Dao
         {
             StringBuilder sql = new StringBuilder();
             StringBuilder sqlcount = new StringBuilder();
-            StringBuilder sqlstr = new StringBuilder();
+            StringBuilder sqlstr = new StringBuilder();            
             try
             {
                 sql.AppendLine(@"select group_id,group_name,domain,tax_id,gift_bonus,bonus_rate,bonus_expire_day,");
@@ -62,8 +62,8 @@ namespace BLL.gigade.Dao
                     sqlstr.AppendFormat(" and group_id={0}", query.group_id);
                 }
                 if (!string.IsNullOrEmpty(query.group_name))
-                {
-                    sqlstr.AppendFormat(" and group_name like %{0}%", query.group_name);
+                {                  
+                    sqlstr.AppendFormat(" and group_name like '%{0}%'", query.group_name);
                 }
                 totalCount = 0;
                 if (query.IsPage)
@@ -210,6 +210,10 @@ namespace BLL.gigade.Dao
                         else if (vu.serchtype.ToString() == "1")
                         {
                             sql.AppendFormat(" and v.user_email like'%{0}%' ", vu.content.Trim());
+                        }
+                        else if (vu.serchtype.ToString() == "2")//by zhaozhi0623j添加，用於會員管理--會員群組管理群組會員的查詢
+                        {
+                            sql.AppendFormat(" and u.user_name like'%{0}%' ", vu.content.Trim());
                         }
                     }
                     else

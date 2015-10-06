@@ -1,6 +1,8 @@
-﻿using BLL.gigade.Mgr.Impl;
+﻿using BLL.gigade.Dao;
+using BLL.gigade.Mgr.Impl;
 using BLL.gigade.Model;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -61,22 +63,6 @@ namespace BLL.gigade.Mgr
             }
         }
 
-        ////add by wwei0216w 2015/2/25
-        ///// <summary>
-        ///// 為排程賦予product_id
-        ///// </summary>
-        ///// <returns>受影響的行數</returns>
-        //public int UpdateProductId(uint schedule_id)
-        //{
-        //    try
-        //    {
-        //        return _scheduleDao.UpdateProductId(schedule_id);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("FreightSetTimeMgr-->UpdateProductId" + ex.Message,ex);
-        //    }
-        //}
 
         //add by wwei0216w 2015/2/25
         /// <summary>

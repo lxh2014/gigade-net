@@ -1,5 +1,4 @@
-﻿
-var pageSize = 10;
+﻿var pageSize = 10;
 
 var priceListStore = Ext.create("Ext.data.Store", {
     fields: ["product_image", "product_id", "brand_name",
@@ -22,7 +21,6 @@ var priceListStore = Ext.create("Ext.data.Store", {
 });
 
 priceListStore.on('beforeload', function () {
-
     var brandId = Ext.getCmp("brand_id").getValue();
     if (brandId == null) {
         brandId = 0;
@@ -47,7 +45,6 @@ priceListStore.on('beforeload', function () {
             time_end: Ext.htmlEncode(timeEnd)
         });
 });
-
 
 //列选择模式
 var sm = Ext.create('Ext.selection.CheckboxModel', {
@@ -81,7 +78,6 @@ proColumns.push(c_pro_itemoney);        //售價
 proColumns.push(c_pro_cost);            //成本 edit by jiajun 2014/08/14 調整欄位 
 proColumns.push(c_pro_itemeventmoney);  //活動價
 ///edit by wangwei0216w  功能: 添加成本與活動成本
-
 proColumns.push(c_pro_eventcost);       //活動成本
 ///時間2014/8/8
 proColumns.push(c_pro_eventdate);       //活動期間
@@ -89,16 +85,10 @@ proColumns.push(c_pro_askfordate);      //申請時間
 proColumns.push(c_pro_askforperson);    //申請人
 proColumns.push(price_master);          //價格Id
 
-
-
-
-
 //grid
 var clientHeight = document.documentElement.clientHeight;
 var clientWidth = document.documentElement.clientWidth;
 var frmHeight;
-
-
 
 function showResultText(btn, text) {
     if (btn == "ok") {
@@ -111,7 +101,6 @@ function showResultText(btn, text) {
         for (var i = 0, j = row.length; i < j ; i++) {
             priceMasters.push({ product_id: row[i].data.product_id, price_master_id: row[i].data.price_master_id, apply_id: row[i].data.apply_id });
         }
-
 
         Ext.Ajax.request({
             url: '/ProductList/PriceVerify',
@@ -147,12 +136,15 @@ function searchShow() {
 }
 
 Ext.onReady(function () {
-    
-    document.body.onkeydown = function () {
-        if (event.keyCode == 13) {
+    //回車鍵查詢
+    // edit by zhuoqin0830w  2015/09/22  以兼容火狐瀏覽器
+    document.onkeydown = function (event) {
+        e = event ? event : (window.event ? window.event : null);
+        if (e.keyCode == 13) {
             $("#btn_search").click();
         }
     };
+
     var frm = Ext.create("Ext.form.Panel", {
         layout: 'column',
         id: 'frm',
@@ -200,10 +192,7 @@ Ext.onReady(function () {
                 }
             }
         }]
-    })
-
-
-
+    });
 
     var showGrid = Ext.create("Ext.grid.Panel", {
         selModel: sm,
@@ -232,7 +221,6 @@ Ext.onReady(function () {
             iconCls: 'icon-accept',
             listeners: {
                 click: function () {
-
                     var myMask = new Ext.LoadMask(Ext.getBody(), {
                         msg: 'Loading...'
                     });
@@ -244,7 +232,7 @@ Ext.onReady(function () {
                     for (var i = 0, j = row.length; i < j ; i++) {
                         priceMasters.push({ product_id: row[i].data.product_id, price_master_id: row[i].data.price_master_id, apply_id: row[i].data.apply_id });
                     }
-                   
+
                     Ext.Ajax.request({
                         url: '/ProductList/PriceVerify',
                         method: 'post',
@@ -381,11 +369,8 @@ Ext.onReady(function () {
             }
         }
     });
-
     Ext.getCmp('date_type').setValue(DateStore.data.items[1].data.code);
-
 });
-
 
 function addDateType() {
     if (DateStore.getCount() == 1) {

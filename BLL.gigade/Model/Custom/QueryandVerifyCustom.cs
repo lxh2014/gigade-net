@@ -78,6 +78,59 @@ namespace BLL.gigade.Model.Custom
         public int off_grade { get; set; }
 
         /// <summary>
+        /// 預購商品開始時間 add by guodong1130w 2015/09/16 
+        /// </summary>
+        public uint purchase_in_advance_start { get; set; }
+        public string purchase_in_advance_start_time
+        {
+            get
+            {
+                DateTime dt = CommonFunction.GetNetTime(purchase_in_advance_start);
+                if (dt.Year == 1970)
+                    return "";
+                else
+                    return dt.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+        }
+
+        /// <summary>
+        /// 預購商品結束時間 add by guodong1130w 2015/09/16 
+        /// </summary>
+        public uint purchase_in_advance_end { get; set; }
+        public string purchase_in_advance_end_time
+        {
+            get
+            {
+                DateTime dt = CommonFunction.GetNetTime(purchase_in_advance_end);
+                if (dt.Year == 1970)
+                    return "";
+                else
+                    return dt.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+        }
+
+        /// <summary>
+        /// 預購商品出貨時間 add by guodong1130w 2015/09/16 
+        /// </summary>
+        public uint expect_time { get; set; }
+        public string expect_time_time
+        {
+            get
+            {
+                DateTime dt = CommonFunction.GetNetTime(expect_time);
+                if (dt.Year == 1970)
+                    return "";
+                else
+                    return dt.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+        }
+        //庫存數 add by guodong1130w 2015/09/16 
+        public int Item_Stock { get; set; }
+        //未出貨數量 add by guodong1130w 2015/09/16 
+        public int bnum { get; set; }
+        //排成設定 add by guodong1130w 2015/09/16 
+        public string  schedule_name { get; set; }
+        /// <summary>
         /// 活動時間
         /// </summary>
         public string event_time {
@@ -210,7 +263,7 @@ namespace BLL.gigade.Model.Custom
         public int sale_status_id { get; set; }
 
         public string itemIds { get; set; }/// add by wwei0216w2015/8/12
-
+        public string remark { get; set; }//添加商品上下架備註欄位 add by mingwei0727w 2015/09/25
         public QueryandVerifyCustom()
         {
              //_imgsrc =string.Empty;
@@ -281,10 +334,14 @@ namespace BLL.gigade.Model.Custom
             erp_id = string.Empty;
             vendor_name_simple = string.Empty;
             Prod_Classify = 0;//添加館別欄位  eidt  by zhuoqin0830w 2015/03/05
+            remark = string.Empty;//添加商品上下架備註欄位 add by mingwei0727w 2015/09/25
             bag_check_money = 0; //寄倉費
             combination_id = 0;
             off_grade = 0;
             itemIds = "Empty data!";
+            Item_Stock = 0;
+             bnum =0;
+             schedule_name = string.Empty;
         }
     }
 }
