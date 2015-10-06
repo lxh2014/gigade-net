@@ -118,6 +118,7 @@ namespace BLL.gigade.Mgr
                 EdmListConditoinSubQuery query = new EdmListConditoinSubQuery();
                 query.elcm_id=elcm_id;
                 List<EdmListConditoinSub> edm = _edmlistsubDao.LoadCondition(query);
+                DateTime dt;
                 foreach (var item in edm)
                 {
                     if (item.elcs_key == "gender")
@@ -130,8 +131,14 @@ namespace BLL.gigade.Mgr
                         query.ChkBuy = true;
                         query.buyCondition = int.Parse(item.elcs_value1.ToString());
                         query.buyTimes = int.Parse(item.elcs_value2.ToString());
-                        query.buyTimeMin = DateTime.Parse(item.elcs_value3.ToString());
-                        query.buyTimeMax = DateTime.Parse(item.elcs_value4.ToString());
+                        if (DateTime.TryParse(item.elcs_value3.ToString(),out dt))
+                        {
+                            query.buyTimeMin = dt;
+                        }
+                        if (DateTime.TryParse(item.elcs_value4.ToString(), out dt))
+                        {
+                            query.buyTimeMax = dt;
+                        }
                     }
                     if (item.elcs_key == "age")
                     {
