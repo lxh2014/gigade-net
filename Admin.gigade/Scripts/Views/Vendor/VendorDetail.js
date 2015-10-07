@@ -13,7 +13,7 @@ function createForm() {
         tabPosition:'bottom',
         items: [
              {
-                 title: '頁面一',
+                 title: '基本信息',
                  margin: '8 10 15 8',
                  anchor: "95%", msgTarget: "side",
                  border: false,
@@ -447,7 +447,7 @@ function createForm() {
                  ]
              },
              {
-                 title: '頁面二',
+                 title: '其他信息',
                  margin: '8 10 15 8',
                  anchor: "95%", msgTarget: "side",
                  border: false,
