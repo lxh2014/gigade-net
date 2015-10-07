@@ -66,7 +66,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
             Ext.getCmp("EdmContentNew").down('#edit').setDisabled(selections.length == 0);
-            Ext.getCmp("EdmContentNew").down('#report').setDisabled(selections.length == 0);
+            //Ext.getCmp("EdmContentNew").down('#report').setDisabled(selections.length == 0);
             Ext.getCmp("EdmContentNew").down('#goSend').setDisabled(selections.length == 0);
 
             
@@ -176,6 +176,8 @@ onGoSendClick = function () {
     } else if (row.length > 1) {
         Ext.Msg.alert("提示信息", "只能選擇一行");
     } else if (row.length == 1) {
+        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+        myMask.show();
         Ext.Ajax.request({
             url: '/EdmNew/GetContentUrl',
             params: {
@@ -183,8 +185,18 @@ onGoSendClick = function () {
                 template_data: row[0].data.template_data,
             },
             success: function (data) {
-                row[0].data.template_data = data.responseText;
-                sendFunction(row[0], EdmContentNewStore);
+                myMask.hide();
+                if (data.responseText == "獲取網頁出現異常！") {
+                    Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
+                }
+                else {
+                    row[0].data.template_data = data.responseText;
+                    sendFunction(row[0], EdmContentNewStore);
+                }
+            },
+            failure: function () {
+                myMask.hide();
+                Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
             }
         });
        
