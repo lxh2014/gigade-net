@@ -1064,10 +1064,14 @@ namespace Admin.gigade.Controllers
 
                 if (strslqmsg.ToString().Length > 0)
                 {
-                    resultthree = _proRemoveMgr.ProductRemoveReasonTransact(strslqmsg.ToString());
+                    resultthree = _proRemoveMgr.ProductRemoveReasonTransact(strslqmsg.ToString() + strslqmsgtwo.ToString());
                 }
                 else
                 {
+                    if (strslqmsgtwo.ToString().Length > 0)
+                    {
+                        _proRemoveMgr.ProductRemoveReasonTransact(strslqmsgtwo.ToString());
+                    }
                     resultthree = 1;
                 }
                 #endregion

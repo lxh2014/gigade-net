@@ -294,7 +294,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("set sql_safe_updates = 0;update element_detail set element_status=2 where element_id='{0}';set sql_safe_updates = 1;", element_id);
+                sql.AppendFormat("set sql_safe_updates = 0;delete from element_detail where element_id='{0}';set sql_safe_updates = 1;", element_id);
                 return sql.ToString();
             }
             catch (Exception ex)

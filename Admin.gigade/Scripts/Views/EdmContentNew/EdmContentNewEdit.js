@@ -264,16 +264,24 @@
                 editable: false,
                 listeners: {
                     'select': function () {
+                        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                        myMask.show();
                         Ext.Ajax.request({
                             url: '/EdmNew/GetEditUrlData',
                             params: {
                                 edit_url: Ext.getCmp('template_id').getRawValue(),
                             },
                             success: function (data) {
-                              $('textarea[name=kendoEditor]').data("kendoEditor").value(Ext.util.Format.htmlDecode(data.responseText));
-                               
+                                myMask.hide();
+                                if (data.responseText == "獲取網頁出現異常！") {
+                                    Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
+                                }
+                                else {
+                                    $('textarea[name=kendoEditor]').data("kendoEditor").value(Ext.util.Format.htmlDecode(data.responseText));
+                                }
                             },
                             failure: function () {
+                                myMask.hide();
                                 Ext.Msg.alert("提示信息","獲取網頁出現異常！");
                             }
                         });
@@ -294,7 +302,7 @@
                 text: '保存',
                 handler: function () {
                     if (Ext.htmlEncode(Ext.getCmp('kendoEditor').getValue()) == "") {
-                        Ext.Msg.alert("提示信息", '郵件內容為空');
+                        Ext.Msg.alert("提示信息", '郵件內容為空！');
                         return;
                     }
                     else {
