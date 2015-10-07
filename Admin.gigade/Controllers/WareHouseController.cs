@@ -7969,7 +7969,11 @@ namespace Admin.gigade.Controllers
             }
             if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
             {
-                q.endtime = time.AddDays(1);
+                q.endtime = time;
+            }
+            if (!string.IsNullOrEmpty(Request.Params["doc_no"].ToUpper()))//by zhaozhi0623j add 20151006
+            {
+                q.doc_no = Request.Params["doc_no"].ToUpper();
             }
             try
             {
@@ -8126,6 +8130,28 @@ namespace Admin.gigade.Controllers
                 json = "{success:false,data:[]}";
             }
         }
+        //public HttpResponseBase GetkutiaoUser() //by zhaozhi0623j add 庫調人員列表
+        //{
+        //    _iagMgr = new IialgMgr(mySqlConnectionString);
+        //    string json = string.Empty;
+        //    try
+        //    {
+        //        json = _iagMgr.GetkutiaoUser();
+        //        IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+        //        //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+        //        timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+        //        json = "{success:true,'msg':'user',data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";//返回json數據
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+        //        logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+        //        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+        //        log.Error(logMessage);
+        //        json = "[]";
+        //    }
+        //    return json;
+        //}
         #endregion
 
         #endregion

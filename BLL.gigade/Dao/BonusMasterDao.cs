@@ -73,6 +73,19 @@ namespace BLL.gigade.Dao
                 throw new Exception("BonusMasterDao-->GetBonusMasterList-->" + sql.ToString() + ex.Message, ex);
             }
         }
+        public DataTable GetBonusMasterList(BonusMasterQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT SUM(master_total) AS master_total ,SUM(master_balance)AS master_balance FROM bonus_master WHERE user_id={0} AND bonus_type={1};", query.user_id, query.bonus_type);
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("BonusMasterDao-->GetBonusMasterList-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
         /// <summary>
         /// 計算購物金每條詳情的狀態
         /// // 購物金

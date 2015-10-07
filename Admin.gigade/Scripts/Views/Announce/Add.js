@@ -5,31 +5,7 @@
     }
 }
 editFunction = function (row, store) {
-    ///*********參數表model***********/
-    //Ext.define("gigade.paraModel", {
-    //    extend: 'Ext.data.Model',
-    //    fields: [
-    //        { name: 'parameterCode', type: 'string' },
-    //        { name: 'parameterName', type: 'string' }
-    //    ]
-    //});
-
-    ////類型
-    //var typeStore = Ext.create("Ext.data.Store", {
-    //    model: 'gigade.paraModel',
-    //    autoLoad: true,
-    //    proxy: {
-    //        type: 'ajax',
-    //        url: '/Parameter/QueryPara?paraType=announce_type',
-    //        noCache: false,
-    //        getMethod: function () { return 'get'; },
-    //        actionMethods: 'post',
-    //        reader: {
-    //            type: 'json',
-    //            root: 'items'
-    //        }
-    //    }
-    //});
+  
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
         frame: true,
@@ -323,7 +299,7 @@ editFunction = function (row, store) {
     editWin.show();
 
     function initRow(row) {
-        $('textarea[name=content]').data("kendoEditor").value(row.data.content);
+        $('textarea[name=content]').data("kendoEditor").value(row.data.content.replace(/>\s*<map/g, '><map'));
         //   Ext.getCmp('status').show();
         switch (row.data.status) {
             case 1:

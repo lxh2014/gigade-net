@@ -3557,7 +3557,7 @@ namespace Admin.gigade.Controllers
                 zipList = zMgr.GetZipList(zip);
                 if (zipList.Count > 0&& resultzip>0)
                 {
-                    jsonStr = "{success:true,msg:\"" + zipList[0].big +"  "+ zipList[0].middle +"  "+ zipList[0].zipcode + "/" + zipList[0].small + "\"}";
+                    jsonStr = "{success:true,msg:\"" + zipList[0].big +"  "+ zipList[0].middle +"  "+ zipList[0].zipcode + "/" + zipList[0].small.Trim() + "\"}";
                 }
                 else
                 {
@@ -5088,12 +5088,13 @@ namespace Admin.gigade.Controllers
                 string picName = array.Last();
                 int brandId = Convert.ToInt32(Request.Params["brand_id"].ToString());
                 var path = imgLocalPath + brandPath + GetDetailFolder(picName) + picName;
+                string type = Request.Params["type"].ToString();
                 //刪除服務器上對應的圖片
                 DeletePicFile(path);
                 if (brandId != 0)
                 {
                     _vendorBrand = new VendorBrandMgr(connectionString);
-                    if (_vendorBrand.DelPromoPic(brandId) > 0)
+                    if (_vendorBrand.DelPromoPic(brandId,type) > 0)
                     {
                         json = "{success:true}";
                     }

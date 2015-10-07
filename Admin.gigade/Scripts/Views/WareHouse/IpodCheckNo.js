@@ -87,11 +87,11 @@ function Query() {
     var start_time = Ext.getCmp('time_start').getValue();
     var end_time = Ext.getCmp('time_end').getValue();
     if (start_time == null && end_time != null) {
-        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        Ext.Msg.alert("提示", "請把異動時間補充完整");
         return false;
     }
     if (start_time != null && end_time == null) {
-        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        Ext.Msg.alert("提示", "請把異動時間補充完整");
         return false;
     }
     //if (falg == 0) {
@@ -259,7 +259,7 @@ Ext.onReady(function () {
 
                      {
                          xtype: 'datefield',
-                         fieldLabel: "創建時間",
+                         fieldLabel: "異動時間",
                          labelWidth: 60,
                         // width: 210,
                          id: 'time_start',
@@ -356,11 +356,11 @@ Ext.onReady(function () {
         var start_time = Ext.getCmp('time_start').getValue();
         var end_time = Ext.getCmp('time_end').getValue();
         if (start_time == null && end_time != null) {
-            Ext.Msg.alert("提示", "請把創建時間補充完整");
+            Ext.Msg.alert("提示", "請把異動時間補充完整");
             return false;
         }
         if (start_time != null && end_time == null) {
-            Ext.Msg.alert("提示", "請把創建時間補充完整");
+            Ext.Msg.alert("提示", "請把異動時間補充完整");
             return false;
         }
         Ext.apply(ipodStore.proxy.extraParams, {
@@ -430,11 +430,11 @@ outExcel = function () {
     var start_time = Ext.getCmp('time_start').getValue();
     var end_time = Ext.getCmp('time_end').getValue();
     if (start_time == null && end_time != null) {
-        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        Ext.Msg.alert("提示", "請把異動時間補充完整");
         return false;
     }
     if (start_time != null && end_time == null) {
-        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        Ext.Msg.alert("提示", "請把異動時間補充完整");
         return false;
     }
     if (start_time!=null) {

@@ -210,7 +210,7 @@ namespace BLL.gigade.Dao
         #endregion
 
         #region 獲取購物金列表+List<BonusMasterQuery> bQuery(BonusMasterQuery store, out int totalCount)
-        public List<BonusMasterQuery> bQuery(BonusMasterQuery store, out int totalCount)
+        public List<BonusMasterQuery> bQuery(BonusMasterQuery query, out int totalCount)
         {
             StringBuilder sb = new StringBuilder();
             try
@@ -218,14 +218,64 @@ namespace BLL.gigade.Dao
                 StringBuilder sql = new StringBuilder();
                 StringBuilder sqlcount = new StringBuilder();
                 StringBuilder sqlfrom = new StringBuilder();
-                //  user_id,user_name,user_email,user_mobile,user_status,user_reg_date,user_company_id,user_source,source_trace,first_time,last_time,be4_last_time
-                sql.Append(@"SELECT	bm.*,us.user_name,bt.type_admin_link,bt.type_description");
-                sqlcount.Append("SELECT	count(*) AS search_total ");
-                sqlfrom.Append(" FROM bonus_master bm left join bonus_type bt on bm.type_id=bt.type_id left join users us on bm.user_id=us.user_id  ");
-                sqlfrom.AppendFormat(" WHERE bm.user_id='{0}' ", store.user_id);
+                StringBuilder sqlStatus = new StringBuilder();
+                sql.Append(@"SELECT	bm.master_id,bm.user_id,bm.master_total,bm.master_balance,bm.master_start,bm.master_end,bm.master_createdate,bm.bonus_type,bm.master_note,us.user_name,us.user_email,bt.type_admin_link,bt.type_description");
+                sqlcount.Append("SELECT	count(bm.master_id) AS search_total ");
+                sqlfrom.Append(" FROM bonus_master bm left join bonus_type bt on bm.type_id=bt.type_id left join users us on bm.user_id=us.user_id  where 1=1 ");
+                if (query.user_id != 0)
+                {
+                    sqlfrom.AppendFormat(" and  bm.user_id='{0}' ", query.user_id);
+                }
+                if (query.user_email != string.Empty)
+                {
+                    sqlfrom.AppendFormat(" and (us.user_email like '%{0}%' or us.user_name like '%{0}%' escape '/')", query.user_email);
+                }
+                //if (query.user_name != string.Empty)
+                //{
+                //    sqlfrom.AppendFormat(" and u.user_name like '%{0}%'ESCAPE'/'", query.user_name);
+                //}
+                if (query.smaster_start != DateTime.MinValue && query.smaster_end != DateTime.MinValue)
+                {
+                    sqlfrom.AppendFormat(" and bm.master_createdate between {0} and {1}", CommonFunction.GetPHPTime(query.smaster_start.ToString()), CommonFunction.GetPHPTime(query.smaster_end.ToString()));
+                }
+                if (query.bonus_type != 0)
+                {
+                    sqlfrom.AppendFormat(" and bm.bonus_type={0}", query.bonus_type);
+                }
+                if (query.type_id != 0)
+                {
+                    sqlfrom.AppendFormat(" and bm.type_id={0}", query.type_id);
+                }
+                if (query.use || query.useing || query.used || query.useings || query.useds)
+                {
+                    sqlStatus.Append(" and (");
+                    if (query.use)
+                    {
+                        sqlStatus.AppendFormat("bm.master_start>'{0}'", CommonFunction.GetPHPTime());
+                    }
+                    if (query.useing)
+                    {
+                        sqlStatus.AppendFormat(" or bm.master_balance>=bm.master_total");
+                    }
+                    if (query.used)
+                    {
+                        sqlStatus.AppendFormat(" or bm.master_end<'{0}'", CommonFunction.GetPHPTime());
+                    }
+                    if (query.useings)
+                    {
+                        sqlStatus.Append(" or bm.master_balance>0");
+                    }
+                    if (query.useds)
+                    {
+                        sqlStatus.Append(" or bm.master_balance=0");
+                    }
+                    sqlStatus.Append(")");
+                    sqlStatus.Replace("( or", "(");
+                }
+                sqlfrom.Append(sqlStatus);
                 sqlfrom.AppendFormat(" order by master_createdate DESC,master_balance DESC , master_end DESC, master_start DESC ");
                 totalCount = 0;
-                if (store.IsPage)
+                if (query.IsPage)
                 {
                     sb.Append(sqlcount.ToString() + sqlfrom.ToString() + ";");
                     System.Data.DataTable _dt = _access.getDataTable(sqlcount.ToString() + sqlfrom.ToString());
@@ -235,7 +285,7 @@ namespace BLL.gigade.Dao
                         totalCount = Convert.ToInt32(_dt.Rows[0]["search_total"]);
                     }
 
-                    sqlfrom.AppendFormat(" limit {0},{1}", store.Start, store.Limit);
+                    sqlfrom.AppendFormat(" limit {0},{1}", query.Start, query.Limit);
                 }
                 sb.Append(sql.ToString() + sqlfrom.ToString());
                 return _access.getDataTableForObj<BonusMasterQuery>(sql.ToString() + sqlfrom.ToString());
@@ -289,7 +339,6 @@ namespace BLL.gigade.Dao
             StringBuilder sqlfrom = new StringBuilder();
             try
             {
-                //  user_id,user_name,user_email,user_mobile,user_status,user_reg_date,user_company_id,user_source,source_trace,first_time,last_time,be4_last_time
                 sql.Append(@"SELECT users_login.login_ipfrom as master_ipfrom,redirect_name,group_name,users.user_id,users.user_name
                            ,user_gender,user_reg_date,
                            user_company_id,user_source ,concat(user_birthday_year,'/',user_birthday_month,'/',user_birthday_day) as birthday,ml_code,

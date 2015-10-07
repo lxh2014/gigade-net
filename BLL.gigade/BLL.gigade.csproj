@@ -138,6 +138,7 @@
     <Compile Include="Dao\BannerSiteDao.cs" />
     <Compile Include="Dao\BoilerrelationDao.cs" />
     <Compile Include="Dao\BonusMasterDao.cs" />
+    <Compile Include="Dao\BonusTypeDao.cs" />
     <Compile Include="Dao\BrowseDataDao.cs" />
     <Compile Include="Dao\BonusRecordDao.cs" />
     <Compile Include="Dao\CalendarDao.cs" />
@@ -235,6 +236,7 @@
     <Compile Include="Dao\Impl\IOrderPaymentHncbImplDao.cs" />
     <Compile Include="Dao\Impl\IParticularsSrcImplDao.cs" />
     <Compile Include="Dao\Impl\IProductOrderTempImplDao.cs" />
+    <Compile Include="Dao\Impl\IProductRemoveReasonImplDao.cs" />
     <Compile Include="Dao\Impl\IScheduleItemImplDao.cs" />
     <Compile Include="Dao\Impl\IScheduleRelationImplDao.cs" />
     <Compile Include="Dao\Impl\IUserForbidImplDao.cs" />
@@ -262,6 +264,7 @@
     <Compile Include="Dao\OrderPaymentHncbDao.cs" />
     <Compile Include="Dao\ParticularsSrcDao.cs" />
     <Compile Include="Dao\ProductOrderTempDao.cs" />
+    <Compile Include="Dao\ProductRemoveReasonDao.cs" />
     <Compile Include="Dao\ProductSearchDao.cs" />
     <Compile Include="Dao\PromoShareConditionDao.cs" />
     <Compile Include="Dao\PromoShareConditionTypeDao.cs" />
@@ -623,6 +626,7 @@
     <Compile Include="Dao\TableHistoryItemDao.cs" />
     <Compile Include="Dao\TabShowDao.cs" />
     <Compile Include="Dao\TFGroupDao.cs" />
+    <Compile Include="Dao\TFunctionDao.cs" />
     <Compile Include="Dao\TicketDao.cs" />
     <Compile Include="Dao\TicketDetailDao.cs" />
     <Compile Include="Dao\TicketMasterDao.cs" />
@@ -684,6 +688,7 @@
     <Compile Include="Mgr\BannerNewsSiteMgr.cs" />
     <Compile Include="Mgr\BannerSiteMgr.cs" />
     <Compile Include="Mgr\BoilerrelationMgr.cs" />
+    <Compile Include="Mgr\BonusTypeMgr.cs" />
     <Compile Include="Mgr\BrowseDataMgr.cs" />
     <Compile Include="Mgr\BonusRecordMgr.cs" />
     <Compile Include="Mgr\CalendarMgr.cs" />
@@ -768,6 +773,7 @@
     <Compile Include="Mgr\Impl\IPageErrorLogMgr.cs" />
     <Compile Include="Mgr\Impl\IParticularsSrcImplMgr.cs" />
     <Compile Include="Mgr\Impl\IProductOrderTempImplMgr.cs" />
+    <Compile Include="Mgr\Impl\IProductRemoveReasonImplMgr.cs" />
     <Compile Include="Mgr\Impl\IScheduleItemImplMgr.cs" />
     <Compile Include="Mgr\Impl\IScheduleRelationImplMgr.cs" />
     <Compile Include="Mgr\Impl\IUserForbidImplMgr.cs" />
@@ -795,6 +801,7 @@
     <Compile Include="Mgr\ProductClickMgr.cs" />
     <Compile Include="Mgr\ParticularsSrcMgr.cs" />
     <Compile Include="Mgr\ProductOrderTempMgr.cs" />
+    <Compile Include="Mgr\ProductRemoveReasonMgr.cs" />
     <Compile Include="Mgr\ProductSearchMgr.cs" />
     <Compile Include="Mgr\PromoShareConditionMgr.cs" />
     <Compile Include="Mgr\PromoShareConditionTypeMgr.cs" />
@@ -1172,6 +1179,7 @@
     <Compile Include="Mgr\TableHistoryMgr.cs" />
     <Compile Include="Mgr\TabShowMgr.cs" />
     <Compile Include="Mgr\TFGroupMgr.cs" />
+    <Compile Include="Mgr\TFunctionMgr.cs" />
     <Compile Include="Mgr\TicketDetailMgr.cs" />
     <Compile Include="Mgr\TicketMasterMgr.cs" />
     <Compile Include="Mgr\TicketMgr.cs" />
@@ -1348,6 +1356,7 @@
     <Compile Include="Model\ProductCategoryBrand.cs" />
     <Compile Include="Model\ProductClick.cs" />
     <Compile Include="Model\ParticularsSrc.cs" />
+    <Compile Include="Model\ProductRemoveReason.cs" />
     <Compile Include="Model\PromoShareCondition.cs" />
     <Compile Include="Model\PromoShareConditionType.cs" />
     <Compile Include="Model\PromoShareMaster.cs" />
@@ -1777,6 +1786,7 @@
     <Compile Include="Model\Temp\ProductTagSetTemp.cs" />
     <Compile Include="Model\Temp\ProductTemp.cs" />
     <Compile Include="Model\TFGroup.cs" />
+    <Compile Include="Model\TFunction.cs" />
     <Compile Include="Model\Ticket.cs" />
     <Compile Include="Model\TicketDetail.cs" />
     <Compile Include="Model\TicketMaster.cs" />

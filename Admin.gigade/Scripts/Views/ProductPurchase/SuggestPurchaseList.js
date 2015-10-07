@@ -37,8 +37,9 @@ Ext.define('gigade.Product', {
         { name: "vendor_name_simple", type: "string" },//供應商名稱
         { name: "procurement_days", type: "string" },//供應商採購天數
         { name: "item_money", type: "string" },//售價(單價)
-        { name: "item_cost", type: "string" },//成本(單價)
+        { name: "item_cost", type: "string" },//成本(單價)//
         { name: "product_status", type: "string" },//商品狀態
+        { name: "product_status_string", type: "string" },//商品狀態
         { name: "sale_name", type: "string" },//販售狀態
         { name: "create_datetime", type: "string" },//下單採購時間
         { name: "NoticeGoods",type:"string" }//補貨通知人數
@@ -62,14 +63,22 @@ var SuggestPurchaseStore = Ext.create('Ext.data.Store', {
     }
 });
 SuggestPurchaseStore.on('beforeload', function () {
-
+    var reg = /^[1-9]\d*$/;
+    if (Ext.getCmp("serchType").getValue() == 1) {
+        if (!reg.test(Ext.getCmp("serchName").getValue().trim())) {
+            Ext.Msg.alert("提示", "供應商編號格式錯誤!");
+            return;
+        }
+    }
     Ext.apply(SuggestPurchaseStore.proxy.extraParams, {
         stockScope: Ext.getCmp('stockScope').getValue().scopeValue,
         sumDays: Ext.getCmp('txtSumDays').getValue(),
         perpaid: Ext.getCmp('perpaid').getValue().perpaidValue,/*是否已下單採購*/
         Is_pod: Ext.getCmp('Is_pod').getValue().Is_podValue,/*是否 買斷*/
-        vendor_name:Ext.getCmp('vendor_name').getValue(),/*供應商名稱*/
-        periodDays: Ext.getCmp('txtPeriodDays').getValue()
+        //vendor_name:Ext.getCmp('vendor_name').getValue(),/*供應商名稱*/
+        periodDays: Ext.getCmp('txtPeriodDays').getValue(),
+        serchType: Ext.getCmp('serchType').getValue(),
+        serchName: Ext.getCmp('serchName').getValue()
     });
 });
 var sm = Ext.create('Ext.selection.CheckboxModel', {
@@ -87,6 +96,15 @@ var datequeryStore = Ext.create('Ext.data.Store', {
         { "txt": '所有時間', "value": "-1" },
         { "txt": '建立時間', "value": "0" },
         { "txt": '發送時間', "value": "1" }
+    ]
+});
+var DDLStore = Ext.create('Ext.data.Store', {
+    fields: ['txt', 'value'],
+    data: [
+    { "txt": "供應商編號", "value": "1" },
+    { "txt": "供應商全稱", "value": "2" },
+    { "txt": "供應商簡稱", "value": "3" },
+    { "txt": "商品ERP編號", "value": "4" }
     ]
 });
 var SendStore = Ext.create('Ext.data.Store', {
@@ -108,6 +126,14 @@ var TrustSendStore = Ext.create('Ext.data.Store', {
 });
 function Query(x) {
     //
+    var reg = /^[1-9]\d*$/;
+    if (Ext.getCmp("serchType").getValue() == 1) {
+        if (!reg.test(Ext.getCmp("serchName").getValue().trim())) {
+            Ext.Msg.alert("提示", "供應商編號格式錯誤!");
+            return;
+        }
+    }
+
     if ((Ext.getCmp("txtSumDays").getValue() != "" && Ext.getCmp("txtSumDays").getValue() != null) ||
         (Ext.getCmp("txtPeriodDays").getValue() != "" && Ext.getCmp("txtPeriodDays").getValue() != null)) {
         SuggestPurchaseStore.removeAll();
@@ -259,13 +285,23 @@ Ext.onReady(function () {
                                  { id: 'Is_pod3', boxLabel: "否", inputValue: '2' }
                              ]
                          },
+                          {
+                              xtype: 'combobox',
+                              editable: false,
+                              fieldLabel: "查詢條件",
+                              labelWidth: 60,
+                              id: 'serchType',
+                              store: DDLStore,
+                              displayField: 'txt',
+                              valueField: 'value',
+                              emptyText: '請選擇...'
+                          },
                          {
                              xtype: 'textfield',
-                             fieldLabel: "供應商簡稱",
                              margin: '0 0 0 25',
-                             id: 'vendor_name',
+                             id: 'serchName',
                              labelWidth: 80,
-                             name: 'vendor_name',
+                             name: 'serchName',
                              listeners: {
                                  specialkey: function (field, e) {
                                      if (e.getKey() == Ext.EventObject.ENTER) {
@@ -367,7 +403,8 @@ Ext.onReady(function () {
             { header: "供應商編號", dataIndex: 'vendor_id', width: 100, align: 'center' },
             { header: "供應商簡稱", dataIndex: 'vendor_name_simple', width: 80, align: 'center' },
             { header: "商品編號", dataIndex: 'product_id', width: 60, align: 'center' },
-            { header: "商品細項編號", dataIndex: 'item_id', width: 80, align: 'center' },//product_name
+            { header: "商品細項編號", dataIndex: 'item_id', width: 80, align: 'center' },
+            { header: "商品ERP編號", dataIndex: 'erp_id', width: 80, align: 'center' },
             { header: "商品名稱", dataIndex: 'product_name', width: 150, align: 'center' },
             {
                 header: "規格1",
@@ -429,6 +466,7 @@ Ext.onReady(function () {
             { header: "補貨通知人數", dataIndex: 'NoticeGoods', width: 90, align: 'center' },
             { header: "售價(單價)", dataIndex: 'item_money', width: 80, align: 'center' },
             { header: "成本(單價)", dataIndex: 'item_cost', width: 80, align: 'center' },
+            { header: "商品狀態", dataIndex: 'product_status_string', width: 80, align: 'center' },
             { header: "販售狀態", dataIndex: 'sale_name', width: 80, align: 'center' },
             { header: "下單採購時間", dataIndex: 'create_datetime', width: 80, align: 'center' }
         ],
@@ -483,11 +521,20 @@ function Tomorrow(days) {
 }
 ///匯出EXcel
 ExportExcel = function () {
+    var reg = /^[1-9]\d*$/;
+    if (Ext.getCmp("serchType").getValue() == 1) {
+        if (!reg.test(Ext.getCmp("serchName").getValue())) {
+            Ext.Msg.alert("提示", "供應商編號格式錯誤!");
+            return;
+        }
+    }
     var stockScope= Ext.getCmp('stockScope').getValue().scopeValue;
     var sumDays=Ext.getCmp('txtSumDays').getValue();
     var perpaid= Ext.getCmp('perpaid').getValue().perpaidValue;/*是否已下單採購*/
     var Is_pod= Ext.getCmp('Is_pod').getValue().Is_podValue;/*是否 買斷*/
-    var vendor_name = Ext.getCmp('vendor_name').getValue();/*供應商名稱*/
+    // var vendor_name = Ext.getCmp('vendor_name').getValue();/*供應商名稱*/
+    var serchType = Ext.getCmp('serchType').getValue();//搜索類型
+    var serchName = Ext.getCmp('serchName').getValue();//搜索內容
     var periodDays = Ext.getCmp('txtPeriodDays').getValue();
-    window.open("/ProductPurchase/ReportSuggestPurchaseExcel?stockScope=" + stockScope + "&sumDays=" + sumDays + "&periodDays=" + periodDays + "&perpaid=" + perpaid + "&Is_pod=" + Is_pod + "&vendor_name=" + vendor_name);
+    window.open("/ProductPurchase/ReportSuggestPurchaseExcel?stockScope=" + stockScope + "&sumDays=" + sumDays + "&periodDays=" + periodDays + "&perpaid=" + perpaid + "&Is_pod=" + Is_pod + "&serchType=" + serchType + "&serchName=" + serchName);
 }
