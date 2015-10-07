@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using BLL.gigade.Common;
 using BLL.gigade.Mgr;
 using BLL.gigade.Mgr.Impl;
+using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -407,6 +408,101 @@ namespace Admin.gigade.Controllers
             this.Response.Write(json);
             this.Response.End();
             return this.Response;
+
+        }
+
+
+
+        //schedule_master 中的狀態啟用
+        public HttpResponseBase UpdateStats_Schedule_master()
+        {
+            string json = string.Empty;
+            try
+            {
+                _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+                ScheduleMasterQuery query = new ScheduleMasterQuery();
+
+                if (!string.IsNullOrEmpty(Request.Params["id"]))
+                {
+                    query.rowid = Convert.ToInt32(Request.Params["id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["active"]))
+                {
+                    query.schedule_state = Convert.ToInt32(Request.Params["active"]);
+                }
+                json = _secheduleServiceMgr.UpdateStats_Schedule_master(query);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+
+        //保存排程_master信息 
+        public HttpResponseBase SaveScheduleMasterInfo()
+        {
+            string json = string.Empty;
+            try
+            {
+                ScheduleMasterQuery query = new ScheduleMasterQuery();
+                _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+
+
+                if (!string.IsNullOrEmpty(Request.Params["schedule_code"]))
+                {
+                    query.schedule_code = Request.Params["schedule_code"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["schedule_name"]))
+                {
+                    query.schedule_name = Request.Params["schedule_name"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["schedule_api"]))
+                {
+                    query.schedule_api = Request.Params["schedule_api"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["schedule_description"]))
+                {
+                    query.schedule_description = Request.Params["schedule_description"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["schedule_state"]))
+                {
+                    query.schedule_state = Convert.ToInt32(Request.Params["schedule_state"]);
+                }
+                query.create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+                query.change_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+                int _dt = _secheduleServiceMgr.SaveScheduleMasterInfo(query);
+
+                if (_dt > 0)
+                {
+                    json = "{success:true}";
+                }
+                else
+                {
+                    json = "{success:false}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return Response;
 
         }
 

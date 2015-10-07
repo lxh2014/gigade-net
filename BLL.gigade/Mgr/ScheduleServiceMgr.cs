@@ -6,18 +6,20 @@ using System.Text;
 using BLL.gigade.Common;
 using BLL.gigade.Dao;
 using BLL.gigade.Model.Query;
+using DBAccess;
 
 namespace BLL.gigade.Mgr
 {
     public class ScheduleServiceMgr
     {
         private ScheduleServiceDao _secheduleServiceDao;
-        
+        private DBAccess.IDBAccess _dbAccess;
         public ScheduleServiceMgr(string connectionString)
         {
             try
             {
                 _secheduleServiceDao = new ScheduleServiceDao(connectionString);
+                _dbAccess = DBFactory.getDBAccess(DBType.MySql, connectionString);
             }
             catch (Exception ex)
             {
@@ -112,6 +114,51 @@ namespace BLL.gigade.Mgr
                 throw new Exception("SecheduleServiceMgr-->GetSchedulePeriodList-->" + ex.Message, ex);
             }
         }
+
+        public string UpdateStats_Schedule_master(ScheduleMasterQuery query)  
+        {
+            string json;
+            string sql = "";
+            try
+            {
+                if (query.schedule_state == 0)
+                {
+                    query.schedule_state = 1;
+                }
+                else
+                {
+                    query.schedule_state = 0;
+                }
+                sql = _secheduleServiceDao.UpdateStats_Schedule_master(query);
+                if (_dbAccess.execCommand(sql) > 0)
+                {
+                    json = "{success:true}";
+                }
+                else
+                {
+                    json = "{success:false}";
+                }
+                return json;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("SecheduleServiceMgr-->UpdateStats_Schedule_master-->" + ex.Message + sql, ex);
+            }
+        }// master 的狀態改變
+
+        //判断是新增 还是 编辑 
+        public int SaveScheduleMasterInfo(ScheduleMasterQuery query)
+        {
+            if (query.rowid == 0)//新增
+            {
+                return _secheduleServiceDao.ScheduleMasterInfoInsert(query);
+            }
+            else//編輯
+            {
+                return _secheduleServiceDao.ScheduleMasterInfoUpdate(query);
+            }
+        }
+
 
         public ScheduleMasterQuery GetExeScheduleMaster(ScheduleMasterQuery query)
         {

@@ -4435,7 +4435,6 @@
     <Folder Include="Views\PromotionsAmountDiscount\" />
     <Folder Include="Views\PromotionsBonusSerialHistory\" />
     <Folder Include="Views\PromotionsBonusSerial\" />
-    <Folder Include="Views\ScheduleService\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\index.cshtml" />
@@ -4607,7 +4606,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>11804</DevelopmentServerPort>
+          <DevelopmentServerPort>60230</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
