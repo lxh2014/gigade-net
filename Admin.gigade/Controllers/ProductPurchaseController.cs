@@ -302,8 +302,8 @@ namespace Admin.gigade.Controllers
                 dtExcel.Columns.Add("商品細項編號", typeof(String));
                 dtExcel.Columns.Add("商品ERP編號", typeof(String));
                 dtExcel.Columns.Add("商品名稱", typeof(String));
-                dtExcel.Columns.Add("規格一", typeof(String));
-                dtExcel.Columns.Add("規格二", typeof(String));
+                dtExcel.Columns.Add("規格", typeof(String));
+                //dtExcel.Columns.Add("規格二", typeof(String));
                 dtExcel.Columns.Add("出貨方式", typeof(String));
                 dtExcel.Columns.Add("是否買斷", typeof(String));
                 dtExcel.Columns.Add("庫存量", typeof(String));
@@ -328,26 +328,26 @@ namespace Admin.gigade.Controllers
                     newRow[3] = dt.Rows[i]["item_id"];
                     newRow[4] = dt.Rows[i]["erp_id"];
                     newRow[5] = dt.Rows[i]["product_name"];
-                    newRow[6] = dt.Rows[i]["spec_title_1"].ToString() + dt.Rows[i]["spec_id_1"].ToString();
-                    newRow[7] = dt.Rows[i]["spec_title_2"].ToString() + dt.Rows[i]["spec_id_2"].ToString();
-                    newRow[8] = dt.Rows[i]["product_mode_name"];
-                    newRow[9] = dt.Rows[i]["prepaid"];
+                    newRow[6] = dt.Rows[i]["spec_title_1"];
+                   // newRow[7] = dt.Rows[i]["spec_title_2"].ToString() + dt.Rows[i]["spec_id_2"].ToString();
+                    newRow[7] = dt.Rows[i]["product_mode_name"];
+                    newRow[8] = dt.Rows[i]["prepaid"];
                     if (!string.IsNullOrEmpty(dt.Rows[i]["prepaid"].ToString()))
                     {
                         int prepaid = Convert.ToInt32(dt.Rows[i]["prepaid"]);
                         if (prepaid == 0)
-                            newRow[9] = "否";
+                            newRow[8] = "否";
                         if (prepaid == 1)
-                            newRow[9] = "是";
+                            newRow[8] = "是";
                     }
-                    newRow[10] = dt.Rows[i]["item_stock"];
-                    newRow[11] = dt.Rows[i]["item_alarm"];
-                    newRow[12] = dt.Rows[i]["sum_total"];
+                    newRow[9] = dt.Rows[i]["item_stock"];
+                    newRow[10] = dt.Rows[i]["item_alarm"];
+                    newRow[11] = dt.Rows[i]["sum_total"];
 
                     if (string.IsNullOrEmpty(dt.Rows[i]["sum_total"].ToString()))
                     {
+                        newRow[12] = 0;
                         newRow[13] = 0;
-                        newRow[14] = 0;
                     }
                     else
                     {
@@ -382,11 +382,11 @@ namespace Admin.gigade.Controllers
                         string averageCount = (sum_total / query.sumDays * query.periodDays).ToString();
                         if (averageCount.Contains('.') && averageCount.Substring(averageCount.IndexOf('.'), averageCount.Length - averageCount.IndexOf('.')).Length > 5)
                         {
-                            newRow[13] = averageCount.Substring(0, averageCount.IndexOf('.') + 5);
+                            newRow[12] = averageCount.Substring(0, averageCount.IndexOf('.') + 5);
                         }
                         else
                         {
-                            newRow[13] = averageCount;
+                            newRow[12] = averageCount;
                         }
 
                         //當前庫存量-供應商的採購天數*平均銷售數量(最小值為1))<=安全存量時,就需要採購
@@ -401,34 +401,34 @@ namespace Admin.gigade.Controllers
                             //}
                             if (suggestPurchaseTemp <= int.Parse(dt.Rows[i]["min_purchase_amount"].ToString()))   //最小值為1
                             {
-                                 newRow[14] = dt.Rows[i]["min_purchase_amount"];
+                                 newRow[13] = dt.Rows[i]["min_purchase_amount"];
                             }
                             else
                             {
                                 int suggestPurchase = Convert.ToInt32(suggestPurchaseTemp);
                                 if (suggestPurchase < suggestPurchaseTemp)
                                 {
-                                    newRow[14] = Convert.ToInt32(suggestPurchaseTemp) + 1;
+                                    newRow[13] = Convert.ToInt32(suggestPurchaseTemp) + 1;
                                 }
                                 else
                                 {
-                                    newRow[14] = Convert.ToInt32(suggestPurchaseTemp);
+                                    newRow[13] = Convert.ToInt32(suggestPurchaseTemp);
                                 }
                             }
                         }
                         else
                         {
-                            newRow[14] = "暫不需採購";
+                            newRow[13] = "暫不需採購";
                         }
                     }
 
-                    newRow[15] = dt.Rows[i]["min_purchase_amount"];
-                    newRow[16] = dt.Rows[i]["procurement_days"];
-                    newRow[17] = dt.Rows[i]["NoticeGoods"];
-                    newRow[18] = dt.Rows[i]["item_money"];
-                    newRow[19] = dt.Rows[i]["item_cost"];
-                    newRow[20] = dt.Rows[i]["product_status_string"];
-                    newRow[21] = dt.Rows[i]["sale_name"];
+                    newRow[14] = dt.Rows[i]["min_purchase_amount"];
+                    newRow[15] = dt.Rows[i]["procurement_days"];
+                    newRow[16] = dt.Rows[i]["NoticeGoods"];
+                    newRow[17] = dt.Rows[i]["item_money"];
+                    newRow[18] = dt.Rows[i]["item_cost"];
+                    newRow[19] = dt.Rows[i]["product_status_string"];
+                    newRow[20] = dt.Rows[i]["sale_name"];
                     dtExcel.Rows.Add(newRow);
                 }
                 if (dtExcel.Rows.Count > 0)
