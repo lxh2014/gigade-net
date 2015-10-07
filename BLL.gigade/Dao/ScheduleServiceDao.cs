@@ -28,6 +28,74 @@ namespace BLL.gigade.Dao
                   throw new Exception("ScheduleServiceDao-->GetExeScheduleMasterList-->" + ex.Message, ex);
               }
           }
+
+          public List<ScheduleMasterQuery> GetScheduleMasterList(ScheduleMasterQuery query)
+          {
+              StringBuilder sql = new StringBuilder();
+              StringBuilder str = new StringBuilder();
+              try
+              {
+                  sql.AppendFormat(" SELECT sm.rowid,sm.schedule_code,sm.schedule_name,sm.schedule_api,sm.schedule_description,sm.schedule_state,sm.previous_execute_time,sm.next_execute_time,sm.schedule_period_id, mu1.user_username as create_username,sm.create_time,mu2.user_username as change_username,sm.change_time  FROM schedule_master sm ");
+                  str.Append(" LEFT JOIN manage_user mu1 on mu1.user_id=sm.create_user ");
+                  str.Append(" LEFT JOIN manage_user mu2 on mu2.user_id=sm.change_user ");
+                  sql.Append(str.ToString());
+                  return _access.getDataTableForObj<ScheduleMasterQuery>(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->GetScheduleMasterList-->" + ex.Message, ex);
+              }
+          }
+
+          public List<ScheduleConfigQuery> GetScheduleConfigList(ScheduleConfigQuery query)
+          {
+              StringBuilder sql = new StringBuilder();
+               StringBuilder sqlCondi = new StringBuilder();
+              try
+              {
+                  sql.AppendFormat("SELECT sc.schedule_code,sc.parameterCode,sc.value,sc.description, mu1.user_username as create_username,sc.create_time, mu2.user_username as change_username,sc.change_time  FROM schedule_config sc ");
+                  sqlCondi.Append(" LEFT JOIN schedule_master sm on sm.schedule_code=sc.schedule_code ");
+                  sqlCondi.Append(" LEFT JOIN manage_user mu1 on mu1.user_id=sc.create_user ");
+                  sqlCondi.Append(" LEFT JOIN manage_user mu2 on mu2.user_id=sc.change_user ");
+                  sqlCondi.Append(" where 1=1 ");
+                  if (!string.IsNullOrEmpty(query.schedule_code))
+                  {
+                      sqlCondi.AppendFormat(" and sm.schedule_code='{0}' ", query.schedule_code);
+                  }
+                  sql.Append(sqlCondi.ToString());
+                  return _access.getDataTableForObj<ScheduleConfigQuery>(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->GetScheduleMasterList-->" + ex.Message, ex);
+              }
+          }
+
+          public List<SchedulePeriodQuery> GetSchedulePeriodList(SchedulePeriodQuery query)
+          {
+              StringBuilder sql = new StringBuilder();
+              StringBuilder sqlCondi = new StringBuilder();
+              try
+              {
+                  sql.AppendFormat("SELECT sp.schedule_code,sp.period_type,sp.period_nums,sp.begin_datetime,sp.current_nums,sp.limit_nums,mu1.user_username as create_username,mu2.user_username as change_username,sp.create_time,sp.change_time  FROM schedule_period sp");
+                  sqlCondi.Append(" LEFT JOIN schedule_master sm on sm.schedule_code=sp.schedule_code ");
+                  sqlCondi.Append(" LEFT JOIN manage_user mu1 on mu1.user_id=sp.create_user ");
+                  sqlCondi.Append(" LEFT JOIN manage_user mu2 on mu2.user_id=sp.change_user ");
+                  sqlCondi.Append(" where 1=1 ");
+                  if (!string.IsNullOrEmpty(query.schedule_code))
+                  {
+                      sqlCondi.AppendFormat(" and sm.schedule_code='{0}' ", query.schedule_code);
+                  }
+                  sql.Append(sqlCondi.ToString());
+                  return _access.getDataTableForObj<SchedulePeriodQuery>(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->GetSchedulePeriodList-->" + ex.Message, ex);
+              }
+          }
+
+
           public ScheduleMasterQuery GetExeScheduleMaster(ScheduleMasterQuery query)
           {
               StringBuilder sql = new StringBuilder();
