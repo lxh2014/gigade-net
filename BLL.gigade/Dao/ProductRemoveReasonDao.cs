@@ -109,7 +109,7 @@ INNER JOIN product pt on pt.product_id =pi.product_id;"); //获取到信息,判�
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat(@"insert into product_status_history (`product_id`,`user_id`,`create_time`,`type`,`product_status`,`remark`)");
-            sb.AppendFormat(" values ({0},{1},now(),{2},{3},'{4}');",psh.product_id,2, psh.type,psh.product_status,psh.remark);
+            sb.AppendFormat(" values ({0},{1},{2},{3},{4},'{5}');",psh.product_id,2,Common.CommonFunction.DateTimeToString(DateTime.Now), psh.type,psh.product_status,psh.remark);
             try
             {
                 return sb.ToString();
