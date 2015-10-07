@@ -3920,8 +3920,8 @@ namespace Admin.gigade.Controllers
             ContactType.Add(1, "負責人");
             ContactType.Add(2, "業務窗口");
             ContactType.Add(3, "圖/文窗口");
-            ContactType.Add(4, "出貨窗口");
-            ContactType.Add(5, "賬務窗口");
+            ContactType.Add(4, "出貨負責窗口");
+            ContactType.Add(5, "帳務連絡窗口");
             ContactType.Add(6, "客服窗口");
             #endregion
             Vendor ven = new Vendor();
@@ -3937,7 +3937,7 @@ namespace Admin.gigade.Controllers
                 if (ContactType.Keys.Contains(ven.contact_type_1))
                 {
                     DataRow row = _dt.NewRow();
-                    row["contact_type"] = ContactType[ven.contact_type_1];
+                    row["contact_type"] = "出貨窗口";
                     row["contact_name"] = ven.contact_name_1;
                     row["contact_phone1"] = ven.contact_phone_1_1;
                     row["contact_phone2"] = ven.contact_phone_2_1;
@@ -4008,6 +4008,59 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+
+        public HttpResponseBase GetVendorType()
+        {
+            string vendorType = "";
+            if (!string.IsNullOrEmpty(Request.Params["VendorType"]))
+            {
+                vendorType = Request.Params["VendorType"];
+            }
+            List<Parametersrc> list = new List<Parametersrc>();
+            paraMgr = new ParameterMgr(connectionString);
+            string types = "vendor_type";
+            list = paraMgr.GetElementType(types);
+            string VendorTypeName = "";
+
+           
+
+            string jsonStr = string.Empty;
+            try
+            {
+                    if (!string.IsNullOrEmpty(vendorType))
+                    {
+                        string[] vendor_types = vendorType.Split(',');
+                        for (int i = 0; i < vendor_types.Length; i++)
+                        {
+                            for (int j = 0; j < list.Count; j++)
+                            {
+                                if (list[j].ParameterCode == vendor_types[i].ToString())
+                                {
+                                    VendorTypeName += list[j].parameterName + ",";
+                                }
+                            }
+
+                        }
+                        VendorTypeName = VendorTypeName.Substring(0, VendorTypeName.Length - 1);
+                    }
+
+                jsonStr = "{success:true,msg:\"" + VendorTypeName + "\"}";
+               
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                jsonStr = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(jsonStr);
+            this.Response.End();
+            return this.Response;
+        }
+
         #endregion
 
         #region 修改供應商品牌列表數據 HttpResponseBase UpdVendorBrand()
