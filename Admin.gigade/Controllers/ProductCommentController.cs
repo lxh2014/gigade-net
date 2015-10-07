@@ -701,6 +701,78 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+        /// <summary>
+        /// 商品滿意度修改
+        /// </summary>
+        /// <returns></returns>
+        public HttpResponseBase ProductCommentSatisfySave()
+        {
+            string json = string.Empty;
+            ProductCommentQuery query = new ProductCommentQuery();
+            try
+            {
+                ProductCommentQuery store = new ProductCommentQuery();
+                _proCommentImpl = new ProductCommentMgr(mySqlConnectionString);
+                if (!string.IsNullOrEmpty(Request.Params["comment_id"]))
+                {
+                    query.comment_id = Convert.ToInt32(Request.Params["comment_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["logistics_deliver"]))
+                {
+                    query.logistics_deliver = Convert.ToInt32(Request.Params["logistics_deliver"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["web_server"]))
+                {
+                    query.web_server = Convert.ToInt32(Request.Params["web_server"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["seller_server"]))
+                {
+                    query.seller_server = Convert.ToInt32(Request.Params["seller_server"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["product_desc"]))
+                {
+                    query.product_desc = Convert.ToInt32(Request.Params["product_desc"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["old_logistics_deliver"]))
+                {
+                    query.old_logistics_deliver = Convert.ToInt32(Request.Params["old_logistics_deliver"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["old_web_server"]))
+                {
+                    query.old_web_server = Convert.ToInt32(Request.Params["old_web_server"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["old_seller_server"]))
+                {
+                    query.old_seller_server = Convert.ToInt32(Request.Params["old_seller_server"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["old_product_desc"]))
+                {
+                    query.old_product_desc = Convert.ToInt32(Request.Params["old_product_desc"].ToString());
+                }
+                query.reply_user = (Session["caller"] as Caller).user_id;
+
+                if (_proCommentImpl.ProductCommentSatisfySave(query) > 0)
+                {
+                    json = "{success:'true'}";//保存成功
+                }
+                else
+                {
+                    json = "{success:'false'}";//保存失敗
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
         #region C#发送邮件函数
         /// <summary>
         /// C#发送邮件函数

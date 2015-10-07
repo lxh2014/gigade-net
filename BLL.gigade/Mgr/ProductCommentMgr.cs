@@ -60,6 +60,23 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductCommentMgr-->ProductCommentSave-->" + ex.Message, ex);
             }
         }
+        /// <summary>
+        /// 修改評價滿意度
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public int ProductCommentSatisfySave(ProductCommentQuery query)
+        {
+            try
+            {
+                return _proCommentDao.ProductCommentSatisfySave(query);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("ProductCommentMgr-->ProductCommentSatisfySave-->" + ex.Message, ex);
+            }
+        }
 
 
         public ProductCommentQuery GetUsetInfo(ProductCommentQuery store)
@@ -174,6 +191,55 @@ namespace BLL.gigade.Mgr
                                 {
                                     item["new_value"] = "發送失敗";
                                 }
+                            }
+                        }
+                        else if (item["change_table"].ToString() == "comment_num")
+                        {
+                            if (item["change_field"].ToString() == "logistics_deliver" || item["change_field"].ToString() == "web_server" || item["change_field"].ToString() == "seller_server" || item["change_field"].ToString() == "product_desc")
+                            {
+                                
+                                if (item["new_value"].ToString() == "1")
+                                {
+                                    item["new_value"] = "非常不滿意";
+                                }
+                                else if (item["new_value"].ToString() == "2")
+                                {
+                                    item["new_value"] = "不滿意";
+                                }
+                                else if (item["new_value"].ToString() == "3")
+                                {
+                                    item["new_value"] = "一般";
+                                }
+                                else if (item["new_value"].ToString() == "4")
+                                {
+                                    item["new_value"] = "滿意";
+                                }
+                                else if (item["new_value"].ToString() == "5")
+                                {
+                                    item["new_value"] = "非常滿意";
+                                }
+
+                                if (item["old_value"].ToString() == "1")
+                                {
+                                    item["old_value"] = "非常不滿意";
+                                }
+                                else if (item["old_value"].ToString() == "2")
+                                {
+                                    item["old_value"] = "不滿意";
+                                }
+                                else if (item["old_value"].ToString() == "3")
+                                {
+                                    item["old_value"] = "一般";
+                                }
+                                else if (item["old_value"].ToString() == "4")
+                                {
+                                    item["old_value"] = "滿意";
+                                }
+                                else if (item["old_value"].ToString() == "5")
+                                {
+                                    item["old_value"] = "非常滿意";
+                                }
+
                             }
                         }
                         _log.change_field = item["change_field"].ToString();
