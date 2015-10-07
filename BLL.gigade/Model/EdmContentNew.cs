@@ -25,6 +25,9 @@ namespace BLL.gigade.Model
 
         public string sender_name { get; set; }
         public string sender_email { get; set; }
+
+        public string edit_url { get; set; }
+        public string content_url { get; set; }
         public EdmContentNew()
         {
             content_id = 0;

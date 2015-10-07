@@ -179,11 +179,11 @@ namespace BLL.gigade.Mgr
             }
         }
 
-        public int DelPromoPic(int brand_id)
+        public int DelPromoPic(int brand_id,string type)
         {
             try
             {
-                return _vendorBrandDao.DelPromoPic(brand_id);
+                return _vendorBrandDao.DelPromoPic(brand_id,type);
             }
             catch (Exception ex)
             {

@@ -32,6 +32,7 @@ namespace Admin.gigade.Controllers
         private EdmGroupMgr _edmGroup;
         private EdmSendMgr _edmSendMgr;
         private EdmEmailMgr _edmEmailMgr;
+        private TFunctionMgr _tFunctonMgr;
         static string excelPath_export = ConfigurationManager.AppSettings["ImportUserIOExcel"];
         private VipUserMgr _vipuserMgr;
         static string excelPath = ConfigurationManager.AppSettings["ImportCompareExcel"];//關於導入的excel文件的限制
@@ -2195,5 +2196,45 @@ namespace Admin.gigade.Controllers
 
         }
         #endregion
+
+        public HttpResponseBase GetfunctionCodeID()
+        {
+            string json = string.Empty;
+            DataTable store = new DataTable();
+            int rowid = 0;
+            try
+            {
+                TFunction query = new TFunction();
+                if (!string.IsNullOrEmpty(Request.Params["functionCode"]))
+                {
+                    query.functionCode = Request.Params["functionCode"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["functionName"]))
+                {
+                    query.functionName = Request.Params["functionName"];
+                }
+                _tFunctonMgr = new TFunctionMgr(mySqlConnectionString);
+                store = _tFunctonMgr.GetModel(query);
+                if (store != null && store.Rows.Count > 0)
+                {
+                    rowid = Convert.ToInt32(store.Rows[0][0]);
+                }
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,rowid:" + rowid + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
     }
 }

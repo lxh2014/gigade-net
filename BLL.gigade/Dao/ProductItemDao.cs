@@ -367,7 +367,7 @@ namespace BLL.gigade.Dao
             _dbAccess.execCommand(sb.ToString());
 
             sbSqlColumn.Append("select v.vendor_id,p.product_id,p.product_name,(select max(create_time) from item_ipo_create_log where item_id=pi.item_id ) as create_datetime, p.sale_status ,'' as sale_name,p.product_mode ,'' as product_mode_name, p.prepaid,pi.erp_id,pi.item_id,pi.item_stock, pi.item_alarm,p.safe_stock_amount,  ");
-            sbSqlColumn.Append("pm.price as item_money,pm.cost as item_cost,sum_biao.sum_total,  p.min_purchase_amount,v.vendor_name_simple, v.procurement_days,p.product_status, ");
+            sbSqlColumn.Append("pm.price as item_money,pm.cost as item_cost,sum_biao.sum_total,  p.min_purchase_amount,v.vendor_name_simple, v.procurement_days,p.product_status,'' as product_status_string, ");
             sbSqlColumn.Append("  pi.product_id,pi.spec_id_1 , '' as spec_title_1,pi.spec_id_2,'' as spec_title_2 ,''as NoticeGoods ");
             sbSqlTable.Append(" from (SELECT  od.item_id,sum( case item_mode when 0 then od.buy_num when  2 then od.buy_num*od.parent_num end ) as sum_total from order_master om INNER JOIN order_slave os USING(order_id)INNER JOIN order_detail od USING(slave_id)  ");
             sbSqlTable.AppendFormat(" where FROM_UNIXTIME( om.order_createdate)>='{0}' and od.item_mode in (0,2) GROUP BY od.item_id) sum_biao ", sumdate);
@@ -387,10 +387,26 @@ namespace BLL.gigade.Dao
             {
                 sbSqlCondition.AppendFormat(" and p.product_id NOT in(select product_id from  product_category_set where category_id in({0}))", query.category_ID_IN);
             }
+            if (query.vendor_id != 0)
+            {
+                sbSqlCondition.AppendFormat(" and v.vendor_id ='{0}' ", query.vendor_id);
+            }
+            if (!string.IsNullOrEmpty(query.vendor_name_full))
+            {
+                sbSqlCondition.AppendFormat(" and v.vendor_name_full like '%{0}%'  ", query.vendor_name_full);
+            }
             if (!string.IsNullOrEmpty(query.vendor_name))
             {
-                sbSqlCondition.AppendFormat(" and (v.vendor_name_full like '%{0}%' or v.vendor_name_simple like '%{0}%') ", query.vendor_name);
+                sbSqlCondition.AppendFormat(" and v.vendor_name_simple like '%{0}%' ", query.vendor_name);
             }
+            if (!string.IsNullOrEmpty(query.Erp_Id))
+            {
+                sbSqlCondition.AppendFormat(" and pi.erp_id = '{0}' ", query.Erp_Id);
+            }
+            //if (!string.IsNullOrEmpty(query.vendor_name))
+            //{
+            //    sbSqlCondition.AppendFormat(" and (v.vendor_name_full like '%{0}%' or v.vendor_name_simple like '%{0}%') ", query.vendor_name);
+            //}
             switch (query.Is_pod)
             {
                 case 0:
@@ -447,6 +463,7 @@ namespace BLL.gigade.Dao
                 IProductSpecImplDao _specDao = new ProductSpecDao(connStr);
                 List<Parametersrc> parameterList = _parameterDao.QueryParametersrcByTypes("product_mode", "sale_status");
                 DataTable dtResult = _dbAccess.getDataTable(sbSqlColumn.ToString() + sbSqlTable.ToString() + sbSqlCondition.ToString());
+                List<Parametersrc> parameterStatus = _parameterDao.QueryParametersrcByTypes("product_status");
                 foreach (DataRow dr in dtResult.Rows)
                 {
                     dr["NoticeGoods"] = 0;
@@ -456,7 +473,7 @@ namespace BLL.gigade.Dao
                     }
                     var alist = parameterList.Find(m => m.ParameterType == "product_mode" && m.ParameterCode == dr["product_mode"].ToString());
                     var dlist = parameterList.Find(m => m.ParameterType == "sale_status" && m.ParameterCode == dr["sale_status"].ToString());
-
+                    var slist = parameterStatus.Find(m => m.ParameterType == "product_status" && m.ParameterCode == dr["product_status"].ToString());
                     if (alist != null)
                     {
                         dr["product_mode_name"] = alist.parameterName;
@@ -465,6 +482,11 @@ namespace BLL.gigade.Dao
                     {
                         dr["sale_name"] = dlist.parameterName;
                     }
+                    if (slist != null)
+                    {
+                        dr["product_status_string"] = slist.parameterName;
+                    }
+
                     ProductSpec spec1 = _specDao.query(Convert.ToInt32(dr["spec_id_1"].ToString()));
                     ProductSpec spec2 = _specDao.query(Convert.ToInt32(dr["spec_id_2"].ToString()));
                     if (spec1 != null)

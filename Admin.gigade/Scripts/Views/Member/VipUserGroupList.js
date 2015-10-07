@@ -62,7 +62,7 @@ Ext.define('gigade.VipUser', {
         { name: "screatedate", type: "string" },
 
 
-        { name: "user_id", type: "string" },
+        { name: "user_id", type: "int" },
         { name: "user_name", type: "string" }, //用戶名
         { name: "user_email", type: "string" },
         { name: "user_password", type: "string" }, //密碼
@@ -117,7 +117,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
             //            Ext.getCmp("vugGrid").down('#callid').setDisabled(selections.length == 0);
         }
     }
-}); 
+});
 
 
 VipUserGroupStore.on('beforeload', function () {
@@ -145,9 +145,9 @@ var VipUserStore = Ext.create('Ext.data.Store', {
 });
 VipUserStore.on('beforeload', function () {
     Ext.apply(VipUserStore.proxy.extraParams, {
-        groupid: Ext.getCmp('vugGrid').getSelectionModel().getSelection()[0].data.group_id
-        //dateOne: Ext.getCmp('dateOne').getValue(),
-        //dateTwo: Ext.getCmp('dateTwo').getValue()
+        groupid: Ext.getCmp('vugGrid').getSelectionModel().getSelection()[0].data.group_id,
+        serchs: Ext.getCmp('searchtype').getValue(),
+        serchcontent: Ext.getCmp('searchcontent').getValue().trim(),        
     })
 });
 var DDLStore = Ext.create('Ext.data.Store', {
@@ -161,22 +161,22 @@ var DDLStore = Ext.create('Ext.data.Store', {
 });
 var typeStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
-    data:[
+    data: [
         { "txt": "會員郵箱", "value": "1" },
-        { "txt": "會員名稱", "value": "2" }        
-        ]
+        { "txt": "會員名稱", "value": "2" }
+    ]
 })
 //var vipUserTpl = new Ext.XTemplate(
 //    '<a href="/VipUserGroup/VipUserGroupAddList?id={group_id}">{list}</a>'
 //);
 
 Ext.onReady(function () {
-   
+
     var vugGrid = Ext.create('Ext.grid.Panel', {
         id: 'vugGrid',
         store: VipUserGroupStore,
         width: document.documentElement.clientWidth,
-        columnLines: true,       
+        columnLines: true,
         frame: true,
         columns: [
             {
@@ -202,13 +202,13 @@ Ext.onReady(function () {
                     }
                 }
             },
-            
+
             {
                 header: "企業圖片",
                 dataIndex: 'image_name',
                 width: 100,
                 align: 'center',
-                xtype: 'templatecolumn',              
+                xtype: 'templatecolumn',
                 tpl: '<img name="tplImg" height=30 width=50 border=0 src="{image_name}" />'
             },
             {
@@ -300,7 +300,7 @@ Ext.onReady(function () {
               fieldLabel: "群組編號/名稱",
               id: 'group_id_or_group_name',
               name: 'group_id_or_group_name',
-              allowBlank: false,                           
+              allowBlank: false,
               submitValue: true,
               emptyText: '請輸入群組編號/名稱',
               listeners: {
@@ -311,21 +311,21 @@ Ext.onReady(function () {
                   }
               }
           },
-          
-          {
-                text: SEARCH,
-                iconCls: 'icon-search',
-                id: 'btnQuery',
-                handler: vugQuery,
-                listeners: {
-                    onClick: function () {
-                        if (Ext.getCmp('group_id_or_group_name')=='') {
-                            Ext.Msg.alert('提示信息', '請輸入查詢條件');
-                        }
-                    }
 
-                }
-            }
+          {
+              text: SEARCH,
+              iconCls: 'icon-search',
+              id: 'btnQuery',
+              handler: vugQuery,
+              listeners: {
+                  onClick: function () {
+                      if (Ext.getCmp('group_id_or_group_name') == '') {
+                          Ext.Msg.alert('提示信息', '請輸入查詢條件');
+                      }
+                  }
+
+              }
+          }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: VipUserGroupStore,
@@ -400,7 +400,7 @@ memberManage = function () {
     else if (row.length > 1) {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
-        
+
         var mmGrid = Ext.create('Ext.grid.Panel', {
             id: 'mmGrid',
             store: VipUserStore,
@@ -408,10 +408,10 @@ memberManage = function () {
             columnLines: true,
             frame: true,
             columns: [
-                { header: "會員編號", dataIndex: 'v_id', width: 80, align: 'center' },
+                { header: "會員編號", dataIndex: 'user_id', width: 80, align: 'center' },
                 { header: "會員名稱", dataIndex: 'user_name', width: 100, align: 'center' },
                 { header: "會員郵箱", dataIndex: 'vuser_email', width: 250, align: 'center' },
-                
+
                 { header: "建立時間", dataIndex: 'screatedate', width: 150, align: 'center' },
 
                 {
@@ -423,15 +423,31 @@ memberManage = function () {
                 }
             ],
             tbar: [
-                { xtype: 'button', iconCls: 'icon-user-add', text: '添加', id: 'add', handler: onAddUserClick },
+                { xtype: 'button', iconCls: 'icon-user-add', text: '添加', id: 'addMM', handler: onAddUserClick },
                 //{ xtype: 'button', text: '編輯', id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
                 //{ xtype: 'button', text: '刪除', id: 'remove', iconCls: 'icon-user-remove', disabled: true, handler: onRemoveClick },
                 '->',
+                //{
+                //    xtype: "textfield",
+                //    fieldLabel: "群組編號/名稱",
+                //    id: 'group_id_or_group_name',
+                //    name: 'group_id_or_group_name',
+                //    allowBlank: false,
+                //    submitValue: true,
+                //    emptyText: '請輸入群組編號/名稱',
+                //    listeners: {
+                //        specialkey: function (field, e) {
+                //            if (e.getKey() == e.ENTER) {
+                //                vugQuery();
+                //            }
+                //        }
+                //    }
+                //},
                 {
                     xtype: 'combobox',
                     editable: false,
                     margin: "0 5 0 0",
-                    fieldLabel: '查詢類別', 
+                    fieldLabel: '查詢類別',
                     labelWidth: 60,
                     id: 'searchtype',
                     store: typeStore,
@@ -452,7 +468,7 @@ memberManage = function () {
                                 if (Ext.getCmp("searchcontent").getValue() == '') {
                                     Ext.getCmp('mmQueryBtn').setDisabled(true);//不可用
                                 }
-                                Ext.getCmp('searchcontent').allowBlank = false;                             
+                                Ext.getCmp('searchcontent').allowBlank = false;
                                 Ext.getCmp('resetBtn').setDisabled(false);//不可用
                                 //Ext.getCmp('searchcontent').setHidden(false);
                             }
@@ -478,7 +494,7 @@ memberManage = function () {
                             change: function () {
                                 if (Ext.getCmp("searchcontent").getValue() != '') {
                                     Ext.getCmp('mmQueryBtn').setDisabled(false);//可用
-                                    
+
                                 }
                             }
                         }
@@ -492,7 +508,7 @@ memberManage = function () {
 
                         }
                     },
-               
+
             ],
             bbar: Ext.create('Ext.PagingToolbar', {
                 store: VipUserStore,
@@ -536,11 +552,12 @@ memberManage = function () {
                         Ext.MessageBox.confirm('提示信息', '是否關閉窗口', function (btn) {
                             if (btn == "yes") {
                                 Ext.getCmp('mmWin').destroy();
-                                VipUserStore.load();
+                               // VipUserStore.load();
+                                VipUserGroupStore.load();
                             }
                             else {
                                 return false;
-                               
+
                             }
                         });
                     }
@@ -553,7 +570,7 @@ memberManage = function () {
 
                         }
                     });
-                }
+                },              
             }
         });
         mmWin.show();
@@ -595,8 +612,8 @@ function vugQuery() {
                     //dateTwo: Ext.getCmp('dateTwo').getValue()
                 }
             });
-        }   
-    }    
+        }
+    }
 }
 /*********************************群組人員信息中查詢會員****************************************************/
 function mmQuery() {
@@ -625,9 +642,9 @@ function mmQuery() {
             });
         }
         else {
-            Ext.Msg.alert('提示信息','請輸入查詢類別')
+            Ext.Msg.alert('提示信息', '請輸入查詢類別')
         }
-       
+
     }
 }
 /*********************************群組中新增會員****************************************************/

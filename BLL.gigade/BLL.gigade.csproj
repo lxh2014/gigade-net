@@ -626,6 +626,7 @@
     <Compile Include="Dao\TableHistoryItemDao.cs" />
     <Compile Include="Dao\TabShowDao.cs" />
     <Compile Include="Dao\TFGroupDao.cs" />
+    <Compile Include="Dao\TFunctionDao.cs" />
     <Compile Include="Dao\TicketDao.cs" />
     <Compile Include="Dao\TicketDetailDao.cs" />
     <Compile Include="Dao\TicketMasterDao.cs" />
@@ -1178,6 +1179,7 @@
     <Compile Include="Mgr\TableHistoryMgr.cs" />
     <Compile Include="Mgr\TabShowMgr.cs" />
     <Compile Include="Mgr\TFGroupMgr.cs" />
+    <Compile Include="Mgr\TFunctionMgr.cs" />
     <Compile Include="Mgr\TicketDetailMgr.cs" />
     <Compile Include="Mgr\TicketMasterMgr.cs" />
     <Compile Include="Mgr\TicketMgr.cs" />
@@ -1784,6 +1786,7 @@
     <Compile Include="Model\Temp\ProductTagSetTemp.cs" />
     <Compile Include="Model\Temp\ProductTemp.cs" />
     <Compile Include="Model\TFGroup.cs" />
+    <Compile Include="Model\TFunction.cs" />
     <Compile Include="Model\Ticket.cs" />
     <Compile Include="Model\TicketDetail.cs" />
     <Compile Include="Model\TicketMaster.cs" />

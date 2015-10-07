@@ -587,7 +587,6 @@ Ext.onReady(function () {
     if (document.getElementById("userid").value != 0) {
         Ext.getCmp('user_id_list').setValue(document.getElementById("userid").value);
         Ext.getCmp('ddlSel').setValue(document.getElementById("bonusType").value);
-        Ext.getCmp('edit').show();
     }
     else {
         Ext.getCmp('goback').hide();
