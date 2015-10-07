@@ -199,7 +199,18 @@ Ext.onReady(function () {
             { xtype: 'button', text: ADD, id: 'add', hidden: false, iconCls: 'icon-user-add', handler: onAddClick },
             { xtype: 'button', text: EDIT, id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
             {
-                xtype: 'button', text: "刪除", id: 'delete', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onDeleteClick
+                xtype: 'button', text: "刪除", id: 'delete', iconCls: 'icon-user-edit', disabled: true, handler: onDeleteClick,
+                listeners: {
+                    'beforerender': function () {
+                        //alert(document.getElementById("packetId").value);
+                        if (document.getElementById("packetId").value ==0) {
+                            Ext.getCmp('delete').hide(true);
+                        }
+                        //else {
+                        //}
+                    }
+                }
+
             },
             '->',
             {
@@ -237,7 +248,7 @@ Ext.onReady(function () {
                  margin: '0 10 0 0',
                  editable: false,
                  typeAhead: true,
-                 queryModel: 'local',
+                 queryModel: 'remote',
                  forceSelection: false,
                  store: elementTypeStore,
                  displayField: 'parameterName',
