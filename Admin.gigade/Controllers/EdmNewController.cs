@@ -165,6 +165,9 @@ namespace Admin.gigade.Controllers
                 {
                     query.description = Request.Params["description"];
                 }
+
+                query.group_create_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+                query.group_update_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 int _dt = edmgroupmgr.SaveEdmGroupNewAdd(query);
 
                 if (_dt > 0)
