@@ -130,7 +130,7 @@ namespace BLL.gigade.Mgr
                     {
                         query.ChkBuy = true;
                         query.buyCondition = int.Parse(item.elcs_value1.ToString());
-                        query.buyTimes = int.Parse(item.elcs_value2.ToString()); 
+                        query.buyTimes = int.Parse(item.elcs_value2.ToString());
                         if (DateTime.TryParse(item.elcs_value3.ToString(), out dt))
                         {
                             query.buyTimeMin = dt;
@@ -139,7 +139,6 @@ namespace BLL.gigade.Mgr
                         {
                             query.buyTimeMax = dt;
                         }
-
                     }
                     if (item.elcs_key == "age")
                     {
