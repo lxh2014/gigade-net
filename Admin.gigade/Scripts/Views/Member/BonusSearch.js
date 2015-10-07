@@ -174,7 +174,7 @@ Ext.onReady(function () {
                             xtype: 'label',
                             forId: 'myFieldId',
                             text: '狀態:',
-                            margin: '5 0 0 5'
+                            margin: '6 0 0 5'
                         },
                         {
                             xtype: 'checkbox',
@@ -269,7 +269,7 @@ Ext.onReady(function () {
                         },
                          {
                              xtype: 'checkbox',
-                             boxLabel: "尚餘點數",
+                             boxLabel: "當前可用點數",
                              id: 'usings',
                              name: 'using',
                              margin: '5 0 0 5',
@@ -401,7 +401,7 @@ Ext.onReady(function () {
                      {
                          xtype: 'textfield',
                          allowBlank: true,
-                         fieldLabel: "用戶名Mail/用戶名",
+                         fieldLabel: "會員姓名/會員Mail",
                          margin: '5 0 0 5',
                          labelWidth: 110,
                          width: 270,
@@ -527,8 +527,8 @@ Ext.onReady(function () {
         columns: [
             { header: "購物金編號", dataIndex: 'master_id', width: 80, align: 'center' },
             { header: "會員編號", dataIndex: 'user_id', width: 70, align: 'center' },
-            { header: "用戶名", dataIndex: 'user_name', width: 70, align: 'center', hidden: false },
-            { header: "用戶名Mail", dataIndex: 'user_email', width: 200, align: 'center' },
+            { header: "會員姓名", dataIndex: 'user_name', width: 70, align: 'center', hidden: false },
+            { header: "會員Mail", dataIndex: 'user_email', width: 200, align: 'center' },
             { header: "發放類型", dataIndex: 'type_description', width: 120, align: 'center' },
             { header: "總額", dataIndex: 'master_total', width: 70, align: 'center' },
             { header: "結餘", dataIndex: 'master_balance', width: 70, align: 'center' },
@@ -635,7 +635,7 @@ function showbonus_status(value, cellmeta, record, rowIndex, columnIndex, store)
             return "未使用";
         }
         if (record.data.master_balance > 0) {
-            return "尚餘點數";
+            return "當前可用點數";
         }
         if (record.data.master_balance == 0) {
             return "已用完";
@@ -659,7 +659,7 @@ function showbonus_status(value, cellmeta, record, rowIndex, columnIndex, store)
             }  
         }
         if (record.data.master_balance > 0) {
-            return "尚餘點數";
+            return "當前可用點數";
         }
         if (record.data.master_balance == 0) {
             return "已用完";

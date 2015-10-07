@@ -2439,6 +2439,11 @@ namespace Admin.gigade.Controllers
                     item.smaster_end = CommonFunction.GetNetTime(item.master_end);
                     item.smaster_createtime = CommonFunction.GetNetTime(item.master_createdate);
                     item.now_time = Convert.ToInt32(CommonFunction.GetPHPTime());
+                    if (!string.IsNullOrEmpty(item.user_name))
+                    {
+                        item.user_name = item.user_name.Substring(0, 1) + "**";
+                    }
+                    item.user_email = item.user_email.Split('@')[0] + "@***";
                 }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
