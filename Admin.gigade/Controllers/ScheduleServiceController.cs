@@ -477,6 +477,10 @@ namespace Admin.gigade.Controllers
                 {
                     query.schedule_state = Convert.ToInt32(Request.Params["schedule_state"]);
                 }
+                if (!string.IsNullOrEmpty(Request.Params["schedule_period_id"]))
+                {
+                    query.schedule_period_id = Convert.ToInt32(Request.Params["schedule_period_id"]);
+                }
                 query.create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 query.change_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 int _dt = _secheduleServiceMgr.SaveScheduleMasterInfo(query);
@@ -504,6 +508,56 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return Response;
 
+        }
+
+
+        //可以多行刪除數據
+        public HttpResponseBase ScheduleMasterDelete()
+        {
+            string json = string.Empty;
+            ScheduleMasterQuery query = new ScheduleMasterQuery();
+            _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+            try
+            {
+                string id = Request.Params["id"];
+                string[] ids = id.Split(',');
+                for (int i = 0; i < ids.Length - 1; i++)
+                {
+                    query.rowid = int.Parse(ids[i].ToString());
+                    _secheduleServiceMgr.ScheduleMasterDelete(query.rowid.ToString());
+
+                }
+                json = "{success:true}";
+            }
+            #region 只刪除一行數據時的代碼段
+            //if (!string.IsNullOrEmpty(Request.Params["id"]))
+            //{
+            //    query.id = Convert.ToUInt32(Request.Params["id"]);
+            //}
+
+            //  int _dt = informationMgr.PersonInfromationDelete(query);
+
+            //if (_dt > 0)
+            //{
+            //    json = "{success:true}";
+            //}
+            //else
+            //{
+            //    json = "{success:false}";
+            //}  
+            #endregion
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
         }
 
     }

@@ -1,6 +1,5 @@
 ﻿/*************************************************************************************添加 編輯 框*************************************************************************************************/
 editFunction = function (row, store) {
-    //alert(row.data.schedule_name);
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
         frame: true,
@@ -204,7 +203,8 @@ editFunction = function (row, store) {
                                 var result = Ext.decode(action.response.responseText);
                                 if (result.success) {
                                     Ext.Msg.alert(INFORMATION, "保存成功! ");
-                                    store.load();
+                                    //store.load();
+                                    ScheduleStore.load();
                                     editWin.close();
                                 }
                                 else {
@@ -260,13 +260,13 @@ editFunction = function (row, store) {
         listeners: {
             'show': function () {
                 if (row) {
-                    //if (row.data.is_member_edm_string.trim().length == 0) {
-                    //    Ext.getCmp("id1").setValue(false);
-                    //    Ext.getCmp("id2").setValue(true);
-                    //} else {
-                    //    Ext.getCmp("id1").setValue(true);
-                    //    Ext.getCmp("id2").setValue(false);
-                    //}
+                    if (row.data.schedule_state == 0) {
+                        Ext.getCmp("id1").setValue(false);
+                        Ext.getCmp("id2").setValue(true);
+                    } else {
+                        Ext.getCmp("id1").setValue(true);
+                        Ext.getCmp("id2").setValue(false);
+                    }
                     editFrm.getForm().loadRecord(row);
 
                 }
@@ -278,7 +278,6 @@ editFunction = function (row, store) {
             }
         }
     });
-
 
     editWin.show();
 
