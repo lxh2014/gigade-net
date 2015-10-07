@@ -7,15 +7,18 @@ using BLL.gigade.Dao;
 using BLL.gigade.Dao.Impl;
 using BLL.gigade.Mgr.Impl;
 using BLL.gigade.Model.Query;
+using BLL.gigade.Model;
 
 namespace BLL.gigade.Mgr
 {
     public class IialgMgr : IIialgImplMgr
     {
          private IIialgImplDao _iagDao;
+         private IManageUserImplDao _maguserDao;
          public IialgMgr(string connectionString)
         {
             _iagDao = new IialgDao(connectionString);
+            _maguserDao = new ManageUserDao(connectionString);
         }
         public int insertiialg(Model.Query.IialgQuery iagQuery)
         {
@@ -51,7 +54,17 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IialgMgr-->HuiruInsertiialg-->" + ex.Message, ex);
             }
         }
-
+        public List<ManageUser> GetkutiaoUser() //by zhaozhi0623j add 庫存調整人員store
+        {
+            try
+            {             
+                return _maguserDao.GetkutiaoUser();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IialgMgr-->GetkutiaoUser-->" + ex.Message, ex);
+            }
+        }
 
         public List<IialgQuery> GetExportIialgList(IialgQuery q)
         {

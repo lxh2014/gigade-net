@@ -163,6 +163,10 @@ CommonFunction.DateTimeToString(q.made_dt),CommonFunction.DateTimeToString(q.cde
                 {
                     sql.AppendFormat(" and  ia.doc_no='{0}' ", q.doc_no);
                 }
+                if (q.doc_userid != 0)//by zhaozhi0623j add 20151006 用於庫存調整管理員查詢
+                {
+                    sql.AppendFormat(" and  ia.create_user='{0}' ", q.doc_userid);
+                }
                 if (q.IsPage)
                 {
                     System.Data.DataTable _dt = _access.getDataTable(sql.ToString());
