@@ -25,9 +25,9 @@ Ext.define('gridlistET', {
         { name: "template_createdate", type: "string" },//建立日期
         { name: "template_updatedate", type: "string" },//更新時間
 
-        { name: "template_create_userid", type: "int" },//建立者
-        { name: "template_update_userid", type: "int" },//修改者
-        { name: "template_createdate",type:"string" },//建立日期
+        //{ name: "template_create_userid", type: "int" },//建立者
+        //{ name: "template_update_userid", type: "int" },//修改者
+        //{ name: "template_createdate",type:"string" },//建立日期
         { name: "template_create_userid", type: "int" },//建立者id
         { name: "template_update_userid", type: "int" },//修改者id
         { name: "template_create_user", type: "string" },//顯示建立者
