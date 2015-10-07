@@ -21,15 +21,18 @@ using BLL.gigade.Dao.Impl;
 using BLL.gigade.Mgr.Impl;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
+using System.Collections;
 
 namespace BLL.gigade.Mgr
 {
     public class ElementDetailMgr : IElementDetailImplMgr
     {
         private IElementDetailImplDao _detaildao;
+        private MySqlDao _mySqlDao;
         public ElementDetailMgr(string connectionString)
         {
             _detaildao = new ElementDetailDao(connectionString);
+            _mySqlDao = new MySqlDao(connectionString);
         }
 
         public List<Model.Query.ElementDetailQuery> QueryAll(Model.Query.ElementDetailQuery query, out int totalCount)
@@ -121,6 +124,29 @@ namespace BLL.gigade.Mgr
             {
                 throw new Exception("ElementDetailMgr-->QueryPacketProd-->" + ex.Message, ex);
             };
+        }
+
+
+        public bool DeleteElementDetail(string[] newRowID)
+        {
+            ArrayList arrList = new ArrayList();
+            bool b = false;
+            try
+            {
+                for (int i = 0; i < newRowID.Length; i++)
+                {
+                    arrList.Add(_detaildao.DeleteElementDetail( Convert.ToInt32(newRowID[i])));
+                }
+                if (arrList.Count > 0)
+                {
+                 b= _mySqlDao.ExcuteSqlsThrowException(arrList);
+                }
+                return b;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ElementDetailMgr-->DeleteElementDetail-->" + ex.Message, ex);
+            }
         }
     }
 }
