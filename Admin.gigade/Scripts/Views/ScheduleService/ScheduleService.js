@@ -127,6 +127,29 @@ var Schedule_Period_Store = Ext.create('Ext.data.Store', {
     }
 });
 
+//每行數據前段的矩形選擇框
+var sm_master = Ext.create('Ext.selection.CheckboxModel', {
+    listeners: {
+        selectionchange: function (sm_master, selections) {
+            Ext.getCmp("masterGiftList").down('#edit').setDisabled(selections.length == 0);
+        }
+    }
+});
+var sm_config = Ext.create('Ext.selection.CheckboxModel', {
+    listeners: {
+        selectionchange: function (sm_config, selections) {
+            Ext.getCmp("detailist1").down('#edit').setDisabled(selections.length == 0);
+        }
+    }
+});
+var sm_period = Ext.create('Ext.selection.CheckboxModel', {
+    listeners: {
+        selectionchange: function (sm_period, selections) {
+            Ext.getCmp("detailist2").down('#edit').setDisabled(selections.length == 0);
+        }
+    }
+});
+
 Schedule_Period_Store.on("beforeload", function () {
     Ext.apply(Schedule_Period_Store.proxy.extraParams, {
         schedule_code: Ext.getCmp("schedule_code").getValue(),
@@ -199,7 +222,7 @@ var center = Ext.create('Ext.form.Panel', {
                                           detailDelete(Schedule_Config_Store);
                                       }
                                   }],
-                              selModel: sm
+                              selModel: sm_config
                           },
 
                         {
@@ -237,7 +260,7 @@ var center = Ext.create('Ext.form.Panel', {
                                         detailDelete(Schedule_Period_Store);
                                     }
                                 }],
-                            selModel: sm
+                            selModel: sm_period
                         },
 
                     ]
@@ -339,7 +362,7 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
     //        }, ]
     //}],
     columns: [                      //顯示master
-        { header: '編號', dataIndex: 'rowid', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center',hidden:true },
+        { header: '編號', dataIndex: 'rowid', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
          {
              header: "排程狀態", dataIndex: 'schedule_state', align: 'center', width: 60, hidden: false,
              renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
@@ -364,7 +387,7 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
     ],
     tbar: [
      { xtype: 'button', text: "添加", id: 'add_master', iconCls: 'icon-user-add', handler: add },//添加按鈕
-     { xtype: 'button', text: "編輯", id: 'edit_master', disabled: true, iconCls: 'icon-user-edit', handler:onedit},//編輯按鈕  包括 添加 刪除 修改 功能
+     { xtype: 'button', text: "編輯", id: 'edit_master',  iconCls: 'icon-user-edit', handler:onedit},//編輯按鈕  包括 添加 刪除 修改 功能
      //{ xtype: 'button', text: "刪除", id: 'add_master', iconCls: 'icon-user-remove', handler: ondelete },
      // { xtype: 'button', text: "新增", id: 'add_master', iconCls: 'icon-user-add', width: 65 },//添加按鈕
      //{ xtype: 'button', text: "修改", id: 'edit_master', disabled: true, iconCls: 'icon-user-edit', width: 65 },//編輯按鈕  包括 添加 刪除 修改 功能
@@ -393,17 +416,18 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
             this.doLayout();
         }
     },
+    selModel: sm_master,
 })
 
-//複選框列
-var sm = Ext.create('Ext.selection.CheckboxModel', {
-    listeners: {
-        selectionchange: function (sm, selections) {
-            //Ext.getCmp("edit").setDisabled(selections.length == 0);
-            // Ext.getCmp("delete").setDisabled(selections.length == 0);
-        }
-    }
-});
+////複選框列
+//var sm = Ext.create('Ext.selection.CheckboxModel', {
+//    listeners: {
+//        selectionchange: function (sm, selections) {
+//            //Ext.getCmp("edit").setDisabled(selections.length == 0);
+//            // Ext.getCmp("delete").setDisabled(selections.length == 0);
+//        }
+//    }
+//});
 
 function LoadDetail(record) {
     if (record.data.rowid == undefined || record.data.rowid == 0) {
@@ -634,6 +658,7 @@ function add() {
     editFunction(null, ScheduleStore);
 }
 
+/*************************************************************************************添加 編輯 框*************************************************************************************************/
 editFunction = function (row, store) {
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
@@ -826,13 +851,13 @@ editFunction = function (row, store) {
                                 schedule_api: Ext.htmlEncode(Ext.getCmp('schedule_api').getValue()),
                                 schedule_description: Ext.htmlEncode(Ext.getCmp('schedule_description').getValue()),
                                 schedule_state: Ext.htmlEncode(Ext.getCmp('schedule_state').getValue().ignore_stockVal),
-                                create_user: Ext.htmlEncode(Ext.getCmp('create_user').getValue()),
-                                change_user: Ext.htmlEncode(Ext.getCmp('change_user').getValue()),
+                                //create_user: Ext.htmlEncode(Ext.getCmp('create_user').getValue()),
+                                //change_user: Ext.htmlEncode(Ext.getCmp('change_user').getValue()),
                                 schedule_period_id: Ext.htmlEncode(Ext.getCmp('schedule_period_id').getValue()),
-                                previous_execute_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('previous_execute_time').getValue()), 'Y-m-d H:i:s')),
-                                next_execute_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('next_execute_time').getValue()), 'Y-m-d H:i:s')),
-                                create_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('create_time').getValue()), 'Y-m-d H:i:s')),
-                                change_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('change_time').getValue()), 'Y-m-d H:i:s')),
+                                //previous_execute_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('previous_execute_time').getValue()), 'Y-m-d H:i:s')),
+                                //next_execute_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('next_execute_time').getValue()), 'Y-m-d H:i:s')),
+                                //create_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('create_time').getValue()), 'Y-m-d H:i:s')),
+                                //change_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('change_time').getValue()), 'Y-m-d H:i:s')),
                             },
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);
@@ -916,9 +941,6 @@ editFunction = function (row, store) {
 
     editWin.show();
 
-
-    function initRow(row) {
-    }
 }
 
 /*************************************************************************************添加信息*************************************************************************************************/

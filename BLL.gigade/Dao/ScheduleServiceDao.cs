@@ -119,7 +119,7 @@ namespace BLL.gigade.Dao
               try
               {
                   sql.Append("insert into schedule_master ( schedule_code, schedule_name, schedule_api,schedule_description,schedule_state,schedule_period_id,create_user,change_user, create_time, change_time, previous_execute_time,next_execute_time) values ");
-                  sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}')", query.schedule_code, query.schedule_name, query.schedule_api, query.schedule_description, query.schedule_description, query.schedule_state, query.schedule_period_id, query.create_user, query.change_user, query.create_time, query.change_time, query.previous_execute_time,query.next_execute_time);
+                  sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}')", query.schedule_code, query.schedule_name, query.schedule_api, query.schedule_description,query.schedule_state, query.schedule_period_id, query.create_user, query.change_user, query.create_time, query.change_time, query.previous_execute_time,query.next_execute_time);
 
                   return _access.execCommand(sql.ToString());
               }
