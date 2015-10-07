@@ -18,6 +18,8 @@ Ext.define('gigade.EdmContentNew', {
     { name: "date", type: "string" },
     { name: "sender_email", type: "string" },
     { name: "sender_name", type: "string" },
+    { name: "edit_url", type: "string" },
+   { name: "content_url", type: "string" },
     ]
 });
 EdmContentNewStore = Ext.create('Ext.data.Store', {
@@ -108,7 +110,7 @@ Ext.onReady(function () {
         { xtype: 'button', text:'新增', id: 'add', hidden: false, iconCls: 'icon-user-add',   handler: onAddClick },
         { xtype: 'button', text: '編輯', id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
         { xtype: 'button', text: "前往發送", id: 'goSend', hidden: false,disabled: true,handler: onGoSendClick  },
-        { xtype: 'button', text: "報表", id: 'report', hidden: false, disabled: true, },
+       // { xtype: 'button', text: "報表", id: 'report', hidden: false, disabled: true, },
          '->',
          {
              xtype: 'combobox', fieldLabel: '電子報類型', id: 'search_group_name', store: EdmGroupNewStore2, displayField: 'group_name',
@@ -174,7 +176,18 @@ onGoSendClick = function () {
     } else if (row.length > 1) {
         Ext.Msg.alert("提示信息", "只能選擇一行");
     } else if (row.length == 1) {
-        sendFunction(row[0], EdmContentNewStore);
+        Ext.Ajax.request({
+            url: '/EdmNew/GetContentUrl',
+            params: {
+                content_url: row[0].data.content_url,
+                template_data: row[0].data.template_data,
+            },
+            success: function (data) {
+                row[0].data.template_data = data.responseText;
+                sendFunction(row[0], EdmContentNewStore);
+            }
+        });
+       
     }
 }
 onStatusClick = function () {

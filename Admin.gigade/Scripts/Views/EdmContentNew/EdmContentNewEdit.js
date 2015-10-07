@@ -269,19 +269,12 @@
                             params: {
                                 edit_url: Ext.getCmp('template_id').getRawValue(),
                             },
-                            success: function (form, action) {
-
-                                //alert(form.responseText);
-                               //   myMask.hide();
-                               // var result = Ext.decode(form.responseText);
-                                //if (result.success) {
-                                // var text = Ext.util.Format.htmlDecode(Ext.getCmp('kendoEditor').getValue());
-                                var text = "";
-                                $('textarea[name=kendoEditor]').data("kendoEditor").value(Ext.util.Format.htmlDecode(form.responseText));
-                               // }
+                            success: function (data) {
+                              $('textarea[name=kendoEditor]').data("kendoEditor").value(Ext.util.Format.htmlDecode(data.responseText));
+                               
                             },
                             failure: function () {
-                                alert(123);
+                                Ext.Msg.alert("提示信息","獲取網頁出現異常！");
                             }
                         });
                     }

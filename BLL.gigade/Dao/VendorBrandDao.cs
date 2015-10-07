@@ -378,14 +378,14 @@ namespace BLL.gigade.Dao
         /// </summary>
         /// <param name="brand_id"></param>
         /// <returns></returns>
-        public int DelPromoPic(int brand_id)
+        public int DelPromoPic(int brand_id,string type)
         {
 
             StringBuilder strSql = new StringBuilder();
             try
             {
 
-                strSql.AppendFormat("set sql_safe_updates = 0; update vendor_brand set promotion_banner_image='' where brand_id='{0}';set sql_safe_updates = 1;", brand_id);
+                strSql.AppendFormat("set sql_safe_updates = 0; update vendor_brand set {1}='' where brand_id='{0}';set sql_safe_updates = 1;", brand_id,type);
 
                 return _dbAccess.execCommand(strSql.ToString());
             }

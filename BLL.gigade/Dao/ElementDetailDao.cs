@@ -54,6 +54,7 @@ namespace BLL.gigade.Dao
                 //   mainSql.Append(" left join (select parametername,parametercode from t_parametersrc where parametertype='element_type') c on ap.element_type=c.parametercode");
                 //  mainSql.Append(" left join (select parametername,parametercode from t_parametersrc where parametertype='element_link_mode') d on bd.element_link_mode=d.parametercode");
                 StringBuilder condi = new StringBuilder();
+                condi.Append(" and element_status!=2  ");
                 if (query.packet_id != 0)
                 {
                     condi.AppendFormat(" and ap.packet_id={0}  ", query.packet_id);
@@ -285,6 +286,21 @@ namespace BLL.gigade.Dao
                 throw new Exception("ElementDetailDao-->QueryPacketProd-->" + ex.Message + sql.ToString(), ex);
             }
 
+        }
+
+        public string DeleteElementDetail(int element_id)
+        {
+            string json = string.Empty;
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("set sql_safe_updates = 0;update element_detail set element_status=2 where element_id='{0}';set sql_safe_updates = 1;", element_id);
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ElementDetailDao-->DeleteElementDetail-->"+sql.ToString()+ex.Message,ex);
+            }
         }
     }
 }
