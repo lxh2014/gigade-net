@@ -4517,6 +4517,7 @@
     <Content Include="App_GlobalResources\Login.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>Login.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -4537,6 +4538,7 @@
     <Content Include="App_GlobalResources\ProductItemMap.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>ProductItemMap.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -4550,6 +4552,7 @@
     <Content Include="App_GlobalResources\OrderAdd.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>OrderAdd.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -4576,6 +4579,7 @@
     <Content Include="App_GlobalResources\Promotion.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>Promotion.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <PropertyGroup>
