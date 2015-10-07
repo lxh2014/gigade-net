@@ -980,6 +980,11 @@ namespace Admin.gigade.Controllers
                 }
                 //获取出临时表中要删除的数据 
                 DataTable _dtthree = _proRemoveMgr.GetDeleteProductRemoveReasonList();
+                for (int b = 0; b < _dtthree.Rows.Count; b++)
+                {
+                    prr.item_id=Convert.ToUInt32(_dtthree.Rows[b]["item_id"]);
+                    str.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prr));
+                }
                 if (str.ToString().Length > 0)
                 {
                     resultone = _proRemoveMgr.ProductRemoveReasonTransact(str.ToString());
@@ -1012,7 +1017,7 @@ namespace Admin.gigade.Controllers
                         if (ts.Days >= (_dtNew.Rows[j]["outofstock_days_stopselling"] == "" ? 0 : Convert.ToInt32(_dtNew.Rows[j]["outofstock_days_stopselling"])))//表示可以下架,执行下架工作
                         {
                             //改变product表中商品的状态
-                            //strsql.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
+                            strsql.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
                             //网记录表中插入一条数据
                             strsql.AppendFormat(_proRemoveMgr.InsertIntoProductStatusHistory(psh));
                             //删除临时表中的数据
@@ -1049,7 +1054,7 @@ namespace Admin.gigade.Controllers
                             psh.type = 1;//1表示申请审核
                             psh.product_status = 1;//申请审核
                             psh.remark = "系统账号插入";
-                            //strslqmsg.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
+                            strslqmsg.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
                             strslqmsg.AppendFormat(_proRemoveMgr.InsertIntoProductStatusHistory(psh));
                         }
                         prr.item_id = Convert.ToUInt32(_dtOutofStock.Rows[z]["item_id"]);//根据item_id删除数据
@@ -1059,10 +1064,14 @@ namespace Admin.gigade.Controllers
 
                 if (strslqmsg.ToString().Length > 0)
                 {
-                    resultthree = _proRemoveMgr.ProductRemoveReasonTransact(strslqmsg.ToString());
+                    resultthree = _proRemoveMgr.ProductRemoveReasonTransact(strslqmsg.ToString() + strslqmsgtwo.ToString());
                 }
                 else
                 {
+                    if (strslqmsgtwo.ToString().Length > 0)
+                    {
+                        _proRemoveMgr.ProductRemoveReasonTransact(strslqmsgtwo.ToString());
+                    }
                     resultthree = 1;
                 }
                 #endregion

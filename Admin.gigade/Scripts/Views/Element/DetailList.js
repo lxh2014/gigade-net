@@ -65,6 +65,8 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
             Ext.getCmp("gdDetail").down('#edit').setDisabled(selections.length == 0);
+            Ext.getCmp("gdDetail").down('#delete').setDisabled(selections.length == 0);
+            
         }
     }
 });
@@ -196,6 +198,9 @@ Ext.onReady(function () {
         tbar: [
             { xtype: 'button', text: ADD, id: 'add', hidden: false, iconCls: 'icon-user-add', handler: onAddClick },
             { xtype: 'button', text: EDIT, id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
+            {
+                xtype: 'button', text: "刪除", id: 'delete', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onDeleteClick
+            },
             '->',
             {
                 xtype: 'combobox',
@@ -371,6 +376,49 @@ onEditClick = function () {
         else {
             editFunction(row[0], ElementDetailStore, null);
         }
+
+    }
+}
+
+onDeleteClick = function () {
+    var row = Ext.getCmp("gdDetail").getSelectionModel().getSelection();
+    var rowIDs="";
+    if (row.length == 0) {
+        Ext.Msg.alert(INFORMATION, NO_SELECTION);
+    }
+    else if (row.length >= 1) {
+        for (var i = 0; i < row.length; i++) {
+            rowIDs += row[i].data.element_id+"|";
+        }
+        Ext.Msg.confirm("確認", Ext.String.format("刪除選中" + row.length + "條數據?", row.length), function (btn) {
+            if (btn == 'yes') {
+                var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                myMask.show();
+                Ext.Ajax.request({
+                    url: '/Element/DeleteElementDetail',
+                    params: {
+                        rowIDs: rowIDs,
+                    },
+                    success: function (form, action) {
+                        myMask.hide();
+                        var result = Ext.decode(form.responseText);
+                        if (result.success) {
+                            Ext.Msg.alert("提示信息", "刪除成功！");
+                            ElementDetailStore.load();
+                        }
+                        else {
+                            Ext.Msg.alert("提示信息", "刪除失敗！");
+                            
+                        }
+                    },
+                    failure: function () {
+                        myMask.hide();
+                        Ext.Msg.alert("提示信息", "出現異常！");
+                       
+                    }
+                });
+            }
+        });
 
     }
 }

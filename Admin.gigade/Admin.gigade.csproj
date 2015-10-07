@@ -1983,7 +1983,9 @@
     <Content Include="Template\ProductDetail\product_detail_safe.txt" />
     <Content Include="XML\Exceptional.xml" />
     <Content Include="XML\ItemPrice.xml" />
-    <Content Include="XML\ParticularsSrc.xml" />
+    <Content Include="XML\ParticularsSrc.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="XML\ProductItemHistory.xml" />
     <Content Include="XML\SaleSum.xml" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\config.rb" />

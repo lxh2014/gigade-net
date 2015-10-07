@@ -17,5 +17,6 @@ namespace BLL.gigade.Dao.Impl
         List<ElementDetail> QueryElementDetail();
         List<ElementDetailQuery> QueryAllWares(ElementDetailQuery query, out int totalCount);
         List<ElementDetailQuery> QueryPacketProd(ElementDetail model);
+        string DeleteElementDetail(int element_id);
     }
 }

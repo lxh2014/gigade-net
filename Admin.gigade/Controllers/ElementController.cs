@@ -987,6 +987,41 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
 
+        #region 刪除
+        public HttpResponseBase DeleteElementDetail()
+        {
+            string json = string.Empty;
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["rowIDs"]))
+                {
+                    _elementDetailMgr = new ElementDetailMgr(mySqlConnectionString);
+                    string rowIDs = Request.Params["rowIDs"].Trim('|');
+                    string[] newRowID = rowIDs.Split('|');
+                    if (_elementDetailMgr.DeleteElementDetail(newRowID))
+                    {
+                        json = "{success:true}";
+                    }
+                    else
+                    {
+                        json = "{success:false}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
         #region 獲取元素詳情列表中類別中的所有商品，包含父節點及其下面的子節點
         public HttpResponseBase GetProductByCategorySet()
         {

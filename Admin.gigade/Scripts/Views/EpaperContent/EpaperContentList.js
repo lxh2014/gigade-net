@@ -4,37 +4,37 @@
 var searchStore = Ext.create('Ext.data.Store', {
     fields: ['searchCondition', 'searchValue'],
     data: [
-        { "searchCondition": "所有資料", "searchValue": "0" },
-        { "searchCondition": "標題", "searchValue": "1" },
-        { "searchCondition": "短標題", "searchValue": "2" },
-        { "searchCondition": "上稿者", "searchValue": "3" }
+    { "searchCondition": "所有資料", "searchValue": "0" },
+    { "searchCondition": "標題", "searchValue": "1" },
+    { "searchCondition": "短標題", "searchValue": "2" },
+    { "searchCondition": "上稿者", "searchValue": "3" }
     ]
 });
 var sizeStore = Ext.create('Ext.data.Store', {
     fields: ['sizeText', 'sizeValue'],
     data: [
-         { "sizeText": "所有尺寸", "sizeValue": "0" },
-        { "sizeText": "725px", "sizeValue": "725px" },
-        { "sizeText": "900px", "sizeValue": "900px" }
+    { "sizeText": "所有尺寸", "sizeValue": "0" },
+    { "sizeText": "725px", "sizeValue": "725px" },
+    { "sizeText": "900px", "sizeValue": "900px" }
     ]
 });
 var activeStatusStore = Ext.create('Ext.data.Store', {
     fields: ['activeStatusText', 'activeStatusValue'],
     data: [
-         { "activeStatusText": "所有狀態", "activeStatusValue": "-1" },
-        { "activeStatusText": "新建", "activeStatusValue": "0" },
-        { "activeStatusText": "顯示", "activeStatusValue": "1" },
-        { "activeStatusText": "隱藏", "activeStatusValue": "2" },
-        { "activeStatusText": "下檔", "activeStatusValue": "3" }
+    { "activeStatusText": "所有狀態", "activeStatusValue": "-1" },
+    { "activeStatusText": "新建", "activeStatusValue": "0" },
+    { "activeStatusText": "顯示", "activeStatusValue": "1" },
+    { "activeStatusText": "隱藏", "activeStatusValue": "2" },
+    { "activeStatusText": "下檔", "activeStatusValue": "3" }
     ]
 });
 //日期條件
 var dateStore = Ext.create('Ext.data.Store', {
     fields: ['searchCondition', 'searchValue'],
     data: [
-        { "searchCondition": "所有日期", "searchValue": "0" },
-        { "searchCondition": "上線日期", "searchValue": "1" },
-        { "searchCondition": "下線日期", "searchValue": "2" }
+    { "searchCondition": "所有日期", "searchValue": "0" },
+    { "searchCondition": "上線日期", "searchValue": "1" },
+    { "searchCondition": "下線日期", "searchValue": "2" }
     ]
 });
 
@@ -42,26 +42,26 @@ var dateStore = Ext.create('Ext.data.Store', {
 Ext.define('gigade.EpaperContentModel', {
     extend: 'Ext.data.Model',
     fields: [
-        { name: "epaper_id", type: "int" },
-        { name: "user_id", type: "int" },
-          { name: "user_username", type: "string" },
-        { name: "epaper_title", type: "string" },
-        { name: "epaper_short_title", type: "string" },
-        { name: "epaper_content", type: "string" },
-        { name: "epaper_sort", type: "int" },
-        { name: "epaper_status", type: "int" },
-        { name: "epaper_size", type: "string" },
-        { name: "epaper_show_start", type: "string" },
-        { name: "epaper_show_end", type: "string" },
-        { name: "fb_description", type: "string" },
-        { name: "epaper_createdate", type: "string" },
-        { name: "epaper_updatedate", type: "string" },
-        { name: "epaper_ipfrom", type: "string" },
-         { name: "epaperShowStart", type: "string" },
-        { name: "epaperShowEnd", type: "string" },
-                 { name: "epaperCreateDate", type: "string" },
-        { name: "epaperUpdateDate", type: "string" },
-        { name: "type", type: "int" }
+    { name: "epaper_id", type: "int" },
+    { name: "user_id", type: "int" },
+    { name: "user_username", type: "string" },
+    { name: "epaper_title", type: "string" },
+    { name: "epaper_short_title", type: "string" },
+    { name: "epaper_content", type: "string" },
+    { name: "epaper_sort", type: "int" },
+    { name: "epaper_status", type: "int" },
+    { name: "epaper_size", type: "string" },
+    { name: "epaper_show_start", type: "string" },
+    { name: "epaper_show_end", type: "string" },
+    { name: "fb_description", type: "string" },
+    { name: "epaper_createdate", type: "string" },
+    { name: "epaper_updatedate", type: "string" },
+    { name: "epaper_ipfrom", type: "string" },
+    { name: "epaperShowStart", type: "string" },
+    { name: "epaperShowEnd", type: "string" },
+    { name: "epaperCreateDate", type: "string" },
+    { name: "epaperUpdateDate", type: "string" },
+    { name: "type", type: "int" }
 
     ]
 });
@@ -98,20 +98,20 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
 });
 EpaperContentStore.on('beforeload', function () {
     Ext.apply(EpaperContentStore.proxy.extraParams,
-        {
-            searchCon: Ext.getCmp('searchCon').getValue(),
-            search_text: Ext.getCmp('search_text').getValue(),
-            dateCon: Ext.getCmp('dateCon').getValue(),
-            date_start: Ext.getCmp('timestart').getValue(),
-            date_end: Ext.getCmp('timeend').getValue(),
-            activeStatus: Ext.getCmp('activeStatus').getValue(),
-            sizeCon: Ext.getCmp('sizeCon').getRawValue()
+    {
+        searchCon: Ext.getCmp('searchCon').getValue(),
+        search_text: Ext.getCmp('search_text').getValue(),
+        dateCon: Ext.getCmp('dateCon').getValue(),
+        date_start: Ext.getCmp('timestart').getValue(),
+        date_end: Ext.getCmp('timeend').getValue(),
+        activeStatus: Ext.getCmp('activeStatus').getValue(),
+        sizeCon: Ext.getCmp('sizeCon').getRawValue()
 
-        });
+    });
 });
 var EditTpl = new Ext.XTemplate(
-        '<a href=javascript:TranToDetial("/EpaperContent/EpaperLogList","{epaper_id}")>' + "記錄" + '</a> '
-    );
+'<a href=javascript:TranToDetial("/EpaperContent/EpaperLogList","{epaper_id}")>' + "記錄" + '</a> '
+);
 
 Ext.onReady(function () {
     var searFrm = Ext.create('Ext.form.Panel', {
@@ -121,161 +121,161 @@ Ext.onReady(function () {
         height: 140,
         width: document.documentElement.clientWidth,
         items: [
-              {
-                  xtype: 'fieldcontainer',
-                  layout: 'hbox',
-                  items: [
-                         {
-                             xtype: 'combobox',
-                             store: searchStore,
-                             id: 'searchCon',
-                             fieldLabel: '查詢條件',
-                             displayField: 'searchCondition',
-                             valueField: 'searchValue',
-                             width: 180,
-                             labelWidth: 60,
-                             margin: '5 5 2 2',
-                             forceSelection: false,
-                             editable: false,
-                             value: '0'
-                         },
-                          {
-                              xtype: 'textfield',
-                              fieldLabel: "查詢內容",
-                              width: 180,
-                              labelWidth: 60,
-                              margin: '5 0 2 2',
-                              id: 'search_text',
-                              name: 'search_text',
-                              value: ""
-                          }
-                  ]
-              },
+        {
+            xtype: 'fieldcontainer',
+            layout: 'hbox',
+            items: [
             {
-                xtype: 'fieldcontainer',
-                layout: 'hbox',
-                items: [
-                    {
-                        xtype: 'combobox',
-                        id: 'dateCon',
-                        name: 'dateCon',
-                        store: dateStore,
-                        displayField: 'searchCondition',
-                        valueField: 'searchValue',
-                        fieldLabel: '日期條件',
-                        value: '0',
-                        editable: false,
-                        labelWidth: 60,
-                        width: 180,
-                        margin: '0 5 0 2'
-                    },
-                    {
-                        xtype: 'datetimefield', allowBlank: true, id: 'timestart', format: 'Y-m-d H:i:s', name: 'serchcontent', editable: false, labelWidth: 60, listeners: {//value: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate(), 0, 0, 0),
-                            select: function (a, b, c) {
-                                var start = Ext.getCmp("timestart");
-                                var end = Ext.getCmp("timeend");
-                                if (end.getValue() == null) {
-                                    end.setValue(setNextMonth(start.getValue(), 1));
-                                } else if (end.getValue() < start.getValue()) {
-                                    Ext.Msg.alert(INFORMATION, DATA_TIP);
-                                    start.setValue(setNextMonth(end.getValue(), -1));
-                                }
-                                else if (end.getValue() > setNextMonth(start.getValue(), 3)) {
-                                    // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                                    end.setValue(setNextMonth(start.getValue(), 1));
-                                }
-                            }
-                        }
-                    },
-                    {
-                        xtype: 'displayfield',
-                        value: '~'
-                    },
-                        {
-                            xtype: 'datetimefield', allowBlank: true, id: 'timeend', format: 'Y-m-d H:i:s', editable: false, name: 'serchcontent', listeners: {//value: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 23, 59, 59), 
-                                select: function (a, b, c) {
-                                    var start = Ext.getCmp("timestart");
-                                    var end = Ext.getCmp("timeend");
-                                    if (start.getValue() != "" && start.getValue() != null) {
-                                        if (end.getValue() < start.getValue()) {
-                                            Ext.Msg.alert(INFORMATION, DATA_TIP);
-                                            end.setValue(setNextMonth(start.getValue(), 1));
-                                        }
-                                        else if (end.getValue() > setNextMonth(start.getValue(), 3)) {
-                                            // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                                            start.setValue(setNextMonth(end.getValue(), -1));
-                                        }
-                                    }
-                                    else {
-                                        start.setValue(setNextMonth(end.getValue(), -1));
-                                    }
-                                }
-                            }
-
-                        }
-                ]
-            }
-             ,
-              {
-                  xtype: 'fieldcontainer',
-                  layout: 'hbox',
-                  items: [
-                        {
-                            xtype: 'combobox',
-                            store: activeStatusStore,
-                            id: 'activeStatus',
-                            fieldLabel: '活動狀態',
-                            displayField: 'activeStatusText',
-                            valueField: 'activeStatusValue',
-                            width: 180,
-                            labelWidth: 60,
-                            margin: '0 5 5 2',
-                            forceSelection: false,
-                            editable: false,
-                            value: '-1'
-                        },
-                        {
-                            xtype: 'combobox',
-                            store: sizeStore,
-                            id: 'sizeCon',
-                            fieldLabel: '尺寸',
-                            displayField: 'sizeText',
-                            valueField: 'sizeValue',
-                            width: 180,
-                            labelWidth: 60,
-                            margin: '0 5 5 2',
-                            forceSelection: false,
-                            editable: false,
-                            value: '0'
-                        }
-                  ]
-              }
-        ],
-        buttonAlign: 'left',
-        buttons: [
-            {
-                text: SEARCH,
-                iconCls: 'icon-search',
-                id: 'btnQuery',
-                margin: '5 5 2 5',
-                handler: Query
+                xtype: 'combobox',
+                store: searchStore,
+                id: 'searchCon',
+                fieldLabel: '查詢條件',
+                displayField: 'searchCondition',
+                valueField: 'searchValue',
+                width: 180,
+                labelWidth: 60,
+                margin: '5 5 2 2',
+                forceSelection: false,
+                editable: false,
+                value: '0'
             },
             {
-                text: RESET,
-                id: 'btn_reset',
-                margin: '5 0 2 0',
-                listeners: {
-                    click: function () {
-                        Ext.getCmp('searchCon').setValue('0');
-                        Ext.getCmp('search_text').setValue("");
-                        Ext.getCmp('dateCon').setValue('0');
-                        Ext.getCmp('activeStatus').setValue('-1');
-                        Ext.getCmp('sizeCon').setValue('0');
-                        Ext.getCmp('timestart').setValue(null);
-                        Ext.getCmp('timeend').setValue(null);
+                xtype: 'textfield',
+                fieldLabel: "查詢內容",
+                width: 180,
+                labelWidth: 60,
+                margin: '5 0 2 2',
+                id: 'search_text',
+                name: 'search_text',
+                value: ""
+            }
+            ]
+        },
+        {
+            xtype: 'fieldcontainer',
+            layout: 'hbox',
+            items: [
+            {
+                xtype: 'combobox',
+                id: 'dateCon',
+                name: 'dateCon',
+                store: dateStore,
+                displayField: 'searchCondition',
+                valueField: 'searchValue',
+                fieldLabel: '日期條件',
+                value: '0',
+                editable: false,
+                labelWidth: 60,
+                width: 180,
+                margin: '0 5 0 2'
+            },
+            {
+                xtype: 'datetimefield', allowBlank: true, id: 'timestart', format: 'Y-m-d H:i:s', name: 'serchcontent', editable: false, labelWidth: 60, listeners: {//value: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate(), 0, 0, 0),
+                    select: function (a, b, c) {
+                        var start = Ext.getCmp("timestart");
+                        var end = Ext.getCmp("timeend");
+                        if (end.getValue() == null) {
+                            end.setValue(setNextMonth(start.getValue(), 1));
+                        } else if (end.getValue() < start.getValue()) {
+                            Ext.Msg.alert(INFORMATION, DATA_TIP);
+                            start.setValue(setNextMonth(end.getValue(), -1));
+                        }
+                        else if (end.getValue() > setNextMonth(start.getValue(), 3)) {
+                            // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                            end.setValue(setNextMonth(start.getValue(), 1));
+                        }
                     }
                 }
             },
+            {
+                xtype: 'displayfield',
+                value: '~'
+            },
+            {
+                xtype: 'datetimefield', allowBlank: true, id: 'timeend', format: 'Y-m-d H:i:s', editable: false, name: 'serchcontent', listeners: {//value: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 23, 59, 59), 
+                    select: function (a, b, c) {
+                        var start = Ext.getCmp("timestart");
+                        var end = Ext.getCmp("timeend");
+                        if (start.getValue() != "" && start.getValue() != null) {
+                            if (end.getValue() < start.getValue()) {
+                                Ext.Msg.alert(INFORMATION, DATA_TIP);
+                                end.setValue(setNextMonth(start.getValue(), 1));
+                            }
+                            else if (end.getValue() > setNextMonth(start.getValue(), 3)) {
+                                // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                                start.setValue(setNextMonth(end.getValue(), -1));
+                            }
+                        }
+                        else {
+                            start.setValue(setNextMonth(end.getValue(), -1));
+                        }
+                    }
+                }
+
+            }
+            ]
+        }
+        ,
+        {
+            xtype: 'fieldcontainer',
+            layout: 'hbox',
+            items: [
+            {
+                xtype: 'combobox',
+                store: activeStatusStore,
+                id: 'activeStatus',
+                fieldLabel: '活動狀態',
+                displayField: 'activeStatusText',
+                valueField: 'activeStatusValue',
+                width: 180,
+                labelWidth: 60,
+                margin: '0 5 5 2',
+                forceSelection: false,
+                editable: false,
+                value: '-1'
+            },
+            {
+                xtype: 'combobox',
+                store: sizeStore,
+                id: 'sizeCon',
+                fieldLabel: '尺寸',
+                displayField: 'sizeText',
+                valueField: 'sizeValue',
+                width: 180,
+                labelWidth: 60,
+                margin: '0 5 5 2',
+                forceSelection: false,
+                editable: false,
+                value: '0'
+            }
+            ]
+        }
+        ],
+        buttonAlign: 'left',
+        buttons: [
+        {
+            text: SEARCH,
+            iconCls: 'icon-search',
+            id: 'btnQuery',
+            margin: '5 5 2 5',
+            handler: Query
+        },
+        {
+            text: RESET,
+            id: 'btn_reset',
+            margin: '5 0 2 0',
+            listeners: {
+                click: function () {
+                    Ext.getCmp('searchCon').setValue('0');
+                    Ext.getCmp('search_text').setValue("");
+                    Ext.getCmp('dateCon').setValue('0');
+                    Ext.getCmp('activeStatus').setValue('-1');
+                    Ext.getCmp('sizeCon').setValue('0');
+                    Ext.getCmp('timestart').setValue(null);
+                    Ext.getCmp('timeend').setValue(null);
+                }
+            }
+        },
         ],
     });
 
@@ -293,62 +293,62 @@ Ext.onReady(function () {
             }
         },
         columns: [
-             { header: "編號", dataIndex: 'epaper_id', width: 60, align: 'center' },
-              { header: '記錄', width: 60, align: 'center', xtype: 'templatecolumn', tpl: EditTpl },
-             { header: '上稿者', dataIndex: 'user_username', width: 100, align: 'center' },
-             { header: '標題', dataIndex: 'epaper_title', width: 300, align: 'center' },
-             { header: "短標題", dataIndex: 'epaper_short_title', width: 100, align: 'center' },
-             { header: "排序", dataIndex: 'epaper_sort', width: 80, align: 'center' },
-             {//0:新建1顯示2隱藏3下檔
-                 header: '狀態', dataIndex: 'epaper_status', width: 150, align: 'center',
-                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                     if (record.data.epaper_status == 1) {
-                         return "顯示";
-                     }
-                     if (record.data.epaper_status == 0) {
-                         return "<span style=' color:red'>新建</span>";
-                     }
-                     if (record.data.epaper_status == 2) {
-                         return "<span style=' color:red'>隱藏</span>";
-                     }
-                     if (record.data.epaper_status == 3) {
-                         return "<span style=' color:red'>下檔</span>";
-                     }
-                 }
-             },
-            { header: "尺寸", dataIndex: 'epaper_size', width: 150, align: 'center' },
-            {
-                header: '上線時間', dataIndex: 'epaperShowStart', width: 150, align: 'center',
-                renderer: function (value) {
-                    if (value > Today2()) {
-                        return "<span style='color:red'>" + value + "</span>";
-                    }
-                    else {
-                        return value;
-                    }
+        { header: "編號", dataIndex: 'epaper_id', width: 60, align: 'center' },
+        { header: '記錄', width: 60, align: 'center', xtype: 'templatecolumn', tpl: EditTpl },
+        { header: '上稿者', dataIndex: 'user_username', width: 100, align: 'center' },
+        { header: '標題', dataIndex: 'epaper_title', width: 300, align: 'center' },
+        { header: "短標題", dataIndex: 'epaper_short_title', width: 100, align: 'center' },
+        { header: "排序", dataIndex: 'epaper_sort', width: 80, align: 'center' },
+        {//0:新建1顯示2隱藏3下檔
+            header: '狀態', dataIndex: 'epaper_status', width: 150, align: 'center',
+            renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                if (record.data.epaper_status == 1) {
+                    return "顯示";
                 }
-            },
-             {
-                 header: '下線時間', dataIndex: 'epaperShowEnd', width: 150, align: 'center',
-                 renderer: function (value) {
-                     if (value < Today2()) {
-                         return "<span style='color:red'>" + value + "</span>";
-                     }
-                     else {
-                         return value;
-                     }
-                 }
-             }
-            //{ header: BANNERLINKURL, dataIndex: 'fb_description', width: 100, align: 'center' },
-            //{ header: BANNERLINKMODE, dataIndex: 'epaper_createdate', width: 80, align: 'center', hidden: true },
-            //{ header: BANNERLINKMODE, dataIndex: 'epaper_updatedate', width: 80, align: 'center' },
-            //{ header: BANNERSORT, dataIndex: 'epaper_ipfrom', width: 50, align: 'center' },
-            //{ header: BANNERSTATUS, dataIndex: 'type', width: 100, align: 'center', hidden: true }
+                if (record.data.epaper_status == 0) {
+                    return "<span style=' color:red'>新建</span>";
+                }
+                if (record.data.epaper_status == 2) {
+                    return "<span style=' color:red'>隱藏</span>";
+                }
+                if (record.data.epaper_status == 3) {
+                    return "<span style=' color:red'>下檔</span>";
+                }
+            }
+        },
+        { header: "尺寸", dataIndex: 'epaper_size', width: 150, align: 'center' },
+        {
+            header: '上線時間', dataIndex: 'epaperShowStart', width: 150, align: 'center',
+            renderer: function (value) {
+                if (value > Today2()) {
+                    return "<span style='color:red'>" + value + "</span>";
+                }
+                else {
+                    return value;
+                }
+            }
+        },
+        {
+            header: '下線時間', dataIndex: 'epaperShowEnd', width: 150, align: 'center',
+            renderer: function (value) {
+                if (value < Today2()) {
+                    return "<span style='color:red'>" + value + "</span>";
+                }
+                else {
+                    return value;
+                }
+            }
+        }
+        //{ header: BANNERLINKURL, dataIndex: 'fb_description', width: 100, align: 'center' },
+        //{ header: BANNERLINKMODE, dataIndex: 'epaper_createdate', width: 80, align: 'center', hidden: true },
+        //{ header: BANNERLINKMODE, dataIndex: 'epaper_updatedate', width: 80, align: 'center' },
+        //{ header: BANNERSORT, dataIndex: 'epaper_ipfrom', width: 50, align: 'center' },
+        //{ header: BANNERSTATUS, dataIndex: 'type', width: 100, align: 'center', hidden: true }
 
         ],
         tbar: [
-            { xtype: 'button', text: ADD, id: 'add', iconCls: 'icon-user-add', handler: onAddClick,hidden:true },
-            { xtype: 'button', text: EDIT, id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick }
+        { xtype: 'button', text: ADD, id: 'add', iconCls: 'icon-user-add', handler: onAddClick, hidden: true },
+        { xtype: 'button', text: EDIT, id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick }
 
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
@@ -383,6 +383,9 @@ Ext.onReady(function () {
         }
     });
     ToolAuthority();
+    if (window.parent.Ext.getCmp('ContentPanel').activeTab.name == 'EpaperContentEdit') {
+        EpaperContentStore.load({ params: { start: 0, limit: 25 } });
+    }
 });
 
 //添加
@@ -397,8 +400,10 @@ onAddClick = function () {
         id: 'detial',
         title: '新增活動列表頁',
         html: window.top.rtnFrame(urlTran),
+        name: panel.activeTab.title,
         closable: true
     });
+    panel.activeTab.close();
     panel.setActiveTab(copy);
     panel.doLayout();
 }
@@ -420,8 +425,10 @@ onEditClick = function () {
             id: 'detial',
             title: '編輯活動列表頁',
             html: window.top.rtnFrame(urlTran),
+            name: panel.activeTab.title,
             closable: true
         });
+        panel.activeTab.close();
         panel.setActiveTab(copy);
         panel.doLayout();
     }
@@ -429,15 +436,12 @@ onEditClick = function () {
 function Query(x) {
     var searchCon = Ext.getCmp('searchCon').getValue();
     var search_text = Ext.getCmp('search_text').getValue();
-    if (Ext.getCmp('dateCon').getValue() != "0")
-    {
-        if (Ext.getCmp('timestart').getValue() == ("" || null))
-        {
+    if (Ext.getCmp('dateCon').getValue() != "0") {
+        if (Ext.getCmp('timestart').getValue() == ("" || null)) {
             Ext.Msg.alert(INFORMATION, "請選擇查詢日期");
             return;
         }
-        if (Ext.getCmp('timeend').getValue() == ("" || null))
-        {
+        if (Ext.getCmp('timeend').getValue() == ("" || null)) {
             Ext.Msg.alert(INFORMATION, "請選擇查詢日期");
             return;
         }

@@ -321,15 +321,25 @@ function editFunction(rowID) {
                         ]
                     },
                      {
+                         xtype: 'fieldcontainer',
+                         combineErrors: true,
+                         layout: 'hbox',
+                         anchor: '90%',
+                         items: [
+                     {
                          xtype: 'filefield',
                          fieldLabel: '形象圖片',
                          name: 'Image_Name',
                          id: 'Image_Name',
                          msgTarget: 'side',
                          allowBlank: true,
-                         anchor: '85%',
+                         flex: 1,
                          buttonText: '選擇...',
                          fileUpload: true
+                     },
+                      {
+                          xtype: 'button', id: 'delImage', margin: '0 0 0 3', iconCls: 'icon-cross', handler: onDelProPicClick
+                      }]
                      },
                     {
                         xtype: 'textfield',
@@ -341,7 +351,12 @@ function editFunction(rowID) {
                         hidden: false,
                         anchor: '90%'
                     },
-
+                     {
+                         xtype: 'fieldcontainer',
+                         combineErrors: true,
+                         layout: 'hbox',
+                         anchor: '90%',
+                         items: [
                     {
                         xtype: 'filefield',
                         fieldLabel: '安心聲明圖片',
@@ -349,10 +364,14 @@ function editFunction(rowID) {
                         id: 'Resume_Image',
                         msgTarget: 'side',
                         allowBlank: true,
-                        anchor: '85%',
+                        flex: 1,
                         buttonText: '選擇...',
                         fileUpload: true
                     },
+                     {
+                         xtype: 'button', id: 'delResume', margin: '0 0 0 3', iconCls: 'icon-cross', handler: onDelProPicClick
+                     }]
+                     },
                     {
                         xtype: 'textfield',
                         fieldLabel: '圖片連接地址',
@@ -363,7 +382,7 @@ function editFunction(rowID) {
                         hidden: false,
                         anchor: '90%'
                     },
-                     { //會員群組和會員條件二擇一
+                     {
                          xtype: 'fieldcontainer',
                          combineErrors: true,
                          layout: 'hbox',
@@ -381,7 +400,7 @@ function editFunction(rowID) {
                         fileUpload: true
                     },
                     {
-                        xtype: 'button', id: 'delete', margin: '0 0 0 3', iconCls: 'icon-cross', handler: onDelProPicClick
+                        xtype: 'button', id: 'delPromo', margin: '0 0 0 3', iconCls: 'icon-cross', handler: onDelProPicClick
                     }]
                      },
                     {
@@ -534,8 +553,27 @@ function editFunction(rowID) {
 
 
     function onDelProPicClick() {
-        var pic = Ext.getCmp('Promotion_Banner_Image').getValue();
-        if (pic != null && pic != "") {
+        var type = "";
+        var targetID = "";
+        switch (this.id) {
+            case "delImage":
+                type = "image_name";
+                targetID = "Image_Name";
+                break;
+            case "delResume":
+                type = "resume_image";
+                targetID = "Resume_Image";
+                break;
+            case "delPromo":
+                type = "promotion_banner_image";
+                targetID = "Promotion_Banner_Image";
+                break;
+            default:
+                break;
+
+        }
+        var pic = Ext.getCmp(targetID).getValue();
+        if (pic != null && pic != "" && type != "") {
             Ext.MessageBox.confirm(CONFIRM, "圖片刪除后將無法找回,是否確認刪除？", function (btn) {
                 if (btn === "yes") {
                     Ext.Ajax.request({
@@ -543,20 +581,21 @@ function editFunction(rowID) {
                         method: 'post',
                         params: {
                             "brand_id": row.data.Brand_Id,
+                            "type": type,
                             "src": pic
                         },
                         success: function (form, action) {
                             var result = Ext.decode(form.responseText);
                             if (result.success) {
 
-                                Ext.getCmp('Promotion_Banner_Image').setRawValue("");
+                                Ext.getCmp(targetID).setRawValue("");
                             }
                             else {
-                                Ext.Msg.alert(INFORMATION, "促銷圖片刪除失敗！");
+                                Ext.Msg.alert(INFORMATION, "圖片刪除失敗！");
                             }
                         },
                         failure: function () {
-                            Ext.Msg.alert(INFORMATION, "促銷圖片刪除失敗！");
+                            Ext.Msg.alert(INFORMATION, "圖片刪除失敗！");
                         }
 
                     });
