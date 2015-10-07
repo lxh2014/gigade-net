@@ -77,8 +77,8 @@ namespace BLL.gigade.Dao
            query.Replace4MySQL();
            try
            {
-               sql.Append("insert into edm_group_new (group_name, is_member_edm,trial_url, sort_order,description)values ");
-               sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}')", query.group_name, query.is_member_edm,query.trial_url, query.sort_order, query.description);
+               sql.Append("insert into edm_group_new (group_name, is_member_edm,trial_url, sort_order,description,group_createdate,group_create_userid,group_update_userid)values ");
+               sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}',NOW(),'{5}','{6}')", query.group_name, query.is_member_edm,query.trial_url, query.sort_order, query.description,query.group_create_userid,query.group_update_userid);
 
                return _access.execCommand(sql.ToString());
            }
@@ -94,7 +94,7 @@ namespace BLL.gigade.Dao
            query.Replace4MySQL();
            try
            {
-               sql.AppendFormat("update edm_group_new set group_name = '{0}', is_member_edm = '{1}', trial_url='{2}',sort_order = '{3}',description='{4}'  where group_id='{5}' ", query.group_name, query.is_member_edm, query.trial_url,query.sort_order, query.description,query.group_id);
+               sql.AppendFormat("update edm_group_new set group_name = '{0}', is_member_edm = '{1}', trial_url='{2}',sort_order = '{3}',description='{4}',group_update_userid='{5}'  where group_id='{6}' ", query.group_name, query.is_member_edm, query.trial_url, query.sort_order, query.description,query.group_update_userid, query.group_id);
                return _access.execCommand(sql.ToString());
            }
            catch (Exception ex)

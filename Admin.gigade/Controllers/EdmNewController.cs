@@ -165,6 +165,9 @@ namespace Admin.gigade.Controllers
                 {
                     query.description = Request.Params["description"];
                 }
+
+                query.group_create_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+                query.group_update_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 int _dt = edmgroupmgr.SaveEdmGroupNewAdd(query);
 
                 if (_dt > 0)
@@ -538,7 +541,7 @@ namespace Admin.gigade.Controllers
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
-                json = "{success:false}";
+                json = "獲取網頁出現異常！";
             }
             this.Response.Clear();
             this.Response.Write(json);
@@ -580,7 +583,7 @@ namespace Admin.gigade.Controllers
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
-                json = "{success:false}";
+                json = "獲取網頁出現異常！";
             }
             this.Response.Clear();
             this.Response.Write(json);

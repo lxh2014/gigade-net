@@ -80,7 +80,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"INSERT INTO email_block_list(email_address,block_reason,block_create_userid,block_update_userid) VALUES('{0}','{1}','{2}','{3}');", query.email_address, query.block_reason, query.block_create_userid, query.block_update_userid);
+                sql.AppendFormat(@"INSERT INTO email_block_list(email_address,block_reason,block_create_userid,block_update_userid,block_createdate,block_updatedate) VALUES('{0}','{1}','{2}','{3}',NOW(),NOW());", query.email_address, query.block_reason, query.block_create_userid, query.block_update_userid);
                 return _access.execCommand(sql.ToString());
             }
             catch (MySqlException ex)
@@ -99,7 +99,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"UPDATE email_block_list SET block_reason='{0}' ,block_update_userid={1} WHERE email_address='{2}'", query.block_reason, query.block_update_userid, query.email_address);
+                sql.AppendFormat(@"UPDATE email_block_list SET block_reason='{0}' ,block_update_userid={1},block_updatedate=NOW() WHERE email_address='{2}'", query.block_reason, query.block_update_userid, query.email_address);
                 return _access.execCommand(sql.ToString());
             }
             catch (MySqlException ex)
