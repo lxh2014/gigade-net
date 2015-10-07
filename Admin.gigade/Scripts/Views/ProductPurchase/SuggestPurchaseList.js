@@ -22,10 +22,10 @@ Ext.define('gigade.Product', {
         { name: "product_id", type: "int" },//商品編號
         { name: "item_id", type: "string" },//商品細項編號
         { name: "product_name", type: "string" },//商品名稱
-        { name: "spec_id_1", type: "string" },//規格1
+       // { name: "spec_id_1", type: "string" },//規格1
         { name: "spec_title_1", type: "string" },//規格1
-        { name: "spec_id_2", type: "string" },//規格2
-        { name: "spec_title_2", type: "string" },//規格2
+       // { name: "spec_id_2", type: "string" },//規格2
+        //{ name: "spec_title_2", type: "string" },//規格2
         { name: "product_mode_name", type: "string" },//出貨方式
         { name: "prepaid", type: "int" },//是否買斷
         { name: "item_stock", type: "string" },//庫存量
@@ -407,23 +407,23 @@ Ext.onReady(function () {
             { header: "商品ERP編號", dataIndex: 'erp_id', width: 80, align: 'center' },
             { header: "商品名稱", dataIndex: 'product_name', width: 150, align: 'center' },
             {
-                header: "規格1",
+                header: "規格",
                 dataIndex: 'spec_title_1',
                 width: 100,
                 align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    return record.data.spec_title_1 + record.data.spec_id_1;
+                    return record.data.spec_title_1;
                 }
             },
-            {
-                header: "規格2",
-                dataIndex: 'spec_title_2',
-                width: 100,
-                align: 'center',
-                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    return record.data.spec_title_2 + record.data.spec_id_2
-                }
-            },
+            //{
+            //    header: "規格2",
+            //    dataIndex: 'spec_title_2',
+            //    width: 100,
+            //    align: 'center',
+            //    renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+            //        return record.data.spec_title_2 + record.data.spec_id_2
+            //    }
+            //},
             {
                 header: "出貨方式", dataIndex: 'product_mode_name', width: 80, align: 'center'
                 //,
