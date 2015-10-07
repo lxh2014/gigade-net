@@ -87,7 +87,6 @@ namespace Admin.gigade.Controllers
         /// <returns>Super Excel匯出</returns>
         public void SuperExportExcel()
         {
-
             SuperQuery query = new SuperQuery();
             int totalCount = 0;
             string json = string.Empty;
@@ -115,14 +114,12 @@ namespace Admin.gigade.Controllers
                     string[] sqlArray = query.superSql.Split(' ', ',', '(', ')');
                     if (sqlArray[0].ToLower() != "select")
                     {
-                        Response.Write("Sql語句不是查詢語句，請輸入查詢語句 ");
-                        
+                        Response.Write("Sql語句不是查詢語句，請輸入查詢語句 ");                      
                     }
                 }
                 else
                 {
-                    Response.Write("查詢語句為空！");
-                    
+                    Response.Write("查詢語句為空！");                   
                 }
 
                 //檢查Sql語句是否錯誤

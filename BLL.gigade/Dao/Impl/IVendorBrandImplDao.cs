@@ -31,7 +31,7 @@ namespace BLL.gigade.Dao.Impl
         int AddVendorBrandStory(VendorBrandQuery query);
         int GetClassify(VendorBrandQuery query);
         List<VendorBrand> GetVendorBrand(VendorBrandQuery query);
-        int DelPromoPic(int brand_id);
+        int DelPromoPic(int brand_id,string type);
         List<VendorBrandQuery> GetBandList(VendorBrandQuery query);
     }
 }

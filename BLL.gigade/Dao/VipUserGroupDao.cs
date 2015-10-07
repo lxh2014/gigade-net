@@ -215,6 +215,7 @@ namespace BLL.gigade.Dao
                         {
                             sql.AppendFormat(" and u.user_name like'%{0}%' ", vu.content.Trim());
                         }
+                        sql.Append("order by u.user_id");//by zhaozhi0623j添加
                     }
                     else
                     {

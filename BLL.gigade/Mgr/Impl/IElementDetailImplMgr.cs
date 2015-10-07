@@ -16,5 +16,6 @@ namespace BLL.gigade.Mgr.Impl
         List<ElementDetail> QueryElementDetail();
         List<ElementDetailQuery> QueryAllWares(ElementDetailQuery query, out int totalCount);
         List<ElementDetailQuery> QueryPacketProd(ElementDetail model);
+        bool DeleteElementDetail(string[] newRowID);
     }
 }

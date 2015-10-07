@@ -165,6 +165,9 @@ namespace Admin.gigade.Controllers
                 {
                     query.description = Request.Params["description"];
                 }
+
+                query.group_create_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+                query.group_update_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 int _dt = edmgroupmgr.SaveEdmGroupNewAdd(query);
 
                 if (_dt > 0)
@@ -517,56 +520,19 @@ namespace Admin.gigade.Controllers
             try
             {
                 #region 獲取edit_url
-             //   string url = "http://www.gigade100.com/epaper2.php?nid=1756";
-                #region 獲取網頁內容方法1
-                //   Uri httpURL = new Uri(url);
-             //   //HttpWebRequest类继承于WebRequest，并没有自己的构造函数，需通过WebRequest的Creat方法 建立，并进行强制的类型转换
-             //   httpReq = (HttpWebRequest)WebRequest.Create(httpURL);
-             //   //通过HttpWebRequest的GetResponse()方法建立HttpWebResponse,强制类型转换
-
-             //   httpResp = (HttpWebResponse)httpReq.GetResponse();
-             //   //GetResponseStream()方法获取HTTP响应的数据流,并尝试取得URL中所指定的网页内容
-             //   //若成功取得网页的内容，则以System.IO.Stream形式返回，若失败则产生ProtoclViolationException错 误。在此正确的做法应将以下的代码放到一个try块中处理。这里简单处理
-             //   Stream respStream = httpResp.GetResponseStream();
-             //   //返回的内容是Stream形式的，所以可以利用StreamReader类获取GetResponseStream的内容，并以
-
-             //   //StreamReader类的Read方法依次读取网页源程序代码每一行的内容，直至行尾（读取的编码格式：UTF8）
-             //   StreamReader respStreamReader = new StreamReader(respStream, Encoding.UTF8);
-             //   byteRead = respStreamReader.Read(cbuffer, 0, 256);
-             //   while (byteRead != 0)
-             //   {
-             //       string strResp = new string(cbuffer, 0, byteRead);
-             //       strBuff = strBuff + strResp;
-             //       byteRead = respStreamReader.Read(cbuffer, 0, 256);
-             //   }
-             //   respStream.Close();
-             ////   strBuff=   "<h1>超傑是個好人哈哈</h1>";
-             //   strBuff= Server.HtmlDecode(Server.HtmlDecode(strBuff));
-                //   json = @"{success:true,msg:" + strBuff + "}";
+                if (!string.IsNullOrEmpty(Request.Params["edit_url"]))
+                {
+                    #region 獲取網頁內容方法
+                    string url = Request.Params["edit_url"].ToString();
+                    HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
+                    httpRequest.Timeout = 5000;
+                    httpRequest.Method = "GET";
+                    HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                    StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
+                    json = sr.ReadToEnd();
+                    #endregion
+                }
                 #endregion
-                #region 獲取網頁內容方法2
-                //HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
-                //httpRequest.Timeout = 5000;
-                //httpRequest.Method = "GET";
-                //HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
-                //StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
-
-            //    string result = sr.ReadToEnd();
-               
-                StreamReader reader = new StreamReader("C:/file_model.html",System.Text.Encoding.Default);
-                json=  reader.ReadToEnd();
-               // json = result.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace("\\", "\\\\");
-
-                json.Replace("@@@", "");
-                #endregion
-                #endregion
-                #region 獲取content_url
-
-                #endregion
-                #region 將content_url中的佔位符替換為edit_url中的內容
-
-                #endregion
-
 
             }
             catch (Exception ex)
@@ -575,7 +541,7 @@ namespace Admin.gigade.Controllers
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
-                json = "{success:false}";
+                json = "獲取網頁出現異常！";
             }
             this.Response.Clear();
             this.Response.Write(json);
@@ -584,7 +550,49 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        #region 
+        
+        #region
+        public HttpResponseBase GetContentUrl()
+        {
+            string json = string.Empty;
+            string template_data = string.Empty;
+            string contentJson = string.Empty;
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["content_url"]))
+                {
+                    #region 獲取網頁內容方法
+                    string url = Request.Params["content_url"].ToString();
+                    HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
+                    httpRequest.Timeout = 5000;
+                    httpRequest.Method = "GET";
+                    HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                    StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
+                    contentJson = sr.ReadToEnd();
+                    #endregion
+                }
+                if (!string.IsNullOrEmpty(Request.Params["template_data"]))
+                {
+                    template_data = Request.Params["template_data"];
+                }
+                json = contentJson + " " + template_data;
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "獲取網頁出現異常！";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+
+        #region
         public HttpResponseBase SendEdm()
         {
             string json = string.Empty;

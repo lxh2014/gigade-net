@@ -337,7 +337,7 @@ namespace BLL.gigade.Dao
                 arrList.Add(CouldReturn(query));
                 arrList.Add(UpOrderReturnMaster(query));
                 HgBatchAccumulateRefund hgBatch = new HgBatchAccumulateRefund();
-                HGLogin hgLogin = GetHGLoginData(query.order_id);
+                HGLogin hgLogin = GetHGLoginData((uint)query.ors_order_id);
                 OrderMaster om = _ordermasterdao.GetOrderMasterByOrderId4Change(Convert.ToInt32(query.ors_order_id));
                 DataTable _returnDt = GetReturnId(query);
                 DataTable odli = _orderDetailDao.OrderDetailTable(Convert.ToUInt32(query.return_id),0);
@@ -351,7 +351,7 @@ namespace BLL.gigade.Dao
                     if (hgLogin != null)
                     {
                         #region hg_batch_accumulate_refund
-                        hgBatch.order_id = query.order_id;
+                        hgBatch.order_id = (uint)query.ors_order_id;
                         hgBatch.head = "B";
                         hgBatch.card_no = ""; 
                         hgBatch.card_checksum = ""; 
@@ -363,9 +363,11 @@ namespace BLL.gigade.Dao
                         hgBatch.merchant_pos = hgLogin.merchant_pos;
                         hgBatch.terminal_pos = hgLogin.terminal_pos;
                         hgBatch.refund_point = om.Deduct_Happygo;
-                        hgBatch.order_note = om.Note_Order;
+                        //hgBatch.order_note = "吉甲地台灣好市集訂單編號" + hgBatch.order_id + "返還" + hgBatch.refund_point + "點";
+                        //吉甲地台灣好市集訂單編號131210039累點取消4點
                         hgBatch.batch_status = 0;
                         hgBatch.billing_checked = 0;
+                       // hgBatch.batch_import_time = Convert.ToInt32(CommonFunction.GetPHPTime());
                         #endregion
                     }
                     #endregion
@@ -1085,12 +1087,12 @@ namespace BLL.gigade.Dao
             {
                 sql.AppendFormat("insert into hg_batch_accumulate_refund(order_id,head,card_no,card_checksum,enc_idno,");
                 sql.AppendFormat("checksum,merchant_pos,terminal_pos,refund_point,category_id, ");
-                sql.AppendFormat("order_note,wallet,batch_import_time,batch_error_code,batch_status,");
+                sql.AppendFormat("order_note,wallet,batch_error_code,batch_status,");
                 sql.AppendFormat("created_time,modified_time,billing_checked)");
                 sql.AppendFormat("values('{0}','{1}','{2}','{3}','{4}',", query.order_id, query.head, query.card_no, query.card_checksum, query.enc_idno);
                 sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',",query.checksum,query.merchant_pos,query.terminal_pos,query.refund_point,query.category_id);
-                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',",query.order_note,query.wallet,query.batch_import_time,query.batch_error_code,query.batch_status);
-                sql.AppendFormat("'{0}','{1}','{2}');",CommonFunction.GetPHPTime(),CommonFunction.GetPHPTime(),query.billing_checked);
+                sql.AppendFormat("'{0}','{1}','{2}','{3}',", "吉甲地台灣好市集訂單編號" + query.order_id + "累點取消" + query.refund_point + "點", query.wallet, query.batch_error_code, query.batch_status);
+                sql.AppendFormat("'{0}','{1}',{2});",CommonFunction.DateTimeToString(DateTime.Now),CommonFunction.DateTimeToString(DateTime.Now),query.billing_checked);
             }
             catch (Exception ex)
             {
@@ -1112,12 +1114,12 @@ namespace BLL.gigade.Dao
             {
                 sql.AppendFormat("insert into hg_batch_deduct_refund(order_id,head,card_no,card_checksum,enc_idno,");
                 sql.AppendFormat("checksum,merchant_pos,terminal_pos,refund_point,category_id, ");
-                sql.AppendFormat("order_note,wallet,batch_import_time,batch_error_code,batch_status,");
+                sql.AppendFormat("order_note,wallet,batch_error_code,batch_status,");
                 sql.AppendFormat("created_time,modified_time,billing_checked)");
                 sql.AppendFormat("values('{0}','{1}','{2}','{3}','{4}',", query.order_id, query.head, query.card_no, query.card_checksum, query.enc_idno);
                 sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',", query.checksum, query.merchant_pos, query.terminal_pos, query.refund_point, query.category_id);
-                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',", query.order_note, query.wallet, query.batch_import_time, query.batch_error_code, query.batch_status);
-                sql.AppendFormat("'{0}','{1}','{2}');", CommonFunction.GetPHPTime(), CommonFunction.GetPHPTime(), query.billing_checked);
+                sql.AppendFormat("'{0}','{1}','{2}','{3}',", "吉甲地台灣好市集訂單編號" + query.order_id + "返還" + query.refund_point + "點", query.wallet, query.batch_error_code, query.batch_status);
+                sql.AppendFormat("'{0}','{1}',{2});", CommonFunction.DateTimeToString(DateTime.Now), CommonFunction.DateTimeToString(DateTime.Now), query.billing_checked);
             }
             catch (Exception ex)
             {

@@ -44,6 +44,13 @@ Ext.define("gigade.kucuntiaozhengModel", {
         { name: 'parameterName', type: 'string' }
     ]
 });
+//Ext.define("gigade.docUserStore", {
+//    extend: 'Ext.data.Model',
+//    fields: [
+//        { name: 'key', type: 'int' },
+//        { name: 'value', type: 'string' }
+//    ]
+//});
 //庫調原因
 var KutiaoStore = Ext.create("Ext.data.Store", {
     model: 'gigade.kucuntiaozhengModel',
@@ -58,6 +65,35 @@ var KutiaoStore = Ext.create("Ext.data.Store", {
         }
     }
 });
+//庫調人員
+//var docUserStore = Ext.create('Ext.data.Store', {
+//    autoDestroy: true,
+//    pageSize: pageSize,
+//    model: 'gigade.docUserStore',
+//    proxy: {
+//        type: 'ajax',
+//        url: '/WareHouse/GetkutiaoUser',
+//        reader: {
+//            type: 'json',
+//            root: 'data',
+//        }
+//    }
+//});
+//var docUserStore = Ext.create("Ext.data.Store", {
+//    model: 'gigade.docUserStore',
+//    autoLoad: true,
+//    proxy: {
+//        type: 'ajax',
+//        url: '/WareHouse/GetkutiaoUser',
+//        noCache: false,
+//        getMethod: function () { return 'get'; },
+//        actionMethods: 'post',
+//        reader: {
+//            type: 'json',
+//            root: 'data'
+//        }
+//    }
+//});
 var IialgStore = Ext.create('Ext.data.Store', {
     autoDestroy: true,
     pageSize: pageSize,
@@ -79,7 +115,8 @@ IialgStore.on('beforeload', function () {
         po_id: Ext.getCmp('po_id').getValue(),
         //iarc_id: Ext.getCmp('iarc_id').getValue(),
         starttime: Ext.getCmp('start_time').getValue(),
-        endtime: Ext.getCmp('end_time').getValue()
+        endtime: Ext.getCmp('end_time').getValue(),
+        doc_no: Ext.getCmp('doc_no').getValue()//
     })
 });
 function Query(x) {
@@ -91,7 +128,8 @@ function Query(x) {
             po_id: Ext.getCmp('po_id').getValue(),
             //iarc_id: Ext.getCmp('iarc_id').getValue(),            
             starttime: Ext.getCmp('start_time').getValue(),
-            endtime: Ext.getCmp('end_time').getValue()
+            endtime: Ext.getCmp('end_time').getValue(),
+            doc_no: Ext.getCmp('doc_no').getValue()//
         }
     });
 }
@@ -177,7 +215,7 @@ Ext.onReady(function () {
                     margin: '0 0 0 5',
                     id: 'start_time',
                     name: 'start_time',
-                    format: 'Y/m/d',
+                    //format: 'Y/m/d',
                     value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
                     listeners: {
                         select: function (a, b, c) {
@@ -202,7 +240,7 @@ Ext.onReady(function () {
                     editable: false,
                     id: 'end_time',
                     name: 'end_time',
-                    format: 'Y/m/d',
+                    //format: 'Y/m/d',
                     value: Tomorrow(),
                     listeners: {
                         select: function (a, b, c) {
@@ -220,7 +258,35 @@ Ext.onReady(function () {
                             }
                         }
                     }
-                },
+                }, {
+                    xtype: 'textfield',
+                    fieldLabel: '庫存調整單號',
+                    id: 'doc_no',
+                    name: 'doc_no',
+                    margin: '0 5 0 2',
+                    listeners: {
+                        specialkey: function (field, e) {
+                            if (e.getKey() == Ext.EventObject.ENTER) {
+                                Query();
+                            }
+                        }
+                    }
+                }
+                //, {
+                //    xtype: 'combobox',
+                //    editable: false,
+                //    margin: "0 5 0 0",
+                //    fieldLabel: '庫調人員',
+                //    labelWidth: 60,
+                //    id: 'searchtype',
+                //    store: docUserStore,
+                //    queryMode: 'local',
+                //    submitValue: true,
+                //    displayField: 'key',
+                //    valueField: 'value',
+                //    emptyText: '請選擇',
+                //    value: -1
+                //},
                 ]
             },
             {
@@ -248,7 +314,8 @@ Ext.onReady(function () {
                                 Ext.getCmp('po_id').setValue('');
                                 Ext.getCmp('iarc_id').setValue(0);
                                 Ext.getCmp('start_time').setValue(new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)));
-                                Ext.getCmp('end_time').setValue(Tomorrow());
+                                Ext.getCmp('end_time').setValue(Tomorrow()); 
+                                Ext.getCmp('doc_no').setValue('');
                             }
                         }
                     }
@@ -265,7 +332,7 @@ Ext.onReady(function () {
         frame: true,
         columns: [
             { header: "編號", dataIndex: 'id', width: 40, align: 'center' },
-            { header: "庫存調整單號", dataIndex: 'row_id', width: 80, align: 'center' },
+            { header: "庫存調整單號", dataIndex: 'doc_no', width: 80, align: 'center' },
             { header: "主料位", dataIndex: 'loc_id', width: 80, align: 'center' },
             { header: "調整料位", dataIndex: 'loc_R', width: 80, align: 'center' },
             { header: "商品細項編號", dataIndex: 'item_id', width: 80, align: 'center' },
