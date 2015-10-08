@@ -116,7 +116,8 @@ editFunction = function (row, store) {
                                         var result = Ext.decode(action.response.responseText);
                                         if (result.success) {
                                             Ext.Msg.alert(INFORMATION, "保存成功！");
-                                            BonusStore.load({ params: { start: 0, limit: 25 } });
+                                            var index = (Ext.getCmp('PagingToolbar').el.dom.getElementsByTagName("input")[0].value - 1) * pageSize;
+                                            BonusStore.load({ params: { start: index, limit: 25 } });
                                             editWin.close();
                                         } else {
                                             Ext.Msg.alert(INFORMATION, "保存失敗！");
