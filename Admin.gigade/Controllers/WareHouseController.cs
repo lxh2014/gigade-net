@@ -8033,6 +8033,14 @@ namespace Admin.gigade.Controllers
                 //{
                 //    q.iarc_id = Request.Params["iarc_id"].ToString();
                 //}
+                if (Request.Params["doc_userid"].ToString() != "-1")//by zhaozhi0623j add 20151006
+                {
+                    q.doc_userid = int.Parse(Request.Params["doc_userid"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["doc_no"].Trim().ToUpper()))//by zhaozhi0623j add 20151006
+                {
+                    q.doc_no = Request.Params["doc_no"].Trim().ToUpper();
+                }
                 DateTime time = DateTime.MinValue;
                 if (DateTime.TryParse(Request.Params["starttime"].ToString(), out time))
                 {
@@ -8040,7 +8048,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
                 {
-                    q.endtime = time.AddDays(1);
+                    q.endtime = time;
                 }
                 if (!System.IO.Directory.Exists(Server.MapPath(excelPath)))
                 {
@@ -8075,12 +8083,12 @@ namespace Admin.gigade.Controllers
                 _iagMgr = new IialgMgr(mySqlConnectionString);
                 q.IsPage = false;
                 store = _iagMgr.GetExportIialgList(q);
-                int i = 0;
+                int i = 1;
                 foreach (var item in store)
                 {
                     DataRow dr = dtHZ.NewRow();
                     dr[0] = i++;
-                    dr[1] = item.row_id;
+                    dr[1] = item.doc_no;
                     dr[2] = item.loc_id;
                     dr[3] = item.loc_R;
                     dr[4] = item.item_id;

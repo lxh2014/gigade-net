@@ -192,7 +192,7 @@ CommonFunction.DateTimeToString(q.made_dt),CommonFunction.DateTimeToString(q.cde
         
             try
             {
-                sql.Append(@"select ia.row_id, ip.loc_id,ia.loc_id as loc_R,ia.item_id,p.product_name,concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz
+                sql.Append(@"select ia.doc_no,ia.row_id, ip.loc_id,ia.loc_id as loc_R,ia.item_id,p.product_name,concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz
         ,ia.made_dt,ia.cde_dt,ia.qty_o,ia.adj_qty,ia.iarc_id,ia.create_dtim ,m.user_username AS name,ia.po_id,ia.remarks,ia.c_made_dt,ia.c_cde_dt  from iialg ia 
         left join product_item pi on ia.item_id=pi.item_id  
         left join product p on p.product_id=pi.product_id 
@@ -219,11 +219,19 @@ CommonFunction.DateTimeToString(q.made_dt),CommonFunction.DateTimeToString(q.cde
                 //}
                 if (q.starttime > DateTime.MinValue)
                 {
-                    sql.AppendFormat(" and ia.create_dtim>='{0}' ", q.starttime);
+                    sql.AppendFormat(" and ia.create_dtim>='{0}' ", q.starttime.ToString("yyyy-MM-dd 00:00:00"));
                 }
                 if (q.endtime > DateTime.MinValue)
                 {
-                    sql.AppendFormat(" and ia.create_dtim<='{0}' ", q.endtime);
+                    sql.AppendFormat(" and ia.create_dtim<='{0}' ", q.endtime.ToString("yyyy-MM-dd 23:59:59"));
+                }
+                if (!string.IsNullOrEmpty(q.doc_no))//by zhaozhi0623j add 20151006 用於庫存調整單號查詢
+                {
+                    sql.AppendFormat(" and  ia.doc_no='{0}' ", q.doc_no);
+                }
+                if (q.doc_userid != 0)//by zhaozhi0623j add 20151006 用於庫存調整管理員查詢
+                {
+                    sql.AppendFormat(" and  ia.create_user='{0}' ", q.doc_userid);
                 }
                
                     sql.AppendFormat(" order by  ia.row_id ;");

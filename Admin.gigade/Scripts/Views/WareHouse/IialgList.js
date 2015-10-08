@@ -423,7 +423,7 @@ Ext.onReady(function () {
 })
 //匯出報表
 ExportExcel = function () {
-    window.open("/WareHouse/IialgExcel?item_id=" + Ext.getCmp("item_id").getValue() + "&loc_id=" + Ext.getCmp("loc_id").getValue() + "&po_id=" + Ext.getCmp("po_id").getValue() + "&starttime=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s') + "&endtime=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'));
+    window.open("/WareHouse/IialgExcel?item_id=" + Ext.getCmp("item_id").getValue() + "&loc_id=" + Ext.getCmp("loc_id").getValue() + "&po_id=" + Ext.getCmp("po_id").getValue() + "&starttime=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s') + "&endtime=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s') + "&doc_no=" + Ext.getCmp('doc_no').getValue() + "&doc_userid=" + Ext.getCmp('doc_userid').getValue());
 }
 function Tomorrow() {
     var d;
