@@ -81,14 +81,14 @@ namespace Admin.gigade.Controllers
                             case 1:
                                 query.vendor_id = uint.Parse(Request.Params["serchName"].Trim());
                                 break;
-                            case 2: 
-                                query.vendor_name_full = Request.Params["serchName"];
+                            case 2:
+                                query.vendor_name_full = Request.Params["serchName"].Trim();
                                 break;
                             case 3:
-                               query.vendor_name =Request.Params["serchName"];
+                                query.vendor_name = Request.Params["serchName"].Trim();
                                 break;
                             case 4:
-                                query.Erp_Id =Request.Params["serchName"];
+                                query.Erp_Id = Request.Params["serchName"].Trim();
                                 break;
                             default:
                                 break;

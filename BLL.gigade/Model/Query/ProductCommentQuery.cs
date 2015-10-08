@@ -14,9 +14,13 @@ namespace BLL.gigade.Model.Query
         public string user_ip { get; set; }
         public int sender_attitude { get; set; }
         public int logistics_deliver { get; set; }
+        public int old_logistics_deliver { get; set; }
         public int web_server { get; set; }
+        public int old_web_server { get; set; }
         public int seller_server { get; set; }
+        public int old_seller_server { get; set; }
         public int product_desc { get; set; }
+        public int old_product_desc { get; set; }
         public int comment_numId { get; set; }
         public string product_name { get; set; }
         public string user_email { get; set; }
@@ -56,6 +60,10 @@ namespace BLL.gigade.Model.Query
             web_server = 0;
             seller_server = 0;
             product_desc = 0;
+            old_logistics_deliver = 0;
+            old_web_server = 0;
+            old_seller_server = 0;
+            old_product_desc = 0;
             comment_numId = 0;
             product_name = string.Empty;
             user_email = string.Empty;
