@@ -110,6 +110,11 @@ INNER JOIN product pt on pt.product_id =pi.product_id;"); //获取到信息,判�
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat(@"insert into product_status_history (`product_id`,`user_id`,`create_time`,`type`,`product_status`,`remark`)");
             sb.AppendFormat(" values ({0},{1},now(),{2},{3},'{4}');",psh.product_id,2, psh.type,psh.product_status,psh.remark);
+            if (psh.product_status == 1)
+            {
+                sb.AppendFormat(@"insert into product_status_apply(`product_id`,`prev_status`,`apply_time`,`online_mode`)");
+                sb.AppendFormat("values('{0}','{1}',now(),'{2}');", psh.product_id, 6, 1);
+            }
             try
             {
                 return sb.ToString();

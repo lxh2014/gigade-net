@@ -1914,6 +1914,7 @@
     <Content Include="Scripts\Views\ProductClick\ProductClickCondition.js" />
     <Content Include="Scripts\Views\ProductClick\ProductClickList.js" />
     <Content Include="Scripts\Views\ProductComment\ChangeLog.js" />
+    <Content Include="Scripts\Views\ProductComment\ProductCommentUpdate.js" />
     <Content Include="Scripts\Views\ProductHistory\ParticularsHistory.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeEdit.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeList.js" />
