@@ -1,5 +1,5 @@
 ﻿/*************************************************************************************添加 編輯 框*************************************************************************************************/
-editFunction = function (row, store) {
+editFunction_master = function (row, store) {
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
         frame: true,

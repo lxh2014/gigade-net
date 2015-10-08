@@ -55,7 +55,7 @@ namespace BLL.gigade.Dao
                StringBuilder sqlCondi = new StringBuilder();
               try
               {
-                  sql.AppendFormat("SELECT sc.schedule_code,sc.parameterCode,sc.value,sc.description, mu1.user_username as create_username,sc.create_time, mu2.user_username as change_username,sc.change_time  FROM schedule_config sc ");
+                  sql.AppendFormat("SELECT  sc.rowid,sc.schedule_code,sc.parameterCode,sc.value,sc.description, mu1.user_username as create_username,sc.create_time, mu2.user_username as change_username,sc.change_time  FROM schedule_config sc ");
                   sqlCondi.Append(" LEFT JOIN schedule_master sm on sm.schedule_code=sc.schedule_code ");
                   sqlCondi.Append(" LEFT JOIN manage_user mu1 on mu1.user_id=sc.create_user ");
                   sqlCondi.Append(" LEFT JOIN manage_user mu2 on mu2.user_id=sc.change_user ");
@@ -79,7 +79,7 @@ namespace BLL.gigade.Dao
               StringBuilder sqlCondi = new StringBuilder();
               try
               {
-                  sql.AppendFormat("SELECT sp.schedule_code,sp.period_type,sp.period_nums,sp.begin_datetime,sp.current_nums,sp.limit_nums,mu1.user_username as create_username,mu2.user_username as change_username,sp.create_time,sp.change_time  FROM schedule_period sp");
+                  sql.AppendFormat("SELECT sp.rowid,sp.schedule_code,sp.period_type,sp.period_nums,sp.begin_datetime,sp.current_nums,sp.limit_nums,mu1.user_username as create_username,mu2.user_username as change_username,sp.create_time,sp.change_time  FROM schedule_period sp");
                   sqlCondi.Append(" LEFT JOIN schedule_master sm on sm.schedule_code=sp.schedule_code ");
                   sqlCondi.Append(" LEFT JOIN manage_user mu1 on mu1.user_id=sp.create_user ");
                   sqlCondi.Append(" LEFT JOIN manage_user mu2 on mu2.user_id=sp.change_user ");
@@ -128,7 +128,7 @@ namespace BLL.gigade.Dao
                   throw new Exception("ScheduleServiceDao-->ScheduleMasterInfoInsert-->" + sql.ToString() + ex.Message);
               }
           }
-          //更新人员信息
+          //更新schedule_master信息
           public int ScheduleMasterInfoUpdate(ScheduleMasterQuery query)
           {
               StringBuilder sql = new StringBuilder();
@@ -145,7 +145,73 @@ namespace BLL.gigade.Dao
           }
 
 
-          //可以多行刪除數據 
+          //插入schedule_config信息
+          public int ScheduleConfigInfoInsert(ScheduleConfigQuery query)
+          {
+              StringBuilder sql = new StringBuilder();
+              query.Replace4MySQL();
+              try
+              {
+                  sql.Append("insert into schedule_config ( schedule_code, parameterCode, value,description,create_user,change_user, create_time, change_time) values ");
+                  sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}')", query.schedule_code, query.parameterCode, query.value, query.description, query.create_user, query.change_user, query.create_time, query.change_time);
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->ScheduleMasterInfoInsert-->" + sql.ToString() + ex.Message);
+              }
+          }
+          //更新schedule_config信息
+          public int ScheduleConfigInfoUpdate(ScheduleConfigQuery query)
+          {
+              StringBuilder sql = new StringBuilder();
+              query.Replace4MySQL();
+              try
+              {
+                  sql.AppendFormat("update schedule_config set schedule_code = '{0}', parameterCode = '{1}', value = '{2}',description='{3}',create_user='{4}',change_user='{5}',create_time='{6}',change_time='{7}' where rowid='{8}' ", query.schedule_code, query.parameterCode, query.value, query.description, query.create_user, query.change_user, query.create_time, query.change_time, query.rowid);
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->ScheduleMasterInfoUpdate-->" + sql.ToString() + ex.Message);
+              }
+          }
+
+
+          //插入schedule_period信息
+          public int SchedulePeriodInfoInsert(SchedulePeriodQuery query)
+          {
+              StringBuilder sql = new StringBuilder();
+              query.Replace4MySQL();
+              try
+              {
+                  sql.Append("insert into schedule_period ( schedule_code,period_type,period_nums,current_nums,limit_nums,begin_datetime,create_user,change_user, create_time, change_time) values ");
+                  sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}')", query.schedule_code, query.period_type, query.period_nums, query.current_nums, query.limit_nums, query.begin_datetime,query.create_user, query.change_user, query.create_time, query.change_time);
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->SchedulePeriodInfoInsert-->" + sql.ToString() + ex.Message);
+              }
+          }
+          //更新schedule_period信息
+          public int SchedulePeriodInfoUpdate(SchedulePeriodQuery query)
+          {
+              StringBuilder sql = new StringBuilder();
+              query.Replace4MySQL();
+              try
+              {
+                  sql.AppendFormat("update schedule_period set schedule_code = '{0}', period_type = '{1}', period_nums = '{2}',current_nums='{3}',create_user='{4}',change_user='{5}',create_time='{6}',change_time='{7}',limit_nums='{8}', begin_datetime='{9}'where rowid='{10}' ", query.schedule_code, query.period_type, query.period_nums, query.current_nums, query.create_user, query.change_user, query.create_time, query.change_time, query.limit_nums,query.begin_datetime,query.rowid);
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->SchedulePeriodInfoUpdate-->" + sql.ToString() + ex.Message);
+              }
+          }
+
+
+          //可以多行刪除數據_master
           public int ScheduleMasterDelete(string ids)
           {
               StringBuilder sql = new StringBuilder();
@@ -162,8 +228,40 @@ namespace BLL.gigade.Dao
               }
           }
 
+          //可以多行刪除數據_config
+          public int ScheduleConfigDelete(string ids)
+          {
+              StringBuilder sql = new StringBuilder();
+              // query.Replace4MySQL();
+              try
+              {
+                  sql.AppendFormat("DELETE FROM schedule_config WHERE rowid in ({0})", ids);
+
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->ScheduleConfigDelete-->" + sql.ToString() + ex.Message);
+              }
+          }
 
 
+          //可以多行刪除數據_period
+          public int SchedulePeriodDelete(string ids)
+          {
+              StringBuilder sql = new StringBuilder();
+              // query.Replace4MySQL();
+              try
+              {
+                  sql.AppendFormat("DELETE FROM schedule_period WHERE rowid in ({0})", ids);
+
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->SchedulePeriodDelete-->" + sql.ToString() + ex.Message);
+              }
+          }
 
           public ScheduleMasterQuery GetExeScheduleMaster(ScheduleMasterQuery query)
           {
