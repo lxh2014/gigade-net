@@ -147,11 +147,11 @@ namespace BLL.gigade.Dao
                 sql.Append("insert into  mail_request(priority,group_id,content_id,user_id,sender_address, ");
                 sql.Append(" sender_name,receiver_address,receiver_name,subject,  ");
                 sql.Append(" body, importance,schedule_date,valid_until_date, ");
-                sql.Append(" retry_count,last_sent,next_send,max_retry,sent_log) values( ");
+                sql.Append(" retry_count,last_sent,next_send,max_retry,sent_log,request_createdate,request_updatedate) values( ");
                 sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',",query.priority,query.group_id,query.content_id,query.user_id,query.sender_address);
                 sql.AppendFormat("'{0}','{1}','{2}','{3}',",query.sender_name,query.receiver_address,query.receiver_name,query.subject);
                 sql.AppendFormat("'{0}','{1}','{2}','{3}',",query.body,query.importance, CommonFunction.DateTimeToString(query.schedule_date), CommonFunction.DateTimeToString(query.valid_until_date));
-                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}');",query.retry_count,CommonFunction.DateTimeToString(query.last_sent),CommonFunction.DateTimeToString(query.next_send),query.max_retry,query.sent_log);
+                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}',NOW());", query.retry_count, CommonFunction.DateTimeToString(query.last_sent), CommonFunction.DateTimeToString(query.next_send), query.max_retry, query.sent_log, CommonFunction.DateTimeToString(DateTime.Now));
                 return sql.ToString();
             }
             catch (Exception ex)
