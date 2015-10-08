@@ -262,8 +262,8 @@ namespace BLL.gigade.Dao
                         sqlStatus.AppendFormat(" or bm.master_end<'{0}'", CommonFunction.GetPHPTime());
                     }
                     if (query.useings)
-                    {
-                        sqlStatus.Append(" or bm.master_balance>0");
+                    {//不包含未開始的，也不包含過期的
+                        sqlStatus.AppendFormat(" or (bm.master_balance>0 and '{0}' between bm.master_start and bm.master_end)", CommonFunction.GetPHPTime());
                     }
                     if (query.useds)
                     {
