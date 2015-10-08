@@ -160,6 +160,13 @@ namespace BLL.gigade.Mgr
         }
 
 
+        //可以多行刪除數據 
+        public int ScheduleMasterDelete(string ids)
+        {
+
+            return _secheduleServiceDao.ScheduleMasterDelete(ids);
+        }
+
         public ScheduleMasterQuery GetExeScheduleMaster(ScheduleMasterQuery query)
         {
             try

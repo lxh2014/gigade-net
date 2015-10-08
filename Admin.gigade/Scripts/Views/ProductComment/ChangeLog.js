@@ -1,25 +1,25 @@
 ﻿
 var pageSize = 25;
-//表名數據
-var tableNameStore = Ext.create('Ext.data.Store', {
-    fields: ['table_name'],
-    data: [{'table_name':'comment_detail'}]
-});
 ////表名數據
 //var tableNameStore = Ext.create('Ext.data.Store', {
 //    fields: ['table_name'],
-//    autoLoad: true,
-//    proxy: {
-//        type: 'ajax',
-//        url: "/ProductComment/GetTableName",
-//        noCache: false,
-//        actionMethods: 'post',
-//        reader: {
-//            type: 'json',
-//            root: 'data'
-//        }
-//    }
+//    data: [{'table_name':'comment_detail'}]
 //});
+//表名數據
+var tableNameStore = Ext.create('Ext.data.Store', {
+    fields: ['table_name'],
+    autoLoad: true,
+    proxy: {
+        type: 'ajax',
+        url: "/ProductComment/GetTableName",
+        noCache: false,
+        actionMethods: 'post',
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
 
 //歷史記錄列表grid
 var listStore = Ext.create('Ext.data.Store', {
@@ -119,7 +119,7 @@ var AuthView = Ext.create('Ext.view.View', {
         '<ul class="ul-detail">',
             '<tpl for=".">',
                 '<li>',
-                    '<h2>回覆編號：{pk_id}   表名：{change_table}    </h2>',
+                    '<h2>主鍵值：{pk_id}   功能：{change_table}    </h2>',
                     '<table class="tbl-cls" style="width:800px">',
                     '<tr><th style="width:200px">欄位</th><th style="width:200px">欄位中文名稱</th><th style="width:200px">修改前</th><th style="200px">修改后</th></tr>',
                         '<tpl for="tclModel">',
@@ -142,7 +142,7 @@ var searchfrm = Ext.create('Ext.form.Panel', {
     border: false,
     defaults: { margin: '5 5 5 5' },
     items: [{
-        fieldLabel: '表名',
+        fieldLabel: '功能',
         id: 'table_name',
         name: 'table_name',
         labelWidth: 43,
@@ -286,7 +286,7 @@ var gridlist = Ext.create('Ext.grid.Panel', {
     frame: false,
     store: listStore,
     height: document.documentElement.clientHeight - 42,
-    columns: [{ header: '回覆編號', dataIndex: 'pk_id', align: 'left', width: 166, menuDisabled: true, sortable: false, flex: 1 },
+    columns: [{ header: '主鍵值', dataIndex: 'pk_id', align: 'left', width: 166, menuDisabled: true, sortable: false, flex: 1 },
         { header: '創建人', dataIndex: 'user_name', align: 'left', width: 65, menuDisabled: true, sortable: false },
         { header: '創建時間', dataIndex: 'create_time', align: 'left', width: 166, menuDisabled: true, sortable: false }],
     bbar: Ext.create('Ext.PagingToolbar', {
