@@ -19,11 +19,13 @@ editFunction_master = function (row, store) {
                 hidden: true
             },
             {
-                xtype: 'textfield',
+                
+                xtype: 'combobox',
                 fieldLabel: '排程Code',
                 id: 'schedule_code',
                 name: 'schedule_code',
                 allowBlank: false,
+                editable: false,
             },
             {
                 xtype: 'textfield',
@@ -31,6 +33,7 @@ editFunction_master = function (row, store) {
                 id: 'schedule_name',
                 name: 'schedule_name',
                 allowBlank: false,
+               
             },
             {
                 xtype: 'textfield',
