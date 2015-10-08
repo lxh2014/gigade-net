@@ -146,7 +146,7 @@ namespace BLL.gigade.Mgr
             }
         }// master 的狀態改變
 
-        //判断是新增 还是 编辑 
+        //schedule_master判断是新增 还是 编辑 
         public int SaveScheduleMasterInfo(ScheduleMasterQuery query)
         {
             if (query.rowid == 0)//新增
@@ -159,12 +159,51 @@ namespace BLL.gigade.Mgr
             }
         }
 
+        //schedule_config判断是新增 还是 编辑 
+        public int SaveScheduleConfigInfo(ScheduleConfigQuery query)
+        {
+            if (query.rowid == 0)//新增
+            {
+                return _secheduleServiceDao.ScheduleConfigInfoInsert(query);
+            }
+            else//編輯
+            {
+                return _secheduleServiceDao.ScheduleConfigInfoUpdate(query);
+            }
+        }
 
-        //可以多行刪除數據 
+        //schedule_period判断是新增 还是 编辑 
+        public int SaveSchedulePeriodInfo(SchedulePeriodQuery query)
+        {
+            if (query.rowid == 0)//新增
+            {
+                return _secheduleServiceDao.SchedulePeriodInfoInsert(query);
+            }
+            else//編輯
+            {
+                return _secheduleServiceDao.SchedulePeriodInfoUpdate(query);
+            }
+        }
+
+        //可以多行刪除數據_master
         public int ScheduleMasterDelete(string ids)
         {
 
             return _secheduleServiceDao.ScheduleMasterDelete(ids);
+        }
+
+        //可以多行刪除數據_config
+        public int ScheduleConfigDelete(string ids)
+        {
+
+            return _secheduleServiceDao.ScheduleConfigDelete(ids);
+        }
+
+        //可以多行刪除數據_period
+        public int SchedulePeriodDelete(string ids)
+        {
+
+            return _secheduleServiceDao.SchedulePeriodDelete(ids);
         }
 
         public ScheduleMasterQuery GetExeScheduleMaster(ScheduleMasterQuery query)

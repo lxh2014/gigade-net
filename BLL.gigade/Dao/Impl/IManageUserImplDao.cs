@@ -19,5 +19,6 @@ namespace BLL.gigade.Dao.Impl
         int CheckEmail(ManageUserQuery query);//新增判斷郵件是否存在
         int UpdStatus(ManageUserQuery query);
         List<ManageUser> GetUserIdByEmail(string email);///根據email查詢出對應的id
+        List<ManageUser> GetkutiaoUser();
     }
 }     
