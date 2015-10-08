@@ -72,6 +72,7 @@
                 handler: function () {
                     var form = this.up('form').getForm();
                     if (form.isValid()) {
+                        this.disable();
                         form.submit({
                             params: {
                                 template_id: Ext.htmlEncode(Ext.getCmp('template_id').getValue()),
