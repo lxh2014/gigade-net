@@ -108,6 +108,7 @@
                             myMask.show();
                             Ext.Ajax.request({
                                 url: '/EdmNew/SendEdm',
+                                timeout:90000,
                                 params: {
                                     testSend: 'true',
                                     content_id: Ext.getCmp('content_id').getValue(),
@@ -148,16 +149,51 @@
                 allowBlank: false,
                 allowBlank: false,
                 format: 'Y-m-d H:i:s',
+                value: new Date( new Date().getFullYear(),new Date().getMonth(),new Date().getDate()+1 ),
+                listeners: {
+                    select: function () {
+                        var sd = Ext.getCmp('schedule_date');
+                        var ed = Ext.getCmp('expire_date');
+                        var nowDate = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours(),new Date().getMinutes(),new Date().getMilliseconds());
+                        if (sd.getValue() <= nowDate)
+                        {
+                            var new_time = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1, new Date().getHours(), new Date().getMinutes(), new Date().getMilliseconds());
+                            sd.setValue(new_time);
+                            if (sd.getValue() >= ed.getValue()) {
+                                var new_time2 = new Date(sd.getValue().getFullYear(), sd.getValue().getMonth(), sd.getValue().getDate() + 1);
+                                ed.setValue(new_time2);
+                            }
+                            Ext.Msg.alert("提示信息", "排程發送時間不能小於當前時間！");
+                        }
+                        if (sd.getValue() >= ed.getValue()) {
+                            var new_time2 = new Date(sd.getValue().getFullYear(), sd.getValue().getMonth(), sd.getValue().getDate() + 1);
+                            ed.setValue(new_time2);
+                        }
+                    }
+                },
             },
            {
-               xtype: 'datetimefield',
+               xtype: 'datefield',
                fieldLabel: '信件有效時間',
                width: 275,
                id: 'expire_date',
                name: 'expire_date',
+               format: 'Y-m-d 23:59:59',
                editable: false,
                allowBlank: false,
-               allowBlank: false
+               value: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 2),
+               listeners: {
+                   select: function () {
+                       var sd = Ext.getCmp('schedule_date');//排程發送時間
+                       var ed = Ext.getCmp('expire_date');//信件有效時間
+                       var nowDate = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+                       if (ed.getValue() <= sd.getValue()) {
+                           var new_time = new Date(sd.getValue().getFullYear(), sd.getValue().getMonth(), sd.getValue().getDate() + 1);
+                           ed.setValue(new_time);
+                           Ext.Msg.alert("提示信息", "信件有效時間須大於排程發送時間！");
+                       }
+                   }
+               },
            },
            {
                xtype: 'combobox',

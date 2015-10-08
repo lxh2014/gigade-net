@@ -114,10 +114,15 @@ Ext.onReady(function () {
          '->',
          {
              xtype: 'combobox', fieldLabel: '電子報類型', id: 'search_group_name', store: EdmGroupNewStore2, displayField: 'group_name',
-             valueField: 'group_id',editable:false,
+             valueField: 'group_id',editable:false,value:0,lastQuery:'',emptyText:'全部',
          },
          {
              xtype:'button',text:'查詢',handler:Search
+         },
+         {
+             xtype: 'button', text: '重置', handler: function () {
+                 Ext.getCmp('search_group_name').setValue();
+             }
          },
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
@@ -243,16 +248,11 @@ onRemoveClick = function () {
 function Search() {
     EdmContentNewStore.removeAll();
     var group_id = Ext.getCmp('search_group_name').getValue();
-    if (group_id == "" || group_id == null) {
-        Ext.Msg.alert("提示信息", '請選擇查詢條件！');
-    }
-    else {
         Ext.getCmp("EdmContentNew").store.loadPage(1, {
             params: {
                 group_id: Ext.getCmp('search_group_name').getValue(),
             }
         });
-    }
 }
 
 
