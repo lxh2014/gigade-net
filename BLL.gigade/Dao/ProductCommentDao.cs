@@ -302,14 +302,22 @@ namespace BLL.gigade.Dao
             StringBuilder SqlCount = new StringBuilder();
             try
             {
-                //SqlCount.AppendFormat("select count(tcl.pk_id) as totalCount ");
-                strSql.AppendFormat(@"select  DISTINCT tcl.create_time,tcl.pk_id,tcl.create_user,comment_detail.comment_id,comment_detail.comment_info");
-                SqlWhere.Append(" from table_change_log tcl LEFT JOIN comment_detail on tcl.pk_id = comment_detail.comment_detail_id WHERE 1=1 ");
-
+                //SqlCount.AppendFormat("select count(tcl.row_id) as totalCount from table_change_log tcl ");
+                strSql.AppendFormat(@"select  DISTINCT tcl.create_time,tcl.pk_id,tcl.create_user,comment_detail.comment_id,comment_detail.comment_info from table_change_log tcl");
+               
                 if (!string.IsNullOrEmpty(query.change_table))
                 {
+                    if (query.change_table == "comment_detail")
+                    {
+                        SqlWhere.Append(" LEFT JOIN comment_detail on tcl.pk_id = comment_detail.comment_detail_id WHERE 1=1 ");
+                    }
+                    else if (query.change_table == "comment_num")
+                    {
+                        SqlWhere.Append(" LEFT JOIN comment_num on tcl.pk_id = comment_num.comment_numid left join comment_detail on comment_num.comment_id=comment_detail.comment_id WHERE 1=1 ");
+                    }
                     SqlWhere.AppendFormat(" and tcl.change_table='{0}'", query.change_table);
                 }
+                
                 if (query.comment_id>0)
                 {
                     SqlWhere.AppendFormat(" and comment_detail.comment_id ='{0}'", query.comment_id);
@@ -321,15 +329,14 @@ namespace BLL.gigade.Dao
 
                 }
                 SqlWhere.Append(" order by tcl.create_time desc");
-
-                //strSql.AppendFormat("select row_id,pk_id,create_user,create_time from table_change_log  where 1=1 ");
-                
+                               
                 totalCount = 0;
                 if (query.IsPage)
                 {
                     DataTable _dt = _access.getDataTable(strSql.ToString() + SqlWhere.ToString());
                     if (_dt.Rows.Count > 0)
                     {
+                        //totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
                         totalCount = _dt.Rows.Count;
                         SqlWhere.AppendFormat(" limit {0},{1};", query.Start, query.Limit);
                     }
