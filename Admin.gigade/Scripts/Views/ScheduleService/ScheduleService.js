@@ -136,20 +136,22 @@ var sm_master = Ext.create('Ext.selection.CheckboxModel', {
         }
     }
 });
-//var sm_config = Ext.create('Ext.selection.CheckboxModel', {
-//    listeners: {
-//        selectionchange: function (sm_config, selections) {
-//            Ext.getCmp("detailist1").down('#edit').setDisabled(selections.length == 0);
-//        }
-//    }
-//});
-//var sm_period = Ext.create('Ext.selection.CheckboxModel', {
-//    listeners: {
-//        selectionchange: function (sm_period, selections) {
-//            Ext.getCmp("detailist2").down('#edit').setDisabled(selections.length == 0);
-//        }
-//    }
-//});
+var sm_config = Ext.create('Ext.selection.CheckboxModel', {
+    listeners: {
+        selectionchange: function (sm_config, selections) {
+            Ext.getCmp("detailist1").down('#edit_config').setDisabled(selections.length == 0);
+            Ext.getCmp("detailist1").down('#delete_config').setDisabled(selections.length == 0);
+        }
+    }
+});
+var sm_period = Ext.create('Ext.selection.CheckboxModel', {
+    listeners: {
+        selectionchange: function (sm_period, selections) {
+            Ext.getCmp("detailist2").down('#edit_period').setDisabled(selections.length == 0);
+            Ext.getCmp("detailist2").down('#delete_period').setDisabled(selections.length == 0);
+        }
+    }
+});
 
 Schedule_Period_Store.on("beforeload", function () {
     Ext.apply(Schedule_Period_Store.proxy.extraParams, {
@@ -213,15 +215,15 @@ var center = Ext.create('Ext.form.Panel', {
                               ],
                               tbar: [
             { xtype: 'button', text: "添加", id: 'add_config', iconCls: 'icon-user-add' },//添加按鈕
-            { xtype: 'button', text: "編輯", id: 'edit_config', iconCls: 'icon-user-edit' },//編輯按鈕  包括 添加 刪除 修改 功能
-            { xtype: 'button', text: "刪除", id: 'delete_config', iconCls: 'icon-user-remove' },
+            { xtype: 'button', text: "編輯", id: 'edit_config', disabled: true, iconCls: 'icon-user-edit' },//編輯按鈕  包括 添加 刪除 修改 功能
+            { xtype: 'button', text: "刪除", id: 'delete_config', disabled: true, iconCls: 'icon-user-remove' },
 
             // { xtype: 'button', text: "添加", id: 'add_master', iconCls: 'icon-user-add', handler: add },//添加按鈕
             //{ xtype: 'button', text: "編輯", id: 'edit_master', iconCls: 'icon-user-edit', handler: onedit },//編輯按鈕  包括 添加 刪除 修改 功能
             //{ xtype: 'button', text: "刪除", id: 'delete_master', iconCls: 'icon-user-remove', handler: ondelete },
 
                               ],
-                              //selModel: sm_config
+                              selModel: sm_config
                           },
 
                         {
@@ -249,15 +251,15 @@ var center = Ext.create('Ext.form.Panel', {
                             ],
                             tbar: [
           { xtype: 'button', text: "添加", id: 'add_period', iconCls: 'icon-user-add' },//添加按鈕
-          { xtype: 'button', text: "編輯", id: 'edit_period', iconCls: 'icon-user-edit' },//編輯按鈕  包括 添加 刪除 修改 功能
-          { xtype: 'button', text: "刪除", id: 'delete_period', iconCls: 'icon-user-remove' },
+          { xtype: 'button', text: "編輯", id: 'edit_period', disabled: true, iconCls: 'icon-user-edit' },//編輯按鈕  包括 添加 刪除 修改 功能
+          { xtype: 'button', text: "刪除", id: 'delete_period',  disabled: true,iconCls: 'icon-user-remove' },
 
           // { xtype: 'button', text: "添加", id: 'add_master', iconCls: 'icon-user-add', handler: add },//添加按鈕
           //{ xtype: 'button', text: "編輯", id: 'edit_master', iconCls: 'icon-user-edit', handler: onedit },//編輯按鈕  包括 添加 刪除 修改 功能
           //{ xtype: 'button', text: "刪除", id: 'delete_master', iconCls: 'icon-user-remove', handler: ondelete },
      
                             ],
-                            //selModel: sm_period
+                            selModel: sm_period
                         },
 
                     ]
@@ -367,9 +369,9 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
        { header: '修改時間', dataIndex: 'show_change_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
     ],
     tbar: [
-     { xtype: 'button', text: "添加", id: 'add_master', iconCls: 'icon-user-add', handler: add },//添加按鈕
-     { xtype: 'button', text: "編輯", id: 'edit_master',iconCls: 'icon-user-edit',disabled:true, handler:onedit},//編輯按鈕  包括 添加 刪除 修改 功能
-     { xtype: 'button', text: "刪除", id: 'delete_master', iconCls: 'icon-user-remove', disabled: true, handler: ondelete },
+     { xtype: 'button', text: "添加", id: 'add_master', iconCls: 'icon-user-add', handler: add_master },//添加按鈕
+     { xtype: 'button', text: "編輯", id: 'edit_master',iconCls: 'icon-user-edit',disabled:true, handler:onedit_master},//編輯按鈕  包括 添加 刪除 修改 功能
+     { xtype: 'button', text: "刪除", id: 'delete_master', iconCls: 'icon-user-remove', disabled: true, handler: ondelete_master },
      '->',
     { xtype: 'button', text: "查詢", id: 'grid_btn_search', iconCls: 'ui-icon ui-icon-search', width: 65, handler: Search },
      ],
@@ -457,7 +459,7 @@ function UpdateActive(id) {
 
 /*************************************************************************************編輯*************************************************************************************************/
 
- function onedit () {
+ function onedit_master () {
     var row = Ext.getCmp("masterGiftList").getSelectionModel().getSelection();
     if (row.length == 0) {
         Ext.Msg.alert("未選中任何行!");
@@ -470,13 +472,13 @@ function UpdateActive(id) {
 }
 /*************************************************************************************添加信息*************************************************************************************************/
 
-function add() {
+function add_master() {
     editFunction(null, ScheduleStore);
 }
 
 /*************************************************************************************刪除*************************************************************************************************/
 
-function ondelete() {
+function ondelete_master() {
     var row = Ext.getCmp("masterGiftList").getSelectionModel().getSelection();
     if (row.length <= 0) {
         Ext.Msg.alert("未選中任何行!");

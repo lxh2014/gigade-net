@@ -456,7 +456,10 @@ namespace Admin.gigade.Controllers
                 ScheduleMasterQuery query = new ScheduleMasterQuery();
                 _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
 
-
+                if (!string.IsNullOrEmpty(Request.Params["rowid"]))
+                {
+                    query.rowid = Convert.ToInt32(Request.Params["rowid"]);
+                }
                 if (!string.IsNullOrEmpty(Request.Params["schedule_code"]))
                 {
                     query.schedule_code = Request.Params["schedule_code"];

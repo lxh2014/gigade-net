@@ -52,13 +52,13 @@ editFunction = function (row, store) {
               //    id: 'schedule_state',
               //    name: 'schedule_state'
               //},
-                {
-                    xtype: 'textfield',
-                    fieldLabel: '下次執行的記錄',
-                    id: 'schedule_period_id',
-                    name: 'schedule_period_id',
-                    allowBlank: false,
-                },
+                //{
+                //    xtype: 'textfield',
+                //    fieldLabel: '下次執行的記錄',
+                //    id: 'schedule_period_id',
+                //    name: 'schedule_period_id',
+                //    allowBlank: false,
+                //},
               {
                   xtype: 'fieldcontainer',
                   combineErrors: true,
@@ -193,7 +193,7 @@ editFunction = function (row, store) {
                                 schedule_state: Ext.htmlEncode(Ext.getCmp('schedule_state').getValue().ignore_stockVal),
                                 //create_user: Ext.htmlEncode(Ext.getCmp('create_user').getValue()),
                                 //change_user: Ext.htmlEncode(Ext.getCmp('change_user').getValue()),
-                                schedule_period_id: Ext.htmlEncode(Ext.getCmp('schedule_period_id').getValue()),
+                               // schedule_period_id: Ext.htmlEncode(Ext.getCmp('schedule_period_id').getValue()),
                                 //previous_execute_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('previous_execute_time').getValue()), 'Y-m-d H:i:s')),
                                 //next_execute_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('next_execute_time').getValue()), 'Y-m-d H:i:s')),
                                 //create_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('create_time').getValue()), 'Y-m-d H:i:s')),
@@ -231,7 +231,7 @@ editFunction = function (row, store) {
         id: 'editWin',
         iconCls: "icon-user-add",
         width: 460,
-        height: 280,
+        height: 260,
         layout: 'fit',//布局样式
         items: [editFrm],
         constrain: true, //束縛窗口在框架內

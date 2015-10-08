@@ -75,6 +75,7 @@
                 handler: function () {
                     var form = this.up('form').getForm();
                     if (form.isValid()) {
+                        this.disable();
                         form.submit({
                             params: {
                                 group_id: Ext.htmlEncode(Ext.getCmp('group_id').getValue()),
@@ -87,6 +88,7 @@
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);
                                 if (result.success) {
+                                   
                                     Ext.Msg.alert(INFORMATION, "保存成功! ");
                                     store.load();
                                     editWin.close();
