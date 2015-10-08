@@ -13,6 +13,7 @@ Ext.define('gigade.EmailBlockList', {
 });
 var EmailBlockListStore = Ext.create('Ext.data.Store', {
     autoDestroy: true,
+    autoLoad: true,
     pageSize: pageSize,
     model: 'gigade.EmailBlockList',
     proxy: {
@@ -28,7 +29,7 @@ var EmailBlockListStore = Ext.create('Ext.data.Store', {
 EmailBlockListStore.on('beforeload', function () {
     Ext.apply(EmailBlockListStore.proxy.extraParams,
         {
-            email: Ext.getCmp('emailAddress').getValue(),
+            //email: Ext.getCmp('emailAddress').getValue(),
         });
 });
 var sm = Ext.create('Ext.selection.CheckboxModel', {
@@ -78,37 +79,37 @@ Ext.onReady(function () {
             disabled: true,
             handler: onUnblockClick
         }, '->',
-        {
-            xtype: 'textfield',
-            fieldLabel: '郵箱位址',
-            id: 'emailAddress',
-            name: 'emailAddress',
-            labelWidth:60,
-            listeners: {
-                specialkey: function (field, e) {
-                    if (e.getKey() == e.ENTER) {
-                        Query(1);
-                    }
-                }
-            }
-        },
-       {
-           xtype: 'button',
-           iconCls: 'ui-icon ui-icon-search-2',
-           text: "查詢",
-           handler: Query
-       },
-        {
-            xtype: 'button',
-            text: '重置',
-            id: 'btn_reset',
-            iconCls: 'ui-icon ui-icon-reset',
-            listeners: {
-                click: function () {
-                    Ext.getCmp('emailAddress').reset();
-                }
-            }
-        }       
+        //{
+        //    xtype: 'textfield',
+        //    fieldLabel: '郵箱位址',
+        //    id: 'emailAddress',
+        //    name: 'emailAddress',
+        //    labelWidth:60,
+        //    listeners: {
+        //        specialkey: function (field, e) {
+        //            if (e.getKey() == e.ENTER) {
+        //                Query(1);
+        //            }
+        //        }
+        //    }
+        //},
+       //{
+       //    xtype: 'button',
+       //    iconCls: 'ui-icon ui-icon-search-2',
+       //    text: "查詢",
+       //    handler: Query
+       //},
+       // {
+       //     xtype: 'button',
+       //     text: '重置',
+       //     id: 'btn_reset',
+       //     iconCls: 'ui-icon ui-icon-reset',
+       //     listeners: {
+       //         click: function () {
+       //             Ext.getCmp('emailAddress').reset();
+       //         }
+       //     }
+       // }       
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: EmailBlockListStore,
