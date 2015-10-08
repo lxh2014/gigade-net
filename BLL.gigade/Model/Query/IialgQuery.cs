@@ -20,6 +20,7 @@ namespace BLL.gigade.Model.Query
         public string name { get; set; }
         public int pnum { get; set; }//RF-撿貨量
         public string order_id { set; get; }
+        public int doc_userid { set; get; }//by zhaozhi0623j
         public IialgQuery()
         {
             made_dttostr = string.Empty;
@@ -27,6 +28,7 @@ namespace BLL.gigade.Model.Query
             starttime = DateTime.MinValue;
             endtime = DateTime.MinValue;
             order_id = string.Empty;
+            doc_userid = 0;
         }
     }
 }
