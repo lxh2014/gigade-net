@@ -554,6 +554,7 @@ Ext.onReady(function () {
             }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
+            id: "PagingToolbar",
             store: BonusStore,
             pageSize: pageSize,
             displayInfo: true,
