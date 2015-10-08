@@ -145,6 +145,24 @@ namespace BLL.gigade.Dao
           }
 
 
+          //可以多行刪除數據 
+          public int ScheduleMasterDelete(string ids)
+          {
+              StringBuilder sql = new StringBuilder();
+              // query.Replace4MySQL();
+              try
+              {
+                  sql.AppendFormat("DELETE FROM schedule_master WHERE rowid in ({0})", ids);
+
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->ScheduleMasterDelete-->" + sql.ToString() + ex.Message);
+              }
+          }
+
+
 
 
           public ScheduleMasterQuery GetExeScheduleMaster(ScheduleMasterQuery query)

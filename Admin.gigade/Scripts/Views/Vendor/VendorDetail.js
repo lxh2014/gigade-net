@@ -109,17 +109,8 @@ function createForm() {
                                     name: 'vendor_status',
                                     fieldLabel: '狀態',
                                     xtype: 'displayfield'
-                                },
-                                {
-                                    fieldLabel: '密碼',
-                                    xtype: 'displayfield',
-                                    id: 'vendor_password',
-                                    name: 'vendor_password',
-                                    //hidden: rowID ? true : false,
-                                    //allowBlank: rowID ? true : false,
-                                    //margin: '0 8 0 20',
-                                    inputType: 'password'
                                 }
+                               
                             ], style: { borderBottom: '1px solid #ced9e7' }
                         },
                         {
@@ -722,21 +713,38 @@ function createForm() {
                                     Ext.getCmp("vendor_status").setValue("失格");
                                     break;
                             }
-                            Ext.getCmp('vendor_password').setValue(result.data[0].vendor_password.substr(0,1) + "***");
+                            //Ext.getCmp('vendor_password').setValue(result.data[0].vendor_password.substr(0,1) + "***");
                             Ext.getCmp('company_phone').setValue(result.data[0].company_phone);
                             Ext.getCmp('company_fax').setValue(result.data[0].company_fax);//vendor_type
                             Ext.getCmp('company_person').setValue(result.data[0].company_person);
-                            switch (result.data[0].vendor_type) {
-                                case '1':
-                                    Ext.getCmp("vendor_type").setValue("食品供應商");
-                                    break;
-                                case '2':
-                                    Ext.getCmp("vendor_type").setValue("用品供應商");
-                                    break;
-                                case '3':
-                                    Ext.getCmp("vendor_type").setValue("休閒供應商");
-                                    break;
-                            }
+                            Ext.Ajax.request({
+                                url: "/Vendor/GetVendorType",
+                                params: {
+                                    VendorType: result.data[0].vendor_type
+                                },
+                                success: function (response) {
+
+                                    var result = Ext.decode(response.responseText);
+                                   
+                                    Ext.getCmp("vendor_type").setValue(result.msg);
+                                   
+                                },
+                                failure: function (form, action) {
+                                    Ext.Msg.alert(INFORMATION, "系統出現錯誤!");
+                                }
+                            });
+                            //alert(result.data[0].vendor_type)
+                            //switch (result.data[0].vendor_type) {
+                            //    case '1':
+                            //        Ext.getCmp("vendor_type").setValue("食品供應商");
+                            //        break;
+                            //    case '2':
+                            //        Ext.getCmp("vendor_type").setValue("用品供應商");
+                            //        break;
+                            //    case '3':
+                            //        Ext.getCmp("vendor_type").setValue("休閒供應商");
+                            //        break;
+                            //}
                            // Ext.getCmp('vendor_type').setValue(VendorTypeStore.getAt(VendorTypeStore.find("vendor_type", '' + result.data[0].vendor_type + '')).data.vendor_type_name);
                             Ext.Ajax.request({
                                 url: "/Vendor/GetZip",

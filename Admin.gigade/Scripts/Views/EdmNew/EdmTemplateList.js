@@ -15,15 +15,26 @@ Ext.define('gridlistET', {
         { name: "edit_url", type: "string" },//EDM編輯者，選擇該範本後，用來給編輯者提供該範本相關資料的網頁
         { name: "content_url", type: "string" },//最終用來產出EDM內容的網頁，會被程式呼叫，以便取得EDM郵件內容。產出的內容會用來寫入到mail_request的body欄位
         { name: "enabled", type: "int" },//是否啟用
-        { name: "template_create_userid", type: "int" },//建立者
-        { name: "template_update_userid", type: "int" },//修改者
-        { name: "template_createdate",type:"string" },//建立日期
+
+
+        //{ name: "template_create_userid", type: "int" },//建立者id
+        //{ name: "template_update_userid", type: "int" },//修改者id
+
+        { name: "template_create_user", type: "string" },//顯示建立者
+        { name: "template_update_user",type:"string" },//顯示修改者
+        { name: "template_createdate", type: "string" },//建立日期
+        { name: "template_updatedate", type: "string" },//更新時間
+
+        //{ name: "template_create_userid", type: "int" },//建立者
+        //{ name: "template_update_userid", type: "int" },//修改者
+        //{ name: "template_createdate",type:"string" },//建立日期
         { name: "template_create_userid", type: "int" },//建立者id
         { name: "template_update_userid", type: "int" },//修改者id
         { name: "template_create_user", type: "string" },//顯示建立者
         { name: "template_update_user",type:"string" },//顯示修改者
         { name: "template_createdate",type:"datetime" },//建立日期
         { name: "template_updatedate",type:"datetime" },//更新時間
+
     ],
 });
 
@@ -64,7 +75,7 @@ Ext.onReady(function () {
         flex: 9.4,
         columns: [
             new Ext.grid.RowNumberer(),//自動顯示行號
-             { header: "編號", dataIndex: "template_id", align: 'center' },
+             { header: "編號", dataIndex: "template_id", align: 'center',hidden:true },
             { header: "範本名稱", dataIndex: "template_name", width: 200, align: 'center' },
             { header: "內容編輯網址", dataIndex: "edit_url", width: 200, align: 'center' },
              { header: "內容產生網址", dataIndex: "content_url", width: 200, align: 'center' },
