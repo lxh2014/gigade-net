@@ -2715,6 +2715,7 @@ namespace Admin.gigade.Controllers
                 #region 獲取數據添加打iialg
                 ia.loc_id = m.plas_loc_id.ToString().ToUpper();
                 ia.item_id = m.item_id;
+                int type = 0;//庫存調整
                 if (!string.IsNullOrEmpty(Request.Params["iarc_id"].ToString()))
                 {
                     ia.iarc_id = Request.Params["iarc_id"].ToString();
@@ -2722,7 +2723,10 @@ namespace Admin.gigade.Controllers
                 else
                 {
                     ia.iarc_id = "PC";
+                    type = 1;//收貨上架
                 }
+                
+               
                 ia.create_dtim = DateTime.Now;
                 ia.create_user = m.create_user;
                 ia.doc_no = "P" + DateTime.Now.ToString("yyyyMMddHHmmss");
@@ -2756,7 +2760,7 @@ namespace Admin.gigade.Controllers
                 proitem.Item_Stock = item_stock;
                 proitem.Item_Id = m.item_id;
                 #endregion
-                if (_iinvd.IsUpd(m) > 0)
+                if (_iinvd.IsUpd(m, type) > 0)
                 {//編輯             
                     ia.qty_o = _iinvd.Selnum(m);
                     ia.adj_qty = m.prod_qty;
