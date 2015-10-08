@@ -122,10 +122,10 @@
         items: [pwdFrm, sqlFrm],
         autoScroll: true,//滚动条
         listeners: {
-            resize: function () {//resize调整大小
-                dataGrid.width = document.documentElement.clientWidth;
-                this.doLayout();//更新一下布局
-            }
+            //resize: function () {//resize调整大小
+            //    dataGrid.width = document.documentElement.clientWidth;
+            //    this.doLayout();//更新一下布局
+            //}
         }
     });
 });
@@ -144,7 +144,7 @@ onSubmit = function () {
                 Ext.getCmp('sqlFrm').show();
                 Ext.getCmp('pwdContent').setValue('');
                 Ext.getCmp('submitBtn').setDisabled(true);
-                Ext.getCmp('pwdContent').setEditable(false);
+               
             }
             else {
                 Ext.Msg.alert("提示信息", "密碼輸入錯誤！");

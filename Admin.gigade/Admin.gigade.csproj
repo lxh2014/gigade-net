@@ -1928,6 +1928,7 @@
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsList.js" />
     <Content Include="Scripts\Views\Redirect\RedirectView.js" />
     <Content Include="Scripts\Views\ReportManagement\OderMessageSearch.js" />
+    <Content Include="Scripts\Views\ScheduleService\ScheduleMasterEdit.js" />
     <Content Include="Scripts\Views\ScheduleService\ScheduleService.js" />
     <Content Include="Scripts\Views\SecretInfo\SecretResetPwd.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverMasterList.js" />
@@ -1984,7 +1985,9 @@
     <Content Include="Template\ProductDetail\product_detail_safe.txt" />
     <Content Include="XML\Exceptional.xml" />
     <Content Include="XML\ItemPrice.xml" />
-    <Content Include="XML\ParticularsSrc.xml" />
+    <Content Include="XML\ParticularsSrc.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="XML\ProductItemHistory.xml" />
     <Content Include="XML\SaleSum.xml" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\config.rb" />
@@ -4524,6 +4527,7 @@
     <Content Include="App_GlobalResources\Login.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>Login.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -4544,6 +4548,7 @@
     <Content Include="App_GlobalResources\ProductItemMap.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>ProductItemMap.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -4557,6 +4562,7 @@
     <Content Include="App_GlobalResources\OrderAdd.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>OrderAdd.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -4583,6 +4589,7 @@
     <Content Include="App_GlobalResources\Promotion.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>Promotion.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <PropertyGroup>
@@ -4607,7 +4614,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>11804</DevelopmentServerPort>
+          <DevelopmentServerPort>50877</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

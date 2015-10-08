@@ -68,9 +68,33 @@ namespace Admin.gigade.Controllers
             //vendor_name:Ext.getCmp('vendor_name').getValue(),/*供應商名稱*/
             query.prepaid = int.Parse(Request.Params["perpaid"] ?? "-1");/*是否買斷*/
             query.Is_pod = int.Parse(Request.Params["Is_pod"] ?? "0");/*是否已下單採購*/
-            query.vendor_name = Request.Params["vendor_name"] ?? "";/*供應商名稱*/
+           // query.vendor_name = Request.Params["vendor_name"] ?? "";/*供應商名稱*/
             try
             {
+                if(!string.IsNullOrEmpty(Request.Params["serchType"] ))
+                {
+                    int serchType=int.Parse(Request.Params["serchType"]);
+                    if (!string.IsNullOrEmpty(Request.Params["serchName"]))
+                    {
+                        switch (serchType)
+                        {
+                            case 1:
+                                query.vendor_id = uint.Parse(Request.Params["serchName"].Trim());
+                                break;
+                            case 2:
+                                query.vendor_name_full = Request.Params["serchName"].Trim();
+                                break;
+                            case 3:
+                                query.vendor_name = Request.Params["serchName"].Trim();
+                                break;
+                            case 4:
+                                query.Erp_Id = Request.Params["serchName"].Trim();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
                 _paraMgr = new ParameterMgr(mySqlConnectionString);
                 Parametersrc p = new Parametersrc();
                 List<Parametersrc> list = new List<Parametersrc>();
@@ -224,7 +248,31 @@ namespace Admin.gigade.Controllers
             query.periodDays = int.Parse(Request.Params["periodDays"] ?? "7"); //周期天數
             query.prepaid = int.Parse(Request.Params["perpaid"] ?? "-1");/*是否買斷*/
             query.Is_pod = int.Parse(Request.Params["Is_pod"] ?? "0");/*是否已下單採購*/
-            query.vendor_name = Request.Params["vendor_name"] ?? "";/*供應商名稱*/
+            //query.vendor_name = Request.Params["vendor_name"] ?? "";/*供應商名稱*/
+            if (!string.IsNullOrEmpty(Request.Params["serchType"]) && Request.Params["serchType"]!="null")
+            {
+                int serchType = int.Parse(Request.Params["serchType"] ?? "0");
+                if (!string.IsNullOrEmpty(Request.Params["serchName"] ?? ""))
+                {
+                    switch (serchType)
+                    {
+                        case 1:
+                            query.vendor_id = uint.Parse(Request.Params["serchName"].Trim());
+                            break;
+                        case 2:
+                            query.vendor_name_full = Request.Params["serchName"];
+                            break;
+                        case 3:
+                            query.vendor_name = Request.Params["serchName"];
+                            break;
+                        case 4:
+                            query.Erp_Id = Request.Params["serchName"];
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
             p.ParameterType = "Food_Articles";
             Paralist = _paraMgr.GetAllKindType(p.ParameterType);
             for (int i = 0; i < Paralist.Count; i++)/*要禁用的食品錧和用品館的商品*/
@@ -252,9 +300,10 @@ namespace Admin.gigade.Controllers
                 dtExcel.Columns.Add("供應商簡稱", typeof(String));
                 dtExcel.Columns.Add("商品編號", typeof(String));
                 dtExcel.Columns.Add("商品細項編號", typeof(String));
+                dtExcel.Columns.Add("商品ERP編號", typeof(String));
                 dtExcel.Columns.Add("商品名稱", typeof(String));
-                dtExcel.Columns.Add("規格一", typeof(String));
-                dtExcel.Columns.Add("規格二", typeof(String));
+                dtExcel.Columns.Add("規格", typeof(String));
+                //dtExcel.Columns.Add("規格二", typeof(String));
                 dtExcel.Columns.Add("出貨方式", typeof(String));
                 dtExcel.Columns.Add("是否買斷", typeof(String));
                 dtExcel.Columns.Add("庫存量", typeof(String));
@@ -267,6 +316,7 @@ namespace Admin.gigade.Controllers
                 dtExcel.Columns.Add("補貨通知人數", typeof(String));
                 dtExcel.Columns.Add("售價(單價)", typeof(String));
                 dtExcel.Columns.Add("成本(單價)", typeof(String));
+                dtExcel.Columns.Add("商品狀態", typeof(String));
                 dtExcel.Columns.Add("販售狀態", typeof(String));
 
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -276,9 +326,10 @@ namespace Admin.gigade.Controllers
                     newRow[1] = dt.Rows[i]["vendor_name_simple"];
                     newRow[2] = dt.Rows[i]["product_id"];
                     newRow[3] = dt.Rows[i]["item_id"];
-                    newRow[4] = dt.Rows[i]["product_name"];
-                    newRow[5] = dt.Rows[i]["spec_title_1"].ToString() + dt.Rows[i]["spec_id_1"].ToString();
-                    newRow[6] = dt.Rows[i]["spec_title_2"].ToString() + dt.Rows[i]["spec_id_2"].ToString();
+                    newRow[4] = dt.Rows[i]["erp_id"];
+                    newRow[5] = dt.Rows[i]["product_name"];
+                    newRow[6] = dt.Rows[i]["spec_title_1"];
+                   // newRow[7] = dt.Rows[i]["spec_title_2"].ToString() + dt.Rows[i]["spec_id_2"].ToString();
                     newRow[7] = dt.Rows[i]["product_mode_name"];
                     newRow[8] = dt.Rows[i]["prepaid"];
                     if (!string.IsNullOrEmpty(dt.Rows[i]["prepaid"].ToString()))
@@ -376,7 +427,8 @@ namespace Admin.gigade.Controllers
                     newRow[16] = dt.Rows[i]["NoticeGoods"];
                     newRow[17] = dt.Rows[i]["item_money"];
                     newRow[18] = dt.Rows[i]["item_cost"];
-                    newRow[19] = dt.Rows[i]["sale_name"];
+                    newRow[19] = dt.Rows[i]["product_status_string"];
+                    newRow[20] = dt.Rows[i]["sale_name"];
                     dtExcel.Rows.Add(newRow);
                 }
                 if (dtExcel.Rows.Count > 0)

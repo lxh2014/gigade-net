@@ -333,7 +333,9 @@ Ext.onReady(function () {
         }
     });
     ToolAuthority();
-    //EdmContentStore.load({ params: { start: 0, limit: 25 } });
+    if (window.parent.Ext.getCmp('ContentPanel').activeTab.name == 'is_edit') {
+        EdmContentStore.load({ params: { start: 0, limit: 25 } });
+    }
 });
 
 /*************************************************************************************新增*************************************************************************************************/
@@ -347,9 +349,11 @@ onAddClick = function () {
     copy = panel.add({
         id: 'addEdm',
         title: '新增電子報',
+        name: panel.activeTab.title,
         html: window.top.rtnFrame(urlTran),
         closable: true
     });
+    panel.activeTab.close();
     panel.setActiveTab(copy);
     panel.doLayout();
 }
@@ -372,9 +376,11 @@ onEditClick = function () {
         copy = panel.add({
             id: 'detial',
             title: '編輯電子報',
+            name: panel.activeTab.title,
             html: window.top.rtnFrame(urlTran),
             closable: true
         });
+        panel.activeTab.close();
         panel.setActiveTab(copy);
         panel.doLayout();
     }
