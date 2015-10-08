@@ -2725,7 +2725,10 @@ namespace Admin.gigade.Controllers
                     ia.iarc_id = "PC";
                     type = 1;//收貨上架
                 }
-                
+                //if (ia.iarc_id == "DR" || ia.iarc_id == "KR")
+                //{
+                //    type = 2;//RF理貨
+                //}
                
                 ia.create_dtim = DateTime.Now;
                 ia.create_user = m.create_user;
