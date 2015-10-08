@@ -1078,6 +1078,7 @@ namespace Admin.gigade.Controllers
 
                 if (resultone > 0 && resulttwo > 0 && resultthree > 0)
                 {
+                    SaleStatus();
                     DataTable _excelMsg = _proRemoveMgr.GetStockMsg();
                     ExeclProductRmoveDownMsg(_excelMsg);
                     return "{success:true}";
