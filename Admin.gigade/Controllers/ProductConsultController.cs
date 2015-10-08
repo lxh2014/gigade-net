@@ -369,7 +369,7 @@ namespace Admin.gigade.Controllers
 
                     else
                     {
-
+                        query.answer_status = 3;
                         if (!string.IsNullOrEmpty(Request.Params["consult_answer"]))
                         {
                             query.consult_answer = Request.Params["consult_answer"].ToString();
@@ -382,7 +382,12 @@ namespace Admin.gigade.Controllers
                         {
                             query.status = 1;
                         }
-                        query.answer_status = 3;
+                        if (Convert.ToInt32(Request.Params["answer_status"]) == 4)
+                        {
+                            query.answer_status = 4;
+                            query.status = 0;
+                        }
+                        
                         query.answer_date = DateTime.Now;
                         query.answer_user = ((Caller)Session["caller"]).user_id;
                         int i = _productconsultMgr.SaveProductConsultAnswer(query);

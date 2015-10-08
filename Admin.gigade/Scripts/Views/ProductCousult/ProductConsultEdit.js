@@ -499,6 +499,13 @@ editFunction = function (rowID, store) {
                         inputValue: "3",
                         //checked: true
                     },
+                    {
+                        boxLabel: '已處理 (不會寄出通知信)',
+                        name: 'answer_status',
+                        id: 'answer_finish',
+                        inputValue: "4",
+                        //checked: true
+                    },
               ],
               listeners: {
                   change: function () {
@@ -520,6 +527,15 @@ editFunction = function (rowID, store) {
                           Ext.getCmp("delay_reason").isValid();
                           Ext.getCmp("consult_answer").allowBlank = false;
                           Ext.getCmp("consult_answer").show();
+                      }
+                      else if (delayreason == 4)
+                      {
+                          Ext.getCmp("delay_reason").allowBlank = true;
+                          Ext.getCmp("delay_reason").setValue(row.data.delay_reason);
+                          Ext.getCmp("delay_reason").hide();
+                          //Ext.getCmp("delay_reason").isValid();
+                          Ext.getCmp("consult_answer").allowBlank = true;
+                          Ext.getCmp("consult_answer").hide();
                       }
                   }
               }
@@ -554,7 +570,8 @@ editFunction = function (rowID, store) {
                 var checkR = Ext.getCmp('delay_reason').getValue();
                 checkR = checkR.replace(/[ ]/g, "");
                 var ss = Ext.htmlEncode(Ext.getCmp('answer_status').getValue().answer_status);
-                if (checkL.length <= 0 && ss != 2) {
+                if (checkL.length <= 0 && ss == 3)
+                {
                     Ext.Msg.alert("提示信息", "回覆內容不能為空！");
                     return;
                 }
@@ -566,7 +583,8 @@ editFunction = function (rowID, store) {
                     Ext.Msg.alert("提示信息", "推遲原因已超出100字！");
                     return;
                 }
-                if (checkL.length > 200 && ss != 2) {
+                if (checkL.length > 200 && ss == 3)
+                {
                     Ext.Msg.alert("提示信息", "回覆內容已超出200字！");
                     return;
                 }
@@ -697,6 +715,18 @@ editFunction = function (rowID, store) {
                         if (row.data.status == 0) {
                             Ext.getCmp("answer_yes").setValue(true);
                             Ext.getCmp("answer_no").setValue(false);
+                            Ext.getCmp("answer_finish").setValue(false);
+                        }
+                    }
+                    if (row.data.answer_status == 4)
+                    {
+                        Ext.getCmp("answer_delay").disabled = true;
+                        Ext.getCmp("answer_delay").readOnly = true;
+                        //if (row.data.status == 0)
+                        {
+                            Ext.getCmp("answer_yes").setValue(false);
+                            Ext.getCmp("answer_no").setValue(false);
+                            Ext.getCmp("answer_finish").setValue(true);
                         }
                     }
 
