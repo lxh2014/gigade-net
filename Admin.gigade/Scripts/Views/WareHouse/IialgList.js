@@ -68,11 +68,11 @@ var KutiaoStore = Ext.create("Ext.data.Store", {
 //庫調人員Store
 var docUserStore = Ext.create("Ext.data.Store", {
     model: 'gigade.UserStoreModel',
-   // autoDestroy: true,
+    // autoDestroy: true,
     autoLoad: true,
     proxy: {
         type: 'ajax',
-        url: '/WareHouse/GetkutiaoUser',       
+        url: '/WareHouse/GetkutiaoUser',
         actionMethods: 'post',
         reader: {
             type: 'json',
@@ -202,20 +202,20 @@ Ext.onReady(function () {
                 layout: 'hbox',
                 items: [
                   {
-                    xtype: 'textfield',
-                    fieldLabel: '庫存調整單號',
-                    id: 'doc_no',
-                    name: 'doc_no',
-                    margin: '0 5 2 0',
-                    labelWidth: 80,
-                    listeners: {
-                        specialkey: function (field, e) {
-                            if (e.getKey() == Ext.EventObject.ENTER) {
-                                Query();
-                            }
-                        }
-                    }
-                }
+                      xtype: 'textfield',
+                      fieldLabel: '庫存調整單號',
+                      id: 'doc_no',
+                      name: 'doc_no',
+                      margin: '0 5 2 0',
+                      labelWidth: 80,
+                      listeners: {
+                          specialkey: function (field, e) {
+                              if (e.getKey() == Ext.EventObject.ENTER) {
+                                  Query();
+                              }
+                          }
+                      }
+                  }
                 , {
                     xtype: 'combobox',
                     editable: false,
@@ -230,7 +230,7 @@ Ext.onReady(function () {
                     valueField: 'user_id',
                     emptyText: '請選擇',
                     value: -1
-                },   
+                },
                 {
                     xtype: "datefield",
                     editable: false,
@@ -283,7 +283,7 @@ Ext.onReady(function () {
                             }
                         }
                     }
-                }, 
+                },
                 ]
             },
             {
@@ -357,7 +357,8 @@ Ext.onReady(function () {
                  renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                      if (value != '' && value.length >= 10) {
                          if (value.substring(0, 10) == "0001-01-01") {
-                             return "日期無更改";
+                             //return "日期無更改";
+                             return "";
                          }
                          else {
                              return value.substring(0, 10);
@@ -370,7 +371,8 @@ Ext.onReady(function () {
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (value != '' && value.length >= 10) {
                         if (value.substring(0, 10) == "0001-01-01") {
-                            return "日期無更改";
+                            //return "日期無更改";
+                            return "";
                         }
                         else {
                             return value.substring(0, 10);
