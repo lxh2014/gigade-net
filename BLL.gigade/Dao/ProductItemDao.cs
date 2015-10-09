@@ -491,11 +491,11 @@ namespace BLL.gigade.Dao
                     ProductSpec spec2 = _specDao.query(Convert.ToInt32(dr["spec_id_2"].ToString()));
                     if (spec1 != null)
                     {
-                        dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString())?"":dr["spec_title_1"]+spec1.spec_name;
+                        dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString())?"":dr["spec_title_1"]+":"+spec1.spec_name;
                     }
                     if (spec2 != null)
                     {
-                        dr["spec_title_2"] = string.IsNullOrEmpty(dr["spec_title_2"].ToString()) ? "" : dr["spec_title_2"] + spec2.spec_name;
+                        dr["spec_title_2"] = string.IsNullOrEmpty(dr["spec_title_2"].ToString()) ? "" : dr["spec_title_2"] +":"+ spec2.spec_name;
                     }
                     dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString()) ? "" : dr["spec_title_1"].ToString() +"  "+ dr["spec_title_2"];
                 }
