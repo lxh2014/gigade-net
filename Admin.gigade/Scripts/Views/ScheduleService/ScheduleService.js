@@ -281,26 +281,6 @@ var center = Ext.create('Ext.form.Panel', {
                     ]
                 }]
         }],
-    //bbar: [{
-    //    text: '保存',
-    //    id: 'btn_save',
-    //    iconCls: 'ui-icon ui-icon-checked'
-    //    ,
-    //    handler: Save
-    //}, {
-    //    text: '重置',
-    //    iconCls: 'ui-icon ui-icon-reset',
-    //    handler: function () {
-    //        this.up('form').getForm().reset();
-    //    }
-    //}, {
-    //    text: '取消',
-    //    id: 'btn_cancel',
-    //    iconCls: 'ui-icon ui-icon-cancel',
-    //    handler: function () {
-    //        Ext.getCmp('west-region-container').setDisabled(false);
-    //    }
-    //}]
 })
 
 Ext.onReady(function () {
