@@ -307,6 +307,8 @@
                     }
                     else {
                         var form = this.up('form').getForm();
+                        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                        myMask.show();
                         if (form.isValid()) {
                             this.disable();
                             form.submit({
@@ -320,17 +322,24 @@
                                     template_data: Ext.htmlEncode(Ext.getCmp('kendoEditor').getValue()),
                                 },
                                 success: function (form, action) {
+                                    myMask.hide();
                                     var result = Ext.decode(action.response.responseText);
                                     if (result.success) {
+                                        myMask.hide();
                                         Ext.Msg.alert("提示信息", "保存成功! ");
                                         store.load();
                                         editWin.close();
                                     }
                                     else {
+                                        myMask.hide();
                                         Ext.Msg.alert("提示信息", "保存失敗! ");
                                         store.load();
                                         editWin.close();
                                     }
+                                },
+                                failure: function () {
+                                    myMask.hide();
+                                    Ext.Msg.alert("提示信息", "出現異常! ");
                                 }
                             });
                         }
@@ -345,7 +354,7 @@
         title: '電子報新增/編輯',
         iconCls: 'icon-user-edit',
         id: 'editWin',
-        height: 650,
+        height: 550,
         width: 750,
         y: 100,
         layout: 'fit',

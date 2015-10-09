@@ -1,7 +1,7 @@
 ﻿/*
  * Copyright (c)J01 
  * 作   者：yachao1120j
- * CreateTime :2015/9/30
+ * CreateTime :2015/10/6
  * 排程
  */
 var currentRecord = { data: {} };
@@ -65,11 +65,11 @@ Ext.define('GIGADE.Config', {
         { name: 'schedule_code', type: 'string' },
         { name: 'parameterCode', type: 'string' },
         { name: 'value', type: 'string' },
-        { name: 'description', type: 'string' },
+        { name: 'parameterName', type: 'string' },
         { name: "create_username", type: "string" },
         { name: "create_time", type: "int" },
         { name: "show_create_time", type: "string" },
-         { name: "show_change_time", type: "string" },
+        { name: "show_change_time", type: "string" },
         { name: "change_username", type: "string" },
         { name: "change_time", type: "int" },
     ]
@@ -79,6 +79,28 @@ var Schedule_Config_Store = Ext.create('Ext.data.Store', {
     proxy: {
         type: 'ajax',
         url: '/ScheduleService/GetScheduleConfigList',
+        actionMethods: 'post',
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
+
+//
+Ext.define('GIGADE.ScheduleCode', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: "schedule_code", type: "string" },
+    ],
+});
+
+var Schedule_Code_Store = Ext.create('Ext.data.Store', {
+    model: 'GIGADE.ScheduleCode',
+    autoLoad: true,
+    proxy: {
+        type: 'ajax',
+        url: '/ScheduleService/GetScheduleMasterList',
         actionMethods: 'post',
         reader: {
             type: 'json',
@@ -127,8 +149,13 @@ var Schedule_Period_Store = Ext.create('Ext.data.Store', {
     }
 });
 
+Schedule_Period_Store.on("beforeload", function () {
+    Ext.apply(Schedule_Period_Store.proxy.extraParams, {
+        schedule_code: Ext.getCmp("schedule_code").getValue(),
+    })
+})
 //每行數據前段的矩形選擇框
-var sm_master = Ext.create('Ext.selection.CheckboxModel', {
+var sm_master = Ext.create('Ext.selection.CheckboxModel', {// master 矩形選擇框
     listeners: {
         selectionchange: function (sm_master, selections) {
             Ext.getCmp("masterGiftList").down('#edit_master').setDisabled(selections.length == 0);
@@ -136,7 +163,7 @@ var sm_master = Ext.create('Ext.selection.CheckboxModel', {
         }
     }
 });
-var sm_config = Ext.create('Ext.selection.CheckboxModel', {
+var sm_config = Ext.create('Ext.selection.CheckboxModel', {// config 矩形選擇框
     listeners: {
         selectionchange: function (sm_config, selections) {
             Ext.getCmp("detailist1").down('#edit_config').setDisabled(selections.length == 0);
@@ -144,7 +171,7 @@ var sm_config = Ext.create('Ext.selection.CheckboxModel', {
         }
     }
 });
-var sm_period = Ext.create('Ext.selection.CheckboxModel', {
+var sm_period = Ext.create('Ext.selection.CheckboxModel', {// period 矩形選擇框
     listeners: {
         selectionchange: function (sm_period, selections) {
             Ext.getCmp("detailist2").down('#edit_period').setDisabled(selections.length == 0);
@@ -153,11 +180,7 @@ var sm_period = Ext.create('Ext.selection.CheckboxModel', {
     }
 });
 
-Schedule_Period_Store.on("beforeload", function () {
-    Ext.apply(Schedule_Period_Store.proxy.extraParams, {
-        schedule_code: Ext.getCmp("schedule_code").getValue(),
-    })
-})
+
 
 // 中間的panel
 var center = Ext.create('Ext.form.Panel', {
@@ -207,8 +230,8 @@ var center = Ext.create('Ext.form.Panel', {
                                   { header: '編號', dataIndex: 'rowid', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
                                   { header: '排程Code', dataIndex: 'schedule_code', align: 'center', flex: 1, menuDisabled: true, sortable: false },
                                    { header: '參數碼', dataIndex: 'parameterCode', align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                                   { header: '參數名稱', dataIndex: 'parameterName', align: 'center', flex: 1, menuDisabled: true, sortable: false },
                                   { header: '參數值', dataIndex: 'value', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                  { header: '參數作用', dataIndex: 'description', align: 'center', flex: 1, menuDisabled: true, sortable: false },
                                   { header: '創建人', dataIndex: 'create_username', align: 'center', flex: 1, menuDisabled: true, sortable: false },
                                  { header: '創建時間', dataIndex: 'show_create_time', width:150, align: 'center', flex: 1, menuDisabled: true, sortable: false },
                                   { header: '修改人', dataIndex: 'change_username', align: 'center', flex: 1, menuDisabled: true, sortable: false },
@@ -216,7 +239,7 @@ var center = Ext.create('Ext.form.Panel', {
                               ],
                               tbar: [
             { xtype: 'button', text: "添加", id: 'add_config', iconCls: 'icon-user-add', handler: add_config },//添加按鈕
-            { xtype: 'button', text: "編輯", id: 'edit_config', disabled: true, iconCls: 'icon-user-edit', handler: onedit_config},//編輯按鈕  包括 添加 刪除 修改 功能
+            { xtype: 'button', text: "編輯", id: 'edit_config', disabled: true, iconCls: 'icon-user-edit', handler: onedit_config},//編輯按鈕  
             { xtype: 'button', text: "刪除", id: 'delete_config', disabled: true, iconCls: 'icon-user-remove', handler: ondelete_config },
 
                               ],
@@ -240,8 +263,8 @@ var center = Ext.create('Ext.form.Panel', {
                                  { header: '執行頻率方式', dataIndex: 'period_type', align: 'center', width: 80,  menuDisabled: true, sortable: false },
                                 { header: '執行頻率倍數', dataIndex: 'period_nums', align: 'center', width: 80, menuDisabled: true, sortable: false },
                                 { header: '啟用時間', dataIndex: 'show_begin_datetime', align: 'center', width: 150, flex: 1, menuDisabled: true, sortable: false },
-                                { header: '當前已執行次數', dataIndex: 'current_nums', align: 'center', width: 50, flex: 1, menuDisabled: true, sortable: false },
-                               { header: '次數限制', dataIndex: 'limit_nums', align: 'center', width: 50, flex: 1, menuDisabled: true, sortable: false },
+                                { header: '當前已執行次數', dataIndex: 'current_nums', align: 'center', width: 80,  menuDisabled: true, sortable: false },
+                               { header: '次數限制', dataIndex: 'limit_nums', align: 'center', width: 80, menuDisabled: true, sortable: false },
                                { header: '創建人', dataIndex: 'create_username', align: 'center', flex: 1, menuDisabled: true, sortable: false },
                               { header: '創建時間', dataIndex: 'show_create_time', align: 'center',width:150, flex: 1, menuDisabled: true, sortable: false },
                                { header: '修改人', dataIndex: 'change_username', align: 'center', flex: 1, menuDisabled: true, sortable: false },
@@ -249,7 +272,7 @@ var center = Ext.create('Ext.form.Panel', {
                             ],
                             tbar: [
           { xtype: 'button', text: "添加", id: 'add_period', iconCls: 'icon-user-add', handler: add_period },//添加按鈕
-          { xtype: 'button', text: "編輯", id: 'edit_period', disabled: true, iconCls: 'icon-user-edit', handler: onedit_period },//編輯按鈕  包括 添加 刪除 修改 功能
+          { xtype: 'button', text: "編輯", id: 'edit_period', disabled: true, iconCls: 'icon-user-edit', handler: onedit_period },//編輯按鈕  
           { xtype: 'button', text: "刪除", id: 'delete_period', disabled: true, iconCls: 'icon-user-remove', handler: ondelete_period },
      
                             ],
@@ -259,26 +282,6 @@ var center = Ext.create('Ext.form.Panel', {
                     ]
                 }]
         }],
-    bbar: [{
-        text: '保存',
-        id: 'btn_save',
-        iconCls: 'ui-icon ui-icon-checked'
-        ,
-        handler: Save
-    }, {
-        text: '重置',
-        iconCls: 'ui-icon ui-icon-reset',
-        handler: function () {
-            this.up('form').getForm().reset();
-        }
-    }, {
-        text: '取消',
-        id: 'btn_cancel',
-        iconCls: 'ui-icon ui-icon-cancel',
-        handler: function () {
-            Ext.getCmp('west-region-container').setDisabled(false);
-        }
-    }]
 })
 
 Ext.onReady(function () {
@@ -337,6 +340,7 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
     height: document.documentElement.clientHeight - 12,
     border: false,
     frame: false,
+    columnLines: true,
     store: ScheduleStore,
     columns: [                      //顯示master
         { header: '編號', dataIndex: 'rowid', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },

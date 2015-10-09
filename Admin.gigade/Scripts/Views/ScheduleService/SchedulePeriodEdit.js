@@ -18,13 +18,19 @@ editFunction_period= function (row, store) {
                 name: 'rowid',
                 hidden: true
             },
-            {
-                xtype: 'textfield',
-                fieldLabel: '排程Code',
-                id: 'schedule_code',
-                name: 'schedule_code',
-                allowBlank: false,
-            },
+           {
+               xtype: 'combobox',
+               editable: false,
+               fieldLabel: '排程Code',
+               id: 'schedule_code_period',
+               name: 'schedule_code_period',
+               allowBlank: false,
+               displayField: 'schedule_code',
+               valueField: 'schedule_code',
+               store: Schedule_Code_Store,
+               value: Ext.getCmp("schedule_code").getValue(),
+
+           },
             {
                 xtype: 'textfield',
                 fieldLabel: '執行頻率方式',
@@ -33,21 +39,21 @@ editFunction_period= function (row, store) {
                 allowBlank: false,
             },
             {
-                xtype: 'textfield',
+                xtype: 'numberfield',
                 fieldLabel: '執行頻率的倍數',
                 id: 'period_nums',
                 name: 'period_nums',
                 allowBlank: false,
             },
              {
-                 xtype: 'textfield',
+                 xtype: 'numberfield',
                  fieldLabel: '當前已執行次數',
                  id: 'current_nums',
                  name: 'current_nums',
                  allowBlank: false,
              },
               {
-                  xtype: 'textfield',
+                  xtype: 'numberfield',
                   fieldLabel: '次數限制',
                   id: 'limit_nums',
                   name: 'limit_nums',
@@ -86,7 +92,7 @@ editFunction_period= function (row, store) {
                         form.submit({
                             params: {
                                 rowid: Ext.htmlEncode(Ext.getCmp('rowid').getValue()),
-                                schedule_code: Ext.htmlEncode(Ext.getCmp('schedule_code').getValue()),
+                                schedule_code: Ext.htmlEncode(Ext.getCmp('schedule_code_period').getValue()),
                                 period_type: Ext.htmlEncode(Ext.getCmp('period_type').getValue()),
                                 period_nums: Ext.htmlEncode(Ext.getCmp('period_nums').getValue()),
                                 current_nums: Ext.htmlEncode(Ext.getCmp('current_nums').getValue()),

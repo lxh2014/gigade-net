@@ -41,6 +41,7 @@ Ext.define('gridlistET', {
 //store 列表頁的數據源 
 var EdmTemplateStore = Ext.create('Ext.data.Store', {
     pageSize: pageSize,
+    autoLoad: true,
     autoDestroy: true,
     model: 'gridlistET',
     proxy: {
@@ -96,14 +97,15 @@ Ext.onReady(function () {
         tbar: [
            { xtype: 'button', text: "新增", id: 'add', iconCls: 'ui-icon ui-icon-user-add', handler: onAddClick },
            { xtype: 'button', text: "編輯", id: 'edit', iconCls: 'ui-icon ui-icon-user-edit', handler: onedit },
-           '->', {
-               text: '查詢',
-               margin: '0 10 0 10',
-               iconCls: 'icon-search',
-               handler: function () {
-                   Query();
-               }
-           },
+           //'->', {
+           //    text: '查詢',
+           //    margin: '0 10 0 10',
+           //    iconCls: 'icon-search',
+           //    hideen:true,
+           //    handler: function () {
+           //        Query();
+           //    }
+           //},
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: EdmTemplateStore,

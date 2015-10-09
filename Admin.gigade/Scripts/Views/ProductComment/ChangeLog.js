@@ -1,25 +1,27 @@
 ﻿
 var pageSize = 25;
 ////表名數據
-//var tableNameStore = Ext.create('Ext.data.Store', {
-//    fields: ['table_name'],
-//    data: [{'table_name':'comment_detail'}]
-//});
-//表名數據
 var tableNameStore = Ext.create('Ext.data.Store', {
     fields: ['table_name'],
-    autoLoad: true,
-    proxy: {
-        type: 'ajax',
-        url: "/ProductComment/GetTableName",
-        noCache: false,
-        actionMethods: 'post',
-        reader: {
-            type: 'json',
-            root: 'data'
-        }
-    }
+    data: [{ 'table_name': 'comment_detail' },
+        { 'table_name': 'comment_num' }
+    ]
 });
+//表名數據
+//var tableNameStore = Ext.create('Ext.data.Store', {
+//    fields: ['table_name'],
+//    autoLoad: true,
+//    proxy: {
+//        type: 'ajax',
+//        url: "/ProductComment/GetTableName",
+//        noCache: false,
+//        actionMethods: 'post',
+//        reader: {
+//            type: 'json',
+//            root: 'data'
+//        }
+//    }
+//});
 
 //歷史記錄列表grid
 var listStore = Ext.create('Ext.data.Store', {

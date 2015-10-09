@@ -1,5 +1,30 @@
 ﻿/*************************************************************************************添加 編輯 框*************************************************************************************************/
-editFunction_config = function (row, store) {
+//參數碼列表
+var ParameterCodeStore = Ext.create('Ext.data.Store', {
+    fields: [
+        { name: 'parameterCode', type: 'string' },
+        { name: 'parameterName', type: 'string' },
+    ],
+    autoLoad: true,
+    proxy: {
+        type: 'ajax',//GetParameterCodeList
+        url: "/Parameter/QueryPara?paraType=schedule_config",
+        noCache: false,
+        actionMethods: 'post',
+        reader: {
+            type: 'json',
+            root: 'items'
+        }
+    }
+});
+//ParameterCodeStore.on("beforeload", function ()
+//{
+//    Ext.apply(ParameterCodeStore.proxy.extraParams, {
+//        paraType: 'schedule_config',
+//    })
+//})
+editFunction_config = function (row, store)
+{
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
         frame: true,
@@ -19,33 +44,45 @@ editFunction_config = function (row, store) {
                 hidden: true
             },
             {
-                xtype: 'textfield',
+                xtype: 'combobox',
+                editable: false,
                 fieldLabel: '排程Code',
-                id: 'schedule_code',
-                name: 'schedule_code',
+                id: 'schedule_code_config',
+                name: 'schedule_code_config',
                 allowBlank: false,
+                displayField: 'schedule_code',
+                valueField: 'schedule_code',
+                store: Schedule_Code_Store,
+                value: Ext.getCmp("schedule_code").getValue(),
+                
             },
             {
-                xtype: 'textfield',
-                fieldLabel: '參數碼',
+                xtype: 'combobox',
+                editable: false,
+                fieldLabel: '參數名稱',
                 id: 'parameterCode',
                 name: 'parameterCode',
                 allowBlank: false,
+                displayField: 'parameterName',
+                valueField: 'parameterCode',
+                store: ParameterCodeStore,
+                //value: Ext.getCmp("schedule_code").getValue(),
+                //listeners: {
+                //    change: function ()
+                //    {
+                //        Ext.getCmp("parameterName").setValue(Ext.getCmp('parameterCode').getRawValue());
+                //    }
+                //}
             },
             {
-                xtype: 'textfield',
+                xtype: 'numberfield',
                 fieldLabel: '參數值',
                 id: 'value',
                 name: 'value',
+                minValue: 0,
                 allowBlank: false,
             },
-             {
-                 xtype: 'textfield',
-                 fieldLabel: '參數作用',
-                 id: 'description',
-                 name: 'description',
-                 allowBlank: false,
-             },
+            
         ],
 
         // 点击保存按钮后  提示信息 
@@ -60,10 +97,10 @@ editFunction_config = function (row, store) {
                         form.submit({
                             params: {
                                 rowid: Ext.htmlEncode(Ext.getCmp('rowid').getValue()),
-                                schedule_code: Ext.htmlEncode(Ext.getCmp('schedule_code').getValue()),
+                                schedule_code: Ext.htmlEncode(Ext.getCmp('schedule_code_config').getValue()),
                                 parameterCode: Ext.htmlEncode(Ext.getCmp('parameterCode').getValue()),
                                 value: Ext.htmlEncode(Ext.getCmp('value').getValue()),
-                                description: Ext.htmlEncode(Ext.getCmp('description').getValue()),
+                                parameterName: Ext.htmlEncode(Ext.getCmp('parameterCode').getRawValue()),
                             },
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);

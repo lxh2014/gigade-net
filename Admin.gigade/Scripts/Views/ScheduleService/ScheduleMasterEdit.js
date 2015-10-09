@@ -19,11 +19,14 @@ editFunction_master = function (row, store) {
                 hidden: true
             },
             {
+                
+               // xtype: 'combobox',
                 xtype: 'textfield',
                 fieldLabel: '排程Code',
                 id: 'schedule_code',
                 name: 'schedule_code',
                 allowBlank: false,
+               // editable: false,
             },
             {
                 xtype: 'textfield',
@@ -31,6 +34,7 @@ editFunction_master = function (row, store) {
                 id: 'schedule_name',
                 name: 'schedule_name',
                 allowBlank: false,
+               
             },
             {
                 xtype: 'textfield',
@@ -203,12 +207,20 @@ editFunction_master = function (row, store) {
                                 var result = Ext.decode(action.response.responseText);
                                 if (result.success) {
                                     Ext.Msg.alert(INFORMATION, "保存成功! ");
-                                    //store.load();
                                     ScheduleStore.load();
                                     editWin.close();
                                 }
-                                else {
-                                    Ext.Msg.alert(INFORMATION, "保存失敗! ");
+                                else
+                                {
+                                    if (result.msg == "3")
+                                    {
+                                        Ext.Msg.alert(INFORMATION, "排程Code已存在! ");
+                                    }
+                                    else
+                                    {
+                                        Ext.Msg.alert(INFORMATION, "保存失敗 ! ");
+                                    }
+                                    alert(result.msg);
                                     editWin.close();
                                 }
                             },
