@@ -164,11 +164,11 @@ namespace BLL.gigade.Mgr
                     if (item.elcs_key == "register_time")
                     {
                         query.ChkRegisterTime = true;
-                        if (DateTime.TryParse(item.elcs_value3.ToString(), out dt))
+                        if (DateTime.TryParse(item.elcs_value1.ToString(), out dt))
                         {
                             query.registerTimeMin = dt;
                         }
-                        if (DateTime.TryParse(item.elcs_value4.ToString(), out dt))
+                        if (DateTime.TryParse(item.elcs_value2.ToString(), out dt))
                         {
                             query.registerTimeMax = dt;
                         }
