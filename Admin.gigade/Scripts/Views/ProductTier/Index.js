@@ -377,9 +377,10 @@ function onEditClick() {
     else if (row.length > 1) {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
-        addPc.show();
-        Ext.getCmp('btnSave').show();
+                                        ///edit by wwei0216w 2015/10/7
+        Ext.getCmp('btnSave').show();  /*交換位置防止panel中顯示 出現上一次數據*/
         Tier_Load(row[0]);
+        addPc.show();
     }
 }
 
@@ -545,7 +546,36 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                 });
                 myMask.show();
 
+                var newList = [];
+                var oldList = [];
+                var updateList = [];
                 var upDataStore = relevantStore.getUpdatedRecords(); //獲得修改過的store
+                
+
+                for (var i = 0; i < relevantStore.data.length; i++) { //查找新增數據
+                    var item = relevantStore.data.items[i];
+                    if (item.data.id == 0) {
+                        newList.push(item.data.item_name);
+                        item.data.type = item.data.tabType;
+                        item.data.key1 = item.data.keyStr;
+                        item.data.value1 = item.data.valueStr;
+                        upDataStore[upDataStore.length] = item;
+                    } else {
+                        oldList.push(item.data.item_name);
+                    }
+                }
+
+                ///查找重複數據
+                for (var i = 0; i < newList.length; i++) {
+                    for (var j = 0; j < oldList.length; j++) {
+                        if (oldList[j] == newList[i]) {
+                            myMask.hide();
+                            Ext.Msg.alert(INFORMATION, PLEASEVERIFYDATAOFREPEAT);//沒有數據被修改
+                            return;
+                        }
+                    }
+                }
+              
 
                 for (var i = 0; i < upDataStore.length; i++) { //更新數據
                     var item = upDataStore[i];
@@ -558,17 +588,24 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                     if (!isNaN(item.data.valueStr)) {
                         item.data.value1 = item.data.valueStr;
                     }
-                }
 
-                for (var i = 0; i < relevantStore.data.length; i++) { //查找新增數據
-                    var item = relevantStore.data.items[i];
-                    if (item.data.id == 0) {
-                        item.data.type = item.data.tabType;
-                        item.data.key1 = item.data.keyStr;
-                        item.data.value1 = item.data.valueStr;
-                        upDataStore[upDataStore.length] = item;
+                    for (var i = 0; i < relevantStore.data.length; i++) {
+                        var itemOld = relevantStore.data.items[i];
+                        if (item.data.id != itemOld.data.id) {
+                            if (item.data.item_name == itemOld.data.item_name) {
+                                myMask.hide();
+                                Ext.Msg.alert(INFORMATION, PLEASEVERIFYDATAOFREPEAT);//沒有數據被修改
+                                return;
+                            }
+                        }
                     }
                 }
+
+
+
+
+
+
 
                 if (!upDataStore.length) {
                     myMask.hide();
