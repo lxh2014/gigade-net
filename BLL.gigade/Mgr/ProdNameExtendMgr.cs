@@ -41,23 +41,34 @@ namespace BLL.gigade.Mgr
                 //foreach (var item in prodExts) edit by wwei0216w 2015/6/30 將只判斷審核狀態改為所有狀態都判斷,防止其它操作造成的flag狀態錯誤
                 foreach (var item in list)
                 {
-                    if ((item.Event_End > time) && ((item.Product_Name.Contains(item.Product_Prefix) && item.Product_Prefix.Length > 0) || (item.Product_Name.Contains(item.Product_Suffix) && item.Product_Suffix.Length > 0))) //擁有前後綴的情況
+                    if (item.Product_Prefix == "" && item.Product_Suffix == "")///前后綴都為空,此種情況可編輯
+                    {
+                        item.Flag = 0;
+                    }
+                    else if ((item.Event_End > time) && ((item.Product_Name.Contains(item.Product_Prefix) && item.Product_Prefix.Length > 0) || (item.Product_Name.Contains(item.Product_Suffix) && item.Product_Suffix.Length > 0))) //擁有前後綴的情況
                     {
                         item.Flag = 2;  ///Flag==2 為商品作用中
                     }
                     else if (item.Type == 3)///Type為3表示申請被駁回///駁回后商品應該顯示可編輯,所以將flag設置為0
                     {
                          item.Flag = 0;///Flag ==0 表示商品可編輯
-                    }   
-                    else if (item.Event_End <= time && item.Event_End!=0) ///add by wwei0215/8/25 添加item.Event_End!=0
+                    }
+                    else if (item.Event_End <= time && item.Event_End != 0) ///add by wwei0215/8/25 添加item.Event_End!=0
                     {
                         item.Flag = 3;///Flag ==3 表示過期
+                    }
+                    else if (item.Flag == 2)
+                    {
+                        item.Flag = 3;
+                    }
+                    else
+                    {
+                        item.Flag = item.Flag;
                     }
                 }
 
                 Update(list.Select(p => (ProdNameExtend)p).ToList());
-                //Update(prodExts.Select(p => (ProdNameExtend)p).ToList());
-
+                
                 //排除重複的可編輯行
                 var a = (from obj in list
                          where obj.Flag == 3
@@ -213,13 +224,21 @@ namespace BLL.gigade.Mgr
                 {
                     list = peDao.GetPastProduct();
                 }
-                //uint[] ids = list.Select(p => p.Price_Master_Id).ToArray();
-                //List<PriceMaster> priceList = pmMgr.Query(ids);
                 foreach (var pM in list)
                 {
-                    //var pec = list.Find(m => m.Price_Master_Id == pM.price_master_id);//獲取對應的PriceMaster數據信息
-                    pM.Product_Name = pM.Product_Name.Replace(PriceMaster.L_HKH + pM.Product_Prefix + PriceMaster.R_HKH, "")//替換掉priceMaster中product_name的前綴
-                    .Replace(PriceMaster.L_HKH + pM.Product_Suffix + PriceMaster.R_HKH, "");//替換掉priceMaster中product_name的後綴
+                    //pM.Product_Name = pM.Product_Name.Replace(PriceMaster.L_HKH + pM.Product_Prefix + PriceMaster.R_HKH, "")//替換掉priceMaster中product_name的前綴
+                    //.Replace(PriceMaster.L_HKH + pM.Product_Suffix + PriceMaster.R_HKH, "");//替換掉priceMaster中product_name的後綴
+                    bool tempFlag = true;
+                    int index = 0;///定義index防止錯誤導致下面的while無限循環
+                    while(tempFlag)///循環刪除前後綴
+                    {
+                        index ++;
+                        pM.Product_Name = ClearPreSuName(pM.Product_Name, PriceMaster.L_HKH.ToString(), PriceMaster.R_HKH.ToString());
+                        if (pM.Product_Name.IndexOf(PriceMaster.L_HKH.ToString()) == -1 && pM.Product_Name.IndexOf(PriceMaster.R_HKH.ToString()) == -1||index>10)
+                        {
+                            tempFlag = false;
+                        }
+                    }
                     PriceMaster p = new PriceMaster();
                     p.price_master_id = pM.Price_Master_Id;
                     p.product_name = pM.Product_Name;
@@ -233,8 +252,6 @@ namespace BLL.gigade.Mgr
                 {
                     peDao.Update(list.Select(p => (ProdNameExtend)p).ToList());
                 }
-
-                //pmMgr.UpdatePriceMasters(priceList, callId,out msg);//不需要審核邏輯
                 if (msg == "")
                 {
                     int days = 30;//過期多少天刪除

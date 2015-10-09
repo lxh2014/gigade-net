@@ -202,8 +202,22 @@ namespace BLL.gigade.Mgr
                           if (_dt.Rows[i]["user_email"].ToString() != "" && _dt.Rows[i]["user_email"].ToString() != null)
                           {
                               MRquery.receiver_address = _dt.Rows[i]["user_email"].ToString();
-                              MRquery.receiver_name = _dt.Rows[i]["user_name"].ToString();
-                              MRquery.user_id = Convert.ToInt32(_dt.Rows[i]["user_id"].ToString());
+                              if (!string.IsNullOrEmpty(_dt.Rows[i]["user_name"].ToString()))
+                              {
+                                  MRquery.receiver_name = _dt.Rows[i]["user_name"].ToString();
+                              }
+                              else
+                              {
+                                  MRquery.receiver_name = "";
+                              }
+                              if (!string.IsNullOrEmpty(_dt.Rows[i]["user_id"].ToString()))
+                              {
+                                  MRquery.user_id = Convert.ToInt32(_dt.Rows[i]["user_id"].ToString());
+                              }
+                              else
+                              {
+                                  MRquery.user_id = 0;
+                              }
                           }
                           else
                           {

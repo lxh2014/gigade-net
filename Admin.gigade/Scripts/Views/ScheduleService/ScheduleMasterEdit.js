@@ -1,5 +1,5 @@
 ﻿/*************************************************************************************添加 編輯 框*************************************************************************************************/
-editFunction = function (row, store) {
+editFunction_master = function (row, store) {
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
         frame: true,
@@ -19,11 +19,14 @@ editFunction = function (row, store) {
                 hidden: true
             },
             {
+                
+               // xtype: 'combobox',
                 xtype: 'textfield',
                 fieldLabel: '排程Code',
                 id: 'schedule_code',
                 name: 'schedule_code',
                 allowBlank: false,
+               // editable: false,
             },
             {
                 xtype: 'textfield',
@@ -31,6 +34,7 @@ editFunction = function (row, store) {
                 id: 'schedule_name',
                 name: 'schedule_name',
                 allowBlank: false,
+               
             },
             {
                 xtype: 'textfield',

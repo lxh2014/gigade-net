@@ -163,6 +163,10 @@ CommonFunction.DateTimeToString(q.made_dt),CommonFunction.DateTimeToString(q.cde
                 {
                     sql.AppendFormat(" and  ia.doc_no='{0}' ", q.doc_no);
                 }
+                if (q.doc_userid != 0)//by zhaozhi0623j add 20151006 用於庫存調整管理員查詢
+                {
+                    sql.AppendFormat(" and  ia.create_user='{0}' ", q.doc_userid);
+                }
                 if (q.IsPage)
                 {
                     System.Data.DataTable _dt = _access.getDataTable(sql.ToString());
@@ -188,7 +192,7 @@ CommonFunction.DateTimeToString(q.made_dt),CommonFunction.DateTimeToString(q.cde
         
             try
             {
-                sql.Append(@"select ia.row_id, ip.loc_id,ia.loc_id as loc_R,ia.item_id,p.product_name,concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz
+                sql.Append(@"select ia.doc_no,ia.row_id, ip.loc_id,ia.loc_id as loc_R,ia.item_id,p.product_name,concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz
         ,ia.made_dt,ia.cde_dt,ia.qty_o,ia.adj_qty,ia.iarc_id,ia.create_dtim ,m.user_username AS name,ia.po_id,ia.remarks,ia.c_made_dt,ia.c_cde_dt  from iialg ia 
         left join product_item pi on ia.item_id=pi.item_id  
         left join product p on p.product_id=pi.product_id 
@@ -215,11 +219,19 @@ CommonFunction.DateTimeToString(q.made_dt),CommonFunction.DateTimeToString(q.cde
                 //}
                 if (q.starttime > DateTime.MinValue)
                 {
-                    sql.AppendFormat(" and ia.create_dtim>='{0}' ", q.starttime);
+                    sql.AppendFormat(" and ia.create_dtim>='{0}' ", q.starttime.ToString("yyyy-MM-dd 00:00:00"));
                 }
                 if (q.endtime > DateTime.MinValue)
                 {
-                    sql.AppendFormat(" and ia.create_dtim<='{0}' ", q.endtime);
+                    sql.AppendFormat(" and ia.create_dtim<='{0}' ", q.endtime.ToString("yyyy-MM-dd 23:59:59"));
+                }
+                if (!string.IsNullOrEmpty(q.doc_no))//by zhaozhi0623j add 20151006 用於庫存調整單號查詢
+                {
+                    sql.AppendFormat(" and  ia.doc_no='{0}' ", q.doc_no);
+                }
+                if (q.doc_userid != 0)//by zhaozhi0623j add 20151006 用於庫存調整管理員查詢
+                {
+                    sql.AppendFormat(" and  ia.create_user='{0}' ", q.doc_userid);
                 }
                
                     sql.AppendFormat(" order by  ia.row_id ;");
@@ -367,7 +379,7 @@ CommonFunction.DateTimeToString(q.made_dt),CommonFunction.DateTimeToString(q.cde
                     _dtprod_qty.Rows[0][0]=0;
                 }
                 sql.Clear();
-                sqlstr.AppendFormat("insert into istock_change(sc_trans_id,sc_cd_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_note,sc_istock_why) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')", "", "", q.item_id, 2, Convert.ToInt32(_dtprod_qty.Rows[0][0]), (q.pnum - q.qty_o), Convert.ToInt32(_dtprod_qty.Rows[0][0]) - q.qty_o + q.pnum, CommonFunction.DateTimeToString(DateTime.Now), q.create_user, "理貨庫調", 2);
+                sqlstr.AppendFormat("insert into istock_change(sc_trans_id,sc_cd_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_note,sc_istock_why) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')", "", "", q.item_id, 3, Convert.ToInt32(_dtprod_qty.Rows[0][0]), (q.pnum - q.qty_o), Convert.ToInt32(_dtprod_qty.Rows[0][0]) - q.qty_o + q.pnum, CommonFunction.DateTimeToString(DateTime.Now), q.create_user, "理貨庫調", 4);
                 mySqlCmd.CommandText = sqlstr.ToString();
 
                 mySqlCmd.ExecuteNonQuery();

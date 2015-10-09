@@ -204,6 +204,56 @@ namespace BLL.gigade.Dao
                 throw new Exception("ProductCommentDao-->ProductCommentSave-->" + ex.Message + sql.ToString(), ex);
             }
         }
+
+        /// <summary>
+        /// 修改評價滿意度
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public int ProductCommentSatisfySave(ProductCommentQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sqlSearch = new StringBuilder();
+            query.Replace4MySQL();
+            int result = 0;
+            try
+            {
+                ///獲取主鍵值
+                sqlSearch.AppendFormat("select comment_numid from comment_num where comment_id='{0}';", query.comment_id);
+                DataTable _dt = _access.getDataTable(sqlSearch.ToString());
+                if(_dt.Rows.Count>0)
+                {
+                    int comment_numid = Convert.ToInt32(_dt.Rows[0]["comment_numid"]);
+                    sql.Append("set sql_safe_updates = 0;");
+
+                    sql.AppendFormat("update comment_num set logistics_deliver='{0}', web_server='{1}',seller_server='{2}',product_desc='{3}'   where comment_id='{4}';", query.logistics_deliver, query.web_server, query.seller_server, query.product_desc, query.comment_id);
+                    if (query.old_logistics_deliver != query.logistics_deliver)
+                    {
+                        sql.AppendFormat("INSERT into table_change_log(user_type,pk_id,change_table,change_field,field_ch_name,old_value,new_value,create_user,create_time)values('1','{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}');", comment_numid, "comment_num", "logistics_deliver", "配送速度滿意度", query.old_logistics_deliver, query.logistics_deliver, query.reply_user, Common.CommonFunction.DateTimeToString(DateTime.Now));
+                    }
+                    if (query.old_web_server != query.web_server)
+                    {
+                        sql.AppendFormat("INSERT into table_change_log(user_type,pk_id,change_table,change_field,field_ch_name,old_value,new_value,create_user,create_time)values('1','{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}');", comment_numid, "comment_num", "web_server", "網站整體滿意度", query.old_web_server, query.web_server, query.reply_user, Common.CommonFunction.DateTimeToString(DateTime.Now));
+                    }
+                    if (query.old_seller_server != query.seller_server)
+                    {
+                        sql.AppendFormat("INSERT into table_change_log(user_type,pk_id,change_table,change_field,field_ch_name,old_value,new_value,create_user,create_time)values('1','{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}');", comment_numid, "comment_num", "seller_server", "商品質量滿意度", query.old_seller_server, query.seller_server, query.reply_user, Common.CommonFunction.DateTimeToString(DateTime.Now));
+                    }
+                    if (query.old_product_desc != query.product_desc)
+                    {
+                        sql.AppendFormat("INSERT into table_change_log(user_type,pk_id,change_table,change_field,field_ch_name,old_value,new_value,create_user,create_time)values('1','{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}');", comment_numid, "comment_num", "product_desc", "商品描述相符度", query.old_product_desc, query.product_desc, query.reply_user, Common.CommonFunction.DateTimeToString(DateTime.Now));
+                    }
+                    sql.AppendFormat("set sql_safe_updates = 1;");
+                    result = _access.execCommand(sql.ToString());
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductCommentDao-->ProductCommentSatisfySave-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
         #region  根據comment_id獲取用戶郵箱，姓名，購買商品，評價信息
         public ProductCommentQuery GetUsetInfo(Model.Query.ProductCommentQuery store)
         {
@@ -252,14 +302,22 @@ namespace BLL.gigade.Dao
             StringBuilder SqlCount = new StringBuilder();
             try
             {
-                //SqlCount.AppendFormat("select count(tcl.pk_id) as totalCount ");
-                strSql.AppendFormat(@"select  DISTINCT tcl.create_time,tcl.pk_id,tcl.create_user,comment_detail.comment_id,comment_detail.comment_info");
-                SqlWhere.Append(" from table_change_log tcl LEFT JOIN comment_detail on tcl.pk_id = comment_detail.comment_detail_id WHERE 1=1 ");
-
+                //SqlCount.AppendFormat("select count(tcl.row_id) as totalCount from table_change_log tcl ");
+                strSql.AppendFormat(@"select  DISTINCT tcl.create_time,tcl.pk_id,tcl.create_user,comment_detail.comment_id,comment_detail.comment_info from table_change_log tcl");
+               
                 if (!string.IsNullOrEmpty(query.change_table))
                 {
+                    if (query.change_table == "comment_detail")
+                    {
+                        SqlWhere.Append(" LEFT JOIN comment_detail on tcl.pk_id = comment_detail.comment_detail_id WHERE 1=1 ");
+                    }
+                    else if (query.change_table == "comment_num")
+                    {
+                        SqlWhere.Append(" LEFT JOIN comment_num on tcl.pk_id = comment_num.comment_numid left join comment_detail on comment_num.comment_id=comment_detail.comment_id WHERE 1=1 ");
+                    }
                     SqlWhere.AppendFormat(" and tcl.change_table='{0}'", query.change_table);
                 }
+                
                 if (query.comment_id>0)
                 {
                     SqlWhere.AppendFormat(" and comment_detail.comment_id ='{0}'", query.comment_id);
@@ -271,15 +329,14 @@ namespace BLL.gigade.Dao
 
                 }
                 SqlWhere.Append(" order by tcl.create_time desc");
-
-                //strSql.AppendFormat("select row_id,pk_id,create_user,create_time from table_change_log  where 1=1 ");
-                
+                               
                 totalCount = 0;
                 if (query.IsPage)
                 {
                     DataTable _dt = _access.getDataTable(strSql.ToString() + SqlWhere.ToString());
                     if (_dt.Rows.Count > 0)
                     {
+                        //totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
                         totalCount = _dt.Rows.Count;
                         SqlWhere.AppendFormat(" limit {0},{1};", query.Start, query.Limit);
                     }

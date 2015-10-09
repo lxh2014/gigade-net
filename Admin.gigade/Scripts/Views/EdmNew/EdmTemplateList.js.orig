@@ -15,6 +15,8 @@ Ext.define('gridlistET', {
         { name: "edit_url", type: "string" },//EDM編輯者，選擇該範本後，用來給編輯者提供該範本相關資料的網頁
         { name: "content_url", type: "string" },//最終用來產出EDM內容的網頁，會被程式呼叫，以便取得EDM郵件內容。產出的內容會用來寫入到mail_request的body欄位
         { name: "enabled", type: "int" },//是否啟用
+<<<<<<< HEAD
+=======
 
 
         //{ name: "template_create_userid", type: "int" },//建立者id
@@ -25,6 +27,7 @@ Ext.define('gridlistET', {
         { name: "template_createdate", type: "string" },//建立日期
         { name: "template_updatedate", type: "string" },//更新時間
 
+>>>>>>> 4281f4434ddb15105150266be40edef3812bb933
         //{ name: "template_create_userid", type: "int" },//建立者
         //{ name: "template_update_userid", type: "int" },//修改者
         //{ name: "template_createdate",type:"string" },//建立日期
@@ -41,7 +44,6 @@ Ext.define('gridlistET', {
 //store 列表頁的數據源 
 var EdmTemplateStore = Ext.create('Ext.data.Store', {
     pageSize: pageSize,
-    autoLoad: true,
     autoDestroy: true,
     model: 'gridlistET',
     proxy: {
@@ -97,15 +99,14 @@ Ext.onReady(function () {
         tbar: [
            { xtype: 'button', text: "新增", id: 'add', iconCls: 'ui-icon ui-icon-user-add', handler: onAddClick },
            { xtype: 'button', text: "編輯", id: 'edit', iconCls: 'ui-icon ui-icon-user-edit', handler: onedit },
-           //'->', {
-           //    text: '查詢',
-           //    margin: '0 10 0 10',
-           //    iconCls: 'icon-search',
-           //    hideen:true,
-           //    handler: function () {
-           //        Query();
-           //    }
-           //},
+           '->', {
+               text: '查詢',
+               margin: '0 10 0 10',
+               iconCls: 'icon-search',
+               handler: function () {
+                   Query();
+               }
+           },
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: EdmTemplateStore,
