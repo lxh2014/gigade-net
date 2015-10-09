@@ -78,7 +78,8 @@ SuggestPurchaseStore.on('beforeload', function () {
         //vendor_name:Ext.getCmp('vendor_name').getValue(),/*供應商名稱*/
         periodDays: Ext.getCmp('txtPeriodDays').getValue(),
         serchType: Ext.getCmp('serchType').getValue(),
-        serchName: Ext.getCmp('serchName').getValue()
+        serchName: Ext.getCmp('serchName').getValue(),
+        sale_status: Ext.getCmp('sale_status').getValue()
     });
 });
 var sm = Ext.create('Ext.selection.CheckboxModel', {
@@ -106,6 +107,29 @@ var DDLStore = Ext.create('Ext.data.Store', {
     { "txt": "供應商簡稱", "value": "3" },
     { "txt": "商品ERP編號", "value": "4" }
     ]
+});
+//定義商品狀態的model
+Ext.define("gigade.gridPara", {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: "parameterCode", type: "string" },//
+        { name: "parameterName", type: "string" }//
+    ]
+});
+//商品販售狀態store
+var prodSale_StatusStore = Ext.create('Ext.data.Store', {
+    model: 'gigade.gridPara',
+    //  autoLoad: true,
+    proxy: {
+        type: 'ajax',
+        url: "/Parameter/QueryPara?paraType=sale_status",//調用查詢商品販售狀態的方法
+        getMethod: function () { return 'get'; },
+        actionMethods: 'post',
+        reader: {
+            type: 'json',
+            root: 'items'
+        }
+    }
 });
 var SendStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
@@ -244,7 +268,7 @@ Ext.onReady(function () {
                          fieldLabel: "是否買斷",
                          colName: 'perpaid',
                          labelWidth: 60,
-                         margin:'0 0 0 20',
+                         margin:'0 0 0 5',
                          width: 250,
                          defaults: {
                              name: 'perpaidValue'
@@ -288,8 +312,9 @@ Ext.onReady(function () {
                           {
                               xtype: 'combobox',
                               editable: false,
-                              fieldLabel: "查詢條件",
-                              labelWidth: 60,
+                              fieldLabel: "供應商/商品ERP",
+                              margin: '0 0 0 10',
+                              labelWidth: 100,
                               id: 'serchType',
                               store: DDLStore,
                               displayField: 'txt',
@@ -298,9 +323,9 @@ Ext.onReady(function () {
                           },
                          {
                              xtype: 'textfield',
-                             margin: '0 0 0 25',
+                             margin: '0 0 0 5',
                              id: 'serchName',
-                             labelWidth: 80,
+                             labelWidth: 20,
                              name: 'serchName',
                              listeners: {
                                  specialkey: function (field, e) {
@@ -345,7 +370,7 @@ Ext.onReady(function () {
                         mouseWheelEnabled: true,
                         allowDecimals: false,
                         allowNegative: true,
-                        margin: '0 0 0 20',
+                        margin: '0 0 0 48',
                         labelWidth: 60,
                         minValue: 1,
                         value: 7,
@@ -356,7 +381,36 @@ Ext.onReady(function () {
                                 }
                             }
                         }
-                    }
+                    },
+                     //{
+                     //    xtype: 'fieldcontainer',
+                     //    layout: 'hbox',
+                     //    items: [
+                             {
+                                 xtype: 'combobox',
+                                 margin: '0 0 0 10',
+                                 fieldLabel: '商品販售狀態',
+                                 store: prodSale_StatusStore,
+                                 id: 'sale_status',
+                                 queryMode: 'local',
+                                 displayField: 'parameterName',
+                                 valueField: 'parameterCode',
+                                 editable: false,
+                                 listeners: {
+                                     beforerender: function () {
+                                         prodSale_StatusStore.load({
+                                             callback: function () {
+                                                 prodSale_StatusStore.insert(0, { parameterCode: '100', parameterName: '全部' });
+                                                 Ext.getCmp('sale_status').setValue(prodSale_StatusStore.data.items[0].data.parameterCode);
+                                                 // alert(prodStatusStore.data.items[0].data.parameterCode);
+                                             }
+                                         });
+                                     }
+                                 }
+                         //    }
+                         //]
+
+                     }
                 ]
             },
             {
@@ -385,6 +439,7 @@ Ext.onReady(function () {
                          iconCls: 'ui-icon ui-icon-reset',
                          handler: function () {
                              this.up('form').getForm().reset();
+                             Ext.getCmp('sale_status').setValue(100);
                          }
                      }
                 ]
@@ -536,5 +591,6 @@ ExportExcel = function () {
     var serchType = Ext.getCmp('serchType').getValue();//搜索類型
     var serchName = Ext.getCmp('serchName').getValue();//搜索內容
     var periodDays = Ext.getCmp('txtPeriodDays').getValue();
-    window.open("/ProductPurchase/ReportSuggestPurchaseExcel?stockScope=" + stockScope + "&sumDays=" + sumDays + "&periodDays=" + periodDays + "&perpaid=" + perpaid + "&Is_pod=" + Is_pod + "&serchType=" + serchType + "&serchName=" + serchName);
+    var sale_status = Ext.getCmp('sale_status').getValue();
+    window.open("/ProductPurchase/ReportSuggestPurchaseExcel?stockScope=" + stockScope + "&sumDays=" + sumDays + "&periodDays=" + periodDays + "&perpaid=" + perpaid + "&Is_pod=" + Is_pod + "&serchType=" + serchType + "&serchName=" + serchName + "&sale_status=" + sale_status);
 }
