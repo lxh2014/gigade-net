@@ -42,17 +42,16 @@ namespace BLL.gigade.Mgr
         }
 
 
-
-        public ScheduleMasterQuery GetExeScheduleMaster(ScheduleMasterQuery query)
+        public ScheduleMasterQuery GetScheduleMaster(ScheduleMasterQuery query)
         {
             try
             {
-                return _secheduleServiceDao.GetExeScheduleMaster(query);
+                return _secheduleServiceDao.GetScheduleMaster(query);
             }
             catch (Exception ex)
             {
 
-                throw new Exception("SecheduleServiceMgr-->GetExeScheduleMaster-->" + ex.Message, ex);
+                throw new Exception("SecheduleServiceMgr-->GetScheduleMaster-->" + ex.Message, ex);
             }
         }
         public List<ScheduleConfigQuery> GetScheduleConfig(ScheduleConfigQuery query)
@@ -279,8 +278,22 @@ namespace BLL.gigade.Mgr
                     {
                         item.sschedule_state = "啟用";
                     }
-                    item.show_previous_execute_time = CommonFunction.GetNetTime(item.previous_execute_time).ToString("yyyy-MM-dd HH:mm:ss ");
-                    item.show_next_execute_time = CommonFunction.GetNetTime(item.next_execute_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                    if (item.previous_execute_time == 0)
+                    {
+                        item.show_previous_execute_time = string.Empty;
+                    }
+                    else
+                    {
+                        item.show_previous_execute_time = CommonFunction.GetNetTime(item.previous_execute_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                    }
+                    if (item.next_execute_time == 0)
+                    {
+                        item.show_next_execute_time = string.Empty;
+                    }
+                    else
+                    {
+                        item.show_next_execute_time = CommonFunction.GetNetTime(item.next_execute_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                    }
                     item.show_create_time = CommonFunction.GetNetTime(item.create_time).ToString("yyyy-MM-dd HH:mm:ss ");
                     item.show_change_time = CommonFunction.GetNetTime(item.change_time).ToString("yyyy-MM-dd HH:mm:ss ");
                 }
@@ -373,6 +386,8 @@ namespace BLL.gigade.Mgr
         {
             if (query.rowid == 0)//新增
             {
+                
+
                 return _secheduleServiceDao.ScheduleMasterInfoInsert(query);
             }
             else//編輯
