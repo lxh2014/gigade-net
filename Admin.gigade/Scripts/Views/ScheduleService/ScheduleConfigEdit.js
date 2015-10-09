@@ -1,22 +1,28 @@
 ﻿/*************************************************************************************添加 編輯 框*************************************************************************************************/
 //參數碼列表
-var tableNameStore = Ext.create('Ext.data.Store', {
+var ParameterCodeStore = Ext.create('Ext.data.Store', {
     fields: [
         { name: 'parameterCode', type: 'string' },
         { name: 'parameterName', type: 'string' },
     ],
     autoLoad: true,
     proxy: {
-        type: 'ajax',
-        url: "/ScheduleService/GetParameterCodeList",
+        type: 'ajax',//GetParameterCodeList
+        url: "/Parameter/QueryPara?paraType=schedule_config",
         noCache: false,
         actionMethods: 'post',
         reader: {
             type: 'json',
-            root: 'data'
+            root: 'items'
         }
     }
 });
+//ParameterCodeStore.on("beforeload", function ()
+//{
+//    Ext.apply(ParameterCodeStore.proxy.extraParams, {
+//        paraType: 'schedule_config',
+//    })
+//})
 editFunction_config = function (row, store)
 {
     var editFrm = Ext.create('Ext.form.Panel', {
@@ -51,11 +57,22 @@ editFunction_config = function (row, store)
                 
             },
             {
-                xtype: 'textfield',
-                fieldLabel: '參數碼',
+                xtype: 'combobox',
+                editable: false,
+                fieldLabel: '參數名稱',
                 id: 'parameterCode',
                 name: 'parameterCode',
                 allowBlank: false,
+                displayField: 'parameterName',
+                valueField: 'parameterCode',
+                store: ParameterCodeStore,
+                //value: Ext.getCmp("schedule_code").getValue(),
+                //listeners: {
+                //    change: function ()
+                //    {
+                //        Ext.getCmp("parameterName").setValue(Ext.getCmp('parameterCode').getRawValue());
+                //    }
+                //}
             },
             {
                 xtype: 'textfield',
@@ -64,13 +81,7 @@ editFunction_config = function (row, store)
                 name: 'value',
                 allowBlank: false,
             },
-             {
-                 xtype: 'textfield',
-                 fieldLabel: '參數作用',
-                 id: 'description',
-                 name: 'description',
-                 allowBlank: false,
-             },
+            
         ],
 
         // 点击保存按钮后  提示信息 
@@ -88,7 +99,7 @@ editFunction_config = function (row, store)
                                 schedule_code: Ext.htmlEncode(Ext.getCmp('schedule_code_config').getValue()),
                                 parameterCode: Ext.htmlEncode(Ext.getCmp('parameterCode').getValue()),
                                 value: Ext.htmlEncode(Ext.getCmp('value').getValue()),
-                                description: Ext.htmlEncode(Ext.getCmp('description').getValue()),
+                                parameterName: Ext.htmlEncode(Ext.getCmp('parameterCode').getRawValue()),
                             },
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);

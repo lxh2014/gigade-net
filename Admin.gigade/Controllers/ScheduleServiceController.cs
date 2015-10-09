@@ -549,9 +549,9 @@ namespace Admin.gigade.Controllers
                 {
                     query.value = Request.Params["value"];
                 }
-                if (!string.IsNullOrEmpty(Request.Params["description"]))
+                if (!string.IsNullOrEmpty(Request.Params["parameterName"]))
                 {
-                    query.description = Request.Params["description"];
+                    query.parameterName = Request.Params["parameterName"];
                 }  
                 query.create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 query.change_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
