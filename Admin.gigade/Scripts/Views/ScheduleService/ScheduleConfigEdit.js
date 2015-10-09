@@ -75,7 +75,7 @@ editFunction_config = function (row, store)
                 //}
             },
             {
-                xtype: 'numberfield',
+                xtype: 'textfield',
                 fieldLabel: '參數值',
                 id: 'value',
                 name: 'value',
