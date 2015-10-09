@@ -234,7 +234,7 @@
                                                {
                                                    xtype: 'textareafield',
                                                    id: 'extra_send',
-                                                   width: 180,
+                                                   width: 195,
                                                    height: 225,
                                                    name: 'extra_send',
                                                },
@@ -251,7 +251,7 @@
                                              {
                                                  xtype: 'textareafield',
                                                  id: 'extra_no_send',
-                                                 width:180,
+                                                 width:195,
                                                  height: 225,
                                                  margin:'0 0 0 30',
                                                  name: 'extra_no_send',
@@ -332,7 +332,7 @@
         iconCls: 'icon-user-edit',
         id: 'sendWin',
         height: 542,
-        width: 470,
+        width: 500,
         y: 100,
         layout: 'fit',
         items: [sendFrm],
