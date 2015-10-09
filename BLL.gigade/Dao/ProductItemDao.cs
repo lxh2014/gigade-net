@@ -403,6 +403,10 @@ namespace BLL.gigade.Dao
             {
                 sbSqlCondition.AppendFormat(" and pi.erp_id = '{0}' ", query.Erp_Id);
             }
+            if (query.sale_status!=100)
+            {
+                sbSqlCondition.AppendFormat(" and p.sale_status = '{0}' ", query.sale_status);
+            }
             //if (!string.IsNullOrEmpty(query.vendor_name))
             //{
             //    sbSqlCondition.AppendFormat(" and (v.vendor_name_full like '%{0}%' or v.vendor_name_simple like '%{0}%') ", query.vendor_name);
