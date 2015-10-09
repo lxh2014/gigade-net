@@ -357,7 +357,8 @@ Ext.onReady(function () {
                  renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                      if (value != '' && value.length >= 10) {
                          if (value.substring(0, 10) == "0001-01-01") {
-                             return "日期無更改";
+                             //return "日期無更改";
+                             return "";
                          }
                          else {
                              return value.substring(0, 10);
@@ -370,7 +371,8 @@ Ext.onReady(function () {
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (value != '' && value.length >= 10) {
                         if (value.substring(0, 10) == "0001-01-01") {
-                            return "日期無更改";
+                            //return "日期無更改";
+                            return "";
                         }
                         else {
                             return value.substring(0, 10);
