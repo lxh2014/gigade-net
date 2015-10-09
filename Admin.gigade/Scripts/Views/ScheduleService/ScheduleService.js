@@ -1,7 +1,7 @@
 ﻿/*
  * Copyright (c)J01 
  * 作   者：yachao1120j
- * CreateTime :2015/9/30
+ * CreateTime :2015/10/6
  * 排程
  */
 var currentRecord = { data: {} };
