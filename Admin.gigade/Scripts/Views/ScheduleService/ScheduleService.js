@@ -149,8 +149,13 @@ var Schedule_Period_Store = Ext.create('Ext.data.Store', {
     }
 });
 
+Schedule_Period_Store.on("beforeload", function () {
+    Ext.apply(Schedule_Period_Store.proxy.extraParams, {
+        schedule_code: Ext.getCmp("schedule_code").getValue(),
+    })
+})
 //每行數據前段的矩形選擇框
-var sm_master = Ext.create('Ext.selection.CheckboxModel', {
+var sm_master = Ext.create('Ext.selection.CheckboxModel', {// master 矩形選擇框
     listeners: {
         selectionchange: function (sm_master, selections) {
             Ext.getCmp("masterGiftList").down('#edit_master').setDisabled(selections.length == 0);
@@ -158,7 +163,7 @@ var sm_master = Ext.create('Ext.selection.CheckboxModel', {
         }
     }
 });
-var sm_config = Ext.create('Ext.selection.CheckboxModel', {
+var sm_config = Ext.create('Ext.selection.CheckboxModel', {// config 矩形選擇框
     listeners: {
         selectionchange: function (sm_config, selections) {
             Ext.getCmp("detailist1").down('#edit_config').setDisabled(selections.length == 0);
@@ -166,7 +171,7 @@ var sm_config = Ext.create('Ext.selection.CheckboxModel', {
         }
     }
 });
-var sm_period = Ext.create('Ext.selection.CheckboxModel', {
+var sm_period = Ext.create('Ext.selection.CheckboxModel', {// period 矩形選擇框
     listeners: {
         selectionchange: function (sm_period, selections) {
             Ext.getCmp("detailist2").down('#edit_period').setDisabled(selections.length == 0);
@@ -175,11 +180,7 @@ var sm_period = Ext.create('Ext.selection.CheckboxModel', {
     }
 });
 
-Schedule_Period_Store.on("beforeload", function () {
-    Ext.apply(Schedule_Period_Store.proxy.extraParams, {
-        schedule_code: Ext.getCmp("schedule_code").getValue(),
-    })
-})
+
 
 // 中間的panel
 var center = Ext.create('Ext.form.Panel', {
@@ -238,7 +239,7 @@ var center = Ext.create('Ext.form.Panel', {
                               ],
                               tbar: [
             { xtype: 'button', text: "添加", id: 'add_config', iconCls: 'icon-user-add', handler: add_config },//添加按鈕
-            { xtype: 'button', text: "編輯", id: 'edit_config', disabled: true, iconCls: 'icon-user-edit', handler: onedit_config},//編輯按鈕  包括 添加 刪除 修改 功能
+            { xtype: 'button', text: "編輯", id: 'edit_config', disabled: true, iconCls: 'icon-user-edit', handler: onedit_config},//編輯按鈕  
             { xtype: 'button', text: "刪除", id: 'delete_config', disabled: true, iconCls: 'icon-user-remove', handler: ondelete_config },
 
                               ],
@@ -271,7 +272,7 @@ var center = Ext.create('Ext.form.Panel', {
                             ],
                             tbar: [
           { xtype: 'button', text: "添加", id: 'add_period', iconCls: 'icon-user-add', handler: add_period },//添加按鈕
-          { xtype: 'button', text: "編輯", id: 'edit_period', disabled: true, iconCls: 'icon-user-edit', handler: onedit_period },//編輯按鈕  包括 添加 刪除 修改 功能
+          { xtype: 'button', text: "編輯", id: 'edit_period', disabled: true, iconCls: 'icon-user-edit', handler: onedit_period },//編輯按鈕  
           { xtype: 'button', text: "刪除", id: 'delete_period', disabled: true, iconCls: 'icon-user-remove', handler: ondelete_period },
      
                             ],

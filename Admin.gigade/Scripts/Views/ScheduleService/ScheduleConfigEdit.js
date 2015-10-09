@@ -58,10 +58,11 @@ editFunction_config = function (row, store)
                 allowBlank: false,
             },
             {
-                xtype: 'textfield',
+                xtype: 'numberfield',
                 fieldLabel: '參數值',
                 id: 'value',
                 name: 'value',
+                minValue: 0,
                 allowBlank: false,
             },
              {
