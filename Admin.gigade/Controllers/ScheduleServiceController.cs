@@ -427,6 +427,8 @@ namespace Admin.gigade.Controllers
                 {
                     query.schedule_state = Convert.ToInt32(Request.Params["active"]);
                 }
+                query.change_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+
                 json = _secheduleServiceMgr.UpdateStats_Schedule_master(query);
             }
             catch (Exception ex)
@@ -483,15 +485,26 @@ namespace Admin.gigade.Controllers
                 }
                 query.create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 query.change_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
-                int _dt = _secheduleServiceMgr.SaveScheduleMasterInfo(query);
-
-                if (_dt > 0)
+                //判斷該schedule_code是否已存在
+                ScheduleMasterQuery query_chongfu = new ScheduleMasterQuery();
+                query_chongfu.schedule_code=query.schedule_code;
+                query_chongfu = _secheduleServiceMgr.GetScheduleMaster(query_chongfu);
+                if (query_chongfu != null)
                 {
-                    json = "{success:true}";
+                    json = "{success:false,msg:3}";
                 }
                 else
                 {
-                    json = "{success:false}";
+                    int _dt = _secheduleServiceMgr.SaveScheduleMasterInfo(query);
+
+                    if (_dt > 0)
+                    {
+                        json = "{success:true}";
+                    }
+                    else
+                    {
+                        json = "{success:false,msg:2}";
+                    }
                 }
             }
             catch (Exception ex)
@@ -781,6 +794,9 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+        
 
     }
+    
+    
 }
