@@ -69,7 +69,7 @@ Ext.define('GIGADE.Config', {
         { name: "create_username", type: "string" },
         { name: "create_time", type: "int" },
         { name: "show_create_time", type: "string" },
-         { name: "show_change_time", type: "string" },
+        { name: "show_change_time", type: "string" },
         { name: "change_username", type: "string" },
         { name: "change_time", type: "int" },
     ]
@@ -79,6 +79,28 @@ var Schedule_Config_Store = Ext.create('Ext.data.Store', {
     proxy: {
         type: 'ajax',
         url: '/ScheduleService/GetScheduleConfigList',
+        actionMethods: 'post',
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
+
+//
+Ext.define('GIGADE.ScheduleCode', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: "schedule_code", type: "string" },
+    ],
+});
+
+var Schedule_Code_Store = Ext.create('Ext.data.Store', {
+    model: 'GIGADE.ScheduleCode',
+    autoLoad: true,
+    proxy: {
+        type: 'ajax',
+        url: '/ScheduleService/GetScheduleMasterList',
         actionMethods: 'post',
         reader: {
             type: 'json',
@@ -337,6 +359,7 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
     height: document.documentElement.clientHeight - 12,
     border: false,
     frame: false,
+    columnLines: true,
     store: ScheduleStore,
     columns: [                      //顯示master
         { header: '編號', dataIndex: 'rowid', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },

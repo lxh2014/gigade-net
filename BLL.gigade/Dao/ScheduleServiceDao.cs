@@ -33,7 +33,7 @@ namespace BLL.gigade.Dao
           }
 
 
-          public ScheduleMasterQuery GetExeScheduleMaster(ScheduleMasterQuery query)
+          public ScheduleMasterQuery GetScheduleMaster(ScheduleMasterQuery query)
           {
               StringBuilder sql = new StringBuilder();
               try
@@ -45,7 +45,7 @@ namespace BLL.gigade.Dao
               catch (Exception ex)
               {
 
-                  throw new Exception("ScheduleServiceDao-->GetExeScheduleMaster-->" + ex.Message, ex);
+                  throw new Exception("ScheduleServiceDao-->GetScheduleMaster-->" + ex.Message, ex);
               }
           }
           public List<ScheduleConfigQuery> GetScheduleConfig(ScheduleConfigQuery query)
@@ -110,7 +110,7 @@ namespace BLL.gigade.Dao
               StringBuilder sql = new StringBuilder();
               try
               {
-                  sql.AppendFormat(@"UPDATE `schedule_master` SET `schedule_code`='{0}', `schedule_name`='{1}', `schedule_api`='{2}', `schedule_description`='{3}', `schedule_state`='{4}', `previous_execute_time`='{5}', `next_execute_time`='{6}',`schedule_period_id`='{7}', `create_user`='{8}', `create_time`='{9}', `change_user`='{10}', `change_time`='{11}' WHERE `rowid`='{12}';", query.schedule_code, query.schedule_name, query.schedule_api, query.schedule_description, query.schedule_state, query.previous_execute_time, query.next_execute_time, query.schedule_period_id, query.create_user, query.create_time, query.change_user, Common.CommonFunction.GetPHPTime(DateTime.Now.ToString()), query.rowid);
+                  sql.AppendFormat(@"UPDATE `schedule_master` SET `schedule_code`='{0}', `schedule_name`='{1}', `schedule_api`='{2}', `schedule_description`='{3}', `schedule_state`='{4}', `previous_execute_time`='{5}', `next_execute_time`='{6}',`schedule_period_id`='{7}', `create_user`='{8}', `create_time`='{9}', `change_user`='{10}', `change_time`='{11}' WHERE `rowid`='{12}';", query.schedule_code, query.schedule_name, query.schedule_api, query.schedule_description, query.schedule_state, query.previous_execute_time, query.next_execute_time, query.schedule_period_id, query.create_user, query.create_time, query.change_user, Common.CommonFunction.GetPHPTime(), query.rowid);
                   return _access.execCommand(sql.ToString());
               }
               catch (Exception ex)
@@ -222,7 +222,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               StringBuilder strSql = new StringBuilder();
               try
               {
-                  strSql.AppendFormat(@"Update schedule_master set schedule_state='{0}' WHERE rowid='{1}'", query.schedule_state, query.rowid);
+                  strSql.AppendFormat(@"Update schedule_master set schedule_state='{0}',change_user='{1}',change_time='{2}' WHERE rowid='{3}'", query.schedule_state,query.change_user, CommonFunction.GetPHPTime(), query.rowid);
                   return strSql.ToString();
               }
               catch (Exception ex)
@@ -237,8 +237,9 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               query.Replace4MySQL();
               try
               {
+
                   sql.Append("insert into schedule_master ( schedule_code, schedule_name, schedule_api,schedule_description,schedule_state,schedule_period_id,create_user,change_user, create_time, change_time, previous_execute_time,next_execute_time) values ");
-                  sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}')", query.schedule_code, query.schedule_name, query.schedule_api, query.schedule_description, query.schedule_state, query.schedule_period_id, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), CommonFunction.GetPHPTime((query.change_time).ToString()), query.previous_execute_time, query.next_execute_time);
+                  sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}')", query.schedule_code, query.schedule_name, query.schedule_api, query.schedule_description, query.schedule_state, query.schedule_period_id, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), CommonFunction.GetPHPTime(), query.previous_execute_time, query.next_execute_time);
 
                   return _access.execCommand(sql.ToString());
               }

@@ -1,5 +1,24 @@
 ﻿/*************************************************************************************添加 編輯 框*************************************************************************************************/
-editFunction_config = function (row, store) {
+//參數碼列表
+var tableNameStore = Ext.create('Ext.data.Store', {
+    fields: [
+        { name: 'parameterCode', type: 'string' },
+        { name: 'parameterName', type: 'string' },
+    ],
+    autoLoad: true,
+    proxy: {
+        type: 'ajax',
+        url: "/ScheduleService/GetParameterCodeList",
+        noCache: false,
+        actionMethods: 'post',
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
+editFunction_config = function (row, store)
+{
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
         frame: true,
@@ -19,11 +38,17 @@ editFunction_config = function (row, store) {
                 hidden: true
             },
             {
-                xtype: 'textfield',
+                xtype: 'combobox',
+                editable: false,
                 fieldLabel: '排程Code',
-                id: 'schedule_code',
-                name: 'schedule_code',
+                id: 'schedule_code_config',
+                name: 'schedule_code_config',
                 allowBlank: false,
+                displayField: 'schedule_code',
+                valueField: 'schedule_code',
+                store: Schedule_Code_Store,
+                value: Ext.getCmp("schedule_code").getValue(),
+                
             },
             {
                 xtype: 'textfield',
@@ -60,7 +85,7 @@ editFunction_config = function (row, store) {
                         form.submit({
                             params: {
                                 rowid: Ext.htmlEncode(Ext.getCmp('rowid').getValue()),
-                                schedule_code: Ext.htmlEncode(Ext.getCmp('schedule_code').getValue()),
+                                schedule_code: Ext.htmlEncode(Ext.getCmp('schedule_code_config').getValue()),
                                 parameterCode: Ext.htmlEncode(Ext.getCmp('parameterCode').getValue()),
                                 value: Ext.htmlEncode(Ext.getCmp('value').getValue()),
                                 description: Ext.htmlEncode(Ext.getCmp('description').getValue()),
