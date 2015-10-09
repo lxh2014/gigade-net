@@ -26,7 +26,6 @@ namespace Admin.gigade.Controllers
             return View();
         }
 
-
         /// <summary>
         /// 獲取需要執行的排程列表并逐個執行，添加日誌和更新排程；
         /// </summary>
@@ -410,8 +409,6 @@ namespace Admin.gigade.Controllers
             return this.Response;
 
         }
-
-
 
         //schedule_master 中的狀態啟用
         public HttpResponseBase UpdateStats_Schedule_master()
