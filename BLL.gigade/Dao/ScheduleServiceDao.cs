@@ -91,20 +91,7 @@ namespace BLL.gigade.Dao
                   throw new Exception("ScheduleServiceDao-->GetSchedulePeriodBySchedule-->" + ex.Message, ex);
               }
           }
-          public int UpdateScheduleServicePeriod(SchedulePeriodQuery query)
-          {
-              StringBuilder sql = new StringBuilder();
-              try
-              {
-                  sql.AppendFormat("SELECT * FROM `schedule_config` WHERE schedule_code = '{0}';", query.schedule_code);
-                  return _access.execCommand(sql.ToString());
-              }
-              catch (Exception ex)
-              {
-
-                  throw new Exception("ScheduleServiceDao-->UpdateScheduleServicePeriod-->" + ex.Message, ex);
-              }
-          }
+          
           public int UpdateScheduleMaster(ScheduleMasterQuery query)
           {
               StringBuilder sql = new StringBuilder();

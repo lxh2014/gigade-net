@@ -127,11 +127,11 @@ Ext.define('GIGADE.Period', {
         { name: "change_time", type: "int" },
          { name: 'period_type', type: 'int' },
         { name: 'period_nums', type: 'int' },
-         { name: 'show_begin_datetime', type: 'string' },
-          { name: 'current_nums', type: 'int' },
+        { name: 'show_begin_datetime', type: 'date', dateFormat: "Y-m-d H:i:s" },
+        { name: 'current_nums', type: 'int' },
         { name: 'limit_nums', type: 'int' },
-         { name: "show_create_time", type: "string" },
-         { name: "show_change_time", type: "string" }
+        { name: "show_create_time", type: "string" },
+        { name: "show_change_time", type: "string" }
     ]
 });
 

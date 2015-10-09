@@ -23,9 +23,10 @@ editFunction_master = function (row, store) {
                // xtype: 'combobox',
                 xtype: 'textfield',
                 fieldLabel: '排程Code',
-                id: 'schedule_code',
-                name: 'schedule_code',
+                id: 'schedule_code_master',
+                name: 'schedule_code_master',
                 allowBlank: false,
+                disabled:true
                // editable: false,
             },
             {
@@ -190,7 +191,7 @@ editFunction_master = function (row, store) {
                         form.submit({
                             params: {
                                 rowid: Ext.htmlEncode(Ext.getCmp('rowid').getValue()),
-                                schedule_code: Ext.htmlEncode(Ext.getCmp('schedule_code').getValue()),
+                                schedule_code: Ext.htmlEncode(Ext.getCmp('schedule_code_master').getValue()),
                                 schedule_name: Ext.htmlEncode(Ext.getCmp('schedule_name').getValue()),
                                 schedule_api: Ext.htmlEncode(Ext.getCmp('schedule_api').getValue()),
                                 schedule_description: Ext.htmlEncode(Ext.getCmp('schedule_description').getValue()),
@@ -280,7 +281,7 @@ editFunction_master = function (row, store) {
                         Ext.getCmp("id2").setValue(false);
                     }
                     editFrm.getForm().loadRecord(row);
-
+                    Ext.getCmp('schedule_code_master').setValue(row.data.schedule_code);
                 }
                 else {
 

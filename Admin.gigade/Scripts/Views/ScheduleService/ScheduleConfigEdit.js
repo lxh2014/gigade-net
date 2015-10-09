@@ -75,11 +75,10 @@ editFunction_config = function (row, store)
                 //}
             },
             {
-                xtype: 'numberfield',
+                xtype: 'textfield',
                 fieldLabel: '參數值',
                 id: 'value',
                 name: 'value',
-                minValue: 0,
                 allowBlank: false,
             },
             
@@ -164,6 +163,7 @@ editFunction_config = function (row, store)
             'show': function () {
                 if (row) {
                     editFrm.getForm().loadRecord(row);
+                    Ext.getCmp('schedule_code_config').setValue(row.data.schedule_code);
                     //initRow(row);
                 }
                 else {
