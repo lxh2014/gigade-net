@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BLL.gigade.Model
 {
- public   class MailRequest
+ public   class MailRequest:PageBase
     {
      public int request_id { get; set; }
      public int priority { get; set; }

@@ -32,11 +32,8 @@
         frame: true,
         plain: true,
         constrain: true,
-        //autoScroll: true,
         layout: 'anchor',
         labelWidth: 45,
-      //  url: '/EdmNew/SaveEdmContentNew',
-     //   defaults: { anchor: "95%", msgTarget: "side" },
         items: [
                                   {
                                       xtype: 'displayfield',
@@ -154,8 +151,9 @@
                     select: function () {
                         var sd = Ext.getCmp('schedule_date');
                         var ed = Ext.getCmp('expire_date');
-                        var nowDate = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours(),new Date().getMinutes(),new Date().getMilliseconds());
-                        if (sd.getValue() <= nowDate)
+                        var nowDate = Ext.htmlEncode(Ext.Date.format(new Date(), 'Y-m-d H:i:s'));
+                        var sdTime = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('schedule_date').getValue()), 'Y-m-d H:i:s'));
+                        if (sdTime <= nowDate)
                         {
                             var new_time = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1, new Date().getHours(), new Date().getMinutes(), new Date().getMilliseconds());
                             sd.setValue(new_time);
@@ -186,7 +184,7 @@
                    select: function () {
                        var sd = Ext.getCmp('schedule_date');//排程發送時間
                        var ed = Ext.getCmp('expire_date');//信件有效時間
-                       var nowDate = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+                       
                        if (ed.getValue() <= sd.getValue()) {
                            var new_time = new Date(sd.getValue().getFullYear(), sd.getValue().getMonth(), sd.getValue().getDate() + 1);
                            ed.setValue(new_time);
@@ -234,7 +232,7 @@
                                                {
                                                    xtype: 'textareafield',
                                                    id: 'extra_send',
-                                                   width: 195,
+                                                   width: 295,
                                                    height: 225,
                                                    name: 'extra_send',
                                                },
@@ -251,7 +249,7 @@
                                              {
                                                  xtype: 'textareafield',
                                                  id: 'extra_no_send',
-                                                 width:195,
+                                                 width:295,
                                                  height: 225,
                                                  margin:'0 0 0 30',
                                                  name: 'extra_no_send',
@@ -288,6 +286,7 @@
                                       }
                                       Ext.Ajax.request({
                                           url: '/EdmNew/SendEdm',
+                                          timeout:180000,
                                           params: {
                                               testSend: 'false',
                                               content_id: Ext.getCmp('content_id').getValue(),
@@ -332,7 +331,7 @@
         iconCls: 'icon-user-edit',
         id: 'sendWin',
         height: 542,
-        width: 500,
+        width: 700,
         y: 100,
         layout: 'fit',
         items: [sendFrm],
