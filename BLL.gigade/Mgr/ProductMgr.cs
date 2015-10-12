@@ -235,6 +235,11 @@ namespace BLL.gigade.Mgr
             ProductStatusHistoryMgr proStatusHistoryMgr = new ProductStatusHistoryMgr("");
             delList.Add(proStatusHistoryMgr.Delete(new ProductStatusHistory { product_id = product_Id }));
 
+            #region 推薦商品刪除  add by zhuoqin0830w  2015/10/08
+            RecommendedProductAttributeMgr recommendedProductAttributeMgr = new RecommendedProductAttributeMgr("");
+            delList.Add(recommendedProductAttributeMgr.DeleteProductAttribute(Convert.ToInt32(product_Id)));
+            #endregion
+
             delList.Add(_productDao.Delete(product_Id));
 
             MySqlDao mySqlDao = new MySqlDao(connectionStr);
@@ -598,53 +603,53 @@ namespace BLL.gigade.Mgr
                     dtnewYuGuo.Columns.Add("庫存數", typeof(String));
                     dtnewYuGuo.Columns.Add("未出貨數量", typeof(String));
                     //複製
-                   dtoldYuGuo= dtnewYuGuo.Clone();
-                   foreach (QueryandVerifyCustom qcustom in itemsYugou)
-                   {
-                       string endtime=qcustom.purchase_in_advance_end_time;
-                       if (DateTime.Parse(endtime == "" ? DateTime.Now.AddDays(1).ToString() : endtime) > DateTime.Now)
-                       {
-                           DataRow newrow = dtnewYuGuo.NewRow();
-                           newrow[0] = qcustom.product_id;
-                           newrow[1] = qcustom.product_name;
-                           newrow[2] = qcustom.brand_name;
-                           newrow[3] = qcustom.vendor_name_full;
-                           newrow[4] = qcustom.combination;
-                           newrow[5] = qcustom.purchase_in_advance_start_time;
-                           newrow[6] = qcustom.purchase_in_advance_end_time;
-                           newrow[7] = qcustom.expect_time_time;
-                           newrow[8] = qcustom.schedule_name;
-                           newrow[9] = qcustom.Item_Stock;
-                           newrow[10] = qcustom.bnum;
-                           dtnewYuGuo.Rows.Add(newrow);
-                       }
-                       else 
-                       {
-                           DataRow oldrow = dtoldYuGuo.NewRow();
-                           oldrow[0] = qcustom.product_id;
-                           oldrow[1] = qcustom.product_name;
-                           oldrow[2] = qcustom.brand_name;
-                           oldrow[3] = qcustom.vendor_name_full;
-                           oldrow[4] = qcustom.combination;
-                           oldrow[5] = qcustom.purchase_in_advance_start_time;
-                           oldrow[6] = qcustom.purchase_in_advance_end_time;
-                           oldrow[7] = qcustom.expect_time_time;
-                           oldrow[8] = qcustom.schedule_name;
-                           oldrow[9] = qcustom.Item_Stock;
-                           oldrow[10] = qcustom.bnum;
-                           dtoldYuGuo.Rows.Add(oldrow);
-                       }
-                   }
-                   List<string> NameList = new List<string>();
-                   NameList.Add("有效期內的預購商品");
-                   NameList.Add("過期的預購商品");
-                   List<DataTable> Elist = new List<DataTable>();
-                   Elist.Add(dtnewYuGuo);
-                   Elist.Add(dtoldYuGuo);
-                   List<bool> comName = new List<bool>();
-                   comName.Add(true);
-                   comName.Add(true);
-                   return ExcelHelperXhf.ExportDTNoColumnsBySdy(Elist, NameList, comName);
+                    dtoldYuGuo = dtnewYuGuo.Clone();
+                    foreach (QueryandVerifyCustom qcustom in itemsYugou)
+                    {
+                        string endtime = qcustom.purchase_in_advance_end_time;
+                        if (DateTime.Parse(endtime == "" ? DateTime.Now.AddDays(1).ToString() : endtime) > DateTime.Now)
+                        {
+                            DataRow newrow = dtnewYuGuo.NewRow();
+                            newrow[0] = qcustom.product_id;
+                            newrow[1] = qcustom.product_name;
+                            newrow[2] = qcustom.brand_name;
+                            newrow[3] = qcustom.vendor_name_full;
+                            newrow[4] = qcustom.combination;
+                            newrow[5] = qcustom.purchase_in_advance_start_time;
+                            newrow[6] = qcustom.purchase_in_advance_end_time;
+                            newrow[7] = qcustom.expect_time_time;
+                            newrow[8] = qcustom.schedule_name;
+                            newrow[9] = qcustom.Item_Stock;
+                            newrow[10] = qcustom.bnum;
+                            dtnewYuGuo.Rows.Add(newrow);
+                        }
+                        else
+                        {
+                            DataRow oldrow = dtoldYuGuo.NewRow();
+                            oldrow[0] = qcustom.product_id;
+                            oldrow[1] = qcustom.product_name;
+                            oldrow[2] = qcustom.brand_name;
+                            oldrow[3] = qcustom.vendor_name_full;
+                            oldrow[4] = qcustom.combination;
+                            oldrow[5] = qcustom.purchase_in_advance_start_time;
+                            oldrow[6] = qcustom.purchase_in_advance_end_time;
+                            oldrow[7] = qcustom.expect_time_time;
+                            oldrow[8] = qcustom.schedule_name;
+                            oldrow[9] = qcustom.Item_Stock;
+                            oldrow[10] = qcustom.bnum;
+                            dtoldYuGuo.Rows.Add(oldrow);
+                        }
+                    }
+                    List<string> NameList = new List<string>();
+                    NameList.Add("有效期內的預購商品");
+                    NameList.Add("過期的預購商品");
+                    List<DataTable> Elist = new List<DataTable>();
+                    Elist.Add(dtnewYuGuo);
+                    Elist.Add(dtoldYuGuo);
+                    List<bool> comName = new List<bool>();
+                    comName.Add(true);
+                    comName.Add(true);
+                    return ExcelHelperXhf.ExportDTNoColumnsBySdy(Elist, NameList, comName);
                 default:
                     throw new Exception("unaccepted exportFlag!!!");
             }

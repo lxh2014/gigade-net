@@ -1,4 +1,10 @@
-﻿var PRODUCT_ID = '', OLD_PRODUCT_ID = '';
+﻿/*  
+ * 
+ * 文件名称：Description.js 
+ * 摘    要：單一商品修改和新增 描述頁面
+ * 
+ */
+var PRODUCT_ID = '', OLD_PRODUCT_ID = '';
 
 Ext.onReady(function () {
     var frm = Ext.create('Ext.form.Panel', {
@@ -110,6 +116,7 @@ Ext.onReady(function () {
     window.parent.GetProduct(this);
     window.parent.updateAuth(frm, 'colName');
 });
+
 function setForm(result) {
     Ext.getCmp('frm').down('#page_content_1').setValue(Ext.htmlDecode(result.Page_Content_1))
     Ext.getCmp('frm').down('#page_content_2').setValue(Ext.htmlDecode(result.Page_Content_2));
@@ -119,13 +126,14 @@ function setForm(result) {
     }
     Ext.getCmp('frm').down('#product_keywords').setValue(Ext.htmlDecode(result.Product_Keywords));
 }
+
 function requestTags(productId,oldproductId) {
     Ext.Ajax.request({
         url: '/Product/GetProTag',
         method: 'post',
         params: {
             ProductId: productId,
-            OldProductId:oldproductId
+            OldProductId: oldproductId
         },
         success: function (form, action) {
             Ext.getCmp('product_tag_set').update(form.responseText);
@@ -134,15 +142,16 @@ function requestTags(productId,oldproductId) {
             Ext.Msg.alert(INFORMATION, DATA_LOAD_FAILURE);
             return false;
         }
-    })
+    });
 }
+
 function requestNotices(productId,oldproductId) {
     Ext.Ajax.request({
         url: '/Product/GetProNotice',
         method: 'post',
         params: {
             ProductId: productId,
-            OldProductId:oldproductId
+            OldProductId: oldproductId
         },
         success: function (form, action) {
             Ext.getCmp('product_notice_set').update(form.responseText);
@@ -151,14 +160,22 @@ function requestNotices(productId,oldproductId) {
             Ext.Msg.alert(INFORMATION, DATA_LOAD_FAILURE);
             return false;
         }
-    })
+    });
 }
 
 function save(functionid) {
+    //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    var mask;
+    if (!mask) {
+        mask = new Ext.LoadMask(Ext.getBody(), { msg: '請稍等...' });
+    }
+    mask.show();
+    //添加disabled屬性  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    window.parent.setMoveEnable(false);
+
     var success = false;
     var frm = Ext.getCmp('frm').getForm();
     if (frm.isValid()) {
-
         var notice_checked = '[', tag_checked = '[';
         $('input[name="notices"]:checked').each(function (idx) {
             notice_checked += '{notice_id:' + $(this).val()+"}";
@@ -177,7 +194,7 @@ function save(functionid) {
         Ext.Ajax.request({
             url: '/Product/SaveDescription',
             method: 'post',
-            async: false,
+            async:  window.parent.GetProductId() == '' ? false : true,
             params: {
                 page_content_1: Ext.htmlEncode(Ext.getCmp('page_content_1').getValue()),
                 page_content_2: Ext.htmlEncode(Ext.getCmp('page_content_2').getValue()),
@@ -193,6 +210,7 @@ function save(functionid) {
             },
             success: function (form, action) {
                 var result = Ext.decode(form.responseText);
+                mask.hide();
                 if (result.success) {
                     success = true;
                     if (PRODUCT_ID != '') {
@@ -201,15 +219,16 @@ function save(functionid) {
                 }
                 else {
                     Ext.Msg.alert(INFORMATION, FAILURE);
-                    window.parent.setMoveEnable(true);
                 }
+                window.parent.setMoveEnable(true);
             },
             failure: function () {
+                mask.hide();
                 Ext.Msg.alert(INFORMATION, FAILURE);
                 window.parent.setMoveEnable(true);
             }
-        })
-    }
-    window.parent.setMoveEnable(true);
+        });
+    } else { mask.hide(); window.parent.setMoveEnable(true); }
+    //window.parent.setMoveEnable(true);
     return success;
 }

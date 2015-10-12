@@ -1,4 +1,10 @@
-﻿var PRODUCT_ID = '', OLD_PRODUCT_ID = '';
+﻿/*  
+ * 
+ * 文件名称：Description.js 
+ * 摘    要：組合商品修改和新增 描述頁面
+ * 
+ */
+var PRODUCT_ID = '', OLD_PRODUCT_ID = '';
 
 Ext.onReady(function () {
     var frm = Ext.create('Ext.form.Panel', {
@@ -112,13 +118,13 @@ Ext.onReady(function () {
     requestTags(PRODUCT_ID);
     requestNotices(PRODUCT_ID);
     window.parent.GetProduct(this);
-
 });
+
 function setForm(result) {
     Ext.getCmp('frm').down('#page_content_1').setValue(Ext.htmlDecode(result.Page_Content_1))
     Ext.getCmp('frm').down('#page_content_2').setValue(Ext.htmlDecode(result.Page_Content_2));
     Ext.getCmp('frm').down('#page_content_3').setValue(Ext.htmlDecode(result.Page_Content_3));
-    if (window.parent.GetProductId()!=""&&result.Product_Buy_Limit != 0) {//edit by xiangwang0413w 2014/10/15 當Product_Buy_Limit為0時應顯示為0
+    if (window.parent.GetProductId() != "" && result.Product_Buy_Limit != 0) {//edit by xiangwang0413w 2014/10/15 當Product_Buy_Limit為0時應顯示為0
         Ext.getCmp('frm').down('#product_buy_limit').setValue(result.Product_Buy_Limit);
     }
     Ext.getCmp('frm').down('#product_keywords').setValue(Ext.htmlDecode(result.Product_Keywords));
@@ -141,6 +147,7 @@ function requestTags(productId) {
         }
     })
 }
+
 function requestNotices(productId) {
     Ext.Ajax.request({
         url: '/ProductCombo/GetProNotice',
@@ -160,10 +167,18 @@ function requestNotices(productId) {
 }
 
 function save(functionid) {
+    //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    var mask;
+    if (!mask) {
+        mask = new Ext.LoadMask(Ext.getBody(), { msg: '請稍等...' });
+    }
+    mask.show();
+    //添加disabled屬性  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    window.parent.setMoveEnable(false);
+
     var success = false;
     var frm = Ext.getCmp('frm').getForm();
     if (frm.isValid()) {
-
         var notice_checked = '[', tag_checked = '[';
         $('input[name="notices"]:checked').each(function (idx) {
             notice_checked += '{notice_id:' + $(this).val() + "}";
@@ -180,11 +195,13 @@ function save(functionid) {
         }
 
         PRODUCT_ID = window.parent.GetProductId();
+
         var values = Ext.Object.fromQueryString(Ext.htmlEncode(frm.getValues(true) + "&Tags=" + tag_checked + "&Notice=" + notice_checked + "&ProductId=" + PRODUCT_ID + "&function=" + functionid));
+
         Ext.Ajax.request({
             url: '/ProductCombo/SaveDescription',
             method: 'post',
-            async: false,
+            async: window.parent.GetProductId() == '' ? false : true,
             params: {
                 page_content_1: Ext.htmlEncode(Ext.getCmp('page_content_1').getValue()),
                 page_content_2: Ext.htmlEncode(Ext.getCmp('page_content_2').getValue()),
@@ -200,6 +217,7 @@ function save(functionid) {
             },
             success: function (form, action) {
                 var result = Ext.decode(form.responseText);
+                mask.hide();
                 if (result.success) {
                     success = true;
                     if (PRODUCT_ID != '') {
@@ -208,15 +226,16 @@ function save(functionid) {
                 }
                 else {
                     Ext.Msg.alert(INFORMATION, FAILURE);
-                    window.parent.setMoveEnable(true);
                 }
+                window.parent.setMoveEnable(true);
             },
             failure: function () {
+                mask.hide();
                 Ext.Msg.alert(INFORMATION, FAILURE);
                 window.parent.setMoveEnable(true);
             }
         })
-    }
-    window.parent.setMoveEnable(true);
+    } else { mask.hide(); window.parent.setMoveEnable(true); }
+    //window.parent.setMoveEnable(true);
     return success;
 }

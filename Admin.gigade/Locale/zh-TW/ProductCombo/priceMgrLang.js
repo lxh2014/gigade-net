@@ -70,3 +70,6 @@ PLEASE_SELECT_ACTIVITY_PRICE_RETURN_PERCENT = "請選擇活動購物金回饋百
 MUSTCHOOSE = "必選數量";
 
 AREYOUSURE = "您確定保存對價格、成本、活動時間等欄位的修改嗎？"
+
+//add by zhuoqin0830w  2015/10/07
+WRITE_SITEID = "請填寫站臺名稱";

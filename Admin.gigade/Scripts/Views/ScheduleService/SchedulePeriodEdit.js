@@ -168,7 +168,7 @@ editFunction_period= function (row, store) {
     //点击关闭按钮后  提示信息
     //一个指定的打算作为一个应用程序窗口的面板。
     var editWin = Ext.create('Ext.window.Window', {
-        title: "新增信息",
+        title: "新增Period",
         id: 'editWin',
         iconCls: "icon-user-add",
         width: 460,
