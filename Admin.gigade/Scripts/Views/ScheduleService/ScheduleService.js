@@ -162,6 +162,7 @@ var sm_master = Ext.create('Ext.selection.CheckboxModel', {// master 矩形選�
         selectionchange: function (sm_master, selections) {
             Ext.getCmp("masterGiftList").down('#edit_master').setDisabled(selections.length == 0);
             Ext.getCmp("masterGiftList").down('#delete_master').setDisabled(selections.length == 0);
+            Ext.getCmp("masterGiftList").down('#runonce_master').setDisabled(selections.length == 0);
         }
     }
 });
@@ -268,7 +269,7 @@ var center = Ext.create('Ext.form.Panel', {
                                { header: '次數限制', dataIndex: 'limit_nums', align: 'center', width: 80, menuDisabled: true, sortable: false },
                                { header: '創建人', dataIndex: 'create_username', align: 'center', width: 80,  menuDisabled: true, sortable: false },
                                { header: '修改人', dataIndex: 'change_username', align: 'center', width: 80, menuDisabled: true, sortable: false },
-                                { header: '啟用時間', dataIndex: 'show_begin_datetime', align: 'center', width: 150, menuDisabled: true, sortable: false },
+                                { header: '啟用時間', dataIndex: 'show_begin_datetime', align: 'center', width: 150, menuDisabled: true, sortable: false, renderer: Ext.util.Format.dateRenderer('Y-m-d H:i:s') },
                                { header: '創建時間', dataIndex: 'show_create_time', align: 'center', width: 150, menuDisabled: true, sortable: false },
                                { header: '修改時間', dataIndex: 'show_change_time', align: 'center', width: 150,  menuDisabled: true, sortable: false },
                             ],
@@ -372,6 +373,7 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
      { xtype: 'button', text: "添加", id: 'add_master', iconCls: 'icon-user-add', handler: add_master },//添加按鈕
      { xtype: 'button', text: "編輯", id: 'edit_master',iconCls: 'icon-user-edit',disabled:true, handler:onedit_master},//編輯按鈕  包括 添加 刪除 修改 功能
      { xtype: 'button', text: "刪除", id: 'delete_master', iconCls: 'icon-user-remove', disabled: true, handler: ondelete_master },
+     { xtype: 'button', text: "立即執行", id: 'runonce_master', iconCls: 'icon-user-edit', disabled: true, handler: onrunonce_master },
      '->',
     { xtype: 'button', text: "查詢", id: 'grid_btn_search', iconCls: 'ui-icon ui-icon-search', width: 65, handler: Search },
      ],
@@ -565,6 +567,58 @@ function ondelete_master() {
     }
 }
 
+/*************************************************************************************立即執行選中的排程_master*************************************************************************************************/
+function onrunonce_master()
+{
+    var row = Ext.getCmp("masterGiftList").getSelectionModel().getSelection();
+    if (row.length <= 0)
+    {
+        Ext.Msg.alert("未選中任何行!");
+    }
+
+    else
+    {
+        //  var id = Ext.getCmp('id').getValue();
+        Ext.Msg.confirm('提示', Ext.String.format("立即執行選中的" + row.length + "條排程?", row.length), function (btn)
+        {
+            if (btn == 'yes')
+            {
+                var rowIDs = '';
+                for (var i = 0; i < row.length; i++)
+                {
+
+                    rowIDs += row[i].data.schedule_api + '&' + row[i].data.schedule_code + ',';//可以執行多條數據記錄                  
+                }
+                Ext.Ajax.request({
+                    //控制器下的delete方法
+                    url: '/ScheduleService/ScheduleMasterRunOnce',
+                    method: 'post',
+                    params: { id: rowIDs },
+                    success: function (form, action)
+                    {
+                        var result = Ext.decode(form.responseText);
+                        if (result.success)
+                        {
+                            Ext.Msg.alert(INFORMATION, "執行成功!");
+                            // ScheduleStore.loadPage(1);
+                            ScheduleStore.load();
+                        }
+                        else
+                        {
+                            Ext.Msg.alert(INFORMATION, "執行失敗!");
+                            //ScheduleStore.loadPage(1);
+                            ScheduleStore.load();
+                        }
+                    },
+                    failure: function ()
+                    {
+                        Ext.Msg.alert("執行失敗!");
+                    }
+                });
+            }
+        });
+    }
+}
 /*************************************************************************************刪除_config*************************************************************************************************/
 
 function ondelete_config() {
