@@ -78,7 +78,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT SUM(master_total) AS master_total ,SUM(master_balance)AS master_balance FROM bonus_master WHERE user_id={0} AND bonus_type={1};", query.user_id, query.bonus_type);
+                sql.AppendFormat(@"SELECT SUM(master_total) AS master_total ,SUM(master_balance)AS master_balance FROM bonus_master WHERE user_id={0} AND bonus_type={1} and ('{2}' between master_start and master_end);", query.user_id, query.bonus_type,CommonFunction.GetPHPTime());
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
