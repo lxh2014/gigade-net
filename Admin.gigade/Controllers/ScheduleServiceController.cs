@@ -486,12 +486,15 @@ namespace Admin.gigade.Controllers
                 query.create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 query.change_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 //判斷該schedule_code是否已存在
-                ScheduleMasterQuery query_chongfu = new ScheduleMasterQuery();
-                query_chongfu.schedule_code=query.schedule_code;
-                query_chongfu = _secheduleServiceMgr.GetScheduleMaster(query_chongfu);
-                if (query_chongfu != null)
+                if (query.rowid == 0)//新增
                 {
-                    json = "{success:false,msg:3}";
+                    ScheduleMasterQuery query_chongfu = new ScheduleMasterQuery();
+                    query_chongfu.schedule_code = query.schedule_code;
+                    query_chongfu = _secheduleServiceMgr.GetScheduleMaster(query_chongfu);
+                    if (query_chongfu != null)
+                    {
+                        json = "{success:false,msg:3}";
+                    }
                 }
                 else
                 {
