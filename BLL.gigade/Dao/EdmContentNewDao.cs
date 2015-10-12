@@ -95,6 +95,7 @@ namespace BLL.gigade.Dao
 
         public int InsertEdmContentNew(EdmContentNew query)
         {
+            query.Replace4MySQL();
             StringBuilder sql = new StringBuilder();
             try
             {
@@ -106,12 +107,13 @@ namespace BLL.gigade.Dao
             }
             catch (Exception ex)
             {
-                throw new Exception("EdmContentNewDao-->InsertEdmContentNew-->" + sql.ToString()+ex.Message, ex);
+                throw new Exception("EdmContentNewDao-->InsertEdmContentNew-->" + ex.Message + ";sql:" + sql.ToString(), ex);
             }
         }
 
         public int UpdateEdmContentNew(EdmContentNew query)
         {
+            query.Replace4MySQL();
             StringBuilder sql = new StringBuilder();
             try
             {
@@ -121,7 +123,7 @@ namespace BLL.gigade.Dao
             }
             catch (Exception ex)
             {
-                throw new Exception("EdmContentNewDao-->InsertEdmContentNew-->" + sql.ToString() + ex.Message, ex);
+                throw new Exception("EdmContentNewDao-->InsertEdmContentNew-->"+ ex.Message+";sql:" + sql.ToString() , ex);
             }
         }
 
