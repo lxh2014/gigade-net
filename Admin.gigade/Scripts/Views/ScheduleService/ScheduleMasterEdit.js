@@ -26,7 +26,8 @@ editFunction_master = function (row, store) {
                 id: 'schedule_code_master',
                 name: 'schedule_code_master',
                 allowBlank: false,
-                disabled:true
+
+               // disabled: true,
                // editable: false,
             },
             {
@@ -51,19 +52,6 @@ editFunction_master = function (row, store) {
                  name: 'schedule_description',
                  allowBlank: false,
              },
-              //{
-              //    xtype: 'textfield',
-              //    fieldLabel: '排程狀態',
-              //    id: 'schedule_state',
-              //    name: 'schedule_state'
-              //},
-                //{
-                //    xtype: 'textfield',
-                //    fieldLabel: '下次執行的記錄',
-                //    id: 'schedule_period_id',
-                //    name: 'schedule_period_id',
-                //    allowBlank: false,
-                //},
               {
                   xtype: 'fieldcontainer',
                   combineErrors: true,
@@ -87,96 +75,6 @@ editFunction_master = function (row, store) {
                   }
                   ]
               },
-
-               //{
-               //    xtype: 'textfield',
-               //    fieldLabel: '創建人',
-               //    id: 'create_user',
-               //    name: 'create_user'
-               //},
-               // {
-               //     xtype: 'textfield',
-               //     fieldLabel: '修改人',
-               //     id: 'change_user',
-               //     name: 'change_user'
-               // },
-
-                  //{
-                  //    xtype: 'fieldcontainer',
-                  //    layout: 'hbox',
-                  //    fieldLabel: '上次執行時間',
-                  //    items: [
-                  //        {
-                  //            xtype: 'datefield',
-                  //            id: 'previous_execute_time',
-                  //            name: 'previous_execute_time',
-                  //            format: 'Y-m-d',
-                  //            editable: false,
-                  //            allowBlank: false,
-                  //        },
-                  //        {
-                  //            xtype: 'displayfield',
-                  //            value: '<span style="color:red">※上次執行時間</span>'
-                  //        }
-                  //    ]
-                  //},
-                  //   {
-                  //       xtype: 'fieldcontainer',
-                  //       layout: 'hbox',
-                  //       fieldLabel: '下次執行時間',
-                  //       items: [
-                  //           {
-                  //               xtype: 'datefield',
-                  //               id: 'next_execute_time',
-                  //               name: 'next_execute_time',
-                  //               format: 'Y-m-d',
-                  //               editable: false,
-                  //               allowBlank: false,
-                  //           },
-                  //           {
-                  //               xtype: 'displayfield',
-                  //               value: '<span style="color:red">※下次執行時間</span>'
-                  //           }
-                  //       ]
-                  //   },
-                  //   {
-                  //       xtype: 'fieldcontainer',
-                  //       layout: 'hbox',
-                  //       fieldLabel: '創建日期',
-                  //       items: [
-                  //           {
-                  //               xtype: 'datefield',
-                  //               id: 'create_time',
-                  //               name: 'create_time',
-                  //               format: 'Y-m-d',
-                  //               editable: false,
-                  //               allowBlank: false,
-                  //           },
-                  //           {
-                  //               xtype: 'displayfield',
-                  //               value: '<span style="color:red">※創建日期</span>'
-                  //           }
-                  //       ]
-                  //   },
-                  //     {
-                  //         xtype: 'fieldcontainer',
-                  //         layout: 'hbox',
-                  //         fieldLabel: '更改日期',
-                  //         items: [
-                  //             {
-                  //                 xtype: 'datefield',
-                  //                 id: 'change_time',
-                  //                 name: 'change_time',
-                  //                 format: 'Y-m-d',
-                  //                 editable: false,
-                  //                 allowBlank: false,
-                  //             },
-                  //             {
-                  //                 xtype: 'displayfield',
-                  //                 value: '<span style="color:red">※更改日期</span>'
-                  //             }
-                  //         ]
-                  //     },
         ],
 
         // 点击保存按钮后  提示信息 
@@ -240,7 +138,7 @@ editFunction_master = function (row, store) {
     //点击关闭按钮后  提示信息
     //一个指定的打算作为一个应用程序窗口的面板。
     var editWin = Ext.create('Ext.window.Window', {
-        title: "新增信息",
+        title: "新增排程",
         id: 'editWin',
         iconCls: "icon-user-add",
         width: 460,
@@ -273,6 +171,7 @@ editFunction_master = function (row, store) {
         listeners: {
             'show': function () {
                 if (row) {
+                    Ext.getCmp('schedule_code_master').setDisabled(true);//排程code 新增時可以修改;編輯時不可修改
                     if (row.data.schedule_state == 0) {
                         Ext.getCmp("id1").setValue(false);
                         Ext.getCmp("id2").setValue(true);
