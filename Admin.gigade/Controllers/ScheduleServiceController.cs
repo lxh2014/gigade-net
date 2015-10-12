@@ -25,7 +25,10 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
-
+        public ActionResult Schedule_Log_Seacrh()
+        {
+            return View();
+        }
         /// <summary>
         /// 獲取需要執行的排程列表并逐個執行，添加日誌和更新排程；
         /// </summary>

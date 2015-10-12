@@ -1928,6 +1928,7 @@
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsList.js" />
     <Content Include="Scripts\Views\Redirect\RedirectView.js" />
     <Content Include="Scripts\Views\ReportManagement\OderMessageSearch.js" />
+    <Content Include="Scripts\Views\ScheduleService\SchedeleLogSearch.js" />
     <Content Include="Scripts\Views\ScheduleService\ScheduleConfigEdit.js" />
     <Content Include="Scripts\Views\ScheduleService\ScheduleMasterEdit.js" />
     <Content Include="Scripts\Views\ScheduleService\SchedulePeriodEdit.js" />
@@ -4402,6 +4403,7 @@
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
     <Content Include="Views\ScheduleService\Index.cshtml" />
     <Content Include="Views\Vendor\VendorDetails.cshtml" />
+    <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
