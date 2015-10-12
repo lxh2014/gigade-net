@@ -144,6 +144,7 @@ namespace BLL.gigade.Mgr
                         Model.TableChangeLog _log = new Model.TableChangeLog();
                         if (item["change_table"].ToString() == "comment_detail")
                         {
+                            _model.change_table_function = "評價回覆";
                             if (item["change_field"].ToString() == "answer_is_show")
                             {
                                 //item["old_value"]=item["old_value"].ToString() == "0" ? "否" : "是";                      
@@ -195,6 +196,7 @@ namespace BLL.gigade.Mgr
                         }
                         else if (item["change_table"].ToString() == "comment_num")
                         {
+                            _model.change_table_function = "商品評價";
                             if (item["change_field"].ToString() == "logistics_deliver" || item["change_field"].ToString() == "web_server" || item["change_field"].ToString() == "seller_server" || item["change_field"].ToString() == "product_desc")
                             {
                                 

@@ -132,19 +132,37 @@ namespace BLL.gigade.Mgr
               }
               else//正式發送
               {
+                  #region 發送名單條件
+
                   DataTable _dt = _edmListConditionMgr.GetUserEmail(eslQuery.elcm_id);
+                  List<string> st = new List<string>();
+                  
                   #region 額外發送列表
-               
+
                   if (MRquery.extra_send != "")
                   {
+                     
                       string[] extra_send = MRquery.extra_send.Split('\n');
                       for (int i = 0; i < extra_send.Length; i++)
                       {
                           if (extra_send[i] != "")
                           {
-                              DataRow dr = _dt.NewRow();
-                              dr["user_email"] = extra_send[i];
-                              _dt.Rows.Add(dr);
+                              int norepeat = 0;
+                              #region 額外發送的時候看看是不是已經存在這個email了，存在則不加入
+                              for (int j = 0; j < _dt.Rows.Count; j++)
+                              {
+                                  if (_dt.Rows[j]["user_email"].ToString() != extra_send[i])
+                                  {
+                                      norepeat++;
+                                  }
+                              }
+                              if (norepeat == _dt.Rows.Count)//證明不重複
+                              {
+                                  DataRow dr = _dt.NewRow();
+                                  dr["user_email"] = extra_send[i];
+                                  _dt.Rows.Add(dr);
+                              }
+                              #endregion
                           }
                       }
                   }
@@ -153,28 +171,79 @@ namespace BLL.gigade.Mgr
                   if (MRquery.extra_no_send != "")
                   {
                       string[] extra_no_send = MRquery.extra_no_send.Split('\n');
-                     
+
                       for (int i = 0; i < extra_no_send.Length; i++)
                       {
                           if (extra_no_send[i] != "")
                           {
-                              for (int j = 0; j < _dt.Rows.Count; j++)
+                              for (int j = 0; j <_dt.Rows.Count; j++)
                               {
                                   if (_dt.Rows[j]["user_email"].ToString() == extra_no_send[i])
                                   {
-                                      _dt.Rows.RemoveAt(j);
+                                      _dt.Rows.Remove(_dt.Rows[j]);
+                                      _dt.AcceptChanges();
                                   }
                               }
                           }
-
                       }
                   }
-              #endregion
-                  #region 包含非訂閱
+                  #endregion
+                  #endregion
                   if (MRquery.is_outer)
                   {
-                      DataTable _outDt = _edmContentNewDao.GetOuterCustomer();
-                      #region  去重
+                  #region 包含非訂閱
+                  DataTable _outDt = _edmContentNewDao.GetOuterCustomer();
+                  #region 額外發送列表
+
+                  if (MRquery.extra_send != "")
+                  {
+                      string[] extra_send = MRquery.extra_send.Split('\n');
+                      for (int i = 0; i < extra_send.Length; i++)
+                      {
+                          if (extra_send[i] != "")
+                          {
+                              #region 額外發送的時候看看是不是已經存在這個email了，存在則不加入
+                              int norepeat = 0;
+                              for (int j = 0; j < _outDt.Rows.Count; j++)
+                              {
+                                  if (_outDt.Rows[j]["customer_email"].ToString() != extra_send[i])
+                                  {
+                                      norepeat++;
+                                  }
+                              }
+                              if (norepeat == _outDt.Rows.Count)//證明不重複
+                              {
+                                  DataRow dr = _outDt.NewRow();
+                                  dr["customer_email"] = extra_send[i];
+                                  _outDt.Rows.Add(dr);
+                              }
+                              #endregion
+                          }
+                      }
+                  }
+                  #endregion
+                  #region 額外排除列表
+                  if (MRquery.extra_no_send != "")
+                  {
+                      string[] extra_no_send = MRquery.extra_no_send.Split('\n');
+
+                      for (int i = 0; i < extra_no_send.Length; i++)
+                      {
+                          if (extra_no_send[i] != "")
+                          {
+                              for (int j = 0; j <_outDt.Rows.Count; j++)
+                              {
+                                  if (_outDt.Rows[j]["customer_email"].ToString() == extra_no_send[i])
+                                  {
+                                      _outDt.Rows.Remove( _outDt.Rows[j]);
+                                      _outDt.AcceptChanges();
+                                  }
+                              }
+                          }
+                      }
+                  }
+                  #endregion
+                  #region  去重
                       for (int i = 0; i < _outDt.Rows.Count; i++)
                       {
                           for (int j = 0; j < _dt.Rows.Count; j++)
@@ -182,23 +251,20 @@ namespace BLL.gigade.Mgr
                               if (_dt.Rows[j]["user_email"] == _outDt.Rows[i]["customer_email"])
                               {
                                   _dt.Rows.RemoveAt(j);
+                                  _dt.AcceptChanges();
                               }
                           }
                       }
                       #endregion
-                      #region  將_outDt中數據加到_dt
-                      _dt.Merge(_outDt);
-                      #endregion 
-                  }
-               
+                  _dt.Merge(_outDt);
                   #endregion
+                  }
                   if (_dt.Rows.Count > 0)
                   {
                       eslQuery.receiver_count = _dt.Rows.Count;
                       arrList.Add(_edmContentNewDao.InsertEdmSendLog(eslQuery));
                       for (int i = 0; i < _dt.Rows.Count; i++)
                       {
-                         // string.IsNullOrEmpty(_dt.Rows[i]["user_email"]);
                           if (_dt.Rows[i]["user_email"].ToString() != "" && _dt.Rows[i]["user_email"].ToString() != null)
                           {
                               MRquery.receiver_address = _dt.Rows[i]["user_email"].ToString();

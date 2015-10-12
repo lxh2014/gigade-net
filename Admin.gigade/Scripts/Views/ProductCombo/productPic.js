@@ -1,4 +1,10 @@
-﻿var PIC_MAX = 20;
+﻿/*  
+ * 
+ * 文件名称：productPic.js 
+ * 摘    要：組合商品修改和新增 圖檔頁面
+ * 
+ */
+var PIC_MAX = 20;
 var Spec_Id;
 var imagesort;  // 定義一個公共的 imagesort 用來接收傳來的 數字  add by zhuoqin0830w 2015/01/29
 var errorMsg = PIC_LIMIT;
@@ -774,16 +780,24 @@ function saveTemp() {
 function imgFadeBig(img, size) {
     var e = this.event;
     var topValue;
-    $("#imgTip").attr("src", img)
-            .css({
-                "top": (e.clientY - size) < 0 ? e.clientY : (e.clientY - size) + "px",
-                "left": e.clientX + "px",
-                "width": size + "px",
-                "height": size + "px"
-            }).show();
+    $("#imgTip").attr("src", img).css({
+        "top": (e.clientY - size) < 0 ? e.clientY : (e.clientY - size) + "px",
+        "left": e.clientX + "px",
+        "width": size + "px",
+        "height": size + "px"
+    }).show();
 }
 
 function save() {
+    //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    var mask;
+    if (!mask) {
+        mask = new Ext.LoadMask(Ext.getBody(), { msg: WAIT });
+    }
+    mask.show();
+    //添加disabled屬性  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    window.parent.setMoveEnable(false);
+
     var retVal = true;
     //保存數據至數據庫
     var product_image = Ext.getCmp("fileName").getValue();
@@ -835,7 +849,7 @@ function save() {
     Ext.Ajax.request({
         url: '/ProductCombo/productPictrueTempSave',
         method: 'POST',
-        async: false,
+        async: window.parent.GetProductId() == '' ? false : true,
         params: {
             "product_id": Ext.htmlEncode(window.parent.GetProductId()),
             "OldProductId": OLD_PRODUCT_ID,
@@ -848,23 +862,22 @@ function save() {
         },
         success: function (msg) {
             var resMsg = eval("(" + msg.responseText + ")");
+            mask.hide();
             if (resMsg.success == true && resMsg.msg != null) {
                 Ext.Msg.alert(PROMPT, resMsg.msg);
-
             }
             if (resMsg.success == false) {
                 Ext.Msg.alert(PROMPT, resMsg.msg);
                 retVal = false;
-                window.parent.setMoveEnable(true);
             }
+            window.parent.setMoveEnable(true);
         }
     });
-    window.parent.setMoveEnable(true);
+    //window.parent.setMoveEnable(true);
     return retVal;
 }
 
 function deletePic() {
-
     var rows = Ext.getCmp("explainPanel").getSelectionModel().getSelection();
     Ext.Msg.confirm(CONFIRM, Ext.String.format(DELETE_INFO, rows.length), function (btn) {
         if (btn == 'yes') {
@@ -905,7 +918,7 @@ function CheckNum(msg) {
             }
         }
     }
-    if (explain > 0 && msg!="error") {
+    if (explain > 0 && msg != "error") {
         errorMsg += PRODUCT_HAVE_REPEAT_IMG_ORDER + '<br/>';//商品說明圖中有重複的商品排序
     }
     if (mobile > 0 && msg != "error") {

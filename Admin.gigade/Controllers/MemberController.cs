@@ -2348,7 +2348,7 @@ namespace Admin.gigade.Controllers
                 BonusTypeMgr bonusTypeMgr = new BonusTypeMgr(mySqlConnectionString);
                 table = bonusTypeMgr.GetBonusTypeList();
                 DataRow row = table.NewRow();
-                row[0] = 0;
+                row[0] = "0";
                 row[1] = "全部";
                 table.Rows.InsertAt(row, 0);
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();

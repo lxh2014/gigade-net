@@ -1,9 +1,14 @@
-﻿var mainPanel;
+﻿/*  
+ * 
+ * 文件名称：PriceMgr.js 
+ * 摘    要：組合商品修改和新增 價格頁面
+ * 
+ */
+var mainPanel;
 var editPanel;
 var itemsNew
 var showComboPanel;
 var OLD_PRODUCT_ID;
-
 var combination = 0;
 var PRICETYPE = 0;
 var isNew = true;
@@ -36,7 +41,7 @@ var priceTypeStore = Ext.create("Ext.data.Store", {
             root: 'items'
         }
     }
-})
+});
 
 //會員等級store
 var userlevelStore = Ext.create("Ext.data.Store", {
@@ -53,7 +58,7 @@ var userlevelStore = Ext.create("Ext.data.Store", {
             root: 'items'
         }
     }
-})
+});
 
 Ext.define('GIGADE.SITE', {
     extend: 'Ext.data.Model',
@@ -107,6 +112,7 @@ Ext.define('GIGADE.PRODUCTSITE', {
         { name: 'product_name_format', type: 'string' }
     ]
 });
+
 var siteProductStore = Ext.create("Ext.data.Store", {
     model: 'GIGADE.PRODUCTSITE',
     proxy: {
@@ -140,6 +146,7 @@ Ext.define('GIGADE.PRODUCT', {
         { name: 'total_price', type: 'int' }
     ]
 });
+
 var product_store = Ext.create('Ext.data.Store', {
     model: 'GIGADE.PRODUCT',
     groupField: 'Pile_Id'
@@ -221,8 +228,7 @@ var columns = [{
     hidden: true,
     menuDisabled: true,
     dataIndex: 'price'
-}
-, {
+}, {
     header: MUSTBUY,
     muiltName: 's_must_buy',
     sortable: false,
@@ -823,10 +829,16 @@ Ext.onReady(function () {
             text: SAVE,
             listeners: {
                 click: function () {
+                    //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+                    var mask;
+                    if (!mask) {
+                        mask = new Ext.LoadMask(Ext.getBody(), { msg: '請稍等...' });
+                    }
+                    mask.show();
                     Ext.Ajax.request({
                         url: '/Product/UpdatePrice',
                         method: 'post',
-                        async: false,
+                        async: window.parent.GetProductId() == '' ? false : true,
                         params: {
                             "ProductId": product_id,
                             "function": 'comboSavePrice',
@@ -837,9 +849,11 @@ Ext.onReady(function () {
                         },
                         success: function (form, action) {
                             var result = Ext.decode(form.responseText);
+                            mask.hide();
                             if (result.success) { Ext.Msg.alert(PROMPT, SUCCESS); }
                         },
                         failure: function (form, action) {
+                            mask.hide();
                             Ext.Msg.alert(PROMPT, FAILURE);
                         }
                     });
@@ -1026,6 +1040,7 @@ Ext.onReady(function () {
             }
         }
     });
+
     showComboPanel = Ext.create("Ext.form.Panel", {
         id: 'showComboPanel',
         border: false,
@@ -1061,7 +1076,7 @@ Ext.onReady(function () {
     if (product_id != "") {
         window.parent.updateAuth(editPanel, 'muiltName');
     }
-})
+});
 
 function setBagCheckMoney(field, mode) {
     if (mode != 2) {
@@ -1107,6 +1122,14 @@ function save(functionid) {
 //保存至臨時表
 function saveIds(functionid) {
     var retVal = true;
+    //判斷站臺名稱是否填寫 避免用戶直接點擊
+    if (window.parent.GetProductId()) {
+        if (Ext.getCmp("site_id").getValue() == null) {
+            Ext.Msg.alert(PROMPT, WRITE_SITEID);
+            return false;
+        }
+    }
+
     if (!Ext.getCmp("mainpanel").getForm().isValid()) {
         return false;
     }
@@ -1193,7 +1216,7 @@ function saveIds(functionid) {
     Ext.Ajax.request({
         url: '/ProductCombo/ComboPriceSave',
         method: 'POST',
-        async: false,
+        async: window.parent.GetProductId() == '' ? false : true,
         params: {
             "OldProductId": OLD_PRODUCT_ID,
             "product_id": Ext.htmlEncode(window.parent.GetProductId()),

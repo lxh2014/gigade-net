@@ -53,3 +53,6 @@ ALERT_MESSAGE = "提示信息";
 FIX_COMPLETE = "修改成功！";
 
 AREYOUSURE = "您確定保存對價格、成本、活動時間等欄位的修改嗎？"
+
+//add by zhuoqin0830w  2015/10/07
+WRITE_SITEID = "請填寫站臺名稱";

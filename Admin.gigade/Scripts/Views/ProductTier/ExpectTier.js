@@ -1191,7 +1191,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                         }
                     });
                 }
-                myMask.hide();
+                //myMask.hide();
             }
         }
     }]

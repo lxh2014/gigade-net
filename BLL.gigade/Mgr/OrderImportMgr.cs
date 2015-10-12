@@ -904,13 +904,13 @@ namespace BLL.gigade.Mgr
                         if (prod != null)
                         {
                             newDetail.Bag_Check_Money = prod.Bag_Check_Money;
-                            newDetail.Combined_Mode =int.Parse(prod.Combination.ToString());
+                            newDetail.Combined_Mode = int.Parse(prod.Combination.ToString());
                         }
                         if (p.Item_Id == 0)
                         {
                             pack_id++;
                             parent_name = p.product_name;
-                            parent_id =int.Parse(p.Product_Id.ToString());
+                            parent_id = int.Parse(p.Product_Id.ToString());
                             newDetail.item_mode = 1;//父商品
                             combined = newDetail.Combined_Mode;
                         }
@@ -951,8 +951,9 @@ namespace BLL.gigade.Mgr
                         //edit by xxl reason:父商品也需要pack_id;
                         newDetail.parent_name = parent_name;
                         newDetail.pack_id = pack_id;
-                        //end by xxl
-                        newDetail.Item_Vendor_Id = vb.Vendor_Id;
+                        //end by xxl  
+                        //判斷商品 是否 買斷 商品  如果是  則 供應商 為 gigade 如果不是 則表示 使用原有的供應商  edit by zhuoqin0830w 2015/10/07
+                        newDetail.Item_Vendor_Id = pr.Prepaid == 0 ? vb.Vendor_Id : Convert.ToUInt32((df.Delivery_Freight_Set == 1 ? 2 : 92));
                         //單一商品
                         if (p.parent_id == 0 && p.Item_Id != 0)
                         {
@@ -1021,7 +1022,7 @@ namespace BLL.gigade.Mgr
                             //查找子商品item_id
                             OrderAddCustom od = odc.Where(rec => rec.group_id == p.group_id && rec.Item_Id != 0).FirstOrDefault();
                             newDetail.Item_Id = od.Item_Id;
-                            newDetail.Parent_Id =int.Parse(p.Product_Id.ToString());//父商品的parent_id為其product_id
+                            newDetail.Parent_Id = int.Parse(p.Product_Id.ToString());//父商品的parent_id為其product_id
                             newDetail.parent_num = p.buynum;
                             newDetail.Buy_Num = p.buynum;
 

@@ -42,17 +42,16 @@ namespace BLL.gigade.Mgr
         }
 
 
-
-        public ScheduleMasterQuery GetExeScheduleMaster(ScheduleMasterQuery query)
+        public ScheduleMasterQuery GetScheduleMaster(ScheduleMasterQuery query)
         {
             try
             {
-                return _secheduleServiceDao.GetExeScheduleMaster(query);
+                return _secheduleServiceDao.GetScheduleMaster(query);
             }
             catch (Exception ex)
             {
 
-                throw new Exception("SecheduleServiceMgr-->GetExeScheduleMaster-->" + ex.Message, ex);
+                throw new Exception("SecheduleServiceMgr-->GetScheduleMaster-->" + ex.Message, ex);
             }
         }
         public List<ScheduleConfigQuery> GetScheduleConfig(ScheduleConfigQuery query)
@@ -279,8 +278,22 @@ namespace BLL.gigade.Mgr
                     {
                         item.sschedule_state = "啟用";
                     }
-                    item.show_previous_execute_time = CommonFunction.GetNetTime(item.previous_execute_time).ToString("yyyy-MM-dd HH:mm:ss ");
-                    item.show_next_execute_time = CommonFunction.GetNetTime(item.next_execute_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                    if (item.previous_execute_time == 0)
+                    {
+                        item.show_previous_execute_time = string.Empty;
+                    }
+                    else
+                    {
+                        item.show_previous_execute_time = CommonFunction.GetNetTime(item.previous_execute_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                    }
+                    if (item.next_execute_time == 0)
+                    {
+                        item.show_next_execute_time = string.Empty;
+                    }
+                    else
+                    {
+                        item.show_next_execute_time = CommonFunction.GetNetTime(item.next_execute_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                    }
                     item.show_create_time = CommonFunction.GetNetTime(item.create_time).ToString("yyyy-MM-dd HH:mm:ss ");
                     item.show_change_time = CommonFunction.GetNetTime(item.change_time).ToString("yyyy-MM-dd HH:mm:ss ");
                 }
@@ -325,7 +338,32 @@ namespace BLL.gigade.Mgr
                 {
                     item.show_create_time = CommonFunction.GetNetTime(item.create_time).ToString("yyyy-MM-dd HH:mm:ss ");
                     item.show_change_time = CommonFunction.GetNetTime(item.change_time).ToString("yyyy-MM-dd HH:mm:ss ");
-                    item.show_begin_datetime = CommonFunction.GetNetTime(item.begin_datetime).ToString("yyyy-MM-dd HH:mm:ss ");
+                   // item.show_begin_datetime = CommonFunction.GetNetTime(item.begin_datetime).ToString("yyyy-MM-dd HH:mm:ss ");
+                    item.show_begin_datetime = CommonFunction.GetNetTime(item.begin_datetime);
+                    if (item.period_type == 1)
+                    {
+                        item.show_period_type = "year";
+                    }
+                    if (item.period_type == 2)
+                    {
+                        item.show_period_type = "month";
+                    }
+                    if (item.period_type == 3)
+                    {
+                        item.show_period_type = "week";
+                    }
+                    if (item.period_type == 4)
+                    {
+                        item.show_period_type = "day";
+                    }
+                    if (item.period_type == 5)
+                    {
+                        item.show_period_type = "hour";
+                    }
+                    if (item.period_type == 6)
+                    {
+                        item.show_period_type = "minute";
+                    }
                 }
                 return store;
 
@@ -373,6 +411,8 @@ namespace BLL.gigade.Mgr
         {
             if (query.rowid == 0)//新增
             {
+                
+
                 return _secheduleServiceDao.ScheduleMasterInfoInsert(query);
             }
             else//編輯
