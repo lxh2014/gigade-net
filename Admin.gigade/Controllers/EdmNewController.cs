@@ -651,7 +651,7 @@ namespace Admin.gigade.Controllers
 
                         #endregion
                         MailHelper mail = new MailHelper();
-                        mail.SendMailAction("shiwei0620j@gimg.tw", mQuery.subject, mQuery.body + "   ");
+                        mail.SendMailAction((Session["caller"] as Caller).user_email, mQuery.subject, mQuery.body + "   ");
                         {
                       json= _edmContentNewMgr.MailAndRequest(eslQuery, mQuery);
                         }
