@@ -550,8 +550,8 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        
-        #region
+
+        #region ContentUrl
         public HttpResponseBase GetContentUrl()
         {
             string json = string.Empty;
@@ -592,7 +592,7 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        #region
+        #region 發送電子報 （測試發送/正式發送）
         public HttpResponseBase SendEdm()
         {
             string json = string.Empty;

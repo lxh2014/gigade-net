@@ -1,4 +1,10 @@
-﻿var PIC_MAX =20;
+﻿/*  
+ * 
+ * 文件名称：productPic.js 
+ * 摘    要：單一商品修改和新增 圖檔頁面
+ * 
+ */
+var PIC_MAX = 20;
 var Spec_Id;
 var imagesort;  // 定義一個公共的 imagesort 用來接收傳來的 數字  add by zhuoqin0830w 2015/01/29
 var errorMsg = PIC_LIMIT;
@@ -7,8 +13,7 @@ var win;
 //產品規格圖model
 Ext.define("picture", {
     extend: 'Ext.data.Model',
-    fields: [
-        { name: "img", type: "string" },
+    fields: [{ name: "img", type: "string" },
         { name: "spec_id", type: "string" },
         { name: "spec_sort", type: "int" },
          { name: "spec_status", type: "string" }]
@@ -111,13 +116,11 @@ var SpecStore = Ext.create("Ext.data.Store", {
 });
 
 SpecStore.on('beforeload', function () {
-    Ext.apply(SpecStore.proxy.extraParams,
-        {
-            ProductId: Ext.htmlEncode(window.parent.GetProductId()),
-            OldProductId: window.parent.GetCopyProductId()
-        });
+    Ext.apply(SpecStore.proxy.extraParams, {
+        ProductId: Ext.htmlEncode(window.parent.GetProductId()),
+        OldProductId: window.parent.GetCopyProductId()
+    });
 });
-
 
 var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
     clicksToEdit: 1
@@ -136,11 +139,9 @@ var checkboxModel = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
             Ext.getCmp("explainPanel").down('#delete').setDisabled(selections.length == 0);
-
         }
     }
 });
-
 
 //var mcheckboxModel = Ext.create('Ext.selection.CheckboxModel', {
 //    listeners: {
@@ -159,22 +160,20 @@ var checkboxModel = Ext.create('Ext.selection.CheckboxModel', {
 //    }
 //});
 
-
 var Pic;
-
 
 ///add by wwei0216w
 ///以下兩個方法用於為單一商品商品說明圖的右上角添加X按鈕 2015/7/13
 function productPicEvent(picClick, img, type) {
     if (type == 1) {
         Ext.getCmp("fileName").setValue("");
-    }else if(type == 2){
+    } else if (type == 2) {
         Ext.getCmp("fileNameMobile").setValue("");
     }
     $('.' + picClick).attr("src", img);
 }
 
-function SetClearPic(className,ImgId,cImgId,defaultImg){
+function SetClearPic(className, ImgId, cImgId, defaultImg) {
     $('.' + className).parent().parent().parent().parent().mousemove(function (e) {
         var target = e.target;
         //如果觸發對象為為IMG元素並且,它的id == "Pic_1"或者是clearPic_1 並且該圖片不是默認圖片,就顯示X小圖標
@@ -186,7 +185,6 @@ function SetClearPic(className,ImgId,cImgId,defaultImg){
     });
 }
 
-
 Ext.onReady(function () {
     var grouping = Ext.create('Ext.grid.feature.Grouping', {
         groupHeaderTpl: '{name}'
@@ -197,10 +195,10 @@ Ext.onReady(function () {
     StandardStore.load();
     //商品圖
     Pic = Ext.create('Ext.Img', {
-        id:'productPic',
+        id: 'productPic',
         width: 150,
         height: 150,
-        floating:false,
+        floating: false,
         //src:"/Content/img/點擊上傳.jpg",
         style: {
             margin: '10px 15px 0px 0px',//修改商品說明圖和手機說明圖之間的間距   edit by zhuoqin0830w 2015/03/19
@@ -214,7 +212,6 @@ Ext.onReady(function () {
                 $('.picClick').click(function () {  //通過picClick找到該控件的點擊事件
                     addPic("prod", 0, 3); //進行圖片上傳的操作 3:商品說明圖
                 });
-                
                 ///為商品圖添加一個img的x,其功能是刪去圖片
                 ///productPicEvent的二個參數
                 ///參數一:要刪除img控件的樣式(刪去圖片根據該控件的樣式來查找控件)
@@ -236,13 +233,10 @@ Ext.onReady(function () {
         }
     });
 
-
-
     //手機商品圖
     Pic2 = Ext.create('Ext.Img', {
         width: 150,
         height: 150,
-
         //src: "/Content/img/點擊上傳圖片.jpg",
         style: {
             margin: '10px 0px 0px 0px',
@@ -378,6 +372,7 @@ Ext.onReady(function () {
             }
         }
     });
+
     //規格圖
     var standard = Ext.create("Ext.grid.Panel", {
         plugins: [cellEditing],
@@ -456,7 +451,6 @@ Ext.onReady(function () {
                 if (recode) {
                     return recode.get("spec_name");
                 }
-
             }
         }, {
             header: PIC_SORT,
@@ -668,7 +662,6 @@ Ext.onReady(function () {
             text: UPLOAD_MANY_ONETIME,
             iconCls: 'icon-add',
             handler: function () {
-
                 if (!win) {
                     win = Ext.create('Ext.window.Window', {
                         title: UPLOAD_MANY_ONETIME,
@@ -748,10 +741,8 @@ Ext.onReady(function () {
                         //延時執行close
                         if (data.fileCount == 0) {
                             setTimeout(function () { win.close(); }, 500);
-
                             //add by zhuoqin0830w  2015/03/24  判斷上傳的圖片中是否有重複排序
                             CheckNum(msg);
-
                             //判斷錯誤信息是否等於 初始值 edit by zhuoqin0830w 2015/02/06
                             if (errorMsg != PIC_LIMIT) {
                                 Ext.Msg.alert(PROMPT, errorMsg);
@@ -763,8 +754,6 @@ Ext.onReady(function () {
             }
         }]
     });
-
-
 
     Ext.create('Ext.Viewport', {
         layout: 'anchor',
@@ -827,7 +816,7 @@ Ext.onReady(function () {
             }
         }
     });
-})
+});
 
 function imgFadeBig(img, width, height) {
     var e = this.event;
@@ -840,7 +829,6 @@ function imgFadeBig(img, width, height) {
                 "height": height + "px"
             }).show();
     }
-
 }
 
 //function addNewRow(imgPath, type) {
@@ -948,7 +936,7 @@ function addNewRow(imgPath, type) {
             }
             if (imgInfo[0] == "ERROR") {
                 Ext.Msg.alert(PROMPT, imgPath.split('/')[1]);
-                break ;
+                break;
             }
 
             var r = Ext.create('explain', {
@@ -1061,6 +1049,15 @@ function saveTemp() {
 }
 
 function save() {
+    //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    var mask;
+    if (!mask) {
+        mask = new Ext.LoadMask(Ext.getBody(), { msg: WAIT });
+    }
+    mask.show();
+    //添加disabled屬性  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    window.parent.setMoveEnable(false);
+
     var retVal = true;
     //保存數據至數據庫
     var product_image = Ext.getCmp("fileName").getValue();//edit by wwei0216w 2015/03/18 將商品說明圖的路徑讀取
@@ -1069,19 +1066,13 @@ function save() {
     var product_spec_info = Ext.getCmp("standardPanel").store.data.items;
     var product_picture_info = Ext.getCmp("explainPanel").store.data.items;
     // var product_mobilepic_info = Ext.getCmp("mobilePanel").store.data.items;  // add by wwei0216w 2014/11/11獲取mobilePanel中的所有數據
-
-
     var image_InsertValue = product_image;//edit by wwei0216w 2015/03/18 將商品說明圖的路徑讀取放入image_InsertValue
     var image_MobileValue = mobile_image;//edit by wwei0216w 2015/03/18 將手機說明圖的路徑讀取放入image_MobileValue
     var specify_Product_alt = pic_specify; // edit by wwei0216w 2015/04/9
-
     var spec_InsertValue = "";
     var picture_InsertValue = "";
     var mobilePic_InsertValue = "";  //用來記錄mobilPanel中的數據
     var productMedia = Ext.getCmp("product_media").getValue();
-
-
-
 
     for (var i = 0; i < product_spec_info.length; i++) {
         var product_img = product_spec_info[i].get("img");
@@ -1139,7 +1130,7 @@ function save() {
     Ext.Ajax.request({
         url: '/Product/productPictrueTempSave',
         method: 'POST',
-        async: false,
+        async: window.parent.GetProductId() == '' ? false : true,
         params: {
             "product_id": Ext.htmlEncode(window.parent.GetProductId()),
             OldProductId: window.parent.GetCopyProductId(),
@@ -1153,22 +1144,20 @@ function save() {
         },
         success: function (msg) {
             var resMsg = eval("(" + msg.responseText + ")");
+            mask.hide();
             if (resMsg.success == true && resMsg.msg != null) {
                 Ext.Msg.alert(PROMPT, resMsg.msg);
-
             }
             if (resMsg.success == false) {
                 Ext.Msg.alert(PROMPT, resMsg.msg);
                 retVal = false;
-                window.parent.setMoveEnable(true);
             }
+            window.parent.setMoveEnable(true);
         }
     });
-    window.parent.setMoveEnable(true);
+    //window.parent.setMoveEnable(true);
     return retVal;
-
 }
-
 
 function deletePic() {
     var rows = Ext.getCmp("explainPanel").getSelectionModel().getSelection();
@@ -1241,7 +1230,7 @@ function CheckNum(msg) {
     //        }
     //    }
     //}
-    if (explain > 0 && msg!="error") {
+    if (explain > 0 && msg != "error") {
         errorMsg += PRODUCT_HAVE_REPEAT_IMG_ORDER + '<br/>';
     }
     if (mobile > 0 && msg != "error") {
@@ -1281,7 +1270,6 @@ function SelectAll(type) {
 //    document.getElementById("yyy").value = mousePos.y; 
 //}
 
-
 //function mouseCoords(ev) {
 //    if (ev.pageX || ev.pageY) {
 //        return { x: ev.pageX, y: ev.pageY };
@@ -1291,5 +1279,4 @@ function SelectAll(type) {
 //        y: ev.clientY + document.body.scrollTop - document.body.clientTop
 //    };
 //}
-
 //document.onmousemove = mouseMove;

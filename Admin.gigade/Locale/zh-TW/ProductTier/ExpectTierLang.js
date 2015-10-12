@@ -84,6 +84,9 @@ DELETE_UNUSUAL = "刪除異常";
 PARALLELISM_INFORMATION_CONFIG = "對應信息設定";
 VALUE = "值";
 
+PLEASEVERIFYDATAOFREPEAT = "請保證名稱不重複"
+EMPTYDATA = "數據不能為空!"
+
 DELETEFAILURE = '无法删除已在使用中的排程，请重新选择';
 
 //ADD 2015.09.23
@@ -92,5 +95,5 @@ IRR_END_TIME = '结束时间';
 WEEK = '日期';
 HOURS = '时间';
 EXECUTE_AFTERDAYS = '執行時間(多少天后)';
-SCHEDULE_DIVIDE_INTO = '排程将分为';
-PART_EXECUTE = '段执行';
+SCHEDULE_DIVIDE_INTO = '排程將分為';
+PART_EXECUTE = '段執行';

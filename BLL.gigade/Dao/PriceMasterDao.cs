@@ -454,7 +454,14 @@ where pm2.price_master_id={0}", query.price_master_id);
         {
             try
             {
-                StringBuilder stb = new StringBuilder("select a.product_id,b.product_name,b.prod_sz, min(a.item_money) as price,c.s_must_buy,c.g_must_buy from product_item a");
+                //StringBuilder stb = new StringBuilder("select a.product_id,b.product_name,b.prod_sz, min(a.item_money) as price,c.s_must_buy,c.g_must_buy from product_item a");
+                //stb.Append(" left join product b on a.product_id=b.product_id");
+                //stb.AppendFormat(" left join product_combo c on a.product_id = c.child_id and parent_id={0}", product_id);
+                //stb.AppendFormat(" where a.product_id in (select child_id from product_combo where parent_id={0} and pile_id={1}) group by a.product_id", product_id, pile_id);
+                //return _dbAccess.getDataTableForObj<Model.Custom.SingleProductPrice>(stb.ToString());
+                ///edit by wwei0216w 2015/10/06 修改原因:該表原本查詢的是product_item表中的價格,現在product_item表已經不再使用,換成price_master表中的價格
+
+                StringBuilder stb = new StringBuilder("select a.product_id,b.product_name,b.prod_sz, min(a.price) as price,c.s_must_buy,c.g_must_buy from price_master a");
                 stb.Append(" left join product b on a.product_id=b.product_id");
                 stb.AppendFormat(" left join product_combo c on a.product_id = c.child_id and parent_id={0}", product_id);
                 stb.AppendFormat(" where a.product_id in (select child_id from product_combo where parent_id={0} and pile_id={1}) group by a.product_id", product_id, pile_id);

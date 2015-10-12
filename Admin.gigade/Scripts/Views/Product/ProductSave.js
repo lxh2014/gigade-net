@@ -1,4 +1,10 @@
-﻿var CLICK_BTN_CHANGE = false;
+﻿/*  
+ * 
+ * 文件名称：ProductSave.js 
+ * 摘    要：單一商品修改和新增 主要 保存頁面
+ * 
+ */
+var CLICK_BTN_CHANGE = false;
 var clickMovePrev = false;//上一步不進行保存驗證 add by xiangwang0413w 2015/01/06
 var COURSEID = 0;
 
@@ -18,7 +24,6 @@ Ext.onReady(function () {
     tabs.push(baseInfo);
 
     /******物流配送模式**********************************************************************/
-
     var transportSet = Ext.create('Ext.panel.Panel', {
         title: PHYSICAL_DISTRIBUTION_DISPATCH_MODE,
         minWidth: 150,
@@ -30,9 +35,7 @@ Ext.onReady(function () {
             }
         }
     });
-
     tabs.push(transportSet);
-
 
     /******描述**********************************************************************/
     var description = Ext.create('Ext.panel.Panel', {
@@ -73,7 +76,6 @@ Ext.onReady(function () {
     });
     //tabs.push(courseDetailItem);
 
-
     /********價格**********************************************************************/
     var price = Ext.create('Ext.panel.Panel', {
         title: TITLE_PRICE,
@@ -100,7 +102,6 @@ Ext.onReady(function () {
     });
     tabs.push(category);
 
-
     /*******新類別**********************************************************************/
     var newcategory = Ext.create('Ext.panel.Panel', {
         title: NEW_PRODUCT_CATEGORY,
@@ -112,8 +113,6 @@ Ext.onReady(function () {
         }
     });
     tabs.push(newcategory);
-
-
 
     /********庫存**********************************************************************/
     var stock = Ext.create('Ext.panel.Panel', {
@@ -162,6 +161,7 @@ Ext.onReady(function () {
     });
     tabs.push(prize);
 
+    //單一商品保存
     var saveForm = Ext.create('Ext.tab.Panel', {
         id: 'ContentPanel',
         //width: 1185,
@@ -172,8 +172,7 @@ Ext.onReady(function () {
         layout: 'fit',
         items: [tabs],
         frame: true,
-        buttons: [
-            {
+        buttons: [{
                 text: BTN_SAVE,
                 id: 'btnSave',
                 hidden: GetProductId() == '',
@@ -181,9 +180,10 @@ Ext.onReady(function () {
                 handler: function () {
                     saveForm.getActiveTab().body.dom.firstChild.contentWindow.save('btnSave');
                 }
-            },
-            { xtype: 'component', height: 25 },
-            {
+        }, {
+            xtype: 'component',
+            height: 25
+        }, {
                 text: BTN_TEMP_SAVE,
                 id: 'btnTempSave',
                 iconCls: 'icon-add',
@@ -191,10 +191,8 @@ Ext.onReady(function () {
                 handler: function () {
                     saveForm.getActiveTab().body.dom.firstChild.contentWindow.saveTemp();
                 }
-            }
-        ],
-        tbar: [
-            {
+        }],
+        tbar: [{
                 id: 'move-prev',
                 iconCls: 'icon-prev',
                 text: PERV_MOVE,
@@ -209,9 +207,7 @@ Ext.onReady(function () {
                     }
                     CLICK_BTN_CHANGE = false;
                 }
-            },
-            '->',
-            {
+        }, '->', {
                 id: 'move-next',
                 iconCls: 'icon-next',
                 iconAlign: 'right',
@@ -242,13 +238,11 @@ Ext.onReady(function () {
                         //else {
                             panel.setActiveTab(t);
                             panel.doLayout();
-                            
                         //}
                     }
                     CLICK_BTN_CHANGE = false;
                 }
-            }
-        ],
+        }],
         listeners: {
             beforetabchange: function (tabPanel, newCard, oldCard, eOpts) {
                 if (Ext.getCmp('move-prev').isDisabled()) return false;
@@ -350,6 +344,8 @@ function updateAuth(panel, str) {
 function setMoveEnable(status) {
     Ext.getCmp('move-prev').setDisabled(!status);
     Ext.getCmp('move-next').setDisabled(!status);
+    //添加 按鈕  disabled 屬性 edit by zhuoqin0830w  2015/09/24
+    Ext.getCmp('btnSave').setDisabled(!status);
 }
 
 function GetProduct(frm) {
@@ -392,4 +388,3 @@ function Is_Continue() {
     });
     $(".x-tool-close").hide();
 }
-

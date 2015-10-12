@@ -314,10 +314,12 @@ var pcFrm = Ext.create('Ext.form.Panel', {
             store: pcStore,
             listeners: {
                 change: function (chose) {
+
                     Ext.getCmp('mst').setText("");
                     Ext.getCmp('ms').setText("");
-                    switch (Ext.getCmp('pc_type').getValue()) {
+                    Ext.getCmp('irrms').setText("");
 
+                    switch (Ext.getCmp('pc_type').getValue()) {
                         case '1':
                             Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#cxsj').setDisabled(true);
@@ -1153,20 +1155,25 @@ var pcFrm = Ext.create('Ext.form.Panel', {
     buttons: [{
         text: SAVE,//保存
         id: 'btnSave',
-        //formBind: true,
-        //disabled: true,
         handler: function () {
             var myMask = new Ext.LoadMask(Ext.getBody(), {
                 msg: 'Loading...'
             });
             myMask.show();
+            var tempType = Ext.getCmp('pc_type').getValue();
             var parames = getParams();
+            var tempFlag = true;////定義一個臨時變量用來作為是否  傳遞 到後臺的判斷依據
+            var form = this.up('form').getForm();
+            if (tempType == "2" || tempType == "1") {////如果執行類型為 單次 或者 重複 執行
+                tempFlag = form.isValid();///啟用form驗證
+            }
             if (parames.error) {
+                tempFlag = false;
                 Ext.Msg.alert(INFORMATION, parames.msg);
+                myMask.hide();
             }
             else {
-                var form = this.up('form').getForm();
-                if (form.isValid()) {
+                if (tempFlag) {
                     form.submit({
                         params: parames,
                         success: function (form, action) {
@@ -1184,6 +1191,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                         }
                     });
                 }
+                //myMask.hide();
             }
         }
     }]
@@ -1288,8 +1296,8 @@ function Tier_Load(record) {
                 Ext.getCmp('noendtime').setValue(true);
                 Ext.getCmp('ce_time').setRawValue("");
             } else {
-                Ext.getCmp('noendtime').setValue(false);
                 Ext.getCmp('ce_time').setRawValue(record.data.duration_end);
+                Ext.getCmp('noendtime').setValue(false);
             }
             irregulartimeStoreLoad(record);
             break;
@@ -1403,7 +1411,7 @@ function getParams() {
             //beginDay = (beginDay - 1) * 24 + source.items[0].data.startHour///獲得頭數據的小時數
             if (source.items.length == 0) {
                 params.error = true;
-                params.msg = "數據不能為空";
+                params.msg = EMPTYDATA;
                 break;
             }
             for (var i = 0; i < source.items.length; i++) {     ///循环遍歷panel中的數據
@@ -1422,7 +1430,7 @@ function getParams() {
                 //    params.msg = THE + (i + 1) + "觸發時間必須處於合理範圍";
                 //    break;
                 //}
-                  
+
                 startTemp = (startTemp - 1) * 24 + source.items[i].data.startHour;
                 endTemp = (endTemp - 1) * 24 + source.items[i].data.endHour;
                 if (endTemp <= startTemp) ///判斷每行的開始時間是否大於結束時間

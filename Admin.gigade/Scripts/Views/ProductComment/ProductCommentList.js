@@ -620,7 +620,7 @@ Ext.onReady(function () {
         tbar: [
         { xtype: 'button', text: ADD, id: 'add', hidden: true, iconCls: 'icon-user-add', handler: onAddClick },
         { xtype: 'button', text: '回覆', id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
-        { xtype: 'button', text: '編輯', id: 'update', iconCls: 'icon-user-edit', disabled: true, handler: onUpdateClick },
+        { xtype: 'button', text: '編輯用戶評價', id: 'update', iconCls: 'icon-user-edit', disabled: true, handler: onUpdateClick },
         '->',
         {
             xtype: 'button',

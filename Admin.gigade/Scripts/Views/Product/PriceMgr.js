@@ -1,9 +1,16 @@
-﻿var NEW_SITE = false;
+﻿/*  
+ * 
+ * 文件名称：PriceMgr.js 
+ * 摘    要：單一商品修改和新增 價格頁面
+ * 
+ */
+var NEW_SITE = false;
 var PRODUCT_ID = '', OLD_PRODUCT_ID = '';
 var FULL_NAME = "`LM``LM``LM`";
 var NAME_FORMAT = "";
 var SPLIT = "`LM`";
 var prod_sz = "";
+
 Ext.define('GIGADE.SITE', {
     extend: 'Ext.data.Model',
     fields: [
@@ -56,12 +63,9 @@ var userLevelStore2 = Ext.create('Ext.data.Store', {
     }
 });
 
-
-
 Ext.define('GIGADE.PRODUCTITEM', {
     extend: 'Ext.data.Model',
-    fields: [
-        { name: 'Item_Id', type: 'string' },
+    fields: [{ name: 'Item_Id', type: 'string' },
         { name: 'Spec_Name_1', type: 'string' },
         { name: 'Spec_Name_2', type: 'string' },
         { name: 'Product_Id', type: 'string' },
@@ -73,8 +77,7 @@ Ext.define('GIGADE.PRODUCTITEM', {
         { name: 'Event_Item_Cost', type: 'string' },
         { name: 'Event_Product_Start', type: 'string' },
         { name: 'Event_Product_End', type: 'string' },
-        { name: 'Item_Code', type: 'string' }
-    ]
+        { name: 'Item_Code', type: 'string' }]
 });
 
 var itemStore = Ext.create('Ext.data.Store', {
@@ -95,6 +98,7 @@ var itemStore = Ext.create('Ext.data.Store', {
         }
     }
 });
+
 var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
     clicksToEdit: 1,
     listeners: {
@@ -107,6 +111,7 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
         }
     }
 });
+
 var cellEditing_wfrm = Ext.create('Ext.grid.plugin.CellEditing', {
     clicksToEdit: 1,
     listeners: {
@@ -122,6 +127,7 @@ var cellEditing_wfrm = Ext.create('Ext.grid.plugin.CellEditing', {
         }
     }
 });
+
 //列选择模式
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     mode: 'SINGLE',
@@ -134,8 +140,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
 
 Ext.define('GIGADE.PRODUCTSITE', {
     extend: 'Ext.data.Model',
-    fields: [
-        { name: 'price_master_id', type: 'string' },
+    fields: [{ name: 'price_master_id', type: 'string' },
         { name: 'product_id', type: 'string' },
         { name: 'site_id', type: 'string' },
         { name: 'site_name', type: 'string' },
@@ -160,9 +165,9 @@ Ext.define('GIGADE.PRODUCTSITE', {
         { name: 'status', type: 'string' },
         { name: 'valid_start', type: 'string' },
         { name: 'valid_end', type: 'string' },
-        { name: 'product_name_format', type: 'string' }
-    ]
+        { name: 'product_name_format', type: 'string' }]
 });
+
 var siteProductStore = Ext.create("Ext.data.Store", {
     model: 'GIGADE.PRODUCTSITE',
     proxy: {
@@ -174,10 +179,10 @@ var siteProductStore = Ext.create("Ext.data.Store", {
         }
     }
 });
+
 Ext.define('GIGADE.ITEMPRICE', {
     extend: 'Ext.data.Model',
-    fields: [
-        { name: 'item_price_id', type: 'string' },
+    fields: [{ name: 'item_price_id', type: 'string' },
         { name: 'item_id', type: 'string' },
         { name: 'price_master_id', type: 'string' },
         { name: 'item_money', type: 'string' },
@@ -185,9 +190,9 @@ Ext.define('GIGADE.ITEMPRICE', {
         { name: 'event_money', type: 'string' },
         { name: 'event_cost', type: 'string' },
         { name: 'spec_name_1', type: 'string' },
-        { name: 'spec_name_2', type: 'string' }
-    ]
+        { name: 'spec_name_2', type: 'string' }]
 });
+
 var sitePriceStore = Ext.create('Ext.data.Store', {
     model: 'GIGADE.ITEMPRICE',
     proxy: {
@@ -198,8 +203,7 @@ var sitePriceStore = Ext.create('Ext.data.Store', {
             type: 'json'
         }
     }
-})
-
+});
 
 Ext.onReady(function () {
     PRODUCT_ID = window.parent.GetProductId();
@@ -231,6 +235,7 @@ Ext.onReady(function () {
             readOnly: true
         }]
     }];
+
     var siteItem = [{
         id: 'siteInfo',
         border: false,
@@ -272,6 +277,7 @@ Ext.onReady(function () {
             name: 'user_id'
         }]
     }];
+
     var defaultItem = [{
         border: false,
         defaults: { labelWidth: 120 },
@@ -354,8 +360,7 @@ Ext.onReady(function () {
                         }
                     }
                 }
-            },
-            { // add by Jiajun 2014/09/17
+            }, { // add by Jiajun 2014/09/17
                 xtype: 'button',
                 text: ELIMINATE,
                 id: 'btn_reset5',
@@ -366,10 +371,10 @@ Ext.onReady(function () {
                         Ext.getCmp("bonus_percent_end").setValue("");
                     }
                 }
-            }
-            ]
+            }]
         }]
     }];
+
     var defaultPrice = [{
         border: false,
         defaults: { labelWidth: 120 },
@@ -402,7 +407,8 @@ Ext.onReady(function () {
             colName: 'bag_check_money',
             id: 'bag_check_money'
         }]
-    }]
+    }];
+
     var defaultEvent = [{
         border: false,
         defaults: { labelWidth: 120 },
@@ -468,6 +474,7 @@ Ext.onReady(function () {
             }]
         }]
     }];
+
     var siteEvent = [{
         border: false,
         defaults: { labelWidth: 120 },
@@ -520,9 +527,7 @@ Ext.onReady(function () {
                         }
                     }
                 }
-            },
-
-            { // add by Jiajun 2014/09/29
+            }, { // add by Jiajun 2014/09/29
                 xtype: 'button',
                 text: ELIMINATE,
                 id: 'btn_reset7',
@@ -614,6 +619,7 @@ Ext.onReady(function () {
             }
         }
     }];
+
     if (PRODUCT_ID == '') {
         //新增時 Form呈現內容
         frmItems.push(siteName);
@@ -921,6 +927,7 @@ Ext.onReady(function () {
             }
         }
     });
+
     //新增時呈現Panel
     var tempPanel = Ext.create('Ext.panel.Panel', {
         id: 'tempPanel',
@@ -939,6 +946,7 @@ Ext.onReady(function () {
             }
         }
     });
+
     //修改時呈現Panel
     var showPanel = Ext.create('Ext.panel.Panel', {
         id: 'showPanel',
@@ -996,7 +1004,6 @@ Ext.onReady(function () {
             resize: function () {
                 this.doLayout();
             }
-
         }
     });
 
@@ -1011,14 +1018,13 @@ Ext.onReady(function () {
 
 
 var NO_SPEC = false;
+
 function setForm(result) {
     NO_SPEC = result.Product_Spec == 0;
     if (NO_SPEC) {
         Ext.getCmp('frm').down('#same_price').setReadOnly(NO_SPEC);
         Ext.getCmp('frm').down('#same_price').setValue(true);
     }
-
-
     Ext.getCmp('tempPanel').down('#Prod_Sz').setValue(result.Prod_Sz);
     //Ext.getCmp('tempPanel').down('#product_name').setValue(result.Product_Name);
     Ext.getCmp('tempPanel').down('#product_name').setValue(result.Prod_Name);
@@ -1100,23 +1106,32 @@ function setForm(result) {
             failure: function () {
                 Ext.Msg.alert(INFORMATION, DATA_LOAD_FAILURE);
             }
-        })
+        });
     }
 }
+
 function savePrice(functionid) {
     var frm = Ext.getCmp('showPanel').down('#profrm');
     if (frm.getForm().isValid()) {
+        //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+        var mask;
+        if (!mask) {
+            mask = new Ext.LoadMask(Ext.getBody(), { msg: '請稍等...' });
+        }
+        mask.show();
         var values = frm.getForm().getValues(true) + "&ProductId=" + PRODUCT_ID + "&function=" + functionid + "&batch=" + window.parent.GetBatchNo();
         Ext.Ajax.request({
             url: '/Product/UpdatePrice',
             method: 'POST',
             params: values,
-            async: false,
+            async: window.parent.GetProductId() == '' ? false : true,
             success: function (form, action) {
                 var result = Ext.decode(form.responseText);
+                mask.hide();
                 if (result.success) { Ext.Msg.alert(INFORMATION, SUCCESS); }
             },
             failure: function (form, action) {
+                mask.hide();
                 Ext.Msg.alert(INFORMATION, FAILURE);
             }
         });
@@ -1130,125 +1145,137 @@ function save(functionid) {
         if (confirm(AREYOUSURE)) {//此時添加消息框彈出
             return saveIds(functionid);
         }
-    }else {
+    } else {
         return saveIds(functionid);///否則直接調用之前的save方法既現在的saveIds方法
     }
 }
-//保存數據至數據庫
+
+//保存數據至數據庫  新增 站台價格
 function saveIds(functionid) {
     cellEditing.completeEdit();
     var success = false;
     var frm = Ext.getCmp('frm');
-            if (frm.getForm().isValid()) {
-                var dates = frm.query('datetimefield');
-                var event_null = true;
-                if (dates[2].getValue() && dates[3].getValue()) {
-                    event_null = false;
-                }
-                var percent = frm.down('#bonus_percent').getValue();
-                if (!event_null && percent != 0 && !percent) {
-                    window.parent.setMoveEnable(true);
-                    Ext.Msg.alert(INFORMATION, BONUS_PERCENT_EMPTY);
-                    return false;
-                }
-                var itemPrices = "[";
-                for (var i = 0; i < itemStore.getCount() ; i++) {
-                    var record = itemStore.getAt(i);
-
-                    //edit by Jiajun 2014/09/18
-                    if (!record.get('Item_Money') || record.get('Item_Money') == 0) {
-                        window.parent.setMoveEnable(true);
-                        alert(ITEM_MONEY_EMPTY);
-                    }
-                    if (!record.get('Item_Cost') || record.get('Item_Cost') == 0) {
-                        window.parent.setMoveEnable(true);
-                        alert(ITEM_COST_EMPTY);
-                    }
-
-                    if (!event_null) {
-                        if (NEW_SITE) {
-                            if (!record.get('Event_Money') || !record.get('Event_Cost')) {
-                                window.parent.setMoveEnable(true);
-                                Ext.Msg.alert(INFORMATION, EVENT_MONEY_EMPTY);
-                                return false;
-                            }
-                        }
-                        else {
-                            if (!record.get('Event_Item_Money') || !record.get('Event_Item_Cost')) {
-                                window.parent.setMoveEnable(true);
-                                Ext.Msg.alert(INFORMATION, EVENT_MONEY_EMPTY);
-                                return false;
-                            }
-                        }
-                    }
-                    itemPrices += "{Item_Id:\"" + record.get('Item_Id') + "\",Item_Code:\"" + Ext.htmlEncode(record.get('Item_Code'))
-                                + "\",Item_Money:\"" + record.get('Item_Money') + "\",Item_Cost:\"" + record.get('Item_Cost')
-                                + "\",Event_Money:\"" + record.get('Event_Money') + "\",Event_Cost:\"" + record.get('Event_Cost') + "\",Event_Item_Money:\""
-                                + record.get('Event_Item_Money') + "\",Event_Item_Cost:\"" + record.get("Event_Item_Cost") + "\"}";
-                }
-                itemPrices += "]";
-                itemPrices = itemPrices.replace(/}{/g, '},{');
-
-                if (!functionid) {
-                    functionid = '';
-                }
-
-                PRODUCT_ID = window.parent.GetProductId();
-                var product_name = frm.down('#product_name') ? Ext.htmlEncode(frm.down('#product_name').getValue()) : '';
-                var tmpName = FULL_NAME.split(SPLIT);
-                tmpName[1] = product_name;
-                tmpName[2] = frm.down('#Prod_Sz').getValue();
-                product_name = "";
-                for (var a = 0; a < tmpName.length; a++) {
-                    product_name += tmpName[a] + SPLIT;
-                }
-                product_name = product_name.substring(0, product_name.lastIndexOf(SPLIT));
-                var values = Ext.Object.fromQueryString(frm.getForm().getValues(true) + "&ProductId=" + PRODUCT_ID + "&OldProductId=" + OLD_PRODUCT_ID + "&function=" + functionid + "&batch=" + window.parent.GetBatchNo());
-                values.Items = itemPrices;
-                values.product_name = product_name;
-
-                // +"&product_name="+Ext.htmlEncode(frm.down('#product_name').getValue())
-
-                Ext.Ajax.request({
-                    url: '/Product/SaveItemPrice',
-                    method: 'POST',
-                    params: values,
-                    async: false,
-                    success: function (form, action) {
-                        var result = Ext.decode(form.responseText);
-                        if (result.success) {
-                            if (NEW_SITE) {
-                                siteProductStore.load({
-                                    params: {
-                                        ProductId: PRODUCT_ID
-                                    }
-                                });
-                                itemStore.load({ params: { ProductId: PRODUCT_ID, OldProductId: OLD_PRODUCT_ID } });
-                                Ext.getCmp('tempPanel').hide();
-                                Ext.getCmp('showPanel').show();
-                                NEW_SITE = false;
-                            }
-                            success = true;
-                            frm.getForm().reset(); //edit by wwei0216w 保存成功后,重置showPanel
-                        }
-                        else {
-                            Ext.Msg.alert(INFORMATION, result.msg ? result.msg : FAILURE);
-                            window.parent.setMoveEnable(true);
-                        }
-                    },
-                    failure: function (form, action) {
-                        Ext.Msg.alert(INFORMATION, result.msg ? result.msg : FAILURE);
-                        window.parent.setMoveEnable(true);
-                    }
-                });
-            }
-            else {
-                return false;
-            }
-            window.parent.setMoveEnable(true);
-            //frm.getForm().reset();
-            return success;
+    if (frm.getForm().isValid()) {
+        //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+        var mask;
+        if (!mask) {
+            mask = new Ext.LoadMask(Ext.getBody(), { msg: '請稍等...' });
         }
+        mask.show();
+        var dates = frm.query('datetimefield');
+        var event_null = true;
+        if (dates[2].getValue() && dates[3].getValue()) {
+            event_null = false;
+        }
+        var percent = frm.down('#bonus_percent').getValue();
+        if (!event_null && percent != 0 && !percent) {
+            mask.hide();
+            window.parent.setMoveEnable(true);
+            Ext.Msg.alert(INFORMATION, BONUS_PERCENT_EMPTY);
+            return false;
+        }
+        var itemPrices = "[";
+        for (var i = 0; i < itemStore.getCount() ; i++) {
+            var record = itemStore.getAt(i);
+
+            //edit by Jiajun 2014/09/18
+            if (!record.get('Item_Money') || record.get('Item_Money') == 0) {
+                mask.hide();
+                window.parent.setMoveEnable(true);
+                alert(ITEM_MONEY_EMPTY);
+            }
+            if (!record.get('Item_Cost') || record.get('Item_Cost') == 0) {
+                mask.hide();
+                window.parent.setMoveEnable(true);
+                alert(ITEM_COST_EMPTY);
+            }
+
+            if (!event_null) {
+                if (NEW_SITE) {
+                    if (!record.get('Event_Money') || !record.get('Event_Cost')) {
+                        mask.hide();
+                        window.parent.setMoveEnable(true);
+                        Ext.Msg.alert(INFORMATION, EVENT_MONEY_EMPTY);
+                        return false;
+                    }
+                }
+                else {
+                    if (!record.get('Event_Item_Money') || !record.get('Event_Item_Cost')) {
+                        mask.hide();
+                        window.parent.setMoveEnable(true);
+                        Ext.Msg.alert(INFORMATION, EVENT_MONEY_EMPTY);
+                        return false;
+                    }
+                }
+            }
+            itemPrices += "{Item_Id:\"" + record.get('Item_Id') + "\",Item_Code:\"" + Ext.htmlEncode(record.get('Item_Code'))
+                        + "\",Item_Money:\"" + record.get('Item_Money') + "\",Item_Cost:\"" + record.get('Item_Cost')
+                        + "\",Event_Money:\"" + record.get('Event_Money') + "\",Event_Cost:\"" + record.get('Event_Cost') + "\",Event_Item_Money:\""
+                        + record.get('Event_Item_Money') + "\",Event_Item_Cost:\"" + record.get("Event_Item_Cost") + "\"}";
+        }
+        itemPrices += "]";
+        itemPrices = itemPrices.replace(/}{/g, '},{');
+
+        if (!functionid) {
+            functionid = '';
+        }
+
+        PRODUCT_ID = window.parent.GetProductId();
+        var product_name = frm.down('#product_name') ? Ext.htmlEncode(frm.down('#product_name').getValue()) : '';
+        var tmpName = FULL_NAME.split(SPLIT);
+        tmpName[1] = product_name;
+        tmpName[2] = frm.down('#Prod_Sz').getValue();
+        product_name = "";
+        for (var a = 0; a < tmpName.length; a++) {
+            product_name += tmpName[a] + SPLIT;
+        }
+        product_name = product_name.substring(0, product_name.lastIndexOf(SPLIT));
+        var values = Ext.Object.fromQueryString(frm.getForm().getValues(true) + "&ProductId=" + PRODUCT_ID + "&OldProductId=" + OLD_PRODUCT_ID + "&function=" + functionid + "&batch=" + window.parent.GetBatchNo());
+        values.Items = itemPrices;
+        values.product_name = product_name;
+        // +"&product_name="+Ext.htmlEncode(frm.down('#product_name').getValue())
+        Ext.Ajax.request({
+            url: '/Product/SaveItemPrice',
+            method: 'POST',
+            params: values,
+            async: window.parent.GetProductId() == '' ? false : true,
+            success: function (form, action) {
+                var result = Ext.decode(form.responseText);
+                mask.hide();
+                if (result.success) {
+                    if (NEW_SITE) {
+                        siteProductStore.load({
+                            params: {
+                                ProductId: PRODUCT_ID
+                            }
+                        });
+                        itemStore.load({ params: { ProductId: PRODUCT_ID, OldProductId: OLD_PRODUCT_ID } });
+                        Ext.getCmp('tempPanel').hide();
+                        Ext.getCmp('showPanel').show();
+                        NEW_SITE = false;
+                    }
+                    success = true;
+                    frm.getForm().reset(); //edit by wwei0216w 保存成功后,重置showPanel
+                }
+                else {
+                    Ext.Msg.alert(INFORMATION, result.msg ? result.msg : FAILURE);
+                    window.parent.setMoveEnable(true);
+                }
+            },
+            failure: function (form, action) {
+                mask.hide();
+                Ext.Msg.alert(INFORMATION, result.msg ? result.msg : FAILURE);
+                window.parent.setMoveEnable(true);
+            }
+        });
+    }
+    else {
+        return false;
+    }
+    window.parent.setMoveEnable(true);
+    //frm.getForm().reset();
+    return success;
+}
 
 function SitePrice(row) {
     var wfrm = Ext.create('Ext.form.Panel', {
@@ -1405,8 +1432,7 @@ function SitePrice(row) {
                         }
                     }
                 }
-            },
-            { // add by Jiajun 2014/09/29
+            }, { // add by Jiajun 2014/09/29
                 xtype: 'button',
                 text: ELIMINATE,
                 id: 'btn_reset1',
@@ -1417,8 +1443,7 @@ function SitePrice(row) {
                         Ext.getCmp("w_bonus_end").setValue("");
                     }
                 }
-            }
-            ]
+            }]
         }, {
             xtype: 'fieldcontainer',
             colName: 'event_start',
@@ -1466,8 +1491,7 @@ function SitePrice(row) {
                         }
                     }
                 }
-            },
-            { // add by Jiajun 2014/09/29
+            }, { // add by Jiajun 2014/09/29
                 xtype: 'button',
                 text: ELIMINATE,
                 id: 'btn_reset2',
@@ -1479,8 +1503,7 @@ function SitePrice(row) {
                     }
                 }
             }]
-        },
-        {
+        }, {
             xtype: 'fieldcontainer',
             layout: 'hbox',
             //id: 'priceValidTime',
@@ -1505,19 +1528,18 @@ function SitePrice(row) {
                 format: 'Y-m-d H:i:s',
                 name: 'valid_end',
                 id: 'w_valid_end'//重新命名ID保證後面的相關控件可以使用  zhuoqin0830w 2015/01/28
-            },
-        { // add by Jiajun 2014/09/29
-            xtype: 'button',
-            text: ELIMINATE,
-            id: 'btn_reset4',
-            margin: '0 0 0 5',
-            listeners: {
-                click: function () {
-                    Ext.getCmp("w_valid_start").setValue("");
-                    Ext.getCmp("w_valid_end").setValue("");
+            }, { // add by Jiajun 2014/09/29
+                xtype: 'button',
+                text: ELIMINATE,
+                id: 'btn_reset4',
+                margin: '0 0 0 5',
+                listeners: {
+                    click: function () {
+                        Ext.getCmp("w_valid_start").setValue("");
+                        Ext.getCmp("w_valid_end").setValue("");
+                    }
                 }
-            }
-        }]
+            }]
         }, {
             xtype: 'checkbox',
             hidden: true,
@@ -1546,6 +1568,7 @@ function SitePrice(row) {
             }
         }]
     });
+
     var wgrid = Ext.create('Ext.grid.Panel', {
         id: 'wgrid',
         store: sitePriceStore,
@@ -1638,6 +1661,7 @@ function SitePrice(row) {
             }
         }
     });
+
     Ext.create('Ext.panel.Panel', {
         id: 'win',
         items: [wfrm, wgrid],
@@ -1700,16 +1724,21 @@ function SitePrice(row) {
             }
         }
     });         //.show();
-
     Ext.getCmp('user_id_modify').setValue(row.data.user_email);
 }
 
+//修改站台價格
 function update(functionid) {
-
     Ext.Msg.confirm(CONFIRM, AREYOUSURE, function (btn) {
         if (btn == 'yes') {
             var frm = Ext.getCmp('wfrm');
             if (frm.getForm().isValid()) {
+                //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+                var mask;
+                if (!mask) {
+                    mask = new Ext.LoadMask(Ext.getBody(), { msg: '請稍等...' });
+                }
+                mask.show();
                 var dates = frm.query('datetimefield');
                 var event_null = true;
                 if (dates[2].getValue() && dates[3].getValue()) {
@@ -1717,6 +1746,7 @@ function update(functionid) {
                 }
                 var percent = frm.query('*[colName=bonus_percent]')[0].getValue();
                 if (!event_null && percent != 0 && !percent) {
+                    mask.hide();
                     Ext.Msg.alert(INFORMATION, BONUS_PERCENT_EMPTY);
                     return false;
                 }
@@ -1724,10 +1754,12 @@ function update(functionid) {
                 for (var i = 0; i < sitePriceStore.getCount() ; i++) {
                     var record = sitePriceStore.getAt(i);
                     if (!record.get('item_money') || record.get('item_money') == "0") {
+                        mask.hide();
                         Ext.Msg.alert(INFORMATION, ITEM_MONEY_EMPTY);
                     }
                     if (!event_null) {
                         if (!record.get('event_money') || !record.get('event_cost') || record.get('event_cost') == "0") {
+                            mask.hide();
                             Ext.Msg.alert(INFORMATION, EVENT_MONEY_EMPTY);
                         }
                     }
@@ -1761,12 +1793,12 @@ function update(functionid) {
                     params: values,
                     success: function (form, action) {
                         var result = Ext.decode(form.responseText);
+                        mask.hide();
                         if (result.success) {
                             // edit by  zhuoqin0830w 2015/01/14  增加提示功能
-                            Ext.MessageBox.alert(ALERT_MESSAGE, FIX_COMPLETE,
-                                                    function () {
-                                                        Ext.getCmp('showPanel').show(); Ext.getCmp('win').destroy();
-                                                    });
+                            Ext.MessageBox.alert(ALERT_MESSAGE, FIX_COMPLETE, function () {
+                                Ext.getCmp('showPanel').show(); Ext.getCmp('win').destroy();
+                            });
                             siteProductStore.load({
                                 params: {
                                     ProductId: PRODUCT_ID
@@ -1783,6 +1815,7 @@ function update(functionid) {
                             itemStore.load({ params: { ProductId: PRODUCT_ID } });
                         }
                         else {
+                            mask.hide();
                             Ext.Msg.alert(INFORMATION, result.msg);
                             return false;
                         }
@@ -1799,9 +1832,7 @@ function update(functionid) {
         } else {
             return false;
         }
-    })
-
-
+    });
 }
 
 //更新價格狀態(上架或下架)
