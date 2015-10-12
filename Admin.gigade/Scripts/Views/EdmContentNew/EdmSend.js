@@ -227,7 +227,8 @@
                                           items: [
                                               {
                                                   xtype: 'displayfield',
-                                                  value:'額外發送名單（換行輸入下一筆）',
+                                                  value: '額外發送名單（換行輸入下一筆）',
+                                                  margin: '0 0 0 30',
                                               },
                                                {
                                                    xtype: 'textareafield',
@@ -244,7 +245,7 @@
                                             {
                                                 xtype: 'displayfield',
                                                 value: '額外排除名單（換行輸入下一筆）',
-                                                margin: '0 0 0 30',
+                                                margin: '0 0 0 60',
                                             },
                                              {
                                                  xtype: 'textareafield',
