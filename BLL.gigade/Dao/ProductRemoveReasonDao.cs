@@ -24,8 +24,8 @@ namespace BLL.gigade.Dao
         public DataTable GetStockLessThanZero()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(@"SELECT pi.item_id,pt.product_name,pt.shortage,pt.product_status,pt.ignore_stock,pi.item_stock FROM product pt 
-INNER JOIN product_item pi on pi.product_id=pt.product_id 
+            sb.AppendFormat(@"SELECT pt.product_id,pt.product_name,pt.shortage,pt.product_status,pt.ignore_stock,pi.item_stock FROM product pt 
+INNER JOIN (SELECT product_id,sum(item_stock) as item_stock from product_item GROUP BY product_id) as pi on pi.product_id=pt.product_id 
 WHERE pt.product_status=5 and pt.shortage = 0 and pt.ignore_stock =0 and pi.item_stock<=0; "); //獲取到上架商品庫存<=0,並且排除掉庫存為0可販賣機暫停售賣的商品sale_status = 0表示正常贩卖ignore_stock =0库存为0不可贩卖
             try
             {
@@ -42,7 +42,7 @@ WHERE pt.product_status=5 and pt.shortage = 0 and pt.ignore_stock =0 and pi.item
         public string InsertProductRemoveReason(ProductRemoveReason prr)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(@"insert into product_remove_reason(item_id,product_num,create_name,create_time)values('{0}','{1}','{2}','{3}');",prr.item_id,prr.product_num,prr.create_name,prr.create_time); //獲取到上架商品庫存<=0,並且排除掉庫存為0可販賣機暫停售賣的商品
+            sb.AppendFormat(@"insert into product_remove_reason(product_id,product_num,create_name,create_time)values('{0}','{1}','{2}','{3}');",prr.product_id,prr.product_num,prr.create_name,prr.create_time); //獲取到上架商品庫存<=0,並且排除掉庫存為0可販賣機暫停售賣的商品
             try
             {
                 return sb.ToString();
@@ -58,9 +58,8 @@ WHERE pt.product_status=5 and pt.shortage = 0 and pt.ignore_stock =0 and pi.item
         public DataTable GetStockMsg()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(@"SELECT prr.item_id,pt.outofstock_days_stopselling,pt.product_id,prr.create_time,FROM_UNIXTIME(prr.create_time) as new_time,pt.product_status,pt.shortage,pt.ignore_stock FROM product_remove_reason prr INNER JOIN product_item pi 
-on prr.item_id =pi.item_id 
-INNER JOIN product pt on pt.product_id =pi.product_id;"); //获取到信息,判断缺货天数
+            sb.AppendFormat(@"SELECT pt.product_id,pt.outofstock_days_stopselling,prr.create_time,FROM_UNIXTIME(prr.create_time) as new_time,pt.product_status,pt.shortage,pt.ignore_stock FROM product_remove_reason prr 
+INNER JOIN product pt on pt.product_id =prr.product_id;"); //获取到信息,判断缺货天数
             try
             {
                 return _access.getDataTable(sb.ToString());
@@ -76,7 +75,7 @@ INNER JOIN product pt on pt.product_id =pi.product_id;"); //获取到信息,判�
         public string DeleteProductRemoveReason(ProductRemoveReason prr)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(@"set sql_safe_updates = 0;delete from  product_remove_reason where item_id='{0}';set sql_safe_updates = 1;", prr.item_id); //獲取到上架商品庫存<=0,並且排除掉庫存為0可販賣機暫停售賣的商品
+            sb.AppendFormat(@"set sql_safe_updates = 0;delete from  product_remove_reason where product_id='{0}';set sql_safe_updates = 1;", prr.product_id); //獲取到上架商品庫存<=0,並且排除掉庫存為0可販賣機暫停售賣的商品
             try
             {
                 return sb.ToString();
@@ -130,8 +129,8 @@ INNER JOIN product pt on pt.product_id =pi.product_id;"); //获取到信息,判�
         public DataTable GetOutofStockMsg()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(@"SELECT pi.item_id,pt.product_id,pt.product_name,pt.sale_status,pt.product_status,pt.ignore_stock,pi.item_stock FROM product pt 
-INNER JOIN product_item pi on pi.product_id=pt.product_id 
+            sb.AppendFormat(@"SELECT pt.product_id,pt.product_name,pt.sale_status,pt.product_status,pt.ignore_stock,pi.item_stock FROM product pt 
+INNER JOIN (SELECT product_id,sum(item_stock) as item_stock from product_item GROUP BY product_id) as pi on pi.product_id=pt.product_id 
 WHERE pt.product_status=7;");//7表示缺货系统下架
             try
             {
@@ -148,7 +147,7 @@ WHERE pt.product_status=7;");//7表示缺货系统下架
         public DataTable GetProductRemoveReasonList()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(@"SELECT item_id,product_num,create_name FROM product_remove_reason ;");
+            sb.AppendFormat(@"SELECT product_id,product_num,create_name FROM product_remove_reason ;");
             try
             {
                 return _access.getDataTable(sb.ToString());
@@ -206,10 +205,11 @@ WHERE pt.product_status=7;");//7表示缺货系统下架
         public DataTable GetDeleteProductRemoveReasonList()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(@"SELECT prr.item_id,prr.product_num,prr.create_name,pii.item_stock,pt.shortage,pt.product_status,pt.ignore_stock FROM product_remove_reason prr
- INNER JOIN product_item pii on prr.item_id=pii.item_id 
- INNER JOIN product pt on pii.product_id =pt.product_id 
- WHERE pt.ignore_stock=1 or pt.shortage = 1 or pii.item_stock>0;");//item_stock>0表示库存大于0 sale_status=0表示正常销售 ignore_stock=1表示贩停继续销售
+            sb.AppendFormat(@"SELECT prr.product_id,prr.product_num,prr.create_name,pi.item_stock,pt.shortage,pt.product_status,pt.ignore_stock FROM product_remove_reason prr
+ INNER JOIN product pt on prr.product_id =pt.product_id 
+ INNER JOIN 
+(SELECT product_id,sum(item_stock) as item_stock from product_item GROUP BY product_id) as pi on pi.product_id=pt.product_id 
+ WHERE pt.ignore_stock=1 or pt.shortage = 1 or pi.item_stock>0;");//item_stock>0表示库存大于0 sale_status=0表示正常销售 ignore_stock=1表示贩停继续销售
             try
             {
                 return _access.getDataTable(sb.ToString());

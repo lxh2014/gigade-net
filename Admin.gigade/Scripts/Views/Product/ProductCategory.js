@@ -1,46 +1,51 @@
-﻿
+﻿/*  
+ * 
+ * 文件名称：ProductCategory.js 
+ * 摘    要：單一商品修改和新增 類別頁面
+ * 
+ */
 var stageCategoryPanel;
 var PRODUCT_ID = '', OLD_PRODUCT_ID = '';
 var cateId = '';
 var topValue = '';
 var myMask = null;
-
 var oldresultStr = '';
 var re = /}{/g;
+
 Ext.onReady(function () {
-
     createPanel();
-
-})
-
-
-
+});
 
 function save(functionid) {
-    var obj = Ext.getCmp('combCate2');
+    //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    var mask;
+    if (!mask) {
+        mask = new Ext.LoadMask(Ext.getBody(), { msg: '請稍等...' });
+    }
+    mask.show();
+    //添加disabled屬性  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    window.parent.setMoveEnable(false);
 
+    var obj = Ext.getCmp('combCate2');
     if (obj != null && obj.isHidden()) {
+        mask.hide();
         return true;
     }
-
     if (obj.getValue() == null || obj.getValue() == '') {
         obj.markInvalid(INPUT_PLEASE);
         window.parent.setMoveEnable(true);
+        mask.hide();
         return false;
     }
-
     var asyncResult = true;
-
     if (!functionid) {
         functionid = '';
     }
-
     var resultStr = getdata();
-
     Ext.Ajax.request({
         url: '/Product/tempCategoryAdd?categoryType=1',
         method: 'POST',
-        async: false,
+        async: window.parent.GetProductId() == '' ? false : true,
         params: {
             coboType: 1,
             'ProductId': PRODUCT_ID,
@@ -53,6 +58,7 @@ function save(functionid) {
         },
         success: function (response, opts) {
             var resText = eval("(" + response.responseText + ")");
+            mask.hide();
             if (PRODUCT_ID != '') {
                 if (resText.success) {
                     Ext.Msg.alert(NOTICE, SAVE_SUCCESS);
@@ -63,14 +69,15 @@ function save(functionid) {
             } else {
                 if (!resText.success) {
                     Ext.Msg.alert(NOTICE, SAVE_FAIL);
-                    window.parent.setMoveEnable(true);
                     asyncResult = false;
                 }
             }
-            if(resText.success)
+            window.parent.setMoveEnable(true);
+            if (resText.success)
                 stageCategoryPanel.doLayout();
         },
         failure: function (response, opts) {
+            mask.hide();
             Ext.Msg.alert(NOTICE, SAVE_FAIL);
             window.parent.setMoveEnable(true);
             asyncResult = false;
@@ -78,12 +85,9 @@ function save(functionid) {
 
     });
     return asyncResult;
-
 }
 
-
 function createPanel() {
-
     PRODUCT_ID = window.parent.GetProductId();
     OLD_PRODUCT_ID = window.parent.GetCopyProductId();
     /**************** 品類管理 Store *****************/
@@ -125,7 +129,6 @@ function createPanel() {
     });
 
     /**************** 前台分類 Store *****************/
-
     var treeStore = Ext.create('Ext.data.TreeStore', {
         proxy: {
             type: 'ajax',
@@ -214,7 +217,6 @@ function createPanel() {
                         }
                     }
                 }
-
             }, {
                 xtype: 'combobox',
                 id: 'combCate2',
@@ -237,14 +239,10 @@ function createPanel() {
                                 topValue: categoryStore1.findRecord('ParameterCode', Ext.getCmp("combCate1").getValue()).data.ParameterCode
                             }
                         });
-
                     }
                 }
             }]
-        }
-
-        ]
-
+        }]
     });
 
     stageCategoryPanel = Ext.create('Ext.tree.Panel', {
@@ -278,11 +276,9 @@ function createPanel() {
         });
     }
 
-
     stageCategoryPanel.on('checkchange', function (node, checked) {
         setChecked(node, checked);
     });
-
 
     cateViewport = Ext.create('Ext.container.Viewport', {
         id: 'cateViewport',
@@ -302,17 +298,14 @@ function createPanel() {
     });
 
     treeStore.load({ params: { ProductId: PRODUCT_ID, OldProductId: OLD_PRODUCT_ID } });
-
 }
 
 function getdata() {
     var resultStr = "";
     var data = stageCategoryPanel.getChecked();
-
     if (data.length == 0) {
         return "[]";
     }
-
     if (data.length > 0) {
         resultStr += "[";
         for (var i = 0, j = data.length; i < j; i++) {
@@ -321,7 +314,5 @@ function getdata() {
         resultStr = resultStr.replace(re, "},{");
         resultStr += "]";
     }
-
     return resultStr;
-
 }

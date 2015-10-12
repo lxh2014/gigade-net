@@ -1,5 +1,6 @@
 ﻿var pageSize = 30;
 var schedule_id = 0;//排程id
+var itemId = 0;
 Ext.define('GIGADE.Tier', {
     extend: 'Ext.data.Model',
     fields: [{ name: 'schedule_id', type: 'int' },
@@ -497,7 +498,8 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
         }],
     tbar: [{
         text: INSERT, handler: function () {//新增
-            relevantGrid.getStore().add({ id: '0' });
+            itemId--;///edit by ww2015/10/09
+            relevantGrid.getStore().add({ id: itemId });
             //relevantStore.insert(0, { id: '0'});
         }
     }, {
@@ -505,10 +507,18 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
             var rowRe = Ext.getCmp("relevantGrid").getSelectionModel().getSelection();
             Ext.Msg.confirm(CONFIRM, Ext.String.format(DELETE_VENDOR_SYSTEM_MESSAGE, rowRe.length), function (btn) {//刪除供應商系統將一同取消供應商旗下商品的排程，確定刪除選中的 {0} 條數據？
                 if (btn == 'yes') {
-                    var rowIDs = ''; var schedule_ids = '';
-                    var item_type, item_value;
+                    var rowTmepId = '', rowIDs = '', schedule_ids = '', item_type, item_value;
                     for (var i = 0; i < rowRe.length; i++) {
-                        rowIDs += rowRe[i].data.id + ',';
+                        var temp = rowRe[i].data.id;
+                        if (temp < 0) {
+                            relevantGrid.getStore().remove(rowRe[i]);
+                        } else {
+                            rowIDs += temp + ',';
+                        }
+                    }
+
+                    if (rowIDs == '') {
+                        return;
                     }
                     schedule_id = rowRe[0].data.schedule_Id;
                     item_type = rowRe[0].data.tabType;
@@ -617,6 +627,9 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
 
                 for (var i = 0; i < upDataStore.length ; i++) {
                     var record = upDataStore[i].data
+                    if (record.id < 0) {
+                        record.id = 0;
+                    }
                     relevants.push({
                         'id': record.id,
                         'schedule_Id': schedule_id,
