@@ -974,12 +974,12 @@ namespace Admin.gigade.Controllers
                     {
                         for (int i = 0; i < _dt.Rows.Count; i++)
                         {
-                            DataRow[] dr = _dttwo.Select("item_id=" + _dt.Rows[i]["item_id"]);
+                            DataRow[] dr = _dttwo.Select("product_id=" + _dt.Rows[i]["product_id"]);
                             if (dr.Length <= 0)//小于等于0  无需处理编辑数据,因为获取的库存都是等于或者小于0的
                             {
                                 prr.create_name = "system";
                                 prr.create_time = Convert.ToInt32(CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(DateTime.Now)));
-                                prr.item_id = Convert.ToUInt32(_dt.Rows[i]["item_id"]);
+                                prr.product_id = Convert.ToUInt32(_dt.Rows[i]["product_id"]);
                                 prr.product_num = Convert.ToInt32(_dt.Rows[i]["item_stock"]);
                                 str.AppendFormat(_proRemoveMgr.InsertProductRemoveReason(prr));
                             }
@@ -989,7 +989,7 @@ namespace Admin.gigade.Controllers
                     DataTable _dtthree = _proRemoveMgr.GetDeleteProductRemoveReasonList();
                     for (int b = 0; b < _dtthree.Rows.Count; b++)
                     {
-                        prr.item_id = Convert.ToUInt32(_dtthree.Rows[b]["item_id"]);
+                        prr.product_id = Convert.ToUInt32(_dtthree.Rows[b]["product_id"]);
                         str.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prr));
                     }
                     if (str.ToString().Length > 0)
@@ -1012,7 +1012,7 @@ namespace Admin.gigade.Controllers
                             int time = Convert.ToInt32(_dtNew.Rows[j]["create_time"]);
                             DateTime dttime = CommonFunction.GetNetTime(time);
                             TimeSpan ts = DateTime.Now - dttime;
-                            prrtwo.item_id = Convert.ToUInt32(_dtNew.Rows[j]["item_id"]);
+                            prrtwo.product_id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
                             pt.Product_Id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
                             pt.Product_Status = 7;//7为缺货系统下架
                             psh.product_id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
@@ -1064,7 +1064,7 @@ namespace Admin.gigade.Controllers
                                 strslqmsg.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
                                 strslqmsg.AppendFormat(_proRemoveMgr.InsertIntoProductStatusHistory(psh));
                             }
-                            prr.item_id = Convert.ToUInt32(_dtOutofStock.Rows[z]["item_id"]);//根据item_id删除数据
+                            prr.product_id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);//根据product_id删除数据
                             strslqmsgtwo.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prr));
                         }
                     }
@@ -1116,7 +1116,7 @@ namespace Admin.gigade.Controllers
                 List<DataTable> Elist = new List<DataTable>();
                 List<bool> comName = new List<bool>();
                 DataTable _dtExeclone = new DataTable();
-                _dtExeclone.Columns.Add("细项编号");
+                _dtExeclone.Columns.Add("商品编号");
                 _dtExeclone.Columns.Add("商品状态");
                 _dtExeclone.Columns.Add("库存为0是否贩售");
                 _dtExeclone.Columns.Add("暂停贩卖商品");
@@ -1125,7 +1125,7 @@ namespace Admin.gigade.Controllers
                 for (int w = 0; w < _dtMsg.Rows.Count; w++)
                 {
                     DataRow drMsg = _dtExeclone.NewRow();
-                    drMsg["细项编号"] = _dtMsg.Rows[w]["item_id"];
+                    drMsg["商品编号"] = _dtMsg.Rows[w]["product_id"];
                     drMsg["商品状态"] = _dtMsg.Rows[w]["product_status"];
                     drMsg["库存为0是否贩售"] = _dtMsg.Rows[w]["shortage"] == "0" ? "是" : "否";
                     drMsg["暂停贩卖商品"] = _dtMsg.Rows[w]["ignore_stock"] == "0" ? "是" : "否";
