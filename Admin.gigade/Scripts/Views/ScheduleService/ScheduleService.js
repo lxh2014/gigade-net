@@ -65,7 +65,7 @@ Ext.define('GIGADE.Config', {
         { name: 'schedule_code', type: 'string' },
         { name: 'parameterCode', type: 'string' },
         { name: 'value', type: 'string' },
-        { name: 'description', type: 'string' },
+        { name: 'parameterName', type: 'string' },
         { name: "create_username", type: "string" },
         { name: "create_time", type: "int" },
         { name: "show_create_time", type: "string" },
@@ -86,7 +86,6 @@ var Schedule_Config_Store = Ext.create('Ext.data.Store', {
         }
     }
 });
-
 //
 Ext.define('GIGADE.ScheduleCode', {
     extend: 'Ext.data.Model',
@@ -127,11 +126,11 @@ Ext.define('GIGADE.Period', {
         { name: "change_time", type: "int" },
          { name: 'period_type', type: 'int' },
         { name: 'period_nums', type: 'int' },
-         { name: 'show_begin_datetime', type: 'string' },
-          { name: 'current_nums', type: 'int' },
+        { name: 'show_begin_datetime', type: 'date', dateFormat: "Y-m-d H:i:s" },
+        { name: 'current_nums', type: 'int' },
         { name: 'limit_nums', type: 'int' },
-         { name: "show_create_time", type: "string" },
-         { name: "show_change_time", type: "string" }
+        { name: "show_create_time", type: "string" },
+        { name: "show_change_time", type: "string" }
     ]
 });
 
@@ -149,8 +148,13 @@ var Schedule_Period_Store = Ext.create('Ext.data.Store', {
     }
 });
 
+Schedule_Period_Store.on("beforeload", function () {
+    Ext.apply(Schedule_Period_Store.proxy.extraParams, {
+        schedule_code: Ext.getCmp("schedule_code").getValue(),
+    })
+})
 //每行數據前段的矩形選擇框
-var sm_master = Ext.create('Ext.selection.CheckboxModel', {
+var sm_master = Ext.create('Ext.selection.CheckboxModel', {// master 矩形選擇框
     listeners: {
         selectionchange: function (sm_master, selections) {
             Ext.getCmp("masterGiftList").down('#edit_master').setDisabled(selections.length == 0);
@@ -158,7 +162,7 @@ var sm_master = Ext.create('Ext.selection.CheckboxModel', {
         }
     }
 });
-var sm_config = Ext.create('Ext.selection.CheckboxModel', {
+var sm_config = Ext.create('Ext.selection.CheckboxModel', {// config 矩形選擇框
     listeners: {
         selectionchange: function (sm_config, selections) {
             Ext.getCmp("detailist1").down('#edit_config').setDisabled(selections.length == 0);
@@ -166,7 +170,7 @@ var sm_config = Ext.create('Ext.selection.CheckboxModel', {
         }
     }
 });
-var sm_period = Ext.create('Ext.selection.CheckboxModel', {
+var sm_period = Ext.create('Ext.selection.CheckboxModel', {// period 矩形選擇框
     listeners: {
         selectionchange: function (sm_period, selections) {
             Ext.getCmp("detailist2").down('#edit_period').setDisabled(selections.length == 0);
@@ -175,11 +179,7 @@ var sm_period = Ext.create('Ext.selection.CheckboxModel', {
     }
 });
 
-Schedule_Period_Store.on("beforeload", function () {
-    Ext.apply(Schedule_Period_Store.proxy.extraParams, {
-        schedule_code: Ext.getCmp("schedule_code").getValue(),
-    })
-})
+
 
 // 中間的panel
 var center = Ext.create('Ext.form.Panel', {
@@ -226,19 +226,19 @@ var center = Ext.create('Ext.form.Panel', {
                               store: Schedule_Config_Store,
                               columns: [
                                  // { header: '序號', xtype: 'rownumberer', width: 46, align: 'center' },
-                                  { header: '編號', dataIndex: 'rowid', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-                                  { header: '排程Code', dataIndex: 'schedule_code', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                   { header: '參數碼', dataIndex: 'parameterCode', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                  { header: '參數值', dataIndex: 'value', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                  { header: '參數作用', dataIndex: 'description', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                  { header: '創建人', dataIndex: 'create_username', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                 { header: '創建時間', dataIndex: 'show_create_time', width:150, align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                  { header: '修改人', dataIndex: 'change_username', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                  { header: '修改時間', dataIndex: 'show_change_time', width:150, align: 'center', flex: 1, menuDisabled: true, sortable: false },
+                                  { header: '編號', dataIndex: 'rowid', align: 'left', width: 40, menuDisabled: true, sortable: false, align: 'center' },
+                                  { header: '排程Code', dataIndex: 'schedule_code',width:100, align: 'center',  menuDisabled: true, sortable: false },
+                                   { header: '參數碼', dataIndex: 'parameterCode', width: 100, align: 'center',  menuDisabled: true, sortable: false },
+                                   { header: '參數名稱', dataIndex: 'parameterName',width:100, align: 'center',  menuDisabled: true, sortable: false },
+                                  { header: '參數值', dataIndex: 'value', align: 'center', width: 100,  menuDisabled: true, sortable: false },
+                                  { header: '創建人', dataIndex: 'create_username', width: 100, align: 'center',menuDisabled: true, sortable: false },
+                                  { header: '修改人', dataIndex: 'change_username', width: 100, align: 'center', menuDisabled: true, sortable: false },
+                                   { header: '創建時間', dataIndex: 'show_create_time', width: 150, align: 'center', menuDisabled: true, sortable: false },
+                                  { header: '修改時間', dataIndex: 'show_change_time', width:150, align: 'center',  menuDisabled: true, sortable: false },
                               ],
                               tbar: [
             { xtype: 'button', text: "添加", id: 'add_config', iconCls: 'icon-user-add', handler: add_config },//添加按鈕
-            { xtype: 'button', text: "編輯", id: 'edit_config', disabled: true, iconCls: 'icon-user-edit', handler: onedit_config},//編輯按鈕  包括 添加 刪除 修改 功能
+            { xtype: 'button', text: "編輯", id: 'edit_config', disabled: true, iconCls: 'icon-user-edit', handler: onedit_config},//編輯按鈕  
             { xtype: 'button', text: "刪除", id: 'delete_config', disabled: true, iconCls: 'icon-user-remove', handler: ondelete_config },
 
                               ],
@@ -257,21 +257,21 @@ var center = Ext.create('Ext.form.Panel', {
                             store: Schedule_Period_Store,
                             columns: [
                                 //{ header: '序號', xtype: 'rownumberer', width: 46, align: 'center' },
-                                 { header: '編號', dataIndex: 'rowid', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-                                { header: '排程Code', dataIndex: 'schedule_code', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                                 { header: '執行頻率方式', dataIndex: 'period_type', align: 'center', width: 80,  menuDisabled: true, sortable: false },
-                                { header: '執行頻率倍數', dataIndex: 'period_nums', align: 'center', width: 80, menuDisabled: true, sortable: false },
-                                { header: '啟用時間', dataIndex: 'show_begin_datetime', align: 'center', width: 150, flex: 1, menuDisabled: true, sortable: false },
-                                { header: '當前已執行次數', dataIndex: 'current_nums', align: 'center', width: 50, flex: 1, menuDisabled: true, sortable: false },
-                               { header: '次數限制', dataIndex: 'limit_nums', align: 'center', width: 50, flex: 1, menuDisabled: true, sortable: false },
-                               { header: '創建人', dataIndex: 'create_username', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                              { header: '創建時間', dataIndex: 'show_create_time', align: 'center',width:150, flex: 1, menuDisabled: true, sortable: false },
-                               { header: '修改人', dataIndex: 'change_username', align: 'center', flex: 1, menuDisabled: true, sortable: false },
-                               { header: '修改時間', dataIndex: 'show_change_time', align: 'center', width: 150, flex: 1, menuDisabled: true, sortable: false },
+                                 { header: '編號', dataIndex: 'rowid', align: 'left', width: 40, menuDisabled: true, sortable: false, align: 'center' },
+                                { header: '排程Code', dataIndex: 'schedule_code', width: 100, align: 'center',  menuDisabled: true, sortable: false },
+                                 { header: '執行頻率方式', dataIndex: 'period_type', align: 'center', width: 100,  menuDisabled: true, sortable: false },
+                                { header: '執行頻率倍數', dataIndex: 'period_nums', align: 'center', width: 100, menuDisabled: true, sortable: false },
+                                { header: '當前已執行次數', dataIndex: 'current_nums', align: 'center', width: 80,  menuDisabled: true, sortable: false },
+                               { header: '次數限制', dataIndex: 'limit_nums', align: 'center', width: 80, menuDisabled: true, sortable: false },
+                               { header: '創建人', dataIndex: 'create_username', align: 'center', width: 80,  menuDisabled: true, sortable: false },
+                               { header: '修改人', dataIndex: 'change_username', align: 'center', width: 80, menuDisabled: true, sortable: false },
+                                { header: '啟用時間', dataIndex: 'show_begin_datetime', align: 'center', width: 150, menuDisabled: true, sortable: false },
+                               { header: '創建時間', dataIndex: 'show_create_time', align: 'center', width: 150, menuDisabled: true, sortable: false },
+                               { header: '修改時間', dataIndex: 'show_change_time', align: 'center', width: 150,  menuDisabled: true, sortable: false },
                             ],
                             tbar: [
           { xtype: 'button', text: "添加", id: 'add_period', iconCls: 'icon-user-add', handler: add_period },//添加按鈕
-          { xtype: 'button', text: "編輯", id: 'edit_period', disabled: true, iconCls: 'icon-user-edit', handler: onedit_period },//編輯按鈕  包括 添加 刪除 修改 功能
+          { xtype: 'button', text: "編輯", id: 'edit_period', disabled: true, iconCls: 'icon-user-edit', handler: onedit_period },//編輯按鈕  
           { xtype: 'button', text: "刪除", id: 'delete_period', disabled: true, iconCls: 'icon-user-remove', handler: ondelete_period },
      
                             ],
@@ -353,16 +353,16 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
                  }
              }
          },
-        { header: '排程Code', dataIndex: 'schedule_code', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+        { header: '排程Code', dataIndex: 'schedule_code', align: 'left', width: 80, menuDisabled: true, sortable: false, align: 'center' },
         { header: '排程名稱', dataIndex: 'schedule_name', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
        { header: 'contriller/action', dataIndex: 'schedule_api', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
        { header: '排程描述', dataIndex: 'schedule_description', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '上次執行時間', dataIndex: 'show_previous_execute_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '下次執行時間', dataIndex: 'show_next_execute_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
        { header: 'schedule_period表主鍵', dataIndex: 'schedule_period_id', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
        { header: '創建人', dataIndex: 'create_username', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '創建時間', dataIndex: 'show_create_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
        { header: '修改人', dataIndex: 'change_username', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+        { header: '上次執行時間', dataIndex: 'show_previous_execute_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+       { header: '下次執行時間', dataIndex: 'show_next_execute_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+       { header: '創建時間', dataIndex: 'show_create_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
        { header: '修改時間', dataIndex: 'show_change_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
     ],
     tbar: [
@@ -424,8 +424,6 @@ function Search() {
 function Save() {
 
 }
-
-
 /*********************啟用/禁用**********************/
 function UpdateActive(id) {
     var activeValue = $("#img" + id).attr("hidValue");

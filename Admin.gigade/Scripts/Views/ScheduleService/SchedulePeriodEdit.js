@@ -1,4 +1,22 @@
-﻿/*************************************************************************************添加 編輯 框*************************************************************************************************/
+﻿//參數碼列表
+var SchedulePeriodStore = Ext.create('Ext.data.Store', {
+    fields: [
+        { name: 'parameterCode', type: 'string' },
+        { name: 'parameterName', type: 'string' },
+    ],
+    autoLoad: true,
+    proxy: {
+        type: 'ajax',//GetParameterCodeList
+        url: "/Parameter/QueryPara?paraType=schedule_period",
+        noCache: false,
+        actionMethods: 'post',
+        reader: {
+            type: 'json',
+            root: 'items'
+        }
+    }
+});
+/*************************************************************************************添加 編輯 框*************************************************************************************************/
 editFunction_period= function (row, store) {
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
@@ -31,33 +49,56 @@ editFunction_period= function (row, store) {
                value: Ext.getCmp("schedule_code").getValue(),
 
            },
+           {
+               xtype: "datetimefield",
+               fieldLabel: '啟用時間',
+               id: 'begin_datetime',
+               name: 'begin_datetime',
+               editable: false,
+               format: 'Y-m-d H:i:s',
+               //time: { hour: 00, min: 00, sec: 00 },//開始時間00：00：00
+               submitValue: true,
+               
+           },
+           {
+               xtype: 'combobox',
+               editable: false,
+               fieldLabel: '執行頻率方式',
+               id: 'period_type',
+               name: 'period_type',
+               allowBlank: false,
+               displayField: 'parameterName',
+               valueField: 'parameterCode',
+               store: SchedulePeriodStore,
+           },
             {
-                xtype: 'textfield',
-                fieldLabel: '執行頻率方式',
-                id: 'period_type',
-                name: 'period_type',
-                allowBlank: false,
-            },
-            {
-                xtype: 'textfield',
-                fieldLabel: '執行頻率的倍數',
+                xtype: 'numberfield',
+                fieldLabel: '執行頻率倍數',
                 id: 'period_nums',
                 name: 'period_nums',
                 allowBlank: false,
+                value: 1,
+                minValue: 1
             },
-             {
-                 xtype: 'textfield',
-                 fieldLabel: '當前已執行次數',
-                 id: 'current_nums',
-                 name: 'current_nums',
-                 allowBlank: false,
-             },
+             
               {
-                  xtype: 'textfield',
-                  fieldLabel: '次數限制',
+                  xtype: 'numberfield',
+                  fieldLabel: '次數限制 (0表示無限制)',
                   id: 'limit_nums',
                   name: 'limit_nums',
                   allowBlank: false,
+                  value: 0,
+                  minValue: 0
+              },
+              {
+                  xtype: 'numberfield',
+                  fieldLabel: '當前已執行次數',
+                  id: 'current_nums',
+                  name: 'current_nums',
+                  allowBlank: false,
+                  value: 0,
+                  disabled: true,
+                  minValue: 0
               },
                //{
                //    xtype: 'fieldcontainer',
@@ -161,6 +202,8 @@ editFunction_period= function (row, store) {
             'show': function () {
                 if (row) {
                     editFrm.getForm().loadRecord(row);
+                    Ext.getCmp('schedule_code_period').setValue(row.data.schedule_code);
+                    Ext.getCmp('begin_datetime').setValue(row.data.show_begin_datetime);
                     //initRow(row);
                 }
                 else {

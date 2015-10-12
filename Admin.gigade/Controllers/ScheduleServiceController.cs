@@ -549,9 +549,9 @@ namespace Admin.gigade.Controllers
                 {
                     query.value = Request.Params["value"];
                 }
-                if (!string.IsNullOrEmpty(Request.Params["description"]))
+                if (!string.IsNullOrEmpty(Request.Params["parameterName"]))
                 {
-                    query.description = Request.Params["description"];
+                    query.parameterName = Request.Params["parameterName"];
                 }  
                 query.create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 query.change_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
@@ -626,11 +626,29 @@ namespace Admin.gigade.Controllers
                 if (_dt > 0)
                 {
                     json = "{success:true}";
+                    //根據schedule_code獲取相應的ScheduleMaster信息
+                    ScheduleMasterQuery query_master = new ScheduleMasterQuery();
+                    query_master.schedule_code = query.schedule_code;
+                    ScheduleMasterQuery item = _secheduleServiceMgr.GetScheduleMaster(query_master);
+                    //更新ScheduleMaster表的previous_execute_time、next_execute_time、state；
+                    
+                    //獲取next_execute_time和schedule_period_id
+                    int schedule_period_id = 0;
+                    int next_execute_time = _secheduleServiceMgr.GetNext_Execute_Time(item.schedule_code, out schedule_period_id);
+                    if (item.next_execute_time > next_execute_time || (item.next_execute_time == 0 && item.next_execute_time < next_execute_time))
+                    {
+                        item.next_execute_time = next_execute_time; ;
+                        item.schedule_period_id = schedule_period_id;
+                        _secheduleServiceMgr.UpdateScheduleMaster(item);
+                    }
+                    
                 }
                 else
                 {
                     json = "{success:false}";
                 }
+
+                
             }
             catch (Exception ex)
             {

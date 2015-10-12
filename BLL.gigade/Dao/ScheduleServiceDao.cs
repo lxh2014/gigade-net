@@ -91,20 +91,7 @@ namespace BLL.gigade.Dao
                   throw new Exception("ScheduleServiceDao-->GetSchedulePeriodBySchedule-->" + ex.Message, ex);
               }
           }
-          public int UpdateScheduleServicePeriod(SchedulePeriodQuery query)
-          {
-              StringBuilder sql = new StringBuilder();
-              try
-              {
-                  sql.AppendFormat("SELECT * FROM `schedule_config` WHERE schedule_code = '{0}';", query.schedule_code);
-                  return _access.execCommand(sql.ToString());
-              }
-              catch (Exception ex)
-              {
-
-                  throw new Exception("ScheduleServiceDao-->UpdateScheduleServicePeriod-->" + ex.Message, ex);
-              }
-          }
+          
           public int UpdateScheduleMaster(ScheduleMasterQuery query)
           {
               StringBuilder sql = new StringBuilder();
@@ -175,7 +162,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                StringBuilder sqlCondi = new StringBuilder();
               try
               {
-                  sql.AppendFormat("SELECT  sc.rowid,sc.schedule_code,sc.parameterCode,sc.value,sc.description, mu1.user_username as create_username,sc.create_time, mu2.user_username as change_username,sc.change_time  FROM schedule_config sc ");
+                  sql.AppendFormat("SELECT  sc.rowid,sc.schedule_code,sc.parameterCode,sc.value,sc.parameterName, mu1.user_username as create_username,sc.create_time, mu2.user_username as change_username,sc.change_time  FROM schedule_config sc ");
                   sqlCondi.Append(" LEFT JOIN schedule_master sm on sm.schedule_code=sc.schedule_code ");
                   sqlCondi.Append(" LEFT JOIN manage_user mu1 on mu1.user_id=sc.create_user ");
                   sqlCondi.Append(" LEFT JOIN manage_user mu2 on mu2.user_id=sc.change_user ");
@@ -270,8 +257,8 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               query.Replace4MySQL();
               try
               {
-                  sql.Append("insert into schedule_config ( schedule_code, parameterCode, value,description,create_user,change_user, create_time, change_time) values ");
-                  sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}')", query.schedule_code, query.parameterCode, query.value, query.description, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), CommonFunction.GetPHPTime(DateTime.Now.ToString()));
+                  sql.Append("insert into schedule_config ( schedule_code, parameterCode, value,parameterName,create_user,change_user, create_time, change_time) values ");
+                  sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}')", query.schedule_code, query.parameterCode, query.value, query.parameterName, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), CommonFunction.GetPHPTime(DateTime.Now.ToString()));
                   return _access.execCommand(sql.ToString());
               }
               catch (Exception ex)
@@ -286,7 +273,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               query.Replace4MySQL();
               try
               {
-                  sql.AppendFormat("update schedule_config set schedule_code = '{0}', parameterCode = '{1}', value = '{2}',description='{3}',create_user='{4}',change_user='{5}',change_time='{6}' where rowid='{7}' ", query.schedule_code, query.parameterCode, query.value, query.description, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), query.rowid);
+                  sql.AppendFormat("update schedule_config set schedule_code = '{0}', parameterCode = '{1}', value = '{2}',parameterName='{3}',create_user='{4}',change_user='{5}',change_time='{6}' where rowid='{7}' ", query.schedule_code, query.parameterCode, query.value, query.parameterName, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), query.rowid);
                   return _access.execCommand(sql.ToString());
               }
               catch (Exception ex)

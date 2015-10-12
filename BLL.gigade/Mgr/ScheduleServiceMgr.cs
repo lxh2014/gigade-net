@@ -338,7 +338,7 @@ namespace BLL.gigade.Mgr
                 {
                     item.show_create_time = CommonFunction.GetNetTime(item.create_time).ToString("yyyy-MM-dd HH:mm:ss ");
                     item.show_change_time = CommonFunction.GetNetTime(item.change_time).ToString("yyyy-MM-dd HH:mm:ss ");
-                    item.show_begin_datetime = CommonFunction.GetNetTime(item.begin_datetime).ToString("yyyy-MM-dd HH:mm:ss ");
+                    item.show_begin_datetime = CommonFunction.GetNetTime(item.begin_datetime);
                 }
                 return store;
 
