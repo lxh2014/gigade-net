@@ -1,10 +1,20 @@
 ﻿
 var pageSize = 25;
+
 ////表名數據
+//var tableNameStore = Ext.create('Ext.data.Store', {
+//    fields: ['table_name'],
+//    data: [{ 'table_name': 'comment_detail' },
+//        { 'table_name': 'comment_num' }
+//    ]
+//});
 var tableNameStore = Ext.create('Ext.data.Store', {
-    fields: ['table_name'],
-    data: [{ 'table_name': 'comment_detail' },
-        { 'table_name': 'comment_num' }
+    fields: [
+        { name: 'table_name', type: 'string' },
+        { name: 'table_function', type: 'string' },
+    ],
+    data: [{ 'table_name': 'comment_detail', 'table_function': '評價回覆' },
+           { 'table_name': 'comment_num', 'table_function': '商品評價' },
     ]
 });
 //表名數據
@@ -41,7 +51,7 @@ var listStore = Ext.create('Ext.data.Store', {
 });
 //歷史詳情
 var historyDetailStore = Ext.create('Ext.data.Store', {
-    fields: ['pk_id', 'change_table', 'tclModel'], //'change_field', 'field_ch_name', 'old_value', 'new_value'],
+    fields: ['pk_id', 'change_table','change_table_function', 'tclModel'], //'change_field', 'field_ch_name', 'old_value', 'new_value'],
     proxy: {
         type: 'ajax',
         url: "/ProductComment/GetChangeLogDetailList",
@@ -63,7 +73,6 @@ listStore.on("beforeload", function ()
         end_time: Ext.getCmp('date_two').getValue()
     })
 })
-
 
 
 Ext.onReady(function ()
@@ -115,13 +124,13 @@ var AuthView = Ext.create('Ext.view.View', {
     deferInitialRefresh: false,
     autoScroll: true,
     frame: false,
-    store: historyDetailStore,
+    store: historyDetailStore,//{change_table}+ GetTableFunction(+
     tpl: Ext.create('Ext.XTemplate',
         '<div id="div_historyDetail" class="View">',
         '<ul class="ul-detail">',
             '<tpl for=".">',
                 '<li>',
-                    '<h2>主鍵值：{pk_id}   功能：{change_table}    </h2>',
+                    '<h2>主鍵值：{pk_id} 功能：{change_table_function}   </h2>',
                     '<table class="tbl-cls" style="width:800px">',
                     '<tr><th style="width:200px">欄位</th><th style="width:200px">欄位中文名稱</th><th style="width:200px">修改前</th><th style="200px">修改后</th></tr>',
                         '<tpl for="tclModel">',
@@ -152,7 +161,7 @@ var searchfrm = Ext.create('Ext.form.Panel', {
         xtype: 'combobox',
         editable: false,
         allowBlank: false,
-        displayField: 'table_name',
+        displayField: 'table_function',
         valueField: 'table_name',
         store: tableNameStore,
         listeners: {
@@ -162,6 +171,7 @@ var searchfrm = Ext.create('Ext.form.Panel', {
                     callback: function ()
                     {
                         Ext.getCmp("table_name").setValue(tableNameStore.data.items[0].data.table_name);
+                        
                     }
                 });
             }
@@ -378,4 +388,20 @@ setNextMonth = function (source, n)
     return s;
 }
 
+function GetTableFunction(table_name)
+{
+    if (table_name== 'comment_num')
+    {
+        return "商品評價"
+    }
+    else if (table_name== 'comment_detail')
+    {
+        return "評價回覆"
+    }
+    else
+    {
+        return table_name;
+    }
 
+    
+}
