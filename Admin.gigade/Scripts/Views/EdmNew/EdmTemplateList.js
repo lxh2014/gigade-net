@@ -126,7 +126,7 @@ Ext.onReady(function () {
     });
     Ext.create('Ext.Viewport', {
         layout: 'vbox',
-        items: [EdmTemplateGrid],// 包含两个控件 
+        items: [EdmTemplateGrid],// 
         autoScroll: true,
         renderTo: Ext.getBody(),
         listeners: {

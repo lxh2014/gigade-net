@@ -413,6 +413,56 @@ namespace Admin.gigade.Controllers
 
         }
 
+
+        public HttpResponseBase GetScheduleLogList()// 獲取Log數據
+        {
+            string json = string.Empty;
+            int totalcount = 0;
+            ScheduleLogQuery query = new ScheduleLogQuery();
+            try
+            {
+                List<ScheduleLogQuery> Store = new List<ScheduleLogQuery>();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                if (!string.IsNullOrEmpty(Request.Params["schedule_code"]))
+                {
+                    query.schedule_code = Request.Params["schedule_code"];
+                }
+
+                if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
+                {
+                    query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
+                {
+                    query.end_time = (int)CommonFunction.GetPHPTime( Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+                }
+              
+
+                _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+                Store = _secheduleServiceMgr.GetScheduleLogList(query, out totalcount);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+               // json = "{success:true,data:" + JsonConvert.SerializeObject(Store, Formatting.Indented, timeConverter) + "}";//返回json數據
+                json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(Store, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+
+        }
+
+
         //schedule_master 中的狀態啟用
         public HttpResponseBase UpdateStats_Schedule_master()
         {
