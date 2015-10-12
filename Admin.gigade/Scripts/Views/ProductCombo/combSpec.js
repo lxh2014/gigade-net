@@ -1,4 +1,10 @@
-﻿var re = /}{/g;
+﻿/*  
+ * 
+ * 文件名称：combSpec.js 
+ * 摘    要：組合商品修改和新增 規格頁面
+ * 
+ */
+var re = /}{/g;
 var PRODUCT_ID;
 var isLoad = false;
 var comboType;
@@ -8,16 +14,14 @@ var groupNum;
 var buyLimit = 0;
 var currentRow;
 var currentCol;
-//edit by mingwei0727w 2015-07-13
+//edit by mingwei0727w 2015-07-13 將數組從10擴大到20
 var numArray = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
 var mustBuyArray = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 var tempData = null;
 var vendorId = null;
 
 Ext.onReady(function () {
-
     initPanel();
-
 });
 
 //運費模式不匹配
@@ -37,14 +41,13 @@ function freightCheck(tempData, resText) {
             Ext.Msg.alert(INFORMATION, PRODUCT_FREIGTH_NOT_MATCH); return false;
         }; break;
         default: return false; break;
-
     }
     return true;
 }
 
 
 //输入商品编号后判断商品是否符合要求
-function productCheck(resText,type) {
+function productCheck(resText, type) {
     if (resText.data.Combination != 1) {
         Ext.Msg.alert(INFORMATION, INPUT_MUSTBE_SINGLE);
         combSpecStroe.getAt(currentRow).set('Product_Name', '');
@@ -104,8 +107,6 @@ function productCheck(resText,type) {
         return;
     }
 
-
-
     //检查运费模式
     if (freightCheck(tempData, resText)) {
         combSpecStroe.getAt(currentRow).set('Product_Name', resText.data.Product_Name);
@@ -131,9 +132,9 @@ function initPanel() {
                 comboType = resText.data.Combination;
                 tempData = resText.data;
                 switch (comboType) {
-                    case 2: createComboFixed(); break;
-                    case 3: createComboOptional(); break;
-                    case 4: createComboGroup(); break;
+                    case 2: createComboFixed(); break;//固定組合保存
+                    case 3: createComboOptional(); break;//任意組合保存
+                    case 4: createComboGroup(); break;//群組搭配保存
                     default: break;
                 }
             }
@@ -144,7 +145,6 @@ function initPanel() {
     });
 }
 
-
 function save() {
     if (PRODUCT_ID != '') {
         Ext.Msg.alert(INFORMATION, COMBO_SPEC_UNCHANGE);
@@ -152,15 +152,13 @@ function save() {
     }
     var saveResult;
     switch (comboType) {
-        case 2: saveResult = fixedSave(); break;
-        case 3: saveResult = optionalSave(); break;
-        case 4: saveResult = groupSave(); break;
+        case 2: saveResult = fixedSave(); break; //固定組合保存
+        case 3: saveResult = optionalSave(); break;//任意組合保存
+        case 4: saveResult = groupSave(); break;//群組搭配保存
         default: break;
-
     }
     return saveResult;
 }
-
 
 function resTextGet(product_id) {
     var result;
@@ -295,7 +293,6 @@ function optionalSave() {
             return false;
         }
 
-
         tempStr = tempStr.replace(re, "},{");
         tempStr += "]";
     }
@@ -304,6 +301,7 @@ function optionalSave() {
         Ext.Msg.alert(NOTICE, msg);
         return result;
     }
+
     Ext.Ajax.request({
         url: '/ProductCombo/combSpecSave',
         method: 'POST',
@@ -345,7 +343,6 @@ function groupSave() {
     var tempStr = "[";
     var msg;
     if (groupNum > 0) {
-
         for (var i = 1; i <= groupNum; i++) {
             if (!Ext.getCmp('G_' + i)) {
                 Ext.Msg.alert(NOTICE, COMPLETE);
@@ -359,12 +356,10 @@ function groupSave() {
             for (var m = 0, n = Ext.getCmp('G_' + i).getStore().getCount() ; m < n; m++) {
                 var data = Ext.getCmp('G_' + i).getStore().getAt(m).data;
                 if (data.Product_Name) {
-
                     tempStr += '{child_id:"' + data.Child_Id + '",s_must_buy:' + data.S_Must_Buy + ',g_must_buy:' + Ext.getCmp(mustId).getValue() + ',pile_id:' + i + ',buy_limit:' + limit + '}';
                     if (data.S_Must_Buy != 0) {
                         sum += parseInt(data.S_Must_Buy);
                     }
-
                 }
                 else {
                     Ext.Msg.alert(NOTICE, Ext.String.format(INPUT_GROUP_INFO, i));

@@ -1,12 +1,15 @@
-﻿
+﻿/*  
+ * 
+ * 文件名称：comboGroup.js 
+ * 摘    要：組合商品修改和新增 規格子頁面 -- 群組搭配
+ * 
+ */
 function createComboGroup() {
-
     var topPanel;
     var bottomPanel;
     var numPanel;
     var gridPanel;
     var viewPort;
-
     //判斷 僅限一單位是否可以被選中
     function CheckAble() {
         var bool = true;
@@ -36,8 +39,6 @@ function createComboGroup() {
 
     /*創建Grid*/
     function createGridPanel(index, value, pileId) {
-
-
         if (Ext.getCmp('G_' + index)) {
             Ext.getCmp('G_' + index).getStore().removeAll();
             for (var i = 0; i < value; i++) {
@@ -54,6 +55,7 @@ function createComboGroup() {
             }
             return;
         }
+
         var specStore = Ext.create('Ext.data.Store', {
             id: '' + index + '_S',
             fields: ['Id', 'Parent_Id', 'Child_Id', 'Product_Name', 'Prod_Sz', 'S_Must_Buy', 'G_Must_Buy', 'Pile_Id', 'Buy_Limit'],
@@ -94,7 +96,6 @@ function createComboGroup() {
                 Buy_Limit: ''
             });
         }
-
 
         var grid = Ext.create('Ext.grid.Panel', {
             id: 'G_' + index,
@@ -205,15 +206,15 @@ function createComboGroup() {
                      listeners: {
                          beforequery: function (qe) {
                              delete qe.combo.lastQuery;
-                             //                         if (Ext.getCmp('chkNum').getValue()) {
-                             //                             for (var i = 0, j = this.getStore().getCount() - 2; i < j; i++) {
-                             //                                 this.getStore().removeAt(2);
-                             //                             }
-                             //                         }
-                             //                         else {
-                             //                             this.getStore().removeAll();
-                             //                             this.getStore().add({ field1: '0' }, { field1: '1' }, { field1: '2' }, { field1: '3' }, { field1: '4' }, { field1: '5' }, { field1: '6' }, { field1: '7' }, { field1: '8' }, { field1: '9' }, { field1: '10' });
-                             //                         }
+                             //if (Ext.getCmp('chkNum').getValue()) {
+                             //    for (var i = 0, j = this.getStore().getCount() - 2; i < j; i++) {
+                             //        this.getStore().removeAt(2);
+                             //    }
+                             //}
+                             //else {
+                             //    this.getStore().removeAll();
+                             //    this.getStore().add({ field1: '0' }, { field1: '1' }, { field1: '2' }, { field1: '3' }, { field1: '4' }, { field1: '5' }, { field1: '6' }, { field1: '7' }, { field1: '8' }, { field1: '9' }, { field1: '10' });
+                             //}
                              this.getStore().removeAll();
                              var t = Ext.getCmp('chkNum').getValue() ? 1 : Ext.getCmp('M_' + index).getValue();
                              for (var i = 0; i <= t; i++) {
@@ -233,9 +234,7 @@ function createComboGroup() {
         bottomPanel.add(grid);
     }
 
-
     function createNumPanel(num, data) {
-
         if (numPanel) {
             numPanel.destroy();
             isLoad = false;
@@ -243,6 +242,7 @@ function createComboGroup() {
         if (bottomPanel.items.length > 0) {
             bottomPanel.removeAll(true);
         }
+
         numPanel = Ext.create('Ext.panel.Panel', {
             id: 'numPanel',
             border: false,
@@ -284,7 +284,6 @@ function createComboGroup() {
                             }
                         }
                     }]
-
                 }, {
                     xtype: 'panel',
                     hidden: isLoad && PRODUCT_ID,
@@ -305,7 +304,6 @@ function createComboGroup() {
                         hidden: true,
                         allowBlank: false
                     }]
-
                 }, {
                     xtype: 'panel',
                     border: false,
@@ -326,6 +324,7 @@ function createComboGroup() {
             });
             numPanel.add(unitPnale);
         }
+
         numPanel.add({
             xtype: 'checkbox',
             boxLabel: BUY_LIMIT,
@@ -354,13 +353,10 @@ function createComboGroup() {
                     else {
                         this.setValue(false);
                     }
-
                 }
                 else {
                     SetMax(2);
                 }
-
-
             }
         });
         topPanel.add(numPanel);
@@ -434,7 +430,6 @@ function createComboGroup() {
         border: false
     });
 
-
     viewPort = Ext.create('Ext.container.Viewport', {
         layout: 'anchor',
         padding: 20,
@@ -473,15 +468,12 @@ function createComboGroup() {
                     Ext.getCmp('comboGroupNum').setValue(len);
                     Ext.getCmp('groupNumPanel').show();
                 }
-
             }
             else {
                 Ext.getCmp('groupNumPanel').show();
             }
         },
         failure: function (response, opts) {
-
         }
     });
-
 }

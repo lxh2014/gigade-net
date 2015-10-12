@@ -1,26 +1,31 @@
-﻿var OLD_PRODUCTID = window.parent.GetCopyProductId();
+﻿/*  
+ * 
+ * 文件名称：productStock.js 
+ * 摘    要：單一商品修改和新增 庫存頁面
+ * 
+ */
+var OLD_PRODUCTID = window.parent.GetCopyProductId();
 var defaultArriveDays = 0;
 var isEditStock = false;  //add by Jiajun 2014.09.26 判斷庫存是否可以修改
 
 //庫存Model
 Ext.define("stock", {
     extend: 'Ext.data.Model',
-    fields: [
-                { name: "item_id", type: "string" },
-                { name: "spec_title_1", type: "string" },
-                { name: "spec_id_1", type: "string" },
-                { name: "spec_title_2", type: "string" },
-                { name: "spec_id_2", type: "string" },
-                { name: "item_stock", type: "string" },
-                { name: "item_alarm", type: "string" },
-                { name: "barcode", type: "string" },
-                { name: "item_code", type: "string" },
-                { name: "erp_id", type: "string" }, //add by xiangwang0413w 2014/06/18 (增加ERP廠商編號)
-                { name: "remark", type: "string" }, //add by zhuoqin0830w 2015/02/05 增加備註
-                { name: "arrive_days", type: "int" },// add by zhuoqin0830w 2014/03/20 增加運達天數
-                { name: "default_arrive_days", type: "int" }
-    ]
+    fields: [{ name: "item_id", type: "string" },
+        { name: "spec_title_1", type: "string" },
+        { name: "spec_id_1", type: "string" },
+        { name: "spec_title_2", type: "string" },
+        { name: "spec_id_2", type: "string" },
+        { name: "item_stock", type: "string" },
+        { name: "item_alarm", type: "string" },
+        { name: "barcode", type: "string" },
+        { name: "item_code", type: "string" },
+        { name: "erp_id", type: "string" }, //add by xiangwang0413w 2014/06/18 (增加ERP廠商編號)
+        { name: "remark", type: "string" }, //add by zhuoqin0830w 2015/02/05 增加備註
+        { name: "arrive_days", type: "int" },// add by zhuoqin0830w 2014/03/20 增加運達天數
+        { name: "default_arrive_days", type: "int" }]
 });
+
 //庫存Store
 var stockStore = Ext.create("Ext.data.Store", {
     model: 'stock',
@@ -40,18 +45,15 @@ var stockStore = Ext.create("Ext.data.Store", {
 });
 
 stockStore.on('beforeload', function () {
-    Ext.apply(stockStore.proxy.extraParams,
-        {
-            product_id: Ext.htmlEncode(window.parent.GetProductId()),
-            OldProductId: OLD_PRODUCTID
-        });
+    Ext.apply(stockStore.proxy.extraParams, {
+        product_id: Ext.htmlEncode(window.parent.GetProductId()),
+        OldProductId: OLD_PRODUCTID
+    });
 });
-
 
 var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
     clicksToEdit: 1
 });
-
 
 Ext.onReady(function () {
     var chekPanel = Ext.create("Ext.form.Panel", {
@@ -119,31 +121,30 @@ Ext.onReady(function () {
             }]
         }]//,
         //listeners: {
-           // beforerender: function () {
-                //Ext.Ajax.request({
-                //    url: '/Product/QueryProduct',
-                //    method: 'post',
-                //    params: {
-                //        "ProductId": window.parent.GetProductId(),
-                //        "OldProductId": OLD_PRODUCTID
-                //    },
-                //    success: function (response) {
-                //        var reStr = eval("(" + response.responseText + ")");
-                //        if (reStr && reStr.data) {
-                //            if (reStr.data.Ignore_Stock == 1) Ext.getCmp("ignore_stock").setValue(true); else Ext.getCmp("ignore_stock").setValue(false);
-                //            if (reStr.data.Shortage == 1) Ext.getCmp("shortage").setValue(true); else Ext.getCmp("shortage").setValue(false);
+        // beforerender: function () {
+        //Ext.Ajax.request({
+        //    url: '/Product/QueryProduct',
+        //    method: 'post',
+        //    params: {
+        //        "ProductId": window.parent.GetProductId(),
+        //        "OldProductId": OLD_PRODUCTID
+        //    },
+        //    success: function (response) {
+        //        var reStr = eval("(" + response.responseText + ")");
+        //        if (reStr && reStr.data) {
+        //            if (reStr.data.Ignore_Stock == 1) Ext.getCmp("ignore_stock").setValue(true); else Ext.getCmp("ignore_stock").setValue(false);
+        //            if (reStr.data.Shortage == 1) Ext.getCmp("shortage").setValue(true); else Ext.getCmp("shortage").setValue(false);
 
-                //        }
-                //        isEditStock = reStr.data.IsEdit; //edit by xiangwang0413w 2014/10/09 設置庫存是否可以修改
-                //        if (!isEditStock&&reStr.data.Prepaid != 1 && reStr.data.Product_Mode != 2) {       //add by Jiajun 2014.09.26 判斷庫存是否可以修改
-                //            isEditStock = true;
-                //        }
-                        
-                //    }
-                //});
-           // }
-       // }
-    })
+        //        }
+        //        isEditStock = reStr.data.IsEdit; //edit by xiangwang0413w 2014/10/09 設置庫存是否可以修改
+        //        if (!isEditStock&&reStr.data.Prepaid != 1 && reStr.data.Product_Mode != 2) {       //add by Jiajun 2014.09.26 判斷庫存是否可以修改
+        //            isEditStock = true;
+        //        }
+        //    }
+        //});
+        // }
+        // }
+    });
 
     var stockPanel = Ext.create("Ext.grid.Panel", {
         id: 'stockGrid',
@@ -152,7 +153,11 @@ Ext.onReady(function () {
         //height:window.parent.GetProductId()?300:500,
         plugins: [cellEditing],
         border: false,
-        columns: [{ xtype: 'rownumberer', width: 50, align: 'center' }, {
+        columns: [{
+            xtype: 'rownumberer',
+            width: 50,
+            align: 'center'
+        }, {
             dataIndex: 'item_id',
             hidden: true
         }, {
@@ -256,7 +261,7 @@ Ext.onReady(function () {
                 minValue: 0,
                 allowBlank: false
             }
-        },{
+        }, {
             header: BARCODE,
             sortable: false,
             menuDisabled: true,
@@ -298,7 +303,6 @@ Ext.onReady(function () {
         }
     });
 
-
     Ext.create('Ext.Viewport', {
         items: [chekPanel, stockPanel],
         renderTo: Ext.getBody(),
@@ -317,14 +321,9 @@ Ext.onReady(function () {
         }
     });
 
-
-
     window.parent.updateAuth(stockPanel, 'colName');
     window.parent.updateAuth(chekPanel, 'colName');
-
-})
-
-
+});
 
 function saveTemp() {
     var mask;
@@ -364,15 +363,21 @@ function saveTemp() {
     });
 }
 
-
 //保存數據至數據庫
 function save(functionid) {
+    //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    var mask;
+    if (!mask) {
+        mask = new Ext.LoadMask(Ext.getBody(), { msg: WAIT });
+    }
+    mask.show();
+    //添加disabled屬性  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    window.parent.setMoveEnable(false);
+
     cellEditing.completeEdit();
     var retVal = true;
     //var InsertValue = "";
     var InsertValueArray = [];//edit by wwei0216w 將字符串格式傳遞改成json傳遞
-
-    
     var stockGrid = Ext.getCmp("stockGrid").store.data.items;
     for (var i = 0; i < stockGrid.length; i++) {
         var spec_title_1 = stockGrid[i].get("spec_id_1");
@@ -406,8 +411,6 @@ function save(functionid) {
     var shortage = Ext.getCmp("shortage").getValue() == true ? 1 : 0;
     var ig_sh_InsertValue = ignore + ',' + shortage;
 
-
-
     if (!functionid) {
         functionid = '';
     }
@@ -415,7 +418,7 @@ function save(functionid) {
     Ext.Ajax.request({
         url: '/Product/StockSave',
         method: 'POST',
-        async: false,
+        async: window.parent.GetProductId() == '' ? false : true,
         params: {
             "product_id": Ext.htmlEncode(window.parent.GetProductId()),
             OldProductId: window.parent.GetCopyProductId(),
@@ -426,14 +429,15 @@ function save(functionid) {
         },
         success: function (msg) {
             var resMsg = eval("(" + msg.responseText + ")");
+            mask.hide();
             if (resMsg.success == true && resMsg.msg != null) {
                 Ext.Msg.alert(PROMPT, resMsg.msg);
             }
             if (resMsg.success == false) {
                 Ext.Msg.alert(PROMPT, resMsg.msg);
                 retVal = false;
-                window.parent.setMoveEnable(true);
             }
+            window.parent.setMoveEnable(true);
         }
     });
     return retVal;

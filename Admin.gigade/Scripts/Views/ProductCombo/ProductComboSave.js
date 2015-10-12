@@ -1,9 +1,15 @@
-﻿var CLICK_BTN_CHANGE = false;
+﻿/*  
+ * 
+ * 文件名称：baseInfo.js
+ * 摘    要：組合商品修改和新增 主要 保存頁面
+ * 
+ */
+var CLICK_BTN_CHANGE = false;
 var clickMovePrev = false;//上一步不進行保存驗證 add by xiangwang0413w 2015/01/06
 
 Ext.onReady(function () {
-
     var tabs = new Array();
+
     /******商品基本資料*************************************************************/
     var baseInfo = Ext.create('Ext.panel.Panel', {
         title: TITLE_BASE_INFO,
@@ -18,7 +24,6 @@ Ext.onReady(function () {
     tabs.push(baseInfo);
 
     /******物流配送模式**********************************************************************/
-
     var transportSet = Ext.create('Ext.form.Panel', {
         title: PHYSICAL_DISTRIBUTION_DISPATCH_MODE,//物流配送模式
         //'<div style="width:100px">' + '物流配送模式' + '</div>',
@@ -30,10 +35,7 @@ Ext.onReady(function () {
             }
         }
     });
-
     tabs.push(transportSet);
-
-
 
     /******描述**********************************************************************/
     var description = Ext.create('Ext.panel.Panel', {
@@ -146,6 +148,7 @@ Ext.onReady(function () {
     });
     tabs.push(prize);
 
+    //組合商品保存
     var saveForm = Ext.create('Ext.tab.Panel', {
         id: 'ContentPanel',
         //width: 1185,
@@ -156,63 +159,55 @@ Ext.onReady(function () {
         layout: 'fit',
         items: [tabs],
         frame: true,
-        buttons: [
-            {
-                text: BTN_SAVE,
-                id: 'btnSave',
-                hidden: GetProductId() == '',
-                iconCls: 'icon-add',
-                handler: function () {
-                    saveForm.getActiveTab().body.dom.firstChild.contentWindow.save('btnSave');
-                }
-            },
-            { xtype: 'component', height: 25 },
-            {
-                text: BTN_TEMP_SAVE,
-                id: 'btnTempSave',
-                iconCls: 'icon-add',
-                hidden: true,
-                handler: function () {
-                    saveForm.getActiveTab().body.dom.firstChild.contentWindow.saveTemp();
-                }
+        buttons: [{
+            text: BTN_SAVE,
+            id: 'btnSave',
+            hidden: GetProductId() == '',
+            iconCls: 'icon-add',
+            handler: function () {
+                saveForm.getActiveTab().body.dom.firstChild.contentWindow.save('btnSave');
             }
-        ],
-        tbar: [
-            {
-                id: 'move-prev',
-                iconCls: 'icon-prev',
-                text: PERV_MOVE,
-                handler: function () {
-                    clickMovePrev = true;
-                    CLICK_BTN_CHANGE = true;
-                    var panel = Ext.getCmp('ContentPanel');
-                    var t = panel.getActiveTab().prev();
-                    if (t) {
-                        panel.setActiveTab(t);
-                        panel.doLayout();
-                    }
-                    CLICK_BTN_CHANGE = false;
-                }
-            },
-            '->',
-            {
-                id: 'move-next',
-                iconCls: 'icon-next',
-                iconAlign: 'right',
-                text: NEXT_MOVE,
-                handler: function () {
-                    clickMovePrev = false;
-                    CLICK_BTN_CHANGE = true;
-                    var panel = Ext.getCmp('ContentPanel');
-                    var t = panel.getActiveTab().next();
-                    if (t) {
-                        panel.setActiveTab(t);
-                        panel.doLayout();
-                    }
-                    CLICK_BTN_CHANGE = false;
-                }
+        }, { xtype: 'component', height: 25 }, {
+            text: BTN_TEMP_SAVE,
+            id: 'btnTempSave',
+            iconCls: 'icon-add',
+            hidden: true,
+            handler: function () {
+                saveForm.getActiveTab().body.dom.firstChild.contentWindow.saveTemp();
             }
-        ],
+        }],
+        tbar: [{
+            id: 'move-prev',
+            iconCls: 'icon-prev',
+            text: PERV_MOVE,
+            handler: function () {
+                clickMovePrev = true;
+                CLICK_BTN_CHANGE = true;
+                var panel = Ext.getCmp('ContentPanel');
+                var t = panel.getActiveTab().prev();
+                if (t) {
+                    panel.setActiveTab(t);
+                    panel.doLayout();
+                }
+                CLICK_BTN_CHANGE = false;
+            }
+        }, '->', {
+            id: 'move-next',
+            iconCls: 'icon-next',
+            iconAlign: 'right',
+            text: NEXT_MOVE,
+            handler: function () {
+                clickMovePrev = false;
+                CLICK_BTN_CHANGE = true;
+                var panel = Ext.getCmp('ContentPanel');
+                var t = panel.getActiveTab().next();
+                if (t) {
+                    panel.setActiveTab(t);
+                    panel.doLayout();
+                }
+                CLICK_BTN_CHANGE = false;
+            }
+        }],
         listeners: {
             beforetabchange: function (tabPanel, newCard, oldCard, eOpts) {
                 if (Ext.getCmp('move-prev').isDisabled()) return false;
@@ -293,6 +288,8 @@ function GethfAspSessID() {
 function setMoveEnable(status) {
     Ext.getCmp('move-prev').setDisabled(!status);
     Ext.getCmp('move-next').setDisabled(!status);
+    //添加 按鈕  disabled 屬性 edit by zhuoqin0830w  2015/09/24
+    Ext.getCmp('btnSave').setDisabled(!status);
 }
 
 function GetProduct(frm) {
@@ -345,4 +342,3 @@ function Is_Continue() {
     });
     $(".x-tool-close").hide();
 }
-

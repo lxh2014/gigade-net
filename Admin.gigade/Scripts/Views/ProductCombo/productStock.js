@@ -1,4 +1,10 @@
-﻿var alarm;
+﻿/*  
+ * 
+ * 文件名称：productStock.js 
+ * 摘    要：組合商品修改和新增 庫存頁面
+ * 
+ */
+var alarm;
 var OLD_PRODUCT_ID;
 
 var chekPanel = Ext.create("Ext.form.Panel", {
@@ -17,16 +23,14 @@ var chekPanel = Ext.create("Ext.form.Panel", {
     }, {
         xtype: 'fieldcontainer',
         defaultType: 'checkboxfield',
-        items: [
-            {
-                boxLabel: IGNORE_STOCK,  //edit by Jiajun 2014.09.26
-                id: 'ignore_stock',
-                /*colName: 'ignore_stock',*/
-                hidden: true,
-                inputValue: '1',
-                readOnly: true
-            },
-        {
+        items: [{
+            boxLabel: IGNORE_STOCK,  //edit by Jiajun 2014.09.26
+            id: 'ignore_stock',
+            /*colName: 'ignore_stock',*/
+            hidden: true,
+            inputValue: '1',
+            readOnly: true
+        }, {
             boxLabel: SHORTAGE_MORE,
             id: 'shortage',
             colName: 'shortage',
@@ -53,7 +57,7 @@ var chekPanel = Ext.create("Ext.form.Panel", {
             });
         }
     }
-})
+});
 
 var stockPanel = Ext.create("Ext.form.Panel", {
     border: false,
@@ -224,15 +228,9 @@ Ext.onReady(function () {
                         }
                     });
                 }
-
-
             }
         });
-
-
     }
-
-
 
     var viewPort = Ext.create('Ext.Viewport', {
         items: [chekPanel, stockPanel],
@@ -250,10 +248,7 @@ Ext.onReady(function () {
     });
 
     window.parent.updateAuth(viewPort, 'colName');
-
-})
-
-
+});
 
 function saveTemp() {
     var mask;
@@ -261,11 +256,13 @@ function saveTemp() {
         mask = new Ext.LoadMask(Ext.getBody(), { msg: WAIT });
     }
     mask.show();
+
     //將數據寫入臨時表
     if (!save()) {
         mask.hide();
         return;
     }
+
     //臨時表批量更新到正式表
     Ext.Ajax.request({
         url: '/ProductCombo/Temp2Pro',
@@ -296,6 +293,15 @@ function saveTemp() {
 
 //保存數據至數據庫
 function save() {
+    //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    var mask;
+    if (!mask) {
+        mask = new Ext.LoadMask(Ext.getBody(), { msg: WAIT });
+    }
+    mask.show();
+    //添加disabled屬性  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    window.parent.setMoveEnable(false);
+
     var retVal = true;
     var InsertValue = "";
 
@@ -306,7 +312,7 @@ function save() {
     Ext.Ajax.request({
         url: '/ProductCombo/SaveBaseInfo',
         method: 'POST',
-        async: false,
+        async: window.parent.GetProductId() == '' ? false : true,
         params: {
             "product_id": Ext.htmlEncode(window.parent.GetProductId()),
             "OldProductId": OLD_PRODUCT_ID,
@@ -314,14 +320,15 @@ function save() {
         },
         success: function (msg) {
             var resMsg = eval("(" + msg.responseText + ")");
+            mask.hide();
             if (resMsg.success == true && resMsg.msg != null) {
                 Ext.Msg.alert(PROMPT, resMsg.msg);
             }
             if (resMsg.success == false) {
                 Ext.Msg.alert(PROMPT, resMsg.msg);
                 retVal = false;
-                window.parent.setMoveEnable(true);
             }
+            window.parent.setMoveEnable(true);
         }
     });
     return retVal;

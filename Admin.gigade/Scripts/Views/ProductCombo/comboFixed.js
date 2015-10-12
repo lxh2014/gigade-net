@@ -1,5 +1,9 @@
-﻿
-
+﻿/*  
+ * 
+ * 文件名称：comboFixed.js 
+ * 摘    要：組合商品修改和新增 規格子頁面 -- 固定組合
+ * 
+ */
 function createComboFixed() {
     combSpecStroe = Ext.create('Ext.data.Store', {
         id: 'combSpecStroe',
@@ -29,7 +33,6 @@ function createComboFixed() {
         if (combSpecStroe.getCount() > 1) {
             cellEditing.startEditByPosition({ row: combSpecStroe.getCount() - 1, column: 1 });
         }
-
     }
 
     function removeTr(rowIdx) {
@@ -58,7 +61,6 @@ function createComboFixed() {
             }
         }
     });
-
 
     var fixedPanel = Ext.create('Ext.form.Panel', {
         id: 'fixedPanel',
@@ -117,63 +119,64 @@ function createComboFixed() {
                 addTr();
             }
         }, '->', {}],
-        columns: [{ header: '', id: 'delCombo', colName: 'delCombo', hidden: true, menuDisabled: true, width: 60, align: 'center', xtype: 'actioncolumn', items: [{
-            icon: '../../../Content/img/icons/cross.gif',
-            handler: function (grid, rowIndex, colIndex) {
-                Ext.Msg.confirm(NOTICE, DELETE_CONFIRM, function (btn) {
-                    if (btn == 'yes') {
-                        if (combSpecStroe.getCount() > 1) {
-                            combSpecStroe.removeAt(rowIndex);
+        columns: [{
+            header: '', id: 'delCombo', colName: 'delCombo', hidden: true, menuDisabled: true, width: 60, align: 'center', xtype: 'actioncolumn', items: [{
+                icon: '../../../Content/img/icons/cross.gif',
+                handler: function (grid, rowIndex, colIndex) {
+                    Ext.Msg.confirm(NOTICE, DELETE_CONFIRM, function (btn) {
+                        if (btn == 'yes') {
+                            if (combSpecStroe.getCount() > 1) {
+                                combSpecStroe.removeAt(rowIndex);
+                            }
+                            else {
+                                removeTr(0);
+                            }
                         }
-                        else {
-                            removeTr(0);
+                    });
+                }
+            }]
+        }, {
+            header: PRODUCT_NUM, colName: 'productNum', hidden: true, menuDisabled: true, sortable: false,
+            editor: {
+                xtype: 'textfield',
+                width: 200,
+                allowBlank: false,
+                listeners: {
+                    blur: function (e) {
+                        if (e.value == '') {
+                            return;
                         }
+                        Ext.Ajax.request({
+                            url: '/ProductCombo/QueryProduct',
+                            method: 'POST',
+                            params: {
+                                ProductId: e.value
+                            },
+                            success: function (response, opts) {
+                                var resText = eval("(" + response.responseText + ")");
+                                if (resText != null && resText.data != null) {
+                                    //添加一個 組合類型傳入 方法  edit by zhuoqin0830w 2015/02/12
+                                    productCheck(resText, FIXED_COMBO);
+                                }
+                                else {
+                                    combSpecStroe.getAt(currentRow).set('Product_Name', '');
+                                }
+                            },
+                            failure: function (response, opts) {
+                                return false;
+                            }
+                        });
                     }
-                });
+                }
+            }, dataIndex: 'Child_Id'
+        }, { header: PRODUCT_NAME, colName: 'productName', hidden: true, menuDisabled: true, sortable: false, width: 200, dataIndex: 'Product_Name', flex: 1 },
+        {
+            header: UNIT_NUM, colName: 'unitNum', hidden: true, menuDisabled: true, sortable: false, dataIndex: 'S_Must_Buy', editor: {
+                //Edit By Castle 2014/07/02
+                xtype: 'numberfield',
+                minValue: 0
             }
-        }]
-        },
-             { header: PRODUCT_NUM, colName: 'productNum', hidden: true, menuDisabled: true, sortable: false,
-                 editor: { xtype: 'textfield',
-                     width: 200,
-                     allowBlank: false,
-                     listeners: {
-                         blur: function (e) {
-                             if (e.value == '') {
-                                 return;
-                             }
-                             Ext.Ajax.request({
-                                 url: '/ProductCombo/QueryProduct',
-                                 method: 'POST',
-                                 params: {
-                                     ProductId: e.value
-                                 },
-                                 success: function (response, opts) {
-                                     var resText = eval("(" + response.responseText + ")");
-                                     if (resText != null && resText.data != null) {
-                                         //添加一個 組合類型傳入 方法  edit by zhuoqin0830w 2015/02/12
-                                         productCheck(resText, FIXED_COMBO);
-                                     }
-                                     else {
-                                         combSpecStroe.getAt(currentRow).set('Product_Name', '');
-                                     }
-                                 },
-                                 failure: function (response, opts) {
-                                     return false;
-                                 }
-                             });
-                         }
-                     }
-                 }, dataIndex: 'Child_Id'
-             },
-             { header: PRODUCT_NAME, colName: 'productName', hidden: true, menuDisabled: true, sortable: false, width: 200, dataIndex: 'Product_Name', flex: 1 },
-             { header: UNIT_NUM, colName: 'unitNum', hidden: true, menuDisabled: true, sortable: false, dataIndex: 'S_Must_Buy', editor: {
-                 //Edit By Castle 2014/07/02
-                 xtype: 'numberfield',
-                 minValue: 0
-             }
-             },
-             { header: 'rid', hidden: true, dataIndex: 'id'}],
+        }, { header: 'rid', hidden: true, dataIndex: 'id' }],
         listeners: {
             beforerender: function () {
                 combSpecStroe.load({
@@ -198,7 +201,6 @@ function createComboFixed() {
         }
     });
 
-
     var viewPort = Ext.create('Ext.Viewport', {
         layout: 'anchor',
         items: [fixedPanel, fixedGrid],
@@ -214,5 +216,4 @@ function createComboFixed() {
             }
         }
     });
-
 }
