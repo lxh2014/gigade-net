@@ -139,7 +139,8 @@ namespace BLL.gigade.Mgr
                     int defaultArriveDays = new ProductTempMgr(connStr).GetDefaultArriveDays(new ProductTemp { Writer_Id = proItemTemp.Writer_Id, Product_Id = proItemTemp.Product_Id });
                     foreach (var item in result)
                     {
-                        item.Arrive_Days += defaultArriveDays;
+                        //ediy by wwei0216w 分開顯示Arrive_Days + defaultArriveDays 所以不需要計算和 2015/10/12
+                        //item.Arrive_Days += defaultArriveDays;
                         stb.Append("{");
                         stb.AppendFormat("\"spec_title_1\":\"{0}\",\"spec_title_2\":\"{1}\",\"item_stock\":\"{2}\",\"item_alarm\":\"{3}\",\"barcode\":\"{4}\",\"spec_id_1\":\"{5}\",\"spec_id_2\":\"{6}\",\"item_id\":\"{7}\",\"erp_id\":\"{8}\",\"remark\":\"{9}\",\"arrive_days\":\"{10}\",\"default_arrive_days\":\"{11}\"", item.Spec_Name_1, item.Spec_Name_2, item.Item_Stock, item.Item_Alarm, item.Barcode, item.Spec_Id_1, item.Spec_Id_2, item.Item_Id, item.Erp_Id, item.Remark, item.Arrive_Days, defaultArriveDays);//edit by xiangwang0413w 2014/06/18 (增加ERP廠商編號erp_id)  // add by zhuoqin0830w 2014/02/05 增加備註  //add by zhuoqin0830w 2014/03/20 增加運達天數
                         stb.Append("}");
