@@ -33,7 +33,7 @@ Ext.define('gridlistMaster', {
     ],
 });
 
-//store 列表頁的數據源 
+//master 列表頁的數據源 
 var ScheduleStore = Ext.create('Ext.data.Store', {
     pageSize: pageSize,
    // autoLoad:true,
@@ -375,7 +375,7 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
      { xtype: 'button', text: "刪除", id: 'delete_master', iconCls: 'icon-user-remove', disabled: true, handler: ondelete_master },
      { xtype: 'button', text: "立即執行", id: 'runonce_master', iconCls: 'icon-user-edit', disabled: true, handler: onrunonce_master },
      '->',
-    { xtype: 'button', text: "查詢", id: 'grid_btn_search', iconCls: 'ui-icon ui-icon-search', width: 65, handler: Search },
+     { xtype: 'button', text: "查詢", id: 'grid_btn_search', iconCls: 'ui-icon ui-icon-search', width: 65, handler: Search },
      ],
     bbar: Ext.create('Ext.PagingToolbar', {
         store: ScheduleStore,
@@ -416,7 +416,6 @@ else
         Schedule_Period_Store.load();
     }
 }
-
 function Search() {
     Ext.getCmp('masterGiftList').store.loadPage(1, {
         params: {
@@ -425,10 +424,6 @@ function Search() {
     });
 }
 
-
-function Save() {
-
-}
 /*********************啟用/禁用**********************/
 function UpdateActive(id) {
     var activeValue = $("#img" + id).attr("hidValue");
