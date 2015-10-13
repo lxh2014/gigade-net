@@ -28,7 +28,8 @@ namespace Admin.gigade.Controllers
         string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];//郵件服務器的設置
         public EdmGroupNewMgr edmgroupmgr;
         public EdmTemplateMgr edmtemplatemgr;        //
-        public EmailBlockListMgr _emailBlockListMgr;        HttpWebRequest httpReq;
+        public EmailBlockListMgr _emailBlockListMgr;        
+        HttpWebRequest httpReq;
         HttpWebResponse httpResp;
         string strBuff = "";
         char[] cbuffer = new char[256];
@@ -650,7 +651,7 @@ namespace Admin.gigade.Controllers
 
                         #endregion
                         MailHelper mail = new MailHelper();
-                        mail.SendMailAction("shiwei0620j@gimg.tw", mQuery.subject, mQuery.body + "   ");
+                        mail.SendMailAction((Session["caller"] as Caller).user_email, mQuery.subject, mQuery.body + "   ");
                         {
                       json= _edmContentNewMgr.MailAndRequest(eslQuery, mQuery);
                         }

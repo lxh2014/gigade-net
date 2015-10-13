@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using BLL.gigade.Common;
@@ -204,6 +205,50 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               }
           }
 
+          public List<ScheduleLogQuery> GetScheduleLogList(ScheduleLogQuery query, out int totalCount)// 得到 period表中的記錄
+          {
+              StringBuilder sql = new StringBuilder();
+              StringBuilder sqlCondi = new StringBuilder();
+              StringBuilder sqlCount = new StringBuilder();
+              totalCount = 0;
+              try
+              {
+                  sqlCount.AppendFormat("SELECT count(rowid) as totalCount ");
+                  sql.AppendFormat("select sl.rowid,sl.schedule_code,mu1.user_username as create_username,sl.create_time,sl.ipfrom ");
+                  sqlCondi.Append(" from schedule_log sl LEFT JOIN manage_user mu1 on mu1.user_id=sl.create_user ");
+                  sqlCondi.Append(" where 1=1 ");
+                  if (!string.IsNullOrEmpty(query.schedule_code))
+                  {
+                      sqlCondi.AppendFormat(" and sl.schedule_code='{0}' ", query.schedule_code);
+                  }
+                  if (query.start_time != 0)
+                  {
+                      sqlCondi.AppendFormat(" and sl.create_time >= '{0}' ", query.start_time);
+                  }
+                  if (query.end_time != 0)
+                  {
+                      sqlCondi.AppendFormat(" and sl.create_time <= '{0}' ", query.end_time);
+                  }
+                  sql.Append(sqlCondi.ToString());
+                  if (query.IsPage)
+                  {
+                      //StringBuilder strpage = new StringBuilder();
+                      //StringBuilder strcontpage = new StringBuilder();
+                      //strpage.AppendFormat(" SELECT count(rowid) as totalCount FROM schedule_log  ");
+                      DataTable _dt = _access.getDataTable(sqlCount.ToString()+ sqlCondi.ToString());
+                      if (_dt.Rows.Count > 0)
+                      {
+                          totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
+                          sql.AppendFormat(" order by rowid desc  limit {0},{1} ", query.Start, query.Limit);
+                      }
+                  }
+                  return _access.getDataTableForObj<ScheduleLogQuery>(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->GetScheduleLogList-->" + ex.Message, ex);
+              }
+          }
           public string UpdateStats_Schedule_master(ScheduleMasterQuery query)  // master 狀態更新
           {
               StringBuilder strSql = new StringBuilder();

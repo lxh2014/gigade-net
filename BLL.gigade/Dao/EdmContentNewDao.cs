@@ -24,6 +24,7 @@ namespace BLL.gigade.Dao
             StringBuilder sqlFrom = new StringBuilder();
             StringBuilder sqlCount = new StringBuilder();
             StringBuilder sqlWhere = new StringBuilder();
+            query.Replace4MySQL();
             totalCount = 0;
             try
             {
@@ -95,7 +96,7 @@ namespace BLL.gigade.Dao
 
         public int InsertEdmContentNew(EdmContentNew query)
         {
-            StringBuilder sql = new StringBuilder();
+           query.Replace4MySQL();            StringBuilder sql = new StringBuilder();
             try
             {
                 sql.Append("insert into edm_content_new(group_id,`subject`,template_id,template_data, ");
@@ -106,13 +107,16 @@ namespace BLL.gigade.Dao
             }
             catch (Exception ex)
             {
-                throw new Exception("EdmContentNewDao-->InsertEdmContentNew-->" + sql.ToString()+ex.Message, ex);
+                throw new Exception("EdmContentNewDao-->InsertEdmContentNew-->" + ex.Message + ";sql:" + sql.ToString(), ex);
             }
         }
 
         public int UpdateEdmContentNew(EdmContentNew query)
         {
+            query.Replace4MySQL();
             StringBuilder sql = new StringBuilder();
+            query.Replace4MySQL();
+
             try
             {
                 sql.AppendFormat("update edm_content_new set group_id='{0}',subject='{1}',template_id='{2}',template_data='{3}',importance='{4}',", query.group_id, query.subject, query.template_id, query.template_data, query.importance);
@@ -121,13 +125,15 @@ namespace BLL.gigade.Dao
             }
             catch (Exception ex)
             {
-                throw new Exception("EdmContentNewDao-->InsertEdmContentNew-->" + sql.ToString() + ex.Message, ex);
+                throw new Exception("EdmContentNewDao-->InsertEdmContentNew-->"+ ex.Message+";sql:" + sql.ToString() , ex);
             }
         }
 
         public string InsertEdmSendLog(EdmSendLog query)
         {
             StringBuilder sql = new StringBuilder();
+            query.Replace4MySQL();
+
             try
             {
                 sql.Append("insert into edm_send_log (content_id,test_send,receiver_count,schedule_date,expire_date,createdate,create_userid)values(");
@@ -142,6 +148,8 @@ namespace BLL.gigade.Dao
 
         public string InsertEmailRequest(MailRequest query)
         {
+            query.Replace4MySQL();
+
             StringBuilder sql = new StringBuilder();
             try
             {

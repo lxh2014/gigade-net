@@ -948,6 +948,8 @@ namespace Admin.gigade.Controllers
             int resultone = 0;
             int resulttwo = 0;
             int resultthree = 0;
+            string startRunInfo = "";
+            string endRunInfo = "";
             try
             {
                 if (Request.Url.Host == "mng.gigade100.com")//判断是否为正式线
@@ -956,6 +958,7 @@ namespace Admin.gigade.Controllers
                 }
                 else
                 {
+                    startRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown Start";
                     _proRemoveMgr = new ProductRemoveReasonMgr(connectionString);
 
                     ProductRemoveReason prr = new ProductRemoveReason();
@@ -1088,10 +1091,14 @@ namespace Admin.gigade.Controllers
                         SaleStatus();
                         DataTable _excelMsg = _proRemoveMgr.GetStockMsg();
                         ExeclProductRmoveDownMsg(_excelMsg);
+                        endRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown End ";
+                        WriterInfo("SetProductRmoveDown-Success", startRunInfo, endRunInfo);
                         return "{success:true}";
                     }
                     else
                     {
+                        endRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown End ";
+                        WriterInfo("SetProductRmoveDown-Fail", startRunInfo, endRunInfo);
                         return "{success:false}";
                     }
                 }
@@ -1102,6 +1109,8 @@ namespace Admin.gigade.Controllers
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
+                endRunInfo = DateTime.Now.ToString() + "SetProductRmoveDown: " + ex.Message;
+                WriterInfo("SetProductRmoveDown", startRunInfo, endRunInfo);
                 return "{success:false,data:'',msg:"+ex.Message+"}";
             }
         }

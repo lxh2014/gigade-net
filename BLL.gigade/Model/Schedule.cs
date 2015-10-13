@@ -72,7 +72,7 @@ namespace BLL.gigade.Model
             start_time = DateTime.MinValue;
             end_time = DateTime.MinValue;
             duration_start = DateTime.MinValue;
-            //duration_end 
+            duration_end = DateTime.MaxValue;
             now = DateTime.Now;
             desc = string.Empty;
             create_user = 0;
