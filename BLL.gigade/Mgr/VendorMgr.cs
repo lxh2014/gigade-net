@@ -22,6 +22,7 @@ using BLL.gigade.Dao;
 using System.Data;
 using BLL.gigade.Model.Query;
 using System.Collections;
+using MySql.Data.MySqlClient;
 namespace BLL.gigade.Mgr
 {
     public class VendorMgr : IVendorImplMgr
@@ -213,14 +214,14 @@ namespace BLL.gigade.Mgr
                 if (list != null)
                 {
                     foreach (TableChangeLog t in list)
-                    { 
-                         TableChangeLogDao _logDao = new TableChangeLogDao(connStr);
-                         t.change_table = "vendor";                        
-                         t.create_time = model.created;
-                         t.create_user = (int)model.kuser_id;
-                         t.pk_id = (int)model.vendor_id;
-                         t.user_type = model.user_type;
-                         _list.Add(_logDao.insert(t));
+                    {
+                        TableChangeLogDao _logDao = new TableChangeLogDao(connStr);
+                        t.change_table = "vendor";
+                        t.create_time = model.created;
+                        t.create_user = (int)model.kuser_id;
+                        t.pk_id = (int)model.vendor_id;
+                        t.user_type = model.user_type;
+                        _list.Add(_logDao.insert(t));
                     }
                 }
                 #endregion
@@ -388,8 +389,149 @@ namespace BLL.gigade.Mgr
             }
             catch (Exception ex)
             {
-                throw new Exception("VendorMgr-->GetArrayDaysInfo"+ex.Message,ex);
+                throw new Exception("VendorMgr-->GetArrayDaysInfo" + ex.Message, ex);
             }
         }
+
+        #region 供應商銀行信息
+        public List<VendorBank> QueryBank(VendorBank query, ref int totalCount)
+        {
+            try
+            {
+                return _vendorDao.QueryBank(query, ref totalCount);
+            }
+            catch (MySqlException ex)
+            {
+                throw new Exception(ex.Number.ToString() + ":VendorMgr-->QueryBank-->" + ex.Message, ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("VendorMgr-->QueryBank" + ex.Message, ex);
+            }
+        }
+
+        public string ImportVendorBank(DataTable dt)
+        {
+            try
+            {
+                string result = "";
+                uint user_id = Convert.ToUInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id);
+                ArrayList _list = new ArrayList();
+                foreach (DataRow dr in dt.Rows)
+                {
+                    VendorBank model = new VendorBank();
+                    model.bank_code = dr[0].ToString();
+                    model.bank_name = dr[1].ToString();
+                    model.kuser = user_id;
+                    model.kdate = DateTime.Now;
+                    model.muser = model.kuser;
+                    model.mdate = model.kdate;
+                    model.status = 1;//默認啟用
+                    List<VendorBank> stores = _vendorDao.GetVendorBank(model);
+                    if (stores.Count == 0)
+                    {
+                        _list.Add(_vendorDao.SaveBank(model));
+                    }
+                    else
+                    {
+                        result += model.bank_code + ',';
+                    }
+                }
+                _mysqlDao.ExcuteSqlsThrowException(_list);
+                return result.TrimEnd(',');
+            }
+            catch (MySqlException ex)
+            {
+                throw new Exception(ex.Number.ToString() + ":VendorMgr-->ImportVendorBank-->" + ex.Message, ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("VendorMgr-->ImportVendorBank" + ex.Message, ex);
+            }
+        }
+        public int SaveVendorBank(VendorBank model)
+        {
+            try
+            {
+                List<VendorBank> _list = _vendorDao.GetVendorBank(model);
+                if (model.id == 0)//新增
+                {
+                    //判定該代碼或名稱是否存在
+                    if (_list.Count > 0)
+                    {
+                        return -1;//提示該代碼或名稱已存在,不可重複保存！
+                    }
+                    else
+                    {
+                        model.kuser = model.muser;
+                        model.kdate = model.mdate;
+                        ArrayList arr = new ArrayList();
+                        arr.Add(_vendorDao.SaveBank(model));
+                        if (_mysqlDao.ExcuteSqls(arr))
+                        {
+                            return 1;//新增成功！
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    }
+
+                }
+                else//編輯
+                {
+                    if (_list.Count > 1)
+                    {
+                        return -1;//提示該代碼或名稱已存在,不可重複保存！
+                    }
+                    else
+                    {
+                        return _vendorDao.UpdateBank(model);
+                    }
+                }
+            }
+            catch (MySqlException ex)
+            {
+                throw new Exception(ex.Number.ToString() + ":VendorMgr-->SaveVendorBank-->" + ex.Message, ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("VendorMgr-->SaveVendorBank" + ex.Message, ex);
+            }
+        }
+
+
+        public int UpdateActiveBank(VendorBank model)
+        {
+            try
+            {
+                return _vendorDao.UpdateActiveBank(model);
+            }
+            catch (MySqlException ex)
+            {
+                throw new Exception(ex.Number.ToString() + ":VendorMgr-->UpdateActiveBank-->" + ex.Message, ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("VendorMgr-->UpdateActiveBank" + ex.Message, ex);
+            }
+        }
+
+        public List<VendorBank> GetVendorBank(VendorBank model)
+        {
+            try
+            {
+                return _vendorDao.GetVendorBank(model);
+            }
+            catch (MySqlException ex)
+            {
+                throw new Exception(ex.Number.ToString() + ":VendorMgr-->GetVendorBank-->" + ex.Message, ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("VendorMgr-->GetVendorBank" + ex.Message, ex);
+            }
+        }
+        #endregion
     }
 }
