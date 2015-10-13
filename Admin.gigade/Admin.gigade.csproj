@@ -4404,11 +4404,8 @@
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
     <Content Include="Views\ScheduleService\Index.cshtml" />
     <Content Include="Views\Vendor\VendorDetails.cshtml" />
-<<<<<<< HEAD
     <Content Include="Views\Vendor\VendorBankList.cshtml" />
-=======
     <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
->>>>>>> e900f574ac3fe59d1c114a0aae8f2a6db6af1fba
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
