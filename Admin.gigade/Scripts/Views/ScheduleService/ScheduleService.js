@@ -127,9 +127,7 @@ Ext.define('GIGADE.Period', {
          { name: 'period_type', type: 'int' },
          {name:"show_period_type",type:'string'},
         { name: 'period_nums', type: 'int' },
-      //  { name: 'show_begin_datetime', type: 'date', dateFormat: "Y-m-d H:i:s" },
         { name: 'show_begin_datetime', type: 'date' },
-         //{ name: "show_begin_datetime", type: "string" },
         { name: 'current_nums', type: 'int' },
         { name: 'limit_nums', type: 'int' },
         { name: "show_create_time", type: "string" },
@@ -183,7 +181,71 @@ var sm_period = Ext.create('Ext.selection.CheckboxModel', {// period 矩形選�
     }
 });
 
-
+//左邊Master 列表頁
+var masterGiftList = Ext.create('Ext.grid.Panel', {
+    id: 'masterGiftList',
+    autoScroll: true,
+    layout: 'anchor',
+    height: document.documentElement.clientHeight - 12,
+    border: false,
+    frame: false,
+    columnLines: true,
+    store: ScheduleStore,
+    columns: [                      //顯示master
+        { header: '編號', dataIndex: 'rowid', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+         {
+             header: "排程狀態", dataIndex: 'schedule_state', align: 'center', width: 60, hidden: false,
+             renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                 if (value) {
+                     return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.rowid + ")'><img hidValue='1' id='img" + record.data.rowid + "' src='../../../Content/img/icons/accept.gif'/></a>";
+                 } else {
+                     return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.rowid + ")'><img hidValue='0' id='img" + record.data.rowid + "' src='../../../Content/img/icons/drop-no.gif'/></a>";
+                 }
+             }
+         },
+        { header: '排程Code', dataIndex: 'schedule_code', align: 'left', width: 80, menuDisabled: true, sortable: false, align: 'center' },
+        { header: '排程名稱', dataIndex: 'schedule_name', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+       { header: 'contriller/action', dataIndex: 'schedule_api', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+       { header: '排程描述', dataIndex: 'schedule_description', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+       { header: 'schedule_period表主鍵', dataIndex: 'schedule_period_id', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+       { header: '創建人', dataIndex: 'create_username', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+       { header: '修改人', dataIndex: 'change_username', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+        { header: '上次執行時間', dataIndex: 'show_previous_execute_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+       { header: '下次執行時間', dataIndex: 'show_next_execute_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+       { header: '創建時間', dataIndex: 'show_create_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+       { header: '修改時間', dataIndex: 'show_change_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+    ],
+    tbar: [
+     { xtype: 'button', text: "添加", id: 'add_master', iconCls: 'icon-user-add', handler: add_master },//添加按鈕
+     { xtype: 'button', text: "編輯", id: 'edit_master', iconCls: 'icon-user-edit', disabled: true, handler: onedit_master },//編輯按鈕  包括 添加 刪除 修改 功能
+     { xtype: 'button', text: "刪除", id: 'delete_master', iconCls: 'icon-user-remove', disabled: true, handler: ondelete_master },
+     { xtype: 'button', text: "立即執行", id: 'runonce_master', iconCls: 'icon-user-edit', disabled: true, handler: onrunonce_master },
+     '->',
+     { xtype: 'button', text: "查詢", id: 'grid_btn_search', iconCls: 'ui-icon ui-icon-search', width: 65, handler: Search },
+    ],
+    bbar: Ext.create('Ext.PagingToolbar', {
+        store: ScheduleStore,
+        pageSize: pageSize,
+        displayInfo: true,//是否顯示數據信息
+        displayMsg: NOW_DISPLAY_RECORD + ': {0} - {1}' + TOTAL + ': {2}',
+        emptyMsg: NOTHING_DISPLAY
+    }),
+    listeners: {
+        scrollershow: function (scroller) {
+            if (scroller && scroller.scrollEl) {
+                scroller.clearManagedListeners();
+                scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
+            }
+        },
+        itemclick: function (view, record, item, index, e) {
+            LoadDetail(currentRecord = record);
+        },
+        resize: function () {
+            this.doLayout();
+        }
+    },
+    selModel: sm_master,
+})
 
 // 中間的panel
 var center = Ext.create('Ext.form.Panel', {
@@ -335,72 +397,6 @@ Ext.onReady(function () {
 
 });
 
-//左邊Master 列表頁
-var masterGiftList = Ext.create('Ext.grid.Panel', {
-    id: 'masterGiftList',
-    autoScroll: true,
-    layout: 'anchor',
-    height: document.documentElement.clientHeight - 12,
-    border: false,
-    frame: false,
-    columnLines: true,
-    store: ScheduleStore,
-    columns: [                      //顯示master
-        { header: '編號', dataIndex: 'rowid', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-         {
-             header: "排程狀態", dataIndex: 'schedule_state', align: 'center', width: 60, hidden: false,
-             renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                 if (value) {
-                     return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.rowid + ")'><img hidValue='1' id='img" + record.data.rowid + "' src='../../../Content/img/icons/accept.gif'/></a>";
-                 } else {
-                     return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.rowid + ")'><img hidValue='0' id='img" + record.data.rowid + "' src='../../../Content/img/icons/drop-no.gif'/></a>";
-                 }
-             }
-         },
-        { header: '排程Code', dataIndex: 'schedule_code', align: 'left', width: 80, menuDisabled: true, sortable: false, align: 'center' },
-        { header: '排程名稱', dataIndex: 'schedule_name', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: 'contriller/action', dataIndex: 'schedule_api', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '排程描述', dataIndex: 'schedule_description', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: 'schedule_period表主鍵', dataIndex: 'schedule_period_id', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '創建人', dataIndex: 'create_username', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '修改人', dataIndex: 'change_username', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-        { header: '上次執行時間', dataIndex: 'show_previous_execute_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '下次執行時間', dataIndex: 'show_next_execute_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '創建時間', dataIndex: 'show_create_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '修改時間', dataIndex: 'show_change_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-    ],
-    tbar: [
-     { xtype: 'button', text: "添加", id: 'add_master', iconCls: 'icon-user-add', handler: add_master },//添加按鈕
-     { xtype: 'button', text: "編輯", id: 'edit_master',iconCls: 'icon-user-edit',disabled:true, handler:onedit_master},//編輯按鈕  包括 添加 刪除 修改 功能
-     { xtype: 'button', text: "刪除", id: 'delete_master', iconCls: 'icon-user-remove', disabled: true, handler: ondelete_master },
-     { xtype: 'button', text: "立即執行", id: 'runonce_master', iconCls: 'icon-user-edit', disabled: true, handler: onrunonce_master },
-     '->',
-     { xtype: 'button', text: "查詢", id: 'grid_btn_search', iconCls: 'ui-icon ui-icon-search', width: 65, handler: Search },
-     ],
-    bbar: Ext.create('Ext.PagingToolbar', {
-        store: ScheduleStore,
-        pageSize: pageSize,
-        displayInfo: true,//是否顯示數據信息
-        displayMsg: NOW_DISPLAY_RECORD + ': {0} - {1}' + TOTAL + ': {2}',
-        emptyMsg: NOTHING_DISPLAY
-    }),
-    listeners: {
-        scrollershow: function (scroller) {
-            if (scroller && scroller.scrollEl) {
-                scroller.clearManagedListeners();
-                scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
-            }
-        },
-        itemclick: function (view, record, item, index, e) {
-            LoadDetail(currentRecord = record);
-        },
-        resize: function () {
-            this.doLayout();
-        }
-    },
-    selModel: sm_master,
-})
-
 
 function LoadDetail(record) {
     if (record.data.rowid == undefined || record.data.rowid == 0) {
@@ -424,7 +420,7 @@ function Search() {
     });
 }
 
-/*********************啟用/禁用**********************/
+/*************************************************************************************啟用/禁用*************************************************************************************************/
 function UpdateActive(id) {
     var activeValue = $("#img" + id).attr("hidValue");
     $.ajax({
@@ -481,7 +477,6 @@ function UpdateActive(id) {
  }
 
  /*************************************************************************************編輯_period*************************************************************************************************/
-
  function onedit_period() {
      var row = Ext.getCmp("detailist2").getSelectionModel().getSelection();
      if (row.length == 0) {
@@ -494,21 +489,16 @@ function UpdateActive(id) {
      }
  }
 
-
 /*************************************************************************************添加信息_master*************************************************************************************************/
 
 function add_master() {
     editFunction_master(null, ScheduleStore);
 }
 
-
 /*************************************************************************************添加信息_config*************************************************************************************************/
-
 function add_config() {
     editFunction_config(null, Schedule_Config_Store);
 }
-
-
 /*************************************************************************************添加信息_period*************************************************************************************************/
 
 function add_period() {
@@ -562,58 +552,6 @@ function ondelete_master() {
     }
 }
 
-/*************************************************************************************立即執行選中的排程_master*************************************************************************************************/
-function onrunonce_master()
-{
-    var row = Ext.getCmp("masterGiftList").getSelectionModel().getSelection();
-    if (row.length <= 0)
-    {
-        Ext.Msg.alert("未選中任何行!");
-    }
-
-    else
-    {
-        //  var id = Ext.getCmp('id').getValue();
-        Ext.Msg.confirm('提示', Ext.String.format("立即執行選中的" + row.length + "條排程?", row.length), function (btn)
-        {
-            if (btn == 'yes')
-            {
-                var rowIDs = '';
-                for (var i = 0; i < row.length; i++)
-                {
-
-                    rowIDs += row[i].data.schedule_api + '&' + row[i].data.schedule_code + ',';//可以執行多條數據記錄                  
-                }
-                Ext.Ajax.request({
-                    //控制器下的delete方法
-                    url: '/ScheduleService/ScheduleMasterRunOnce',
-                    method: 'post',
-                    params: { id: rowIDs },
-                    success: function (form, action)
-                    {
-                        var result = Ext.decode(form.responseText);
-                        if (result.success)
-                        {
-                            Ext.Msg.alert(INFORMATION, "執行成功!");
-                            // ScheduleStore.loadPage(1);
-                            ScheduleStore.load();
-                        }
-                        else
-                        {
-                            Ext.Msg.alert(INFORMATION, "執行失敗!");
-                            //ScheduleStore.loadPage(1);
-                            ScheduleStore.load();
-                        }
-                    },
-                    failure: function ()
-                    {
-                        Ext.Msg.alert("執行失敗!");
-                    }
-                });
-            }
-        });
-    }
-}
 /*************************************************************************************刪除_config*************************************************************************************************/
 
 function ondelete_config() {
@@ -703,6 +641,49 @@ function ondelete_period() {
                     },
                     failure: function () {
                         Ext.Msg.alert("刪除失敗!");
+                    }
+                });
+            }
+        });
+    }
+}
+
+/*************************************************************************************立即執行選中的排程_master*************************************************************************************************/
+function onrunonce_master() {
+    var row = Ext.getCmp("masterGiftList").getSelectionModel().getSelection();
+    if (row.length <= 0) {
+        Ext.Msg.alert("未選中任何行!");
+    }
+
+    else {
+        //  var id = Ext.getCmp('id').getValue();
+        Ext.Msg.confirm('提示', Ext.String.format("立即執行選中的" + row.length + "條排程?", row.length), function (btn) {
+            if (btn == 'yes') {
+                var rowIDs = '';
+                for (var i = 0; i < row.length; i++) {
+
+                    rowIDs += row[i].data.schedule_api + '&' + row[i].data.schedule_code + ',';//可以執行多條數據記錄                  
+                }
+                Ext.Ajax.request({
+                    //控制器下的delete方法
+                    url: '/ScheduleService/ScheduleMasterRunOnce',
+                    method: 'post',
+                    params: { id: rowIDs },
+                    success: function (form, action) {
+                        var result = Ext.decode(form.responseText);
+                        if (result.success) {
+                            Ext.Msg.alert(INFORMATION, "執行成功!");
+                            // ScheduleStore.loadPage(1);
+                            ScheduleStore.load();
+                        }
+                        else {
+                            Ext.Msg.alert(INFORMATION, "執行失敗!");
+                            //ScheduleStore.loadPage(1);
+                            ScheduleStore.load();
+                        }
+                    },
+                    failure: function () {
+                        Ext.Msg.alert("執行失敗!");
                     }
                 });
             }

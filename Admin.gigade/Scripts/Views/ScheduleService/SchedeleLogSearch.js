@@ -1,7 +1,7 @@
 ﻿/*
  * Copyright (c)J01 
  * 作   者：yachao1120j
- * CreateTime :2015/8/24
+ * CreateTime :2015/10/12
  * 排程日誌查詢
  */
 
