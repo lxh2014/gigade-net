@@ -1272,7 +1272,7 @@ function Tier_Load(record) {
 
             Ext.getCmp('cs_time').setRawValue(record.data.duration_start);
 
-            if (record.data.duration_end == "0001/01/01" || record.data.duration_end == "") {
+            if (record.data.duration_end == "0001/01/01" || record.data.duration_end == "" || record.data.duration_end=="9999/12/31") {
                 Ext.getCmp('noendtime').setValue(true);
                 Ext.getCmp('ce_time').setRawValue("");
             } else {
@@ -1292,7 +1292,7 @@ function Tier_Load(record) {
 
             Ext.getCmp('cs_time').setRawValue(record.data.duration_start);
 
-            if (record.data.duration_end == "0001/01/01" || record.data.duration_end == "") {
+            if (record.data.duration_end == "0001/01/01" || record.data.duration_end == "" || record.data.duration_end == "9999/12/31") {
                 Ext.getCmp('noendtime').setValue(true);
                 Ext.getCmp('ce_time').setRawValue("");
             } else {
