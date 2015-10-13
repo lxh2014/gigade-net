@@ -6,21 +6,24 @@ using BLL.gigade.Dao;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using System.Data;
+using BLL.gigade.Dao.Impl;
 
 namespace BLL.gigade.Mgr
 {
     public class SecretInfoLogMgr
     {
         private SecretInfoLogDao _secretlogDao;
+        private IParametersrcImplDao _paraDao;
         private string connStr;
         public SecretInfoLogMgr(string connectionStr)
         {
             _secretlogDao = new SecretInfoLogDao(connectionStr);
+            _paraDao = new ParametersrcDao(connectionStr);
             connStr = connectionStr;
         }
         public DataTable GetSecretInfoLog(SecretInfoLog query, out int totalCount)
         {
-            try 
+            try
             {
                 DataTable _dt = _secretlogDao.GetSecretInfoLog(query, out totalCount);
 
@@ -84,6 +87,32 @@ namespace BLL.gigade.Mgr
             catch (Exception ex)
             {
                 throw new Exception("SecretInfoLogMgr-->UpdateSecretInfoLog-->" + ex.Message, ex);
+            }
+        }
+        public string QuerySecretType(string strParaType, int used = 1)
+        {
+            try
+            {
+                List<Parametersrc> paraResult = _paraDao.Query(new Parametersrc { ParameterType = strParaType, Used = used });
+                StringBuilder stb = new StringBuilder();
+
+                stb.Append("{");
+                stb.Append(string.Format("success:true,items:["));
+                stb.Append("{");
+                stb.AppendFormat("\"parameterCode\":\"{0}\",\"parameterName\":\"{1}\"", 0, "全部");
+                stb.Append("}");
+                foreach (Parametersrc para in paraResult)
+                {
+                    stb.Append("{");
+                    stb.Append(string.Format("\"parameterCode\":\"{0}\",\"parameterName\":\"{1}\"", para.ParameterCode, para.parameterName));
+                    stb.Append("}");
+                }
+                stb.Append("]}");
+                return stb.ToString().Replace("}{", "},{");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("SecretInfoLogMgr-->QuerySecretType-->" + ex.Message, ex);
             }
         }
     }

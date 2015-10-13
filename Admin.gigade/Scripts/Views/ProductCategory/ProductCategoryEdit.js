@@ -27,211 +27,212 @@ editFunction = function (row, store, fatherid, fathername) {
         labelWidth: 45,
         url: '/ProductCategory/ProductCategorySave',
         items: [
-                    {
-                        xtype: 'textfield',
-                        fieldLabel: CATEGORYID,
-                        id: 'category_id',
-                        name: 'category_id',
-                        submitValue: true,
-                        hidden: true,
-                        width: 300
-                    },
-                    {
-                        xtype: 'combotree',
-                        id: 'comboFrontCage',
-                        name: 'category_father_name',
-                        hiddenname: 'category_father_name',
-                        editable: false,
-                        submitValue: false,
-                        colName: 'category_father_name',
-                        store: frontCateStore,
-                        fieldLabel: FATHERCATE,
-                        width: 300,
-                        labelWidth: 100,
-                        allowBlank: false
-                    },
-                    {
-                        hidden: true,
-                        xtype: 'textfield',
-                        id: 'comboFrontCage_hide',
-                        name: 'category_father_id',
-                        width: 10
-                    },
-                    {
-                        xtype: 'textfield',
-                        fieldLabel: CATEGORYNAME,
-                        id: 'category_name',
-                        name: 'category_name',
-                        submitValue: true,
-                        hidden: false,
-                        width: 300,
-                        allowBlank: false
-                    },
-                    {
-                        xtype: 'numberfield',
-                        fieldLabel: SORT,
-                        allowBlank: false,
-                        id: 'category_sort',
-                        name: 'category_sort',
-                        minValue: 0,
-                        value: 0,
-                        allowDecimals: false,
-                        submitValue: true,
-                        width: 300
-                    },
-                    {
-                        xtype: 'radiogroup',
-                        hidden: false,
-                        id: 'category_display',
-                        name: 'category_display',
-                        fieldLabel: ISSHOW,
-                        colName: 'category_display',
-                        anchor: '100%',
-                        defaults: {
-                            name: 'category_display',
-                            margin: '0 8 0 0'
-                        },
-                        columns: 2,
-                        vertical: true,
-                        items: [
-                        { boxLabel: SHOWSTATUS, id: 'isShow', inputValue: '1', checked: true },
-                        { boxLabel: HIDESTATUS, id: 'noShow', inputValue: '0' }
-                        ]
+        {
+            xtype: 'textfield',
+            fieldLabel: CATEGORYID,
+            id: 'category_id',
+            name: 'category_id',
+            submitValue: true,
+            hidden: true,
+            width: 300
+        },
+        {
+            xtype: 'combotree',
+            id: 'comboFrontCage',
+            name: 'category_father_name',
+            hiddenname: 'category_father_name',
+            editable: false,
+            submitValue: false,
+            colName: 'category_father_name',
+            store: frontCateStore,
+            fieldLabel: FATHERCATE,
+            width: 300,
+            labelWidth: 100,
+            allowBlank: false
+        },
+        {
+            hidden: true,
+            xtype: 'textfield',
+            id: 'comboFrontCage_hide',
+            name: 'category_father_id',
+            width: 10
+        },
+        {
+            xtype: 'textfield',
+            fieldLabel: CATEGORYNAME,
+            id: 'category_name',
+            name: 'category_name',
+            submitValue: true,
+            hidden: false,
+            width: 300,
+            allowBlank: false
+        },
+        {
+            xtype: 'numberfield',
+            fieldLabel: SORT,
+            allowBlank: false,
+            id: 'category_sort',
+            name: 'category_sort',
+            minValue: 0,
+            value: 0,
+            allowDecimals: false,
+            submitValue: true,
+            width: 300
+        },
+        {
+            xtype: 'radiogroup',
+            hidden: false,
+            id: 'category_display',
+            name: 'category_display',
+            fieldLabel: ISSHOW,
+            colName: 'category_display',
+            anchor: '100%',
+            defaults: {
+                name: 'category_display',
+                margin: '0 8 0 0'
+            },
+            columns: 2,
+            vertical: true,
+            items: [
+            { boxLabel: SHOWSTATUS, id: 'isShow', inputValue: '1', checked: true },
+            { boxLabel: HIDESTATUS, id: 'noShow', inputValue: '0' }
+            ]
+        }
+        ,
+        {
+            xtype: 'radiogroup',
+            hidden: false,
+            id: 'category_link_mode',
+            name: 'category_link_mode',
+            fieldLabel: LINKMODE,
+            colName: 'category_link_mode',
+            anchor: '100%',
+            defaults: {
+                name: 'category_link_mode',
+                margin: '0 8 0 0'
+            },
+            columns: 2,
+            vertical: true,
+            items: [
+            { boxLabel: OLDWIN, id: 'ls', inputValue: '1', checked: true },
+            { boxLabel: NEWWIN, id: 'lm', inputValue: '2' }
+            ]
+        },
+        {
+            xtype: 'textfield',
+            vtype: 'url',
+            fieldLabel: CATELINKURL,
+            id: 'category_link_url',
+            name: 'category_link_url',
+            submitValue: true,
+            hidden: false,
+            width: 300
+        },
+        {//Banner
+            xtype: 'filefield',
+            name: 'photo',
+            id: 'photo',
+            fieldLabel: CATEBANNER,
+            msgTarget: 'side',
+            buttonText: SELECT_IMG,
+            submitValue: true,
+            allowBlank: true,
+            fileUpload: true,
+            hidden: false,
+            width: 300
+        },
+        {
+            xtype: 'radiogroup',
+            hidden: false,
+            id: 'banner_status',
+            name: 'banner_status',
+            fieldLabel: BANNERSTATUS,
+            colName: 'banner_status',
+            defaults: {
+                name: 'banner_status',
+                margin: '0 8 0 0'
+            },
+            columns: 2,
+            vertical: true,
+            items: [
+            { boxLabel: ACTIVE, id: 'isStatus', inputValue: '1', checked: true },
+            { boxLabel: NOTACTIVE, id: 'noStatus', inputValue: '2' }
+            ]
+        }
+        ,
+        {
+            xtype: 'radiogroup',
+            hidden: false,
+            id: 'banner_link_mode',
+            name: 'banner_link_mode',
+            fieldLabel: BANNERLINKMODE,
+            colName: 'banner_link_mode',
+            defaults: {
+                name: 'banner_link_mode',
+                margin: '0 8 0 0'
+            },
+            columns: 2,
+            vertical: true,
+            items: [
+            { boxLabel: OLDWIN, id: 'link_mode1', inputValue: '1', checked: true, width: 150 },
+            { boxLabel: NEWWIN, id: 'link_mode12', inputValue: '2' }
+            ]
+        }
+        ,
+        {
+            xtype: 'textfield',
+            fieldLabel: BANNERLINKURL,
+            id: 'banner_link_url',
+            name: 'banner_link_url',
+            submitValue: true,
+            hidden: false,
+            width: 300,
+            vtype: 'url'
+        },
+        {
+            xtype: "datetimefield",
+            fieldLabel: BANNERSTART,
+            editable: false,
+            id: 'startdate',
+            name: 'start_date',
+            format: 'Y-m-d H:i:s',
+            width: 300,
+            allowBlank: false,
+            submitValue: true,
+            time: { hour: 00, min: 00, sec: 00 },
+            listeners: {
+                select: function (a, b, c) {
+                    var start = Ext.getCmp("startdate");
+                    var end = Ext.getCmp("enddate");
+                    if (start.getValue() > end.getValue() && end.getValue() != null) {
+                        Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                        end.setValue("");
                     }
-                    ,
-                    {
-                        xtype: 'radiogroup',
-                        hidden: false,
-                        id: 'category_link_mode',
-                        name: 'category_link_mode',
-                        fieldLabel: LINKMODE,
-                        colName: 'category_link_mode',
-                        anchor: '100%',
-                        defaults: {
-                            name: 'category_link_mode',
-                            margin: '0 8 0 0'
-                        },
-                        columns: 2,
-                        vertical: true,
-                        items: [
-                        { boxLabel: OLDWIN, id: 'ls', inputValue: '1', checked: true },
-                        { boxLabel: NEWWIN, id: 'lm', inputValue: '2' }
-                        ]
-                    },
-                    {
-                        xtype: 'textfield',
-                        vtype: 'url',
-                        fieldLabel: CATELINKURL,
-                        id: 'category_link_url',
-                        name: 'category_link_url',
-                        submitValue: true,
-                        hidden: false,
-                        width: 300
-                    },
-                    {//Banner
-                        xtype: 'filefield',
-                        name: 'photo',
-                        id: 'photo',
-                        fieldLabel: CATEBANNER,
-                        msgTarget: 'side',
-                        buttonText: SELECT_IMG,
-                        submitValue: true,
-                        allowBlank: true,
-                        fileUpload: true,
-                        hidden: false,
-                        width: 300
-                    },
-                    {
-                        xtype: 'radiogroup',
-                        hidden: false,
-                        id: 'banner_status',
-                        name: 'banner_status',
-                        fieldLabel: BANNERSTATUS,
-                        colName: 'banner_status',
-                        defaults: {
-                            name: 'banner_status',
-                            margin: '0 8 0 0'
-                        },
-                        columns: 2,
-                        vertical: true,
-                        items: [
-                        { boxLabel: ACTIVE, id: 'isStatus', inputValue: '1', checked: true },
-                        { boxLabel: NOTACTIVE, id: 'noStatus', inputValue: '2' }
-                        ]
+                }
+            }
+        },
+        {
+            xtype: "datetimefield",
+            fieldLabel: BANNEREND,
+            editable: false,
+            id: 'enddate',
+            name: 'end_date',
+            format: 'Y-m-d H:i:s',
+            width: 300,
+            allowBlank: false,
+            submitValue: true, //
+            time: { hour: 23, min: 59, sec: 59 },
+            listeners: {
+                select: function (a, b, c) {
+                    var start = Ext.getCmp("startdate");
+                    var end = Ext.getCmp("enddate");
+                    if (end.getValue() < start.getValue()) {
+                        Ext.Msg.alert(INFORMATION, TIMETIP);
+                        end.setValue("");
                     }
-                    ,
-                    {
-                        xtype: 'radiogroup',
-                        hidden: false,
-                        id: 'banner_link_mode',
-                        name: 'banner_link_mode',
-                        fieldLabel: BANNERLINKMODE,
-                        colName: 'banner_link_mode',
-                        defaults: {
-                            name: 'banner_link_mode',
-                            margin: '0 8 0 0'
-                        },
-                        columns: 2,
-                        vertical: true,
-                        items: [
-                        { boxLabel: OLDWIN, id: 'link_mode1', inputValue: '1', checked: true, width: 150 },
-                        { boxLabel: NEWWIN, id: 'link_mode12', inputValue: '2' }
-                        ]
-                    }
-                    ,
-                    {
-                        xtype: 'textfield',
-                        fieldLabel: BANNERLINKURL,
-                        id: 'banner_link_url',
-                        name: 'banner_link_url',
-                        submitValue: true,
-                        hidden: false,
-                        width: 300,
-                        vtype: 'url'
-                    },
-                    {
-                        xtype: "datetimefield",
-                        fieldLabel: BANNERSTART,
-                        editable: false,
-                        id: 'startdate',
-                        name: 'start_date',
-                        format: 'Y-m-d H:i:s',
-                        width: 300,
-                        allowBlank: false,
-                        submitValue: true,
-                        value: Tomorrow(),
-                        listeners: {
-                            select: function (a, b, c) {
-                                var start = Ext.getCmp("startdate");
-                                var end = Ext.getCmp("enddate");
-                                var s_date = new Date(start.getValue());
-                                end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                            }
-                        }
-                    },
-                    {
-                        xtype: "datetimefield",
-                        fieldLabel: BANNEREND,
-                        editable: false,
-                        id: 'enddate',
-                        name: 'end_date',
-                        format: 'Y-m-d H:i:s',
-                        width: 300,
-                        allowBlank: false,
-                        submitValue: true, //
-                        value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
-                        listeners: {
-                            select: function (a, b, c) {
-                                var start = Ext.getCmp("startdate");
-                                var end = Ext.getCmp("enddate");
-                                var s_date = new Date(start.getValue());
-                                if (end.getValue() < start.getValue()) {
-                                    Ext.Msg.alert(INFORMATION, TIMETIP);
-                                    end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                }
-                            }
-                        }
-                    }
+                }
+            }
+        }
         ],
         buttons: [{
             formBind: true,
@@ -299,20 +300,20 @@ editFunction = function (row, store, fatherid, fathername) {
         bodyStyle: 'padding:5px 5px 5px 5px',
         closable: false,
         tools: [
-         {
-             type: 'close',
-             qtip: ISCLOSE,
-             handler: function (event, toolEl, panel) {
-                 Ext.MessageBox.confirm(CONFIRM, IS_CLOSEFORM, function (btn) {
-                     if (btn == "yes") {
-                         Ext.getCmp('editWin').destroy();
-                     }
-                     else {
-                         return false;
-                     }
-                 });
-             }
-         }
+        {
+            type: 'close',
+            qtip: ISCLOSE,
+            handler: function (event, toolEl, panel) {
+                Ext.MessageBox.confirm(CONFIRM, IS_CLOSEFORM, function (btn) {
+                    if (btn == "yes") {
+                        Ext.getCmp('editWin').destroy();
+                    }
+                    else {
+                        return false;
+                    }
+                });
+            }
+        }
         ],
         listeners: {
             'show': function () {

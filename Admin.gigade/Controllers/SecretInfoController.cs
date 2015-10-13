@@ -1072,5 +1072,29 @@ namespace Admin.gigade.Controllers
 
         }
         #endregion
+
+        [CustomHandleError]
+        public string QueryPara()
+        {
+            _secretLogMgr = new SecretInfoLogMgr(mySqlConnectionString);
+            string json = string.Empty;
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.QueryString["paraType"]))
+                {
+                    json = _secretLogMgr.QuerySecretType(Request.QueryString["paraType"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "[]";
+            }
+            return json;
+        }
+
     }
 }
