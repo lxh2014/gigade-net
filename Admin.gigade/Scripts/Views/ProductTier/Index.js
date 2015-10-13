@@ -366,7 +366,6 @@ function onAddClick() {
     Ext.getCmp('mst').setText("");
     Ext.getCmp('irrms').setText("");
     Ext.getCmp('ms').setText("");
-    
     Ext.getCmp('btnSave').show();
 }
 
@@ -379,7 +378,7 @@ function onEditClick() {
     else if (row.length > 1) {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
-                                        ///edit by wwei0216w 2015/10/7
+        ///edit by wwei0216w 2015/10/7
         Ext.getCmp('btnSave').show();  /*交換位置防止panel中顯示 出現上一次數據*/
         Tier_Load(row[0]);
         addPc.show();
@@ -561,7 +560,7 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                 var oldList = [];
                 var updateList = [];
                 var upDataStore = relevantStore.getUpdatedRecords(); //獲得修改過的store
-                
+
 
                 for (var i = 0; i < relevantStore.data.length; i++) { //查找新增數據
                     var item = relevantStore.data.items[i];
@@ -589,7 +588,7 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                         }
                     }
                 }
-              
+
 
                 for (var i = 0; i < upDataStore.length; i++) { //更新數據
                     var item = upDataStore[i];

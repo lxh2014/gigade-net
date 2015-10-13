@@ -4620,11 +4620,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-
-          <DevelopmentServerPort>55819</DevelopmentServerPort>
-
-          <DevelopmentServerPort>7466</DevelopmentServerPort>
-
+          <DevelopmentServerPort>9046</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

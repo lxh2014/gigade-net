@@ -94,13 +94,6 @@ editFunction_master = function (row, store) {
                                 schedule_api: Ext.htmlEncode(Ext.getCmp('schedule_api').getValue()),
                                 schedule_description: Ext.htmlEncode(Ext.getCmp('schedule_description').getValue()),
                                 schedule_state: Ext.htmlEncode(Ext.getCmp('schedule_state').getValue().ignore_stockVal),
-                                //create_user: Ext.htmlEncode(Ext.getCmp('create_user').getValue()),
-                                //change_user: Ext.htmlEncode(Ext.getCmp('change_user').getValue()),
-                               // schedule_period_id: Ext.htmlEncode(Ext.getCmp('schedule_period_id').getValue()),
-                                //previous_execute_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('previous_execute_time').getValue()), 'Y-m-d H:i:s')),
-                                //next_execute_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('next_execute_time').getValue()), 'Y-m-d H:i:s')),
-                                //create_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('create_time').getValue()), 'Y-m-d H:i:s')),
-                                //change_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('change_time').getValue()), 'Y-m-d H:i:s')),
                             },
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);

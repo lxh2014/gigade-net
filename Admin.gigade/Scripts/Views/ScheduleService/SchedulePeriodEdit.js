@@ -100,25 +100,6 @@ editFunction_period= function (row, store) {
                   disabled: true,
                   minValue: 0
               },
-               //{
-               //    xtype: 'fieldcontainer',
-               //    layout: 'hbox',
-               //    fieldLabel: '啟用時間',
-               //    items: [
-               //        {
-               //            xtype: 'datefield',
-               //            id: 'begin_datetime',
-               //            name: 'begin_datetime',
-               //            format: 'Y-m-d',
-               //            editable: false,
-               //            allowBlank: false,
-               //        },
-               //        {
-               //            xtype: 'displayfield',
-               //            value: '<span style="color:red">※此為啟用時間</span>'
-               //        }
-               //    ]
-               //},
         ],
 
         // 点击保存按钮后  提示信息 
@@ -138,7 +119,6 @@ editFunction_period= function (row, store) {
                                 period_nums: Ext.htmlEncode(Ext.getCmp('period_nums').getValue()),
                                 current_nums: Ext.htmlEncode(Ext.getCmp('current_nums').getValue()),
                                 limit_nums: Ext.htmlEncode(Ext.getCmp('limit_nums').getValue()),
-                                //begin_datetime: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('begin_datetime').getValue()), 'Y-m-d H:i:s')),
                             },
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);

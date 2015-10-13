@@ -239,7 +239,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                       if (_dt.Rows.Count > 0)
                       {
                           totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
-                          sql.AppendFormat(" limit {0},{1}", query.Start, query.Limit);
+                          sql.AppendFormat(" order by rowid desc  limit {0},{1} ", query.Start, query.Limit);
                       }
                   }
                   return _access.getDataTableForObj<ScheduleLogQuery>(sql.ToString());
