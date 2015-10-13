@@ -563,6 +563,10 @@ editFunction = function (rowID, store) {
                                   Ext.getCmp("delay_reason").show();
                                   Ext.getCmp("delay_reason").allowBlank = false;
                                   //Ext.getCmp("delay_reason").isValid();
+                                  Ext.getCmp("is_sendEmail_yes").setValue(false);
+                                  Ext.getCmp("is_sendEmail_no").setValue(true);
+                                  Ext.getCmp("is_sendEmail_yes").disabled = true;
+                                  Ext.getCmp("is_sendEmail_no").disabled = true;
                               }
                               else if (delayreason == 1 || delayreason == 3) {
 
@@ -572,6 +576,10 @@ editFunction = function (rowID, store) {
                                   Ext.getCmp("delay_reason").isValid();
                                   Ext.getCmp("consult_answer").allowBlank = false;
                                   Ext.getCmp("consult_answer").show();
+                                  //Ext.getCmp("is_sendEmail_yes").setValue(true);
+                                  //Ext.getCmp("is_sendEmail_no").setValue(true);
+                                  Ext.getCmp("is_sendEmail_yes").disabled = false;
+                                  Ext.getCmp("is_sendEmail_no").disabled = false;
                               }
                           }
                       }
@@ -855,6 +863,11 @@ editFunction = function (rowID, store) {
                     {
                         Ext.getCmp("answer_status_yes").setValue(false);
                         Ext.getCmp("answer_status_delay").setValue(true);
+
+                        Ext.getCmp("is_sendEmail_yes").setValue(false);
+                        Ext.getCmp("is_sendEmail_no").setValue(true);
+                        Ext.getCmp("is_sendEmail_yes").disabled = true;
+                        Ext.getCmp("is_sendEmail_no").disabled = true;
                     }
                     if (row.data.answer_status == 3)
                     {                
