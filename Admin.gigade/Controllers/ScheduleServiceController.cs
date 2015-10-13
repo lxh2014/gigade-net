@@ -25,7 +25,10 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
-
+        public ActionResult Schedule_Log_Seacrh()
+        {
+            return View();
+        }
         /// <summary>
         /// 獲取需要執行的排程列表并逐個執行，添加日誌和更新排程；
         /// </summary>
@@ -279,6 +282,7 @@ namespace Admin.gigade.Controllers
             
 
         }
+
         static string GetHtmlByDataTable(DataTable _dtmyMonth)
         {
             System.Text.StringBuilder sbHtml = new System.Text.StringBuilder();
@@ -410,6 +414,56 @@ namespace Admin.gigade.Controllers
 
         }
 
+
+        public HttpResponseBase GetScheduleLogList()// 獲取Log數據
+        {
+            string json = string.Empty;
+            int totalcount = 0;
+            ScheduleLogQuery query = new ScheduleLogQuery();
+            try
+            {
+                List<ScheduleLogQuery> Store = new List<ScheduleLogQuery>();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                if (!string.IsNullOrEmpty(Request.Params["schedule_code"]))
+                {
+                    query.schedule_code = Request.Params["schedule_code"];
+                }
+
+                if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
+                {
+                    query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
+                {
+                    query.end_time = (int)CommonFunction.GetPHPTime( Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+                }
+              
+
+                _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+                Store = _secheduleServiceMgr.GetScheduleLogList(query, out totalcount);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+               // json = "{success:true,data:" + JsonConvert.SerializeObject(Store, Formatting.Indented, timeConverter) + "}";//返回json數據
+                json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(Store, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+
+        }
+
+
         //schedule_master 中的狀態啟用
         public HttpResponseBase UpdateStats_Schedule_master()
         {
@@ -494,6 +548,19 @@ namespace Admin.gigade.Controllers
                     if (query_chongfu != null)
                     {
                         json = "{success:false,msg:3}";
+                    }
+                    else
+                    {
+                        int _dt = _secheduleServiceMgr.SaveScheduleMasterInfo(query);
+
+                        if (_dt > 0)
+                        {
+                            json = "{success:true}";
+                        }
+                        else
+                        {
+                            json = "{success:false,msg:2}";
+                        }
                     }
                 }
                 else
@@ -718,6 +785,44 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
 
+        
+        //立即執行選中的排程
+        public HttpResponseBase ScheduleMasterRunOnce()
+        {
+            string json = string.Empty;
+            ScheduleMasterQuery query = new ScheduleMasterQuery();
+            _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+            try
+            {
+                string id = Request.Params["id"];
+                string[] ids = id.Split(',');
+                for (int i = 0; i < ids.Length - 1; i++)
+                {
+                    string[] scheduleapis = ids[i].Split('&');
+                    if(scheduleapis.Length==2)
+                    {
+                        
+                        if (!string.IsNullOrEmpty(scheduleapis[0].ToString())&&!string.IsNullOrEmpty(scheduleapis[1].ToString()))
+                        {
+                            ExeScheduleService(scheduleapis[0].ToString(),scheduleapis[1].ToString());
+                        }
+                    }
+                }
+                json = "{success:true}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
         //可以多行刪除數據_config
         public HttpResponseBase ScheduleConfigDelete()
         {

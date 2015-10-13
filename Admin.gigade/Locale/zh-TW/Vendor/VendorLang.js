@@ -20,3 +20,7 @@ EDIT = "編輯";
 
 NEXT_MOVE = "下一步";
 
+
+FILE_TYPE_WRONG = "上傳文件格式錯誤('xls', 'xlsx')!";
+FILE_UPLOADING = "數據匯入中...";
+WAIT_TITLE = "請稍等^_^";

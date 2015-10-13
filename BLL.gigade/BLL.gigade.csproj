@@ -1807,6 +1807,7 @@
     <Compile Include="Model\Vendor.cs" />
     <Compile Include="Model\VendorAccountDetail.cs" />
     <Compile Include="Model\VendorAccountMonth.cs" />
+    <Compile Include="Model\VendorBank.cs" />
     <Compile Include="Model\VendorBrand.cs" />
     <Compile Include="Model\VendorBrandSet.cs" />
     <Compile Include="Model\VendorLogin.cs" />

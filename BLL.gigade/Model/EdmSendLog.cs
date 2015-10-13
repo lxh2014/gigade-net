@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BLL.gigade.Model
 {
-  public  class EdmSendLog
+  public  class EdmSendLog:PageBase
     {
       public int log_id { get; set; }
       public int content_id { get; set; }
