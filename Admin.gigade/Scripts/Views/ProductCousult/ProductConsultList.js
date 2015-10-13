@@ -171,7 +171,6 @@ var DDLStore = Ext.create('Ext.data.Store', {
         { "txt": '待回覆', "value": "1" },
         { "txt": '處理中', "value": "2" },
         { "txt": '已回覆', "value": "3" },
-        { "txt": '已處理 (不會寄出通知信)', "value": "4" }
     ]
 });
 var HFStore = Ext.create('Ext.data.Store', {
@@ -646,11 +645,7 @@ Ext.onReady(function () {
                        }
                        else if (value == 3) {
                            return Ext.String.format('已回覆');
-                       }
-                       else if (value == 4)
-                       {
-                           return Ext.String.format('已處理 (不會寄出通知信)');
-                       }
+                       }                      
 
                    }
                },

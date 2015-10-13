@@ -54,14 +54,14 @@ editFunction = function (rowID, store) {
               submitValue: true,
               hidden: true
           },
-          {
-              xtype: 'displayfield',
-              fieldLabel: '是否發送郵件',
-              id: 'is_sendEmail',
-              name: 'is_sendEmail',
-              submitValue: true,
-              hidden: true
-          },
+          //{
+          //    xtype: 'displayfield',
+          //    fieldLabel: '是否發送郵件',
+          //    id: 'is_sendEmail',
+          //    name: 'is_sendEmail',
+          //    submitValue: true,
+          //    hidden: true
+          //},
           {
               xtype: 'displayfield',
               fieldLabel: '郵箱',
@@ -469,78 +469,204 @@ editFunction = function (rowID, store) {
           {
               xtype: 'radiogroup',
               hidden: false,
+              id: 'is_sendEmail',
+              name: 'is_sendEmail',
+              fieldLabel: '是否發郵件',
+              colName: 'is_sendEmail',
+              columns: 2,
+              margin: '0 0 0 105',
+              vertical: true,
+              items: [
+                    {
+                        boxLabel: '是',
+                        name: 'is_sendEmail',
+                        id: 'is_sendEmail_yes',
+                        inputValue: "1",
+                        checked: true,
+
+                    },
+                    {
+                        boxLabel: '否',
+                        name: 'is_sendEmail',
+                        id: 'is_sendEmail_no',
+                        inputValue: "0",
+                        checked: false,
+
+                    }
+                    ]
+          },
+          {
+              xtype: 'radiogroup',
+              hidden: false,
+              id: 'status',
+              name: 'status',
+              fieldLabel: '是否顯示諮詢',
+              colName: 'status',
+              columns: 2,
+              margin: '0 0 0 105',
+              vertical: true,
+              items: [
+                    {
+                        boxLabel: '是',
+                        name: 'status',
+                        id: 'status_yes',
+                        inputValue: "1",
+                        checked: true,
+
+                    },
+                    {
+                        boxLabel: '否',
+                        name: 'status',
+                        id: 'status_no',
+                        inputValue: "0",
+                        checked: false,
+
+                    }
+              ]
+          },
+          {
+              xtype: 'radiogroup',
+              hidden: false,
               id: 'answer_status',
               name: 'answer_status',
-              fieldLabel: '',
-              colName: 'answer_status',
-              columns: 3,
+              fieldLabel: '處理狀況',
+              colName: 'status',
+              columns: 2,
               margin: '0 0 0 105',
               vertical: true,
               items: [
                     {
                         boxLabel: '回覆',
                         name: 'answer_status',
-                        id: 'answer_no',
-                        inputValue: "1",
+                        id: 'answer_status_yes',
+                        inputValue: "3",
                         checked: true,
 
                     },
                     {
                         boxLabel: '推遲回覆',
                         name: 'answer_status',
-                        id: 'answer_delay',
+                        id: 'answer_status_delay',
                         inputValue: "2",
-                        //checked: true
-                    },
-                    {
-                        boxLabel: '回覆不顯示',
-                        name: 'answer_status',
-                        id: 'answer_yes',
-                        inputValue: "3",
-                        //checked: true
-                    },
-                    {
-                        boxLabel: '已處理 (不會寄出通知信)',
-                        name: 'answer_status',
-                        id: 'answer_finish',
-                        inputValue: "4",
-                        //checked: true
-                    },
+                        checked: false,
+
+                    }
               ],
               listeners: {
-                  change: function () {
-                      var delayreason = Ext.getCmp("answer_status").getValue().answer_status;
-                      if (delayreason == 2) {
-                          Ext.getCmp("consult_answer").allowBlank = true;
-                          Ext.getCmp("consult_answer").setValue(row.data.consult_answer);
-                          Ext.getCmp("consult_answer").hide();
-                          Ext.getCmp("consult_answer").isValid();
-                          Ext.getCmp("delay_reason").show();
-                          Ext.getCmp("delay_reason").allowBlank = false;
-                          //Ext.getCmp("delay_reason").isValid();
-                      }
-                      else if (delayreason == 1 || delayreason == 3) {
+                          change: function () {
+                              var delayreason = Ext.getCmp("answer_status").getValue().answer_status;
+                              if (delayreason == 2) {
+                                  Ext.getCmp("consult_answer").allowBlank = true;
+                                  Ext.getCmp("consult_answer").setValue(row.data.consult_answer);
+                                  Ext.getCmp("consult_answer").hide();
+                                  Ext.getCmp("consult_answer").isValid();
+                                  Ext.getCmp("delay_reason").show();
+                                  Ext.getCmp("delay_reason").allowBlank = false;
+                                  //Ext.getCmp("delay_reason").isValid();
+                              }
+                              else if (delayreason == 1 || delayreason == 3) {
 
-                          Ext.getCmp("delay_reason").allowBlank = true;
-                          Ext.getCmp("delay_reason").setValue(row.data.delay_reason);
-                          Ext.getCmp("delay_reason").hide();
-                          Ext.getCmp("delay_reason").isValid();
-                          Ext.getCmp("consult_answer").allowBlank = false;
-                          Ext.getCmp("consult_answer").show();
+                                  Ext.getCmp("delay_reason").allowBlank = true;
+                                  Ext.getCmp("delay_reason").setValue(row.data.delay_reason);
+                                  Ext.getCmp("delay_reason").hide();
+                                  Ext.getCmp("delay_reason").isValid();
+                                  Ext.getCmp("consult_answer").allowBlank = false;
+                                  Ext.getCmp("consult_answer").show();
+                              }
+                          }
                       }
-                      else if (delayreason == 4)
-                      {
-                          Ext.getCmp("delay_reason").allowBlank = true;
-                          Ext.getCmp("delay_reason").setValue(row.data.delay_reason);
-                          Ext.getCmp("delay_reason").hide();
-                          //Ext.getCmp("delay_reason").isValid();
-                          Ext.getCmp("consult_answer").allowBlank = true;
-                          Ext.getCmp("consult_answer").hide();
-                      }
-                  }
-              }
-
           },
+          //{
+          //    xtype: 'radiogroup',
+          //    hidden: false,
+          //    id: 'answer_status',
+          //    name: 'answer_status',
+          //    fieldLabel: '回覆諮詢',
+          //    colName: 'answer_status',
+          //    columns: 3,
+          //    margin: '0 0 0 105',
+          //    vertical: true,
+          //    items: [
+          //          {
+          //              boxLabel: '是否發郵件',
+          //              name: 'is_sendEmail',
+          //              id: 'is_sendEmail',
+          //              inputValue: "1",
+          //              checked: true,
+
+          //          },
+          //          {
+          //              boxLabel: '是否顯示諮詢',
+          //              name: 'status',
+          //              id: 'status',
+          //              inputValue: "1",
+          //              checked: true,
+
+          //          },
+          //          {
+          //              boxLabel: '回覆',
+          //              name: 'answer_status',
+          //              id: 'answer_no',
+          //              inputValue: "1",
+          //              checked: true,
+
+          //          },
+          //          {
+          //              boxLabel: '推遲回覆',
+          //              name: 'answer_status',
+          //              id: 'answer_delay',
+          //              inputValue: "2",
+          //              //checked: true
+          //          },
+          //          {
+          //              boxLabel: '回覆不顯示',
+          //              name: 'answer_status',
+          //              id: 'answer_yes',
+          //              inputValue: "3",
+          //              //checked: true
+          //          },
+          //          {
+          //              boxLabel: '已處理 (不會寄出通知信)',
+          //              name: 'answer_status',
+          //              id: 'answer_finish',
+          //              inputValue: "4",
+          //              //checked: true
+          //          },
+          //    ],
+          //    listeners: {
+          //        change: function () {
+          //            var delayreason = Ext.getCmp("answer_status").getValue().answer_status;
+          //            if (delayreason == 2) {
+          //                Ext.getCmp("consult_answer").allowBlank = true;
+          //                Ext.getCmp("consult_answer").setValue(row.data.consult_answer);
+          //                Ext.getCmp("consult_answer").hide();
+          //                Ext.getCmp("consult_answer").isValid();
+          //                Ext.getCmp("delay_reason").show();
+          //                Ext.getCmp("delay_reason").allowBlank = false;
+          //                //Ext.getCmp("delay_reason").isValid();
+          //            }
+          //            else if (delayreason == 1 || delayreason == 3) {
+
+          //                Ext.getCmp("delay_reason").allowBlank = true;
+          //                Ext.getCmp("delay_reason").setValue(row.data.delay_reason);
+          //                Ext.getCmp("delay_reason").hide();
+          //                Ext.getCmp("delay_reason").isValid();
+          //                Ext.getCmp("consult_answer").allowBlank = false;
+          //                Ext.getCmp("consult_answer").show();
+          //            }
+          //            else if (delayreason == 4)
+          //            {
+          //                Ext.getCmp("delay_reason").allowBlank = true;
+          //                Ext.getCmp("delay_reason").setValue(row.data.delay_reason);
+          //                Ext.getCmp("delay_reason").hide();
+          //                //Ext.getCmp("delay_reason").isValid();
+          //                Ext.getCmp("consult_answer").allowBlank = true;
+          //                Ext.getCmp("consult_answer").hide();
+          //            }
+          //        }
+          //    }
+
+          //},
           {
               xtype: 'textareafield',
               name: 'delay_reason',
@@ -570,6 +696,12 @@ editFunction = function (rowID, store) {
                 var checkR = Ext.getCmp('delay_reason').getValue();
                 checkR = checkR.replace(/[ ]/g, "");
                 var ss = Ext.htmlEncode(Ext.getCmp('answer_status').getValue().answer_status);
+                ////
+                //alert(Ext.htmlEncode(Ext.getCmp('answer_status').getValue().answer_status));
+                //alert(Ext.htmlEncode(Ext.getCmp('is_sendEmail').getValue().is_sendEmail));
+                //return;
+
+                ////
                 if (checkL.length <= 0 && ss == 3)
                 {
                     Ext.Msg.alert("提示信息", "回覆內容不能為空！");
@@ -602,7 +734,8 @@ editFunction = function (rowID, store) {
                             consult_url: Ext.htmlEncode(Ext.getCmp('consult_url').getValue()),
                             product_url: Ext.htmlEncode(Ext.getCmp('product_url').getValue()),
                             product_id: Ext.htmlEncode(Ext.getCmp('product_id').getValue()),
-                            is_sendEmail: Ext.htmlEncode(Ext.getCmp('is_sendEmail').getValue()),
+                            is_sendEmail: Ext.htmlEncode(Ext.getCmp('is_sendEmail').getValue().is_sendEmail),
+                            status: Ext.getCmp('status').getValue().status,
                             item_id: Ext.htmlEncode(Ext.getCmp('item_id').getValue()),
                             spec_id: Ext.htmlEncode(Ext.getCmp('spec_id').getValue()),
                             answer_status: Ext.htmlEncode(Ext.getCmp('answer_status').getValue().answer_status),
@@ -698,37 +831,67 @@ editFunction = function (rowID, store) {
                         Ext.getCmp("consultType5").setValue(true);
                         ischecked = 1;
                     }
+                    if (row.data.status == 1)
+                    {
+                        Ext.getCmp("status_yes").setValue(true);
+                        Ext.getCmp("status_no").setValue(false);
+                    }
+                    if (row.data.status == 0)
+                    {
+                        Ext.getCmp("status_yes").setValue(false);
+                        Ext.getCmp("status_no").setValue(true);
+                    }
+                    if (row.data.is_sendEmail == 1)
+                    {
+                        Ext.getCmp("is_sendEmail_yes").setValue(true);
+                        Ext.getCmp("is_sendEmail_no").setValue(false);
+                    }
+                    if (row.data.is_sendEmail == 0)
+                    {
+                        Ext.getCmp("is_sendEmail_yes").setValue(false);
+                        Ext.getCmp("is_sendEmail_no").setValue(true);
+                    }
+                    if (row.data.answer_status == 2)
+                    {
+                        Ext.getCmp("answer_status_yes").setValue(false);
+                        Ext.getCmp("answer_status_delay").setValue(true);
+                    }
+                    if (row.data.answer_status == 3)
+                    {                
+                        Ext.getCmp("answer_status_yes").setValue(true);
+                        Ext.getCmp("answer_status_delay").setValue(false);
+                    }
                     //if (row.data.answer_status == 1) {
                     //    Ext.getCmp("answer_no").setValue(true);
                     //    Ext.getCmp("delay_reason").hide();
                     //    Ext.getCmp("delay_reason").allowBlank = true;
                     //}
-                    if (row.data.answer_status == 2) {
-                        Ext.getCmp("answer_delay").setValue(true);
-                        Ext.getCmp("answer_no").setValue(false);
-                        Ext.getCmp("delay_reason").show();
-                        Ext.getCmp("consult_answer").hide();
-                    }
-                    if (row.data.answer_status == 3) {
-                        Ext.getCmp("answer_delay").disabled = true;
-                        Ext.getCmp("answer_delay").readOnly = true;
-                        if (row.data.status == 0) {
-                            Ext.getCmp("answer_yes").setValue(true);
-                            Ext.getCmp("answer_no").setValue(false);
-                            Ext.getCmp("answer_finish").setValue(false);
-                        }
-                    }
-                    if (row.data.answer_status == 4)
-                    {
-                        Ext.getCmp("answer_delay").disabled = true;
-                        Ext.getCmp("answer_delay").readOnly = true;
-                        //if (row.data.status == 0)
-                        {
-                            Ext.getCmp("answer_yes").setValue(false);
-                            Ext.getCmp("answer_no").setValue(false);
-                            Ext.getCmp("answer_finish").setValue(true);
-                        }
-                    }
+                    //if (row.data.answer_status == 2) {
+                    //    Ext.getCmp("answer_delay").setValue(true);
+                    //    Ext.getCmp("answer_no").setValue(false);
+                    //    Ext.getCmp("delay_reason").show();
+                    //    Ext.getCmp("consult_answer").hide();
+                    //}
+                    //if (row.data.answer_status == 3) {
+                    //    Ext.getCmp("answer_delay").disabled = true;
+                    //    Ext.getCmp("answer_delay").readOnly = true;
+                    //    if (row.data.status == 0) {
+                    //        Ext.getCmp("answer_yes").setValue(true);
+                    //        Ext.getCmp("answer_no").setValue(false);
+                    //        Ext.getCmp("answer_finish").setValue(false);
+                    //    }
+                    //}
+                    //if (row.data.answer_status == 4)
+                    //{
+                    //    Ext.getCmp("answer_delay").disabled = true;
+                    //    Ext.getCmp("answer_delay").readOnly = true;
+                    //    //if (row.data.status == 0)
+                    //    {
+                    //        Ext.getCmp("answer_yes").setValue(false);
+                    //        Ext.getCmp("answer_no").setValue(false);
+                    //        Ext.getCmp("answer_finish").setValue(true);
+                    //    }
+                    //}
 
                 }
 
