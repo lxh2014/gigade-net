@@ -467,6 +467,10 @@ editFunction = function (rowID, store) {
               fieldLabel: '諮詢內容'
           },
           {
+              xtype: 'displayfield',
+              fieldLabel: '回覆諮詢',
+          },
+          {
               xtype: 'radiogroup',
               hidden: false,
               id: 'is_sendEmail',
@@ -786,7 +790,7 @@ editFunction = function (rowID, store) {
         width: 600,
         height: document.documentElement.clientHeight * 260 / 783,
         y: 200,
-        height: 420,
+        height: 480,
         layout: 'fit',
         items: [editFrm],
         constrain: true,
