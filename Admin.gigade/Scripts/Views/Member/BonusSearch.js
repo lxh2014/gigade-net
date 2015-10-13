@@ -7,8 +7,6 @@ Ext.require([
 ]);
 var CallidForm;
 var pageSize = 25;
-/**********************************************************************群組管理主頁面**************************************************************************************/
-//群組管理Model
 Ext.define('gigade.Gwj', {
     extend: 'Ext.data.Model',
     fields: [
@@ -184,7 +182,7 @@ Ext.onReady(function () {
                         },
                          {
                              xtype: 'checkbox',
-                             boxLabel: "當前可用點數",
+                             boxLabel: "尚餘點數",
                              id: 'usings',
                              name: 'using',
                              margin: '5 0 0 5'
@@ -501,7 +499,7 @@ function showbonus_status(value, cellmeta, record, rowIndex, columnIndex, store)
             return "尚未開通";
         }
         if (record.data.master_balance > 0 && record.data.master_total > record.data.master_balance && record.data.master_start < value && value < record.data.master_end) {
-            return "當前可用點數";
+            return "尚餘點數";
         }
         if (record.data.master_total <= record.data.master_balance && record.data.master_start < value && value < record.data.master_end) {
             return "未使用";
