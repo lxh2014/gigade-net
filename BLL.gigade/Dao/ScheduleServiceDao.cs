@@ -138,7 +138,6 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
           }
 
 
-
           public List<ScheduleMasterQuery> GetScheduleMasterList(ScheduleMasterQuery query)// 得到 master表中的記錄
           {
               StringBuilder sql = new StringBuilder();

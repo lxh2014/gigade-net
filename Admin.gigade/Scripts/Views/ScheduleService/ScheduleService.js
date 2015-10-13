@@ -258,7 +258,7 @@ var center = Ext.create('Ext.form.Panel', {
     items: [
         {
             flex: 2.0,
-            title: 'Config  Period',
+            title: '排程服務',
             autoScroll: true,
             frame: false,
             items: [
@@ -281,7 +281,7 @@ var center = Ext.create('Ext.form.Panel', {
                           },
                           {
                               flex: 3.0,
-                              title: 'config',
+                              title: '排程參數信息',
                               xtype: 'gridpanel',
                               id: 'detailist1',
                               autoScroll: true,
@@ -313,7 +313,7 @@ var center = Ext.create('Ext.form.Panel', {
 
                         {
                             flex: 3.0,
-                            title: 'period',
+                            title: '排程執行信息',
                             xtype: 'gridpanel',
                             id: 'detailist2',
                             autoScroll: true,
@@ -396,7 +396,6 @@ Ext.onReady(function () {
     });
 
 });
-
 
 function LoadDetail(record) {
     if (record.data.rowid == undefined || record.data.rowid == 0) {
@@ -494,7 +493,6 @@ function UpdateActive(id) {
 function add_master() {
     editFunction_master(null, ScheduleStore);
 }
-
 /*************************************************************************************添加信息_config*************************************************************************************************/
 function add_config() {
     editFunction_config(null, Schedule_Config_Store);
