@@ -68,6 +68,7 @@ namespace Admin.gigade.Controllers
             //vendor_name:Ext.getCmp('vendor_name').getValue(),/*供應商名稱*/
             query.prepaid = int.Parse(Request.Params["perpaid"] ?? "-1");/*是否買斷*/
             query.Is_pod = int.Parse(Request.Params["Is_pod"] ?? "0");/*是否已下單採購*/
+            query.sale_status = uint.Parse(Request.Params["sale_status"] ?? "100");/*販售狀態*/
            // query.vendor_name = Request.Params["vendor_name"] ?? "";/*供應商名稱*/
             try
             {
@@ -81,14 +82,14 @@ namespace Admin.gigade.Controllers
                             case 1:
                                 query.vendor_id = uint.Parse(Request.Params["serchName"].Trim());
                                 break;
-                            case 2: 
-                                query.vendor_name_full = Request.Params["serchName"];
+                            case 2:
+                                query.vendor_name_full = Request.Params["serchName"].Trim();
                                 break;
                             case 3:
-                               query.vendor_name =Request.Params["serchName"];
+                                query.vendor_name = Request.Params["serchName"].Trim();
                                 break;
                             case 4:
-                                query.Erp_Id =Request.Params["serchName"];
+                                query.Erp_Id = Request.Params["serchName"].Trim();
                                 break;
                             default:
                                 break;
@@ -249,6 +250,14 @@ namespace Admin.gigade.Controllers
             query.prepaid = int.Parse(Request.Params["perpaid"] ?? "-1");/*是否買斷*/
             query.Is_pod = int.Parse(Request.Params["Is_pod"] ?? "0");/*是否已下單採購*/
             //query.vendor_name = Request.Params["vendor_name"] ?? "";/*供應商名稱*/
+            if (!string.IsNullOrEmpty(Request.Params["sale_status"]) && Request.Params["sale_status"] != "null")
+            {
+                query.sale_status = uint.Parse(Request.Params["sale_status"]);/*販售狀態*/
+            }
+            else 
+            {
+                query.sale_status = 100;
+            }
             if (!string.IsNullOrEmpty(Request.Params["serchType"]) && Request.Params["serchType"]!="null")
             {
                 int serchType = int.Parse(Request.Params["serchType"] ?? "0");

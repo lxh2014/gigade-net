@@ -1914,6 +1914,7 @@
     <Content Include="Scripts\Views\ProductClick\ProductClickCondition.js" />
     <Content Include="Scripts\Views\ProductClick\ProductClickList.js" />
     <Content Include="Scripts\Views\ProductComment\ChangeLog.js" />
+    <Content Include="Scripts\Views\ProductComment\ProductCommentUpdate.js" />
     <Content Include="Scripts\Views\ProductHistory\ParticularsHistory.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeEdit.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeList.js" />
@@ -1927,7 +1928,10 @@
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsList.js" />
     <Content Include="Scripts\Views\Redirect\RedirectView.js" />
     <Content Include="Scripts\Views\ReportManagement\OderMessageSearch.js" />
+    <Content Include="Scripts\Views\ScheduleService\SchedeleLogSearch.js" />
+    <Content Include="Scripts\Views\ScheduleService\ScheduleConfigEdit.js" />
     <Content Include="Scripts\Views\ScheduleService\ScheduleMasterEdit.js" />
+    <Content Include="Scripts\Views\ScheduleService\SchedulePeriodEdit.js" />
     <Content Include="Scripts\Views\ScheduleService\ScheduleService.js" />
     <Content Include="Scripts\Views\SecretInfo\SecretResetPwd.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverMasterList.js" />
@@ -4400,7 +4404,11 @@
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
     <Content Include="Views\ScheduleService\Index.cshtml" />
     <Content Include="Views\Vendor\VendorDetails.cshtml" />
+<<<<<<< HEAD
     <Content Include="Views\Vendor\VendorBankList.cshtml" />
+=======
+    <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
+>>>>>>> e900f574ac3fe59d1c114a0aae8f2a6db6af1fba
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4615,7 +4623,11 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
+<<<<<<< HEAD
           <DevelopmentServerPort>55819</DevelopmentServerPort>
+=======
+          <DevelopmentServerPort>7466</DevelopmentServerPort>
+>>>>>>> e900f574ac3fe59d1c114a0aae8f2a6db6af1fba
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

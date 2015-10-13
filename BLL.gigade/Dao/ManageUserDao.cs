@@ -258,5 +258,21 @@ namespace BLL.gigade.Dao
                 throw new Exception("ManageUserDao-->GetUserIdByEmail" +ex.Message,ex);
             }
         }
+        public List<ManageUser> GetkutiaoUser() //by zhaozhi0623j
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                sb.Append(@"select mu.user_id,mu.user_username from t_fgroup tfg 
+                                   LEFT JOIN t_groupcaller tg on  tfg.rowid=tg.groupid
+                                   left join manage_user mu on mu.user_email=tg.callid
+                                   where groupCode='picking'");
+                return _access.getDataTableForObj<ManageUser>(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ManageUserDao-->GetkutiaoUser" + ex.Message, ex);
+            }
+        }
     }
 }

@@ -81,17 +81,25 @@ namespace BLL.gigade.Dao
             try
             {
                 sql.Append("SELECT ip.po_id,p.parameterName,pi.erp_id,pt.product_name,CONCAT(ps.spec_name,'-',ps2.spec_name) as spec,ip.qty_ord,ip.qty_claimed,qty_damaged,v.vendor_name_full,v.vendor_id,");
-                sql.Append("pt.product_id as productid,pi.item_id,mu.user_username as create_username,mu1.user_username as change_username,ip.create_dtim,ip.change_dtim   FROM ipod ip ");
+                sql.Append("pt.product_id as productid,pi.item_id,mu.user_username as create_username,mu1.user_username as change_username,ip.create_dtim,ip.change_dtim,dfsm.delivery_freight_set as product_freight_set FROM ipod ip ");
                 sqlJoin.Append("LEFT JOIN ipo i ON ip.po_id=i.po_id ");
                 sqlJoin.Append("LEFT JOIN (select parameterCode,parameterName from t_parametersrc where parameterType='po_type') p ON i.po_type=p.parameterCode ");
                 sqlJoin.Append("LEFT JOIN product_item pi ON ip.prod_id=pi.item_id ");
                 sqlJoin.Append("LEFT JOIN product pt ON pi.product_id=pt.product_id ");
+                sqlJoin.Append("left join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=pt.product_freight_set  ");
                 sqlJoin.Append("LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id ");
                 sqlJoin.Append("LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id  ");
                 sqlJoin.Append("LEFT JOIN vendor v ON i.vend_id=v.erp_id ");
                 sqlJoin.AppendFormat("LEFT JOIN manage_user mu on mu.user_id=ip.create_user ");
-                sqlJoin.Append("left join manage_user mu1 on mu1.user_id=ip.change_user where 1=1 ");
-
+                sqlJoin.Append("left join manage_user mu1 on mu1.user_id=ip.change_user where ip.plst_id='F' ");
+                if (query.product_freight_set != 0)
+                {
+                    sqlWhr.AppendFormat(" and dfsm.delivery_freight_set={0} ", query.product_freight_set);
+                }
+                if (query.change_user != 0)
+                {
+                    sqlWhr.AppendFormat(" and ip.change_user={0} ", query.change_user);
+                }
                 if (!string.IsNullOrEmpty(query.po_type))
                 {
                     sqlWhr.AppendFormat(" and i.po_type='{0}' ", query.po_type);

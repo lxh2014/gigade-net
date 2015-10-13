@@ -11,7 +11,7 @@ namespace BLL.gigade.Model
         public string schedule_code { get; set; } //排程代碼
         public string parameterCode { get; set; } //
         public string value { get; set; }
-        public string description { get; set; }
+        public string parameterName { get; set; }
         public int create_user { get; set; }
         public int create_time { get; set; }
         public int change_user { get; set; }
@@ -23,7 +23,7 @@ namespace BLL.gigade.Model
             schedule_code = string.Empty;
             parameterCode = string.Empty;
             value = string.Empty;
-            description = string.Empty;
+            parameterName = string.Empty;
             create_user = 0;
             create_time = 0;
             change_user = 0;

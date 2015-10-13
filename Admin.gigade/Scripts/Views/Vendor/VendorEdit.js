@@ -352,7 +352,7 @@ function editFunction(rowID) {
                 header: '窗口屬性',
                 dataIndex: 'contact_type',
                 width: 90,
-                align: 'left',
+                align: 'center',
                 editor: {
                     id: 'txt_contacttype',
                     xtype: 'combobox',

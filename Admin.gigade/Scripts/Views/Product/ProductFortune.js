@@ -1,5 +1,10 @@
-﻿var PRODUCT_ID = '', OLD_PRODUCT_ID = '';
-
+﻿/*  
+ * 
+ * 文件名称：ProductFortune.js 
+ * 摘    要：單一商品修改和新增 抽獎頁面
+ * 
+ */
+var PRODUCT_ID = '', OLD_PRODUCT_ID = '';
 
 function saveTemp() {
     var mask;
@@ -36,20 +41,28 @@ function saveTemp() {
                         Ext.Msg.alert(INFORMATION, data.msg);
                     }
                 }
-
             }
         });
     }
 }
 
 function save() {
+    //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    var mask;
+    if (!mask) {
+        mask = new Ext.LoadMask(Ext.getBody(), { msg: WAIT });
+    }
+    mask.show();
+    //添加disabled屬性  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    window.parent.setMoveEnable(false);
+
     var form = Ext.getCmp('fortunePanel').getForm();
     var result = true;
     if (form.isValid()) {
         Ext.Ajax.request({
             url: '/Product/fortuneSave',
             method: 'POST',
-            async: false,
+            async: window.parent.GetProductId() == '' ? false : true,
             params: {
                 ProductId: PRODUCT_ID,
                 OldProductId: OLD_PRODUCT_ID,
@@ -57,6 +70,7 @@ function save() {
                 Fortune_Freight: Ext.getCmp('numFreight').getValue()
             },
             success: function (response, opts) {
+                mask.hide();
                 var resText = eval("(" + response.responseText + ")");
                 if (PRODUCT_ID != '') {
                     if (resText.success) {
@@ -70,11 +84,12 @@ function save() {
                     if (!resText.success) {
                         Ext.Msg.alert(NOTICE, SAVE_FAIL);
                         result = false;
-                        window.parent.setMoveEnable(true);
                     }
                 }
+                window.parent.setMoveEnable(true);
             },
             failure: function (response, opts) {
+                mask.hide();
                 Ext.Msg.alert(NOTICE, SAVE_FAIL);
                 window.parent.setMoveEnable(true);
                 result = false;
@@ -131,9 +146,7 @@ var fortunePanel = Ext.create('Ext.form.Panel', {
     }
 });
 
-
 Ext.onReady(function () {
-
     PRODUCT_ID = window.parent.GetProductId();
     OLD_PRODUCT_ID = window.parent.GetCopyProductId();
 
@@ -150,7 +163,4 @@ Ext.onReady(function () {
             }
         }
     });
-
 });
-
-

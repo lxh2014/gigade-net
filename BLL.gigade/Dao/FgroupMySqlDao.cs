@@ -94,7 +94,23 @@ namespace BLL.gigade.Dao
             }
 
         }
+        public DataTable GetFgroupLists()
+        {
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+                strSql.Append("select mu.user_id,mu.user_username from t_fgroup tfg  ");
+                strSql.Append(" LEFT JOIN t_groupcaller tg on  tfg.rowid=tg.groupid ");
+                strSql.Append(" left join manage_user mu on mu.user_email=tg.callid");
+                strSql.Append(" where groupCode='picking' ;");
+                return _access.getDataTable(strSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(" FgroupDao-->GetFgroupLists-->" + ex.Message + strSql.ToString(), ex);
+            }
 
+        }
         public DataTable GetUsersByGroupId(int groupid)
         {
             StringBuilder sb = new StringBuilder();

@@ -44,13 +44,13 @@ Ext.define("gigade.kucuntiaozhengModel", {
         { name: 'parameterName', type: 'string' }
     ]
 });
-//Ext.define("gigade.docUserStore", {
-//    extend: 'Ext.data.Model',
-//    fields: [
-//        { name: 'key', type: 'int' },
-//        { name: 'value', type: 'string' }
-//    ]
-//});
+Ext.define("gigade.UserStoreModel", {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: 'user_id', type: 'int' },
+        { name: 'user_username', type: 'string' }
+    ]
+});
 //庫調原因
 var KutiaoStore = Ext.create("Ext.data.Store", {
     model: 'gigade.kucuntiaozhengModel',
@@ -65,35 +65,21 @@ var KutiaoStore = Ext.create("Ext.data.Store", {
         }
     }
 });
-//庫調人員
-//var docUserStore = Ext.create('Ext.data.Store', {
-//    autoDestroy: true,
-//    pageSize: pageSize,
-//    model: 'gigade.docUserStore',
-//    proxy: {
-//        type: 'ajax',
-//        url: '/WareHouse/GetkutiaoUser',
-//        reader: {
-//            type: 'json',
-//            root: 'data',
-//        }
-//    }
-//});
-//var docUserStore = Ext.create("Ext.data.Store", {
-//    model: 'gigade.docUserStore',
-//    autoLoad: true,
-//    proxy: {
-//        type: 'ajax',
-//        url: '/WareHouse/GetkutiaoUser',
-//        noCache: false,
-//        getMethod: function () { return 'get'; },
-//        actionMethods: 'post',
-//        reader: {
-//            type: 'json',
-//            root: 'data'
-//        }
-//    }
-//});
+//庫調人員Store
+var docUserStore = Ext.create("Ext.data.Store", {
+    model: 'gigade.UserStoreModel',
+    // autoDestroy: true,
+    autoLoad: true,
+    proxy: {
+        type: 'ajax',
+        url: '/WareHouse/GetkutiaoUser',
+        actionMethods: 'post',
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
 var IialgStore = Ext.create('Ext.data.Store', {
     autoDestroy: true,
     pageSize: pageSize,
@@ -116,7 +102,8 @@ IialgStore.on('beforeload', function () {
         //iarc_id: Ext.getCmp('iarc_id').getValue(),
         starttime: Ext.getCmp('start_time').getValue(),
         endtime: Ext.getCmp('end_time').getValue(),
-        doc_no: Ext.getCmp('doc_no').getValue()//
+        doc_no: Ext.getCmp('doc_no').getValue(),
+        doc_userid: Ext.getCmp('doc_userid').getValue(),
     })
 });
 function Query(x) {
@@ -129,7 +116,8 @@ function Query(x) {
             //iarc_id: Ext.getCmp('iarc_id').getValue(),            
             starttime: Ext.getCmp('start_time').getValue(),
             endtime: Ext.getCmp('end_time').getValue(),
-            doc_no: Ext.getCmp('doc_no').getValue()//
+            doc_no: Ext.getCmp('doc_no').getValue(),
+            doc_userid: Ext.getCmp('doc_userid').getValue()
         }
     });
 }
@@ -137,7 +125,7 @@ Ext.onReady(function () {
     var frm = Ext.create('Ext.form.Panel', {
         id: 'frm',
         layout: 'anchor',
-        height: 100,
+        height: 110,
         border: 0,
         bodyPadding: 10,
         width: document.documentElement.clientWidth,
@@ -152,6 +140,8 @@ Ext.onReady(function () {
                         fieldLabel: '商品細項編號',
                         id: 'item_id',
                         name: 'item_id',
+                        margin: '0 5 2 0',
+                        labelWidth: 80,
                         listeners: {
                             specialkey: function (field, e) {
                                 if (e.getKey() == Ext.EventObject.ENTER) {
@@ -165,6 +155,8 @@ Ext.onReady(function () {
                         fieldLabel: '調整料位',
                         id: 'loc_id',
                         name: 'loc_id',
+                        margin: '0 5 2 0',
+                        labelWidth: 60,
                         listeners: {
                             specialkey: function (field, e) {
                                 if (e.getKey() == Ext.EventObject.ENTER) {
@@ -178,7 +170,8 @@ Ext.onReady(function () {
                         fieldLabel: '前置單號',
                         id: 'po_id',
                         name: 'po_id',
-                        margin: '0 5 0 2',
+                        margin: '0 5 2 0',
+                        labelWidth: 60,
                         listeners: {
                             specialkey: function (field, e) {
                                 if (e.getKey() == Ext.EventObject.ENTER) {
@@ -208,11 +201,42 @@ Ext.onReady(function () {
                 combineErrors: true,
                 layout: 'hbox',
                 items: [
-                     { xtype: 'label', text: '調整時間:' },
+                  {
+                      xtype: 'textfield',
+                      fieldLabel: '庫存調整單號',
+                      id: 'doc_no',
+                      name: 'doc_no',
+                      margin: '0 5 2 0',
+                      labelWidth: 80,
+                      listeners: {
+                          specialkey: function (field, e) {
+                              if (e.getKey() == Ext.EventObject.ENTER) {
+                                  Query();
+                              }
+                          }
+                      }
+                  }
+                , {
+                    xtype: 'combobox',
+                    editable: false,
+                    margin: "0 5 2 0",
+                    fieldLabel: '庫調人員',
+                    labelWidth: 60,
+                    id: 'doc_userid',
+                    store: docUserStore,
+                    queryMode: 'local',
+                    submitValue: true,
+                    displayField: 'user_username',
+                    valueField: 'user_id',
+                    emptyText: '請選擇',
+                    value: -1
+                },
                 {
                     xtype: "datefield",
                     editable: false,
-                    margin: '0 0 0 5',
+                    margin: '0 5 2 0',
+                    fieldLabel: '調整時間',
+                    labelWidth: 60,
                     id: 'start_time',
                     name: 'start_time',
                     //format: 'Y/m/d',
@@ -240,6 +264,7 @@ Ext.onReady(function () {
                     editable: false,
                     id: 'end_time',
                     name: 'end_time',
+                    margin: '0 5 2 0',
                     //format: 'Y/m/d',
                     value: Tomorrow(),
                     listeners: {
@@ -258,35 +283,7 @@ Ext.onReady(function () {
                             }
                         }
                     }
-                }, {
-                    xtype: 'textfield',
-                    fieldLabel: '庫存調整單號',
-                    id: 'doc_no',
-                    name: 'doc_no',
-                    margin: '0 5 0 2',
-                    listeners: {
-                        specialkey: function (field, e) {
-                            if (e.getKey() == Ext.EventObject.ENTER) {
-                                Query();
-                            }
-                        }
-                    }
-                }
-                //, {
-                //    xtype: 'combobox',
-                //    editable: false,
-                //    margin: "0 5 0 0",
-                //    fieldLabel: '庫調人員',
-                //    labelWidth: 60,
-                //    id: 'searchtype',
-                //    store: docUserStore,
-                //    queryMode: 'local',
-                //    submitValue: true,
-                //    displayField: 'key',
-                //    valueField: 'value',
-                //    emptyText: '請選擇',
-                //    value: -1
-                //},
+                },
                 ]
             },
             {
@@ -296,7 +293,7 @@ Ext.onReady(function () {
                 items: [
                     {
                         xtype: 'button',
-                        margin: '0 10 0 10',
+                        margin: '5 10 0 5',
                         iconCls: 'icon-search',
                         text: "查詢",
                         handler: Query
@@ -305,17 +302,18 @@ Ext.onReady(function () {
                         xtype: 'button',
                         text: '重置',
                         id: 'btn_reset',
-                        margin: '0 10 0 10',
+                        margin: '5 10 0 5',
                         iconCls: 'ui-icon ui-icon-reset',
                         listeners: {
                             click: function () {
-                                Ext.getCmp('item_id').setValue('');
-                                Ext.getCmp('loc_id').setValue('');
-                                Ext.getCmp('po_id').setValue('');
-                                Ext.getCmp('iarc_id').setValue(0);
-                                Ext.getCmp('start_time').setValue(new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)));
-                                Ext.getCmp('end_time').setValue(Tomorrow()); 
-                                Ext.getCmp('doc_no').setValue('');
+                                //Ext.getCmp('item_id').setValue('');
+                                //Ext.getCmp('loc_id').setValue('');
+                                //Ext.getCmp('po_id').setValue('');
+                                //Ext.getCmp('iarc_id').setValue(0);
+                                //Ext.getCmp('start_time').setValue(new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)));
+                                //Ext.getCmp('end_time').setValue(Tomorrow()); 
+                                //Ext.getCmp('doc_no').setValue(''); 
+                                this.up('form').getForm().reset();
                             }
                         }
                     }
@@ -331,15 +329,15 @@ Ext.onReady(function () {
         columnLines: true,
         frame: true,
         columns: [
-            { header: "編號", dataIndex: 'id', width: 40, align: 'center' },
-            { header: "庫存調整單號", dataIndex: 'doc_no', width: 80, align: 'center' },
+            { header: "編號", dataIndex: 'id', width: 35, align: 'center' },
+            { header: "庫存調整單號", dataIndex: 'doc_no', width: 110, align: 'center' },
             { header: "主料位", dataIndex: 'loc_id', width: 80, align: 'center' },
             { header: "調整料位", dataIndex: 'loc_R', width: 80, align: 'center' },
             { header: "商品細項編號", dataIndex: 'item_id', width: 80, align: 'center' },
             { header: "商品名稱", dataIndex: 'product_name', width: 150, align: 'center' },
-            { header: "商品規格", dataIndex: 'prod_sz', width: 50, align: 'center' },
+            { header: "商品規格", dataIndex: 'prod_sz', width: 55, align: 'center' },
             {
-                header: "製造日期", dataIndex: 'made_dt', width: 90, align: 'center',
+                header: "製造日期", dataIndex: 'made_dt', width: 85, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (value != '' && value.length >= 10) {
                         return value.substring(0, 10);
@@ -347,7 +345,7 @@ Ext.onReady(function () {
                 }
             },
             {
-                header: "有效日期", dataIndex: 'cde_dt', width: 90, align: 'center',
+                header: "有效日期", dataIndex: 'cde_dt', width: 85, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (value != '' && value.length >= 10) {
                         return value.substring(0, 10);
@@ -355,11 +353,12 @@ Ext.onReady(function () {
                 }
             },
              {
-                 header: "新製造日期", dataIndex: 'c_made_dt', width: 100, align: 'center',
+                 header: "新製造日期", dataIndex: 'c_made_dt', width: 90, align: 'center',
                  renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                      if (value != '' && value.length >= 10) {
                          if (value.substring(0, 10) == "0001-01-01") {
-                             return "日期無更改";
+                             //return "日期無更改";
+                             return "";
                          }
                          else {
                              return value.substring(0, 10);
@@ -368,11 +367,12 @@ Ext.onReady(function () {
                  }
              },
             {
-                header: "新有效日期", dataIndex: 'c_cde_dt', width: 100, align: 'center',
+                header: "新有效日期", dataIndex: 'c_cde_dt', width: 90, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (value != '' && value.length >= 10) {
                         if (value.substring(0, 10) == "0001-01-01") {
-                            return "日期無更改";
+                            //return "日期無更改";
+                            return "";
                         }
                         else {
                             return value.substring(0, 10);
@@ -425,7 +425,7 @@ Ext.onReady(function () {
 })
 //匯出報表
 ExportExcel = function () {
-    window.open("/WareHouse/IialgExcel?item_id=" + Ext.getCmp("item_id").getValue() + "&loc_id=" + Ext.getCmp("loc_id").getValue() + "&po_id=" + Ext.getCmp("po_id").getValue() + "&starttime=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s') + "&endtime=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'));
+    window.open("/WareHouse/IialgExcel?item_id=" + Ext.getCmp("item_id").getValue() + "&loc_id=" + Ext.getCmp("loc_id").getValue() + "&po_id=" + Ext.getCmp("po_id").getValue() + "&starttime=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s') + "&endtime=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s') + "&doc_no=" + Ext.getCmp('doc_no').getValue() + "&doc_userid=" + Ext.getCmp('doc_userid').getValue());
 }
 function Tomorrow() {
     var d;

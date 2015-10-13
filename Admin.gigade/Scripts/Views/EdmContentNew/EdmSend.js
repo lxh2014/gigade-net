@@ -32,11 +32,8 @@
         frame: true,
         plain: true,
         constrain: true,
-        //autoScroll: true,
         layout: 'anchor',
         labelWidth: 45,
-      //  url: '/EdmNew/SaveEdmContentNew',
-     //   defaults: { anchor: "95%", msgTarget: "side" },
         items: [
                                   {
                                       xtype: 'displayfield',
@@ -108,6 +105,7 @@
                             myMask.show();
                             Ext.Ajax.request({
                                 url: '/EdmNew/SendEdm',
+                                timeout:90000,
                                 params: {
                                     testSend: 'true',
                                     content_id: Ext.getCmp('content_id').getValue(),
@@ -148,16 +146,52 @@
                 allowBlank: false,
                 allowBlank: false,
                 format: 'Y-m-d H:i:s',
+                value: new Date( new Date().getFullYear(),new Date().getMonth(),new Date().getDate()+1 ),
+                listeners: {
+                    select: function () {
+                        var sd = Ext.getCmp('schedule_date');
+                        var ed = Ext.getCmp('expire_date');
+                        var nowDate = Ext.htmlEncode(Ext.Date.format(new Date(), 'Y-m-d H:i:s'));
+                        var sdTime = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('schedule_date').getValue()), 'Y-m-d H:i:s'));
+                        if (sdTime <= nowDate)
+                        {
+                            var new_time = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1, new Date().getHours(), new Date().getMinutes(), new Date().getMilliseconds());
+                            sd.setValue(new_time);
+                            if (sd.getValue() >= ed.getValue()) {
+                                var new_time2 = new Date(sd.getValue().getFullYear(), sd.getValue().getMonth(), sd.getValue().getDate() + 1);
+                                ed.setValue(new_time2);
+                            }
+                            Ext.Msg.alert("提示信息", "排程發送時間不能小於當前時間！");
+                        }
+                        if (sd.getValue() >= ed.getValue()) {
+                            var new_time2 = new Date(sd.getValue().getFullYear(), sd.getValue().getMonth(), sd.getValue().getDate() + 1);
+                            ed.setValue(new_time2);
+                        }
+                    }
+                },
             },
            {
-               xtype: 'datetimefield',
+               xtype: 'datefield',
                fieldLabel: '信件有效時間',
                width: 275,
                id: 'expire_date',
                name: 'expire_date',
+               format: 'Y-m-d 23:59:59',
                editable: false,
                allowBlank: false,
-               allowBlank: false
+               value: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 2),
+               listeners: {
+                   select: function () {
+                       var sd = Ext.getCmp('schedule_date');//排程發送時間
+                       var ed = Ext.getCmp('expire_date');//信件有效時間
+                       
+                       if (ed.getValue() <= sd.getValue()) {
+                           var new_time = new Date(sd.getValue().getFullYear(), sd.getValue().getMonth(), sd.getValue().getDate() + 1);
+                           ed.setValue(new_time);
+                           Ext.Msg.alert("提示信息", "信件有效時間須大於排程發送時間！");
+                       }
+                   }
+               },
            },
            {
                xtype: 'combobox',
@@ -193,12 +227,13 @@
                                           items: [
                                               {
                                                   xtype: 'displayfield',
-                                                  value:'額外發送名單（換行輸入下一筆）',
+                                                  value: '額外發送名單（換行輸入下一筆）',
+                                                  margin: '0 0 0 30',
                                               },
                                                {
                                                    xtype: 'textareafield',
                                                    id: 'extra_send',
-                                                   width: 180,
+                                                   width: 295,
                                                    height: 225,
                                                    name: 'extra_send',
                                                },
@@ -210,12 +245,12 @@
                                             {
                                                 xtype: 'displayfield',
                                                 value: '額外排除名單（換行輸入下一筆）',
-                                                margin: '0 0 0 30',
+                                                margin: '0 0 0 60',
                                             },
                                              {
                                                  xtype: 'textareafield',
                                                  id: 'extra_no_send',
-                                                 width:180,
+                                                 width:295,
                                                  height: 225,
                                                  margin:'0 0 0 30',
                                                  name: 'extra_no_send',
@@ -252,6 +287,7 @@
                                       }
                                       Ext.Ajax.request({
                                           url: '/EdmNew/SendEdm',
+                                          timeout:180000,
                                           params: {
                                               testSend: 'false',
                                               content_id: Ext.getCmp('content_id').getValue(),
@@ -296,7 +332,7 @@
         iconCls: 'icon-user-edit',
         id: 'sendWin',
         height: 542,
-        width: 470,
+        width: 700,
         y: 100,
         layout: 'fit',
         items: [sendFrm],

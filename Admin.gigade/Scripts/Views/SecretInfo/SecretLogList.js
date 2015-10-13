@@ -106,14 +106,13 @@ Ext.define("gigade.paraModel", {
     ]
 });
 
-
 var secretTypeStore = Ext.create("Ext.data.Store", {
     model: 'gigade.paraModel',
     autoLoad: true,
     autoDestroy: true,
     proxy: {
         type: 'ajax',
-        url: '/Parameter/QueryPara?paraType=secret_type',
+        url: '/SecretInfo/QueryPara?paraType=secret_type',
         noCache: false,
         getMethod: function () { return 'get'; },
         actionMethods: 'post',
@@ -123,6 +122,7 @@ var secretTypeStore = Ext.create("Ext.data.Store", {
         }
     }
 });
+
 //查询
 Query = function () {
     if (Ext.getCmp('user_id').getValue() != "" || Ext.getCmp('login_mail').getValue() != "" || Ext.getCmp('login_ipfrom').getValue() != "" || Ext.getCmp('sumtotal').getValue() != "" || Ext.getCmp('start').getValue() != null || Ext.getCmp('type').getValue() != "") {
@@ -213,10 +213,11 @@ Ext.onReady(function () {
                          labelWidth: 80,
                          margin: "0 5 0 5",
                          id: 'type',
+                         lastQuery: '',
                          store: secretTypeStore,
                          displayField: 'parameterName',
                          valueField: 'parameterCode',
-                         value: 0,
+                         value: "0",
                          emptyValue: '所有類型'
                      },
                     {
@@ -280,7 +281,7 @@ Ext.onReady(function () {
                                         end.setValue(setNextMonth(start.getValue(), 1));
                                     }
                                     else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                                       // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                                        // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
                                         start.setValue(setNextMonth(end.getValue(), -1));
                                     }
                                 }
