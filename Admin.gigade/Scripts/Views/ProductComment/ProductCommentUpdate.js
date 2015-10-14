@@ -16,11 +16,12 @@
     var CommentSatisfyStore = Ext.create('Ext.data.Store', {
         fields: ['txt', 'value'],
         data: [
-        { "txt": '非常不滿意(1分)', "value": "1" },
-        { "txt": '不滿意(2分)', "value": "2" },
-        { "txt": '一般(3分)', "value": "3" },
-        { "txt": '滿意(4分)', "value": "4" },
-        { "txt": '非常滿意(5分)', "value": "5" }
+        { "txt": '非常滿意', "value": "5" },
+        { "txt": '滿意', "value": "4" },
+        { "txt": '一般', "value": "3" },
+        { "txt": '不滿意', "value": "2" },
+        { "txt": '非常不滿意', "value": "1" },
+        
         ]
     });
 
