@@ -32,8 +32,6 @@ namespace BLL.gigade.Dao
                   throw new Exception("ScheduleServiceDao-->GetExeScheduleMasterList-->" + ex.Message, ex);
               }
           }
-
-
           public ScheduleMasterQuery GetScheduleMaster(ScheduleMasterQuery query)
           {
               StringBuilder sql = new StringBuilder();
@@ -92,7 +90,6 @@ namespace BLL.gigade.Dao
                   throw new Exception("ScheduleServiceDao-->GetSchedulePeriodBySchedule-->" + ex.Message, ex);
               }
           }
-          
           public int UpdateScheduleMaster(ScheduleMasterQuery query)
           {
               StringBuilder sql = new StringBuilder();
