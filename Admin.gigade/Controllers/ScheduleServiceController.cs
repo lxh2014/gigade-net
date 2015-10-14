@@ -20,7 +20,6 @@ namespace Admin.gigade.Controllers
         string xmlPath = System.Configuration.ConfigurationManager.AppSettings["SiteConfig"];//
         private ScheduleServiceMgr _secheduleServiceMgr;
         // GET: /Schedule/
-
         public ActionResult Index()
         {
             return View();
@@ -125,12 +124,10 @@ namespace Admin.gigade.Controllers
 
         public bool UserLoginLogService()
         {
-
             if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
             {
                 return false;
             }
-            //////////////////////
             try
             {
                 string schedule_code = Request.Params["schedule_code"].ToString();
@@ -274,10 +271,7 @@ namespace Admin.gigade.Controllers
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
             }
-
-            return true;
-            
-
+            return true; 
         }
         static string GetHtmlByDataTable(DataTable _dtmyMonth)
         {
@@ -815,8 +809,28 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
-        
 
+        public bool SendEMail()
+        {
+            string json = string.Empty;
+            List<MailRequest> MR = new List<MailRequest>();
+            MailRequest model = new MailRequest();
+            MailHelper mail = new MailHelper();
+            _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+            try
+            {
+                return _secheduleServiceMgr.SendEMail(mail);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            return true;
+        }
     }
     
     

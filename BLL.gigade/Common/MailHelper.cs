@@ -64,6 +64,7 @@ namespace BLL.gigade.Common
 
     public class MailHelper
     {
+        private int i = 0;
         #region 屬性
 
         /// <summary>
@@ -568,6 +569,104 @@ namespace BLL.gigade.Common
                               Value = x.Attribute("Value").Value,
                           }).ToList();
             return result.FirstOrDefault().Value;
+        }
+        #endregion
+
+        #region 郵件排成專用(添加寄件人方法)
+        /// <summary>
+        /// 執行發送動作，不支持群發(帶寄件者)
+        /// </summary>
+        /// <param name="MailToAddress">收件人地址</param>
+        /// <param name="MailTitle">郵件主題</param>
+        /// <param name="MailBody">郵件主體內容</param>
+        /// <param name="SendAddress">寄件人地址</param>
+        /// <param name="SendName">寄件人名稱</param>
+        /// <returns></returns>
+        public Boolean SendMailAction(string MailToAddress, string MailTitle, string MailBody, string SendAddress, string SendName)
+        {
+            Boolean result = false;
+            try
+            {
+                arryMailTo.Clear();
+                arryMailTo.Add(MailToAddress);
+                if (SendMailAction(arryMailTo, MailTitle, MailBody, SendAddress, SendName))
+                {
+                    result = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(" Error:MailHelper-->SendMailAction-->" + ex.Message, ex);
+            }
+            return result;
+        }
+        /// <summary>
+        /// 執行發送動作，不支持群發(帶寄件者)
+        /// </summary>
+        /// <param name="MailToAddress">收件人地址</param>
+        /// <param name="MailTitle">郵件主題</param>
+        /// <param name="MailBody">郵件主體內容</param>
+        /// <param name="SendAddress">寄件人地址</param>
+        /// <param name="SendName">寄件人名稱</param>
+        /// <returns></returns>
+        public Boolean SendMailAction(ArrayList MailToAddress, string MailTitle, string MailBody, string SendAddress, string SendName)
+        {
+            Boolean result = false;
+            try
+            {
+                MailMessage objMail = new MailMessage();
+                //發送人地址（發送郵件時顯示發件人名稱）
+                objMail.From = new MailAddress(SendAddress, SendName);
+                //郵件主題
+                objMail.Subject = MailTitle;
+                //郵件主題編碼方式
+                objMail.SubjectEncoding = System.Text.Encoding.UTF8;
+                //郵件主體內容
+                objMail.Body = MailBody;
+                //郵件主體內容支持html編碼
+                objMail.IsBodyHtml = true;
+                //郵件主體編碼方式
+                objMail.BodyEncoding = System.Text.Encoding.UTF8;
+                //郵件收件人列表
+
+                foreach (string item in MailToAddress)
+                {
+                    objMail.To.Add(item);
+                }
+                //使用SMTP方式發送郵件
+                SmtpClient client = new SmtpClient();
+                //驗證發件人身份憑證
+                client.Credentials = new System.Net.NetworkCredential(MailFromAddress, MailFormPwd);
+                if (MailHost.Split(',').Length > 0)
+                {//MailHost
+                    string[] host = MailHost.Split(',');
+                    client.Host = host[i];
+                    if (i + 1 >= MailHost.Split(',').Length)
+                    {
+                        i = 0;
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+                else
+                {
+                    client.Host = MailHost;
+                }
+                //client.Host = MailHost;
+                if (!string.IsNullOrEmpty(MailPort))
+                {
+                    client.Port = Convert.ToInt32(MailPort);
+                }
+                client.Send(objMail);
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(" Error:MailHelper-->SendMailAction-->" + ex.Message, ex);
+            }
+            return result;
         }
         #endregion
     }
