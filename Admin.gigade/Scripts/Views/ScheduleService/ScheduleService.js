@@ -216,10 +216,10 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
        { header: '修改時間', dataIndex: 'show_change_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
     ],
     tbar: [
-     { xtype: 'button', text: "添加", id: 'add_master', iconCls: 'icon-user-add', handler: add_master },//添加按鈕
-     { xtype: 'button', text: "編輯", id: 'edit_master', iconCls: 'icon-user-edit', disabled: true, handler: onedit_master },//編輯按鈕  包括 添加 刪除 修改 功能
-     { xtype: 'button', text: "刪除", id: 'delete_master', iconCls: 'icon-user-remove', disabled: true, handler: ondelete_master },
-     { xtype: 'button', text: "立即執行", id: 'runonce_master', iconCls: 'icon-user-edit', disabled: true, handler: onrunonce_master },
+     { xtype: 'button', text: "添加", id: 'add_master', iconCls: 'icon-user-add',hidden:true, handler: add_master },//添加按鈕
+     { xtype: 'button', text: "編輯", id: 'edit_master', iconCls: 'icon-user-edit', hidden: true, disabled: true, handler: onedit_master },//編輯按鈕  包括 添加 刪除 修改 功能
+     { xtype: 'button', text: "刪除", id: 'delete_master', iconCls: 'icon-user-remove', hidden: true, disabled: true, handler: ondelete_master },
+     { xtype: 'button', text: "立即執行", id: 'runonce_master', iconCls: 'icon-user-edit', hidden: true, disabled: true, handler: onrunonce_master },
      '->',
      { xtype: 'button', text: "查詢", id: 'grid_btn_search', iconCls: 'ui-icon ui-icon-search', width: 65, handler: Search },
     ],
@@ -286,9 +286,9 @@ var center = Ext.create('Ext.form.Panel', {
                               id: 'detailist1',
                               autoScroll: true,
                               columnLines: true,
-                              height: 300,
+                              height: 330,
                               frame: false,
-                              Height: 500,
+                              //Height: 550,
                               store: Schedule_Config_Store,
                               columns: [
                                  // { header: '序號', xtype: 'rownumberer', width: 46, align: 'center' },
@@ -303,9 +303,9 @@ var center = Ext.create('Ext.form.Panel', {
                                   { header: '修改時間', dataIndex: 'show_change_time', width:150, align: 'center',  menuDisabled: true, sortable: false },
                               ],
                               tbar: [
-            { xtype: 'button', text: "添加", id: 'add_config', iconCls: 'icon-user-add', handler: add_config },//添加按鈕
-            { xtype: 'button', text: "編輯", id: 'edit_config', disabled: true, iconCls: 'icon-user-edit', handler: onedit_config},//編輯按鈕  
-            { xtype: 'button', text: "刪除", id: 'delete_config', disabled: true, iconCls: 'icon-user-remove', handler: ondelete_config },
+            { xtype: 'button', text: "添加", id: 'add_config', iconCls: 'icon-user-add', hidden: true, handler: add_config },//添加按鈕
+            { xtype: 'button', text: "編輯", id: 'edit_config', disabled: true, iconCls: 'icon-user-edit', hidden: true, handler: onedit_config },//編輯按鈕  
+            { xtype: 'button', text: "刪除", id: 'delete_config', disabled: true, iconCls: 'icon-user-remove', hidden: true, handler: ondelete_config },
 
                               ],
                               selModel: sm_config
@@ -323,29 +323,42 @@ var center = Ext.create('Ext.form.Panel', {
                             store: Schedule_Period_Store,
                             columns: [
                                 //{ header: '序號', xtype: 'rownumberer', width: 46, align: 'center' },
-                                 { header: '編號', dataIndex: 'rowid', align: 'left', width: 40, menuDisabled: true, sortable: false, align: 'center' },
-                                { header: '排程Code', dataIndex: 'schedule_code', width: 100, align: 'center',  menuDisabled: true, sortable: false },
-                                 { header: '執行頻率方式', dataIndex: 'show_period_type', align: 'center', width: 100, menuDisabled: true, sortable: false },
-                                { header: '執行頻率倍數', dataIndex: 'period_nums', align: 'center', width: 100, menuDisabled: true, sortable: false },
-                                { header: '當前已執行次數', dataIndex: 'current_nums', align: 'center', width: 80,  menuDisabled: true, sortable: false },
+                               { header: '編號', dataIndex: 'rowid', align: 'left', width: 40, menuDisabled: true, sortable: false, align: 'center' },
+                               { header: '排程Code', dataIndex: 'schedule_code', width: 100, align: 'center',  menuDisabled: true, sortable: false },
+                               { header: '執行頻率方式', dataIndex: 'show_period_type', align: 'center', width: 100, menuDisabled: true, sortable: false },
+                               { header: '執行頻率倍數', dataIndex: 'period_nums', align: 'center', width: 100, menuDisabled: true, sortable: false },
+                               { header: '當前已執行次數', dataIndex: 'current_nums', align: 'center', width: 80,  menuDisabled: true, sortable: false },
                                { header: '次數限制', dataIndex: 'limit_nums', align: 'center', width: 80, menuDisabled: true, sortable: false },
                                { header: '創建人', dataIndex: 'create_username', align: 'center', width: 80,  menuDisabled: true, sortable: false },
                                { header: '修改人', dataIndex: 'change_username', align: 'center', width: 80, menuDisabled: true, sortable: false },
-                                { header: '啟用時間', dataIndex: 'show_begin_datetime', align: 'center', width: 150, menuDisabled: true, sortable: false, renderer: Ext.util.Format.dateRenderer('Y-m-d H:i:s') },
+                               { header: '啟用時間', dataIndex: 'show_begin_datetime', align: 'center', width: 150, menuDisabled: true, sortable: false, renderer: Ext.util.Format.dateRenderer('Y-m-d H:i:s') },
                                { header: '創建時間', dataIndex: 'show_create_time', align: 'center', width: 150, menuDisabled: true, sortable: false },
                                { header: '修改時間', dataIndex: 'show_change_time', align: 'center', width: 150,  menuDisabled: true, sortable: false },
                             ],
                             tbar: [
-          { xtype: 'button', text: "添加", id: 'add_period', iconCls: 'icon-user-add', handler: add_period },//添加按鈕
-          { xtype: 'button', text: "編輯", id: 'edit_period', disabled: true, iconCls: 'icon-user-edit', handler: onedit_period },//編輯按鈕  
-          { xtype: 'button', text: "刪除", id: 'delete_period', disabled: true, iconCls: 'icon-user-remove', handler: ondelete_period },
+          { xtype: 'button', text: "添加", id: 'add_period', iconCls: 'icon-user-add', hidden: true, handler: add_period },//添加按鈕
+          { xtype: 'button', text: "編輯", id: 'edit_period', disabled: true, iconCls: 'icon-user-edit', hidden: true, handler: onedit_period },//編輯按鈕  
+          { xtype: 'button', text: "刪除", id: 'delete_period', disabled: true, iconCls: 'icon-user-remove', hidden: true, handler: ondelete_period },
      
                             ],
+                            listeners: {
+                                show: function (scroller) {
+                                    if (scroller && scroller.scrollEl)
+                                    {
+                                        scroller.clearManagedListeners();
+                                        scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
+                                    }
+                                },
+                                resize: function () {
+                                    this.doLayout();
+                                }
+                            },
                             selModel: sm_period
                         },
 
                     ]
                 }]
+
         }],
 })
 
@@ -394,7 +407,7 @@ Ext.onReady(function () {
         },
         renderTo: Ext.getBody()
     });
-
+    ToolAuthority();
 });
 
 function LoadDetail(record) {
