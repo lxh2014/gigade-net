@@ -884,6 +884,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                             if (result.success) {
                                 Ext.getCmp('ce_time').setRawValue("");
                                 irregulartimeStore.removeAll();
+                                Ext.getCmp('noendtime').setValue(false);
                                 addPc.hide();
                                 tierStore.load();
                                 Ext.Msg.alert(INFORMATION, SAVE_SUCCESS);

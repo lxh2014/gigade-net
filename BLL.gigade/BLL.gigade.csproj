@@ -175,6 +175,7 @@
     <Compile Include="Dao\ElementMapDao.cs" />
     <Compile Include="Dao\EmailBlockListDao.cs" />
     <Compile Include="Dao\EmailBlockLogDao.cs" />
+    <Compile Include="Dao\EmailGroupDao.cs" />
     <Compile Include="Dao\EventChinaTrustBagDao.cs" />
     <Compile Include="Dao\EventChinaTrustBagMapDao.cs" />
     <Compile Include="Dao\EventChinatrustDao.cs" />
@@ -725,6 +726,7 @@
     <Compile Include="Mgr\EdmTestMgr.cs" />
     <Compile Include="Mgr\ElementMapMgr.cs" />
     <Compile Include="Mgr\EmailBlockListMgr.cs" />
+    <Compile Include="Mgr\EmailGroupMgr.cs" />
     <Compile Include="Mgr\EventChinaTrustBagMapMgr.cs" />
     <Compile Include="Mgr\EventChinaTrustBagMgr.cs" />
     <Compile Include="Mgr\EventChinatrustMgr.cs" />
@@ -1310,6 +1312,7 @@
     <Compile Include="Model\ElementMap.cs" />
     <Compile Include="Model\EmailBlockList.cs" />
     <Compile Include="Model\EmailBlockLog.cs" />
+    <Compile Include="Model\EmailGroup.cs" />
     <Compile Include="Model\EventChinatrust.cs" />
     <Compile Include="Model\EventChinaTrustBag.cs" />
     <Compile Include="Model\EventChinaTrustBagMap.cs" />
