@@ -23,7 +23,7 @@ namespace BLL.gigade.Dao
               StringBuilder sql = new StringBuilder();
               try
               {
-                  sql.AppendFormat("SELECT * FROM `schedule_master` WHERE schedule_state = '{0}' AND  next_execute_time<='{1}' and next_execute_time > 0 ;", query.schedule_state, Common.CommonFunction.GetPHPTime(DateTime.Now.ToString()));
+                  sql.AppendFormat("SELECT `rowid`, `schedule_code`, `schedule_name`, `schedule_api`, `schedule_description`, `schedule_state`, `previous_execute_time`, `next_execute_time`, `schedule_period_id`, `create_user`, `create_time`, `change_user`, `change_time` FROM `schedule_master` WHERE schedule_state = '{0}' AND  next_execute_time<='{1}' and next_execute_time > 0 ;", query.schedule_state, Common.CommonFunction.GetPHPTime(DateTime.Now.ToString()));
 
                   return _access.getDataTableForObj<ScheduleMasterQuery>(sql.ToString());
               }
@@ -32,14 +32,12 @@ namespace BLL.gigade.Dao
                   throw new Exception("ScheduleServiceDao-->GetExeScheduleMasterList-->" + ex.Message, ex);
               }
           }
-
-
           public ScheduleMasterQuery GetScheduleMaster(ScheduleMasterQuery query)
           {
               StringBuilder sql = new StringBuilder();
               try
               {
-                  sql.AppendFormat("SELECT * FROM `schedule_master` WHERE schedule_code = '{0}';", query.schedule_code);
+                  sql.AppendFormat("SELECT `rowid`, `schedule_code`, `schedule_name`, `schedule_api`, `schedule_description`, `schedule_state`, `previous_execute_time`, `next_execute_time`, `schedule_period_id`, `create_user`, `create_time`, `change_user`, `change_time` FROM `schedule_master` WHERE schedule_code = '{0}';", query.schedule_code);
 
                   return _access.getSinggleObj<ScheduleMasterQuery>(sql.ToString());
               }
@@ -54,7 +52,7 @@ namespace BLL.gigade.Dao
               StringBuilder sql = new StringBuilder();
               try
               {
-                  sql.AppendFormat("SELECT * FROM `schedule_config` WHERE schedule_code = '{0}';", query.schedule_code);
+                  sql.AppendFormat("SELECT `rowid`, `schedule_code`, `parameterCode`, `parameterName`, `value`, `create_user`, `create_time`, `change_user`, `change_time` FROM `schedule_config` WHERE schedule_code = '{0}';", query.schedule_code);
                   return _access.getDataTableForObj<ScheduleConfigQuery>(sql.ToString());
               }
               catch (Exception ex)
@@ -92,7 +90,6 @@ namespace BLL.gigade.Dao
                   throw new Exception("ScheduleServiceDao-->GetSchedulePeriodBySchedule-->" + ex.Message, ex);
               }
           }
-          
           public int UpdateScheduleMaster(ScheduleMasterQuery query)
           {
               StringBuilder sql = new StringBuilder();
@@ -136,7 +133,6 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                   throw new Exception("ScheduleServiceDao-->AddScheduleLog-->" + ex.Message, ex);
               }
           }
-
 
           public List<ScheduleMasterQuery> GetScheduleMasterList(ScheduleMasterQuery query)// 得到 master表中的記錄
           {
@@ -248,6 +244,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                   throw new Exception("ScheduleServiceDao-->GetScheduleLogList-->" + ex.Message, ex);
               }
           }
+
           public string UpdateStats_Schedule_master(ScheduleMasterQuery query)  // master 狀態更新
           {
               StringBuilder strSql = new StringBuilder();

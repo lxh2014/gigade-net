@@ -346,7 +346,7 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return Response;
  
-        }
+        } // 獲取 master數據
 
         public HttpResponseBase GetScheduleConfigList()
         {
@@ -593,7 +593,7 @@ namespace Admin.gigade.Controllers
 
         }
 
-
+         
         //保存排程_config信息 
         public HttpResponseBase SaveScheduleConfigInfo()
         {
