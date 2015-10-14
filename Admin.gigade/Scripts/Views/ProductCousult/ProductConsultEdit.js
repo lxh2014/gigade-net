@@ -616,20 +616,20 @@ editFunction = function (rowID, store) {
                                   }
                               })
                           }
-                          //else
-                          //{
-                          //    Ext.getCmp("consult_answer").allowBlank = true;
-                          //    Ext.getCmp("consult_answer").setValue(row.data.consult_answer);
-                          //    Ext.getCmp("consult_answer").hide();
-                          //    Ext.getCmp("consult_answer").isValid();
-                          //    Ext.getCmp("delay_reason").show();
-                          //    Ext.getCmp("delay_reason").allowBlank = false;
-                          //    //Ext.getCmp("delay_reason").isValid();
-                          //    Ext.getCmp("is_sendEmail_yes").setValue(false);
-                          //    Ext.getCmp("is_sendEmail_no").setValue(true);
-                          //    Ext.getCmp("is_sendEmail_yes").setDisabled(true);
-                          //    Ext.getCmp("is_sendEmail_no").setDisabled(true);
-                          //}
+                          else
+                          {
+                              Ext.getCmp("consult_answer").allowBlank = true;
+                              Ext.getCmp("consult_answer").setValue(row.data.consult_answer);
+                              Ext.getCmp("consult_answer").hide();
+                              Ext.getCmp("consult_answer").isValid();
+                              Ext.getCmp("delay_reason").show();
+                              Ext.getCmp("delay_reason").allowBlank = false;
+                              //Ext.getCmp("delay_reason").isValid();
+                              Ext.getCmp("is_sendEmail_yes").setValue(false);
+                              Ext.getCmp("is_sendEmail_no").setValue(true);
+                              Ext.getCmp("is_sendEmail_yes").setDisabled(true);
+                              Ext.getCmp("is_sendEmail_no").setDisabled(true);
+                          }
                           isfirstshow = 0;
 
                       }
