@@ -23,9 +23,10 @@ namespace BLL.gigade.Dao
         public List<Fgroup> QueryAll()
         {
 
-            return _access.getDataTableForObj<Fgroup>(@"select a.rowid,groupname,groupcode,count(b.rowid) as callid,remark from t_fgroup a left join t_groupcaller b on a.rowid=b.groupid 
- LEFT JOIN manage_user mu on b.callid=mu.user_email  WHERE mu.user_status !=0 and mu.user_status !=2 
- group by a.rowid,groupname,groupcode,remark");
+            return _access.getDataTableForObj<Fgroup>(@"select a.rowid,groupname,groupcode,count(b.rowid) as callid,remark from t_fgroup a 
+left join  (SELECT tg.rowid,tg.groupId FROM manage_user mu LEFT JOIN t_groupcaller tg on mu.user_email=tg.callid WHERE mu.user_status=1)as b 
+on a.rowid=b.groupid 
+group by a.rowid ,groupname,groupcode,remark;");
         }
 
         public List<Fgroup> Query(string callid, string groupCode)
