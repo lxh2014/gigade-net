@@ -1201,26 +1201,35 @@ namespace Admin.gigade.Controllers
                 //導出EXCLE  分別導出6種
                 List<MemoryStream> msVipUser = _recommendedExcleMgr.GetVipUserInfo(rop, liparsrc[0].parameterName);
                 OutExcleForRecommendedByMs(msVipUser, liparsrc[0].parameterName, out strNewPath, nowtime);
-                //strPath = AddstrPath(strPath, strNewPath);
+                strPath = AddstrPath(strPath, strNewPath);
                 List<MemoryStream> msProduct = _recommendedExcleMgr.GetProductInfo(rop, liparsrc[1].parameterName);
                 OutExcleForRecommendedByMs(msProduct, liparsrc[1].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
                 List<MemoryStream> msOrder = _recommendedExcleMgr.GetOrderInfo(rop, liparsrc[2].parameterName);
                 OutExcleForRecommendedByMs(msOrder, liparsrc[2].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
                 List<MemoryStream> msOrderDetail = _recommendedExcleMgr.GetOrderDetailInfo(rop, liparsrc[3].parameterName);
                 OutExcleForRecommendedByMs(msOrderDetail, liparsrc[3].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
                 List<MemoryStream> msCategory = _recommendedExcleMgr.GetCategoryInfo(rop, liparsrc[4].parameterName);
                 OutExcleForRecommendedByMs(msCategory, liparsrc[4].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
                 List<MemoryStream> msBrand = _recommendedExcleMgr.GetBrandInfo(rop, liparsrc[5].parameterName);
                 OutExcleForRecommendedByMs(msBrand, liparsrc[5].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
                 #region
-                //strPath = AddstrPath(strPath, strNewPath);
-                ////打包壓縮文件
-                //string strZipPath = Server.MapPath("../ImportUserIOExcel/吉甲地推薦系統匯出.zip");
-                //string strZipTopDirectoryPath = Server.MapPath("../ImportUserIOExcel/");
-                //int intZipLevel = 6;
-                //string strPassword = "";
-                //SharpZipLibHelp szlh = new SharpZipLibHelp();
-                //szlh.Zip(strZipPath, strZipTopDirectoryPath, intZipLevel, strPassword, strPath);
+                //打包壓縮文件
+                string zipfifilename = "吉甲地推薦系統匯出.zip";
+                string strZipPath = Server.MapPath("../ImportUserIOExcel/" + zipfifilename + "");
+                string strZipTopDirectoryPath = Server.MapPath("../ImportUserIOExcel/");
+                int intZipLevel = 6;
+                string strPassword = "";
+                SharpZipLibHelp szlh = new SharpZipLibHelp();
+                szlh.Zip(strZipPath, strZipTopDirectoryPath, intZipLevel, strPassword, strPath);
+                //下載
+                downLoad(strZipPath, zipfifilename);
+                //下載完後刪除本次的緩存文件
+                DeleteFileByPath(strPath);
                 #endregion
                 return "{success:true}";
             }
@@ -1247,8 +1256,9 @@ namespace Admin.gigade.Controllers
                 fs.Close();
                 ms[i].Close();
                 //上傳FTP
-                UploadFTP(RecommendExcleLocalPath, serverPath, ftpuser, ftppwd);
-                //strPath.Add(Server.MapPath("../ImportUserIOExcel/" + fileName));
+                //UploadFTP(RecommendExcleLocalPath, serverPath, ftpuser, ftppwd);
+                //記錄本次導出文件
+                strPath.Add(serverPath);
             }
         }
         //新增導出地址
@@ -1312,6 +1322,34 @@ namespace Admin.gigade.Controllers
             {
                 // MessageBox.Show(ex.Message, "Upload Error");
                 Response.Write("Upload Error：" + ex.Message);
+            }
+        }
+        //文件下載方法
+        private void downLoad(string path, string filename)
+        {
+            FileInfo fi = new FileInfo(path);
+            if (fi.Exists)
+            {
+                Response.Clear();
+                Response.AddHeader("Content-Disposition", "attachment;filename=" + Server.UrlEncode(filename));
+                Response.AddHeader("Content-Length", fi.Length.ToString());
+                Response.ContentType = "application/octet-stream;charset=gb2321";
+                Response.WriteFile(fi.FullName);
+                Response.Flush();
+                Response.Close();
+            }
+        }
+        //刪除指定文件
+        public void DeleteFileByPath(List<string> strPath) 
+        {
+            foreach (string path in strPath)
+            {
+                FileInfo file = new FileInfo(path);//指定文件路径
+                if (file.Exists)//判断文件是否存在
+                {
+                    file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
+                    file.Delete();//删除文件
+                }
             }
         }
         #endregion
