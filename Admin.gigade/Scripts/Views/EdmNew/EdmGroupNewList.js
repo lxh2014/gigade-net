@@ -3,9 +3,9 @@
  * Copyright (c)J01 
  * 作   者：yachao1120j
  * CreateTime :2015/9/21
- * 電子報列表
+ * 電子報類型
  */
-var pageSize = 23;
+var pageSize = 25;
 
 //列表頁的model
 Ext.define('gridlistEGN', {
@@ -27,6 +27,7 @@ Ext.define('gridlistEGN', {
 var EdmGroupNewStore = Ext.create('Ext.data.Store', {//EdmGroupNewStore
     pageSize: pageSize,
     autoDestroy: true,
+    autoLoad: true,
     model: 'gridlistEGN',
     proxy: {
         type: 'ajax',
@@ -42,7 +43,7 @@ var EdmGroupNewStore = Ext.create('Ext.data.Store', {//EdmGroupNewStore
 EdmGroupNewStore.on('beforeload', function () {
     Ext.apply(EdmGroupNewStore.proxy.extraParams,
         {
-            group_name_list: Ext.getCmp('group_name_list').getValue(),
+           // group_name_list: Ext.getCmp('group_name_list').getValue(),
         });
 });
 
@@ -69,7 +70,7 @@ Ext.onReady(function () {
             { header: "編號", dataIndex: "group_id", align: 'center' },
             { header: "群組名稱", dataIndex: "group_name", width: 300, align: 'center' },
             { header: "會員電子報", dataIndex: "is_member_edm_string", width: 200, align: 'center' },
-            {header: "試閱",dataIndex:"trial_url",align:'center',width:120},
+            {header: "試閱",dataIndex:"trial_url",align:'center',width:150},
             {
                 header: "是否啟用", dataIndex: 'enabled', align: 'center', hidden: false,
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
@@ -97,37 +98,49 @@ Ext.onReady(function () {
                handler: onedit
            },
            '->',
-          {
-              xtype: 'textfield',
-              fieldLabel: '群組名稱',
-              labelWidth: 70,
-              width: 180,
-              id: 'group_name_list',
-              name: 'group_name_list',
-              listeners: {
-                  specialkey: function (field, e) {
-                      if (e.getKey() == e.ENTER) {
-                          Query();
-                      }
-                  }
-              }
-          },
+          //{
+          //    xtype: 'textfield',
+          //    fieldLabel: '群組名稱',
+          //    labelWidth: 70,
+          //    width: 180,
+          //    id: 'group_name_list',
+          //    name: 'group_name_list',
+          //    allowBlank: false,
+          //    submitValue: true,
+          //    hideen:true,
+          //    emptyText:'群組名稱',
+          //    listeners: {
+          //        specialkey: function (field, e) {
+          //            if (e.getKey() == e.ENTER) {
+          //                Query();
+          //            }
+          //        }
+          //    }
+          //},
 
-                         {
-                             text: '查詢',
-                             margin: '0 10 0 10',
-                             iconCls: 'icon-search',
-                             handler: function () {
-                                 Query();
-                             }
-                         },
-                         {
-                             text: '重置',
-                             iconCls: 'ui-icon ui-icon-reset',
-                             handler: function () {
-                                 Ext.getCmp('group_name_list').setValue('');//重置為空
-                             }
-                         },
+                         //{
+                         //    text: '查詢',
+                         //    margin: '0 10 0 10',
+                         //    iconCls: 'icon-search',
+                         //    hidden:true,
+                         //    handler: function () {
+                         //        Query(); 
+                         //    },
+                         //    listeners: {
+                         //        onClick: function () {
+                         //            if (Ext.getCmp('group_name_list') == '') {
+                         //                Ext.Msg.alert('提示信息', '請輸入查詢條件')
+                         //            }
+                         //        }
+                         //    }
+                         //},
+                         //{
+                         //    text: '重置',
+                         //    iconCls: 'ui-icon ui-icon-reset',
+                         //    handler: function () {
+                         //        Ext.getCmp('group_name_list').setValue('');//重置為空
+                         //    }
+                         //},
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: EdmGroupNewStore,
@@ -164,11 +177,17 @@ Ext.onReady(function () {
 /*************************************************************************************查询信息*************************************************************************************************/
 
 function Query(x) {
-    Ext.getCmp('EdmGroupNewGrid').store.loadPage(1, {
-        params: {
-            group_name: Ext.getCmp('group_name_list').getValue(),
-        }
-    });
+    if (Ext.getCmp('group_name_list').getValue() == '') {
+        Ext.Msg.alert('提示信息', '請輸入查詢條件');
+    }
+    else {
+        Ext.getCmp('EdmGroupNewGrid').store.loadPage(1, {
+            params: {
+                group_name: Ext.getCmp('group_name_list').getValue(),
+            }
+        });
+    }
+
 }
 
 /*********************啟用/禁用**********************/
@@ -198,24 +217,20 @@ function UpdateActive(id) {
     });
 }
 
-/*************************************************************************************添加人员*************************************************************************************************/
+/*************************************************************************************添加信息*************************************************************************************************/
 
 function onAddClick() {
     editFunction(null, EdmGroupNewStore);
 }
-
-
 /*************************************************************************************編輯*************************************************************************************************/
 
 onedit = function () {
     var row = Ext.getCmp("EdmGroupNewGrid").getSelectionModel().getSelection();
     if (row.length == 0) {
-        // Ext.Msg.alert(INFORMATION, NO_SELECTION);
-        Ext.Msg.alert("未選中任何行!");
+         Ext.Msg.alert(INFORMATION, NO_SELECTION);
     }
     else if (row.length > 1) {
-        // Ext.Msg.alert(INFORMATION, ONE_SELECTION);
-        Ext.Msg.alert("只能选择一行!");
+         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
         //Ext.Msg.alert(row[0].data.name);
         editFunction(row[0], EdmGroupNewStore);

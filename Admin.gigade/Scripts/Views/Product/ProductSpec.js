@@ -1,4 +1,9 @@
-﻿
+﻿/*  
+ * 
+ * 文件名称：ProductSpec.js 
+ * 摘    要：單一商品修改和新增 規格頁面
+ * 
+ */
 var conditionPanel;
 var contentPanel
 var spec1Rows = 1;
@@ -23,12 +28,11 @@ var spec1Init = '';
 var spec2Init = '';
 var spec1cellEditing = null;
 var spec2cellEditing = null;
-
+var asyncResult = true;
 
 Ext.onReady(function () {
     initPanel();
 });
-
 
 var spectypeStore = Ext.create('Ext.data.Store', {
     fields: ['parameterCode', 'parameterName'],
@@ -43,10 +47,7 @@ var spectypeStore = Ext.create('Ext.data.Store', {
     }
 });
 
-
-
 /************** 規格 Model Store **************/
-
 Ext.define('GIGADE.SPEC', {
     extend: 'Ext.data.Model',
     fields: [
@@ -72,9 +73,7 @@ spec1Store = Ext.create('Ext.data.Store', {
     }
 });
 
-
 /******************** Spec2 ***********************/
-
 spec2Store = Ext.create('Ext.data.Store', {
     model: 'GIGADE.SPEC',
     proxy: {
@@ -88,11 +87,8 @@ spec2Store = Ext.create('Ext.data.Store', {
     }
 });
 
-
 /************** 初始化界面 **************/
-
 function initPanel() {
-
     if (!PRODUCT_ID) {
         PRODUCT_ID = window.parent.GetProductId();
     }
@@ -160,9 +156,7 @@ function initPanel() {
     });
 }
 
-
 function createConditionPanel(spectype) {
-
     conditionPanel = Ext.create('Ext.form.Panel', {
         id: 'conditionPanel',
         title: '',
@@ -171,8 +165,7 @@ function createConditionPanel(spectype) {
         items: [{
             layout: 'hbox',
             border: false,
-            items: [
-            {
+            items: [{
                 xtype: 'combobox',
                 id: 'comboSpecType',
                 colName: 'comboSpecType',
@@ -283,7 +276,6 @@ function createConditionPanel(spectype) {
             padding: '15 0 0 0',
             html: '<span style="color:red;font-weight:bold;font-size:12px;font-family:雅黑;float:left">' + NOTICE_SPEC_CANNOTMODIFY + '</span>'
         }]
-
     });
 
     spectypeStore.load({
@@ -293,8 +285,6 @@ function createConditionPanel(spectype) {
             }
         }
     });
-
-
 
     conditionViewport = Ext.create('Ext.container.Viewport', {
         id: 'conditionViewport',
@@ -311,7 +301,6 @@ function createConditionPanel(spectype) {
         }
     });
 
-
     if (!Ext.getCmp('comboSpecType').isHidden()) {
         Ext.getCmp('disNotice').show();
     }
@@ -320,10 +309,7 @@ function createConditionPanel(spectype) {
     }
 }
 
-
-
 function blurToGrid() {
-
     typeVal = Ext.getCmp('comboSpecType').getValue();
     var num1Value = Ext.getCmp('numSpec1').getValue();
     var num2Value = Ext.getCmp('numSpec2').getValue();
@@ -371,11 +357,9 @@ function createContentPanel(typeVal) {
     if (isBlur && specnamePanel != null) {
         return;
     }
-
     destroyPanel();
 
     /**************** 規格名稱 Panel ****************/
-
     specnamePanel = Ext.create('Ext.form.Panel', {
         id: 'specnamePanel',
         title: '',
@@ -425,16 +409,13 @@ function createContentPanel(typeVal) {
             fieldLabel: SPEC_1_NAME + '<span style="color:red;">*</span>',
             labelWidth: 100,
             margin: '0 3 10 0'
-
         }],
         listeners: {
             afterrender: function (panel) {
                 window.parent.updateAuth(panel, 'colName');
             }
         }
-
     });
-
 
     if (typeVal == 2) {
         specnamePanel.add({
@@ -451,9 +432,7 @@ function createContentPanel(typeVal) {
         });
     }
 
-
     /**************** 規格內容 Grid ****************/
-
     gridPanel = Ext.create('Ext.panel.Panel', {
         id: 'gridPanel',
         title: '',
@@ -469,7 +448,6 @@ function createContentPanel(typeVal) {
     });
 
     /****************** 列編輯 ******************/
-
     spec1cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
         clicksToEdit: 1
     });
@@ -480,7 +458,6 @@ function createContentPanel(typeVal) {
 
 
     /*******************添加/刪除 Store *******************/
-
     function spec1StoreAdd(rows) {
         for (var i = 0; i < rows; i++) {
             spec1Store.add({
@@ -489,19 +466,14 @@ function createContentPanel(typeVal) {
                 spec_status: '1'
             });
         }
-
         // spec1cellEditing.startEditByPosition({ row: spec1Store.getCount() - 1, column: 1 });
     }
-
     function spec1StoreRemove(rowIdx) {
         var data = spec1Store.getAt(rowIdx);
         data.set('spec_name', '');
         data.set('spec_sort', '0');
         data.set('spec_status', '1');
     }
-
-
-
     function spec2StoreAdd(rows) {
         for (var i = 0; i < rows; i++) {
             spec2Store.add({
@@ -512,16 +484,12 @@ function createContentPanel(typeVal) {
         }
         // spec2cellEditing.startEditByPosition({ row: spec2Store.getCount() - 1, column: 1 });
     }
-
     function spec2StoreRemove(rowIdx) {
         var data = spec2Store.getAt(rowIdx);
         data.set('spec_name', '');
         data.set('spec_sort', '0');
         data.set('spec_status', '1');
     }
-
-
-
 
     /**************** 規格一 Grid ****************/
     var statusStore1 = Ext.create('Ext.data.Store', {
@@ -555,7 +523,7 @@ function createContentPanel(typeVal) {
          { parameterCode: '1', parameterName: SPEC_SHOW },
          { parameterCode: '0', parameterName: SPEC_HIDE }
         ]
-    })
+    });
 
     function statusRenderer2(value, m, r, row, column) {
         var index = statusStore2.find("parameterCode", value);
@@ -611,8 +579,7 @@ function createContentPanel(typeVal) {
                 allowBlank: false
             }
         },
-        { id: 'spec1_id', hidden: true, dataIndex: 'spec_id' }
-        ],
+        { id: 'spec1_id', hidden: true, dataIndex: 'spec_id' }],
         tbar: {
             bodyStyle: 'padding:2px 5px;',
             id: 'barSpec1',
@@ -645,7 +612,6 @@ function createContentPanel(typeVal) {
     });
 
     /**************** 規格二 Grid ****************/
-
     spec2Grid = Ext.create('Ext.grid.Panel', {
         id: 'spec2Grid',
         title: SPEC_2,
@@ -689,8 +655,7 @@ function createContentPanel(typeVal) {
                  editable: false
              }
          },
-        { id: 'spec2_id', hidden: true, dataIndex: 'spec_id' }
-        ],
+         { id: 'spec2_id', hidden: true, dataIndex: 'spec_id' }],
         tbar: {
             id: 'barSpec2',
             bodyStyle: 'padding:2px 5px;',
@@ -723,14 +688,11 @@ function createContentPanel(typeVal) {
     });
 
     /*********** 添加規格Grid至規格Panel ***********/
-
-
     gridPanel.add(spec1Grid);
     if (isLoad && !isModify) {
         Ext.getCmp('txtSpec1Name').setValue(spec_title_1);
         spec1StoreLoad();
     }
-
 
     if (typeVal == 2) {
         gridPanel.add(spec2Grid);
@@ -780,10 +742,14 @@ function createContentPanel(typeVal) {
     }
 }
 
-
-
-
 function save(functionid) {
+    //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    var mask;
+    if (!mask) {
+        mask = new Ext.LoadMask(Ext.getBody(), { msg: '請稍等...' });
+    }
+    mask.show();
+
     //结束列编辑
     if (spec1cellEditing) {
         spec1cellEditing.completeEdit();
@@ -795,12 +761,14 @@ function save(functionid) {
     var obj = Ext.getCmp('comboSpecType');
 
     if (Ext.getCmp('conditionPanel') != null && Ext.getCmp('conditionPanel').isHidden()) {
+        mask.hide();
         return true;
     }
 
     if (isLoad == false && typeVal == null) {
         obj.markInvalid(INPUT_PLEASE);
         window.parent.setMoveEnable(true);
+        mask.hide();
         return false;
     }
     else if (typeVal != 0 && Ext.getCmp('specnamePanel') == null) {
@@ -817,17 +785,22 @@ function save(functionid) {
             }
         }
         window.parent.setMoveEnable(true);
+        mask.hide();
         return false;
+    } else {//添加disabled屬性  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+        window.parent.setMoveEnable(false);
     }
 
     if (typeVal == 1 && Ext.getCmp('txtSpec1Name').getValue() == ' ') {
         Ext.getCmp('txtSpec1Name').markInvalid(INPUT_PLEASE);
         window.parent.setMoveEnable(true);
+        mask.hide();
         return false;
     }
     if (typeVal == 2 && Ext.getCmp('txtSpec2Name').getValue() == ' ') {
         Ext.getCmp('txtSpec2Name').markInvalid(INPUT_PLEASE);
         window.parent.setMoveEnable(true);
+        mask.hide();
         return false;
     }
 
@@ -839,13 +812,13 @@ function save(functionid) {
     if (typeVal != 0) {
         var panelform = Ext.getCmp('specnamePanel').getForm();
         if (panelform.isValid()) {
-
             var isRight = true;
             spec1Result += '[';
             spec2Result += '';
             var msgStr = COMPLETE_PLEASE;
             var re = /}{/g;
             if (spec1Store.data.length == 0) {
+                mask.hide();
                 Ext.Msg.alert(INFORMATION, msgStr + ' ' + SPEC_1 + CONTENT);
                 return;
             }
@@ -861,9 +834,9 @@ function save(functionid) {
             spec1Result = spec1Result.replace(re, "},{");
             spec1Result += ']';
 
-
             if (typeVal == 2) {
                 if (spec2Store.data.length == 0) {
+                    mask.hide();
                     Ext.Msg.alert(INFORMATION, msgStr + ' ' + SPEC_2 + CONTENT);
                     return;
                 }
@@ -882,16 +855,17 @@ function save(functionid) {
             }
             msgStr += ' ' + CONTENT;
             if (!isRight) {
+                mask.hide();
                 Ext.Msg.alert(NOTICE, msgStr);
                 window.parent.setMoveEnable(true);
                 return false;
             }
             spec1Name = Ext.htmlEncode(Ext.getCmp('txtSpec1Name').getValue());
             spec2Name = typeVal == 2 ? Ext.htmlEncode(Ext.getCmp('txtSpec2Name').getValue()) : '';
-
         }
         else {
             window.parent.setMoveEnable(true);
+            mask.hide();
             return false;
         }
     }
@@ -900,11 +874,10 @@ function save(functionid) {
         functionid = '';
     }
 
-    var asyncResult = true;
     Ext.Ajax.request({
         url: '/Product/specTempSave',
         method: 'POST',
-        async: false,
+        async: window.parent.GetProductId() == '' ? false : true,
         params: {
             'ProductId': PRODUCT_ID,
             OldProductId: OLD_PRODUCT_ID,
@@ -921,21 +894,24 @@ function save(functionid) {
         },
         success: function (response, opts) {
             var resText = eval("(" + response.responseText + ")");
+            mask.hide();
             if (resText.success) {
+                //保存成功后重新加載一遍 避免數據重複添加  edit by zhuoqin0830w  2015/09/24
+                spec1StoreLoad(); spec2StoreLoad();
                 if (PRODUCT_ID != '' && resText.Msg) {
                     Ext.Msg.alert(NOTICE, SUCCESS_MSG);     //Add by wangwei0216w 2014/9/19
                 } else {
                     Ext.Msg.alert(NOTICE, SAVE_SUCCESS);
                 }
-
             }
             else {
                 Ext.Msg.alert(NOTICE, SAVE_FAIL);
                 asyncResult = false;
-                window.parent.setMoveEnable(true);
             }
+            window.parent.setMoveEnable(true);
         },
         failure: function (response, opts) {
+            mask.hide();
             Ext.Msg.alert(NOTICE, SAVE_FAIL);
             window.parent.setMoveEnable(true);
             asyncResult = false;
@@ -943,8 +919,6 @@ function save(functionid) {
     });
     return asyncResult;
 }
-
-
 
 function spec1StoreLoad() {
     spec1Store.load({
@@ -976,7 +950,6 @@ function spec2StoreLoad() {
                     spec2Init += records[i].data.spec_id;
                 }
             }
-
         }
     });
 }

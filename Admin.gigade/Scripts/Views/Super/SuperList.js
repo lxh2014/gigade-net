@@ -56,27 +56,42 @@
         bodyPadding: 20,
         hidden: true,
         items: [
-            {
-                xtype: 'fieldcontainer',
-                layout: 'hbox',
-                combineErrors: true,
-                items: [
-                    {
-                        xtype: 'textarea',
-                        width: 800,
-                        height: 200,
-                        fieldLabel: 'Sql 語句',
-                        labelWidth: 60,
-                        id: 'sqlContent',
-                        name: 'sqlContent',
-                        emptyText: '請輸入查詢語句......',
+             {
+                 xtype: 'textareafield',
+                 width: 800,
+                 height: 200,
+                 fieldLabel: 'Sql 語句',
+                 labelWidth: 60,
+                 id: 'sqlContent',
+                 name: 'sqlContent',
+                 //grow: true,
+                 emptyText: '請輸入查詢語句......',
 
-                        listeners: {
+                 listeners: {
 
-                        }
-                    }
-                ],
-            }
+                 }
+             }
+            //{
+            //    xtype: 'fieldcontainer',
+            //    layout: 'hbox',
+            //    combineErrors: true,
+            //    items: [
+            //        {
+            //            xtype: 'textarea',
+            //            width: 800,
+            //            height: 200,
+            //            fieldLabel: 'Sql 語句',
+            //            labelWidth: 60,
+            //            id: 'sqlContent',
+            //            name: 'sqlContent',
+            //            emptyText: '請輸入查詢語句......',
+
+            //            listeners: {
+
+            //            }
+            //        }
+            //    ],
+            //}
         ],
         buttonAlign: 'left',
         buttons: [
@@ -84,8 +99,8 @@
                 text: '匯出Excel',
                 iconCls: 'ui-icon ui-icon-excel',
                 handler: function () {
-
-                    window.open("/Super/SuperExportExcel?superSql=" + Ext.getCmp('sqlContent').getValue());
+                    var superSql = Ext.getCmp('sqlContent').getValue();                    
+                    window.open("/Super/SuperExportExcel?superSql=" + superSql);
 
                 },
             }, {
@@ -107,10 +122,10 @@
         items: [pwdFrm, sqlFrm],
         autoScroll: true,//滚动条
         listeners: {
-            resize: function () {//resize调整大小
-                dataGrid.width = document.documentElement.clientWidth;
-                this.doLayout();//更新一下布局
-            }
+            //resize: function () {//resize调整大小
+            //    dataGrid.width = document.documentElement.clientWidth;
+            //    this.doLayout();//更新一下布局
+            //}
         }
     });
 });
@@ -129,7 +144,7 @@ onSubmit = function () {
                 Ext.getCmp('sqlFrm').show();
                 Ext.getCmp('pwdContent').setValue('');
                 Ext.getCmp('submitBtn').setDisabled(true);
-                Ext.getCmp('pwdContent').setEditable(false);
+               
             }
             else {
                 Ext.Msg.alert("提示信息", "密碼輸入錯誤！");

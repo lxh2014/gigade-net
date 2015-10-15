@@ -2,16 +2,16 @@
 var PRODUCT_ID, OLD_PRODUCT_ID = '';
 var messages = '';
 var messagesrep = '';
+var irrmessages = '';
 var messagestime = '';
 
 //排程類型store
 var pcStore = Ext.create('Ext.data.Store', {
     fields: ['id', 'name'],
     data: [
-        //{ "id": "1", "name": "出貨一次" },
-        //{ "id": "2", "name": "重複出貨" }]
         { "id": "1", "name": EXECUTE_ONCE },//單次執行
-        { "id": "2", "name": EXECUTE_REPEAT }]// edit by wwei0216w 2015/5/20 重複執行
+        { "id": "2", "name": EXECUTE_REPEAT },
+        { "id": "3", "name": EXECUTE_IRREGULAR }]//不规律執行
 });
 
 
@@ -23,6 +23,45 @@ var runStore = Ext.create('Ext.data.Store', {
         { "runtype": "2W", "runname": EVERYWEEK },//每週
         { "runtype": "2M", "runname": EVERYMONTH }]//每月
 });
+
+//不規律執行（每週）
+var irregularStore = Ext.create('Ext.data.Store', {
+    fields: ['irregulartype', 'irregularname'],
+    data: [{ "irregulartype": "w", "irregularname": EVERYWEEK }]
+});
+
+
+//不規律執行startWeeks
+var startWeeksStore = Ext.create('Ext.data.Store', {
+    fields: ['abbr', 'name'],
+    autoDestroy: true,
+    autoLoad: false,
+    data: [
+        { abbr: "1", name: MONDAY },//星期一
+        { abbr: "2", name: TUESDAY },//星期二
+        { abbr: "3", name: WEDNESDAY },//星期三
+        { abbr: "4", name: THURSDAY },//星期四
+        { abbr: "5", name: FRIDAY },//星期五
+        { abbr: "6", name: SATURADY },//星期六
+        { abbr: "7", name: SUNDAY }]//星期日
+});
+
+//不規律執行endWeeks
+var endWeeksStore = Ext.create('Ext.data.Store', {
+    fields: ['abbr', 'name'],
+    autoDestroy: true,
+    autoLoad: false,
+    data: [
+        { abbr: "1", name: MONDAY },//星期一
+        { abbr: "2", name: TUESDAY },//星期二
+        { abbr: "3", name: WEDNESDAY },//星期三
+        { abbr: "4", name: THURSDAY },//星期四
+        { abbr: "5", name: FRIDAY },//星期五
+        { abbr: "6", name: SATURADY },//星期六
+        { abbr: "7", name: SUNDAY }]//星期日
+});
+
+
 
 //第幾周
 var onweeksStore = Ext.create('Ext.data.Store', {
@@ -104,6 +143,154 @@ var gxGrid = Ext.create('Ext.grid.Panel', {
         }]
 });
 
+Ext.define('GIGADE.irregularTier', {
+    extend: 'Ext.data.Model',
+    fields: [
+                { name: 'schedule_id', type: 'int' },
+                { name: 'schedule_name', type: 'string' },
+                { name: 'type', type: 'int' },
+                { name: 'execute_days', type: 'string' },
+                { name: 'trigger_time', type: 'string' },
+                //{ name: 'week_day', type: 'string' },
+                { name: 'repeat_count', type: 'int' },
+                { name: 'duration_start', type: 'string' },
+                { name: 'desc', type: 'string' }]
+
+});
+
+var irregulartimeStore = Ext.create('Ext.data.Store', {
+    model: 'GIGADE.irregularTier',
+    //pageSize: pageSize,
+    proxy: {
+        type: 'ajax',
+        url: '/ProductTier/GetTiers',
+        actionMethods: 'post',
+        reader: {
+            type: 'json',
+            root: 'item',
+            totalProperty: 'totalCount'
+        }
+    },
+    listeners: {
+        datachanged: function () {
+            irrmessages = SCHEDULE_DIVIDE_INTO + irregulartimeStore.count() + PART_EXECUTE + '。';
+            Ext.getCmp('pcFrm').down('#irrms').setText(irrmessages);
+        }
+    }
+});
+
+irregularGrid = Ext.create('Ext.grid.Panel', {
+    plugins: [{ ptype: 'cellediting' }],
+    disabled: true,
+    store: irregulartimeStore,
+    margin: '0 0 0 10',
+    id: 'irregularGrid',
+    width: 550,
+    height: 150,
+    columns: [
+        { xtype: 'rownumberer', width: 25, align: 'center' },
+        {
+            text: '', menuDisabled: true, width: 35, align: 'center', xtype: 'actioncolumn',
+            icon: '../../../Content/img/icons/cross.gif',
+            handler: function (grid, rowIndex, colIndex) {
+                irregulartimeStore.removeAt(rowIndex);
+            }
+        }, {
+
+            text: IRR_START_TIME, menuDisabled: true, sortable: false, columns: [{
+                text: WEEK, dataIndex: 'trigger_days_start', width: 65, align: 'right', menuDisabled: true, sortable: false,
+                editor: {
+                    xtype: 'combobox',
+                    queryMode: 'local',
+                    id: 'sw_combx',
+                    editable: false,
+                    allowBlank: false,
+                    store: startWeeksStore,
+                    displayField: 'name',
+                    valueField: 'abbr'
+                },
+                renderer: function (val) {
+                    var record = startWeeksStore.findRecord('abbr', val);
+                    if (record) {
+                        return record.data.name;
+                    }
+                    return val ? val : '';
+                }
+            }, {
+                text: HOURS, dataIndex: 'startHour', width: 67, align: 'left', menuDisabled: true, sortable: false,
+                editor: {
+                    xtype: 'numberfield',
+                    allowBlank: false,
+                    minValue: 0,
+                    maxValue: 23
+                },
+                renderer: function (val) {
+                    if (val == 0) {
+                        return val + '0:00';
+                    }
+                    return val ? val + ':00' : '';
+                }
+            }]
+        }, {
+            text: IRR_END_TIME, menuDisabled: true, sortable: false, columns: [{
+                text: WEEK, dataIndex: 'trigger_days_end', width: 67, align: 'right', menuDisabled: true, sortable: false,
+                editor: {
+                    xtype: 'combobox',
+                    id: 'week_day_end',
+                    queryMode: 'local',
+                    displayField: 'name',
+                    valueField: 'abbr',
+                    store: endWeeksStore,
+                    emptyText: '请选择',
+                    value: 3,
+                    editable: false,
+                    allowBlank: false
+                },
+                renderer: function (val) {
+                    var record = endWeeksStore.findRecord('abbr', val);
+                    if (record) {
+                        return record.data.name;
+                    }
+                    return val ? val : '';
+                }
+            }, {
+                text: HOURS, dataIndex: 'endHour', width: 67, align: 'left', menuDisabled: true, sortable: false,
+                editor: {
+                    xtype: 'numberfield',
+                    allowBlank: false,
+                    minValue: 0,
+                    maxValue: 23
+                },
+                renderer: function (val) {
+                    if (val == 0) {
+                        return val + '0:00';
+                    }
+                    return val ? val + ':00' : '';
+                }
+            }]
+        }, {
+            text: EXECUTE_AFTERDAYS, dataIndex: 'executeDays', flex: 1, align: 'center', menuDisabled: true, sortable: false,
+            editor: {
+                xtype: 'numberfield',
+                allowBlank: false,
+                minValue: 1
+            }
+        }],
+    tbar: [{
+        text: INSERT, handler: function () {
+            irregularGrid.getStore().add({
+                trigger_days_start: 1,
+                startHour: 0,
+                trigger_days_end: 1,
+                endHour: 0,
+                executeDays: 1
+            });
+        }
+    }]
+});
+
+
+
 
 var pcFrm = Ext.create('Ext.form.Panel', {
     id: 'pcFrm',
@@ -129,17 +316,31 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                 change: function (chose) {
                     Ext.getCmp('mst').setText("");
                     Ext.getCmp('ms').setText("");
-                    if (Ext.getCmp('pc_type').getValue() == 2) {
-                        Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
-                        Ext.getCmp('pcFrm').down('#pl').setDisabled(false);
-                        //Ext.getCmp('pcFrm').down('#mtpl').setDisabled(false);
-                        Ext.getCmp('pcFrm').down('#cxsj').setDisabled(false);
-                    } else {
-                        Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
-                        //Ext.getCmp('pcFrm').down('#mtpl').setDisabled(true);
-                        Ext.getCmp('pcFrm').down('#cxsj').setDisabled(true);
-                        Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(false);
+                    switch (Ext.getCmp('pc_type').getValue()) {
+
+                        case '1':
+                            Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
+                            Ext.getCmp('pcFrm').down('#cxsj').setDisabled(true);
+                            Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(false);
+                            Ext.getCmp('pcFrm').down('#bglzx').setDisabled(true);
+                            Ext.getCmp('irregularGrid').setDisabled(true);
+                            break;
+                        case '2':
+                            Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
+                            Ext.getCmp('pcFrm').down('#pl').setDisabled(false);
+                            Ext.getCmp('pcFrm').down('#cxsj').setDisabled(false);
+                            Ext.getCmp('pcFrm').down('#bglzx').setDisabled(true);
+                            Ext.getCmp('irregularGrid').setDisabled(true);
+                            break;
+                        case '3':
+                            Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
+                            Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
+                            Ext.getCmp('pcFrm').down('#cxsj').setDisabled(false);
+                            Ext.getCmp('pcFrm').down('#bglzx').setDisabled(false);
+                            Ext.getCmp('irregularGrid').setDisabled(false);
+                            break;
                     }
+
                 }
             }
         }, {
@@ -843,11 +1044,14 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                id: 'cs_time',
                listeners: {
                    change: function () {
+                       Ext.getCmp("ce_time").setMinValue(this.getValue());
                        if (Ext.getCmp('noendtime').checked) {
                            messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
+                           Ext.getCmp('mst').setText('');
                            Ext.getCmp('mst').setText(messagestime);
                        } else {
                            messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
+                           Ext.getCmp('mst').setText('');
                            Ext.getCmp('mst').setText(messagestime);
                        }
                    }
@@ -863,11 +1067,14 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                id: 'ce_time',
                listeners: {
                    change: function () {
+                       Ext.getCmp("cs_time").setMaxValue(this.getValue());
                        if (Ext.getCmp('noendtime').checked) {
                            messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + '。';
+                           Ext.getCmp('mst').setText('');
                            Ext.getCmp('mst').setText(messagestime);
                        } else {
                            messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d ') + '。';
+                           Ext.getCmp('mst').setText('');
                            Ext.getCmp('mst').setText(messagestime);
                        }
                    }
@@ -883,16 +1090,40 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                    change: function (chack) {
                        if (chack.checked) {
                            Ext.getCmp('ce_time').setDisabled(true);
+                           Ext.getCmp("ce_time").setValue('');
                            messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
+                           Ext.getCmp('mst').setText('');
                            Ext.getCmp('mst').setText(messagestime);
                        } else {
                            Ext.getCmp('ce_time').setDisabled(false);
                            messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
+                           Ext.getCmp('mst').setText('');
                            Ext.getCmp('mst').setText(messagestime);
                        }
                    }
                }
            }]
+       }, {
+           xtype: 'fieldset',
+           title: '不規律執行',//不規律執行
+           id: 'bglzx',
+           layout: 'column',
+           padding: '10 10 10 10',
+           disabled: true,
+           items: [{
+               xtype: 'combobox',
+               fieldLabel: '執行于',//執行于(每週)
+               allowBlank: false,
+               id: 'irregularwhen',
+               displayField: 'irregularname',
+               valueField: 'irregulartype',
+               labelWidth: 54,
+               width: 150,
+               margin: '10 10 15 10',
+               editable: false,
+               value: 'w',
+               store: irregularStore
+           }, irregularGrid]
        }, {
            xtype: 'container',
            layout: 'column',
@@ -908,6 +1139,11 @@ var pcFrm = Ext.create('Ext.form.Panel', {
               //    id: 'mscf',
               //    text: messagesrep
               //},
+              {
+                  xtype: 'label',
+                  id: 'irrms',
+                  text: irrmessages
+              },
              {
                  xtype: 'label',
                  id: 'mst',
@@ -920,28 +1156,32 @@ var pcFrm = Ext.create('Ext.form.Panel', {
         //formBind: true,
         //disabled: true,
         handler: function () {
-            var form = this.up('form').getForm();
-            if (form.isValid()) {
-                form.submit({
-                    params: getParams(),
-                    success: function (form, action) {
-                        var result = Ext.decode(action.response.responseText);
-                        if (result.success) {
-                            addPc.hide();
-                            tierStore.load();
-                            Ext.Msg.alert(INFORMATION, SAVE_SUCCESS);
+            var parames = getParams();
+            if (parames.error) {
+                Ext.Msg.alert(INFORMATION, parames.msg);
+            }
+            else {
+                var form = this.up('form').getForm();
+                if (form.isValid()) {
+                    form.submit({
+                        params: parames,
+                        success: function (form, action) {
+                            var result = Ext.decode(action.response.responseText);
+                            if (result.success) {
+                                addPc.hide();
+                                tierStore.load();
+                                Ext.Msg.alert(INFORMATION, SAVE_SUCCESS);
+                            }
+                        },
+                        failure: function () {
+                            Ext.Msg.alert(INFORMATION, FAILURE);
                         }
-                    },
-                    failure: function () {
-                        Ext.Msg.alert(INFORMATION, FAILURE);
-                    }
-                });
+                    });
+                }
             }
         }
     }]
 });
-
-
 
 var addPc = Ext.create('Ext.window.Window', {
     title: SCHEDULE_CONFIG,//排成設定
@@ -957,6 +1197,7 @@ var addPc = Ext.create('Ext.window.Window', {
     padding: '5 5 5 5'
 });
 
+//排程加载
 function Tier_Load(record) {
     Ext.getCmp('schedule_id_win').setValue(record.data.schedule_id);
     Ext.getCmp('schedule_name').setValue(record.data.schedule_name);
@@ -1027,9 +1268,26 @@ function Tier_Load(record) {
             break;
 
         case 1:
-            Ext.getCmp('pc_type').setValue(1)
+            Ext.getCmp('pc_type').setValue(1);
             Ext.getCmp('datatime').setRawValue(record.data.duration_start);
             break;
+
+
+        case 3:
+            Ext.getCmp('pc_type').setValue(3);
+
+            Ext.getCmp('cs_time').setRawValue(record.data.duration_start);
+
+            if (record.data.duration_end == "0001/01/01" || record.data.duration_end == "") {
+                Ext.getCmp('noendtime').setValue(true);
+                Ext.getCmp('ce_time').setRawValue("");
+            } else {
+                Ext.getCmp('noendtime').setValue(false);
+                Ext.getCmp('ce_time').setRawValue(record.data.duration_end);
+            }
+            irregulartimeStoreLoad(record);
+            break;
+
     }
 
     var desces = record.data.desc.split("。");
@@ -1039,14 +1297,45 @@ function Tier_Load(record) {
     } else {
         var mst = desces[1] + '。';
     }
-    Ext.getCmp('ms').setText(ms);
-    Ext.getCmp('mst').setText(mst);
 
+    if (record.data.type == 3) {
+        Ext.getCmp('ms').setText('');
+        Ext.getCmp('irrms').setText(ms);
+        Ext.getCmp('mst').setText(mst);
+    } else {
+        Ext.getCmp('ms').setText(ms);
+        Ext.getCmp('irrms').setText('');
+        Ext.getCmp('mst').setText(mst);
+    }
 }
 
+///特殊排程值設置
+function irregulartimeStoreLoad(record) {
+    irregulartimeStore.removeAll();
 
+    var triggerValue = record.data.trigger_time.split(',');
+    var executeValue = record.data.execute_days.split(',');
+
+    for (var i = 0; i < triggerValue.length; i++) {
+        var temp = i / 2;
+        if (i % 2 == 0) {
+            //var temp = i;
+            irregulartimeStore.add({
+                trigger_days_start: parseInt((triggerValue[i] / 24), 10) + 1,
+                startHour: parseInt((triggerValue[i] % 24), 10),
+                trigger_days_end: parseInt((triggerValue[i + 1] / 24), 10) + 1,
+                endHour: parseInt((triggerValue[i + 1] % 24), 10),
+                executeDays: executeValue[temp]
+            });
+        }
+    }
+}
+
+//获取排程数据
 function getParams() {
     var params = new Object();
+    params.error = false;
+    params.msg = "";
     var pc_type = params['type'] = Ext.getCmp('pc_type').getValue();
     if (Ext.getCmp('schedule_id_win').getValue() != "") {
         params.schedule_id = Ext.getCmp('schedule_id_win').getValue();
@@ -1055,7 +1344,7 @@ function getParams() {
     }
 
     params.schedule_name = Ext.getCmp('schedule_name').getValue();
-    params.desc = Ext.getCmp('ms').text + Ext.getCmp('mst').text;
+    params.desc = Ext.getCmp('ms').text + Ext.getCmp('irrms').text + Ext.getCmp('mst').text;
 
     switch (pc_type) {
         case '2':
@@ -1086,26 +1375,7 @@ function getParams() {
                     }
                     break;
             }
-            //var zxycradio = Ext.getCmp('zxycradio');
-            //if (zxycradio.checked) {
-            //    params.day_type = 1;
-            //    params.start_time = Ext.String.format('{0}:{1}:{2}',
-            //        Ext.getCmp('ro_hou').getValue(),
-            //        Ext.getCmp('ro_min').getValue(),
-            //        Ext.getCmp('ro_sen').getValue());
-            //} else {
-            //    params.day_type = 2;
-            //    params.repeat_hours = Ext.getCmp('cfnh').getValue();
-            //    params.time_type = Ext.getCmp('cfhms').getValue();
-            //    params.start_time = Ext.String.format('{0}:{1}:{2}',
-            //        Ext.getCmp('s_hour').getValue(),
-            //        Ext.getCmp('s_min').getValue(),
-            //        Ext.getCmp('s_sen').getValue());
-            //    params.end_time = Ext.String.format('{0}:{1}:{2}',
-            //        Ext.getCmp('e_hour').getValue(),
-            //        Ext.getCmp('e_min').getValue(),
-            //        Ext.getCmp('e_sen').getValue());
-            //}
+
             params.duration_start = Ext.getCmp('cs_time').getValue();
 
             if (!Ext.getCmp('noendtime').checked) {
@@ -1114,6 +1384,57 @@ function getParams() {
             break;
         case '1':
             params.duration_start = Ext.getCmp('datatime').getValue();
+            break;
+
+        case '3':
+            //Ext.each(irregulartimeStore.data.items, function () {
+            //    irregulartimeStore.push(this.data);
+            //});
+            params.execute_days = "";///執行時間
+            params.trigger_time = "";///觸發時間
+            var source = irregulartimeStore.data;///獲得不規則排程的store
+            //var beginDay = source.items[0].data.week_day_start;///獲得頭數據的開始天數
+            //beginDay = (beginDay - 1) * 24 + source.items[0].data.startHour///獲得頭數據的小時數
+            for (var i = 0; i < source.items.length; i++) {     ///循环遍歷panel中的數據
+                var startTemp = source.items[i].data.trigger_days_start;///獲得開始時間
+                var endTemp = source.items[i].data.trigger_days_end;///獲得結束時間
+                if (isNaN(endTemp)) {       ///判斷結束時間格式是否正確
+                    params.error = true;
+                    params.msg = THEENDTIMEERROR;
+                    break;
+                }
+
+                startTemp = (startTemp - 1) * 24 + source.items[i].data.startHour;
+                endTemp = (endTemp - 1) * 24 + source.items[i].data.endHour;
+                if (endTemp <= startTemp) ///判斷每行的開始時間是否大於結束時間
+                {
+                    params.error = true;
+                    params.msg = ROWERROR;
+                    break;
+                }
+                params.trigger_time += (source.items[i].data.trigger_days_start - 1) * 24 + source.items[i].data.startHour + ",";
+                if (i > 0) {
+                    var tempStart = (source.items[i].data.trigger_days_start - 1) * 24 + source.items[i].data.startHour;
+                    var lastTempEnd = (source.items[i - 1].data.trigger_days_end - 1) * 24 + source.items[i - 1].data.endHour;
+                    if (tempStart < lastTempEnd || tempStart == lastTempEnd || isNaN(tempStart)) {
+                        params.error = true;
+                        params.msg = THE + (i + 1) + LASTROWENDERROR;
+                        break;
+                    }
+                }
+                params.trigger_time += (source.items[i].data.trigger_days_end - 1) * 24 + source.items[i].data.endHour + ",";
+                params.execute_days += source.items[i].data.executeDays + ",";
+            }
+            //params.week_day = beginDay + "," + params.week_day;
+            params.execute_days = params.execute_days.substring(0, params.execute_days.length - 1);
+            params.trigger_time = params.trigger_time.substring(0, params.trigger_time.length - 1);
+
+            params.duration_start = Ext.getCmp('cs_time').getValue();
+
+            if (!Ext.getCmp('noendtime').checked) {
+                params.duration_end = Ext.getCmp('ce_time').getValue();
+            }
+
             break;
     }
 

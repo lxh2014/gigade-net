@@ -156,7 +156,6 @@
     <Compile Include="Controllers\DeliveryStoreController.cs" />
     <Compile Include="Controllers\DispatchingSystemController.cs" />
     <Compile Include="Controllers\EdmController.cs" />
-    <Compile Include="Controllers\EdmGroupNewQuery.cs" />
     <Compile Include="Controllers\EdmNewController.cs" />
     <Compile Include="Controllers\EdmSController.cs" />
     <Compile Include="Controllers\ElementController.cs" />
@@ -1847,12 +1846,16 @@
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsList.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmSend.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateList.js" />
     <Content Include="Scripts\Views\EdmNew\EmailBlockEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EmailBlockList.js" />
+    <Content Include="Scripts\Views\EdmNew\EmailGroupEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EmailGroupImport.js" />
+    <Content Include="Scripts\Views\EdmNew\EmailGroupList.js" />
     <Content Include="Scripts\Views\EdmS\Edmlist.js" />
     <Content Include="Scripts\Views\Edm\BlackList.js" />
     <Content Include="Scripts\Views\Edm\BlackListEdit.js" />
@@ -1914,6 +1917,7 @@
     <Content Include="Scripts\Views\ProductClick\ProductClickCondition.js" />
     <Content Include="Scripts\Views\ProductClick\ProductClickList.js" />
     <Content Include="Scripts\Views\ProductComment\ChangeLog.js" />
+    <Content Include="Scripts\Views\ProductComment\ProductCommentUpdate.js" />
     <Content Include="Scripts\Views\ProductHistory\ParticularsHistory.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeEdit.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeList.js" />
@@ -1927,6 +1931,11 @@
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsList.js" />
     <Content Include="Scripts\Views\Redirect\RedirectView.js" />
     <Content Include="Scripts\Views\ReportManagement\OderMessageSearch.js" />
+    <Content Include="Scripts\Views\ScheduleService\SchedeleLogSearch.js" />
+    <Content Include="Scripts\Views\ScheduleService\ScheduleConfigEdit.js" />
+    <Content Include="Scripts\Views\ScheduleService\ScheduleMasterEdit.js" />
+    <Content Include="Scripts\Views\ScheduleService\SchedulePeriodEdit.js" />
+    <Content Include="Scripts\Views\ScheduleService\ScheduleService.js" />
     <Content Include="Scripts\Views\SecretInfo\SecretResetPwd.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverMasterList.js" />
     <Content Include="Scripts\Views\Service\OrderQuestionAdd.js" />
@@ -1947,9 +1956,12 @@
     <Content Include="Scripts\Views\Ticket\TicketReturnList.js" />
     <Content Include="Scripts\Views\Ticket\TicketVerification.js" />
     <Content Include="Scripts\Views\UserLevelLog\UserLevelLogList.js" />
+    <Content Include="Scripts\Views\Vendor\VendorBankList.js" />
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryEdit.js" />
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryList.js" />
     <Content Include="Scripts\Views\Vendor\VendorChangeLog.js" />
+    <Content Include="Scripts\Views\Vendor\VendorChild.js" />
+    <Content Include="Scripts\Views\Vendor\VendorDetail.js" />
     <Content Include="Scripts\Views\VipUserGroup\edit.js" />
     <Content Include="Scripts\Views\VipUserGroup\GCCInfo.js" />
     <Content Include="Scripts\Views\VipUserGroup\list.js" />
@@ -1980,7 +1992,9 @@
     <Content Include="Template\ProductDetail\product_detail_safe.txt" />
     <Content Include="XML\Exceptional.xml" />
     <Content Include="XML\ItemPrice.xml" />
-    <Content Include="XML\ParticularsSrc.xml" />
+    <Content Include="XML\ParticularsSrc.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="XML\ProductItemHistory.xml" />
     <Content Include="XML\SaleSum.xml" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\config.rb" />
@@ -4387,8 +4401,15 @@
     <Content Include="Views\EdmNew\Index.cshtml" />
     <Content Include="Views\EdmNew\EdmContentNew.cshtml" />
     <Content Include="Views\EdmNew\EdmTemplate.cshtml" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
+    <Content Include="Views\ScheduleService\Index.cshtml" />
+    <Content Include="Views\Vendor\VendorDetails.cshtml" />
+    <Content Include="Views\Vendor\VendorBankList.cshtml" />
+    <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
+    <Content Include="Views\EdmNew\EmailGroup.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4422,6 +4443,7 @@
     <Folder Include="Models\" />
     <Folder Include="Scripts\kindeditor\attached\" />
     <Folder Include="Scripts\Views\Bonus\" />
+    <Folder Include="Template\EmailGroup\" />
     <Folder Include="Template\OrderImport\" />
     <Folder Include="Template\VipUsers\" />
     <Folder Include="Views\Bonus\" />
@@ -4516,6 +4538,7 @@
     <Content Include="App_GlobalResources\Login.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>Login.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -4536,6 +4559,7 @@
     <Content Include="App_GlobalResources\ProductItemMap.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>ProductItemMap.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -4549,6 +4573,7 @@
     <Content Include="App_GlobalResources\OrderAdd.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>OrderAdd.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -4575,6 +4600,7 @@
     <Content Include="App_GlobalResources\Promotion.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>Promotion.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <PropertyGroup>
@@ -4599,7 +4625,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>11804</DevelopmentServerPort>
+          <DevelopmentServerPort>9046</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

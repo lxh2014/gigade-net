@@ -97,6 +97,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
             Ext.getCmp("pcGift").down('#edit').setDisabled(selections.length == 0);
+            Ext.getCmp("pcGift").down('#update').setDisabled(selections.length == 0);
             //  Ext.getCmp("pcGift").down('#remove').setDisabled(selections.length == 0);
         }
     }
@@ -619,6 +620,7 @@ Ext.onReady(function () {
         tbar: [
         { xtype: 'button', text: ADD, id: 'add', hidden: true, iconCls: 'icon-user-add', handler: onAddClick },
         { xtype: 'button', text: '回覆', id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
+        { xtype: 'button', text: '編輯用戶評價', id: 'update', iconCls: 'icon-user-edit', disabled: true, handler: onUpdateClick },
         '->',
         {
             xtype: 'button',
@@ -771,7 +773,7 @@ function SecretLogin(rid, info_id, info_type) {//secretcopy
 onAddClick = function () {
     editFunction(null, ProductCommentStore);
 }
-//修改
+//回覆
 onEditClick = function () {
     var row = Ext.getCmp("pcGift").getSelectionModel().getSelection();
     if (row.length == 0) {
@@ -780,6 +782,21 @@ onEditClick = function () {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
         editFunction(row[0], ProductCommentStore);
+    }
+}
+//編輯
+onUpdateClick = function ()
+{
+    var row = Ext.getCmp("pcGift").getSelectionModel().getSelection();
+    if (row.length == 0)
+    {
+        Ext.Msg.alert(INFORMATION, NO_SELECTION);
+    } else if (row.length > 1)
+    {
+        Ext.Msg.alert(INFORMATION, ONE_SELECTION);
+    } else if (row.length == 1)
+    {
+        updateFunction(row[0], ProductCommentStore);
     }
 }
 

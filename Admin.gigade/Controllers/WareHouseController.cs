@@ -23,6 +23,7 @@ using BLL.gigade.Model.Custom;
 using System.Text.RegularExpressions;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using BLL.gigade.Dao;
 
 namespace Admin.gigade.Controllers
 {
@@ -2642,7 +2643,7 @@ namespace Admin.gigade.Controllers
                 ProductItem proitem = new ProductItem();
                 Caller call = new Caller();
                 call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
-                string path="";
+                string path = "";
                 _iinvd = new IinvdMgr(mySqlConnectionString);
                 _iagMgr = new IialgMgr(mySqlConnectionString);
                 _IiupcMgr = new IupcMgr(mySqlConnectionString);
@@ -2715,6 +2716,7 @@ namespace Admin.gigade.Controllers
                 #region 獲取數據添加打iialg
                 ia.loc_id = m.plas_loc_id.ToString().ToUpper();
                 ia.item_id = m.item_id;
+                int type = 0;//庫存調整
                 if (!string.IsNullOrEmpty(Request.Params["iarc_id"].ToString()))
                 {
                     ia.iarc_id = Request.Params["iarc_id"].ToString();
@@ -2722,7 +2724,13 @@ namespace Admin.gigade.Controllers
                 else
                 {
                     ia.iarc_id = "PC";
+                    type = 1;//收貨上架
                 }
+                //if (ia.iarc_id == "DR" || ia.iarc_id == "KR")
+                //{
+                //    type = 2;//RF理貨
+                //}
+               
                 ia.create_dtim = DateTime.Now;
                 ia.create_user = m.create_user;
                 ia.doc_no = "P" + DateTime.Now.ToString("yyyyMMddHHmmss");
@@ -2751,22 +2759,22 @@ namespace Admin.gigade.Controllers
 
                 #region 新增/編輯
                 #region 庫存調整的時候，商品庫存也要調整
-                _proditemMgr = new ProductItemMgr(mySqlConnectionString); 
+                _proditemMgr = new ProductItemMgr(mySqlConnectionString);
                 int item_stock = m.prod_qty;
                 proitem.Item_Stock = item_stock;
                 proitem.Item_Id = m.item_id;
                 #endregion
-                if (_iinvd.IsUpd(m) > 0)
+                if (_iinvd.IsUpd(m, type) > 0)
                 {//編輯             
                     ia.qty_o = _iinvd.Selnum(m);
                     ia.adj_qty = m.prod_qty;
-                  
+
                     m.prod_qty = _iinvd.Selnum(m) + m.prod_qty;
                     if (m.prod_qty >= 0)
                     {
-                        if (_iinvd.Upd(m) > 0 )
+                        if (_iinvd.Upd(m) > 0)
                         {
-                            if (Request.Params["iialg"].ToString() == "Y") 
+                            if (Request.Params["iialg"].ToString() == "Y")
                             {// 
                                 if (ia.iarc_id == "DR" || ia.iarc_id == "KR")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
                                 {
@@ -2817,7 +2825,7 @@ namespace Admin.gigade.Controllers
                                     if (ia.iarc_id == "DR" || ia.iarc_id == "KR")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
                                     {
                                         path = "/WareHouse/KutiaoAddorReduce";
-                                        _proditemMgr.UpdateItemStock(proitem,path,call);
+                                        _proditemMgr.UpdateItemStock(proitem, path, call);
                                     }
                                     ia.qty_o = 0;
                                     ia.adj_qty = m.prod_qty;
@@ -7343,7 +7351,7 @@ namespace Admin.gigade.Controllers
 
                 #region 庫存調整的時候，商品庫存也要調整
                 _proditemMgr = new ProductItemMgr(mySqlConnectionString);
-                int item_stock =0;
+                int item_stock = 0;
                 #endregion
                 if (kucuntype == 1)//表示選擇了加
                 {
@@ -7377,11 +7385,11 @@ namespace Admin.gigade.Controllers
                     Icg.sc_note = Request.Params["remarks"];//備註
                 }
                 _istockMgr = new IstockChangeMgr(mySqlConnectionString);
-               
+
                 int j = _iinvd.kucunTiaozheng(invd); //更改iloc表中的狀態並且在iialg表中插入數據
-                string path="/WareHouse/KutiaoAddorReduce";
-                Caller call=new Caller();
-                call=(System.Web.HttpContext.Current.Session["caller"] as Caller);
+                string path = "/WareHouse/KutiaoAddorReduce";
+                Caller call = new Caller();
+                call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
                 int k = _proditemMgr.UpdateItemStock(Proitems, path, call);
                 int newsumcount = _iinvd.GetProqtyByItemid(Convert.ToInt32(Icg.item_id));//總庫存
                 Icg.sc_num_chg = newsumcount - oldsumcount;
@@ -7395,7 +7403,7 @@ namespace Admin.gigade.Controllers
                 {
                     results = 1;
                 }
-                if (j > 0 && results > 0&&k>0)
+                if (j > 0 && results > 0 && k > 0)
                 {
                     jsonStr = "{success:true}";
                 }
@@ -7958,6 +7966,10 @@ namespace Admin.gigade.Controllers
             {
                 q.po_id = Request.Params["po_id"].ToString();
             }
+            if (Request.Params["doc_userid"].ToString() != "-1")
+            {
+                q.doc_userid = int.Parse(Request.Params["doc_userid"]);
+            }
             //if (!string.IsNullOrEmpty(Request.Params["iarc_id"]))
             //{
             //    q.iarc_id = Request.Params["iarc_id"].ToString();
@@ -7969,7 +7981,11 @@ namespace Admin.gigade.Controllers
             }
             if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
             {
-                q.endtime = time.AddDays(1);
+                q.endtime = time;
+            }
+            if (!string.IsNullOrEmpty(Request.Params["doc_no"].Trim().ToUpper()))//by zhaozhi0623j add 20151006
+            {
+                q.doc_no = Request.Params["doc_no"].Trim().ToUpper();
             }
             try
             {
@@ -8025,6 +8041,14 @@ namespace Admin.gigade.Controllers
                 //{
                 //    q.iarc_id = Request.Params["iarc_id"].ToString();
                 //}
+                if (Request.Params["doc_userid"].ToString() != "-1")//by zhaozhi0623j add 20151006
+                {
+                    q.doc_userid = int.Parse(Request.Params["doc_userid"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["doc_no"].Trim().ToUpper()))//by zhaozhi0623j add 20151006
+                {
+                    q.doc_no = Request.Params["doc_no"].Trim().ToUpper();
+                }
                 DateTime time = DateTime.MinValue;
                 if (DateTime.TryParse(Request.Params["starttime"].ToString(), out time))
                 {
@@ -8032,7 +8056,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
                 {
-                    q.endtime = time.AddDays(1);
+                    q.endtime = time;
                 }
                 if (!System.IO.Directory.Exists(Server.MapPath(excelPath)))
                 {
@@ -8067,12 +8091,12 @@ namespace Admin.gigade.Controllers
                 _iagMgr = new IialgMgr(mySqlConnectionString);
                 q.IsPage = false;
                 store = _iagMgr.GetExportIialgList(q);
-                int i = 0;
+                int i = 1;
                 foreach (var item in store)
                 {
                     DataRow dr = dtHZ.NewRow();
                     dr[0] = i++;
-                    dr[1] = item.row_id;
+                    dr[1] = item.doc_no;
                     dr[2] = item.loc_id;
                     dr[3] = item.loc_R;
                     dr[4] = item.item_id;
@@ -8125,6 +8149,36 @@ namespace Admin.gigade.Controllers
                 log.Error(logMessage);
                 json = "{success:false,data:[]}";
             }
+        }
+        public HttpResponseBase GetkutiaoUser() //by zhaozhi0623j add 庫調人員列表
+        {
+
+            string json = string.Empty;
+            try
+            {
+                _iagMgr = new IialgMgr(mySqlConnectionString);
+                List<ManageUser> store = new List<ManageUser>();
+
+
+                store = _iagMgr.GetkutiaoUser();
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";//返回json數據
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+
         }
         #endregion
 
@@ -8279,7 +8333,7 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(Request.Params["freight"]))
             {
-               ipo.freight = Convert.ToInt32(Request.Params["freight"].ToString());
+                ipo.freight = Convert.ToInt32(Request.Params["freight"].ToString());
             }
             //變更的時候記得把匯出也修改了獲取條件是同時的
             try
@@ -10898,6 +10952,14 @@ namespace Admin.gigade.Controllers
             {
                 IpodQuery ipod = new IpodQuery();
                 List<IpodQuery> ipoStore = new List<IpodQuery>();
+                if (!string.IsNullOrEmpty(Request.Params["freight"]))
+                {
+                    ipod.product_freight_set =int.Parse(Request.Params["freight"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["updateuser"]))
+                {
+                    ipod.change_user = int.Parse(Request.Params["updateuser"]);
+                }
                 if (!string.IsNullOrEmpty(Request.Params["erp_id"]))
                 {
                     ipod.Erp_Id = Request.Params["erp_id"];
@@ -10967,17 +11029,18 @@ namespace Admin.gigade.Controllers
                 DateTime date;
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]))
                 {
-                    if(DateTime.TryParse(Request.Params["start_time"].ToString(),out date)){
+                    if (DateTime.TryParse(Request.Params["start_time"].ToString(), out date))
+                    {
                         ipod.start_time = date;
                     }
-                    
+
                 }
                 if (!string.IsNullOrEmpty(Request.Params["end_time"]))
                 {
                     if (DateTime.TryParse(Request.Params["end_time"].ToString(), out date))
                     {
-                        ipod.end_time =Convert.ToDateTime(date.ToString("yyyy-MM-dd 23:59:59"));
-                    }   
+                        ipod.end_time = Convert.ToDateTime(date.ToString("yyyy-MM-dd 23:59:59"));
+                    }
                 }
                 ipod.IsPage = false;
                 _ipodMgr = new IpodMgr(mySqlConnectionString);
@@ -10992,6 +11055,7 @@ namespace Admin.gigade.Controllers
                 _newDt.Columns.Add("商品編號", typeof(string));
                 _newDt.Columns.Add("商品細項編號", typeof(string));
                 _newDt.Columns.Add("商品名稱", typeof(string));
+                _newDt.Columns.Add("溫層", typeof(string));
                 _newDt.Columns.Add("規格", typeof(string));
                 _newDt.Columns.Add("採購數量", typeof(string));
                 _newDt.Columns.Add("允收數量", typeof(string));
@@ -11001,7 +11065,7 @@ namespace Admin.gigade.Controllers
                 _newDt.Columns.Add("異動時間", typeof(string));
                 _newDt.Columns.Add("異動人", typeof(string));
 
-          
+
 
                 for (int i = 0; i < ipoStore.Count; i++)
                 {
@@ -11022,7 +11086,7 @@ namespace Admin.gigade.Controllers
                     newRow["創建人"] = ipoStore[i].create_username;
                     newRow["異動時間"] = ipoStore[i].change_dtim.ToString("yyyy-MM-dd HH:mm:ss");
                     newRow["異動人"] = ipoStore[i].change_username;
-
+                    newRow["溫層"] = ipoStore[i].product_freight_set==1?"常溫":"冷凍";
                     _newDt.Rows.Add(newRow);
                 }
                 string fileName = string.Empty;
@@ -11053,6 +11117,14 @@ namespace Admin.gigade.Controllers
             string json = string.Empty;
             ipod.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
             ipod.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");//用於分頁的變量
+            if (!string.IsNullOrEmpty(Request.Params["freight"]))
+            {
+                ipod.product_freight_set = int.Parse(Request.Params["freight"]);
+            }
+            if (!string.IsNullOrEmpty(Request.Params["updateuser"]))
+            {
+                ipod.change_user = int.Parse(Request.Params["updateuser"]);
+            }
             if (!string.IsNullOrEmpty(Request.Params["erp_id"]))
             {
                 ipod.Erp_Id = Request.Params["erp_id"];
@@ -11064,7 +11136,7 @@ namespace Admin.gigade.Controllers
             if (!string.IsNullOrEmpty(Request.Params["vendor_id"]))
             {
                 UInt64 vendorid = 0;
-                if (UInt64.TryParse(Request.Params["vendor_id"],out vendorid))
+                if (UInt64.TryParse(Request.Params["vendor_id"], out vendorid))
                 {
                     ipod.vendor_id = vendorid;
                 }
@@ -11072,15 +11144,15 @@ namespace Admin.gigade.Controllers
             if (!string.IsNullOrEmpty(Request.Params["vendor_name_full"]))
             {
                 string vendorName = Request.Params["vendor_name_full"].ToString();
-                int index1=vendorName.IndexOf('%');
-                int index2=vendorName.IndexOf('_');
-                if (index1 != -1 )
+                int index1 = vendorName.IndexOf('%');
+                int index2 = vendorName.IndexOf('_');
+                if (index1 != -1)
                 {
                     string start = vendorName.Substring(0, index1);
                     string end = vendorName.Substring(index1 + 1);
                     vendorName = start + "/" + "%" + end;
                 }
-                if(index2 != -1)
+                if (index2 != -1)
                 {
                     string start = vendorName.Substring(0, index2);
                     string end = vendorName.Substring(index2 + 1);
@@ -11130,7 +11202,7 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(Request.Params["end_time"]))
             {
-                ipod.end_time =Convert.ToDateTime(Convert.ToDateTime(Request.Params["end_time"].ToString()).ToString("yyyy-MM-dd 23:59:59"));
+                ipod.end_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["end_time"].ToString()).ToString("yyyy-MM-dd 23:59:59"));
             }
             try
             {
@@ -11142,6 +11214,33 @@ namespace Admin.gigade.Controllers
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = "{success:true,'msg':'user',totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";//返回json數據
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        public HttpResponseBase GetUpdateUsersList()
+        {
+            string json = string.Empty;
+            try
+            {
+                FgroupMySqlDao  fdao=new FgroupMySqlDao(mySqlConnectionString);
+                DataTable dt = fdao.GetFgroupLists();
+                DataRow row= dt.NewRow();
+                row[0] = "0";
+                row[1] = "全部";
+                dt.Rows.InsertAt(row, 0);
+                json = "{data:" + JsonConvert.SerializeObject(dt, Formatting.Indented) + "}";//返回json數據
             }
             catch (Exception ex)
             {

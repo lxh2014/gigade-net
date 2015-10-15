@@ -152,6 +152,36 @@ namespace BLL.gigade.Dao
                 throw new Exception("ZipDao-->GetZipList-->" + ex.Message + strSql.ToString(), ex);
             }
         }
+        /// <summary>
+        /// chaojie1124j add 搬移2015/09/29實現供應商細項的公司地址和發票地址
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public List<Zip> GetZipList(Zip query)
+        {
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+                strSql.AppendFormat("select big,middle,middlecode,zipcode,small from t_zip_code where 1=1");
+                if (!string.IsNullOrEmpty(query.bigcode))
+                {
+                    strSql.AppendFormat(" and bigcode='{0}' ", query.bigcode);
+                }
+                if (!string.IsNullOrEmpty(query.middlecode))
+                {
+                    strSql.AppendFormat(" and middlecode='{0}' ", query.middlecode);
+                }
+                if (!string.IsNullOrEmpty(query.zipcode))
+                {
+                    strSql.AppendFormat(" and zipcode='{0}' ", query.zipcode);
+                }
+                return _accessMySql.getDataTableForObj<Zip>(strSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ZipDao-->GetZipList-->" + ex.Message + strSql.ToString(), ex);
+            }
+        }
         #endregion
     }
 }

@@ -117,6 +117,7 @@ namespace BLL.gigade.Mgr
             {
                 EdmListConditoinSubQuery query = new EdmListConditoinSubQuery();
                 query.elcm_id=elcm_id;
+                DateTime dt;
                 List<EdmListConditoinSub> edm = _edmlistsubDao.LoadCondition(query);
                 foreach (var item in edm)
                 {
@@ -130,8 +131,14 @@ namespace BLL.gigade.Mgr
                         query.ChkBuy = true;
                         query.buyCondition = int.Parse(item.elcs_value1.ToString());
                         query.buyTimes = int.Parse(item.elcs_value2.ToString());
-                        query.buyTimeMin = DateTime.Parse(item.elcs_value3.ToString());
-                        query.buyTimeMax = DateTime.Parse(item.elcs_value4.ToString());
+                        if (DateTime.TryParse(item.elcs_value3.ToString(), out dt))
+                        {
+                            query.buyTimeMin = dt;
+                        }
+                        if (DateTime.TryParse(item.elcs_value4.ToString(), out dt))
+                        {
+                            query.buyTimeMax = dt;
+                        }
                     }
                     if (item.elcs_key == "age")
                     {
@@ -144,28 +151,54 @@ namespace BLL.gigade.Mgr
                         query.ChkCancel = true;
                         query.cancelCondition = Convert.ToInt32(item.elcs_value1.ToString());
                         query.cancelTimes = Convert.ToInt32(item.elcs_value2.ToString());
-                        query.cancelTimeMin = Convert.ToDateTime(item.elcs_value3);
-                        query.cancelTimeMax = Convert.ToDateTime(item.elcs_value4);
+                        if (DateTime.TryParse(item.elcs_value3.ToString(), out dt))
+                        {
+                            query.cancelTimeMin = dt;
+                        }
+                        if (DateTime.TryParse(item.elcs_value4.ToString(), out dt))
+                        {
+                            query.cancelTimeMax = dt;
+                        }
+
                     }
                     if (item.elcs_key == "register_time")
                     {
                         query.ChkRegisterTime = true;
-                        query.registerTimeMin = Convert.ToDateTime(item.elcs_value3);
-                        query.registerTimeMax = Convert.ToDateTime(item.elcs_value4);
+                        if (DateTime.TryParse(item.elcs_value1.ToString(), out dt))
+                        {
+                            query.registerTimeMin = dt;
+                        }
+                        if (DateTime.TryParse(item.elcs_value2.ToString(), out dt))
+                        {
+                            query.registerTimeMax = dt;
+                        }
+
                     }
                     if (item.elcs_key == "return_times")
                     {
                         query.ChkReturn = true;
                         query.returnCondition = Convert.ToInt32(item.elcs_value1.ToString());
                         query.returnTimes = Convert.ToInt32(item.elcs_value2.ToString());
-                        query.returnTimeMin = Convert.ToDateTime(item.elcs_value3);
-                        query.returnTimeMax = Convert.ToDateTime(item.elcs_value4);
+                        if (DateTime.TryParse(item.elcs_value3.ToString(), out dt))
+                        {
+                            query.returnTimeMin = dt;
+                        }
+                        if (DateTime.TryParse(item.elcs_value4.ToString(), out dt))
+                        {
+                            query.returnTimeMax = dt;
+                        }
                     }
                     if (item.elcs_key == "last_order")
                     {
                         query.ChkLastOrder = true;
-                        query.lastOrderMin = Convert.ToDateTime(item.elcs_value3);
-                        query.lastOrderMax = Convert.ToDateTime(item.elcs_value4);
+                        if (DateTime.TryParse(item.elcs_value3.ToString(), out dt))
+                        {
+                            query.lastOrderMin = dt;
+                        }
+                        if (DateTime.TryParse(item.elcs_value4.ToString(), out dt))
+                        {
+                            query.lastOrderMax = dt;
+                        }
                     }
                     if (item.elcs_key == "replenishment_info")
                     {
@@ -176,8 +209,14 @@ namespace BLL.gigade.Mgr
                     if (item.elcs_key == "last_login")
                     {
                         query.ChkLastLogin = true;
-                        query.lastLoginMin = Convert.ToDateTime(item.elcs_value3);
-                        query.lastLoginMax = Convert.ToDateTime(item.elcs_value4);
+                        if (DateTime.TryParse(item.elcs_value3.ToString(), out dt))
+                        {
+                            query.lastLoginMin = dt;
+                        }
+                        if (DateTime.TryParse(item.elcs_value4.ToString(), out dt))
+                        {
+                            query.lastLoginMax = dt;
+                        }
                     }
                     if (item.elcs_key == "total_consumption")
                     {

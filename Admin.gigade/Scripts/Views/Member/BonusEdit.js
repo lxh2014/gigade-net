@@ -1,5 +1,12 @@
 ﻿
 editFunction = function (row, store) {
+    var bonus_type;
+    if (row.data.bonus_type == 1) {
+        bonus_type = "購物金";
+    }
+    else {
+        bonus_type = "抵用劵";
+    }
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
         frame: true,
@@ -25,20 +32,20 @@ editFunction = function (row, store) {
             },
             {
                 xtype: 'displayfield',
-                fieldLabel: "購物金編號",
+                fieldLabel: bonus_type+"編號",
                 id: 'master_id',
                 name: 'master_id',
                 allowBlank: false
             },
             {
                 xtype: 'displayfield',
-                fieldLabel: "已使用購物金",
+                fieldLabel: "已使用" + bonus_type,
                 id: 'already_use_bonus',
                 name: 'already_use_bonus'
             },
             {
                 xtype: 'textfield',
-                fieldLabel: "購物金總金額",
+                fieldLabel: bonus_type + "總金額",
                 id: 'master_total',
                 name: 'master_total',
                 allowBlank: true
@@ -79,20 +86,20 @@ editFunction = function (row, store) {
                         return;
                     }
                     if (parseInt(Ext.getCmp('master_total').getValue()) <= 0) {
-                        Ext.Msg.alert(INFORMATION, "購物金額錯誤");
+                        Ext.Msg.alert(INFORMATION, bonus_type+"金額錯誤");
                         return;
                     }
                     if (parseInt(Ext.getCmp('master_total').getValue()) > 9999) {
-                        Ext.Msg.alert(INFORMATION, "購物金額不得大於五位數");
+                        Ext.Msg.alert(INFORMATION, bonus_type + "金額不得大於五位數");
                         return;
                     }
                     if (parseInt(Ext.getCmp('master_total').getValue()) < parseInt(Ext.getCmp('already_use_bonus').getValue())) {
-                        Ext.Msg.alert(INFORMATION, "總額必須大於已使用購物金額");
+                        Ext.Msg.alert(INFORMATION, "總額必須大於已使用" + bonus_type + "金額");
                         return;
                     }
 
                     if (form.isValid()) {
-                        Ext.MessageBox.confirm(CONFIRM, "確定要新增/修改購物金嗎?", function (btn) {
+                        Ext.MessageBox.confirm(CONFIRM, "確定要修改" + bonus_type + "嗎?", function (btn) {
                             if (btn == "yes") {
                                 form.submit({
                                     params: {
@@ -109,7 +116,8 @@ editFunction = function (row, store) {
                                         var result = Ext.decode(action.response.responseText);
                                         if (result.success) {
                                             Ext.Msg.alert(INFORMATION, "保存成功！");
-                                            BonusStore.load({ params: { start: 0, limit: 25 } });
+                                            var index = (Ext.getCmp('PagingToolbar').el.dom.getElementsByTagName("input")[0].value - 1) * pageSize;
+                                            BonusStore.load({ params: { start: index, limit: 25 } });
                                             editWin.close();
                                         } else {
                                             Ext.Msg.alert(INFORMATION, "保存失敗！");
@@ -130,7 +138,7 @@ editFunction = function (row, store) {
     });
 
     var editWin = Ext.create('Ext.window.Window', {
-        title: "新增/修改購物金",
+        title: row.data.bonus_type == "1" ? "修改購物金" : "修改抵用劵",
         id: 'editWin',
         iconCls: 'icon-user-edit',
         width: 400,

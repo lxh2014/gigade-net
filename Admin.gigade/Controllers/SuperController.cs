@@ -87,7 +87,6 @@ namespace Admin.gigade.Controllers
         /// <returns>Super Excel匯出</returns>
         public void SuperExportExcel()
         {
-
             SuperQuery query = new SuperQuery();
             int totalCount = 0;
             string json = string.Empty;
@@ -111,17 +110,16 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["superSql"]))
                 {
                     query.superSql = Request.Params["superSql"];
+                    query.superSql = query.superSql.Replace(",", ", ").Replace("\r", " ").Replace("\n", " ");
                     string[] sqlArray = query.superSql.Split(' ', ',', '(', ')');
                     if (sqlArray[0].ToLower() != "select")
                     {
-                        Response.Write("Sql語句不是查詢語句，請輸入查詢語句 ");
-                        throw new Exception("Sql語句不是查詢語句，請輸入查詢語句 ");
+                        Response.Write("Sql語句不是查詢語句，請輸入查詢語句 ");                      
                     }
                 }
                 else
                 {
-                    Response.Write("查詢語句為空！");
-                    throw new Exception("查詢語句為空，請輸入查詢語句 ");
+                    Response.Write("查詢語句為空！");                   
                 }
 
                 //檢查Sql語句是否錯誤
@@ -138,6 +136,7 @@ namespace Admin.gigade.Controllers
                 if (totalCount >= 60000)
                 {
                     Response.Write("查詢到的數據多於60000條，請重新輸入查詢語句！");
+                    
                 }
                 //返回与 Web 服务器上的指定虚拟路径相对应的物理文件路径。
                 //Exists确定给定路径是否引用磁盘上的现有目录。

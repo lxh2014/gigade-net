@@ -29,7 +29,10 @@ namespace BLL.gigade.Model.Query
         public DateTime reg_date { get; set; }
         public string userLevel { get; set; }
         public int update_user { get; set; }
-
+        public int bonus_type { get; set; }
+        public int bonus_type1 { get; set; }
+        public string bonus_typename { get; set; }
+        public string bonus_typenamequan { get; set; }
         public UsersListQuery()
         {
 
@@ -55,6 +58,10 @@ namespace BLL.gigade.Model.Query
             reg_date = DateTime.Now;
             userLevel = string.Empty;
             update_user = 0;
+            bonus_type = 0;
+            bonus_type1 = 0;
+            bonus_typename = string.Empty;
+            bonus_typenamequan = string.Empty;
         }
     }
 }

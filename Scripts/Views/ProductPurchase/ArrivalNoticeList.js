@@ -13,6 +13,7 @@ Ext.define('gridlistRIS', {
          { name: "id", type: "int" },//商品編號
         { name: "product_id", type: "int" },//商品編號
         { name: "product_name", type: "string" },//商品名稱
+        { name: "product_id_OR_product_name", type: "string " },//商品編號或名稱
         { name: "item_id", type: "int" },//商品細項編號
         { name: "product_spec", type: "string" },//商品規格
         { name: "vendor_name_full_OR_vendor_id", type: "string" },//供應商名稱或編號
@@ -163,7 +164,7 @@ ArrNoticeStore.on('beforeload', function () {
     Ext.apply(ArrNoticeStore.proxy.extraParams,
         {
             vendor_name_full_OR_vendor_id: Ext.getCmp('vendor_name_full_OR_vendor_id').getValue(),
-            product_id: Ext.getCmp('product_ids').getValue(),
+            product_id_OR_product_name: Ext.getCmp('product_id_OR_product_name').getValue(),
             start_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s')),
             end_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s')),
         });
@@ -204,10 +205,10 @@ Ext.onReady(function () {
                    items: [
                     {
                         xtype: 'textfield',
-                        id: 'product_ids',
+                        id: 'product_id_OR_product_name',
                         margin: '0 0 0 10',
-                        labelWidth: 60,
-                        fieldLabel: '商品編號',
+                        labelWidth: 100,
+                        fieldLabel: '商品編號/名稱',
                         listeners: {
                             specialkey: function (field, e) {
                                 if (e.getKey() == Ext.EventObject.ENTER) {
@@ -402,13 +403,13 @@ onEditClick = function () {
     
 }
 
-/************匯入到Exce************/
+/************匯出到Exce************/
 function Export() {
     var vendor_name_full_OR_vendor_id= Ext.getCmp('vendor_name_full_OR_vendor_id').getValue();
-    var product_id= Ext.getCmp('product_ids').getValue();
+    var product_id_OR_product_name = Ext.getCmp('product_id_OR_product_name').getValue();
     var start_time= Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s'));
     var end_time = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'));
-    window.open("/ProductPurchase/ExportCSV?vendor_name_full_OR_vendor_id=" + vendor_name_full_OR_vendor_id + "&product_id=" + product_id + "&start_time=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d') + "&end_time=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d'));
+    window.open("/ProductPurchase/ExportCSV?vendor_name_full_OR_vendor_id=" + vendor_name_full_OR_vendor_id + "&product_id_OR_product_name=" + product_id_OR_product_name + "&start_time=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d') + "&end_time=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d'));
 }
 /******************************************************************************************************************************************************************************************/
 function Tomorrow(s) {

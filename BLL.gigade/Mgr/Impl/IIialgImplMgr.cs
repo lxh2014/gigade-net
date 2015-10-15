@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using BLL.gigade.Model.Query;
+using BLL.gigade.Model;
 
 namespace BLL.gigade.Mgr.Impl
 {
@@ -15,5 +16,6 @@ namespace BLL.gigade.Mgr.Impl
 
         List<IialgQuery> GetExportIialgList(IialgQuery q);
         int addIialgIstock(IialgQuery q);
+        List<ManageUser> GetkutiaoUser();//by zhaozhi0623j 庫調管理員store
     }
 }

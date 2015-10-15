@@ -20,12 +20,12 @@ Ext.define('gigade.Ipod', {
      { name: "change_username", type: "string" },
      { name: "change_dtim", type: "string" },
      { name: "item_id", type: "string" },
+     { name: "product_freight_set", type: "string" }
      
     ]
 });
 var ipodStore = Ext.create('Ext.data.Store', {
     model: 'gigade.Ipod',
-    autoDestroy: true,
     pageSize: pageSize,
     proxy: {
         type: 'ajax',
@@ -62,7 +62,6 @@ Ext.define("gigade.parameter", {
 });
 var PoTypeStore = Ext.create('Ext.data.Store', {
     model: 'gigade.parameter',
-    autoDestroy: true,
     autoLoad:true,
     proxy: {
         type: 'ajax',
@@ -74,6 +73,33 @@ var PoTypeStore = Ext.create('Ext.data.Store', {
     }
 });
 
+var freightStore = Ext.create('Ext.data.Store', {
+    fields: ['parameterName', 'ParameterCode'],
+    data: [
+           { 'parameterName': '全部', 'ParameterCode': '0' },
+           { 'parameterName': '常溫', 'ParameterCode': '1' },
+           { 'parameterName': '冷凍', 'ParameterCode': '2' },
+    ]
+});
+Ext.define("gigade.UpdateUser", {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: "user_id", type: "string" },
+        { name: "user_username", type: "string" }
+    ]
+});
+var UpdateUserStore = Ext.create('Ext.data.Store', {
+    model: 'gigade.UpdateUser',
+    autoLoad: true,
+    proxy: {
+        type: 'ajax',
+        url: "/WareHouse/GetUpdateUsersList",
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
 function Query() {
     var falg = 0;
     var Poty = Ext.getCmp('Poty').getValue(); if (Poty != '') { falg++; }
@@ -82,16 +108,19 @@ function Query() {
     var check = Ext.getCmp('checkInfoYesOrNo').getValue();
     var vendor_name_full = Ext.getCmp('vendor_name_full').getValue().trim(); if (vendor_name_full != '') { falg++; }
 
+    var freight = Ext.getCmp('freight').getValue();
+    var updateuser = Ext.getCmp('UpdateUser').getValue();
+
     var product_id = Ext.getCmp('product_id').getValue();
     var product_name = Ext.getCmp('product_name').getValue();
     var start_time = Ext.getCmp('time_start').getValue();
     var end_time = Ext.getCmp('time_end').getValue();
     if (start_time == null && end_time != null) {
-        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        Ext.Msg.alert("提示", "請把異動時間補充完整");
         return false;
     }
     if (start_time != null && end_time == null) {
-        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        Ext.Msg.alert("提示", "請把異動時間補充完整");
         return false;
     }
     //if (falg == 0) {
@@ -113,7 +142,9 @@ function Query() {
                     product_id:product_id,
                     product_name : product_name,
                     start_time :start_time,
-                    end_time : end_time
+                    end_time: end_time,
+                    freight: freight,
+                    updateuser: updateuser
                 }
             });
     }
@@ -259,7 +290,7 @@ Ext.onReady(function () {
 
                      {
                          xtype: 'datefield',
-                         fieldLabel: "創建時間",
+                         fieldLabel: "異動時間",
                          labelWidth: 60,
                         // width: 210,
                          id: 'time_start',
@@ -310,8 +341,51 @@ Ext.onReady(function () {
 
                             }
                         },
-
-                    ]
+                         {
+                             xtype: 'combobox', 
+                             editable: false,
+                             id: 'freight',
+                             fieldLabel: "溫層",
+                             name: 'freight',
+                             width: 110,
+                             labelWidth: 30,
+                             margin: '5 0 0 5',
+                             store: freightStore,
+                             lastQuery: '',
+                             displayField: 'parameterName',
+                             valueField: 'ParameterCode',
+                             value:0,
+                             listeners: {
+                                 specialkey: function (field, e) {
+                                     if (e.getKey() == e.ENTER) {
+                                         Query();
+                                     }
+                                 }
+                             }
+                },
+                 {
+                     xtype: 'combobox', 
+                     editable: false,
+                     id: 'UpdateUser',
+                     fieldLabel: "異動人",
+                     name: 'UpdateUser',
+                     width: 120,
+                     labelWidth: 45,
+                     margin: '5 0 0 5',
+                     store: UpdateUserStore,
+                     lastQuery: '',
+                     displayField: 'user_username',
+                     valueField: 'user_id',
+                     value:'0',
+                     listeners: {
+                         specialkey: function (field, e) {
+                             if (e.getKey() == e.ENTER) {
+                                 Query();
+                             }
+                         }
+                     }
+                 }
+             ]
                 },
                 {
                     xtype: 'fieldcontainer',
@@ -356,11 +430,11 @@ Ext.onReady(function () {
         var start_time = Ext.getCmp('time_start').getValue();
         var end_time = Ext.getCmp('time_end').getValue();
         if (start_time == null && end_time != null) {
-            Ext.Msg.alert("提示", "請把創建時間補充完整");
+            Ext.Msg.alert("提示", "請把異動時間補充完整");
             return false;
         }
         if (start_time != null && end_time == null) {
-            Ext.Msg.alert("提示", "請把創建時間補充完整");
+            Ext.Msg.alert("提示", "請把異動時間補充完整");
             return false;
         }
         Ext.apply(ipodStore.proxy.extraParams, {
@@ -372,7 +446,9 @@ Ext.onReady(function () {
          product_id : Ext.getCmp('product_id').getValue(),
          product_name: Ext.getCmp('product_name').getValue(),
          start_time: Ext.getCmp('time_start').getValue(),
-         end_time : Ext.getCmp('time_end').getValue()
+         end_time: Ext.getCmp('time_end').getValue(),
+         freight : Ext.getCmp('freight').getValue(),
+         updateuser:Ext.getCmp('UpdateUser').getValue()
         });
     });
     var gdAccum = Ext.create('Ext.grid.Panel', {
@@ -382,18 +458,27 @@ Ext.onReady(function () {
         width: document.documentElement.clientWidth,
         columnLines: true,//顯示列線條
         frame: true,//Panel是圆角框显示
-        columns: [{ header: "採購單別", dataIndex: 'parameterName', width: 65, align: 'center' },
-            { header: "採購單號", dataIndex: 'po_id', width: 110, align: 'center' },
-            { header: "供應商編號", dataIndex: 'vendor_id', width: 90, align: 'center' },
+        columns: [{ header: "採購單別", dataIndex: 'parameterName', width: 60, align: 'center' },
+            { header: "採購單號", dataIndex: 'po_id', width: 105, align: 'center' },
+            { header: "供應商編號", dataIndex: 'vendor_id', width: 85, align: 'center' },
             { header: "供應商名稱", dataIndex: 'vendor_name_full', width: 170, align: 'center' },
-            { header: "品號", dataIndex: 'Erp_Id', width: 110, align: 'center' },
+            { header: "品號", dataIndex: 'Erp_Id', width: 100, align: 'center' },
             { header: "商品編號", dataIndex: 'productid', width: 65, align: 'center' },
             { header: "商品細項編號", dataIndex: 'item_id', width: 80, align: 'center' },
             { header: "商品名稱", dataIndex: 'product_name', width: 250, align: 'center' },
-            { header: "規格", dataIndex: 'spec', width: 130, align: 'center' },
-            { header: "採購數量", dataIndex: 'qty_ord', width: 65, align: 'center' },
-            { header: "允收數量", dataIndex: 'qty_claimed', width: 65, align: 'center' },
-            { header: "不允收量", dataIndex: 'qty_damaged', width: 65, align: 'center' },
+            {
+                header: "溫層", dataIndex: 'product_freight_set', width: 40, align: 'center',
+                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                    if (value =="1") {
+                        return "常溫";
+                    } if(value=="2") { return "冷凍"; }
+                }
+
+            },
+            { header: "規格", dataIndex: 'spec', width: 120, align: 'center' },
+            { header: "採購數量", dataIndex: 'qty_ord', width: 60, align: 'center' },
+            { header: "允收數量", dataIndex: 'qty_claimed', width: 60, align: 'center' },
+            { header: "不允收量", dataIndex: 'qty_damaged', width: 60, align: 'center' },
             { header: "創建時間", dataIndex: 'create_dtim', width: 120, align: 'center' },
             { header: "創建人", dataIndex: 'create_username', width: 60, align: 'center' },
             { header: "異動時間", dataIndex: 'change_dtim', width: 120, align: 'center' },
@@ -429,12 +514,14 @@ outExcel = function () {
     var product_name = Ext.getCmp('product_name').getValue();
     var start_time = Ext.getCmp('time_start').getValue();
     var end_time = Ext.getCmp('time_end').getValue();
+    var freight = Ext.getCmp('freight').getValue();
+    var updateuser = Ext.getCmp('UpdateUser').getValue();
     if (start_time == null && end_time != null) {
-        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        Ext.Msg.alert("提示", "請把異動時間補充完整");
         return false;
     }
     if (start_time != null && end_time == null) {
-        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        Ext.Msg.alert("提示", "請把異動時間補充完整");
         return false;
     }
     if (start_time!=null) {
@@ -444,6 +531,6 @@ outExcel = function () {
         end_time = Ext.htmlEncode(Ext.Date.format(new Date(end_time), 'Y-m-d 00:00:00'));
     }
     var params = 'Potype=' + Ext.getCmp('Poty').getValue() + '&erp_id=' + Ext.getCmp('erp_id').getValue() + '&vendor_id=' + Ext.getCmp('vendor_id').getValue() + '&check=' + Ext.getCmp('checkInfoYesOrNo').getValue() + '&vendor_name_full=' + Ext.getCmp('vendor_name_full').getValue().trim()
-    + "&product_id=" + product_id + "&product_name=" + product_name + "&start_time=" + start_time + "&end_time=" +end_time ;
+    + "&product_id=" + product_id + "&product_name=" + product_name + "&start_time=" + start_time + "&end_time=" + end_time + "&freight=" + freight + "&updateuser=" + updateuser;
     window.open('/WareHouse/WriteExcel?' + params);
 }

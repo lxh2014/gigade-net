@@ -892,6 +892,10 @@ namespace BLL.gigade.Dao
 
                     if (!query.IsPage)//匯出時不匯出大於10000的商品
                     {
+//商品匯出添加商品上下架備註欄位 add by mingwei0727w 2015/09/25
+                        strCols.Append(" ,psh.remark ");
+                        //strTbls.AppendFormat(" LEFT JOIN (select product_id,remark from (select product_id,remark from product_status_history where type =1 order by create_time desc) as kp group by product_id) as psh on a.product_id = psh.product_id ");
+                        strTbls.AppendFormat(" LEFT JOIN (select product_id,remark from product_status_history as pshman inner join ( select max(id) as mid from product_status_history where type = 1 and remark <> '' group by product_id ) as pshson on pshman.id=pshson.mid)as psh on a.product_id = psh.product_id ");
                         strCondition.Append(" and a.product_id > 10000");
                     }
                 }

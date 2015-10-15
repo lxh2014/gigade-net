@@ -45,7 +45,7 @@
         extend: 'Ext.data.Model',
         fields: [
             { name: 'template_id', type: 'int' },
-            { name: 'content_url', type: 'string' }
+            { name: 'edit_url', type: 'string' }
         ]
     });
     var EdmTemplateStore = Ext.create("Ext.data.Store", {
@@ -201,7 +201,7 @@
                   fieldLabel: '編號',
                   id: 'content_id',
                   name: 'content_id',
-                  //hidden: true
+                  hidden: true
               },
             {
                 xtype: 'combobox',
@@ -215,6 +215,7 @@
                 lastQuery: '',
                 editable: false,
                 allowBlank: false,
+                lastQuery: '',
              
             },
             {
@@ -228,6 +229,7 @@
                 id: 'group_id',
                 name: 'group_id',
                 editable: false,
+                lastQuery: '',
               
             },
             {
@@ -239,7 +241,8 @@
                 id: 'importance',
                 name: 'importance',
                 value:1,
-                editable: false
+                editable: false,
+                lastQuery: '',
             },
             {
                 xtype: 'textfield',
@@ -252,13 +255,38 @@
                 xtype: 'combobox',
                 store: EdmTemplateStore,
                 valueField: 'template_id',
-                displayField:'content_url',
+                displayField: 'edit_url',
                 fieldLabel: '郵件範本',
                 id: 'template_id',
                 name: 'template_id',
                 editable: false,
                 lastQuery:'',
                 editable: false,
+                listeners: {
+                    'select': function () {
+                        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                        myMask.show();
+                        Ext.Ajax.request({
+                            url: '/EdmNew/GetEditUrlData',
+                            params: {
+                                edit_url: Ext.getCmp('template_id').getRawValue(),
+                            },
+                            success: function (data) {
+                                myMask.hide();
+                                if (data.responseText == "獲取網頁出現異常！") {
+                                    Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
+                                }
+                                else {
+                                    $('textarea[name=kendoEditor]').data("kendoEditor").value(Ext.util.Format.htmlDecode(data.responseText));
+                                }
+                            },
+                            failure: function () {
+                                myMask.hide();
+                                Ext.Msg.alert("提示信息","獲取網頁出現異常！");
+                            }
+                        });
+                    }
+                }
             },
             {
                 xtype: 'textarea',
@@ -274,11 +302,13 @@
                 text: '保存',
                 handler: function () {
                     if (Ext.htmlEncode(Ext.getCmp('kendoEditor').getValue()) == "") {
-                        Ext.Msg.alert("提示信息", '郵件內容為空');
+                        Ext.Msg.alert("提示信息", '郵件內容為空！');
                         return;
                     }
                     else {
                         var form = this.up('form').getForm();
+                        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                        myMask.show();
                         if (form.isValid()) {
                             this.disable();
                             form.submit({
@@ -292,17 +322,24 @@
                                     template_data: Ext.htmlEncode(Ext.getCmp('kendoEditor').getValue()),
                                 },
                                 success: function (form, action) {
+                                    myMask.hide();
                                     var result = Ext.decode(action.response.responseText);
                                     if (result.success) {
+                                        myMask.hide();
                                         Ext.Msg.alert("提示信息", "保存成功! ");
                                         store.load();
                                         editWin.close();
                                     }
                                     else {
+                                        myMask.hide();
                                         Ext.Msg.alert("提示信息", "保存失敗! ");
                                         store.load();
                                         editWin.close();
                                     }
+                                },
+                                failure: function () {
+                                    myMask.hide();
+                                    Ext.Msg.alert("提示信息", "出現異常! ");
                                 }
                             });
                         }
@@ -317,7 +354,7 @@
         title: '電子報新增/編輯',
         iconCls: 'icon-user-edit',
         id: 'editWin',
-        height: 650,
+        height: 550,
         width: 750,
         y: 100,
         layout: 'fit',

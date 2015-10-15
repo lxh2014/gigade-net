@@ -52,6 +52,7 @@
 
     //add by zhuoqin0830w  2015/07/15
     OFF_GRADE = "失格";
+    EXPECT_TIME_IS_ERROR = "預計出貨時間必須大於預購時間的結束時間！";
 
     //add by mingwei0727w  2015/07/17
     CURRICULUM_NAME = "課程名稱";
@@ -73,5 +74,5 @@
 
     MONTH_SET_NOEMPTY = "推薦月份不能為空";
 
-    MONTH_SET_USED_TIME_NOEMPTY = "推薦月份設定為必填項，且預計消耗時間必須大於等於0";
+    MONTH_SET_USED_TIME_NOEMPTY = "推薦月份設定為必填項，且預計消耗時間必須大於等于0";
 });

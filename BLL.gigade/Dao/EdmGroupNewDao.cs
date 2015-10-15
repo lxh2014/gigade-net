@@ -27,7 +27,7 @@ namespace BLL.gigade.Dao
            totalCount = 0;
            try
            {
-               str.AppendFormat(" select group_id,group_name,is_member_edm,trial_url,enabled from edm_group_new egn  ");
+               str.AppendFormat(" select group_id,group_name,is_member_edm,trial_url,enabled,sort_order,description from edm_group_new egn  ");
                strcont.AppendFormat(" where 1=1 ");
 
                strcont.AppendFormat(" and egn.group_name like '%{0}%'", query.group_name);
@@ -57,8 +57,6 @@ namespace BLL.gigade.Dao
                throw new Exception("EdmGroupNewDao-->GetEdmGroupNewList-->" + ex.Message);
            }
        } // add by yachao1120j 2015-9-21
-
-
        public string UpdateStatus(EdmGroupNewQuery query)  // add by yachao1120j 2015-9-21
        {
            StringBuilder strSql = new StringBuilder();
@@ -72,17 +70,15 @@ namespace BLL.gigade.Dao
                throw new Exception("EdmGroupNewDao-->UpdateStatus-->" + ex.Message + strSql.ToString(), ex);
            }
        } 
-
-
-       //插入人员信息
+       //插入信息
        public int EdmGroupNewInsert(EdmGroupNewQuery query)
        {
            StringBuilder sql = new StringBuilder();
            query.Replace4MySQL();
            try
            {
-               sql.Append("insert into edm_group_new (group_name, is_member_edm,trial_url, sort_order,description)values ");
-               sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}')", query.group_name, query.is_member_edm,query.trial_url, query.sort_order, query.description);
+               sql.Append("insert into edm_group_new (group_name, is_member_edm,trial_url, sort_order,description,group_createdate,group_create_userid,group_update_userid)values ");
+               sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}',NOW(),'{5}','{6}')", query.group_name, query.is_member_edm,query.trial_url, query.sort_order, query.description,query.group_create_userid,query.group_update_userid);
 
                return _access.execCommand(sql.ToString());
            }
@@ -91,14 +87,14 @@ namespace BLL.gigade.Dao
                throw new Exception("EdmGroupNewDao-->EdmGroupNewInsert-->" + sql.ToString() + ex.Message);
            }
        }
-       //更新人员信息
+       //更新信息
        public int EdmGroupNewUpdate(EdmGroupNewQuery query)
        {
            StringBuilder sql = new StringBuilder();
            query.Replace4MySQL();
            try
            {
-               sql.AppendFormat("update edm_group_new set group_name = '{0}', is_member_edm = '{1}', trial_url='{2}',sort_order = '{3}',description='{4}'  where group_id='{5}' ", query.group_name, query.is_member_edm, query.trial_url,query.sort_order, query.description,query.group_id);
+               sql.AppendFormat("update edm_group_new set group_name = '{0}', is_member_edm = '{1}', trial_url='{2}',sort_order = '{3}',description='{4}',group_update_userid='{5}'  where group_id='{6}' ", query.group_name, query.is_member_edm, query.trial_url, query.sort_order, query.description,query.group_update_userid, query.group_id);
                return _access.execCommand(sql.ToString());
            }
            catch (Exception ex)

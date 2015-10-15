@@ -1,7 +1,10 @@
-﻿
-
+﻿/*  
+ * 
+ * 文件名称：comboOptional.js 
+ * 摘    要：組合商品修改和新增 規格子頁面 -- 任意組合
+ * 
+ */
 function createComboOptional() {
-
     combSpecStroe = Ext.create('Ext.data.Store', {
         id: 'combSpecStroe',
         fields: ['Id', 'Parent_Id', 'Child_Id', 'Product_Name', 'S_Must_Buy', 'G_Must_Buy', 'Pile_Id', 'Buy_Limit'],
@@ -14,7 +17,6 @@ function createComboOptional() {
                 root: 'data'
             }
         }
-
     });
 
     var numSelectStore = Ext.create('Ext.data.Store', {
@@ -53,7 +55,6 @@ function createComboOptional() {
         }
         return bool;
     }
-
 
     var optionalPanel = Ext.create('Ext.form.Panel', {
         id: 'optionalPanel',
@@ -137,7 +138,6 @@ function createComboOptional() {
                     }
                 }
             }]
-
         }, {
             xtype: 'panel',
             border: false,
@@ -159,7 +159,6 @@ function createComboOptional() {
                     }
                 }
             }]
-
         }, {
             xtype: 'panel',
             border: false,
@@ -173,7 +172,6 @@ function createComboOptional() {
                 fieldLabel: MUST_BUY_NUM,
                 colName: 'mustBuyNum'
             }]
-
         }, {
             xtype: 'checkbox',
             boxLabel: BUY_LIMIT,
@@ -198,7 +196,6 @@ function createComboOptional() {
                         Ext.getCmp('combMustBuy').setMaxValue(Number.MAX_VALUE);
                         Ext.getCmp('combMustBuy').clearInvalid()
                     }
-
                 }
                 else {
                     this.setValue(false);
@@ -255,9 +252,8 @@ function createComboOptional() {
                 });
             }
         }
-
     });
-    
+
     var optionalGrid = Ext.create('Ext.grid.Panel', {
         id: 'optionalGrid',
         title: '',
@@ -271,7 +267,6 @@ function createComboOptional() {
         maxWidth: 420,
         //draggable: true,
         resizable: true,
-
         plugins: [cellEditing],
         listeners: {
             viewready: function (grid) {
@@ -313,39 +308,38 @@ function createComboOptional() {
                     }
                 }
             }, dataIndex: 'Child_Id'
+        }, { header: PRODUCT_NAME, colName: 'productName', hidden: true, menuDisabled: true, sortable: false, width: 200, dataIndex: 'Product_Name', flex: 1 },
+        {
+            header: UNIT_NUM, menuDisabled: true, colName: 'unitNum', hidden: true, sortable: false, width: 100, dataIndex: 'S_Must_Buy', editor: {
+                xtype: 'combobox',
+                queryMode: 'local',
+                store: mustBuyArray,
+                displayField: 'value',
+                valueField: 'value',
+                editable: false,
+                listeners: {
+                    beforequery: function () {
+                        //if (Ext.getCmp('chkNum').getValue()) {
+                        //    for (var i = 0, j = this.getStore().getCount() - 2; i < j; i++) {
+                        //        this.getStore().removeAt(2);
+                        //    }
+                        //}
+                        //else {
+                        //    if (this.getStore().getCount() <= 2) {
+                        //        this.getStore().removeAll();
+                        //        this.getStore().add({ field1: '0' }, { field1: '1' }, { field1: '2' }, { field1: '3' }, { field1: '4' }, { field1: '5' }, { field1: '6' }, { field1: '7' }, { field1: '8' }, { field1: '9' }, { field1: '10' });
+                        //    }
+                        //}
+                        this.getStore().removeAll();
+                        var t = Ext.getCmp('chkNum').getValue() ? 1 : numMustBuy;
+                        for (var i = 0; i <= t; i++) {
+                            this.getStore().add({ field1: i });
+                        }
+                    }
+                }
+            }
         },
-             { header: PRODUCT_NAME, colName: 'productName', hidden: true, menuDisabled: true, sortable: false, width: 200, dataIndex: 'Product_Name', flex: 1 },
-             {
-                 header: UNIT_NUM, menuDisabled: true, colName: 'unitNum', hidden: true, sortable: false, width: 100, dataIndex: 'S_Must_Buy', editor: {
-                     xtype: 'combobox',
-                     queryMode: 'local',
-                     store: mustBuyArray,
-                     displayField: 'value',
-                     valueField: 'value',
-                     editable: false,
-                     listeners: {
-                         beforequery: function () {
-                             //                         if (Ext.getCmp('chkNum').getValue()) {
-                             //                             for (var i = 0, j = this.getStore().getCount() - 2; i < j; i++) {
-                             //                                 this.getStore().removeAt(2);
-                             //                             }
-                             //                         }
-                             //                         else {
-                             //                             if (this.getStore().getCount() <= 2) {
-                             //                                 this.getStore().removeAll();
-                             //                                 this.getStore().add({ field1: '0' }, { field1: '1' }, { field1: '2' }, { field1: '3' }, { field1: '4' }, { field1: '5' }, { field1: '6' }, { field1: '7' }, { field1: '8' }, { field1: '9' }, { field1: '10' });
-                             //                             }
-                             //                         }
-                             this.getStore().removeAll();
-                             var t = Ext.getCmp('chkNum').getValue() ? 1 : numMustBuy;
-                             for (var i = 0; i <= t; i++) {
-                                 this.getStore().add({ field1: i });
-                             }
-                         }
-                     }
-                 }
-             },
-             { header: 'rid', hidden: true, dataIndex: 'Id' }]
+        { header: 'rid', hidden: true, dataIndex: 'Id' }]
     });
 
     var optionalViewPort = Ext.create('Ext.Viewport', {
@@ -360,5 +354,4 @@ function createComboOptional() {
             }
         }
     });
-
 }

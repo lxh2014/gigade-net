@@ -1,5 +1,6 @@
 ﻿var pageSize = 30;
 var schedule_id = 0;//排程id
+var itemId = 0;
 Ext.define('GIGADE.Tier', {
     extend: 'Ext.data.Model',
     fields: [{ name: 'schedule_id', type: 'int' },
@@ -358,12 +359,16 @@ function showRelationDetail(rec) {
 }
 
 function onAddClick() {
-    pcFrm.getForm().reset();
+    addPc.show();
     irregulartimeStore.removeAll();
+    Ext.getCmp('ce_time').setRawValue("");
+    //Ext.getCmp('noendtime').setValue(false);
+    pcFrm.getForm().reset();
+
     Ext.getCmp('gxGrid').hide();
     Ext.getCmp('mst').setText("");
+    Ext.getCmp('irrms').setText("");
     Ext.getCmp('ms').setText("");
-    addPc.show();
     Ext.getCmp('btnSave').show();
 }
 
@@ -376,9 +381,10 @@ function onEditClick() {
     else if (row.length > 1) {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
-        addPc.show();
-        Ext.getCmp('btnSave').show();
+        ///edit by wwei0216w 2015/10/7
+        Ext.getCmp('btnSave').show();  /*交換位置防止panel中顯示 出現上一次數據*/
         Tier_Load(row[0]);
+        addPc.show();
     }
 }
 
@@ -495,7 +501,8 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
         }],
     tbar: [{
         text: INSERT, handler: function () {//新增
-            relevantGrid.getStore().add({ id: '0' });
+            itemId--;///edit by ww2015/10/09
+            relevantGrid.getStore().add({ id: itemId });
             //relevantStore.insert(0, { id: '0'});
         }
     }, {
@@ -503,10 +510,18 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
             var rowRe = Ext.getCmp("relevantGrid").getSelectionModel().getSelection();
             Ext.Msg.confirm(CONFIRM, Ext.String.format(DELETE_VENDOR_SYSTEM_MESSAGE, rowRe.length), function (btn) {//刪除供應商系統將一同取消供應商旗下商品的排程，確定刪除選中的 {0} 條數據？
                 if (btn == 'yes') {
-                    var rowIDs = ''; var schedule_ids = '';
-                    var item_type, item_value;
+                    var rowTmepId = '', rowIDs = '', schedule_ids = '', item_type, item_value;
                     for (var i = 0; i < rowRe.length; i++) {
-                        rowIDs += rowRe[i].data.id + ',';
+                        var temp = rowRe[i].data.id;
+                        if (temp < 0) {
+                            relevantGrid.getStore().remove(rowRe[i]);
+                        } else {
+                            rowIDs += temp + ',';
+                        }
+                    }
+
+                    if (rowIDs == '') {
+                        return;
                     }
                     schedule_id = rowRe[0].data.schedule_Id;
                     item_type = rowRe[0].data.tabType;
@@ -544,7 +559,39 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                 });
                 myMask.show();
 
+                var newList = [];
+                var oldList = [];
+                var updateList = [];
                 var upDataStore = relevantStore.getUpdatedRecords(); //獲得修改過的store
+
+
+                for (var i = 0; i < relevantStore.data.length; i++) { //查找新增數據
+                    var item = relevantStore.data.items[i];
+                    if (item.data.id < 0) {
+                        item.data.id = 0;
+                    }
+                    if (item.data.id == 0) {
+                        newList.push(item.data.item_name);
+                        item.data.type = item.data.tabType;
+                        item.data.key1 = item.data.keyStr;
+                        item.data.value1 = item.data.valueStr;
+                        //upDataStore[upDataStore.length] = item;
+                    } else {
+                        oldList.push(item.data.item_name);
+                    }
+                }
+
+                ///查找重複數據
+                for (var i = 0; i < newList.length; i++) {
+                    for (var j = 0; j < oldList.length; j++) {
+                        if (oldList[j] == newList[i]) {
+                            myMask.hide();
+                            Ext.Msg.alert(INFORMATION, PLEASEVERIFYDATAOFREPEAT);//沒有數據被修改
+                            return;
+                        }
+                    }
+                }
+
 
                 for (var i = 0; i < upDataStore.length; i++) { //更新數據
                     var item = upDataStore[i];
@@ -557,17 +604,24 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                     if (!isNaN(item.data.valueStr)) {
                         item.data.value1 = item.data.valueStr;
                     }
-                }
 
-                for (var i = 0; i < relevantStore.data.length; i++) { //查找新增數據
-                    var item = relevantStore.data.items[i];
-                    if (item.data.id == 0) {
-                        item.data.type = item.data.tabType;
-                        item.data.key1 = item.data.keyStr;
-                        item.data.value1 = item.data.valueStr;
-                        upDataStore[upDataStore.length] = item;
+                    for (var i = 0; i < relevantStore.data.length; i++) {
+                        var itemOld = relevantStore.data.items[i];
+                        if (item.data.id != itemOld.data.id) {
+                            if (item.data.item_name == itemOld.data.item_name) {
+                                myMask.hide();
+                                Ext.Msg.alert(INFORMATION, PLEASEVERIFYDATAOFREPEAT);//沒有數據被修改
+                                return;
+                            }
+                        }
                     }
                 }
+
+
+
+
+
+
 
                 if (!upDataStore.length) {
                     myMask.hide();
@@ -579,6 +633,9 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
 
                 for (var i = 0; i < upDataStore.length ; i++) {
                     var record = upDataStore[i].data
+                    if (record.id < 0) {
+                        record.id = 0;
+                    }
                     relevants.push({
                         'id': record.id,
                         'schedule_Id': schedule_id,
@@ -603,6 +660,11 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                         var res = Ext.decode(response.responseText);
                         if (res) {
                             Ext.Msg.alert(INFORMATION, SUCCESS);
+                            relevantStore.load({///add by wwei0216w 添加store加載,防止新增對應關係-->直接刪除 后導致的全部數據都被刪除
+                                params: {
+                                    schedule_id: schedule_id
+                                }
+                            })
                         } else {
                             Ext.Msg.alert(INFORMATION, DELETE_UNUSUAL);//刪除異常
                         }

@@ -10,9 +10,9 @@ namespace BLL.gigade.Model
         public int rowid { get; set; }
         public string schedule_code { get; set; } //排程代碼
         public string schedule_name { get; set; } //排程名稱
-        public string api { get; set; }
-        public string description { get; set; }
-        public int state { get; set; }
+        public string schedule_api { get; set; }
+        public string schedule_description { get; set; }
+        public int schedule_state { get; set; }
         public int previous_execute_time { get; set; }
         public int next_execute_time { get; set; }
         public int schedule_period_id { get; set; }
@@ -26,9 +26,9 @@ namespace BLL.gigade.Model
             rowid = 0;
             schedule_code = string.Empty;
             schedule_name = string.Empty;
-            api = string.Empty;
-            description = string.Empty;
-            state = 0;
+            schedule_api = string.Empty;
+            schedule_description = string.Empty;
+            schedule_state = 0;
             previous_execute_time = 0;
             next_execute_time = 0;
             schedule_period_id = 0;

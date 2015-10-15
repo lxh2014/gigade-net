@@ -63,6 +63,23 @@ namespace BLL.gigade.Mgr
             }
         }
 
+        /// <summary>
+        /// 添加刪除的SQL語句 同時返回的也是SQL語句  add by zhuoqin0830w  2015/10/08
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <returns></returns>
+        public string DeleteProductAttribute(int productId)
+        {
+            try
+            {
+                return _rProductAttribute.DeleteProductAttribute(productId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("RecommendedProductAttributeDao-->Delete-->" + ex.Message, ex);
+            }
+        }
+
         public string TempDelete(int userId,int productId,int comboType)
         {
             try
