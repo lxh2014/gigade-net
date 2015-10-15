@@ -238,6 +238,7 @@
     <Compile Include="Dao\Impl\IParticularsSrcImplDao.cs" />
     <Compile Include="Dao\Impl\IProductOrderTempImplDao.cs" />
     <Compile Include="Dao\Impl\IProductRemoveReasonImplDao.cs" />
+    <Compile Include="Dao\Impl\IRecommendedExcleImplDao.cs" />
     <Compile Include="Dao\Impl\IScheduleItemImplDao.cs" />
     <Compile Include="Dao\Impl\IScheduleRelationImplDao.cs" />
     <Compile Include="Dao\Impl\IUserForbidImplDao.cs" />
@@ -270,6 +271,7 @@
     <Compile Include="Dao\PromoShareConditionDao.cs" />
     <Compile Include="Dao\PromoShareConditionTypeDao.cs" />
     <Compile Include="Dao\PromoShareMasterDao.cs" />
+    <Compile Include="Dao\RecommendedExcleDao.cs" />
     <Compile Include="Dao\RecommendedProductAttributeDao.cs" />
     <Compile Include="Dao\ScheduleDao.cs" />
     <Compile Include="Dao\IinvdDao.cs" />
@@ -776,6 +778,7 @@
     <Compile Include="Mgr\Impl\IParticularsSrcImplMgr.cs" />
     <Compile Include="Mgr\Impl\IProductOrderTempImplMgr.cs" />
     <Compile Include="Mgr\Impl\IProductRemoveReasonImplMgr.cs" />
+    <Compile Include="Mgr\Impl\IRecommendedExcleImplMgr.cs" />
     <Compile Include="Mgr\Impl\IScheduleItemImplMgr.cs" />
     <Compile Include="Mgr\Impl\IScheduleRelationImplMgr.cs" />
     <Compile Include="Mgr\Impl\IUserForbidImplMgr.cs" />
@@ -808,6 +811,7 @@
     <Compile Include="Mgr\PromoShareConditionMgr.cs" />
     <Compile Include="Mgr\PromoShareConditionTypeMgr.cs" />
     <Compile Include="Mgr\PromoShareMasterMgr.cs" />
+    <Compile Include="Mgr\RecommendedExcleMgr.cs" />
     <Compile Include="Mgr\RecommendedProductAttributeMgr.cs" />
     <Compile Include="Mgr\ScheduleItemMgr.cs" />
     <Compile Include="Mgr\ScheduleMgr.cs" />
@@ -1451,6 +1455,7 @@
     <Compile Include="Model\Query\ZipQuery.cs" />
     <Compile Include="Model\Query\SchedulePeriodQuery.cs" />
     <Compile Include="Model\Query\ScheduleLogQuery.cs" />
+    <Compile Include="Model\RecommendedOutPra.cs" />
     <Compile Include="Model\RecommendedProductAttribute.cs" />
     <Compile Include="Model\RecommendedRroductAttributeTemp.cs" />
     <Compile Include="Model\Schedule.cs" />
