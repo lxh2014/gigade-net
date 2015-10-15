@@ -24,7 +24,7 @@ namespace BLL.gigade.Dao
         {
 
             return _access.getDataTableForObj<Fgroup>(@"select a.rowid,groupname,groupcode,count(b.rowid) as callid,remark from t_fgroup a 
-left join  (SELECT tg.rowid,tg.groupId FROM manage_user mu LEFT JOIN t_groupcaller tg on mu.user_email=tg.callid WHERE mu.user_status=1)as b 
+left join  (SELECT tg.rowid,tg.groupId FROM manage_user mu LEFT JOIN t_groupcaller tg on mu.user_email=tg.callid WHERE mu.user_status!=0 and mu.user_status!=2)as b 
 on a.rowid=b.groupid 
 group by a.rowid ,groupname,groupcode,remark;");
         }
