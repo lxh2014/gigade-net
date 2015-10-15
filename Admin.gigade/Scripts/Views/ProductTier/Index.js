@@ -361,10 +361,7 @@ function showRelationDetail(rec) {
 function onAddClick() {
     addPc.show();
     irregulartimeStore.removeAll();
-    Ext.getCmp('ce_time').setRawValue("");
-    //Ext.getCmp('noendtime').setValue(false);
     pcFrm.getForm().reset();
-
     Ext.getCmp('gxGrid').hide();
     Ext.getCmp('mst').setText("");
     Ext.getCmp('irrms').setText("");

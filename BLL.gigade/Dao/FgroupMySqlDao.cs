@@ -23,7 +23,9 @@ namespace BLL.gigade.Dao
         public List<Fgroup> QueryAll()
         {
 
-            return _access.getDataTableForObj<Fgroup>("select a.rowid,groupname,groupcode,count(b.rowid) as callid,remark from t_fgroup a left join t_groupcaller b on a.rowid=b.groupid group by a.rowid,groupname,groupcode,remark");
+            return _access.getDataTableForObj<Fgroup>(@"select a.rowid,groupname,groupcode,count(b.rowid) as callid,remark from t_fgroup a left join t_groupcaller b on a.rowid=b.groupid 
+ LEFT JOIN manage_user mu on b.callid=mu.user_email  WHERE mu.user_status !=0 and mu.user_status !=2 
+ group by a.rowid,groupname,groupcode,remark");
         }
 
         public List<Fgroup> Query(string callid, string groupCode)
@@ -33,7 +35,7 @@ namespace BLL.gigade.Dao
 
         public List<ManageUser> QueryCallid()
         {
-            return _access.getDataTableForObj<ManageUser>("select user_username as name,user_email as callid from manage_user where user_status = '1'");
+            return _access.getDataTableForObj<ManageUser>("select user_username as name,user_email as callid from manage_user where user_status != 0 and user_status !=2 ");
         }
 
         public int Save(Fgroup fg)
@@ -94,6 +96,7 @@ namespace BLL.gigade.Dao
             }
 
         }
+
         public DataTable GetFgroupLists()
         {
             StringBuilder strSql = new StringBuilder();
@@ -111,6 +114,7 @@ namespace BLL.gigade.Dao
             }
 
         }
+
         public DataTable GetUsersByGroupId(int groupid)
         {
             StringBuilder sb = new StringBuilder();
@@ -176,5 +180,7 @@ WHERE tft.topValue =0 and tf.rowid='{0}' and tftg.groupId='{0}') as thistb LEFT 
                 throw new Exception(" FgroupDao-->GetSingle-->" + ex.Message + strSql.ToString(), ex);
             }
         }
+
+       
     }
 }

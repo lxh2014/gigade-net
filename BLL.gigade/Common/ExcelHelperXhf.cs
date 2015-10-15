@@ -521,7 +521,7 @@ namespace gigadeExcel.Comment
                     #endregion
                     rowIndex++;
                 }
-                            sheet.DefaultColumnWidth = 10;
+                sheet.DefaultColumnWidth = 10;
                 sheet.AutoSizeColumn(1, true);
                 sheet.AutoSizeColumn(2, true);
                 sheet.AutoSizeColumn(3, true);
@@ -1644,6 +1644,7 @@ namespace gigadeExcel.Comment
                             case "System.Int32":
                             case "System.Int64":
                             case "System.Byte":
+                            case "System.UInt32":
                                 int intV = 0;
                                 int.TryParse(drValue, out intV);
                                 newCell.SetCellValue(intV);
@@ -1705,7 +1706,8 @@ namespace gigadeExcel.Comment
                         table.Columns.Add(column);
                     }
 
-                    //行號從1開始；第一行為表頭
+                    //最后一列的标号  即总的行数
+                    //int rowCount = sheet.LastRowNum;
                     for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++)
                     {
                         IRow row = sheet.GetRow(i);
