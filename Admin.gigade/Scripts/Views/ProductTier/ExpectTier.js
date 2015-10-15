@@ -376,6 +376,9 @@ var pcFrm = Ext.create('Ext.form.Panel', {
             margin: '10 10 15 10',
             listeners: {
                 change: function () {
+                    if (Ext.getCmp('pcFrm').down('#datatime').getValue() == null) {
+                        return;
+                    }
                     messages = SCHEDULE_WILL_IN + Ext.Date.format(Ext.getCmp('pcFrm').down('#datatime').getValue(), 'Y/m/d') + DATE_EXECUTE + '。';
                     Ext.getCmp('pcFrm').down('#ms').setText(messages);
                 }
@@ -732,129 +735,141 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                 }]
             }]
         }]
-    },{
-           xtype: 'fieldset',
-           title: CONTINUE_TIME,//持續時間
-           id: 'cxsj',
-           layout: 'column',
-           padding: '10 10 10 10',
-           items: [{
-               xtype: 'datefield',
-               format: 'Y/m/d',
-               fieldLabel: BEGIN_TIME,//開始時間
-               allowBlank: false,
-               labelWidth: 64,
-               width: 220,
-               margin: '0 0 0 15',
-               id: 'cs_time',
-               listeners: {
-                   change: function () {
-                       Ext.getCmp("ce_time").setMinValue(this.getValue());
-                       if (Ext.getCmp('noendtime').checked) {
-                           messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
-                           Ext.getCmp('mst').setText('');
-                           Ext.getCmp('mst').setText(messagestime);
-                       } else {
-                           messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
-                           Ext.getCmp('mst').setText('');
-                           Ext.getCmp('mst').setText(messagestime);
-                       }
-                   }
-               }
-           }, {
-               xtype: 'datefield',
-               format: 'Y/m/d',
-               fieldLabel: END_TIME,//結束時間
-               allowBlank: false,
-               labelWidth: 64,
-               width: 220,
-               margin: '0 0 0 20',
-               id: 'ce_time',
-               listeners: {
-                   change: function () {
-                       Ext.getCmp("cs_time").setMaxValue(this.getValue());
-                       if (Ext.getCmp('noendtime').checked) {
-                           messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + '。';
-                           Ext.getCmp('mst').setText('');
-                           Ext.getCmp('mst').setText(messagestime);
-                       } else {
-                           messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d ') + '。';
-                           Ext.getCmp('mst').setText('');
-                           Ext.getCmp('mst').setText(messagestime);
-                       }
-                   }
-               }
-           }, {
-               xtype: 'checkbox',
-               boxLabel: NON_END_TIME,//沒有結束時間
-               width: 100,
-               inputValue: 'noentime',
-               id: 'noendtime',
-               margin: '0 0 0 20',
-               listeners: {
-                   change: function (chack) {
-                       if (chack.checked) {
-                           Ext.getCmp('ce_time').setDisabled(true);
-                           Ext.getCmp("ce_time").setValue('');
-                           messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
-                           Ext.getCmp('mst').setText('');
-                           Ext.getCmp('mst').setText(messagestime);
-                       } else {
-                           Ext.getCmp('ce_time').setDisabled(false);
-                           messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
-                           Ext.getCmp('mst').setText('');
-                           Ext.getCmp('mst').setText(messagestime);
-                       }
-                   }
-               }
-           }]
-       }, {
-           xtype: 'fieldset',
-           title: '不規律執行',//不規律執行
-           id: 'bglzx',
-           layout: 'column',
-           padding: '10 10 10 10',
-           disabled: true,
-           items: [{
-               xtype: 'combobox',
-               fieldLabel: '執行于',//執行于(每週)
-               allowBlank: false,
-               id: 'irregularwhen',
-               displayField: 'irregularname',
-               valueField: 'irregulartype',
-               labelWidth: 54,
-               width: 150,
-               margin: '10 10 15 10',
-               editable: false,
-               value: 'w',
-               store: irregularStore
-           }, irregularGrid]
-       }, {
-           xtype: 'container',
-           layout: 'column',
-           id: 'wenben',
-           height: 19,
-           items: [{
+    }, {
+        xtype: 'fieldset',
+        title: CONTINUE_TIME,//持續時間
+        id: 'cxsj',
+        layout: 'column',
+        padding: '10 10 10 10',
+        items: [{
+            xtype: 'datefield',
+            format: 'Y/m/d',
+            fieldLabel: BEGIN_TIME,//開始時間
+            allowBlank: false,
+            labelWidth: 64,
+            width: 220,
+            margin: '0 0 0 15',
+            id: 'cs_time',
+            listeners: {
+                change: function () {
+                    if (Ext.getCmp('cs_time').getValue() == null) {
+                        return;
+                    }
+                    Ext.getCmp("ce_time").setMinValue(this.getValue());
+                    if (Ext.getCmp('noendtime').checked) {
+                        messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
+                        Ext.getCmp('mst').setText('');
+                        Ext.getCmp('mst').setText(messagestime);
+                    } else {
+                        messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
+                        Ext.getCmp('mst').setText('');
+                        Ext.getCmp('mst').setText(messagestime);
+                    }
+                }
+            }
+        }, {
+            xtype: 'datefield',
+            format: 'Y/m/d',
+            fieldLabel: END_TIME,//結束時間
+            allowBlank: false,
+            labelWidth: 64,
+            width: 220,
+            margin: '0 0 0 20',
+            id: 'ce_time',
+            listeners: {
+                change: function () {
+                    if (Ext.getCmp('cs_time').getValue() == null) {
+                        return;
+                    }
+                    Ext.getCmp("cs_time").setMaxValue(this.getValue());
+                    if (Ext.getCmp('noendtime').checked) {
+                        messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + '。';
+                        Ext.getCmp('mst').setText('');
+                        Ext.getCmp('mst').setText(messagestime);
+                    } else {
+                        messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d ') + '。';
+                        Ext.getCmp('mst').setText('');
+                        Ext.getCmp('mst').setText(messagestime);
+                    }
+                }
+            }
+        }, {
+            xtype: 'checkbox',
+            boxLabel: NON_END_TIME,//沒有結束時間
+            width: 100,
+            inputValue: 'noentime',
+            id: 'noendtime',
+            margin: '0 0 0 20',
+            listeners: {
+                change: function (chack) {
+                    if (chack.checked) {
+                        Ext.getCmp('ce_time').setDisabled(true);
+                        Ext.getCmp("ce_time").setValue('');
+                    if (Ext.getCmp('cs_time').getValue() == null) {
+                        return;
+                    }
+                        messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
+                        Ext.getCmp('mst').setText('');
+                        Ext.getCmp('mst').setText(messagestime);
+                    } else {
+                        Ext.getCmp('ce_time').setDisabled(false);
+                        if (Ext.getCmp('cs_time').getValue() == null) {
+                            return;
+                        }
+                        messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
+                        Ext.getCmp('mst').setText('');
+                        Ext.getCmp('mst').setText(messagestime);
+                    }
+                }
+            }
+        }]
+    }, {
+        xtype: 'fieldset',
+        title: '不規律執行',//不規律執行
+        id: 'bglzx',
+        layout: 'column',
+        padding: '10 10 10 10',
+        disabled: true,
+        items: [{
+            xtype: 'combobox',
+            fieldLabel: '執行于',//執行于(每週)
+            allowBlank: false,
+            id: 'irregularwhen',
+            displayField: 'irregularname',
+            valueField: 'irregulartype',
+            labelWidth: 54,
+            width: 150,
+            margin: '10 10 15 10',
+            editable: false,
+            value: 'w',
+            store: irregularStore
+        }, irregularGrid]
+    }, {
+        xtype: 'container',
+        layout: 'column',
+        id: 'wenben',
+        height: 19,
+        items: [{
+            xtype: 'label',
+            id: 'ms',
+            text: messages
+        },
+           //{
+           //    xtype: 'label',
+           //    id: 'mscf',
+           //    text: messagesrep
+           //},
+           {
                xtype: 'label',
-               id: 'ms',
-               text: messages
+               id: 'irrms',
+               text: irrmessages
            },
-              //{
-              //    xtype: 'label',
-              //    id: 'mscf',
-              //    text: messagesrep
-              //},
-              {
-                  xtype: 'label',
-                  id: 'irrms',
-                  text: irrmessages
-              },
-             {
-                 xtype: 'label',
-                 id: 'mst',
-                 text: messagestime
-             }]
-       }],
+          {
+              xtype: 'label',
+              id: 'mst',
+              text: messagestime
+          }]
+    }],
     buttons: [{
         text: SAVE,//保存
         id: 'btnSave',
@@ -862,7 +877,6 @@ var pcFrm = Ext.create('Ext.form.Panel', {
             var myMask = new Ext.LoadMask(Ext.getBody(), {
                 msg: 'Loading...'
             });
-            myMask.show();
             var tempType = Ext.getCmp('pc_type').getValue();
             var parames = getParams();
             var tempFlag = true;////定義一個臨時變量用來作為是否  傳遞 到後臺的判斷依據
@@ -877,14 +891,13 @@ var pcFrm = Ext.create('Ext.form.Panel', {
             }
             else {
                 if (tempFlag) {
+                    myMask.show();
                     form.submit({
                         params: parames,
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
                             if (result.success) {
-                                Ext.getCmp('ce_time').setRawValue("");
                                 irregulartimeStore.removeAll();
-                                Ext.getCmp('noendtime').setValue(false);
                                 addPc.hide();
                                 tierStore.load();
                                 Ext.Msg.alert(INFORMATION, SAVE_SUCCESS);
@@ -897,7 +910,6 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                         }
                     });
                 }
-                //myMask.hide();
             }
         }
     }]
@@ -978,7 +990,7 @@ function Tier_Load(record) {
 
             Ext.getCmp('cs_time').setRawValue(record.data.duration_start);
 
-            if (record.data.duration_end == "0001/01/01" || record.data.duration_end == "" || record.data.duration_end=="9999/12/31") {
+            if (record.data.duration_end == "0001/01/01" || record.data.duration_end == "" || record.data.duration_end == "9999/12/31") {
                 Ext.getCmp('noendtime').setValue(true);
                 Ext.getCmp('ce_time').setRawValue("");
             } else {

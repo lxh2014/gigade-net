@@ -50,7 +50,6 @@ var ScheduleStore = Ext.create('Ext.data.Store', {
     }
 });
 
-
 ScheduleStore.on("beforeload", function () {
     Ext.apply(ScheduleStore.proxy.extraParams, {
 
