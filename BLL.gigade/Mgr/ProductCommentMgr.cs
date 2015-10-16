@@ -156,6 +156,10 @@ namespace BLL.gigade.Mgr
                                 {
                                     item["old_value"] = "是";
                                 }
+                                if (item["old_value"].ToString() == "-1")
+                                {
+                                    item["old_value"] = "";
+                                }
                                 if (item["new_value"].ToString() == "0")
                                 {
                                     item["new_value"] = "否";
@@ -202,44 +206,44 @@ namespace BLL.gigade.Mgr
                                 
                                 if (item["new_value"].ToString() == "1")
                                 {
-                                    item["new_value"] = "非常不滿意";
+                                    item["new_value"] = "非常不滿意(1分)";
                                 }
                                 else if (item["new_value"].ToString() == "2")
                                 {
-                                    item["new_value"] = "不滿意";
+                                    item["new_value"] = "不滿意(2分)";
                                 }
                                 else if (item["new_value"].ToString() == "3")
                                 {
-                                    item["new_value"] = "一般";
+                                    item["new_value"] = "一般(3分)";
                                 }
                                 else if (item["new_value"].ToString() == "4")
                                 {
-                                    item["new_value"] = "滿意";
+                                    item["new_value"] = "滿意(4分)";
                                 }
                                 else if (item["new_value"].ToString() == "5")
                                 {
-                                    item["new_value"] = "非常滿意";
+                                    item["new_value"] = "非常滿意(5分)";
                                 }
 
                                 if (item["old_value"].ToString() == "1")
                                 {
-                                    item["old_value"] = "非常不滿意";
+                                    item["old_value"] = "非常不滿意(1分)";
                                 }
                                 else if (item["old_value"].ToString() == "2")
                                 {
-                                    item["old_value"] = "不滿意";
+                                    item["old_value"] = "不滿意(2分)";
                                 }
                                 else if (item["old_value"].ToString() == "3")
                                 {
-                                    item["old_value"] = "一般";
+                                    item["old_value"] = "一般(3分)";
                                 }
                                 else if (item["old_value"].ToString() == "4")
                                 {
-                                    item["old_value"] = "滿意";
+                                    item["old_value"] = "滿意(4分)";
                                 }
                                 else if (item["old_value"].ToString() == "5")
                                 {
-                                    item["old_value"] = "非常滿意";
+                                    item["old_value"] = "非常滿意(5分)";
                                 }
 
                             }
