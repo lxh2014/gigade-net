@@ -250,7 +250,12 @@ Ext.onReady(function () {
         columnLines: true,
         frame: true,
         columns: [
-        { header: "編號", dataIndex: 'user_id', width: 50, align: 'center' },
+        {
+            header: "編號", dataIndex: 'user_id', width: 50, align: 'center',
+            renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                return "<a href='javascript:void(0);' onclick='TranToDetial(" + record.data.user_id + ")'>" + value + "</a>";//<span style='color:Red;'></span>
+            }
+        },
         {
             header: "姓名", dataIndex: 'user_name', width: 60, align: 'center'
         ,
@@ -729,3 +734,6 @@ EditEmail = function () {
     }
 }
 
+function TranToDetial(user_id) {
+    window.open("http://www.gigade100.com/ecservice_jump.php?uid=" + user_id);
+}
