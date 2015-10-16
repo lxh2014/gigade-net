@@ -100,3 +100,6 @@ SAVEWRONGMESSAGE = "若有保存期限、允出天數、允收天數請勾選有
 
 //add by zhuoqin0830w  2015/09/30
 SAME_PARTICULARSVALID = "存在相同的有效天數！請確認后再操作！";
+
+//add by zhuoqin0830w  2015/10/13
+SAVE_TIME_LIMIT_IS_NULL = "效期天數、允出天數、允收天數不能為0";

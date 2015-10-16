@@ -321,6 +321,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
 
                     switch (Ext.getCmp('pc_type').getValue()) {
                         case '1':
+                            Ext.getCmp('weeks').allowBlank = true;
                             Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#cxsj').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(false);
@@ -328,6 +329,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                             Ext.getCmp('irregularGrid').setDisabled(true);
                             break;
                         case '2':
+                            Ext.getCmp('weeks').allowBlank = false;
                             Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#pl').setDisabled(false);
                             Ext.getCmp('pcFrm').down('#cxsj').setDisabled(false);
@@ -335,6 +337,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                             Ext.getCmp('irregularGrid').setDisabled(true);
                             break;
                         case '3':
+                            Ext.getCmp('weeks').allowBlank = true;
                             Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#cxsj').setDisabled(false);
@@ -405,52 +408,52 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                 change: function () {
                     switch (Ext.getCmp('runwhen').getValue()) {
                         case '2D':
-                            Ext.getCmp('pcFrm').down('#everyday').show();
                             Ext.getCmp('repeatday').allowBlank = false;
+                            Ext.getCmp('pcFrm').down('#everyday').show();
 
-                            Ext.getCmp('pcFrm').down('#everyweeks').hide();
                             Ext.getCmp('repeatweek').allowBlank = true;
                             Ext.getCmp('weeks').allowBlank = true;
+                            Ext.getCmp('pcFrm').down('#everyweeks').hide();
 
-                            Ext.getCmp('pcFrm').down('#everymonths').hide();
                             Ext.getCmp('nr').allowBlank = true;
                             Ext.getCmp('cfjg').allowBlank = true;
                             Ext.getCmp('njg').allowBlank = true;
                             Ext.getCmp('dijizhou').allowBlank = true;
                             Ext.getCmp('naxietian').allowBlank = true;
                             Ext.getCmp('ncfjg').allowBlank = true;
+                            Ext.getCmp('pcFrm').down('#everymonths').hide();
                             break;
                         case '2W':
-                            Ext.getCmp('pcFrm').down('#everyday').hide();
                             Ext.getCmp('repeatday').allowBlank = true;
+                            Ext.getCmp('pcFrm').down('#everyday').hide();
 
-                            Ext.getCmp('pcFrm').down('#everyweeks').show();
                             Ext.getCmp('repeatweek').allowBlank = false;
                             Ext.getCmp('weeks').allowBlank = false;
+                            Ext.getCmp('pcFrm').down('#everyweeks').show();
 
-                            Ext.getCmp('pcFrm').down('#everymonths').hide();
                             Ext.getCmp('nr').allowBlank = true;
                             Ext.getCmp('cfjg').allowBlank = true;
                             Ext.getCmp('njg').allowBlank = true;
                             Ext.getCmp('dijizhou').allowBlank = true;
                             Ext.getCmp('naxietian').allowBlank = true;
                             Ext.getCmp('ncfjg').allowBlank = true;
+                            Ext.getCmp('pcFrm').down('#everymonths').hide();
                             break;
                         case '2M':
-                            Ext.getCmp('pcFrm').down('#everyday').hide();
                             Ext.getCmp('repeatday').allowBlank = true;
+                            Ext.getCmp('pcFrm').down('#everyday').hide();
 
-                            Ext.getCmp('pcFrm').down('#everyweeks').hide();
                             Ext.getCmp('repeatweek').allowBlank = true;
                             Ext.getCmp('weeks').allowBlank = true;
+                            Ext.getCmp('pcFrm').down('#everyweeks').hide();
 
-                            Ext.getCmp('pcFrm').down('#everymonths').show();
                             Ext.getCmp('nr').allowBlank = false;
                             Ext.getCmp('cfjg').allowBlank = false;
                             Ext.getCmp('njg').allowBlank = false;
                             Ext.getCmp('dijizhou').allowBlank = false;
                             Ext.getCmp('naxietian').allowBlank = false;
                             Ext.getCmp('ncfjg').allowBlank = false;
+                            Ext.getCmp('pcFrm').down('#everymonths').show();
                             break;
                     }
                     messages = SCHEDULE_WILL_IN + Ext.getCmp('runwhen').getRawValue() + EXECUTE + '。';
@@ -757,10 +760,19 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                     }
                     Ext.getCmp("ce_time").setMinValue(this.getValue());
                     if (Ext.getCmp('noendtime').checked) {
+                        if (Ext.getCmp('cs_time').getValue() == null) {
+                            return;
+                        }
                         messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
                         Ext.getCmp('mst').setText('');
                         Ext.getCmp('mst').setText(messagestime);
                     } else {
+                        if (Ext.getCmp('cs_time').getValue() == null) {
+                            return;
+                        }
+                        if (Ext.getCmp('ce_time').getValue() == null) {
+                            return;
+                        }
                         messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
                         Ext.getCmp('mst').setText('');
                         Ext.getCmp('mst').setText(messagestime);
@@ -783,10 +795,19 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                     }
                     Ext.getCmp("cs_time").setMaxValue(this.getValue());
                     if (Ext.getCmp('noendtime').checked) {
+                        if (Ext.getCmp('cs_time').getValue() == null) {
+                            return;
+                        }
                         messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + '。';
                         Ext.getCmp('mst').setText('');
                         Ext.getCmp('mst').setText(messagestime);
                     } else {
+                        if (Ext.getCmp('cs_time').getValue() == null) {
+                            return;
+                        }
+                        if (Ext.getCmp('ce_time').getValue() == null) {
+                            return;
+                        }
                         messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d ') + '。';
                         Ext.getCmp('mst').setText('');
                         Ext.getCmp('mst').setText(messagestime);
@@ -805,9 +826,9 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                     if (chack.checked) {
                         Ext.getCmp('ce_time').setDisabled(true);
                         Ext.getCmp("ce_time").setValue('');
-                    if (Ext.getCmp('cs_time').getValue() == null) {
-                        return;
-                    }
+                        if (Ext.getCmp('cs_time').getValue() == null) {
+                            return;
+                        }
                         messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
                         Ext.getCmp('mst').setText('');
                         Ext.getCmp('mst').setText(messagestime);
@@ -888,8 +909,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                 tempFlag = false;
                 Ext.Msg.alert(INFORMATION, parames.msg);
                 myMask.hide();
-            }
-            else {
+            } else {
                 if (tempFlag) {
                     myMask.show();
                     form.submit({
