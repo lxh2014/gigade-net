@@ -3445,7 +3445,7 @@ namespace Admin.gigade.Controllers
             try
             {
                 int totalCount = 0;
-                stores = _vendorMgr.VendorQueryAll(new Vendor());
+                stores = _vendorMgr.VendorQueryList(new Vendor());
                 json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(stores) + "}";//返回json數據
             }
             catch (Exception ex)
