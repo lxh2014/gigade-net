@@ -107,7 +107,7 @@ namespace BLL.gigade.Dao
             }
             catch (Exception ex)
             {
-                throw new Exception(" FgroupDao-->GetFgroupLists-->" + ex.Message + strSql.ToString(), ex);
+                throw new Exception(" FgroupMySqlDao-->GetFgroupLists-->" + ex.Message + strSql.ToString(), ex);
             }
 
         }
