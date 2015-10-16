@@ -133,10 +133,10 @@ namespace Admin.gigade.Controllers
             return View();
         }
         /// <summary>
-        /// 供應商銀行信息管理
+        /// 供應商銀行信息匯入
         /// </summary>
         /// <returns></returns>
-        public ActionResult VendorBankList()
+        public ActionResult VendorBankImport()
         {
             return View();
         }
@@ -5183,47 +5183,6 @@ namespace Admin.gigade.Controllers
 
         #region 供應商銀行信息管理
         /// <summary>
-        /// 獲取供應商銀行信息數據
-        /// </summary>
-        /// <returns></returns>
-        public HttpResponseBase GetVendorBankList()
-        {
-
-            string json = "{success:false,totalCount:0,data:[]}";
-
-            try
-            {
-
-                _vendorMgr = new VendorMgr(connectionString);
-                #region 搜索條件
-                VendorBank query = new VendorBank();
-                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
-                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");//用於分頁的變量
-                query.bank_code = Request.Params["key"];
-                query.bank_name = Request.Params["key"];
-                #endregion
-
-                int totalCount = 0;
-                List<VendorBank> stores = _vendorMgr.QueryBank(query, ref totalCount);
-                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
-                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(stores, Formatting.Indented, timeConverter) + "}";//返回json數據
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
-
-        /// <summary>
         /// 銀行信息匯入
         /// </summary>
         /// <returns></returns>
@@ -5260,6 +5219,8 @@ namespace Admin.gigade.Controllers
                             json = "{success:true,error:\"" + result + "\"}";
                         }
                     }
+                    FileInfo file = new FileInfo(newExcelName);
+                    file.Delete();
                 }
 
             }
@@ -5277,85 +5238,8 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
-        /// <summary>
-        /// 保存銀行信息
-        /// </summary>
-        /// <returns></returns>
-        [CustomHandleError]
-        [HttpPost]
-        public HttpResponseBase SaveVendorBank()
-        {
-
-            string json = "{success:false,error:\"0\"}";
-            try
-            {
-                _vendorMgr = new VendorMgr(connectionString);
-                VendorBank model = new VendorBank();
-                model.id = Request.Params["id"].ToString() == "" ? 0 : Convert.ToInt32(Request.Params["id"].ToString());
-                model.bank_code = Request.Params["code"].ToString();
-                model.bank_name = Request.Params["name"].ToString();
-                model.muser = Convert.ToUInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString());
-                model.mdate = DateTime.Now;
-                model.status = 1;
-                int result = _vendorMgr.SaveVendorBank(model);
-                if (result == 1)
-                {
-                    json = "{success:true,error:\"0\"}";
-                }
-                else if (result == -1)
-                {
-                    json = "{success:false,error:\"-1\"}";
-                }
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:false,error:\"" + BLL.gigade.Common.CommonFunction.MySqlException(ex) + "\"}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
 
 
-
-        public JsonResult UpdateActiveBank()
-        {
-            string jsonStr = string.Empty;
-            try
-            {
-                _vendorMgr = new VendorMgr(connectionString);
-                int id = Convert.ToInt32(Request.Params["id"]);
-                int activeValue = Convert.ToInt32(Request.Params["active"]);
-                VendorBank model = new VendorBank();
-                model.id = id;
-                model.status = activeValue;
-                model.muser = Convert.ToUInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString());
-                model.mdate = DateTime.Now;
-                if (_vendorMgr.UpdateActiveBank(model) > 0)
-                {
-                    return Json(new { success = "true" });
-                }
-                else
-                {
-                    return Json(new { success = "false" });
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                return Json(new { success = "false" });
-            }
-
-        }
         /// <summary>
         /// 根據bankcode獲取bankname
         /// </summary>
@@ -5364,18 +5248,10 @@ namespace Admin.gigade.Controllers
         {
             try
             {
-                VendorBank model = new VendorBank();
-                model.bank_code = Request.Params["bankCode"].ToString();
+                string code = Request.Params["bankCode"].ToString();
                 _vendorMgr = new VendorMgr(connectionString);
-                VendorBank store = _vendorMgr.GetVendorBank(model).FirstOrDefault();
-                if (store != null)
-                {
-                    return Json(new { success = "true", name = store.bank_name });
-                }
-                else
-                {
-                    return Json(new { success = "true", name = "" });
-                }
+                return Json(new { success = "true", name = _vendorMgr.GetVendorBank(code) });
+
             }
             catch (Exception ex)
             {

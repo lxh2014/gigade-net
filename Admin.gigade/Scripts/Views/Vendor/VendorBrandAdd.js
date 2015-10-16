@@ -113,7 +113,7 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                     },
                     {
                         xtype: 'combobox',
-                        fieldLabel: '供應商<font color="red">*</font>',
+                        fieldLabel: '供應商簡稱<font color="red">*</font>',
                         allowBlank: false,
                         editable: false,
                         hidden: false,

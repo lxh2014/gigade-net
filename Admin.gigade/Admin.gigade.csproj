@@ -1953,7 +1953,7 @@
     <Content Include="Scripts\Views\Ticket\TicketReturnList.js" />
     <Content Include="Scripts\Views\Ticket\TicketVerification.js" />
     <Content Include="Scripts\Views\UserLevelLog\UserLevelLogList.js" />
-    <Content Include="Scripts\Views\Vendor\VendorBankList.js" />
+    <Content Include="Scripts\Views\Vendor\VendorBankImport.js" />
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryEdit.js" />
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryList.js" />
     <Content Include="Scripts\Views\Vendor\VendorChangeLog.js" />
@@ -4404,8 +4404,8 @@
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
     <Content Include="Views\ScheduleService\Index.cshtml" />
     <Content Include="Views\Vendor\VendorDetails.cshtml" />
-    <Content Include="Views\Vendor\VendorBankList.cshtml" />
     <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
+    <Content Include="Views\Vendor\VendorBankImport.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4620,7 +4620,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>9046</DevelopmentServerPort>
+          <DevelopmentServerPort>9048</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
