@@ -265,7 +265,7 @@ Ext.onReady(function () {
                 }, {
                     text: '+',
                     dataIndex: 'symbol',
-                    width: 16,
+                    width: 20,
                     sortable: false,
                     align: 'center',
                     menuDisabled: true,
@@ -284,6 +284,7 @@ Ext.onReady(function () {
                         id: 'arrive_days',
                         decimalPrecision: 0,
                         minValue: 0,
+                        maxValue: 99,
                         allowBlank: false
                     }
                 }
@@ -427,7 +428,8 @@ function save(functionid) {
         // add by zhuoqin0830w 2014/02/05 增加備註
         var remark = stockGrid[i].get("remark");
         //add by zhuoqin0830w 2014/03/20 增加運達天數
-        var arrive_days = stockGrid[i].get("arrive_days") - defaultArriveDays;
+        //var arrive_days = stockGrid[i].get("arrive_days") - defaultArriveDays;
+        var arrive_days = stockGrid[i].get("arrive_days");///eidt by wwei0216w 分開顯示后arrive_days 不需要減defaultArriveDays
         //InsertValue += spec_title_1 + "," + spec_title_2 + "," + item_stock + "," + item_alarm + "," + barcode + "," + item_id + "," + item_code + "," + erp_id + "," + remark + "," + arrive_days + ";";
         InsertValueArray.push({//edit by wwei0216w 將字符串格式傳遞改成json傳遞
             'Spec_Id_1': spec_title_1,

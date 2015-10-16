@@ -1,6 +1,8 @@
 ﻿var ischecked = 0;
+
 editFunction = function (rowID, store) {
     var row = null;
+    var isfirstshow = 1;
     if (rowID != null) {
         edit_ProductConsultStore.load({
             params: { relation_id: rowID },
@@ -124,7 +126,10 @@ editFunction = function (rowID, store) {
                              if (newValue) {
                                  if (ischecked != 0) {
                                      Ext.MessageBox.confirm(CONFIRM, "更改類型會向相關負責人發送郵件，確認更改？", function (btn) {
-                                         if (btn == "yes") {
+                                         if (btn == "yes")
+                                         {
+                                             var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "loding..." });
+                                             myMask.show();
                                              var zixunType = Ext.getCmp("zixunType").getValue().zixunType;
                                              Ext.Ajax.request({
                                                  url: '/ProductConsult/SendMailByGroup',
@@ -143,10 +148,11 @@ editFunction = function (rowID, store) {
                                                      ischecked = 0;
                                                      Ext.Msg.alert("提示信息", "操作成功！");
                                                      editWin.close();
-
+                                                     myMask.hide();
                                                  },
                                                  failure: function () {
                                                      Ext.Msg.alert(INFORMATION, FAILURE);
+                                                     myMask.hide();
                                                  }
                                              });
                                          }
@@ -190,7 +196,10 @@ editFunction = function (rowID, store) {
                              if (newValue) {
                                  if (ischecked != 0) {
                                      Ext.MessageBox.confirm(CONFIRM, "更改類型會向相關負責人發送郵件，確認更改？", function (btn) {
-                                         if (btn == "yes") {
+                                         if (btn == "yes")
+                                         {
+                                             var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "loding..." });
+                                             myMask.show();
                                              var zixunType = Ext.getCmp("zixunType").getValue().zixunType;
                                              Ext.Ajax.request({
                                                  url: '/ProductConsult/SendMailByGroup',
@@ -210,9 +219,11 @@ editFunction = function (rowID, store) {
                                                      ischecked = 0;
                                                      Ext.Msg.alert("提示信息", "操作成功！");
                                                      editWin.close();
+                                                     myMask.hide();
                                                  },
                                                  failure: function () {
                                                      Ext.Msg.alert(INFORMATION, FAILURE);
+                                                     myMask.hide();
                                                  }
                                              });
                                          }
@@ -259,7 +270,10 @@ editFunction = function (rowID, store) {
                              if (newValue) {
                                  if (ischecked != 0) {
                                      Ext.MessageBox.confirm(CONFIRM, "更改類型會向相關負責人發送郵件，確認更改？", function (btn) {
-                                         if (btn == "yes") {
+                                         if (btn == "yes")
+                                         {
+                                             var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "loding..." });
+                                             myMask.show();
                                              var zixunType = Ext.getCmp("zixunType").getValue().zixunType;
                                              Ext.Ajax.request({
                                                  url: '/ProductConsult/SendMailByGroup',
@@ -279,9 +293,11 @@ editFunction = function (rowID, store) {
                                                      ischecked = 0;
                                                      Ext.Msg.alert("提示信息", "操作成功！");
                                                      editWin.close();
+                                                     myMask.hide();
                                                  },
                                                  failure: function () {
                                                      Ext.Msg.alert(INFORMATION, FAILURE);
+                                                     myMask.hide();
                                                  }
                                              });
                                          }
@@ -326,7 +342,10 @@ editFunction = function (rowID, store) {
                              if (newValue) {
                                  if (ischecked != 0) {
                                      Ext.MessageBox.confirm(CONFIRM, "更改類型會向相關負責人發送郵件，確認更改？", function (btn) {
-                                         if (btn == "yes") {
+                                         if (btn == "yes")
+                                         {
+                                             var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "loding..." });
+                                             myMask.show();
                                              var zixunType = Ext.getCmp("zixunType").getValue().zixunType;
                                              Ext.Ajax.request({
                                                  url: '/ProductConsult/SendMailByGroup',
@@ -346,9 +365,11 @@ editFunction = function (rowID, store) {
                                                      ischecked = 0;
                                                      Ext.Msg.alert("提示信息", "操作成功！");
                                                      editWin.close();
+                                                     myMask.hide();
                                                  },
                                                  failure: function () {
                                                      Ext.Msg.alert(INFORMATION, FAILURE);
+                                                     myMask.hide();
                                                  }
                                              });
                                          }
@@ -392,11 +413,17 @@ editFunction = function (rowID, store) {
                              if (newValue) {
                                  if (ischecked != 0) {
                                      Ext.MessageBox.confirm(CONFIRM, "更改類型會向相關負責人發送郵件，確認更改？", function (btn) {
-                                         if (btn == "yes") {
+                                         if (btn == "yes")
+                                         {
+                                             var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "loding..." });
+                                             myMask.show();
                                              var zixunType = Ext.getCmp("zixunType").getValue().zixunType;
                                              Ext.Ajax.request({
                                                  url: '/ProductConsult/SendMailByGroup',
                                                  method: 'post',
+                                                 waitMsg: "發送郵件中...",
+                                                 waitTitle: "請稍等",
+                                                 timeout: 90000,
                                                  params: {
                                                      zixunType: zixunType,
                                                      consult_id: row.data.consult_id,
@@ -412,9 +439,11 @@ editFunction = function (rowID, store) {
                                                      ischecked = 0;
                                                      Ext.Msg.alert("提示信息", "操作成功！");
                                                      editWin.close();
+                                                     myMask.hide();
                                                  },
                                                  failure: function () {
                                                      Ext.Msg.alert(INFORMATION, FAILURE);
+                                                     myMask.hide();
                                                  }
                                              });
                                          }
@@ -465,6 +494,10 @@ editFunction = function (rowID, store) {
               id: 'consult_info',
               submitValue: true,
               fieldLabel: '諮詢內容'
+          },
+          {
+              xtype: 'displayfield',
+              fieldLabel: '回覆諮詢',
           },
           {
               xtype: 'radiogroup',
@@ -549,40 +582,73 @@ editFunction = function (rowID, store) {
                         id: 'answer_status_delay',
                         inputValue: "2",
                         checked: false,
-
+                        
                     }
               ],
               listeners: {
-                          change: function () {
-                              var delayreason = Ext.getCmp("answer_status").getValue().answer_status;
-                              if (delayreason == 2) {
-                                  Ext.getCmp("consult_answer").allowBlank = true;
-                                  Ext.getCmp("consult_answer").setValue(row.data.consult_answer);
-                                  Ext.getCmp("consult_answer").hide();
-                                  Ext.getCmp("consult_answer").isValid();
-                                  Ext.getCmp("delay_reason").show();
-                                  Ext.getCmp("delay_reason").allowBlank = false;
-                                  //Ext.getCmp("delay_reason").isValid();
-                                  Ext.getCmp("is_sendEmail_yes").setValue(false);
-                                  Ext.getCmp("is_sendEmail_no").setValue(true);
-                                  Ext.getCmp("is_sendEmail_yes").disabled = true;
-                                  Ext.getCmp("is_sendEmail_no").disabled = true;
-                              }
-                              else if (delayreason == 1 || delayreason == 3) {
-
-                                  Ext.getCmp("delay_reason").allowBlank = true;
-                                  Ext.getCmp("delay_reason").setValue(row.data.delay_reason);
-                                  Ext.getCmp("delay_reason").hide();
-                                  Ext.getCmp("delay_reason").isValid();
-                                  Ext.getCmp("consult_answer").allowBlank = false;
-                                  Ext.getCmp("consult_answer").show();
-                                  //Ext.getCmp("is_sendEmail_yes").setValue(true);
-                                  //Ext.getCmp("is_sendEmail_no").setValue(true);
-                                  Ext.getCmp("is_sendEmail_yes").disabled = false;
-                                  Ext.getCmp("is_sendEmail_no").disabled = false;
-                              }
+                  change: function ()
+                  {
+                      var delayreason = Ext.getCmp("answer_status").getValue().answer_status;
+                      if (delayreason == 2)
+                      {
+                          if (isfirstshow == 0 || row.data.answer_status != 2)
+                          {
+                              Ext.MessageBox.confirm(CONFIRM, "選擇推遲回覆時不會並且無法發送郵件，確認更改？", function (btn)
+                              {
+                                  if (btn == "yes")
+                                  {
+                                      Ext.getCmp("consult_answer").allowBlank = true;
+                                      Ext.getCmp("consult_answer").setValue(row.data.consult_answer);
+                                      Ext.getCmp("consult_answer").hide();
+                                      Ext.getCmp("consult_answer").isValid();
+                                      Ext.getCmp("delay_reason").show();
+                                      Ext.getCmp("delay_reason").allowBlank = false;
+                                      //Ext.getCmp("delay_reason").isValid();
+                                      Ext.getCmp("is_sendEmail_yes").setValue(false);
+                                      Ext.getCmp("is_sendEmail_no").setValue(true);
+                                      Ext.getCmp("is_sendEmail_yes").setDisabled(true);
+                                      Ext.getCmp("is_sendEmail_no").setDisabled(true);
+                                  }
+                                  else
+                                  {
+                                      Ext.getCmp("answer_status_yes").setValue(true);
+                                      Ext.getCmp("answer_status_delay").setValue(false);
+                                  }
+                              })
                           }
+                          else
+                          {
+                              Ext.getCmp("consult_answer").allowBlank = true;
+                              Ext.getCmp("consult_answer").setValue(row.data.consult_answer);
+                              Ext.getCmp("consult_answer").hide();
+                              Ext.getCmp("consult_answer").isValid();
+                              Ext.getCmp("delay_reason").show();
+                              Ext.getCmp("delay_reason").allowBlank = false;
+                              //Ext.getCmp("delay_reason").isValid();
+                              Ext.getCmp("is_sendEmail_yes").setValue(false);
+                              Ext.getCmp("is_sendEmail_no").setValue(true);
+                              Ext.getCmp("is_sendEmail_yes").setDisabled(true);
+                              Ext.getCmp("is_sendEmail_no").setDisabled(true);
+                          }
+                          isfirstshow = 0;
+
                       }
+                      else if (delayreason == 1 || delayreason == 3)
+                      {
+
+                          Ext.getCmp("delay_reason").allowBlank = true;
+                          Ext.getCmp("delay_reason").setValue(row.data.delay_reason);
+                          Ext.getCmp("delay_reason").hide();
+                          Ext.getCmp("delay_reason").isValid();
+                          Ext.getCmp("consult_answer").allowBlank = false;
+                          Ext.getCmp("consult_answer").show();
+                          //Ext.getCmp("is_sendEmail_yes").setValue(true);
+                          //Ext.getCmp("is_sendEmail_no").setValue(true);
+                          Ext.getCmp("is_sendEmail_yes").setDisabled(false);
+                          Ext.getCmp("is_sendEmail_no").setDisabled(false);
+                      }
+                  }
+              }
           },
           //{
           //    xtype: 'radiogroup',
@@ -786,7 +852,7 @@ editFunction = function (rowID, store) {
         width: 600,
         height: document.documentElement.clientHeight * 260 / 783,
         y: 200,
-        height: 420,
+        height: 480,
         layout: 'fit',
         items: [editFrm],
         constrain: true,
@@ -866,8 +932,9 @@ editFunction = function (rowID, store) {
 
                         Ext.getCmp("is_sendEmail_yes").setValue(false);
                         Ext.getCmp("is_sendEmail_no").setValue(true);
-                        Ext.getCmp("is_sendEmail_yes").disabled = true;
-                        Ext.getCmp("is_sendEmail_no").disabled = true;
+                        Ext.getCmp("is_sendEmail_yes").setDisabled(true);
+                        Ext.getCmp("is_sendEmail_no").setDisabled(true);
+                        //alert("Ext.getCmp(setDisabled(true)" +Ext.getCmp("is_sendEmail_yes").disabled);
                     }
                     if (row.data.answer_status == 3)
                     {                
