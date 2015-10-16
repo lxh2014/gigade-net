@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using BLL.gigade.Common;
+using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using DBAccess;
 
@@ -23,7 +24,7 @@ namespace BLL.gigade.Dao
               StringBuilder sql = new StringBuilder();
               try
               {
-                  sql.AppendFormat("SELECT * FROM `schedule_master` WHERE schedule_state = '{0}' AND  next_execute_time<='{1}' and next_execute_time > 0 ;", query.schedule_state, Common.CommonFunction.GetPHPTime(DateTime.Now.ToString()));
+                  sql.AppendFormat("SELECT `rowid`, `schedule_code`, `schedule_name`, `schedule_api`, `schedule_description`, `schedule_state`, `previous_execute_time`, `next_execute_time`, `schedule_period_id`, `create_user`, `create_time`, `change_user`, `change_time` FROM `schedule_master` WHERE schedule_state = '{0}' AND  next_execute_time<='{1}' and next_execute_time > 0 ;", query.schedule_state, Common.CommonFunction.GetPHPTime(DateTime.Now.ToString()));
 
                   return _access.getDataTableForObj<ScheduleMasterQuery>(sql.ToString());
               }
@@ -32,14 +33,12 @@ namespace BLL.gigade.Dao
                   throw new Exception("ScheduleServiceDao-->GetExeScheduleMasterList-->" + ex.Message, ex);
               }
           }
-
-
           public ScheduleMasterQuery GetScheduleMaster(ScheduleMasterQuery query)
           {
               StringBuilder sql = new StringBuilder();
               try
               {
-                  sql.AppendFormat("SELECT * FROM `schedule_master` WHERE schedule_code = '{0}';", query.schedule_code);
+                  sql.AppendFormat("SELECT `rowid`, `schedule_code`, `schedule_name`, `schedule_api`, `schedule_description`, `schedule_state`, `previous_execute_time`, `next_execute_time`, `schedule_period_id`, `create_user`, `create_time`, `change_user`, `change_time` FROM `schedule_master` WHERE schedule_code = '{0}';", query.schedule_code);
 
                   return _access.getSinggleObj<ScheduleMasterQuery>(sql.ToString());
               }
@@ -54,7 +53,7 @@ namespace BLL.gigade.Dao
               StringBuilder sql = new StringBuilder();
               try
               {
-                  sql.AppendFormat("SELECT * FROM `schedule_config` WHERE schedule_code = '{0}';", query.schedule_code);
+                  sql.AppendFormat("SELECT `rowid`, `schedule_code`, `parameterCode`, `parameterName`, `value`, `create_user`, `create_time`, `change_user`, `change_time` FROM `schedule_config` WHERE schedule_code = '{0}';", query.schedule_code);
                   return _access.getDataTableForObj<ScheduleConfigQuery>(sql.ToString());
               }
               catch (Exception ex)
@@ -92,7 +91,6 @@ namespace BLL.gigade.Dao
                   throw new Exception("ScheduleServiceDao-->GetSchedulePeriodBySchedule-->" + ex.Message, ex);
               }
           }
-          
           public int UpdateScheduleMaster(ScheduleMasterQuery query)
           {
               StringBuilder sql = new StringBuilder();
@@ -136,7 +134,6 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                   throw new Exception("ScheduleServiceDao-->AddScheduleLog-->" + ex.Message, ex);
               }
           }
-
 
           public List<ScheduleMasterQuery> GetScheduleMasterList(ScheduleMasterQuery query)// 得到 master表中的記錄
           {
@@ -248,6 +245,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                   throw new Exception("ScheduleServiceDao-->GetScheduleLogList-->" + ex.Message, ex);
               }
           }
+
           public string UpdateStats_Schedule_master(ScheduleMasterQuery query)  // master 狀態更新
           {
               StringBuilder strSql = new StringBuilder();
@@ -405,6 +403,170 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               }
           }
 
+        #region
 
+          //清除過期信件
+          public int ValidUntilDate()
+          {
+              StringBuilder sql = new StringBuilder();
+              StringBuilder sql1 = new StringBuilder();
+              List<MailRequest> MR = new List<MailRequest>();
+              try
+              {
+                  sql1.AppendFormat("SELECT request_id,priority,user_id,sender_address,sender_name,receiver_address,receiver_name,`subject`,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,request_createdate,request_updatedate from mail_request where valid_until_date<'{0}'  ;", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                  MR = _access.getDataTableForObj<MailRequest>(sql1.ToString());
+                  sql.Append(InsertLog(MR, "mail expired", 0));
+                  if (sql.Length > 0)
+                  {
+                      return _access.execCommand(sql.ToString());
+                  }
+                  return 0;
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->SchedulePeriodDelete-->" + sql.ToString() + ex.Message);
+              }          
+          }
+          //清除重複過多次數的信件
+          public int MaxRetry()
+          {
+              StringBuilder sql = new StringBuilder();
+              StringBuilder sql1 = new StringBuilder();
+              List<MailRequest> MR = new List<MailRequest>();
+              try
+              {
+                  sql1.AppendFormat("SELECT request_id,priority,user_id,sender_address,sender_name,receiver_address,receiver_name,`subject`,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,request_createdate,request_updatedate from mail_request where retry_count<>0 and retry_count >= max_retry;");
+                  MR = _access.getDataTableForObj<MailRequest>(sql1.ToString());
+                  sql.Append(InsertLog(MR, "retry count exceeded", 0));
+                  if (sql.Length > 0)
+                  {
+                      return _access.execCommand(sql.ToString());
+                  }
+                  return 0;
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->SchedulePeriodDelete-->" + sql.ToString() + ex.Message);
+              }
+          }
+        //
+          public bool SendEMail(MailHelper mail)
+          {
+              DataTable dt = new DataTable();
+              StringBuilder sql = new StringBuilder();
+              StringBuilder sql1 = new StringBuilder();
+              StringBuilder sql2 = new StringBuilder();
+              List<MailRequest> MR = new List<MailRequest>();
+
+              //MailHelper mail = new MailHelper();
+              try
+              {
+                  sql1.AppendFormat("SELECT request_id,priority,user_id,sender_address,sender_name,receiver_address,receiver_name,`subject`,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,request_createdate,request_updatedate,body,success_action,fail_action from mail_request where schedule_date<'{0}'   order by next_send,priority,valid_until_date;", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                  MR = _access.getDataTableForObj<MailRequest>(sql1.ToString());
+                  int next_time = int.Parse(_access.getDataTable("SELECT parameterCode from t_parametersrc WHERE parameterType='next_send';").Rows[0][0].ToString());
+                  sql2.Append("SELECT email_address from email_block_list;");
+                  dt = _access.getDataTable(sql2.ToString());
+                  foreach (var item in MR)
+                  {
+                      bool black = true;
+                      //擋信名單排除
+                      for (int i = 0; i < dt.Rows.Count; i++)
+                      {
+                          if (item.receiver_address.ToString() == dt.Rows[i][0].ToString())
+                          {
+                              //刪除擋信名單的數據
+                              sql.Append(InsertLog(item, "blocked email", 0));
+                              black = false;
+                              if (sql.Length > 0)
+                              {
+                                  _access.execCommand(sql.ToString());
+                                  sql.Clear();
+                              }
+                          }
+                      }
+                      if (black)
+                      {//是不是擋信名單的email
+                          try
+                          {
+                              if (mail.SendMailAction(item.receiver_address.ToString(), item.subject.ToString(), item.body.ToString(), item.sender_address, item.sender_name))
+                              {
+                                  //sql.Append(item.success_action + ";");
+                                  //發送成功刪除原數據新增log
+                                  sql.Append(InsertLog(item, "success", 1));
+                              }
+                              else
+                              {
+                                  //發送失敗更新數據
+                                  sql.AppendFormat("update mail_request set retry_count ='{1}',next_send='{2}',sent_log='{3}' where request_id='{0}' ;", item.request_id, item.retry_count + 1, DateTime.Now.AddMinutes(next_time), "not errow massage");
+                                  //sql.Append(item.fail_action + ";");
+                              }
+                              if (sql.Length > 0)
+                              {
+                                  _access.execCommand(sql.ToString());
+                                  sql.Clear();
+                              }
+                          }
+                          catch (Exception ex)
+                          {
+                              item.sent_log = ex.ToString();
+                              item.Replace4MySQL();
+                              //發送失敗更新數據
+                              sql.AppendFormat("update mail_request set retry_count ='{1}',next_send='{2}',sent_log='{3}' where request_id='{0}' ;", item.request_id, item.retry_count + 1, DateTime.Now.AddMinutes(next_time).ToString("yyyy-MM-dd HH:mm:ss"), item.sent_log);
+                              _access.execCommand(sql.ToString());
+                          }
+                      }
+                  }
+                  return true;
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->SchedulePeriodDelete-->" + sql.ToString() + ex.Message);
+              }
+          }
+          #region 刪除mailrequest 新增log
+          public string InsertLog(List<MailRequest> q, string mail_result, int send)
+          {
+              StringBuilder sb = new StringBuilder();
+              string id = "";
+              try
+              {
+                  if (q.Count > 0)
+                  {
+                      foreach (var m in q)
+                      {
+                          sb.AppendFormat("insert into mail_log (priority,user_id,send_address,sender_name,receiver_address,receiver_name,subject,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,send_result,request_createdate,request_updatedate,log_createdate) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}',NOW(),NOW(),NOW());", m.priority, m.user_id, m.sender_address, m.sender_name, m.receiver_address, m.receiver_name, m.subject, m.importance, CommonFunction.DateTimeToString(m.schedule_date), CommonFunction.DateTimeToString(m.valid_until_date), m.retry_count, CommonFunction.DateTimeToString(m.last_sent), mail_result, send);
+                          id += m.request_id + ",";
+                      }
+                  }
+
+                  if (id.Length > 1)
+                  {
+                      id = id.Substring(0, id.Length - 1);
+                      sb.AppendFormat("Delete from mail_request where request_id in ({0});", id);
+                  }
+                  return sb.ToString();
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->InsertLog1-->" + sb.ToString() + ex.Message);
+              }       
+          }
+
+          public string InsertLog(MailRequest m, string mail_result, int send)
+          {
+              StringBuilder sb = new StringBuilder();
+              try
+              {
+                  sb.AppendFormat("insert into mail_log (priority,user_id,send_address,sender_name,receiver_address,receiver_name,subject,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,send_result,request_createdate,request_updatedate,log_createdate) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}',NOW(),NOW(),NOW());", m.priority, m.user_id, m.sender_address, m.sender_name, m.receiver_address, m.receiver_name, m.subject, m.importance, CommonFunction.DateTimeToString(m.schedule_date), CommonFunction.DateTimeToString(m.valid_until_date), m.retry_count, CommonFunction.DateTimeToString(m.last_sent), mail_result, send);
+                  sb.AppendFormat("Delete from mail_request where request_id in ({0});",m.request_id);
+                  return sb.ToString();
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->InsertLog2-->" + sb.ToString() + ex.Message);
+              }       
+          }
+          #endregion
+        #endregion
     }
 }
