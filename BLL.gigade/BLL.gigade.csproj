@@ -1350,7 +1350,8 @@
     <Compile Include="Model\ItemIpoCreateLog.cs" />
     <Compile Include="Model\IwmsRrecord.cs" />
     <Compile Include="Model\LogisticsDetail.cs" />
-    <Compile Include="Model\MailRequest.cs" />
+    <Compile Include="Model\MailLog.cs" />
+    <Compile Include="Model\MailRequest .cs" />
     <Compile Include="Model\MailSend.cs" />
     <Compile Include="Model\MailSender.cs" />
     <Compile Include="Model\MemberEvent.cs" />

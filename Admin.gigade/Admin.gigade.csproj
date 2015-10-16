@@ -2001,6 +2001,7 @@
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-rtl-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\resources\Readme.md" />
+    <None Include="Properties\PublishProfiles\gigade-jialei.pubxml" />
     <None Include="Properties\PublishProfiles\gigade.pubxml" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all-vsdoc.js" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all.min.intellisense.js" />
