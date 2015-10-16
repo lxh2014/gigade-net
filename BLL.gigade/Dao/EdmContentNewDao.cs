@@ -183,6 +183,111 @@ namespace BLL.gigade.Dao
             }
         }
 
-
+        #region 統計資料
+        //發信名單統計
+        public DataTable FXMD()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("SELECT * FROM edm_trace INNER JOIN edm_trace_email ON edm_trace.email_id=edm_trace_email.email_id WHERE content_id='{0}' ;");
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetOuterCustomer-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        //開信名單下載
+        public DataTable KXMD()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT * FROM edm_trace INNER JOIN edm_trace_email ON edm_trace.email_id=edm_trace_email.email_id WHERE content_id=@contentId AND edm_trace.count>0 ;");
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetOuterCustomer-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        //未開信名單下載
+        public DataTable WKXMD()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT * FROM edm_trace
+INNER JOIN edm_trace_email ON edm_trace.email_id=edm_trace_email.email_id
+WHERE content_id=@contentId AND edm_trace.count=0;");
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetOuterCustomer-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        //發信成功人數
+        public int GetSendMailSCount()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT COUNT(*) FROM edm_trace
+WHERE content_id=@contentId AND edm_trace.success=0;");
+                return int.Parse(_access.getDataTable(sql.ToString()).Rows[0][0].ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetSendMailSCount-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        //發信失敗人數
+        public int GetSendMailFCount()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT COUNT(*) FROM edm_trace
+WHERE content_id=@contentId AND edm_trace.success=0;");
+                return int.Parse(_access.getDataTable(sql.ToString()).Rows[0][0].ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetSendMailFCount-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        //總開信人數
+        public int GetSendMailCount()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT SUM(edm_trace.count) FROM edm_trace
+WHERE content_id=@contentId AND edm_trace.count>0;");
+                return int.Parse(_access.getDataTable(sql.ToString()).Rows[0][0].ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetSendMailCount-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        //總開信ci數
+        public int GetSendCount()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT SUM(edm_trace.count) FROM edm_trace
+WHERE content_id=@contentId AND edm_trace.count>0;");
+                return int.Parse(_access.getDataTable(sql.ToString()).Rows[0][0].ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetSendCount-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        #endregion
     }
 }

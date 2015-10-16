@@ -265,7 +265,7 @@ Ext.onReady(function () {
                 }, {
                     text: '+',
                     dataIndex: 'symbol',
-                    width: 16,
+                    width: 20,
                     sortable: false,
                     align: 'center',
                     menuDisabled: true,
@@ -284,6 +284,7 @@ Ext.onReady(function () {
                         id: 'arrive_days',
                         decimalPrecision: 0,
                         minValue: 0,
+                        maxValue: 99,
                         allowBlank: false
                     }
                 }

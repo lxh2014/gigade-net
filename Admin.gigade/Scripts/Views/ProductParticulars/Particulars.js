@@ -434,15 +434,33 @@ Ext.onReady(function () {
                         var particulars = [];
                         var upDataStore = particularsStore.getUpdatedRecords();//僅獲得修改后的行 add by wwei0216w 2015/6/24
                         var sumday = 0;
+                        if (!upDataStore.length) {
+                            myMask.hide();
+                            Ext.Msg.alert(INFORMATION, NON_DATA_EDIT);//沒有數據被修改
+                            return;
+                        }
                         for (var i = 0, j = upDataStore.length ; i < j; i++) {
                             var record = upDataStore[i];
                             //2015/09/09 guodong1130w增加有效期控制判斷
-                            sumday = record.get("Cde_dt_shp") + record.get("Cde_dt_var") + record.get("Cde_dt_incr");
+                            var Cde_dt_shp = record.get("Cde_dt_shp");
+                            var Cde_dt_var = record.get("Cde_dt_var");
+                            var Cde_dt_incr = record.get("Cde_dt_incr");
+
+                            sumday = Cde_dt_shp + Cde_dt_var + Cde_dt_incr;
+
                             if (sumday > 0 && record.get("Pwy_dte_ctl_bool") == false) {
                                 Ext.Msg.alert(INFORMATION, SAVEWRONGMESSAGE);
                                 myMask.hide();
                                 return;
                             }
+
+                            //add by zhuoqin0830w  2015/10/12  添加判斷  效期天數、允出天數、允收天數若不能為0
+                            if (Cde_dt_shp == 0 || Cde_dt_var == 0 || Cde_dt_incr == 0) {
+                                Ext.Msg.alert(INFORMATION, SAVE_TIME_LIMIT_IS_NULL);
+                                myMask.hide();
+                                return;
+                            }
+
                             particulars.push({
                                 "Product_id": record.get("Product_id"),//add by wwei0216w 註:後臺需要product_id作為歷史繼續查詢時的查詢條件 2015/7/6 
                                 "item_id": record.get("Item_id"),
@@ -467,9 +485,6 @@ Ext.onReady(function () {
                         }
                         particulars = JSON.stringify(particulars);
                         if (particulars == "[]") {
-                            if (particularsStore.count() > 0) {
-                                Ext.Msg.alert(INFORMATION, SUCCESS)
-                            }
                             myMask.hide();
                             return;
                         }

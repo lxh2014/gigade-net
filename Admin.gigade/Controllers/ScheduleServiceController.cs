@@ -20,7 +20,6 @@ namespace Admin.gigade.Controllers
         string xmlPath = System.Configuration.ConfigurationManager.AppSettings["SiteConfig"];//
         private ScheduleServiceMgr _secheduleServiceMgr;
         // GET: /Schedule/
-
         public ActionResult Index()
         {
             return View();
@@ -128,12 +127,10 @@ namespace Admin.gigade.Controllers
 
         public bool UserLoginLogService()
         {
-
             if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
             {
                 return false;
             }
-            //////////////////////
             try
             {
                 string schedule_code = Request.Params["schedule_code"].ToString();
@@ -153,6 +150,7 @@ namespace Admin.gigade.Controllers
                 query_config.schedule_code = schedule_code;
                 _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
                 store_config = _secheduleServiceMgr.GetScheduleConfig(query_config);
+                #region mailhelp賦值
                 foreach (ScheduleConfigQuery item in store_config)
                 {
                     if (item.parameterCode.Equals("MailFromAddress"))
@@ -171,7 +169,7 @@ namespace Admin.gigade.Controllers
                     {
                         mailModel.MailFromUser = item.value;
                     }
-                    else if (item.parameterCode.Equals("MailFormPwd"))
+                    else if (item.parameterCode.Equals("EmailPassWord"))
                     {
                         mailModel.MailFormPwd = item.value;
                     }
@@ -224,9 +222,8 @@ namespace Admin.gigade.Controllers
                             IsSeparate = true;
                         }
                     }
-
                 }
-
+                #endregion
                 ///獲取用戶登陸信息
                 ///
                 int totalCount = 0;
@@ -277,10 +274,7 @@ namespace Admin.gigade.Controllers
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
             }
-
-            return true;
-            
-
+            return true; 
         }
 
         static string GetHtmlByDataTable(DataTable _dtmyMonth)
@@ -346,7 +340,7 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return Response;
  
-        }
+        } // 獲取 master數據
 
         public HttpResponseBase GetScheduleConfigList()
         {
@@ -593,7 +587,7 @@ namespace Admin.gigade.Controllers
 
         }
 
-
+         
         //保存排程_config信息 
         public HttpResponseBase SaveScheduleConfigInfo()
         {
@@ -920,8 +914,128 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
-        
 
+        public bool SendEMail()
+        {
+            string json = string.Empty;
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+                string schedule_code = Request.Params["schedule_code"].ToString();
+                MailModel mailModel = new MailModel();
+                mailModel.MysqlConnectionString = mySqlConnectionString;
+                string GroupCode = string.Empty;
+                string MailTitle = string.Empty;
+                string MailBody = string.Empty;
+                bool IsSeparate = false;
+                bool IsDisplyName = true;
+
+                List<MailRequest> MR = new List<MailRequest>();
+                MailRequest model = new MailRequest();
+                List<ScheduleConfigQuery> store_config = new List<ScheduleConfigQuery>();
+                ScheduleConfigQuery query_config = new ScheduleConfigQuery();
+                if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+                {
+                    return false;
+                }
+                query_config.schedule_code = schedule_code;
+                _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+                store_config = _secheduleServiceMgr.GetScheduleConfig(query_config);
+                foreach (ScheduleConfigQuery item in store_config)
+                {
+                    if (item.parameterCode.Equals("MailFromAddress"))
+                    {
+                        mailModel.MailFromAddress = item.value;
+                    }
+                    else if (item.parameterCode.Equals("MailHost"))
+                    {
+                        mailModel.MailHost = item.value;
+                    }
+                    else if (item.parameterCode.Equals("MailPort"))
+                    {
+                        mailModel.MailPort = item.value;
+                    }
+                    else if (item.parameterCode.Equals("MailFromUser"))
+                    {
+                        mailModel.MailFromUser = item.value;
+                    }
+                    else if (item.parameterCode.Equals("EmailPassWord"))
+                    {
+                        mailModel.MailFormPwd = item.value;
+                    }
+                    else if (item.parameterCode.Equals("GroupCode"))
+                    {
+                        GroupCode = item.value;
+                    }
+                    else if (item.parameterCode.Equals("MailTitle"))
+                    {
+                        MailTitle = item.value;
+                    }
+                    else if (item.parameterCode.Equals("MailTitle"))
+                    {
+                        MailTitle = item.value;
+                    }
+                    else if (item.parameterCode.Equals("MailBody"))
+                    {
+                        MailBody = item.value;
+                    }
+                    else if (item.parameterCode.Equals("IsSeparate"))
+                    {
+                        if (item.value.ToString().Trim().ToLower() == "false")
+                        {
+                            IsSeparate = false;
+                        }
+                        else if (item.value.ToString().Trim().ToLower() == "true")
+                        {
+                            IsSeparate = true;
+                        }
+                    }
+                    else if (item.parameterCode.Equals("IsDisplyName"))
+                    {
+                        if (item.value.ToString().Trim().ToLower() == "false")
+                        {
+                            IsDisplyName = false;
+                        }
+                        else if (item.value.ToString().Trim().ToLower() == "true")
+                        {
+                            IsDisplyName = true;
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(Request.Params["IsDisplyName"]))
+                    {
+                        if (Request.Params["IsDisplyName"].ToString().Trim().ToLower() == "false")
+                        {
+                            IsSeparate = false;
+                        }
+                        else if (Request.Params["IsDisplyName"].ToString().Trim().ToLower() == "true")
+                        {
+                            IsSeparate = true;
+                        }
+                    }
+                } 
+                MailHelper mail = new MailHelper(mailModel);
+                _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+                _secheduleServiceMgr.SendEMail(mail);
+                //添加排程執行日誌
+                ScheduleLogQuery query_log = new ScheduleLogQuery();
+                query_log.schedule_code = schedule_code;
+                query_log.create_user = 9;
+                query_log.ipfrom = BLL.gigade.Common.CommonFunction.GetIP4Address(Request.UserHostAddress.ToString());
+                _secheduleServiceMgr.AddScheduleLog(query_log);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            return true;
+        }
     }
     
     
