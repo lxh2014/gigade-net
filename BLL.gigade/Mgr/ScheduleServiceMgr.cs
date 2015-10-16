@@ -40,8 +40,6 @@ namespace BLL.gigade.Mgr
                 throw new Exception("SecheduleServiceMgr-->GetExeScheduleMasterList-->" + ex.Message, ex);
             }
         }
-
-
         public ScheduleMasterQuery GetScheduleMaster(ScheduleMasterQuery query)
         {
             try
@@ -372,6 +370,26 @@ namespace BLL.gigade.Mgr
             {
 
                 throw new Exception("SecheduleServiceMgr-->GetSchedulePeriodList-->" + ex.Message, ex);
+            }
+        }
+
+        public List<ScheduleLogQuery> GetScheduleLogList(ScheduleLogQuery query, out int totalCount)// Log 
+        {
+            try
+            {
+                List<ScheduleLogQuery> store = new List<ScheduleLogQuery>();
+                store = _secheduleServiceDao.GetScheduleLogList(query, out totalCount);
+                foreach (var item in store)
+                {
+                    item.show_create_time = CommonFunction.GetNetTime(item.create_time).ToString("yyyy-MM-dd HH:mm:ss ");
+                }
+                return store;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("SecheduleServiceMgr-->GetScheduleLogList-->" + ex.Message, ex);
             }
         }
 

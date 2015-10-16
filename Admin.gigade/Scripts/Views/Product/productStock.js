@@ -23,7 +23,8 @@ Ext.define("stock", {
         { name: "erp_id", type: "string" }, //add by xiangwang0413w 2014/06/18 (增加ERP廠商編號)
         { name: "remark", type: "string" }, //add by zhuoqin0830w 2015/02/05 增加備註
         { name: "arrive_days", type: "int" },// add by zhuoqin0830w 2014/03/20 增加運達天數
-        { name: "default_arrive_days", type: "int" }]
+        { name: "default_arrive_days", type: "int" },
+        { name: "symbol", type: "string" }]
 });
 
 //庫存Store
@@ -149,134 +150,169 @@ Ext.onReady(function () {
     var stockPanel = Ext.create("Ext.grid.Panel", {
         id: 'stockGrid',
         store: stockStore,
-        width: 960,
+        width: 1100,
         //height:window.parent.GetProductId()?300:500,
         plugins: [cellEditing],
         border: false,
-        columns: [{
-            xtype: 'rownumberer',
-            width: 50,
-            align: 'center'
-        }, {
-            dataIndex: 'item_id',
-            hidden: true
-        }, {
-            header: SPEC1,
-            sortable: false,
-            menuDisabled: true,
-            id: 'spec_title_1',
-            colName: 'spec_title_1',
-            hidden: true,
-            dataIndex: 'spec_title_1',
-            width: 100
-        }, {
-            dataIndex: 'spec_id_1',
-            hidden: true
-        }, {
-            header: SPEC2,
-            dataIndex: 'spec_title_2',
-            sortable: false,
-            colName: 'spec_title_2',
-            menuDisabled: true,
-            width: 100,
-            hidden: true,
-            id: 'spec_title_2'
-        }, {
-            dataIndex: 'spec_id_2',
-            hidden: true
-        }, {
-            header: PRODUCT_STOCK,//庫存
-            sortable: false,
-            colName: 'item_stock',
-            menuDisabled: true,
-            width: 60,
-            dataIndex: 'item_stock',
-            hidden: true,
-            id: 'item_stock',
-            editor: {
-                xtype: 'numberfield',
-                decimalPrecision: 0,
-                minValue: 0,
-                id: 'stock',
-                allowBlank: false
-            }
-        }, {
-            header: ITEM_ALARM + NOT_EMPTY,
-            sortable: false,
-            menuDisabled: true,
-            colName: 'item_alarm',
-            width: 60,
-            dataIndex: 'item_alarm',
-            hidden: true,
-            id: 'item_alarm',
-            editor: {
-                xtype: 'numberfield',
-                decimalPrecision: 0,
-                minValue: 0,
-                id: 'alarm',
-                allowBlank: false
-            }
-        }, {
-            header: ITEM_CODE,
-            dataIndex: 'item_code',
-            colName: 'item_code',
-            sortable: false,
-            menuDisabled: true,
-            width: 100,
-            hidden: true,
-            editor: {
-                xtype: 'textfield',
-                allowBlank: false
-            }
-        }, {//add by xiangwang0413w 2014/06/18 (增加ERP廠商編號)
-            header: ERP_ID,
-            dataIndex: 'erp_id',
-            sortable: false,
-            width: 100,
-            hidden: window.parent.GetProductId() == ""
-        }, {// add by zhuoqin0830w 2014/02/05 增加備註
-            header: REMARK,
-            dataIndex: 'remark',
-            colName: 'remark',
-            sortable: false,
-            menuDisabled: true,
-            width: 150,
-            editor: {
-                xtype: 'textfield',
-                id: 'remark',
-                allowBlank: false
-            }
-        }, {// add by zhuoqin0830w 2014/03/20 增加運達天數
-            header: TRANSPORT_ARRIVE_DAY,
-            dataIndex: 'arrive_days',
-            colName: 'arrive_days',
-            //hidden:true,
-            sortable: false,
-            menuDisabled: true,
-            width: 60,
-            editor: {
-                xtype: 'numberfield',
-                id: 'arrive_days',
-                decimalPrecision: 0,
-                minValue: 0,
-                allowBlank: false
-            }
-        }, {
-            header: BARCODE,
-            sortable: false,
-            menuDisabled: true,
-            flex: 1,
-            //width: 180,
-            dataIndex: 'barcode',
-            hidden: true,
-            colName: 'barcode',
-            id: 'barcode',
-            editor: {
-                xtype: 'textfield',
+        columns: [
+            {
+                xtype: 'rownumberer',
+                width: 50,
+                align: 'center'
+            }, {
+                dataIndex: 'item_id',
+                hidden: true
+            }, {
+                header: SPEC1,
+                sortable: false,
+                menuDisabled: true,
+                id: 'spec_title_1',
+                colName: 'spec_title_1',
+                hidden: true,
+                dataIndex: 'spec_title_1',
+                width: 100
+            }, {
+                dataIndex: 'spec_id_1',
+                hidden: true
+            }, {
+                header: SPEC2,
+                dataIndex: 'spec_title_2',
+                sortable: false,
+                colName: 'spec_title_2',
+                menuDisabled: true,
+                width: 100,
+                hidden: true,
+                id: 'spec_title_2'
+            }, {
+                dataIndex: 'spec_id_2',
+                hidden: true
+            }, {
+                header: PRODUCT_STOCK,//庫存
+                sortable: false,
+                colName: 'item_stock',
+                menuDisabled: true,
+                width: 60,
+                dataIndex: 'item_stock',
+                hidden: true,
+                id: 'item_stock',
+                editor: {
+                    xtype: 'numberfield',
+                    decimalPrecision: 0,
+                    minValue: 0,
+                    id: 'stock',
+                    allowBlank: false
+                }
+            }, {
+                header: ITEM_ALARM + NOT_EMPTY,
+                sortable: false,
+                menuDisabled: true,
+                colName: 'item_alarm',
+                width: 60,
+                dataIndex: 'item_alarm',
+                hidden: true,
+                id: 'item_alarm',
+                editor: {
+                    xtype: 'numberfield',
+                    decimalPrecision: 0,
+                    minValue: 0,
+                    id: 'alarm',
+                    allowBlank: false
+                }
+            }, {
+                header: ITEM_CODE,
+                dataIndex: 'item_code',
+                colName: 'item_code',
+                sortable: false,
+                menuDisabled: true,
+                width: 100,
+                hidden: true,
+                editor: {
+                    xtype: 'textfield',
+                    allowBlank: false
+                }
+            }, {//add by xiangwang0413w 2014/06/18 (增加ERP廠商編號)
+                header: ERP_ID,
+                dataIndex: 'erp_id',
+                sortable: false,
+                width: 100,
+                hidden: window.parent.GetProductId() == ""
+            }, {// add by zhuoqin0830w 2014/02/05 增加備註
+                header: REMARK,
+                dataIndex: 'remark',
+                colName: 'remark',
+                sortable: false,
+                menuDisabled: true,
+                width: 150,
+                editor: {
+                    xtype: 'textfield',
+                    id: 'remark',
+                    allowBlank: false
+                }
+            }, {// edit  2015/10/12  拆分運達天數
+                header: TRANSPORT_ARRIVE_DAY,
+                colName: 'arrive_days',
+                //hidden:true,
+                sortable: false,
+                menuDisabled: true,
+                columns: [{
+                    text: '供應商運達天數',
+                    id: 'default_arrive_days',
+                    dataIndex: 'default_arrive_days',
+                    width: 95,
+                    sortable: false,
+                    align: 'center',
+                    menuDisabled: true
+                }, {
+                    text: '+',
+                    dataIndex: 'symbol',
+                    width: 16,
+                    sortable: false,
+                    align: 'center',
+                    menuDisabled: true,
+                    renderer: function (val) {
+                        return '+';
+                    }
+                }, {
+                    text: '商品運達天數',
+                    dataIndex: 'arrive_days',
+                    align: 'center',
+                    sortable: false,
+                    menuDisabled: true,
+                    width: 85,
+                    editor: {
+                        xtype: 'numberfield',
+                        id: 'arrive_days',
+                        decimalPrecision: 0,
+                        minValue: 0,
+                        allowBlank: false
+                    }
+                }
+                //,{
+                //    text: '總運達天數',
+                //    id: 'totalday',
+                //    dataIndex: '',
+                //    width: 75,
+                //    align: 'center',
+                //    sortable: false,
+                //    menuDisabled: true
+                //}
+                ]
+            }, {
+                header: BARCODE,
+                sortable: false,
+                menuDisabled: true,
+                flex: 1,
+                //width: 180,
+                dataIndex: 'barcode',
+                hidden: true,
+                colName: 'barcode',
                 id: 'barcode',
-                allowBlank: false
-            }
-        }],
+                editor: {
+                    xtype: 'textfield',
+                    id: 'barcode',
+                    allowBlank: false
+                }
+            }],
         listeners: {
             scrollershow: function (scroller) {
                 if (scroller && scroller.scrollEl) {
@@ -391,7 +427,8 @@ function save(functionid) {
         // add by zhuoqin0830w 2014/02/05 增加備註
         var remark = stockGrid[i].get("remark");
         //add by zhuoqin0830w 2014/03/20 增加運達天數
-        var arrive_days = stockGrid[i].get("arrive_days") - defaultArriveDays;
+        //var arrive_days = stockGrid[i].get("arrive_days") - defaultArriveDays;
+        var arrive_days = stockGrid[i].get("arrive_days");///eidt by wwei0216w 分開顯示后arrive_days 不需要減defaultArriveDays
         //InsertValue += spec_title_1 + "," + spec_title_2 + "," + item_stock + "," + item_alarm + "," + barcode + "," + item_id + "," + item_code + "," + erp_id + "," + remark + "," + arrive_days + ";";
         InsertValueArray.push({//edit by wwei0216w 將字符串格式傳遞改成json傳遞
             'Spec_Id_1': spec_title_1,

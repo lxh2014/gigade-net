@@ -1853,9 +1853,6 @@
     <Content Include="Scripts\Views\EdmNew\EdmTemplateList.js" />
     <Content Include="Scripts\Views\EdmNew\EmailBlockEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EmailBlockList.js" />
-    <Content Include="Scripts\Views\EdmNew\EmailGroupEdit.js" />
-    <Content Include="Scripts\Views\EdmNew\EmailGroupImport.js" />
-    <Content Include="Scripts\Views\EdmNew\EmailGroupList.js" />
     <Content Include="Scripts\Views\EdmS\Edmlist.js" />
     <Content Include="Scripts\Views\Edm\BlackList.js" />
     <Content Include="Scripts\Views\Edm\BlackListEdit.js" />
@@ -2001,7 +1998,6 @@
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-rtl-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\resources\Readme.md" />
-    <None Include="Properties\PublishProfiles\gigade-jialei.pubxml" />
     <None Include="Properties\PublishProfiles\gigade.pubxml" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all-vsdoc.js" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all.min.intellisense.js" />
@@ -4410,7 +4406,6 @@
     <Content Include="Views\Vendor\VendorDetails.cshtml" />
     <Content Include="Views\Vendor\VendorBankList.cshtml" />
     <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
-    <Content Include="Views\EdmNew\EmailGroup.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4444,7 +4439,6 @@
     <Folder Include="Models\" />
     <Folder Include="Scripts\kindeditor\attached\" />
     <Folder Include="Scripts\Views\Bonus\" />
-    <Folder Include="Template\EmailGroup\" />
     <Folder Include="Template\OrderImport\" />
     <Folder Include="Template\VipUsers\" />
     <Folder Include="Views\Bonus\" />
@@ -4626,7 +4620,11 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>9046</DevelopmentServerPort>
+
+          <DevelopmentServerPort>55819</DevelopmentServerPort>
+
+          <DevelopmentServerPort>7466</DevelopmentServerPort>
+
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

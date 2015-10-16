@@ -17,12 +17,6 @@ var ParameterCodeStore = Ext.create('Ext.data.Store', {
         }
     }
 });
-//ParameterCodeStore.on("beforeload", function ()
-//{
-//    Ext.apply(ParameterCodeStore.proxy.extraParams, {
-//        paraType: 'schedule_config',
-//    })
-//})
 editFunction_config = function (row, store)
 {
     var editFrm = Ext.create('Ext.form.Panel', {

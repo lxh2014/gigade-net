@@ -139,7 +139,6 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
           }
 
 
-
           public List<ScheduleMasterQuery> GetScheduleMasterList(ScheduleMasterQuery query)// 得到 master表中的記錄
           {
               StringBuilder sql = new StringBuilder();
@@ -206,6 +205,50 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               }
           }
 
+          public List<ScheduleLogQuery> GetScheduleLogList(ScheduleLogQuery query, out int totalCount)// 得到 period表中的記錄
+          {
+              StringBuilder sql = new StringBuilder();
+              StringBuilder sqlCondi = new StringBuilder();
+              StringBuilder sqlCount = new StringBuilder();
+              totalCount = 0;
+              try
+              {
+                  sqlCount.AppendFormat("SELECT count(rowid) as totalCount ");
+                  sql.AppendFormat("select sl.rowid,sl.schedule_code,mu1.user_username as create_username,sl.create_time,sl.ipfrom ");
+                  sqlCondi.Append(" from schedule_log sl LEFT JOIN manage_user mu1 on mu1.user_id=sl.create_user ");
+                  sqlCondi.Append(" where 1=1 ");
+                  if (!string.IsNullOrEmpty(query.schedule_code))
+                  {
+                      sqlCondi.AppendFormat(" and sl.schedule_code='{0}' ", query.schedule_code);
+                  }
+                  if (query.start_time != 0)
+                  {
+                      sqlCondi.AppendFormat(" and sl.create_time >= '{0}' ", query.start_time);
+                  }
+                  if (query.end_time != 0)
+                  {
+                      sqlCondi.AppendFormat(" and sl.create_time <= '{0}' ", query.end_time);
+                  }
+                  sql.Append(sqlCondi.ToString());
+                  if (query.IsPage)
+                  {
+                      //StringBuilder strpage = new StringBuilder();
+                      //StringBuilder strcontpage = new StringBuilder();
+                      //strpage.AppendFormat(" SELECT count(rowid) as totalCount FROM schedule_log  ");
+                      DataTable _dt = _access.getDataTable(sqlCount.ToString()+ sqlCondi.ToString());
+                      if (_dt.Rows.Count > 0)
+                      {
+                          totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
+                          sql.AppendFormat(" order by rowid desc  limit {0},{1} ", query.Start, query.Limit);
+                      }
+                  }
+                  return _access.getDataTableForObj<ScheduleLogQuery>(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->GetScheduleLogList-->" + ex.Message, ex);
+              }
+          }
           public string UpdateStats_Schedule_master(ScheduleMasterQuery query)  // master 狀態更新
           {
               StringBuilder strSql = new StringBuilder();
@@ -373,7 +416,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               List<MailRequest> MR = new List<MailRequest>();
               try
               {
-                  sql1.AppendFormat("SELECT request_id,priority,user_id,sender_address,sender_name,receiver_address,receiver_name,`subject`,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,request_createdate,request_updatedate from mail_request where valid_until_date<'{0}'  ;", DateTime.Now.ToString("yyyy-MM-dd 00:00:00"));
+                  sql1.AppendFormat("SELECT request_id,priority,user_id,sender_address,sender_name,receiver_address,receiver_name,`subject`,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,request_createdate,request_updatedate from mail_request where valid_until_date<'{0}'  ;", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                   MR = _access.getDataTableForObj<MailRequest>(sql1.ToString());
                   sql.Append(InsertLog(MR, "mail expired", 0));
                   if (sql.Length > 0)
@@ -424,12 +467,12 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                   sql1.AppendFormat("SELECT request_id,priority,user_id,sender_address,sender_name,receiver_address,receiver_name,`subject`,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,request_createdate,request_updatedate,body,success_action,fail_action from mail_request where schedule_date<'{0}'   order by next_send,priority,valid_until_date;", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                   MR = _access.getDataTableForObj<MailRequest>(sql1.ToString());
                   int next_time = int.Parse(_access.getDataTable("SELECT parameterCode from t_parametersrc WHERE parameterType='next_send';").Rows[0][0].ToString());
+                  sql2.Append("SELECT email_address from email_block_list;");
+                  dt = _access.getDataTable(sql2.ToString());
                   foreach (var item in MR)
                   {
                       bool black = true;
-                      //添加擋信名單
-                      sql2.Append("SELECT email_address from email_block_list;");
-                      dt = _access.getDataTable(sql2.ToString());
+                      //擋信名單排除
                       for (int i = 0; i < dt.Rows.Count; i++)
                       {
                           if (item.receiver_address.ToString() == dt.Rows[i][0].ToString())
@@ -441,7 +484,6 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                               {
                                   _access.execCommand(sql.ToString());
                                   sql.Clear();
-                                  Console.WriteLine(item.receiver_address.ToString() + " 是黑名單!");
                               }
                           }
                       }
@@ -451,7 +493,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                           {
                               if (mail.SendMailAction(item.receiver_address.ToString(), item.subject.ToString(), item.body.ToString(), item.sender_address, item.sender_name))
                               {
-                                  sql.Append(item.success_action + ";");
+                                  //sql.Append(item.success_action + ";");
                                   //發送成功刪除原數據新增log
                                   sql.Append(InsertLog(item, "success", 1));
                               }
@@ -459,8 +501,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                               {
                                   //發送失敗更新數據
                                   sql.AppendFormat("update mail_request set retry_count ='{1}',next_send='{2}',sent_log='{3}' where request_id='{0}' ;", item.request_id, item.retry_count + 1, DateTime.Now.AddMinutes(next_time), "not errow massage");
-
-                                  sql.Append(item.fail_action + ";");
+                                  //sql.Append(item.fail_action + ";");
                               }
                               if (sql.Length > 0)
                               {

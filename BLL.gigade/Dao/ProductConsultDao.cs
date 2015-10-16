@@ -157,7 +157,7 @@ namespace BLL.gigade.Dao
             StringBuilder strSql = new StringBuilder();
             try
             {
-                strSql.AppendFormat("set sql_safe_updates = 0; update product_consult set answer_date='{0}',consult_answer='{1}',answer_user='{2}',answer_status={3},status={4} where consult_id='{5}'; set sql_safe_updates = 1;", query.answer_date.ToString("yyyy-MM-dd HH:mm:ss"), query.consult_answer, query.answer_user, query.answer_status, query.status, query.consult_id);
+                strSql.AppendFormat("set sql_safe_updates = 0; update product_consult set answer_date='{0}',consult_answer='{1}',answer_user='{2}',answer_status='{3}',status='{4}',is_sendEmail='{5}' where consult_id='{6}'; set sql_safe_updates = 1;", query.answer_date.ToString("yyyy-MM-dd HH:mm:ss"), query.consult_answer, query.answer_user, query.answer_status, query.status,query.is_sendEmail, query.consult_id);
                 return _access.execCommand(strSql.ToString());
             }
             catch (Exception ex)
@@ -201,7 +201,7 @@ namespace BLL.gigade.Dao
             string strSql = string.Empty;
             try
             {
-                strSql = string.Format("set sql_safe_updates = 0; update product_consult set answer_status='{0}',answer_user='{1}',delay_reason='{2}' where consult_id='{3}'; set sql_safe_updates = 1;", model.answer_status, model.answer_user, model.delay_reason, model.consult_id);
+                strSql = string.Format("set sql_safe_updates = 0; update product_consult set answer_status='{0}',answer_user='{1}',delay_reason='{2}',status='{3}',is_sendEmail='{4}' where consult_id='{5}'; set sql_safe_updates = 1;", model.answer_status, model.answer_user, model.delay_reason, model.status, model.is_sendEmail, model.consult_id);
                 return _access.execCommand(strSql);
             }
             catch (Exception ex)

@@ -248,7 +248,7 @@ namespace BLL.gigade.Mgr
                       {
                           for (int j = 0; j < _dt.Rows.Count; j++)
                           {
-                              if (_dt.Rows[j]["user_email"] == _outDt.Rows[i]["customer_email"])
+                              if (_dt.Rows[j]["user_email"].ToString() == _outDt.Rows[i]["customer_email"].ToString())
                               {
                                   _dt.Rows.RemoveAt(j);
                                   _dt.AcceptChanges();
