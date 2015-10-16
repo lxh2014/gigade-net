@@ -921,8 +921,8 @@ namespace Admin.gigade.Controllers
                     newPresentQuery.modified = newPresentQuery.created;
                     newPresentQuery.muser = newPresentQuery.kuser;
                     _INewPromoPresentMgr = new NewPromoPresentMgr(mySqlConnectionString);
-                    newPresentQuery.start = Convert.ToDateTime(Request.Params["valid_start"]);
-                    newPresentQuery.end = Convert.ToDateTime(Request.Params["valid_end"]);
+                    newPresentQuery.start = Convert.ToDateTime((Convert.ToDateTime(Request.Params["valid_start"])).ToString("yyyy-MM-dd 00:00:00"));
+                    newPresentQuery.end = Convert.ToDateTime((Convert.ToDateTime(Request.Params["valid_end"])).ToString("yyyy-MM-dd 23:59:59"));
                     newPresentQuery.bonus_expire_day = Convert.ToInt32(Request.Params["bonus_expire_day"]);
                     if (!string.IsNullOrEmpty(Request.Params["use_span_day"]))
                     {
@@ -972,8 +972,8 @@ namespace Admin.gigade.Controllers
                     NewPromoPresentQuery newPresentQuery = new NewPromoPresentQuery();
                     _INewPromoPresentMgr = new NewPromoPresentMgr(mySqlConnectionString);
                     newPresentQuery.row_id = Convert.ToInt32(Request.Params["row_id"]);
-                    newPresentQuery.start = Convert.ToDateTime(CommonFunction.DateTimeToString(Convert.ToDateTime(Request.Params["valid_start"])));
-                    newPresentQuery.end = Convert.ToDateTime(CommonFunction.DateTimeToString(Convert.ToDateTime(Request.Params["valid_end"])));
+                    newPresentQuery.start = Convert.ToDateTime((Convert.ToDateTime(Request.Params["valid_start"])).ToString("yyyy-MM-dd 00:00:00"));
+                    newPresentQuery.end = Convert.ToDateTime((Convert.ToDateTime(Request.Params["valid_end"])).ToString("yyyy-MM-dd 23:59:59"));
                     newPresentQuery.bonus_expire_day = Convert.ToInt32(Request.Params["bonus_expire_day"]);
                     newPresentQuery.event_id = Request.Params["this_event_id"];
                     newPresentQuery.muser = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
