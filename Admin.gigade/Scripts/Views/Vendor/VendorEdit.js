@@ -1860,49 +1860,49 @@ function editFunction(rowID) {
                         id: 'bank_code',
                         name: 'bank_code',
                         allowBlank: false
-                        //,
-                        //listeners: {
-                        //    blur: function (text, e) {
-                        //        var code = Ext.getCmp('bank_code').getValue();
-                        //        var name = Ext.getCmp('bank_name');
-                        //        if (code != "") {
-                        //            Ext.Ajax.request({
-                        //                url: "/Vendor/GetBankName",
-                        //                method: 'post',
-                        //                async: false, //true為異步，false為同步
-                        //                params: {
-                        //                    bankCode: code
-                        //                },
-                        //                success: function (form, action) {
-                        //                    var result = Ext.decode(form.responseText);
-                        //                    if (result.success) {
-                        //                        if (!rowID) {//新增
-                        //                            name.setValue(result.name);
-                        //                        }
+                        ,
+                        listeners: {
+                            blur: function (text, e) {
+                                var code = Ext.getCmp('bank_code').getValue();
+                                var name = Ext.getCmp('bank_name');
+                                if (code != "") {
+                                    Ext.Ajax.request({
+                                        url: "/Vendor/GetBankName",
+                                        method: 'post',
+                                        async: false, //true為異步，false為同步
+                                        params: {
+                                            bankCode: code
+                                        },
+                                        success: function (form, action) {
+                                            var result = Ext.decode(form.responseText);
+                                            if (result.success) {
+                                                if (!rowID) {//新增
+                                                    name.setValue(result.name);
+                                                }
 
-                        //                        else {
-                        //                            if (result.name == "") {
-                        //                                Ext.Msg.alert(INFORMATION, "請確認該銀行代碼是否存在！ ");
-                        //                            }
-                        //                            else if (name.getValue() == "") {
-                        //                                name.setValue(result.name);
-                        //                            }
-                        //                            else if (result.name != name.getValue()) {
-                        //                                Ext.MessageBox.confirm(CONFIRM, "是否用[" + result.name + "]替換現有銀行名稱？", function (btn) {
-                        //                                    if (btn === "yes") {
-                        //                                        name.setValue(result.name);
-                        //                                    }
+                                                else {
+                                                    if (result.name == "") {
+                                                        Ext.Msg.alert(INFORMATION, "請確認該銀行代碼是否存在！ ");
+                                                    }
+                                                    else if (name.getValue() == "") {
+                                                        name.setValue(result.name);
+                                                    }
+                                                    else if (result.name != name.getValue()) {
+                                                        Ext.MessageBox.confirm(CONFIRM, "是否用【" + result.name + "】替換現有銀行名稱？", function (btn) {
+                                                            if (btn === "yes") {
+                                                                name.setValue(result.name);
+                                                            }
 
-                        //                                });
-                        //                            }
-                        //                        }
+                                                        });
+                                                    }
+                                                }
 
-                        //                    }
-                        //                }
-                        //            });
-                        //        }
-                        //    }
-                        //}
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        }
 
                     },
                     {
