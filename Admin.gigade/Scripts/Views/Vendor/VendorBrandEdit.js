@@ -148,7 +148,7 @@ function editFunction(rowID) {
                 },
                 {
                     xtype: 'combobox',
-                    fieldLabel: '供應商<font color="red">*</font>',
+                    fieldLabel: '供應商簡稱<font color="red">*</font>',
                     allowBlank: false,
                     editable: false,
                     hidden: false,
@@ -159,6 +159,7 @@ function editFunction(rowID) {
                     valueField: 'vendor_id',
                     typeAhead: true,
                     forceSelection: false,
+                    lastQuery: '',
                     anchor: '90%',
                     emptyText: 'SELECT'
                 },

@@ -116,11 +116,11 @@ BonusStore.on('beforeload', function () {
     var start_time = Ext.getCmp('time_start_create').getValue();
     var end_time = Ext.getCmp('time_end_create').getValue();
     if (start_time == null && end_time != null) {
-        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        Ext.Msg.alert("提示", "請把發放日期補充完整");
         return false;
     }
     if (start_time != null && end_time == null) {
-        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        Ext.Msg.alert("提示", "請把發放日期補充完整");
         return false;
     }
     Ext.apply(BonusStore.proxy.extraParams, {
@@ -563,11 +563,11 @@ function Query() {
     var start_time = Ext.getCmp('time_start_create').getValue();
     var end_time = Ext.getCmp('time_end_create').getValue();
     if (start_time == null && end_time != null) {
-        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        Ext.Msg.alert("提示", "請把發放日期補充完整");
         return false;
     }
     if (start_time != null && end_time == null) {
-        Ext.Msg.alert("提示", "請把創建時間補充完整");
+        Ext.Msg.alert("提示", "請把發放日期補充完整");
         return false;
     }
     var falg = 0;
