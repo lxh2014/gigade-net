@@ -23,6 +23,8 @@ using System.Data;
 using BLL.gigade.Model.Query;
 using System.Collections;
 using MySql.Data.MySqlClient;
+using System.Text.RegularExpressions;
+
 namespace BLL.gigade.Mgr
 {
     public class VendorMgr : IVendorImplMgr
@@ -394,51 +396,93 @@ namespace BLL.gigade.Mgr
         }
 
         #region 供應商銀行信息
-        public List<VendorBank> QueryBank(VendorBank query, ref int totalCount)
-        {
-            try
-            {
-                return _vendorDao.QueryBank(query, ref totalCount);
-            }
-            catch (MySqlException ex)
-            {
-                throw new Exception(ex.Number.ToString() + ":VendorMgr-->QueryBank-->" + ex.Message, ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("VendorMgr-->QueryBank" + ex.Message, ex);
-            }
-        }
 
         public string ImportVendorBank(DataTable dt)
         {
             try
             {
                 string result = "";
-                uint user_id = Convert.ToUInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id);
                 ArrayList _list = new ArrayList();
+                string user_email = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_email;
+                ParametersrcDao _paraDao = new ParametersrcDao(connStr);
+                string faCode = ""; int topValue = 0;
                 foreach (DataRow dr in dt.Rows)
                 {
-                    VendorBank model = new VendorBank();
-                    model.bank_code = dr[0].ToString();
-                    model.bank_name = dr[1].ToString();
-                    model.kuser = user_id;
-                    model.kdate = DateTime.Now;
-                    model.muser = model.kuser;
-                    model.mdate = model.kdate;
-                    model.status = 1;//默認啟用
-                    List<VendorBank> stores = _vendorDao.GetVendorBank(model);
-                    if (stores.Count == 0)
+
+                    Regex reg = new Regex("^[0-9]{7}$");
+                    if (reg.IsMatch(dr[0].ToString()))
                     {
-                        _list.Add(_vendorDao.SaveBank(model));
+                        string sumCode = dr[0].ToString().Substring(0, 3);
+                        var blist = _paraDao.Query(new Parametersrc { ParameterType = "BankBranchName", ParameterCode = dr[0].ToString() });
+                        if (blist == null || blist.Count == 0)//不存在則保存總行數據
+                        {
+                            //查看總行是否已存在
+                            if (faCode != sumCode)
+                            {
+                                var alist = _paraDao.Query(new Parametersrc { ParameterType = "BankName", ParameterCode = sumCode });
+                                if (alist == null || alist.Count == 0)//不存在則保存總行數據
+                                {
+                                    Parametersrc para = new Parametersrc();
+                                    para.ParameterType = "BankName";
+                                    para.ParameterCode = sumCode;
+                                    para.parameterName = dr[1].ToString().Split('-')[0].ToString();
+                                    para.remark = para.parameterName;
+                                    para.Kdate = DateTime.Now;
+                                    para.Kuser = user_email;
+                                    para.Used = 1;
+                                    _list.Add(_paraDao.Save(para));
+
+                                }
+                                faCode = sumCode;
+                            }
+                        }
+                        else
+                        {
+                            result += dr[0].ToString() + "有重複匯入,";
+                            break;
+                        }
                     }
                     else
                     {
-                        result += model.bank_code + ',';
+                        result += dr[0].ToString() + ',';
                     }
                 }
-                _mysqlDao.ExcuteSqlsThrowException(_list);
+
+                if (string.IsNullOrEmpty(result))//匯入數據無異常
+                {
+                    //執行保存總行信息的事務
+
+                    if (_mysqlDao.ExcuteSqlsThrowException(_list))
+                    {
+                        _list.Clear();
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            string sumCode = dr[0].ToString().Substring(0, 3);
+                            //查看總行是否已存在
+                            if (faCode != sumCode)
+                            {
+                                topValue = _paraDao.Query(new Parametersrc { ParameterCode = sumCode, ParameterType = "BankName" }).FirstOrDefault().Rowid;
+                                faCode = sumCode;
+                            }
+                            Parametersrc paraBranch = new Parametersrc();
+                            paraBranch.ParameterType = "BankBranchName";
+                            paraBranch.ParameterCode = dr[0].ToString();
+                            paraBranch.parameterName = dr[1].ToString().Split('-')[1].ToString();
+                            paraBranch.remark = dr[1].ToString();
+                            paraBranch.Kdate = DateTime.Now;
+                            paraBranch.Kuser = user_email;
+                            paraBranch.Used = 1;
+                            paraBranch.TopValue = topValue.ToString();
+                            _list.Add(_paraDao.Save(paraBranch));
+
+                        }
+                        _mysqlDao.ExcuteSqlsThrowException(_list);
+                    }
+
+                }
+
                 return result.TrimEnd(',');
+
             }
             catch (MySqlException ex)
             {
@@ -449,83 +493,21 @@ namespace BLL.gigade.Mgr
                 throw new Exception("VendorMgr-->ImportVendorBank" + ex.Message, ex);
             }
         }
-        public int SaveVendorBank(VendorBank model)
+
+        public string GetVendorBank(string code)
         {
             try
             {
-                List<VendorBank> _list = _vendorDao.GetVendorBank(model);
-                if (model.id == 0)//新增
+                ParametersrcDao paraDao = new ParametersrcDao(connStr);
+                List<Parametersrc> list = paraDao.Query(new Parametersrc { ParameterCode = code, ParameterType = "BankBranchName" });
+                if (list != null && list.Count > 0)
                 {
-                    //判定該代碼或名稱是否存在
-                    if (_list.Count > 0)
-                    {
-                        return -1;//提示該代碼或名稱已存在,不可重複保存！
-                    }
-                    else
-                    {
-                        model.kuser = model.muser;
-                        model.kdate = model.mdate;
-                        ArrayList arr = new ArrayList();
-                        arr.Add(_vendorDao.SaveBank(model));
-                        if (_mysqlDao.ExcuteSqls(arr))
-                        {
-                            return 1;//新增成功！
-                        }
-                        else
-                        {
-                            return 0;
-                        }
-                    }
-
+                    return list[0].remark;
                 }
-                else//編輯
+                else
                 {
-                    if (_list.Count > 1)
-                    {
-                        return -1;//提示該代碼或名稱已存在,不可重複保存！
-                    }
-                    else
-                    {
-                        return _vendorDao.UpdateBank(model);
-                    }
+                    return "";
                 }
-            }
-            catch (MySqlException ex)
-            {
-                throw new Exception(ex.Number.ToString() + ":VendorMgr-->SaveVendorBank-->" + ex.Message, ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("VendorMgr-->SaveVendorBank" + ex.Message, ex);
-            }
-        }
-
-
-        public int UpdateActiveBank(VendorBank model)
-        {
-            try
-            {
-                return _vendorDao.UpdateActiveBank(model);
-            }
-            catch (MySqlException ex)
-            {
-                throw new Exception(ex.Number.ToString() + ":VendorMgr-->UpdateActiveBank-->" + ex.Message, ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("VendorMgr-->UpdateActiveBank" + ex.Message, ex);
-            }
-        }
-
-        public List<VendorBank> GetVendorBank(VendorBank model)
-        {
-            try
-            {
-                return _vendorDao.GetVendorBank(model);
-            }
-            catch (MySqlException ex)
-            {
-                throw new Exception(ex.Number.ToString() + ":VendorMgr-->GetVendorBank-->" + ex.Message, ex);
             }
             catch (Exception ex)
             {

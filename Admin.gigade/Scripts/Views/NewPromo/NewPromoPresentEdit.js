@@ -236,13 +236,13 @@ editPresentFunction = function (row, store, o_event_id) {
                    maxValue:9999999
                },
                {
-                   xtype: "datetimefield",
+                   xtype: "datefield",
                    fieldLabel: DATESTART,
                    editable: false,
                    id: 'tstart',
                    name: 'tstart',
                    anchor: '95%',
-                   format: 'Y-m-d H:i:s',
+                   format: 'Y-m-d 00:00:00',
                    width: 150,
                    allowBlank: false,
                    submitValue: true,
@@ -251,20 +251,21 @@ editPresentFunction = function (row, store, o_event_id) {
                        select: function (a, b, c) {
                            var start = Ext.getCmp("tstart");
                            var end = Ext.getCmp("tend");
-                           if (end.getValue() < start.getValue()) {
-                               Ext.Msg.alert(INFORMATION, TIMETIP);
+                           if (end.getValue() < start.getValue()) {//開始時間大於了結束時間
+                               var start_date = start.getValue();
+                               Ext.getCmp('tend').setValue(new Date(start_date.getFullYear(), start_date.getMonth()+ 1, start_date.getDate()));
                            }
                        }
                    }
                },
                {
-                   xtype: "datetimefield",
+                   xtype: "datefield",
                    fieldLabel: DATEEND,
                    editable: false,
                    id: 'tend',
                    anchor: '95%',
                    name: 'tend',
-                   format: 'Y-m-d H:i:s',
+                   format: 'Y-m-d 23:59:59',
                    allowBlank: false,
                    submitValue: true,
                    value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
@@ -272,8 +273,9 @@ editPresentFunction = function (row, store, o_event_id) {
                        select: function (a, b, c) {
                            var start = Ext.getCmp("tstart");
                            var end = Ext.getCmp("tend");
-                           if (end.getValue() < start.getValue()) {
-                               Ext.Msg.alert(INFORMATION, TIMETIP);
+                           if (end.getValue() < start.getValue()) {//開始時間大於了結束時間
+                               var end_date = end.getValue();
+                               Ext.getCmp('tstart').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                            }
                        }
                    }
@@ -304,8 +306,8 @@ editPresentFunction = function (row, store, o_event_id) {
                                     welfare_mulriple: Ext.htmlEncode(Ext.getCmp('welfare_mulriple').getValue()),
                                     freight_price: Ext.htmlEncode(Ext.getCmp('freight_price').getValue()),
                                     bonus_expire_day: Ext.htmlEncode(Ext.getCmp('bonus_expire_day').getValue()),
-                                    valid_end: Ext.getCmp('tend').getValue(),
-                                    valid_start: Ext.getCmp('tstart').getValue(),
+                                    valid_end: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('tend').getValue()), 'Y-m-d H:i:s')),
+                                    valid_start: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('tstart').getValue()), 'Y-m-d H:i:s')),
                                     gift_amount: Ext.getCmp('gift_amount').getValue(),
                                     use_span_day: Ext.getCmp('use_span_day').getValue(),
                                 },
@@ -348,8 +350,8 @@ editPresentFunction = function (row, store, o_event_id) {
                                 welfare_mulriple: Ext.htmlEncode(Ext.getCmp('welfare_mulriple').getValue()),
                                 freight_price: Ext.htmlEncode(Ext.getCmp('freight_price').getValue()),
                                 bonus_expire_day: Ext.htmlEncode(Ext.getCmp('bonus_expire_day').getValue()),
-                                valid_start: Ext.getCmp('tstart').getValue(),
-                                valid_end: Ext.getCmp('tend').getValue(),
+                                valid_end: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('tend').getValue()), 'Y-m-d H:i:s')),
+                                valid_start: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('tstart').getValue()), 'Y-m-d H:i:s')),
                                 gift_amount: Ext.getCmp('gift_amount').getValue()
                             },
                             success: function (form, action) {

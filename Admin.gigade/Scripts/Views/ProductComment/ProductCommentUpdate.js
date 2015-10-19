@@ -16,11 +16,12 @@
     var CommentSatisfyStore = Ext.create('Ext.data.Store', {
         fields: ['txt', 'value'],
         data: [
-        { "txt": '非常不滿意(1分)', "value": "1" },
-        { "txt": '不滿意(2分)', "value": "2" },
-        { "txt": '一般(3分)', "value": "3" },
+        { "txt": '非常滿意(5分)', "value": "5" },
         { "txt": '滿意(4分)', "value": "4" },
-        { "txt": '非常滿意(5分)', "value": "5" }
+        { "txt": '一般(3分)', "value": "3" },
+        { "txt": '不滿意(2分)', "value": "2" },
+        { "txt": '非常不滿意(1分)', "value": "1" },
+        
         ]
     });
 
@@ -127,10 +128,10 @@
                     form.submit({
                         params: {
                             comment_id: Ext.htmlEncode(Ext.getCmp('comment_id').getValue()),
-                            old_logistics_deliver: Ext.getCmp('logistics_deliver').getValue(),
-                            old_web_server: Ext.getCmp('web_server').getValue(),
-                            old_seller_server: Ext.getCmp('seller_server').getValue(),
-                            old_product_desc: Ext.getCmp('product_desc').getValue(),
+                            logistics_deliver: Ext.getCmp('logistics_deliver').getValue(),
+                            web_server: Ext.getCmp('web_server').getValue(),
+                            seller_server: Ext.getCmp('seller_server').getValue(),
+                            product_desc: Ext.getCmp('product_desc').getValue(),
                             old_logistics_deliver: row.data.logistics_deliver,
                             old_web_server: row.data.web_server,
                             old_seller_server: row.data.seller_server,

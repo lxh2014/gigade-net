@@ -12,6 +12,11 @@ public class Unitle
         local,
         server
     }
+    //吉甲地推薦系統FTP地址  guodong1130w 20151014
+    public enum RecommendExcle
+    {
+        local
+    }
 
     public enum ImgGigade100ComType
     {
@@ -154,6 +159,20 @@ public class Unitle
                 break;
             case ImgPathType.server:
                 result = ConfigurationManager.AppSettings["imgServerPath"];
+                break;
+            default:
+                break;
+        }
+        return result;
+    }
+    //吉甲地推薦系統FTP地址  guodong1130w 20151014
+    public static string GetImgGigade100ComRecommendSitePath(RecommendExcle pathType)
+    {
+        string result = string.Empty;
+        switch (pathType)
+        {
+            case RecommendExcle.local:
+                result = ConfigurationManager.AppSettings["RecommendLocalPath"];
                 break;
             default:
                 break;

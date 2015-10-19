@@ -60,16 +60,30 @@ Ext.onReady(function () {
     var chekPanel = Ext.create("Ext.form.Panel", {
         width: 800,
         border: false,
+        bodyStyle: "padding: 2px 0px 0px 5px;",
         items: [{
             xtype: 'fieldcontainer',
             defaultType: 'checkboxfield',
-            items: [{
+            items: [
+                {
                 boxLabel: IGNORE_STOCK,
                 id: 'ignore_stock',
                 hidden: true,
                 colName: 'ignore_stock',
                 inputValue: '1'
             }, {
+                    xtype: 'numberfield',
+                    fieldLabel: "缺貨下架天數 ",
+                    name: 'outofstock_days_stopselling',
+                    id: 'outofstock_days_stopselling',
+                    emptyText: "請輸入天數",
+                    submitValue: true,
+                    labelWidth: 90,
+                    width: 170,
+                    maxValue: 9999,
+                    minValue: 1,
+                    value: 15
+                }, {
                 boxLabel: SHORTAGE,
                 id: 'shortage',
                 hidden: true,
@@ -265,7 +279,7 @@ Ext.onReady(function () {
                 }, {
                     text: '+',
                     dataIndex: 'symbol',
-                    width: 16,
+                    width: 20,
                     sortable: false,
                     align: 'center',
                     menuDisabled: true,
@@ -284,6 +298,7 @@ Ext.onReady(function () {
                         id: 'arrive_days',
                         decimalPrecision: 0,
                         minValue: 0,
+                        maxValue: 99,
                         allowBlank: false
                     }
                 }
@@ -446,8 +461,8 @@ function save(functionid) {
     var InsertValue = Ext.encode(InsertValueArray);//edit by wwei0216w 將字符串格式傳遞改成json傳遞
     var ignore = Ext.getCmp("ignore_stock").getValue() == true ? 1 : 0;
     var shortage = Ext.getCmp("shortage").getValue() == true ? 1 : 0;
-    var ig_sh_InsertValue = ignore + ',' + shortage;
-
+    var outofstock_days = Ext.getCmp('outofstock_days_stopselling').getValue();
+    var ig_sh_InsertValue = ignore + ',' + shortage + ',' + outofstock_days;
     if (!functionid) {
         functionid = '';
     }
@@ -491,6 +506,7 @@ function queryProduct(stockPanel) {
         success: function (response) {
             var reStr = eval("(" + response.responseText + ")");
             if (reStr && reStr.data) {
+                Ext.getCmp("outofstock_days_stopselling").setValue(reStr.data.outofstock_days_stopselling);
                 if (reStr.data.Ignore_Stock == 1) Ext.getCmp("ignore_stock").setValue(true); else Ext.getCmp("ignore_stock").setValue(false);
                 if (reStr.data.Shortage == 1) Ext.getCmp("shortage").setValue(true); else Ext.getCmp("shortage").setValue(false);
             }

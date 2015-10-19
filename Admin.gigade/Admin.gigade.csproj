@@ -1956,7 +1956,7 @@
     <Content Include="Scripts\Views\Ticket\TicketReturnList.js" />
     <Content Include="Scripts\Views\Ticket\TicketVerification.js" />
     <Content Include="Scripts\Views\UserLevelLog\UserLevelLogList.js" />
-    <Content Include="Scripts\Views\Vendor\VendorBankList.js" />
+    <Content Include="Scripts\Views\Vendor\VendorBankImport.js" />
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryEdit.js" />
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryList.js" />
     <Content Include="Scripts\Views\Vendor\VendorChangeLog.js" />
@@ -2001,6 +2001,7 @@
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-rtl-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\resources\Readme.md" />
+    <None Include="Properties\PublishProfiles\gigade-jialei.pubxml" />
     <None Include="Properties\PublishProfiles\gigade.pubxml" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all-vsdoc.js" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all.min.intellisense.js" />
@@ -4407,9 +4408,11 @@
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
     <Content Include="Views\ScheduleService\Index.cshtml" />
     <Content Include="Views\Vendor\VendorDetails.cshtml" />
-    <Content Include="Views\Vendor\VendorBankList.cshtml" />
     <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
+
+    <Content Include="Views\Vendor\VendorBankImport.cshtml" />
     <Content Include="Views\EdmNew\EmailGroup.cshtml" />
+
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4625,7 +4628,10 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>9046</DevelopmentServerPort>
+
+          <DevelopmentServerPort>9048</DevelopmentServerPort>
+
+      
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

@@ -201,7 +201,7 @@ namespace BLL.gigade.Dao
             string strSql = string.Empty;
             try
             {
-                strSql = string.Format("set sql_safe_updates = 0; update product_consult set answer_status='{0}',answer_user='{1}',delay_reason='{2}',status='{3}',is_sendEmail='{4}' where consult_id='{5}'; set sql_safe_updates = 1;", model.answer_status, model.answer_user, model.delay_reason, model.status, model.is_sendEmail, model.consult_id);
+                strSql = string.Format("set sql_safe_updates = 0; update product_consult set answer_status='{0}',answer_user='{1}',delay_reason='{2}' where consult_id='{3}'; set sql_safe_updates = 1;", model.answer_status, model.answer_user, model.delay_reason, model.consult_id);
                 return _access.execCommand(strSql);
             }
             catch (Exception ex)

@@ -35,6 +35,8 @@ pro.push({ name: 'off_grade', type: 'int' });
 pro.push({ name: 'purchase_in_advance', type: 'int' });
 //2015/08/12
 pro.push({ name: 'itemIds', type: 'string' });
+//add by dongya   2015/10/16
+pro.push({ name: 'outofstock_days_stopselling', type: 'int' });
 
 Ext.define('GIGADE.PRODUCT', {
     extend: 'Ext.data.Model',
@@ -109,6 +111,8 @@ site.push(m_prod_classify);
 site.push(off_grade);
 //添加預購商品 guodong1130w 2015/9/16添加
 site.push(m_purchase_in_advance);
+
+site.push(m_outofstock_days_stopselling);
 
 Ext.define('GIGADE.SITEPRODUCT', {
     extend: 'Ext.data.Model',
@@ -534,6 +538,7 @@ Ext.onReady(function () {
     proColumns.push(c_pro_mode);
     proColumns.push(c_pro_tax);
     proColumns.push(c_pro_sort);
+    proColumns.push(c_pro_days);//add by dongya 2015/10/16
     proColumns.push(c_pro_create);
     proColumns.push(c_pro_start);
     proColumns.push(c_pro_end);
@@ -588,6 +593,7 @@ Ext.onReady(function () {
     siteColumns.push(c_prod_classify);
     //添加是否失格  add  by zhuoqin0830w 2015/06/30
     siteColumns.push(c_off_grade);
+    siteColumns.push(c_pro_days);
 
     var siteProGrid = Ext.create('Ext.grid.Panel', {
         hidden: true,
