@@ -11267,7 +11267,49 @@ namespace Admin.gigade.Controllers
 
         #endregion
 
+        //等待料位報表
+        //public HttpResponseBase GetWaitLiaoWeiList()// createTime 2015/10/19 by yachao1120j
+        //{
+        //    string json = string.Empty;
+        //    int totalcount = 0;
+        //    ArrivalNoticeQuery query = new ArrivalNoticeQuery();
+        //    query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+        //    query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+        //    arrivalnoticemgr = new ArrivalNoticeMgr(mySqlConnectionString);
 
+        //    if (!string.IsNullOrEmpty(Request.Params["vendor_name_full_OR_vendor_id"]))
+        //    {
+        //        query.vendor_name_full_OR_vendor_id = Request.Params["vendor_name_full_OR_vendor_id"];//供應商名稱/供應商編號
+        //    }
+        //    if (!string.IsNullOrEmpty(Request.Params["freight"]))//溫層
+        //    {
+        //        query.product_freight_set = int.Parse(Request.Params["freight"]);
+        //    }
+
+        //    if (!string.IsNullOrEmpty(Request.Params["product_id_OR_product_name"]))
+        //    {
+        //        query.product_id_OR_product_name = Request.Params["product_id_OR_product_name"];//商品编号/名称
+        //    }
+
+        //    if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
+        //    {
+        //        query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
+        //    }
+        //    if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
+        //    {
+        //        query.end_time = Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59");
+        //    }
+        //    List<ArrivalNoticeQuery> list = arrivalnoticemgr.GetArrNoticeList(query, out totalcount);
+        //    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+        //    timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+        //    timeConverter.DateTimeFormat = "yyyy-MM-dd";
+        //    json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+        //    this.Response.Clear();
+        //    this.Response.Write(json);
+        //    this.Response.End();
+        //    return Response;
+
+        //}
 
     }
 }

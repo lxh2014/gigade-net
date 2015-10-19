@@ -22,6 +22,7 @@ Ext.define('gridlistWLW', {
         //商品類型
         { name: "product_freight_set", type: "string" },//溫層
         { name: "process_type", type: "int" },//出貨方式
+         { name: "process_type_string", type: "string" },//出貨方式
         { name: "product_start", type: "int" },//商品上架時間
 
     ],
@@ -60,6 +61,7 @@ var ProductStatusStore = Ext.create('Ext.data.Store', {
 var OutProductStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
+        {"txt":"全部","value":"100"},
         { "txt": "實體商品", "value": "1" },
         { "txt": "電子商品", "value": "2" },
     ]
@@ -79,14 +81,11 @@ var freightStore = Ext.create('Ext.data.Store', {
 WareHouseStore.on('beforeload', function () {
     Ext.apply(WareHouseStore.proxy.extraParams,
         {
-            //vendor_name_full_OR_vendor_id: Ext.getCmp('vendor_name_full_OR_vendor_id').getValue(),//供應商名稱或編號
-            //product_id_OR_product_name: Ext.getCmp('product_id_OR_product_name').getValue(),//商品編號或名稱
-            //brand_id_OR_brand_name: Ext.getCmp('brand_id_OR_brand_name').getValue(),//品牌編號或名稱
-            //product_status: Ext.getCmp('product_status').getValue(),//商品狀態
-            //sale_status: Ext.getCmp('sale_status').getValue(),//商品販售狀態
-            //item_stock_start: Ext.getCmp('item_stock_start').getValue(),//庫存數量開始
-            //item_stock_end: Ext.getCmp('item_stock_end').getValue(),//庫存數量結束
-            //ignore_stockRdo: Ext.getCmp('ignore_stockRdo').getValue()//庫存為0時是否還能販售
+            product_status: Ext.getCmp('product_status').getValue(),//商品狀態
+            process_type: Ext.getCmp('process_type').getValue(),
+            freight: Ext.getCmp('freight').getValue(),
+            start_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s')),
+            end_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s')),
         });
 });
 
@@ -197,13 +196,30 @@ Ext.onReady(function () {
                 items: [
            {
                xtype: 'combobox',
-               name: 'Search_type',
-               id: 'Search_type',
+               name: 'product_status',
+               id: 'product_status',
                editable: false,
                fieldLabel: "商品狀態",
                labelWidth: 60,
                margin: '5 0 0 5',
                store: ProductStatusStore,
+               queryMode: 'local',
+               submitValue: true,
+               displayField: 'txt',
+               valueField: 'value',
+               typeAhead: true,
+               forceSelection: false,
+               value: 100
+           },
+           {
+               xtype: 'combobox',
+               name: 'process_type',
+               id: 'process_type',
+               editable: false,
+               fieldLabel: "出貨方式",
+               labelWidth: 60,
+               margin: '5 0 0 5',
+               store: OutProductStore,
                queryMode: 'local',
                submitValue: true,
                displayField: 'txt',
@@ -262,7 +278,7 @@ Ext.onReady(function () {
                 { header: '商品細項編號', dataIndex: 'item_id', align: 'center' },
                 { header: '商品規格', dataIndex: 'product_spec', width: 120, align: 'center' },
                 //商品類型
-                //出貨方式
+                { header: "出貨方式", dataIndex: "process_type_string", align: 'center' },//出貨方式
                 { header: "商品狀態", dataIndex: "product_status_string", align: 'center' },
                 {
                     header: "溫層", dataIndex: 'product_freight_set', width: 40, align: 'center',
