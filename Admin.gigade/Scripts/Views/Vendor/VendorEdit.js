@@ -1876,11 +1876,6 @@ function editFunction(rowID) {
                                         success: function (form, action) {
                                             var result = Ext.decode(form.responseText);
                                             if (result.success) {
-                                                if (!rowID) {//新增
-                                                    name.setValue(result.name);
-                                                }
-
-                                                else {
                                                     if (result.name == "") {
                                                         Ext.Msg.alert(INFORMATION, "請確認該銀行代碼是否存在！ ");
                                                     }
@@ -1895,7 +1890,6 @@ function editFunction(rowID) {
 
                                                         });
                                                     }
-                                                }
 
                                             }
                                         }

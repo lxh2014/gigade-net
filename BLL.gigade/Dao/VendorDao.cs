@@ -233,7 +233,7 @@ namespace BLL.gigade.Dao
 
         #region 獲取所有供應商（用作下拉列表框）+List<Vendor> VendorQueryAll(Vendor query)
         /// <summary>
-        /// 獲取所有未失格的供應商（用作下拉列表框）
+        /// 獲取所有有效的供應商（用作下拉列表框）
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -273,7 +273,7 @@ namespace BLL.gigade.Dao
             StringBuilder sbSql = new StringBuilder();
             try
             {
-                sbSql.Append(@" SELECT vendor_id,vendor_name_full,vendor_name_simple FROM vendor WHERE vendor_status!=3 ");
+                sbSql.Append(@" SELECT vendor_id,vendor_name_full,vendor_name_simple FROM vendor WHERE vendor_status = 1 ");
                 if (query.assist != 0)
                 {
                     sbSql.AppendFormat(" AND assist = 1 ");
