@@ -536,52 +536,56 @@ editFunction = function (rowID, store) {
                       {
                           if (isfirstshow == 0 || row.data.answer_status != 2)
                           {
-                              Ext.MessageBox.confirm(CONFIRM, "選擇推遲回覆時不會發送郵件,不會修改諮詢顯示狀態，確認更改？", function (btn)
-                              {
-                                  if (btn == "yes")
-                                  {
-                                      Ext.getCmp("consult_answer").allowBlank = true;
-                                      Ext.getCmp("consult_answer").setValue(row.data.consult_answer);
-                                      Ext.getCmp("consult_answer").hide();
-                                      Ext.getCmp("consult_answer").isValid();
-                                      Ext.getCmp("delay_reason").show();
-                                      Ext.getCmp("delay_reason").allowBlank = false;
-                                      //Ext.getCmp("delay_reason").isValid();
-                                      if (row.data.is_sendEmail == 1)
-                                      {
-                                          Ext.getCmp("is_sendEmail_yes").setValue(true);
-                                          Ext.getCmp("is_sendEmail_no").setValue(false);
-                                      }
-                                      else
-                                      {
-                                          Ext.getCmp("is_sendEmail_yes").setValue(false);
-                                          Ext.getCmp("is_sendEmail_no").setValue(true);
-                                      }
-                                      if (row.data.status == 1)
-                                      {
-                                          Ext.getCmp("status_yes").setValue(true);
-                                          Ext.getCmp("status_no").setValue(false);
-                                      }
-                                      else
-                                      {
-                                          Ext.getCmp("status_yes").setValue(false);
-                                          Ext.getCmp("status_no").setValue(true);
-                                      }
-                                      Ext.getCmp("is_sendEmail_yes").setDisabled(true);
-                                      Ext.getCmp("is_sendEmail_no").setDisabled(true);
-                                      Ext.getCmp("status_yes").setDisabled(true);
-                                      Ext.getCmp("status_no").setDisabled(true);
-                                  }
-                                  else
-                                  {
+                            Ext.Msg.alert('提示', '選擇推遲回覆時不會發送郵件,不會修改諮詢顯示狀態');
+                            //Ext.MessageBox.prompt(CONFIRM, "選擇推遲回覆時不會發送郵件,不會修改諮詢顯示狀態，確認更改？", function (btn)
+                            {
+                                if (true)
+                                //if (btn == "yes")
+                                {
+                                    Ext.getCmp("consult_answer").allowBlank = true;
+                                    Ext.getCmp("consult_answer").setValue(row.data.consult_answer);
+                                    Ext.getCmp("consult_answer").hide();
+                                    Ext.getCmp("consult_answer").isValid();
+                                    Ext.getCmp("delay_reason").show();
+                                    Ext.getCmp("delay_reason").allowBlank = false;
+                                    Ext.getCmp("answer_status_yes").setValue(false);
+                                    Ext.getCmp("answer_status_delay").setValue(true);
+                                    //Ext.getCmp("delay_reason").isValid();
+                                    if (row.data.is_sendEmail == 1)
+                                    {
+                                        Ext.getCmp("is_sendEmail_yes").setValue(true);
+                                        Ext.getCmp("is_sendEmail_no").setValue(false);
+                                    }
+                                    else
+                                    {
+                                        Ext.getCmp("is_sendEmail_yes").setValue(false);
+                                        Ext.getCmp("is_sendEmail_no").setValue(true);
+                                    }
+                                    if (row.data.status == 1)
+                                    {
+                                        Ext.getCmp("status_yes").setValue(true);
+                                        Ext.getCmp("status_no").setValue(false);
+                                    }
+                                    else
+                                    {
+                                        Ext.getCmp("status_yes").setValue(false);
+                                        Ext.getCmp("status_no").setValue(true);
+                                    }
+                                    Ext.getCmp("is_sendEmail_yes").setDisabled(true);
+                                    Ext.getCmp("is_sendEmail_no").setDisabled(true);
+                                    Ext.getCmp("status_yes").setDisabled(true);
+                                    Ext.getCmp("status_no").setDisabled(true);
+                                }
+                                else
+                                {
 
-                                      Ext.getCmp("answer_status_yes").setValue(true);
-                                      Ext.getCmp("answer_status_delay").setValue(false);
-                                  }
-                              }
-                              
-                              )
-                              
+                                    Ext.getCmp("answer_status_yes").setValue(true);
+                                    Ext.getCmp("answer_status_delay").setValue(false);
+                                }
+
+                            }
+
+                            //)
                           }
                           else
                           {
@@ -612,7 +616,7 @@ editFunction = function (rowID, store) {
                                   Ext.getCmp("status_yes").setValue(false);
                                   Ext.getCmp("status_no").setValue(true);
                               }
-                              
+
                               Ext.getCmp("is_sendEmail_yes").setDisabled(true);
                               Ext.getCmp("is_sendEmail_no").setDisabled(true);
                               Ext.getCmp("status_yes").setDisabled(true);
