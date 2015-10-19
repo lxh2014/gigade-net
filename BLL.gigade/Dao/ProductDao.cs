@@ -46,7 +46,7 @@ namespace BLL.gigade.Dao
                 strSql.Append("product_ipfrom,goods_area,goods_image1,goods_image2,city,bag_check_money,combination,bonus_percent,default_bonus_percent,bonus_percent_start,");
                 strSql.Append("bonus_percent_end,tax_type,cate_id,fortune_quota,fortune_freight,product_media,ignore_stock,shortage,stock_alarm,price_type,user_id,show_listprice,expect_msg,");
                 strSql.Append("detail_created,detail_createdate,detail_update,detail_updatedate,");//add by shuangshuang0420j 20150513 16:26 商品詳情文字更動時間
-                strSql.Append("process_type,show_in_deliver,prepaid,product_type,prod_name,prod_sz,prod_classify,vb.vendor_id,cp.course_id,p.safe_stock_amount,p.deliver_days,p.min_purchase_amount,p.extra_days, mobile_image,sr.schedule_id,product_alt,s.`desc`,p.off_grade, purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end,rpa.months,rpa.expend_day  from product p ");//edit by wwei0216 查詢的屬性多加一個mobile_image 2015/3/18
+                strSql.Append("process_type,show_in_deliver,prepaid,product_type,prod_name,prod_sz,prod_classify,vb.vendor_id,cp.course_id,p.safe_stock_amount,p.deliver_days,p.min_purchase_amount,p.extra_days, mobile_image,sr.schedule_id,product_alt,s.`desc`,p.off_grade, purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end,rpa.months,rpa.expend_day,p.outofstock_days_stopselling  from product p ");//edit by wwei0216 查詢的屬性多加一個mobile_image 2015/3/18
                 strSql.Append(" left join vendor_brand vb ON p.brand_id = vb.brand_id ");
                 strSql.Append(" left join course_product cp on p.product_id=cp.product_id");
                 strSql.Append(" left join schedule_relation sr ON sr.relation_id = p.product_id  AND sr.relation_table = 'product'");
@@ -136,7 +136,7 @@ namespace BLL.gigade.Dao
                 strSql.AppendFormat(",cate_id='{0}',fortune_quota={1},fortune_freight={2},shortage={3},price_type={4}", product.Cate_Id, product.Fortune_Quota, product.Fortune_Freight, product.Shortage, product.Price_type);
                 strSql.AppendFormat(",show_listprice={0},expect_msg='{1}',process_type={2},show_in_deliver={3},prepaid={4},product_type={5},prod_name='{6}', prod_sz='{7}',prod_classify={8} ",
                     product.show_listprice, product.expect_msg, product.Process_Type, product.Show_In_Deliver, product.Prepaid, product.Product_Type, product.Prod_Name, product.Prod_Sz, product.Prod_Classify);//新增Process_Type ，Show_In_Deliver，Prepaid，Product_Type四個欄位 edit by xiangwang0413w 2014/09/26
-                strSql.AppendFormat(",deliver_days={0},min_purchase_amount={1},safe_stock_amount={2},extra_days={3},product_alt='{4}',purchase_in_advance={5},purchase_in_advance_start = {6},purchase_in_advance_end={7}", product.Deliver_Days, product.Min_Purchase_Amount, product.Safe_Stock_Amount, product.Extra_Days, product.Product_alt, product.purchase_in_advance, product.purchase_in_advance_start, product.purchase_in_advance_end);// add by zhuoqin0830w 新增5個修改欄位  2015/03/17
+                strSql.AppendFormat(",deliver_days={0},min_purchase_amount={1},safe_stock_amount={2},extra_days={3},product_alt='{4}',purchase_in_advance={5},purchase_in_advance_start = {6},purchase_in_advance_end={7},outofstock_days_stopselling={8}", product.Deliver_Days, product.Min_Purchase_Amount, product.Safe_Stock_Amount, product.Extra_Days, product.Product_alt, product.purchase_in_advance, product.purchase_in_advance_start, product.purchase_in_advance_end,product.outofstock_days_stopselling);// add by zhuoqin0830w 新增5個修改欄位  2015/03/17
                 strSql.AppendFormat(" where product_id={0};SET sql_safe_updates = 1;", product.Product_Id);
                 ///add by wwei0216w 2015/7/30 添加預購3欄位
                 //strSql.Append(pmDao.UpdateProductName(product.Prod_Sz,product.Product_Id.ToString()));
@@ -753,7 +753,7 @@ namespace BLL.gigade.Dao
                 StringBuilder strCols = new StringBuilder("select  a.product_id,b.brand_name,a.product_image,a.prod_sz,a.combination AS combination_id,a.product_spec AS product_spec_id,");
                 strCols.Append("a.product_price_list,a.sale_status AS sale_status_id,v.vendor_name_full,v.vendor_name_simple,v.erp_id,a.product_status as product_status_id,a.user_id, a.create_channel,a.prepaid,a.bag_check_money,a.off_grade ");//添加 失格欄位 a.off_grade  add by zhuoqin0830w  2015/06/30
                 //add by wangwei 2014/9/29 添加a.create_channel字段
-                strCols.Append(",a.purchase_in_advance_start,a.purchase_in_advance_end,a.expect_time ");//添加預購商品開始時間 ,結束時間 guodong1130w 2015/9/16
+                strCols.Append(",a.purchase_in_advance_start,a.purchase_in_advance_end,a.expect_time,a.outofstock_days_stopselling ");//添加預購商品開始時間 ,結束時間 guodong1130w 2015/9/16
                 StringBuilder strTbls = new StringBuilder("from product a left join vendor_brand b on a.brand_id=b.brand_id ");
                 //strTbls.Append("left join (select parametercode,parametername from t_parametersrc where parametertype='combo_type') c on a.combination=c.parametercode ");
                 //strTbls.Append("left join (select parametercode,parametername from t_parametersrc where parametertype='product_spec') d on a.product_spec=d.parametercode ");
