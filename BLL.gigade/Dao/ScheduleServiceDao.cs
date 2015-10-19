@@ -527,6 +527,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
           public string InsertLog(List<MailRequest> q, string mail_result, int send)
           {
               StringBuilder sb = new StringBuilder();
+             
               string id = "";
               try
               {
@@ -534,7 +535,8 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                   {
                       foreach (var m in q)
                       {
-                          sb.AppendFormat("insert into mail_log (priority,user_id,send_address,sender_name,receiver_address,receiver_name,subject,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,send_result,request_createdate,request_updatedate,log_createdate) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}',NOW(),NOW(),NOW());", m.priority, m.user_id, m.sender_address, m.sender_name, m.receiver_address, m.receiver_name, m.subject, m.importance, CommonFunction.DateTimeToString(m.schedule_date), CommonFunction.DateTimeToString(m.valid_until_date), m.retry_count, CommonFunction.DateTimeToString(m.last_sent), mail_result, send);
+                          m.Replace4MySQL();
+                          sb.AppendFormat("insert into mail_log (priority,user_id,send_address,sender_name,receiver_address,receiver_name,subject,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,send_result,request_createdate,request_updatedate,log_createdate) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}',NOW(),NOW(),NOW());", m.priority, m.user_id, m.sender_address, m.sender_name, m.receiver_address, m.receiver_name, m.subject, m.importance, CommonFunction.DateTimeToString(m.schedule_date), CommonFunction.DateTimeToString(m.valid_until_date), m.retry_count, CommonFunction.DateTimeToString(m.last_sent),m.sent_log, mail_result);
                           id += m.request_id + ",";
                       }
                   }
@@ -557,7 +559,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               StringBuilder sb = new StringBuilder();
               try
               {
-                  sb.AppendFormat("insert into mail_log (priority,user_id,send_address,sender_name,receiver_address,receiver_name,subject,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,send_result,request_createdate,request_updatedate,log_createdate) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}',NOW(),NOW(),NOW());", m.priority, m.user_id, m.sender_address, m.sender_name, m.receiver_address, m.receiver_name, m.subject, m.importance, CommonFunction.DateTimeToString(m.schedule_date), CommonFunction.DateTimeToString(m.valid_until_date), m.retry_count, CommonFunction.DateTimeToString(m.last_sent), mail_result, send);
+                  sb.AppendFormat("insert into mail_log (priority,user_id,send_address,sender_name,receiver_address,receiver_name,subject,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,send_result,request_createdate,request_updatedate,log_createdate) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}',NOW(),NOW(),NOW());", m.priority, m.user_id, m.sender_address, m.sender_name, m.receiver_address, m.receiver_name, m.subject, m.importance, CommonFunction.DateTimeToString(m.schedule_date), CommonFunction.DateTimeToString(m.valid_until_date), m.retry_count, CommonFunction.DateTimeToString(m.last_sent), m.sent_log, mail_result);
                   sb.AppendFormat("Delete from mail_request where request_id in ({0});",m.request_id);
                   return sb.ToString();
               }
