@@ -1981,6 +1981,7 @@
     <Content Include="Scripts\Views\WareHouse\IpoList.js" />
     <Content Include="Scripts\Views\WareHouse\IstockChangeList.js" />
     <Content Include="Scripts\Views\WareHouse\IwmsRecord.js" />
+    <Content Include="Scripts\Views\WareHouse\WaitLiaoWeiList.js" />
     <Content Include="Scripts\Views\Website\BannerCategoryList.js" />
     <Content Include="Scripts\Views\Website\BannerImageEdit.js" />
     <Content Include="Scripts\Views\Website\BannerImageHistoryDetail.js" />
@@ -4411,6 +4412,7 @@
     <Content Include="Views\Vendor\VendorBankList.cshtml" />
     <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
     <Content Include="Views\EdmNew\EmailGroup.cshtml" />
+    <Content Include="Views\WareHouse\WaitLiaoWei.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

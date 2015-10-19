@@ -336,9 +336,14 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+        //等待料位報表
+        public ActionResult WaitLiaoWei()
+        {
+            return View();
+        }
         #endregion
 
-        #region 料位管理模塊
+        #region 料位管理模塊 
 
         #region 料位維護 iloc
 
