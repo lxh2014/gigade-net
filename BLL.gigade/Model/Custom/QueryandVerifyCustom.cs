@@ -127,7 +127,7 @@ namespace BLL.gigade.Model.Custom
         //庫存數 add by guodong1130w 2015/09/16 
         public int Item_Stock { get; set; }
         //未出貨數量 add by guodong1130w 2015/09/16 
-        public int bnum { get; set; }
+        public Int64 bnum { get; set; }
         //排成設定 add by guodong1130w 2015/09/16 
         public string  schedule_name { get; set; }
         /// <summary>

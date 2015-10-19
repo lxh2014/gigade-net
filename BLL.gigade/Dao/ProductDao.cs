@@ -1003,15 +1003,14 @@ namespace BLL.gigade.Dao
                 var regex = new Regex("^[0-9,]+$");
                 query.Replace4MySQL();
                 StringBuilder strCols = new StringBuilder("select  a.product_id,b.brand_name,v.vendor_name_full,a.combination AS combination_id");
-                strCols.Append(",a.purchase_in_advance_start,a.purchase_in_advance_end,a.expect_time,pi.item_stock,sum(odetail.buy_num) as bnum,sdule.schedule_name  ");
+                strCols.Append(",a.purchase_in_advance_start,a.purchase_in_advance_end,a.expect_time,pi.item_stock,CAST(sum(odetail.buy_num)  AS SIGNED) as bnum,sdule.schedule_name  ");
                 StringBuilder strTbls = new StringBuilder("from product a left join vendor_brand b on a.brand_id=b.brand_id ");
                 strTbls.Append(" LEFT JOIN vendor v ON v.vendor_id = b.vendor_id ");
                 //連接查出未出貨數量
                 strTbls.Append(" LEFT JOIN product_item pi ON pi.product_id = a.product_id ");
-                strTbls.Append(" LEFT JOIN order_detail odetail ON odetail.item_id = pi.item_id ");
-                strTbls.Append(" LEFT JOIN order_slave oslave ON oslave.slave_id = odetail.slave_id ");
-                strTbls.Append(" LEFT JOIN order_master omaster ON omaster.order_id = oslave.order_id  and order_status = 2");
-                strTbls.Append(" LEFT JOIN deliver_master dmaster ON dmaster.order_id = omaster.order_id AND dmaster.delivery_status in (0,1,2,3) ");
+                strTbls.Append(@"LEFT JOIN (SELECT ordetail.item_id,ordetail.buy_num   from order_detail as ordetail
+INNER JOIN  deliver_detail as ddetail on ordetail.detail_id=ddetail.detail_id  and  ddetail.delivery_status in (0,1,2,3)
+and ordetail.detail_status=2) as odetail on  odetail.item_id = pi.item_id ");
                 //關聯查出排成名稱
                 strTbls.Append(" LEFT JOIN schedule_relation srelation on srelation.relation_id=a.product_id and srelation.relation_table='product' ");
                 strTbls.Append(" LEFT JOIN schedule sdule on sdule.schedule_id=srelation.schedule_id ");
