@@ -120,7 +120,7 @@ group by a.rowid ,groupname,groupcode,remark;");
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat(@"SELECT mu.user_username,mu.user_email,tf.groupName FROM t_fgroup tf LEFT JOIN t_groupcaller tg on tg.groupId=tf.rowid 
-LEFT JOIN manage_user mu on tg.callid=mu.user_email WHERE tf.rowid='{0}';", groupid);
+LEFT JOIN manage_user mu on tg.callid=mu.user_email WHERE  mu.user_status!=0 and mu.user_status !=2 and tf.rowid='{0}';", groupid);
             try
             {
                 return _access.getDataTable(sb.ToString());
