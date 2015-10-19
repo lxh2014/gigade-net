@@ -536,7 +536,7 @@ editFunction = function (rowID, store) {
                       {
                           if (isfirstshow == 0 || row.data.answer_status != 2)
                           {
-                            Ext.Msg.alert('提示', '選擇推遲回覆時不會發送郵件,不會修改諮詢顯示狀態');
+                            Ext.Msg.alert('提示', '推遲回覆不會發送郵件,且不修改諮詢顯示狀態');
                             //Ext.MessageBox.prompt(CONFIRM, "選擇推遲回覆時不會發送郵件,不會修改諮詢顯示狀態，確認更改？", function (btn)
                             {
                                 if (true)
