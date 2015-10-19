@@ -245,6 +245,8 @@ Ext.onReady(function () {
                     select: function (combo, record) {
                         particularsStore.getAt(currentRow).set("Cde_dt_shp", record[0].data.particularsCome);
                         particularsStore.getAt(currentRow).set("Cde_dt_var", record[0].data.particularsCollect);
+                        //當保存期限被選擇的時候 自動勾選有效期控制  add by zhuoqin0830w  2015/10/19
+                        particularsStore.getAt(currentRow).set("Pwy_dte_ctl_bool", true);
                     }
                 }
             }, menuDisabled: true, sortable: false
@@ -315,21 +317,46 @@ Ext.onReady(function () {
             ]
         }, {
             xtype: 'checkcolumn',
-            header: EFFECTIVE_CONTROL_TIME_LIMIT, menuDisabled: true, sortable: false,//有效期控制
+            header: EFFECTIVE_CONTROL_TIME_LIMIT,
+            menuDisabled: true,
+            sortable: false,//有效期控制
             dataIndex: 'Pwy_dte_ctl_bool',
             id: 'Pwy_dte_ctl_bool',
             width: 70,
-            editor: {
-                xtype: 'checkbox'
+            //editor: {
+            //    xtype: 'checkbox'
+            //},
+            //避免用戶二次點擊才能生效  edit by zhuoqin0830w  2015/10/19
+            listeners: {
+                click: function (a, b, c) {
+                    if (particularsStore.getAt(c).get("Pwy_dte_ctl_bool")) {
+                        particularsStore.getAt(c).set("Pwy_dte_ctl_bool", false);
+                    } else {
+                        particularsStore.getAt(c).set("Pwy_dte_ctl_bool", true);
+                    }
+                }
             }
         },
         {
             xtype: 'checkcolumn',
             header: WAIT_DELETE,//等待刪除
-            dataIndex: 'Pend_del_bool', menuDisabled: true, sortable: false,
+            dataIndex: 'Pend_del_bool',
+            id: 'Pend_del_bool',
+            menuDisabled: true,
+            sortable: false,
             width: 60,
-            editor: {
-                xtype: 'checkbox'
+            //editor: {
+            //    xtype: 'checkbox'
+            //},
+            //避免用戶二次點擊才能生效  edit by zhuoqin0830w  2015/10/19
+            listeners: {
+                click: function (a, b, c) {
+                    if (particularsStore.getAt(c).get("Pend_del_bool")) {
+                        particularsStore.getAt(c).set("Pend_del_bool", false);
+                    } else {
+                        particularsStore.getAt(c).set("Pend_del_bool", true);
+                    }
+                }
             }
         }],
         dockedItems: [{
