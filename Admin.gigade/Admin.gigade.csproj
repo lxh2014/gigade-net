@@ -1981,6 +1981,7 @@
     <Content Include="Scripts\Views\WareHouse\IpoList.js" />
     <Content Include="Scripts\Views\WareHouse\IstockChangeList.js" />
     <Content Include="Scripts\Views\WareHouse\IwmsRecord.js" />
+    <Content Include="Scripts\Views\WareHouse\WaitLiaoWeiList.js" />
     <Content Include="Scripts\Views\Website\BannerCategoryList.js" />
     <Content Include="Scripts\Views\Website\BannerImageEdit.js" />
     <Content Include="Scripts\Views\Website\BannerImageHistoryDetail.js" />
@@ -2003,6 +2004,7 @@
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\resources\Readme.md" />
     <None Include="Properties\PublishProfiles\gigade-jialei.pubxml" />
     <None Include="Properties\PublishProfiles\gigade.pubxml" />
+    <None Include="Properties\PublishProfiles\userlist.pubxml" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all-vsdoc.js" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all.min.intellisense.js" />
     <Content Include="Scripts\kendo\2014.2.716\kendo.all.min.js" />
@@ -4408,11 +4410,12 @@
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
     <Content Include="Views\ScheduleService\Index.cshtml" />
     <Content Include="Views\Vendor\VendorDetails.cshtml" />
+    <Content Include="Views\Vendor\VendorBankList.cshtml" />
     <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
 
     <Content Include="Views\Vendor\VendorBankImport.cshtml" />
     <Content Include="Views\EdmNew\EmailGroup.cshtml" />
-
+    <Content Include="Views\WareHouse\WaitLiaoWei.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4632,6 +4635,7 @@
           <DevelopmentServerPort>9048</DevelopmentServerPort>
 
       
+          <DevelopmentServerPort>2212</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

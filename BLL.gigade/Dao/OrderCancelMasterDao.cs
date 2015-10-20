@@ -13,6 +13,7 @@ using System.Net;
 using System.Xml;
 using System.Configuration;
 using BLL.gigade.Model.Query;
+using System.IO;
 namespace BLL.gigade.Dao
 {
     public class OrderCancelMasterDao : IOrderCancelMasterImplDao
@@ -295,9 +296,12 @@ namespace BLL.gigade.Dao
                         if (ocm.order_id != 0 && deduct_happygo != 0)
                         {
                             sqlstr.Append(Deduct_Refund(ocm.order_id, 0, 0, deduct_happygo, ocm.cancel_ipfrom));
-                            mySqlCmd.CommandText = sqlstr.ToString();
-                            result = mySqlCmd.ExecuteNonQuery();
-                            sqlstr.Clear();
+                            if (!string.IsNullOrEmpty(sqlstr.ToString().Trim()))
+                            {
+                                mySqlCmd.CommandText = sqlstr.ToString();
+                                result = mySqlCmd.ExecuteNonQuery();
+                                sqlstr.Clear();
+                            }
                         }
                         else
                         {
@@ -638,9 +642,12 @@ namespace BLL.gigade.Dao
                 if (deduct_happygo > 0)
                 {
                     sqlstr.Append(Deduct_Refund(om.Order_Id, 0, 0, deduct_happygo, om.Order_Ipfrom));
-                    mySqlCmd.CommandText = sqlstr.ToString();
-                    result = mySqlCmd.ExecuteNonQuery();
-                    sqlstr.Clear();
+                    if (!string.IsNullOrEmpty(sqlstr.ToString().Trim()))
+                    {
+                        mySqlCmd.CommandText = sqlstr.ToString();
+                        result = mySqlCmd.ExecuteNonQuery();
+                        sqlstr.Clear();
+                    }
                 }
                 if (Convert.ToInt32(ordermaster.Rows[0]["deduct_bonus"]) > 0)
                 {
@@ -861,12 +868,13 @@ namespace BLL.gigade.Dao
         public string Deduct_User_Happy_Go(int accumulated_happygo, string order_id, DataTable hg_deduct)
         {
             StringBuilder sql = new StringBuilder();
+            //insert表明更改為hg_batch_accumulate_refund 
             try
             {
                 if (hg_deduct.Rows.Count > 0)
                 {
                     DataRow dr = hg_deduct.Rows[0];
-                    sql.AppendFormat(@"insert into hg_accumulate_refund (enc_idno,chk_sum,transaction_date,");
+                    sql.AppendFormat(@"insert into hg_batch_accumulate_refund (enc_idno,chk_sum,transaction_date,");/*hg_accumulate_refund更改為hg_batch_accumulate_refund*/; 
                     sql.AppendFormat(@"merchant,terminal,refund_point,category,wallet,note,order_id)");
                     sql.AppendFormat(@" values('{0}','{1}','{2}','{3}',", dr["enc_idno"].ToString(), dr["chk_sum"].ToString(), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), "6601000081");//
                     sql.AppendFormat(@"'{0}','{1}','{2}','{3}',", "13999501", accumulated_happygo, "N0699999", "991991");
@@ -956,88 +964,212 @@ namespace BLL.gigade.Dao
 
         public string Hg_Deduct_Reverse(int deduct_happygo, uint order_id)
         {
+            //查看該訂單成立日期是否是當天如果是 走url 如果不是走世偉的方法
+            //先判斷該訂單成立日期是否是當天
+            //如果是走url
+            //訪問url回傳xml文件解析
+            //新增一條數據到hg_deduct_reversal把回傳的結果記錄進去
+            //如果返還結果是失敗需要往hg_batch_deduct_refund裏面新增一條數據;
+            //如果不是走世偉的方法
+            //以上填寫完成即可
             StringBuilder sql = new StringBuilder();
-            //var wc = new WebClient();
-            //var html = wc.DownloadString("http://zhidao.baidu.com/question/499087825.html?seed=0");
-
-
-            string Code = "5000";//這兩個參數是獲取的，
-            string Message = "交易成功";
-            try
-            {
-                sql.AppendFormat("select * from  hg_deduct where order_id={0} limit 0,1", order_id);
-                DataTable _dtHg = _accessMySql.getDataTable(sql.ToString());
-                sql.Clear();
-                string date = DateTime.Now.Month + "" + DateTime.Now.Day;
-                string time = DateTime.Now.Hour + "" + DateTime.Now.Minute + DateTime.Now.Second;
-
-
-                XmlDocument xmldoc = new XmlDocument();
-                string xmlPath = ConfigurationManager.AppSettings["REDEEM_XML"];//郵件服務器的設置
-                string path = System.Web.HttpContext.Current.Server.MapPath(xmlPath);
-                if (System.IO.File.Exists(path))
+            StringBuilder sb = new StringBuilder();
+            DataTable ordermaster = GetOrderMaster(order_id);
+            long starttime = CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd 00:00:00"));
+            long endtime = CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd 23:59:59"));
+            try{
+                if (Convert.ToInt32(ordermaster.Rows[0]["order_createdate"]) >= starttime && Convert.ToInt32(ordermaster.Rows[0]["order_createdate"]) <= endtime)
                 {
-                    xmldoc.Load(path);//加載XML
-                    System.Xml.XmlNode xn = xmldoc.SelectSingleNode("RESPONSE");//找到XML中的節點
-                    //System.Xml.XmlNodeList xnl = xn.ChildNodes;// 得到根节点的所有子节点 ;
+                    StringBuilder url = new StringBuilder();
+                    #region 判斷是正式線還是測試線
+                    sb.Append(" select parameterCode from t_parametersrc where parameterType ='CancelUrl';");//判斷是正式線還是測試線
+                    DataTable _dtDEV = _accessMySql.getDataTable(sb.ToString());
+                    sb.Clear();
+                      string DEV = "false";
+                      string urlPath = "/XML/happygo_deduct_reverse.ctp";//本地的路徑
+                      if (_dtDEV.Rows.Count > 0)
+                      {
+                          if (urlPath == _dtDEV.Rows[0]["parameterCode"].ToString())
+                          {
+                              urlPath = _dtDEV.Rows[0]["parameterCode"].ToString();
+                              DEV = "true";
+                          }
+                          else 
+                          {
+                              sb.AppendFormat(" select order_id,enc_idno,chk_sum,token from hg_login where order_id='{0}';", order_id);
+                              DataTable _dtReturnHg = _accessMySql.getDataTable(sb.ToString());
+                              if (_dtReturnHg.Rows.Count > 0)
+                              {
+                                  urlPath += "&ORDER_ID=" + _dtReturnHg.Rows[0]["order_id"].ToString() + "&ENC_IDNO=" + _dtReturnHg.Rows[0]["enc_idno"].ToString();
+                                  urlPath += "&CHK_SUM=" + _dtReturnHg.Rows[0]["chk_sum"].ToString() + "&TOKEN=" + _dtReturnHg.Rows[0]["token"].ToString();
+                              }
+                              else 
+                              {
+                                  return ""; 
+                              }
+                          }
 
-                    foreach (System.Xml.XmlNode node in xmldoc.ChildNodes)
+                      }
+                    string Code = "0";//這兩個參數是獲取的，
+                    string Message = "0";
+                    if (DEV == "false")
                     {
-                        if (node.Name == "REVERSAL_FULL_REDEEM")
+                       // string Url = ConfigurationManager.AppSettings["Url"];
+                        HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(urlPath);
+                        httpRequest.Timeout = 2000;
+                        httpRequest.Method = "GET";
+                        HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                        StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("gb2312"));
+                        string result = sr.ReadToEnd();
+                        if (result.Length > 0)
                         {
-                            foreach (System.Xml.XmlNode item in node.ChildNodes)
+                            int StartCodeindex = result.IndexOf("<CODE>");
+                            int EndCodeindex = result.IndexOf("</CODE>");
+                            Code = result.Substring(StartCodeindex + 6, EndCodeindex - StartCodeindex - 6);
+                            int StartMessageindex = result.IndexOf("<MESSAGE>");
+                            int EndMessageindex = result.IndexOf("</MESSAGE>");
+                            Message = result.Substring(StartMessageindex + 9, EndMessageindex - StartMessageindex - 9);
+                        }
+                    }
+                    else //直接解析xml
+                    {
+                        XmlDocument xmldoc = new XmlDocument();
+                        string path = System.Web.HttpContext.Current.Server.MapPath(urlPath);
+                        if (System.IO.File.Exists(path))
+                        {
+                            xmldoc.Load(path);//加載XML
+                            System.Xml.XmlNode xn = xmldoc.SelectSingleNode("RESPONSE");//找到XML中的節點
+                            //System.Xml.XmlNodeList xnl = xn.ChildNodes;// 得到根节点的所有子节点 ;
+
+                            foreach (System.Xml.XmlNode node in xmldoc.ChildNodes)
                             {
-                                if (item.Name == "RESPONSE")
+                                if (node.Name == "REVERSAL_FULL_REDEEM")
                                 {
-                                    foreach (System.Xml.XmlNode nod in item.ChildNodes)
+                                    foreach (System.Xml.XmlNode item in node.ChildNodes)
                                     {
-                                        if (nod.Name == "CODE")
+                                        if (item.Name == "RESPONSE")
                                         {
-                                            Code = nod.InnerText;
-                                        }
-                                        if (nod.Name == "MESSAGE")
-                                        {
-                                            Message = nod.InnerText;
+                                            foreach (System.Xml.XmlNode nod in item.ChildNodes)
+                                            {
+                                                if (nod.Name == "CODE")
+                                                {
+                                                    Code = nod.InnerText;
+                                                }
+                                                if (nod.Name == "MESSAGE")
+                                                {
+                                                    Message = nod.InnerText;
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
+
                         }
+
+                    }
+                    #endregion
+
+                        sql.AppendFormat("select * from  hg_deduct where order_id={0} limit 0,1", order_id);
+                        DataTable _dtHg = _accessMySql.getDataTable(sql.ToString());
+                        int dHg = _dtHg.Rows.Count > 0 ? _dtHg.Rows.Count : 0;
+                        sql.AppendFormat(@"insert into hg_deduct_reversal (order_id,response_code,response_message,transaction_time)");
+                        sql.AppendFormat(@" values('{0}','{1}','{2}','{3}');", order_id, Code, Message, dHg==0?"":_dtHg.Rows[0]["data"]);//-------------------時間未獲
+                    if (Code != "5000")//成功
+                    {     
+                        sql.AppendFormat(@"insert into hg_batch_accumulate_refund (enc_idno,chk_sum,transaction_date,");/*hg_accumulate_refund更改為hg_batch_accumulate_refund*/; 
+                        sql.AppendFormat(@"merchant,terminal,refund_point,category,wallet,note,order_id)");
+                        sql.AppendFormat(@" values('{0}','{1}','{2}','{3}',", dHg == 0 ? "" : _dtHg.Rows[0]["enc_idno"].ToString(), dHg == 0 ? "" : _dtHg.Rows[0]["chk_sum"].ToString(), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), "6601000081");//
+                        sql.AppendFormat(@"'{0}','{1}','{2}','{3}',", "13999501", deduct_happygo, "N0699999", "991991");
+                        sql.AppendFormat(@"'{0}','{1}');", "吉甲地台灣好市集訂單編號" + order_id + "扣除點數:" + deduct_happygo + "點", order_id);
+
                     }
 
                 }
-
-
-                if (_dtHg.Rows.Count > 0)
+                else 
                 {
-                    // 成功失敗都新增到這個表裡面 hg_deduct_reversal
-                    //////sql.AppendFormat(@"insert into  hg_deduct_reverse (merchant_pos,terminal_pos,enc_idno,chk_sum,token,order_id,date,time,code,message,created,modified)");
-                    //////sql.AppendFormat(@" values('{0}','{1}','{2}','{3}','{4}',", 6601000081, 13999501, _dtHg.Rows[0]["enc_idno"].ToString(), _dtHg.Rows[0]["chk_sum"].ToString(), _dtHg.Rows[0]["token"].ToString());
-                    //////sql.AppendFormat(@"'{0}','{1}','{2}','{3}','{4}','{5}','{6}');", _dtHg.Rows[0]["order_id"].ToString(), date, time, Code, Message, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                    //////if (Code == "5000")
-                    //////{
-                    //////    if (deduct_happygo != 0 && order_id != 0)
-                    //////    {
-                    //////        sql.AppendFormat(@"insert into hg_deduct_refund (enc_idno,chk_sum,transaction_date,");
-                    //////        sql.AppendFormat(@"merchant,terminal,refund_point,category,wallet,note,order_id)");
-                    //////        sql.AppendFormat(@" values('{0}','{1}','{2}','{3}',", _dtHg.Rows[0]["enc_idno"].ToString(), _dtHg.Rows[0]["chk_sum"].ToString(), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), "6601000081");
-                    //////        sql.AppendFormat(@"'{0}','{1}','{2}','{3}',", "13999501", deduct_happygo, "N0699999", "991991");
-                    //////        sql.AppendFormat(@"'{0}','{1}');", "吉甲地台灣好市集訂單編號" + order_id + "歸還點數:" + deduct_happygo + "點", order_id);
-
-                    //////    }
-                    //////    else
-                    //////    {
-                    //////        //扣除HappyGo點數失敗;
-                    //////    }
-                    //////}
-                    //////else 
-                    //////{
-                    //////    // insert hg_batch_deduct_refund
-                    //////}
-
-                    //如果失敗還往這張表裡面插入數據 insert hg_batch_deduct_refund
-
+                    //如果不是走世偉的方法
                 }
+#region happy_go注釋
+		 
+	
+            //string Code = "5000";//這兩個參數是獲取的，
+            //string Message = "交易成功";
+            //try
+            //{
+            //    sql.AppendFormat("select * from  hg_deduct where order_id={0} limit 0,1", order_id);
+            //    DataTable _dtHg = _accessMySql.getDataTable(sql.ToString());
+            //    sql.Clear();
+            //    string date = DateTime.Now.Month + "" + DateTime.Now.Day;
+            //    string time = DateTime.Now.Hour + "" + DateTime.Now.Minute + DateTime.Now.Second;
+
+
+            //    XmlDocument xmldoc = new XmlDocument();
+            //    string xmlPath = ConfigurationManager.AppSettings["REDEEM_XML"];//郵件服務器的設置
+            //    string path = System.Web.HttpContext.Current.Server.MapPath(xmlPath);
+            //    if (System.IO.File.Exists(path))
+            //    {
+            //        xmldoc.Load(path);//加載XML
+            //        System.Xml.XmlNode xn = xmldoc.SelectSingleNode("RESPONSE");//找到XML中的節點
+            //        //System.Xml.XmlNodeList xnl = xn.ChildNodes;// 得到根节点的所有子节点 ;
+
+            //        foreach (System.Xml.XmlNode node in xmldoc.ChildNodes)
+            //        {
+            //            if (node.Name == "REVERSAL_FULL_REDEEM")
+            //            {
+            //                foreach (System.Xml.XmlNode item in node.ChildNodes)
+            //                {
+            //                    if (item.Name == "RESPONSE")
+            //                    {
+            //                        foreach (System.Xml.XmlNode nod in item.ChildNodes)
+            //                        {
+            //                            if (nod.Name == "CODE")
+            //                            {
+            //                                Code = nod.InnerText;
+            //                            }
+            //                            if (nod.Name == "MESSAGE")
+            //                            {
+            //                                Message = nod.InnerText;
+            //                            }
+            //                        }
+            //                    }
+            //                }
+            //            }
+            //        }
+
+            //    }
+
+
+            //    if (_dtHg.Rows.Count > 0)
+            //    {
+            //        // 成功失敗都新增到這個表裡面 hg_deduct_reversal
+            //        //////sql.AppendFormat(@"insert into  hg_deduct_reverse (merchant_pos,terminal_pos,enc_idno,chk_sum,token,order_id,date,time,code,message,created,modified)");
+            //        //////sql.AppendFormat(@" values('{0}','{1}','{2}','{3}','{4}',", 6601000081, 13999501, _dtHg.Rows[0]["enc_idno"].ToString(), _dtHg.Rows[0]["chk_sum"].ToString(), _dtHg.Rows[0]["token"].ToString());
+            //        //////sql.AppendFormat(@"'{0}','{1}','{2}','{3}','{4}','{5}','{6}');", _dtHg.Rows[0]["order_id"].ToString(), date, time, Code, Message, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            //        //////if (Code == "5000")
+            //        //////{
+            //        //////    if (deduct_happygo != 0 && order_id != 0)
+            //        //////    {
+            //        //////        sql.AppendFormat(@"insert into hg_deduct_refund (enc_idno,chk_sum,transaction_date,");
+            //        //////        sql.AppendFormat(@"merchant,terminal,refund_point,category,wallet,note,order_id)");
+            //        //////        sql.AppendFormat(@" values('{0}','{1}','{2}','{3}',", _dtHg.Rows[0]["enc_idno"].ToString(), _dtHg.Rows[0]["chk_sum"].ToString(), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), "6601000081");
+            //        //////        sql.AppendFormat(@"'{0}','{1}','{2}','{3}',", "13999501", deduct_happygo, "N0699999", "991991");
+            //        //////        sql.AppendFormat(@"'{0}','{1}');", "吉甲地台灣好市集訂單編號" + order_id + "歸還點數:" + deduct_happygo + "點", order_id);
+
+            //        //////    }
+            //        //////    else
+            //        //////    {
+            //        //////        //扣除HappyGo點數失敗;
+            //        //////    }
+            //        //////}
+            //        //////else 
+            //        //////{
+            //        //////    // insert hg_batch_deduct_refund
+            //        //////}
+
+            //        //如果失敗還往這張表裡面插入數據 insert hg_batch_deduct_refund
+            #endregion
+               
                 return sql.ToString();
             }
             catch (Exception ex)

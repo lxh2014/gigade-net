@@ -34,7 +34,7 @@ namespace BLL.gigade.Dao
         public List<IinvdQuery> GetIinvdList(Model.Query.IinvdQuery ivd, out int totalCount)
         {
             StringBuilder sql = new StringBuilder();
-            StringBuilder sb = new StringBuilder();
+             StringBuilder sb = new StringBuilder();
             StringBuilder sbwhere = new StringBuilder();
             totalCount = 0;
             try
@@ -1226,5 +1226,49 @@ us.user_username as user_name from iinvd ii ");
                 throw new Exception("IinvdDao-->GetProqtyByItemid-->" + ex.Message + sql.ToString(), ex);
             }
         }
+        /**
+         *chaojie1124j庫調或收貨上架的時候，如果庫存鎖住，不能進行庫調
+         */
+        public List<IinvdQuery> GetSearchIinvd(Model.Query.IinvdQuery ivd)
+        {
+           
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sbwhere = new StringBuilder();
+           
+            try
+            {
+                sql.Append(@"select row_id from iinvd ii");
+               
+                sql.Append(" where 1=1 ");
+                if (!string.IsNullOrEmpty(ivd.plas_loc_id))
+                {
+                    sbwhere.AppendFormat(" and ii.plas_loc_id='{0}' ", ivd.plas_loc_id.ToString().ToUpper());
+                }
+                if (!string.IsNullOrEmpty(ivd.ista_id))
+                {
+                    sbwhere.AppendFormat(" and ii.ista_id='{0}' ", ivd.ista_id);
+                }
+                if (ivd.made_date != ivd.cde_dt && ivd.made_date>DateTime.MinValue)
+                {
+                    sbwhere.AppendFormat(" and ii.made_date='{0}' ", ivd.made_date.ToString("yyyy-MM-dd"));
+                }
+                if (ivd.made_date != ivd.cde_dt && ivd.cde_dt > DateTime.MinValue)
+                {
+                    sbwhere.AppendFormat(" and ii.cde_dt='{0}' ", ivd.cde_dt.ToString("yyyy-MM-dd"));
+                }
+                if (ivd.made_date == ivd.cde_dt && ivd.made_date > DateTime.MinValue)
+                {
+                    sbwhere.AppendFormat(" and ii.cde_dt='{0}' and ii.made_date='{1}' ", ivd.cde_dt.ToString("yyyy-MM-dd"),ivd.made_date.ToString("yyyy-MM-dd"));
+                }
+                
+               
+                return _access.getDataTableForObj<IinvdQuery>(sql.ToString() + sbwhere.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IupcDao-->GetSearchIinvd-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+
     }
 }

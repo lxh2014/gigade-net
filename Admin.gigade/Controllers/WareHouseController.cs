@@ -58,6 +58,7 @@ namespace Admin.gigade.Controllers
         IstockChangeMgr _istockMgr;
         IIpoImplMgr _ipoMgr;
         IIpodImplMgr _ipodMgr;
+        public ProductItemMgr productitemMgr;
         private IVendorImplMgr _vendorMgr;
         IProductItemImplMgr _proditemMgr;
         #region Views
@@ -336,9 +337,14 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+        //等待料位報表
+        public ActionResult WaitLiaoWei()
+        {
+            return View();
+        }
         #endregion
 
-        #region 料位管理模塊
+        #region 料位管理模塊 
 
         #region 料位維護 iloc
 
@@ -2776,7 +2782,7 @@ namespace Admin.gigade.Controllers
                         {
                             if (Request.Params["iialg"].ToString() == "Y")
                             {// 
-                                if (ia.iarc_id == "DR" || ia.iarc_id == "KR")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
+                                if (ia.iarc_id != "PC" && ia.iarc_id != "NE")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
                                 {
                                     path = "/WareHouse/KutiaoAddorReduce";
                                     _proditemMgr.UpdateItemStock(proitem, path, call);
@@ -2822,7 +2828,7 @@ namespace Admin.gigade.Controllers
                             {
                                 if (Request.Params["iialg"].ToString() == "Y")
                                 {
-                                    if (ia.iarc_id == "DR" || ia.iarc_id == "KR")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
+                                    if (ia.iarc_id != "PC" && ia.iarc_id != "NE")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
                                     {
                                         path = "/WareHouse/KutiaoAddorReduce";
                                         _proditemMgr.UpdateItemStock(proitem, path, call);
@@ -2852,7 +2858,7 @@ namespace Admin.gigade.Controllers
                         {
                             if (Request.Params["iialg"].ToString() == "Y")
                             {
-                                if (ia.iarc_id == "DR" || ia.iarc_id == "KR")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
+                                if (ia.iarc_id != "PC" && ia.iarc_id != "NE")//------------庫存調整的時候商品庫存也更改，收貨上架的時候不更改,RF理貨的時候也是不更改
                                 {
                                     path = "/WareHouse/KutiaoAddorReduce";
                                     _proditemMgr.UpdateItemStock(proitem, path, call);
@@ -3181,20 +3187,41 @@ namespace Admin.gigade.Controllers
                         q.cde_dt = store.cde_dt;
                         if (_iagMgr.insertiialg(q) > 0)
                         {
+                            Caller call = new Caller();
+                            call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
+                            ProductItem proitem = new ProductItem();
+                            _proditemMgr = new ProductItemMgr(mySqlConnectionString);
+                            int item_stock = store.prod_qty;
+                            proitem.Item_Stock = -item_stock;
+                            proitem.Item_Id = store.item_id;
+                           string path = "/WareHouse/KutiaoAddorReduce";
+                            _proditemMgr.UpdateItemStock(proitem, path, call);
                             return Json(new { success = "true" });
                         }
                         else
                         {
+                            
                             return Json(new { success = "false" });
                         }
                     }
                     else
                     {
+                        Iinvd store = _iinvd.GetIinvd(nvd).FirstOrDefault();
+                        Caller call = new Caller();
+                        call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
+                        ProductItem proitem = new ProductItem();
+                        _proditemMgr = new ProductItemMgr(mySqlConnectionString);
+                        int item_stock = store.prod_qty;
+                        proitem.Item_Stock = item_stock;
+                        proitem.Item_Id = store.item_id;
+                        string path = "/WareHouse/KutiaoAddorReduce";
+                        _proditemMgr.UpdateItemStock(proitem, path, call);
                         return Json(new { success = "true" });
                     }
                 }
                 else
                 {
+                   
                     return Json(new { success = "false" });
                 }
             }
@@ -3390,6 +3417,78 @@ namespace Admin.gigade.Controllers
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
             }
+        }
+        
+        //判斷某個料位的商品是否被鎖定
+        public HttpResponseBase GetSearchStock()
+        {
+            string json = string.Empty;
+            int islock = 0;
+            _iinvd = new IinvdMgr(mySqlConnectionString);
+            IinvdQuery query = new IinvdQuery();
+
+            if (!string.IsNullOrEmpty(Request.Params["loc_id"]))
+            {
+                query.plas_loc_id = Request.Params["loc_id"];
+            }
+             if(!string.IsNullOrEmpty(Request.Params["item_id"]))
+            {
+              query.item_id = uint.Parse(Request.Params["item_id"]);
+            }
+
+             if (!string.IsNullOrEmpty(Request.Params["cde_date"]) && Request.Params["cde_date"] != "null")
+            {
+                query.cde_dt = DateTime.Parse(Request.Params["cde_date"]);
+            }
+              if (!string.IsNullOrEmpty(Request.Params["made_date"]) && Request.Params["made_date"]!="null")
+            {
+              query.made_date =  DateTime.Parse(Request.Params["made_date"]);
+            }
+            query.ista_id = "H";
+            //{
+            //    plas_loc_id = Request.Params["plas_loc_id"],
+            //    item_id = uint.Parse(Request.Params["item_id"]),
+            //    ista_id = "H",
+            //    made_date = string.IsNullOrEmpty(Request.Params["made_date"]) ? DateTime.MinValue : DateTime.Parse(Request.Params["made_date"]),
+            //    cde_dt = string.IsNullOrEmpty(Request.Params["cde_dt"]) ? DateTime.MinValue : DateTime.Parse(Request.Params["cde_dt"])
+            //};
+            try
+            {
+                if (!string.IsNullOrEmpty(query.plas_loc_id))
+                {
+                    if (query.made_date == query.cde_dt)
+                    {
+                        query.cde_dt=query.made_date = DateTime.Now;
+                    }
+                    List<IinvdQuery> listIinvdQuery = _iinvd.GetSearchIinvd(query);
+
+                   
+
+                    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                    //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                    //timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                    timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                    if (listIinvdQuery.Count>0)
+                    {
+                        islock = 1;
+                    }
+                    //實際能檢的庫存listIinvdQuery.Count
+                    json = "{success:true,msg:\"" + islock + "\"}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
         }
         #endregion
 
@@ -7323,7 +7422,56 @@ namespace Admin.gigade.Controllers
         #endregion
 
         #region 庫存管理
+        #region 庫存調整列表頁
+          public HttpResponseBase GeKuCunList()
+        {
+            string json = string.Empty;
+            IinvdQuery Iinvd = new IinvdQuery();
 
+            if (!string.IsNullOrEmpty(Request.Params["prod_id"]))//查詢商品编号
+            {
+                if (Request.Params["prod_id"].Length == 6)
+                {
+                    Iinvd.item_id = UInt32.Parse(Request.Params["prod_id"]);
+                }
+                else
+                {
+                    Iinvd.upc_id = Request.Params["prod_id"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["sloc_id"]))
+                {
+                    Iinvd.plas_loc_id = Request.Params["sloc_id"].ToString().Trim().ToUpper();
+                }
+                Iinvd.ista_id = "A";
+            }
+            try
+            {
+                List<IinvdQuery> store = new List<IinvdQuery>();
+                _ipalet = new PalletMoveMgr(mySqlConnectionString);
+                store = _ipalet.GetPalletList(Iinvd);//查询的是副料位
+                foreach (var item in store)
+                {
+                    item.cde_dt_make = item.made_date;
+                }
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";//返回json數據
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
         #region 庫存調整
         public HttpResponseBase KutiaoAddorReduce()
         {
@@ -7348,7 +7496,12 @@ namespace Admin.gigade.Controllers
                     Proitems.Item_Id = Icg.item_id;
                 }
                 int oldsumcount = _iinvd.GetProqtyByItemid(Convert.ToInt32(Icg.item_id));//總庫存
-
+                string iarc_id="";
+                if (!string.IsNullOrEmpty(Request.Params["iarcid"]))
+                {
+                    iarc_id = Request.Params["iarcid"];//庫調原因
+                }
+               
                 #region 庫存調整的時候，商品庫存也要調整
                 _proditemMgr = new ProductItemMgr(mySqlConnectionString);
                 int item_stock = 0;
@@ -7390,8 +7543,17 @@ namespace Admin.gigade.Controllers
                 string path = "/WareHouse/KutiaoAddorReduce";
                 Caller call = new Caller();
                 call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
-                int k = _proditemMgr.UpdateItemStock(Proitems, path, call);
+                int k =0;
+               
+                if (iarc_id == "NE")//庫存調整-不改動前台庫存
+                {
+                    k = 1;
+                }else
+                {
+                     k = _proditemMgr.UpdateItemStock(Proitems, path, call);
+                }
                 int newsumcount = _iinvd.GetProqtyByItemid(Convert.ToInt32(Icg.item_id));//總庫存
+               
                 Icg.sc_num_chg = newsumcount - oldsumcount;
                 Icg.sc_num_new = newsumcount;
                 Icg.sc_istock_why = 2;
@@ -11262,7 +11424,47 @@ namespace Admin.gigade.Controllers
 
         #endregion
 
+       // 等待料位報表
+        //public HttpResponseBase GetWaitLiaoWeiList()// createTime 2015/10/19 by yachao1120j
+        //{
+        //    string json = string.Empty;
+        //    int totalcount = 0;
+        //    ProductItemQuery query = new ProductItemQuery();
+        //    query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+        //    query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+        //    productitemMgr = new ProductItemMgr(mySqlConnectionString);
 
+        //    if (!string.IsNullOrEmpty(Request.Params["process_type"]))
+        //    {
+        //        query.process_type = Convert.ToInt32(Request.Params["process_type"]);//出貨方式
+        //    }
+        //    if (!string.IsNullOrEmpty(Request.Params["freight"]))//溫層
+        //    {
+        //        query.product_freight_set = Request.Params["freight"];
+        //    }
+        //    if (!string.IsNullOrEmpty(Request.Params["product_status"]))
+        //    {
+        //        query.product_status = Convert.ToUInt32(Request.Params["product_status"]);//商品状态
+        //    }
+        //    if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
+        //    {
+        //        query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
+        //    }
+        //    if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
+        //    {
+        //        query.end_time = Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59");
+        //    }
+        //    List<ProductItemQuery> list = productitemMgr.GetWaitLiaoWeiList(query, out totalcount);
+        //    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+        //    timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+        //    timeConverter.DateTimeFormat = "yyyy-MM-dd";
+        //    json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+        //    this.Response.Clear();
+        //    this.Response.Write(json);
+        //    this.Response.End();
+        //    return Response;
+
+        //}
 
     }
 }
