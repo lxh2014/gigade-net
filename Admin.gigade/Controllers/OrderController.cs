@@ -2969,6 +2969,10 @@ namespace Admin.gigade.Controllers
                 {
                     query.invoice_type = Convert.ToInt32(Request.Params["invoice_type"]);
                 }
+                if (!string.IsNullOrEmpty(Request.Params["payment"]))
+                {
+                    query.Order_Payment = Convert.ToUInt32(Request.Params["payment"]);
+                }
                 int totalCount = 0;
                 _OrderMasterMgr = new OrderMasterMgr(connectionString);
                 _dt = _OrderMasterMgr.OrderMasterExportList(query, out totalCount);
@@ -3035,6 +3039,10 @@ namespace Admin.gigade.Controllers
                 } if (!string.IsNullOrEmpty(Request.Params["invoice_type"]))
                 {
                     query.invoice_type = Convert.ToInt32(Request.Params["invoice_type"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["payment"]))
+                {
+                    query.Order_Payment = Convert.ToUInt32(Request.Params["payment"]);
                 }
                 _OrderMasterMgr = new OrderMasterMgr(connectionString);
                 _dt = _OrderMasterMgr.OrderMasterHuiZong(query);
@@ -3227,6 +3235,10 @@ namespace Admin.gigade.Controllers
                 {
                     query.invoice_type = Convert.ToInt32(Request.Params["invoice_type"]);
                 }
+                if (!string.IsNullOrEmpty(Request.Params["payment"]))
+                {
+                    query.Order_Payment = Convert.ToUInt32(Request.Params["payment"]);
+                }
                 _OrderMasterMgr = new OrderMasterMgr(connectionString);
                 _dt = _OrderMasterMgr.OrderMasterExport(query);
                 if (_dt.Rows.Count > 0)
@@ -3265,48 +3277,7 @@ namespace Admin.gigade.Controllers
                         }
                         dr["退貨入帳手續費"] = _dt.Rows[i]["return_poundage"];
                         dr["退貨入帳金額"] = _dt.Rows[i]["return_collection_money"];
-                        int poun = 0;
-                        int coll = 0;
-                        int Rpoun = 0;
-                        int Rcoll = 0;
-                        int totalMoney = 0;
-                        //if (!string.IsNullOrEmpty(_dt.Rows[i]["poundage"].ToString()) && !string.IsNullOrEmpty(_dt.Rows[i]["account_collection_money"].ToString()) && !string.IsNullOrEmpty(_dt.Rows[i]["return_poundage"].ToString()) && !string.IsNullOrEmpty(_dt.Rows[i]["return_collection_money"].ToString()))
-                        //{
-                        //    dr["入帳總額"] = Convert.ToInt32(_dt.Rows[i]["poundage"]) + Convert.ToInt32(_dt.Rows[i]["account_collection_money"]) + Convert.ToInt32(_dt.Rows[i]["return_poundage"]) + Convert.ToInt32(_dt.Rows[i]["return_collection_money"]); ;//D=B+C+M+N
-                        //if (!string.IsNullOrEmpty(dr["訂單應收金額"].ToString()) && !string.IsNullOrEmpty(dr["入帳總額"].ToString()))
-                        //{
-                        //    dr["入帳金額差異"] = Convert.ToInt32(dr["訂單應收金額"].ToString()) - Convert.ToInt32(dr["入帳總額"].ToString());//E=A-D
-                        //}
-                        // }
-                        if (!string.IsNullOrEmpty(_dt.Rows[i]["poundage"].ToString()))
-                        {
-                            if (int.TryParse(_dt.Rows[i]["poundage"].ToString(), out poun))
-                            {
-                                totalMoney += poun;
-                            }
-                        }
-                        if (!string.IsNullOrEmpty(_dt.Rows[i]["account_collection_money"].ToString()))
-                        {
-                            if (int.TryParse(_dt.Rows[i]["account_collection_money"].ToString(), out coll))
-                            {
-                                totalMoney += coll;
-                            }
-                        }
-                        if (!string.IsNullOrEmpty(_dt.Rows[i]["return_poundage"].ToString()))
-                        {
-                            if (int.TryParse(_dt.Rows[i]["return_poundage"].ToString(), out Rpoun))
-                            {
-                                totalMoney += Rpoun;
-                            }
-                        }
-                        if (!string.IsNullOrEmpty(_dt.Rows[i]["return_collection_money"].ToString()))
-                        {
-                            if (int.TryParse(_dt.Rows[i]["return_collection_money"].ToString(), out Rcoll))
-                            {
-                                totalMoney += Rcoll;
-                            }
-                        }
-                        dr["入帳總額"] = totalMoney;
+                        dr["入帳總額"] = _dt.Rows[i]["oacamount"];
                         if (!string.IsNullOrEmpty(dr["訂單應收金額"].ToString()) && !string.IsNullOrEmpty(dr["入帳總額"].ToString()))
                         {
                             dr["入帳金額差異"] = Convert.ToInt32(dr["訂單應收金額"].ToString()) - Convert.ToInt32(dr["入帳總額"].ToString());//E=A-D
@@ -3317,10 +3288,11 @@ namespace Admin.gigade.Controllers
                         }
                         dr["發票銷售額"] = _dt.Rows[i]["free_tax"];//F
                         dr["發票稅額"] = _dt.Rows[i]["tax_amount"];//G
-                        if (!string.IsNullOrEmpty(dr["發票銷售額"].ToString()) && !string.IsNullOrEmpty(dr["發票稅額"].ToString()))
-                        {
-                            dr["發票總額"] = Convert.ToInt32(dr["發票銷售額"]) + Convert.ToInt32(dr["發票稅額"]);//F+G
-                        }
+                        dr["發票總額"] = _dt.Rows[i]["invoicetotal"];//F+G
+                        //if (!string.IsNullOrEmpty(dr["發票銷售額"].ToString()) && !string.IsNullOrEmpty(dr["發票稅額"].ToString()))
+                        //{
+                        //    dr["發票總額"] = Convert.ToInt32(dr["發票銷售額"]) + Convert.ToInt32(dr["發票稅額"]);//F+G
+                        //}
                         //dr["發票總額"] = Convert.ToInt32(_dt.Rows[i]["sales_amount"]) + Convert.ToInt32(_dt.Rows[i]["free_tax"]);
                         if (Convert.ToInt32(_dt.Rows[i]["money_cancel"]) != 0 && Convert.ToInt32(_dt.Rows[i]["money_return"]) == 0)
                         {
@@ -3334,10 +3306,11 @@ namespace Admin.gigade.Controllers
                         {
                             dr["請款狀態"] = "商品取消";
                         }
-                        if (!string.IsNullOrEmpty(dr["入帳金額差異"].ToString()) && !string.IsNullOrEmpty(dr["發票總額"].ToString()))
-                        {
-                            dr["發票金額差異"] = Convert.ToInt32(dr["入帳總額"].ToString()) - Convert.ToInt32(dr["發票總額"].ToString());//J=E-H
-                        }
+                        dr["發票金額差異"] = _dt.Rows[i]["invoice_diff"];//入帳總額-發票總額
+                        //if (!string.IsNullOrEmpty(dr["入帳總額"].ToString()) && !string.IsNullOrEmpty(dr["發票總額"].ToString()))
+                        //{
+                        //    dr["發票金額差異"] = Convert.ToInt32(dr["入帳總額"].ToString()) - Convert.ToInt32(dr["發票總額"].ToString());//J=E-H
+                        //}
 
                         dr["備註"] = _dt.Rows[i]["remark"]; ;
                         dtHZ.Rows.Add(dr);

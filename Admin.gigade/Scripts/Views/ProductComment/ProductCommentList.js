@@ -600,6 +600,7 @@ Ext.onReady(function () {
         {
             header: '狀態',
             dataIndex: 'status',
+            colName: 'col_status',
             align: 'center',
             id: 'commentControlActive',
             hidden: true,
@@ -702,12 +703,18 @@ Ext.onReady(function () {
             emptyMsg: NOTHING_DISPLAY
         }),
         listeners: {
+            viewready: function ()
+            {
+                setShow(pcGift, 'colName');
+            },
             scrollershow: function (scroller) {
                 if (scroller && scroller.scrollEl) {
                     scroller.clearManagedListeners();
                     scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
                 }
+
             },
+        
             //edit:function(editor,e){
             //    var comment_id = e.record.data.comment_id;
             //    var value = e.value;
@@ -738,13 +745,20 @@ Ext.onReady(function () {
         renderTo: Ext.getBody(),
         // autoScroll: true,
         listeners: {
-            resize: function () {
+            resize: function ()
+            {
                 pcGift.width = document.documentElement.clientWidth;
                 this.doLayout();
+            },
+            afterrender: function ()
+            {
+                ToolAuthorityQuery(function () { })
             }
+
         }
     });
     ToolAuthority();
+
     //ProductCommentStore.load({ params: { start: 0, limit: 25 } });
 });
 

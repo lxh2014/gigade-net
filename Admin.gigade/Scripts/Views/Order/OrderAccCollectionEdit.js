@@ -81,10 +81,15 @@
                     var collM = Ext.getCmp("account_collection_money");
                     var collP = Ext.getCmp("poundage");
                     if (Ext.getCmp("account_collection_time").getValue() != null) {
-                        collM.allowBlank = false;
-                        collP.allowBlank = false;
+
                         collM.setDisabled(false);
                         collP.setDisabled(false);
+                        collM.allowBlank = false;
+                        collP.allowBlank = false;
+                        collP.setValue(0);
+                        collP.setValue("");
+                        collM.setValue(0);
+                        collM.setValue("");
                     } else {
                         collM.setValue(0);
                         collP.setValue(0);
@@ -104,7 +109,6 @@
             id: 'account_collection_money',
             allowDecimals: false,
             disabled: true,
-            value: 0,
             fieldLabel: '入賬金額'
         },
         //{
@@ -129,12 +133,9 @@
             xtype: 'numberfield',
             name: 'poundage',
             id: 'poundage',
-            value: 0,
             disabled: true,
             fieldLabel: '手續費'
         },
-
-
          {
              xtype: 'datetimefield',
              name: 'return_collection_time',
@@ -152,6 +153,10 @@
                          RcollP.allowBlank = false;
                          RcollM.setDisabled(false);
                          RcollP.setDisabled(false);
+                         RcollM.setValue(0);
+                         RcollM.setValue("");
+                         RcollP.setValue(0);
+                         RcollP.setValue("");
                      } else {
                          RcollM.setValue(0);
                          RcollP.setValue(0);
@@ -185,7 +190,6 @@
             xtype: 'textfield',
             name: 'remark',
             id: 'remark',
-            allowBlank: true,
             submitValue: true,
             fieldLabel: '備註'
         }],
@@ -245,7 +249,7 @@
                 else {//如果是編輯
                     if (Ext.getCmp('order_id').getValue() == row.data.order_id) {
                         if (form.isValid()) {
-                           
+
                             form.submit({
                                 params: {
                                     row_id: Ext.htmlEncode(Ext.getCmp('row_id').getValue()),

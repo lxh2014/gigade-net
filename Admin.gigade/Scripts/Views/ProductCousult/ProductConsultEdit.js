@@ -499,64 +499,7 @@ editFunction = function (rowID, store) {
               xtype: 'displayfield',
               fieldLabel: '回覆諮詢',
           },
-          {
-              xtype: 'radiogroup',
-              hidden: false,
-              id: 'is_sendEmail',
-              name: 'is_sendEmail',
-              fieldLabel: '是否發郵件',
-              colName: 'is_sendEmail',
-              columns: 2,
-              margin: '0 0 0 105',
-              vertical: true,
-              items: [
-                    {
-                        boxLabel: '是',
-                        name: 'is_sendEmail',
-                        id: 'is_sendEmail_yes',
-                        inputValue: "1",
-                        checked: true,
-
-                    },
-                    {
-                        boxLabel: '否',
-                        name: 'is_sendEmail',
-                        id: 'is_sendEmail_no',
-                        inputValue: "0",
-                        checked: false,
-
-                    }
-                    ]
-          },
-          {
-              xtype: 'radiogroup',
-              hidden: false,
-              id: 'status',
-              name: 'status',
-              fieldLabel: '是否顯示諮詢',
-              colName: 'status',
-              columns: 2,
-              margin: '0 0 0 105',
-              vertical: true,
-              items: [
-                    {
-                        boxLabel: '是',
-                        name: 'status',
-                        id: 'status_yes',
-                        inputValue: "1",
-                        checked: true,
-
-                    },
-                    {
-                        boxLabel: '否',
-                        name: 'status',
-                        id: 'status_no',
-                        inputValue: "0",
-                        checked: false,
-
-                    }
-              ]
-          },
+          
           {
               xtype: 'radiogroup',
               hidden: false,
@@ -593,28 +536,56 @@ editFunction = function (rowID, store) {
                       {
                           if (isfirstshow == 0 || row.data.answer_status != 2)
                           {
-                              Ext.MessageBox.confirm(CONFIRM, "選擇推遲回覆時不會並且無法發送郵件，確認更改？", function (btn)
-                              {
-                                  if (btn == "yes")
-                                  {
-                                      Ext.getCmp("consult_answer").allowBlank = true;
-                                      Ext.getCmp("consult_answer").setValue(row.data.consult_answer);
-                                      Ext.getCmp("consult_answer").hide();
-                                      Ext.getCmp("consult_answer").isValid();
-                                      Ext.getCmp("delay_reason").show();
-                                      Ext.getCmp("delay_reason").allowBlank = false;
-                                      //Ext.getCmp("delay_reason").isValid();
-                                      Ext.getCmp("is_sendEmail_yes").setValue(false);
-                                      Ext.getCmp("is_sendEmail_no").setValue(true);
-                                      Ext.getCmp("is_sendEmail_yes").setDisabled(true);
-                                      Ext.getCmp("is_sendEmail_no").setDisabled(true);
-                                  }
-                                  else
-                                  {
-                                      Ext.getCmp("answer_status_yes").setValue(true);
-                                      Ext.getCmp("answer_status_delay").setValue(false);
-                                  }
-                              })
+                            Ext.Msg.alert('提示', '推遲回覆不會發送郵件,且不修改諮詢顯示狀態');
+                            //Ext.MessageBox.prompt(CONFIRM, "選擇推遲回覆時不會發送郵件,不會修改諮詢顯示狀態，確認更改？", function (btn)
+                            {
+                                if (true)
+                                //if (btn == "yes")
+                                {
+                                    Ext.getCmp("consult_answer").allowBlank = true;
+                                    Ext.getCmp("consult_answer").setValue(row.data.consult_answer);
+                                    Ext.getCmp("consult_answer").hide();
+                                    Ext.getCmp("consult_answer").isValid();
+                                    Ext.getCmp("delay_reason").show();
+                                    Ext.getCmp("delay_reason").allowBlank = false;
+                                    Ext.getCmp("answer_status_yes").setValue(false);
+                                    Ext.getCmp("answer_status_delay").setValue(true);
+                                    //Ext.getCmp("delay_reason").isValid();
+                                    if (row.data.is_sendEmail == 1)
+                                    {
+                                        Ext.getCmp("is_sendEmail_yes").setValue(true);
+                                        Ext.getCmp("is_sendEmail_no").setValue(false);
+                                    }
+                                    else
+                                    {
+                                        Ext.getCmp("is_sendEmail_yes").setValue(false);
+                                        Ext.getCmp("is_sendEmail_no").setValue(true);
+                                    }
+                                    if (row.data.status == 1)
+                                    {
+                                        Ext.getCmp("status_yes").setValue(true);
+                                        Ext.getCmp("status_no").setValue(false);
+                                    }
+                                    else
+                                    {
+                                        Ext.getCmp("status_yes").setValue(false);
+                                        Ext.getCmp("status_no").setValue(true);
+                                    }
+                                    Ext.getCmp("is_sendEmail_yes").setDisabled(true);
+                                    Ext.getCmp("is_sendEmail_no").setDisabled(true);
+                                    Ext.getCmp("status_yes").setDisabled(true);
+                                    Ext.getCmp("status_no").setDisabled(true);
+                                }
+                                else
+                                {
+
+                                    Ext.getCmp("answer_status_yes").setValue(true);
+                                    Ext.getCmp("answer_status_delay").setValue(false);
+                                }
+
+                            }
+
+                            //)
                           }
                           else
                           {
@@ -625,10 +596,31 @@ editFunction = function (rowID, store) {
                               Ext.getCmp("delay_reason").show();
                               Ext.getCmp("delay_reason").allowBlank = false;
                               //Ext.getCmp("delay_reason").isValid();
-                              Ext.getCmp("is_sendEmail_yes").setValue(false);
-                              Ext.getCmp("is_sendEmail_no").setValue(true);
+                              if (row.data.is_sendEmail == 1)
+                              {
+                                  Ext.getCmp("is_sendEmail_yes").setValue(true);
+                                  Ext.getCmp("is_sendEmail_no").setValue(false);
+                              }
+                              else
+                              {
+                                  Ext.getCmp("is_sendEmail_yes").setValue(false);
+                                  Ext.getCmp("is_sendEmail_no").setValue(true);
+                              }
+                              if (row.data.status == 1)
+                              {
+                                  Ext.getCmp("status_yes").setValue(true);
+                                  Ext.getCmp("status_no").setValue(false);
+                              }
+                              else
+                              {
+                                  Ext.getCmp("status_yes").setValue(false);
+                                  Ext.getCmp("status_no").setValue(true);
+                              }
+
                               Ext.getCmp("is_sendEmail_yes").setDisabled(true);
                               Ext.getCmp("is_sendEmail_no").setDisabled(true);
+                              Ext.getCmp("status_yes").setDisabled(true);
+                              Ext.getCmp("status_no").setDisabled(true);
                           }
                           isfirstshow = 0;
 
@@ -646,9 +638,69 @@ editFunction = function (rowID, store) {
                           //Ext.getCmp("is_sendEmail_no").setValue(true);
                           Ext.getCmp("is_sendEmail_yes").setDisabled(false);
                           Ext.getCmp("is_sendEmail_no").setDisabled(false);
+                          Ext.getCmp("status_yes").setDisabled(false);
+                          Ext.getCmp("status_no").setDisabled(false);
                       }
                   }
               }
+          },
+          {
+              xtype: 'radiogroup',
+              hidden: false,
+              id: 'is_sendEmail',
+              name: 'is_sendEmail',
+              fieldLabel: '是否發郵件',
+              colName: 'is_sendEmail',
+              columns: 2,
+              margin: '0 0 0 105',
+              vertical: true,
+              items: [
+                    {
+                        boxLabel: '是',
+                        name: 'is_sendEmail',
+                        id: 'is_sendEmail_yes',
+                        inputValue: "1",
+                        checked: true,
+
+                    },
+                    {
+                        boxLabel: '否',
+                        name: 'is_sendEmail',
+                        id: 'is_sendEmail_no',
+                        inputValue: "0",
+                        checked: false,
+
+                    }
+              ]
+          },
+          {
+              xtype: 'radiogroup',
+              hidden: false,
+              id: 'status',
+              name: 'status',
+              fieldLabel: '是否顯示諮詢',
+              colName: 'status',
+              columns: 2,
+              margin: '0 0 0 105',
+              vertical: true,
+              items: [
+                    {
+                        boxLabel: '是',
+                        name: 'status',
+                        id: 'status_yes',
+                        inputValue: "1",
+                        checked: true,
+
+                    },
+                    {
+                        boxLabel: '否',
+                        name: 'status',
+                        id: 'status_no',
+                        inputValue: "0",
+                        checked: false,
+
+                    }
+              ]
           },
           //{
           //    xtype: 'radiogroup',
@@ -930,10 +982,12 @@ editFunction = function (rowID, store) {
                         Ext.getCmp("answer_status_yes").setValue(false);
                         Ext.getCmp("answer_status_delay").setValue(true);
 
-                        Ext.getCmp("is_sendEmail_yes").setValue(false);
-                        Ext.getCmp("is_sendEmail_no").setValue(true);
+                        //Ext.getCmp("is_sendEmail_yes").setValue(false);
+                        //Ext.getCmp("is_sendEmail_no").setValue(true);
                         Ext.getCmp("is_sendEmail_yes").setDisabled(true);
                         Ext.getCmp("is_sendEmail_no").setDisabled(true);
+                        Ext.getCmp("status_yes").setDisabled(true);
+                        Ext.getCmp("status_no").setDisabled(true);
                         //alert("Ext.getCmp(setDisabled(true)" +Ext.getCmp("is_sendEmail_yes").disabled);
                     }
                     if (row.data.answer_status == 3)
