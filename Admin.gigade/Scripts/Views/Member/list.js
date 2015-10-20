@@ -53,7 +53,8 @@ Ext.define('gigade.Users', {
     { name: "bonus_typename", type: "string" }, 
     { name: "bonus_typenamequan", type: "string" },
     { name: "bonus_type", type: "string" },
-    { name: "bonus_type1", type: "string" }
+    { name: "bonus_type1", type: "string" }, 
+    { name: "user_url", type: "string" }
     ]
 });
 
@@ -737,23 +738,31 @@ EditEmail = function () {
     }
 }
 
-function TranToDetial(user_id) {
-    var secret_type = '20';
-    var url = "http://www.gigade100.com/ecservice_jump.php?uid=" + user_id;
-    var ralated_id = user_id;
-    var info_id = user_id;
-    boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
-    if (boolPassword != "-1") {
-        if (boolPassword) {
-            SecretLoginFun(secret_type, ralated_id, true, false, true, url);//先彈出驗證框，關閉時在彈出顯示框
-            //SecretLoginFun(secret_type, ralated_id, false, true, false, url);//直接彈出顯示框
-        }
-        else {
-            // productId = 15382;//product_id
-            if (winDetail == undefined) {
-                window.open("http://www.gigade100.com/ecservice_jump.php?uid=" + user_id);
+function TranToDetial(us) {
+    var row = Ext.getCmp("gdUser").getSelectionModel().getSelection();
+    if (row.length == 0) {
+        Ext.Msg.alert(INFORMATION, NO_SELECTION);
+    }
+    else if (row.length > 1) {
+        Ext.Msg.alert(INFORMATION, ONE_SELECTION);
+    } else if (row.length == 1) {
+        var secret_type = '20';
+        var url = row[0].data.user_url + "?uid=" + row[0].data.user_id;
+       
+        var ralated_id = row[0].data.user_id;
+        var info_id = row[0].data.user_id;
+        boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+        if (boolPassword != "-1") {
+            if (boolPassword) {
+                SecretLoginFun(secret_type, ralated_id, true, false, true, url);//先彈出驗證框，關閉時在彈出顯示框
+                //SecretLoginFun(secret_type, ralated_id, false, true, false, url);//直接彈出顯示框
+            }
+            else {
+                // productId = 15382;//product_id
+                //if (winDetail == undefined) {
+                    window.open(url);
+               // }
             }
         }
     }
-   
 }

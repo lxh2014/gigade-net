@@ -221,7 +221,7 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                         showDetail(relatedID);
                     }
                     else if (urlType.substring(0, 43) == "http://www.gigade100.com/ecservice_jump.php") {
-                        TranToDetial(relatedID);
+                        TranToDetial(relatedID, urlType);
                     }
                     else {
                         editFunction(relatedID);
