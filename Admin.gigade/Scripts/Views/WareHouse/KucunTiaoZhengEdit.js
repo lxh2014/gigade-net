@@ -310,36 +310,83 @@
                     //vendor_id = store.data.items[0].raw.vendor_id;
                     vendor_id = vendorid;
                     if (form.isValid()) {
-                        form.submit({
+                        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: 'Loading...' });
+                        myMask.show();
+                        Ext.Ajax.request({
+                            url: "/WareHouse/GetSearchStock",
                             params: {
-                                //id: Ext.htmlEncode(Ext.getCmp('plas_prdd_id').getValue()),//條碼
-                                iialg:'Y',//寄倉流程 新增庫存用到
-                                item_id: Ext.htmlEncode(Ext.getCmp('plas_prod_id').getValue()),//商品品號
-                                product_name: Ext.htmlEncode(Ext.getCmp('product_name').getValue()),//品名
-                                prod_qty: Ext.htmlEncode(Ext.getCmp('prod_qty').getValue()),//數量
-                                startTime: Ext.htmlEncode(Ext.getCmp('startTime').getValue()),//創建時間
-                                cde_dt: Ext.htmlEncode(Ext.getCmp('cde_dt').getValue()),//有效時間
-                                plas_loc_id: Ext.htmlEncode(Ext.getCmp('plas_loc_id').getValue()),//上架料位
-                                loc_id: Ext.getCmp('loc_id').getValue(),//主料位
-                                cde_dt_var: Ext.htmlEncode(Ext.getCmp('cde_dt_var').getValue()),
-                                cde_dt_incr: cde_dt_incr,
-                                iarc_id: Ext.getCmp('iarc_id').getValue(),
-                                vendor_id: vendor_id
+                                loc_id: Ext.getCmp("plas_loc_id").getValue(),
+                                item_id: Ext.getCmp("plas_prod_id").getValue(),
+                                cde_date: Ext.getCmp('cde_dt').getValue(),
+                                made_date: Ext.getCmp('startTime').getValue()
                             },
-                            success: function (form, action) {
-                                var result = Ext.decode(action.response.responseText);
-                                Ext.Msg.alert(INFORMATION, SUCCESS);
-                                if (result.success) {
-                                    KucunTiaozhengStore.load();
-                                    editWin.close();
-                                } else {
-                                    Ext.MessageBox.alert(ERRORSHOW + result.success);
+                            success: function (response) {
+                               
+                                var result = Ext.decode(response.responseText);
+                                
+                                if (result.msg != "0") {
+                                    myMask.hide();
+                                     Ext.Msg.alert("提示", "該料位有上鎖的庫存，不能庫調!");
+                                }
+                                else {
+                                     
+                                     form.submit({
+                                         params: {
+                                             //id: Ext.htmlEncode(Ext.getCmp('plas_prdd_id').getValue()),//條碼
+                                             iialg: 'Y',//寄倉流程 新增庫存用到
+                                             item_id: Ext.htmlEncode(Ext.getCmp('plas_prod_id').getValue()),//商品品號
+                                             product_name: Ext.htmlEncode(Ext.getCmp('product_name').getValue()),//品名
+                                             prod_qty: Ext.htmlEncode(Ext.getCmp('prod_qty').getValue()),//數量
+                                             startTime: Ext.htmlEncode(Ext.getCmp('startTime').getValue()),//創建時間
+                                             cde_dt: Ext.htmlEncode(Ext.getCmp('cde_dt').getValue()),//有效時間
+                                             plas_loc_id: Ext.htmlEncode(Ext.getCmp('plas_loc_id').getValue()),//上架料位
+                                             loc_id: Ext.getCmp('loc_id').getValue(),//主料位
+                                             cde_dt_var: Ext.htmlEncode(Ext.getCmp('cde_dt_var').getValue()),
+                                             cde_dt_incr: cde_dt_incr,
+                                             iarc_id: Ext.getCmp('iarc_id').getValue(),
+                                             vendor_id: vendor_id
+                                         },
+                                         success: function (form, action) {
+                                             var result = Ext.decode(action.response.responseText);
+                                             Ext.Msg.alert(INFORMATION, SUCCESS);
+                                             if (result.success) {
+                                                 myMask.hide();
+                                                 KucunTiaozhengStore.load();
+                                                 editWin.close();
+                                             } else {
+                                                 myMask.hide();
+                                                 Ext.MessageBox.alert(ERRORSHOW + result.success);
+                                             }
+                                         },
+                                         failure: function () {
+                                             myMask.hide();
+                                             Ext.Msg.alert(INFORMATION, FAILURE);
+                                         }
+                                     });
                                 }
                             },
-                            failure: function () {
-                                Ext.Msg.alert(INFORMATION, FAILURE);
+                            failure: function (form, action) {
+                                
+                                Ext.Msg.alert(INFORMATION, "等待超時!");
                             }
                         });
+                        //$.get('/WareHouse/GetSearchStock',
+                        //    {
+                        //        'loc_id': Ext.getCmp("plas_loc_id").getValue(),
+                        //        'item_id': Ext.getCmp("plas_prod_id").getValue(),
+                        //        cde_date: Ext.getCmp('cde_dt').getValue(),
+                        //        made_date:Ext.getCmp('startTime').getValue()
+                                   
+                        //    }, function (data) {
+                        //    //var datadata = data.parseJSON();
+                        //    var datadata = eval('(' + data + ')');
+                        //    if (datadata.islock != "0") {
+                        //        Ext.Msg.alert("提示", "該料位有上鎖的庫存，不能庫調!");
+                        //    }
+                        //    else {
+                               
+                        //    }
+                        //})
                     }
                 }
                 else if (isloc == 1) {
