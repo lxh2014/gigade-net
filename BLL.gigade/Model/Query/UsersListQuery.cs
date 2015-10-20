@@ -33,6 +33,7 @@ namespace BLL.gigade.Model.Query
         public int bonus_type1 { get; set; }
         public string bonus_typename { get; set; }
         public string bonus_typenamequan { get; set; }
+        public string user_url { get; set; }//chaojie1124j add by 20151019,用來實現會員管理,會員列表頁面的跳轉
         public UsersListQuery()
         {
 
@@ -62,6 +63,7 @@ namespace BLL.gigade.Model.Query
             bonus_type1 = 0;
             bonus_typename = string.Empty;
             bonus_typenamequan = string.Empty;
+            user_url = string.Empty;
         }
     }
 }

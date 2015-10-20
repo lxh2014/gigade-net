@@ -27,7 +27,7 @@ Ext.define('GIGADE.Log', {
 var Schedule_Log_Store = Ext.create('Ext.data.Store', {
     model: 'GIGADE.Log',
     pageSize: pageSize,
-   // autoLoad: true,
+   // autoLoad: true,//自動加載
     autoDestroy: true,
     proxy: {
         type: 'ajax',

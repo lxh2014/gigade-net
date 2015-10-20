@@ -58,6 +58,7 @@ namespace Admin.gigade.Controllers
         IstockChangeMgr _istockMgr;
         IIpoImplMgr _ipoMgr;
         IIpodImplMgr _ipodMgr;
+        public ProductItemMgr productitemMgr;
         private IVendorImplMgr _vendorMgr;
         IProductItemImplMgr _proditemMgr;
         #region Views
@@ -336,9 +337,14 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+        //等待料位報表
+        public ActionResult WaitLiaoWei()
+        {
+            return View();
+        }
         #endregion
 
-        #region 料位管理模塊
+        #region 料位管理模塊 
 
         #region 料位維護 iloc
 
@@ -11262,7 +11268,47 @@ namespace Admin.gigade.Controllers
 
         #endregion
 
+       // 等待料位報表
+        //public HttpResponseBase GetWaitLiaoWeiList()// createTime 2015/10/19 by yachao1120j
+        //{
+        //    string json = string.Empty;
+        //    int totalcount = 0;
+        //    ProductItemQuery query = new ProductItemQuery();
+        //    query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+        //    query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+        //    productitemMgr = new ProductItemMgr(mySqlConnectionString);
 
+        //    if (!string.IsNullOrEmpty(Request.Params["process_type"]))
+        //    {
+        //        query.process_type = Convert.ToInt32(Request.Params["process_type"]);//出貨方式
+        //    }
+        //    if (!string.IsNullOrEmpty(Request.Params["freight"]))//溫層
+        //    {
+        //        query.product_freight_set = Request.Params["freight"];
+        //    }
+        //    if (!string.IsNullOrEmpty(Request.Params["product_status"]))
+        //    {
+        //        query.product_status = Convert.ToUInt32(Request.Params["product_status"]);//商品状态
+        //    }
+        //    if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
+        //    {
+        //        query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
+        //    }
+        //    if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
+        //    {
+        //        query.end_time = Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59");
+        //    }
+        //    List<ProductItemQuery> list = productitemMgr.GetWaitLiaoWeiList(query, out totalcount);
+        //    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+        //    timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+        //    timeConverter.DateTimeFormat = "yyyy-MM-dd";
+        //    json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+        //    this.Response.Clear();
+        //    this.Response.Write(json);
+        //    this.Response.End();
+        //    return Response;
+
+        //}
 
     }
 }
