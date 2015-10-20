@@ -298,5 +298,29 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductItemMgr-->UpdateItemStock" + ex.Message, ex);
             }
         }
+
+        //public List<ProductItemQuery> GetWaitLiaoWeiList(ProductItemQuery query, out int totalCount)// 等待料位報表
+        //{
+        //    try
+        //    {
+        //        List<ProductItemQuery> store = new List<ProductItemQuery>();
+        //        store = _productItemDao.GetWaitLiaoWeiList(query, out totalCount);
+        //        foreach (var item in store)
+        //        {
+        //            item.product_spec = item.Spec_Name_1;
+        //            item.product_spec += string.IsNullOrEmpty(item.Spec_Name_1) ? item.Spec_Name_2 : (string.IsNullOrEmpty(item.Spec_Name_2) ? "" : " / " + item.Spec_Name_2);
+                   
+
+        //        }
+
+        //        return store;
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("ProductItemMgr->GetWaitLiaoWeiList" + ex.Message);
+        //    }
+        //}
+        
     }
 }
