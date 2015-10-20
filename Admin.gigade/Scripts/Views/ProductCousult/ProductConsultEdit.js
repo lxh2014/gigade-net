@@ -991,7 +991,8 @@ editFunction = function (rowID, store) {
                         //alert("Ext.getCmp(setDisabled(true)" +Ext.getCmp("is_sendEmail_yes").disabled);
                     }
                     if (row.data.answer_status == 3)
-                    {                
+                    {
+                        Ext.getCmp("answer_status_delay").setDisabled(true);
                         Ext.getCmp("answer_status_yes").setValue(true);
                         Ext.getCmp("answer_status_delay").setValue(false);
                     }
