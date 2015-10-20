@@ -37,7 +37,11 @@ namespace BLL.gigade.Model.Query
         public int item_stock_end { get; set; }
         public string vendor_name_full_OR_vendor_id { get; set; }
 
-
+        //等待料位報表
+        public int process_type { get; set; }
+        public string  product_freight_set  { get; set; }
+        public string start_time { get; set; }
+        public string end_time { get; set; }
 
 
         public ProductItemQuery()
@@ -68,6 +72,10 @@ namespace BLL.gigade.Model.Query
             item_stock_start = 0;
             item_stock_end = 0;
             vendor_name_full_OR_vendor_id = string.Empty;
+            process_type = 0;
+            product_freight_set = string.Empty;
+            start_time = string.Empty;
+            end_time = string.Empty;
         }
     }
 }

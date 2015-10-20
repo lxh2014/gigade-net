@@ -53,7 +53,8 @@ Ext.define('gigade.Users', {
     { name: "bonus_typename", type: "string" }, 
     { name: "bonus_typenamequan", type: "string" },
     { name: "bonus_type", type: "string" },
-    { name: "bonus_type1", type: "string" }
+    { name: "bonus_type1", type: "string" }, 
+    { name: "user_url", type: "string" }
     ]
 });
 
@@ -250,12 +251,9 @@ Ext.onReady(function () {
         columnLines: true,
         frame: true,
         columns: [
-        {
-            header: "編號", dataIndex: 'user_id', width: 50, align: 'center',
-            renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                return "<a href='javascript:void(0);' onclick='TranToDetial(" + record.data.user_id + ")'>" + value + "</a>";//<span style='color:Red;'></span>
-            }
-        },
+        {header: "編號", dataIndex: 'user_id', width: 50, align: 'center' },
+            
+       
         {
             header: "姓名", dataIndex: 'user_name', width: 60, align: 'center'
         ,
@@ -305,6 +303,12 @@ Ext.onReady(function () {
         { header: "購物金", xtype: 'templatecolumn', width: 140, tpl: channelTpl2, align: 'center' },
         { header: "抵用券", xtype: 'templatecolumn', width: 140, tpl: channelTpl3, align: 'center' },
         { header: "帳號開通", dataIndex: 'user_status', width: 100, align: 'center', renderer: show_user_status }, //基本搞定
+        {
+            header: "操作", dataIndex: 'user_id', width: 100, align: 'center',
+                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                    return "<a href='javascript:void(0);' onclick='TranToDetial(" + record.data.user_id + ")'>點擊跳轉會員登陸頁面</a>";//<span style='color:Red;'></span>
+                }
+        }, //基本搞定
         //{//經東亞與阿鴻確認,此功能已棄用,數據庫表已刪除
         //    header: "銷售賬號",
         //    dataIndex: 's_id',
@@ -734,6 +738,31 @@ EditEmail = function () {
     }
 }
 
-function TranToDetial(user_id) {
-    window.open("http://www.gigade100.com/ecservice_jump.php?uid=" + user_id);
+function TranToDetial(us) {
+    var row = Ext.getCmp("gdUser").getSelectionModel().getSelection();
+    if (row.length == 0) {
+        Ext.Msg.alert(INFORMATION, NO_SELECTION);
+    }
+    else if (row.length > 1) {
+        Ext.Msg.alert(INFORMATION, ONE_SELECTION);
+    } else if (row.length == 1) {
+        var secret_type = '20';
+        var url = row[0].data.user_url + "?uid=" + row[0].data.user_id;
+       
+        var ralated_id = row[0].data.user_id;
+        var info_id = row[0].data.user_id;
+        boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+        if (boolPassword != "-1") {
+            if (boolPassword) {
+                SecretLoginFun(secret_type, ralated_id, true, false, true, url);//先彈出驗證框，關閉時在彈出顯示框
+                //SecretLoginFun(secret_type, ralated_id, false, true, false, url);//直接彈出顯示框
+            }
+            else {
+                // productId = 15382;//product_id
+                //if (winDetail == undefined) {
+                    window.open(url);
+               // }
+            }
+        }
+    }
 }

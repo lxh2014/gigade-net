@@ -542,7 +542,7 @@ namespace Admin.gigade.Controllers
             {
                 DataTable _dt = _proCommentImpl.ProductCommentLogExport(query);
 
-                string filename = "ProductCommentLog_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+                string filename = "評價管理異動記錄_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
                 if (!System.IO.Directory.Exists(Server.MapPath(excelPath)))
                 {
                     System.IO.Directory.CreateDirectory(Server.MapPath(excelPath));

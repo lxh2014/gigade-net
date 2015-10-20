@@ -46,5 +46,6 @@ namespace BLL.gigade.Dao.Impl
         DataTable getproduct(IinvdQuery m);
         DataTable GetIinvdCountBook(IinvdQuery m);
         int GetProqtyByItemid(int item_id);
+        List<IinvdQuery> GetSearchIinvd(Model.Query.IinvdQuery ivd);
     }
 }
