@@ -254,10 +254,10 @@ Ext.onReady(function () {
                                     datetime1.setFullYear(2000, 1, 1);
                                     var datetime2 = new Date();
                                     datetime2.setFullYear(2100, 1, 1);
-                                    Ext.getCmp("time_start").setMinValue(datetime1);
-                                    Ext.getCmp("time_start").setMaxValue(datetime2);
-                                    Ext.getCmp("time_end").setMinValue(datetime1);
-                                    Ext.getCmp("time_end").setMaxValue(datetime2);
+                                    Ext.getCmp("start_time").setMinValue(datetime1);
+                                    Ext.getCmp("start_time").setMaxValue(datetime2);
+                                    Ext.getCmp("end_time").setMinValue(datetime1);
+                                    Ext.getCmp("end_time").setMaxValue(datetime2);
                                 }
                             }
                 }
