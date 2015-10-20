@@ -46,7 +46,9 @@ x64/
 *.scc
 *.xls
 *.pdf
+*.csv
 Web.config
+*.publish.xml
 
 # OS generated files #
 .DS_Store*
