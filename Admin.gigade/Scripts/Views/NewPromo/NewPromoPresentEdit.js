@@ -236,17 +236,18 @@ editPresentFunction = function (row, store, o_event_id) {
                    maxValue:9999999
                },
                {
-                   xtype: "datefield",
+                   xtype: "datetimefield",
                    fieldLabel: DATESTART,
                    editable: false,
                    id: 'tstart',
                    name: 'tstart',
                    anchor: '95%',
-                   format: 'Y-m-d 00:00:00',
+                   format: 'Y-m-d H:i:s',
                    width: 150,
                    allowBlank: false,
                    submitValue: true,
                    value: Tomorrow(),
+                   time: { hour: 00, min: 00, sec: 00 },//開始時間00：00：00
                    listeners: {
                        select: function (a, b, c) {
                            var start = Ext.getCmp("tstart");
@@ -259,16 +260,18 @@ editPresentFunction = function (row, store, o_event_id) {
                    }
                },
                {
-                   xtype: "datefield",
+                   xtype: "datetimefield",
                    fieldLabel: DATEEND,
                    editable: false,
                    id: 'tend',
                    anchor: '95%',
                    name: 'tend',
-                   format: 'Y-m-d 23:59:59',
+                   format: 'Y-m-d H:i:s',
                    allowBlank: false,
                    submitValue: true,
-                   value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+                   time: { hour: 23, min: 59, sec: 59 },
+                   // value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+                   value:setNextMonth(Tomorrow(),1),
                    listeners: {
                        select: function (a, b, c) {
                            var start = Ext.getCmp("tstart");
@@ -447,4 +450,14 @@ editPresentFunction = function (row, store, o_event_id) {
         return dt;                                 // 返回日期。
     }
 }
-
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
+}
