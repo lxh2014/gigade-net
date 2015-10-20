@@ -31,11 +31,11 @@ namespace BLL.gigade.Model
             consult_info = string.Empty;
             consult_type = 0;
             consult_answer = string.Empty;
-            is_sendEmail = 0;
+            is_sendEmail = 1;//默認發送郵件
             create_date = DateTime.MinValue;
             answer_date = DateTime.MinValue;
             answer_user = 0;
-            status = 0;
+            status = 1;
             consult_url = string.Empty;
             product_url = string.Empty;
             item_id = 0;

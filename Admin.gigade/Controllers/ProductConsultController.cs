@@ -356,14 +356,6 @@ namespace Admin.gigade.Controllers
                 {
                     query.consult_id = Convert.ToInt32(Request.Params["consult_id"]);
                 }
-                if (!string.IsNullOrEmpty(Request.Params["status"]))
-                {
-                    query.status = Convert.ToInt32(Request.Params["status"]);
-                }
-                if (!string.IsNullOrEmpty(Request.Params["is_sendEmail"]))
-                {
-                    query.is_sendEmail = Convert.ToInt32(Request.Params["is_sendEmail"]);
-                }
                 if (!string.IsNullOrEmpty(Request.Params["answer_status"]))
                 {
                     if (Convert.ToInt32(Request.Params["answer_status"]) == 2)
@@ -379,6 +371,14 @@ namespace Admin.gigade.Controllers
                     else
                     {
                         query.answer_status = 3;
+                        if (!string.IsNullOrEmpty(Request.Params["status"]))
+                        {
+                            query.status = Convert.ToInt32(Request.Params["status"]);
+                        }
+                        if (!string.IsNullOrEmpty(Request.Params["is_sendEmail"]))
+                        {
+                            query.is_sendEmail = Convert.ToInt32(Request.Params["is_sendEmail"]);
+                        }
                         if (!string.IsNullOrEmpty(Request.Params["consult_answer"]))
                         {
                             query.consult_answer = Request.Params["consult_answer"].ToString();
