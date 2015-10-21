@@ -59,6 +59,10 @@ namespace BLL.gigade.Dao
                 {
                     sb.AppendFormat(" and ioc.lcat_id='{0}' ", invposcat);
                 }
+                if (!string.IsNullOrEmpty(Iinvd.ista_id))//如果无条件就查询所有。如果有条件就查询副料位的,主料位 S，副料位R
+                {
+                    sb.AppendFormat(" and i.ista_id='{0}' ", Iinvd.ista_id);
+                }
                 sb.AppendFormat(" order by cde_dt");
 
                 return _access.getDataTableForObj<IinvdQuery>(sb.ToString());

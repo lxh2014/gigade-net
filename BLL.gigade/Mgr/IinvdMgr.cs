@@ -491,5 +491,16 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IinvdMgr-->GetProqtyByItemid-->" + ex.Message, ex);
             }
         }
+        public List<IinvdQuery> GetSearchIinvd(Model.Query.IinvdQuery ivd)
+        {
+            try
+            {
+                return _ivddao.GetSearchIinvd(ivd);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->GetSearchIinvd-->" + ex.Message, ex);
+            }
+        }
     }
 }

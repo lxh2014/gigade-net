@@ -335,7 +335,7 @@ namespace Admin.gigade.Controllers
                     newRow[1] = dt.Rows[i]["vendor_name_simple"];
                     newRow[2] = dt.Rows[i]["product_id"];
                     newRow[3] = dt.Rows[i]["item_id"];
-                    newRow[4] = dt.Rows[i]["erp_id"];
+                    newRow[4] = " "+dt.Rows[i]["erp_id"];
                     newRow[5] = dt.Rows[i]["product_name"];
                     newRow[6] = dt.Rows[i]["spec_title_1"];
                    // newRow[7] = dt.Rows[i]["spec_title_2"].ToString() + dt.Rows[i]["spec_id_2"].ToString();

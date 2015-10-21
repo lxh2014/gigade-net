@@ -58,7 +58,7 @@ var KucunTiaozhengStore = Ext.create('Ext.data.Store', {
     model: 'GIGADE.KucunMessage',
     proxy: {
         type: 'ajax',
-        url: '/WareHouse/GetFPalletList',
+        url: '/WareHouse/GeKuCunList',
         actionMethods: 'post',
         reader: {
             type: 'json',
@@ -409,7 +409,7 @@ Ext.onReady(function () {
             {
                 header: "加/減", width: 150, align: 'center', renderer:
                 function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    return " <button type='button' onclick='function_add(" + record.data.row_id + "," + record.data.prod_qty + "," + record.data.movenum + ")'>加+</button>&nbsp;&nbsp;&nbsp;<button type='button' onclick='function_uadd(" + record.data.row_id + "," + record.data.prod_qty + "," + record.data.movenum + ")'>減-</button>"
+                    return " <button type='button' onclick='function_add(" + record.data.row_id + "," + record.data.prod_qty + "," + record.data.movenum +")'>加+</button>&nbsp;&nbsp;&nbsp;<button type='button' onclick='function_uadd(" + record.data.row_id + "," + record.data.prod_qty + "," + record.data.movenum +")'>減-</button>"
                 }
             }
         ],
@@ -419,7 +419,9 @@ Ext.onReady(function () {
         tbar: [
            { xtype: 'button', text: "新增庫存", id: 'add_new_message', name: 'add_new_message', iconCls: 'icon-user-add', handler:
                  function () {
-                     StoreAdd();
+                    
+                             StoreAdd();
+                      
                  }
            }
         ],
@@ -607,7 +609,8 @@ function StoreAdd() {
         Ext.Msg.alert(INFORMATION, "請先輸入正確的商品細項編號或料位!");
     }
     else {
-        addFunction(null, KucunTiaozhengStore, vendor_id);
+       
+                addFunction(null, KucunTiaozhengStore, vendor_id);
     }
 }
 
@@ -617,131 +620,172 @@ Query = function () {
         Ext.Msg.alert(INFORMATION, "請先輸入正確的商品細項編號或料位!");
     }
     else {
-        KucunTiaozhengStore.removeAll();
-        Ext.getCmp("KucunTiaozhengGrid").store.loadPage(1, {
-            params: {
-                prod_id: Ext.getCmp('item_id').getValue(),
-                sloc_id: Ext.getCmp('ktloc_id').getValue()
-            }
-        });
+        //$.get('/WareHouse/GetStockByProductId', { 'loc_id': Ext.getCmp("ktloc_id").getValue() }, function (data) {
+        //    //var datadata = data.parseJSON();
+        //    var datadata = eval('(' + data + ')');
+        //    if (datadata.islock != "0") {
+        //        Ext.Msg.alert("提示", "該料位有上鎖的庫存，不能庫調!");
+        //    }
+        //    else {
+                KucunTiaozhengStore.removeAll();
+                Ext.getCmp("KucunTiaozhengGrid").store.loadPage(1, {
+                    params: {
+                        prod_id: Ext.getCmp('item_id').getValue(),
+                        sloc_id: Ext.getCmp('ktloc_id').getValue()
+                    }
+                });
+        //    }
+           
+        //});
+       
     }
 }
 //加
-function function_add(i, j, z) {
-    if (Ext.getCmp('iarc_id').getValue() == 'DR' || Ext.getCmp('iarc_id').getValue() == 'KR') {
-        if (Ext.getCmp('po_id').getValue().trim() == "") {
-            Ext.Msg.alert(INFORMATION, "前置單號不能為空");
-            return;
-        }
-    }
-    if (z == 0) {
-        Ext.Msg.alert(INFORMATION, "調整量不能為0");
-        return;
-    }
-    else {
-        Ext.Ajax.request({//調整庫存數量
-            url: "/WareHouse/InsertIialg",
-            params: {
-                row_id: i,//該行數據的行號碼
-                item_id: Ext.getCmp('item_id').getValue(),//商品細項編號
-                po_id: Ext.getCmp('po_id').getValue(),//前置單編號
-                iarc_id: Ext.getCmp('iarc_id').getValue(),
-                ktloc_id: Ext.getCmp('ktloc_id').getValue(),//料位編號
-                doc_no: Ext.getCmp('doc_no').getValue(),
-                remarks: Ext.getCmp('remarks').getValue(),//備註
-                benginnumber: j,//庫存
-                changenumber: z,//庫調數
-                kutiaotype: 1 //1表示加
-            },
-            success: function (response) {
-                var result = Ext.decode(response.responseText);
-                if (result.success) {
-                    Ext.Ajax.request({//調整庫存數量
-                        url: "/WareHouse/KutiaoAddorReduce",
-                        params: {
-                            row_id: i,//該行數據的行號碼
-                            benginnumber: j,//庫存
-                            changenumber: z,//庫調數
-                            kutiaotype: 1, //1表示加
-                            item_id: Ext.getCmp('item_id').getValue(),//商品細項編號
-                            po_id: Ext.getCmp('po_id').getValue(),//前置單編號
-                            doc_no: Ext.getCmp('doc_no').getValue(),
-                            remarks: Ext.getCmp('remarks').getValue()//備註
-                        },
-                        success: function (response) {
-                            var result = Ext.decode(response.responseText);
-                            if (result.success) {
-                                KucunTiaozhengStore.load();
-                            }
-                        }
-                    });
-                }
-                else {
-                    Ext.Msg.alert(INFORMATION, "插入表Iialg表失敗");
+function function_add(i, j, z, th) {
+
+            if (Ext.getCmp('iarc_id').getValue() == 'DR' || Ext.getCmp('iarc_id').getValue() == 'KR') {
+                if (Ext.getCmp('po_id').getValue().trim() == "") {
+                    Ext.Msg.alert(INFORMATION, "前置單號不能為空");
+                    return;
                 }
             }
-        });
-    }
+            if (z == 0) {
+                Ext.Msg.alert(INFORMATION, "調整量不能為0");
+                return;
+            }
+            else {
+                var myMask = new Ext.LoadMask(Ext.getBody(), { msg: 'Loading...' });
+                myMask.show();
+                Ext.Ajax.request({//調整庫存數量
+                    url: "/WareHouse/InsertIialg",
+                    params: {
+                        row_id: i,//該行數據的行號碼
+                        item_id: Ext.getCmp('item_id').getValue(),//商品細項編號
+                        po_id: Ext.getCmp('po_id').getValue(),//前置單編號
+                        iarc_id: Ext.getCmp('iarc_id').getValue(),
+                        ktloc_id: Ext.getCmp('ktloc_id').getValue(),//料位編號
+                        doc_no: Ext.getCmp('doc_no').getValue(),
+                        remarks: Ext.getCmp('remarks').getValue(),//備註
+                        benginnumber: j,//庫存
+                        changenumber: z,//庫調數
+                        kutiaotype: 1 //1表示加
+                    },
+                    success: function (response) {
+                        var result = Ext.decode(response.responseText);
+                        if (result.success) {
+                          
+                            Ext.Ajax.request({//調整庫存數量
+                                url: "/WareHouse/KutiaoAddorReduce",
+                                params: {
+                                    row_id: i,//該行數據的行號碼
+                                    benginnumber: j,//庫存
+                                    changenumber: z,//庫調數
+                                    kutiaotype: 1, //1表示加
+                                    item_id: Ext.getCmp('item_id').getValue(),//商品細項編號
+                                    po_id: Ext.getCmp('po_id').getValue(),//前置單編號
+                                    doc_no: Ext.getCmp('doc_no').getValue(),
+                                    remarks: Ext.getCmp('remarks').getValue(),//備註
+                                    iarcid: Ext.getCmp('iarc_id').getValue()//調整代碼
+                                 
+                                },
+                                success: function (response) {
+                                    var result = Ext.decode(response.responseText);
+                                    if (result.success) {
+                                        myMask.hide();
+                                        KucunTiaozhengStore.load();
+                                        //Ext.Msg.alert(INFORMATION, "操作成功!");
+                                        //setTimeout('Loadthis()', 4000);
+                                       
+                                    }
+                                }
+                            });
+                        }
+                        else {
+                            myMask.hide();
+                            Ext.Msg.alert(INFORMATION, "插入表Iialg表失敗");
+                        }
+                    }
+                });
+            }
+
+     
 }
 //減
 function function_uadd(i, j, z) {
-    if (Ext.getCmp('iarc_id').getValue() == 'DR' || Ext.getCmp('iarc_id').getValue() == 'KR') {
-        if (Ext.getCmp('po_id').getValue().trim() == "") {
-            Ext.Msg.alert(INFORMATION, "前置單號不能為空");
-            return;
-        }
-    }
-    if (z == 0) {
-        Ext.Msg.alert(INFORMATION, "調整量不能為0");
-        return;
-    }
-    else if (z > j) {
-        Ext.Msg.alert(INFORMATION, "調整量不能大於庫存量");
-        return;
-    }
-    else {
-        Ext.Ajax.request({//調整庫存數量
-            url: "/WareHouse/InsertIialg",
-            params: {
-                row_id: i,//該行數據的行號碼
-                item_id: Ext.getCmp('item_id').getValue(),//商品細項編號
-                po_id: Ext.getCmp('po_id').getValue(),//前置單編號
-                iarc_id: Ext.getCmp('iarc_id').getValue(),
-                ktloc_id: Ext.getCmp('ktloc_id').getValue(),//料位編號
-                doc_no: Ext.getCmp('doc_no').getValue(),
-                remarks: Ext.getCmp('remarks').getValue(),//備註
-                benginnumber: j,//庫存
-                changenumber: z,//庫調數
-                kutiaotype: 2 //2表示減
-            },
-            success: function (response) {
-                var result = Ext.decode(response.responseText);
-                if (result.success) {
-                    Ext.Ajax.request({//調整庫存數量
-                        url: "/WareHouse/KutiaoAddorReduce",
-                        params: {
-                            row_id: i,//該行數據的行號碼
-                            benginnumber: j,//庫存
-                            changenumber: z,//庫調數
-                            kutiaotype: 2,//2表示減
-                            item_id: Ext.getCmp('item_id').getValue(),//商品細項編號
-                            po_id: Ext.getCmp('po_id').getValue(),//前置單編號
-                            doc_no: Ext.getCmp('doc_no').getValue(),
-                            remarks: Ext.getCmp('remarks').getValue()//備註
-
-                        },
-                        success: function (response) {
-                            var result = Ext.decode(response.responseText);
-                            if (result.success) {
-                                KucunTiaozhengStore.load();
-                            }
-                        }
-                    });
-                }
-                else {
-                    Ext.Msg.alert(INFORMATION, "插入表Iialg表失敗");
+ 
+            if (Ext.getCmp('iarc_id').getValue() == 'DR' || Ext.getCmp('iarc_id').getValue() == 'KR') {
+                if (Ext.getCmp('po_id').getValue().trim() == "") {
+                    Ext.Msg.alert(INFORMATION, "前置單號不能為空");
+                    return;
                 }
             }
-        });
-    }
+            if (z == 0) {
+                Ext.Msg.alert(INFORMATION, "調整量不能為0");
+                return;
+            }
+            else if (z > j) {
+                Ext.Msg.alert(INFORMATION, "調整量不能大於庫存量");
+                return;
+            }
+            else {
+                var myMask = new Ext.LoadMask(Ext.getBody(), { msg: 'Loading...' });
+                myMask.show();
+                Ext.Ajax.request({//調整庫存數量
+                    url: "/WareHouse/InsertIialg",
+                    params: {
+                        row_id: i,//該行數據的行號碼
+                        item_id: Ext.getCmp('item_id').getValue(),//商品細項編號
+                        po_id: Ext.getCmp('po_id').getValue(),//前置單編號
+                        iarc_id: Ext.getCmp('iarc_id').getValue(),
+                        ktloc_id: Ext.getCmp('ktloc_id').getValue(),//料位編號
+                        doc_no: Ext.getCmp('doc_no').getValue(),
+                        remarks: Ext.getCmp('remarks').getValue(),//備註
+               
+                        benginnumber: j,//庫存
+                        changenumber: z,//庫調數
+                        kutiaotype: 2 //2表示減
+                    },
+                    success: function (response) {
+                        var result = Ext.decode(response.responseText);
+                        if (result.success) {
+                          
+                            Ext.Ajax.request({//調整庫存數量
+                                url: "/WareHouse/KutiaoAddorReduce",
+                                params: {
+                                    row_id: i,//該行數據的行號碼
+                                    benginnumber: j,//庫存
+                                    changenumber: z,//庫調數
+                                    kutiaotype: 2,//2表示減
+                                    item_id: Ext.getCmp('item_id').getValue(),//商品細項編號
+                                    po_id: Ext.getCmp('po_id').getValue(),//前置單編號
+                                    doc_no: Ext.getCmp('doc_no').getValue(),
+                                    iarcid: Ext.getCmp('iarc_id').getValue(),//調整代碼
+                                    remarks: Ext.getCmp('remarks').getValue()//備註
+
+                                },
+                                success: function (response) {
+                                 
+                                    var result = Ext.decode(response.responseText);
+                                    if (result.success) {
+                                        myMask.hide();
+                                        //Ext.Msg.alert(INFORMATION, "操作成功!");
+                                        //setTimeout('Loadthis()', 4000);
+                                        KucunTiaozhengStore.load();
+                                    }
+                                }
+                            });
+                        }
+                        else {
+                            myMask.hide();
+                            Ext.Msg.alert(INFORMATION, "插入表Iialg表失敗");
+                        }
+                    }
+                });
+            }
+       
+}
+
+
+function Loadthis() {
+    KucunTiaozhengStore.load();
 }
