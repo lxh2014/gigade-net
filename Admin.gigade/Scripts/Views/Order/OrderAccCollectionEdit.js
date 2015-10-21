@@ -81,10 +81,15 @@
                     var collM = Ext.getCmp("account_collection_money");
                     var collP = Ext.getCmp("poundage");
                     if (Ext.getCmp("account_collection_time").getValue() != null) {
+
+                        collM.setDisabled(false);
+                        collP.setDisabled(false);
                         collM.allowBlank = false;
                         collP.allowBlank = false;
-                        collM.setDisabled(false);
-                        collP.setDisabled(false);                     
+                        collP.setValue(0);
+                        collP.setValue("");
+                        collM.setValue(0);
+                        collM.setValue("");
                     } else {
                         collM.setValue(0);
                         collP.setValue(0);
@@ -106,6 +111,24 @@
             disabled: true,
             fieldLabel: '入賬金額'
         },
+        //{
+        //    xtype: 'numberfield',
+        //    name: 'amount_account_collection_money',
+        //    id: 'amount_account_collection_money',
+        //    allowDecimals: false,
+        //    allowBlank: false,
+        //    value: 0,
+        //    fieldLabel: '入賬總額'
+        //},
+        //{
+        //    xtype: 'numberfield',
+        //    name: 'amount_invoice',
+        //    id: 'amount_invoice',
+        //    allowDecimals: false,
+        //    allowBlank: false,
+        //    value: 0,
+        //    fieldLabel: '發票總額'
+        //},
         {
             xtype: 'numberfield',
             name: 'poundage',
@@ -130,6 +153,10 @@
                          RcollP.allowBlank = false;
                          RcollM.setDisabled(false);
                          RcollP.setDisabled(false);
+                         RcollM.setValue(0);
+                         RcollM.setValue("");
+                         RcollP.setValue(0);
+                         RcollP.setValue("");
                      } else {
                          RcollM.setValue(0);
                          RcollP.setValue(0);

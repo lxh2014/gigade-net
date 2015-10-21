@@ -18,12 +18,19 @@ Ext.define('gridlistWLW', {
         { name: "product_spec", type: "string" },//商品規格
         { name: "product_status", type: "int" },//商品狀態
         { name: "product_status_string", type: "string" },//商品狀態顯示
-        { name: "product_createdate", type: "int" },//商品建立日期
-        //商品類型
-        { name: "product_freight_set", type: "string" },//溫層
-        { name: "process_type", type: "int" },//出貨方式
-         { name: "process_type_string", type: "string" },//出貨方式
+        { name: "product_createdate", type: "int" },//商品建立日期  
+        { name: "product_createdate_string", type: "string" },//商品建立日期  
+        { name: "product_createdate", type: "string" },
+        { name: "combination", type: "int" },//商品類型   商品組合類型  1:單一商品 2:固定組合 3:任選組合 4:群組搭配
+        { name: "combination_string", type: "string" },
+        { name: "product_freight_set", type: "int" },//溫層 
+         { name: "product_freight_set_string", type: "string" },//溫層顯示
+        { name: "product_mode", type: "int" },//出貨方式
+         { name: "product_mode_string", type: "string" },//出貨方式 商品出貨方式  1:自出   2:寄倉 3 調度
         { name: "product_start", type: "int" },//商品上架時間
+        { name: "product_start_string", type: "string" },//商品上架時間
+        { name: "product_fenlei_xiaolei", type: "string" },//商品上架時間
+        { name: "product_fenlei_dalei", type: "string" },//商品上架時間
 
     ],
 });
@@ -62,8 +69,9 @@ var OutProductStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
         {"txt":"全部","value":"100"},
-        { "txt": "實體商品", "value": "1" },
-        { "txt": "電子商品", "value": "2" },
+        { "txt": "自出", "value": "1" },
+        { "txt": "寄倉", "value": "2" },
+        { "txt": "調度", "value": "3" }
     ]
 });
 
@@ -71,7 +79,7 @@ var OutProductStore = Ext.create('Ext.data.Store', {
 var freightStore = Ext.create('Ext.data.Store', {
     fields: ['parameterName', 'ParameterCode'],
     data: [
-           { 'parameterName': '全部', 'ParameterCode': '0' },
+           { 'parameterName': '全部', 'ParameterCode': '100' },
            { 'parameterName': '常溫', 'ParameterCode': '1' },
            { 'parameterName': '冷凍', 'ParameterCode': '2' },
     ]
@@ -82,7 +90,7 @@ WareHouseStore.on('beforeload', function () {
     Ext.apply(WareHouseStore.proxy.extraParams,
         {
             product_status: Ext.getCmp('product_status').getValue(),//商品狀態
-            process_type: Ext.getCmp('process_type').getValue(),
+            product_mode: Ext.getCmp('product_mode').getValue(),
             freight: Ext.getCmp('freight').getValue(),
             start_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s')),
             end_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s')),
@@ -114,11 +122,11 @@ Ext.onReady(function () {
                            {
                                xtype: 'datefield',
                                margin: '5 0 0 5',
-                               fieldLabel: '時間區間',
-                               labelWidth: 60,
+                               fieldLabel: '品牌建立時間',
+                               labelWidth: 80,
                                id: 'start_time',
                                format: 'Y-m-d',
-                               width: 170,
+                               width: 180,
                                value: Tomorrow(1 - new Date().getDate()),
                                editable: false,
                                listeners: {
@@ -178,7 +186,7 @@ Ext.onReady(function () {
                              lastQuery: '',
                              displayField: 'parameterName',
                              valueField: 'ParameterCode',
-                             value: 0,
+                             value: 100,
                              listeners: {
                                  specialkey: function (field, e) {
                                      if (e.getKey() == e.ENTER) {
@@ -213,8 +221,8 @@ Ext.onReady(function () {
            },
            {
                xtype: 'combobox',
-               name: 'process_type',
-               id: 'process_type',
+               name: 'product_mode',
+               id: 'product_mode',
                editable: false,
                fieldLabel: "出貨方式",
                labelWidth: 60,
@@ -272,24 +280,18 @@ Ext.onReady(function () {
         frame: true,
         flex: 9.4,
         columns: [
-                { header: '商品編號', dataIndex: 'product_id', width: 80, align: 'center' },
-                { header: "商品建立日期", dataIndex: 'product_createdate', align: 'center' },
+             { header: '商品細項編號', dataIndex: 'item_id', align: 'center' },
                 { header: '商品名稱', dataIndex: 'product_name', width: 180, align: 'center' },
-                { header: '商品細項編號', dataIndex: 'item_id', align: 'center' },
-                { header: '商品規格', dataIndex: 'product_spec', width: 120, align: 'center' },
-                //商品類型
-                { header: "出貨方式", dataIndex: "process_type_string", align: 'center' },//出貨方式
+                { header: '商品規格', dataIndex: 'product_spec', width: 120, align: 'center' }, 
+                { header: '商品類型', dataIndex: 'combination_string', width: 120, align: 'center' },//商品類型
+                { header: "分類--大類", dataIndex: "product_fenlei_dalei", align: 'center' },
+                 { header: "分類--小類", dataIndex: "product_fenlei_xiaolei", align: 'center' },
                 { header: "商品狀態", dataIndex: "product_status_string", align: 'center' },
-                {
-                    header: "溫層", dataIndex: 'product_freight_set', width: 40, align: 'center',
-                    renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                        if (value == "1") {
-                            return "常溫";
-                        } if (value == "2") { return "冷凍"; }
-                    }
-
-                },
-                { header: "商品上架時間", dataIndex: "product_start", align: 'center' }
+                 { header: "出貨方式", dataIndex: "product_mode_string", align: 'center' },//出貨方式
+                { header: "溫層", dataIndex: "product_freight_set_string", align: 'center' },
+                 { header: "商品建立日期", dataIndex: 'product_createdate_string', align: 'center',width:180 },
+                { header: "商品上架時間", dataIndex: "product_start_string", align: 'center', width: 180 },
+                 
 
         ],
         tbar: [
@@ -348,13 +350,11 @@ function Tomorrow(s) {
 
 /************匯出到Exce************/
 function Export() {
-    //var vendor_name_full_OR_vendor_id = Ext.getCmp('vendor_name_full_OR_vendor_id').getValue();
-    //var product_id_OR_product_name = Ext.getCmp('product_id_OR_product_name').getValue();
-    //var brand_id_OR_brand_name = Ext.getCmp('brand_id_OR_brand_name').getValue();
-    //var product_status = Ext.getCmp('product_status').getValue();
-    //var sale_status = Ext.getCmp('sale_status').getValue();
-    //var item_stock_start = Ext.getCmp('item_stock_start').getValue();
-    //var item_stock_end = Ext.getCmp('item_stock_end').getValue();
-    //var ignore_stockRdo = Ext.getCmp('ignore_stockRdo').getValue().ignore_stockVal;
-    //window.open("/Product/ExportCSV?vendor_name_full_OR_vendor_id=" + vendor_name_full_OR_vendor_id + "&sale_status=" + sale_status + "&item_stock_end=" + item_stock_end + "&product_id_OR_product_name=" + product_id_OR_product_name + "&brand_id_OR_brand_name=" + brand_id_OR_brand_name + "&item_stock_start=" + item_stock_start + "&ignore_stockRdo=" + ignore_stockRdo + "&product_status=" + product_status);
+    var freight = Ext.getCmp('freight').getValue();
+    var product_status = Ext.getCmp('product_status').getValue();
+    var product_mode = Ext.getCmp('product_mode').getValue();
+    var start_time = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s'));
+    var end_time = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'));
+    window.open("/WareHouse/ExportCSV?product_status=" + product_status + "&product_mode=" + product_mode + "&freight=" + freight + "&start_time=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d') + "&end_time=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d'));
+   
 }

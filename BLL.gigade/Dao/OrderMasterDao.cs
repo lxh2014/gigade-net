@@ -1060,7 +1060,7 @@ namespace BLL.gigade.Dao
                 sql.AppendFormat("  SUM(imr.free_tax) as free_tax,SUM(imr.sales_amount) as sales_amount,SUM(imr.tax_amount) as tax_amount,SUM(imr.total_amount) imramount,");
                 sql.AppendFormat("om.money_cancel,om.money_return,om.delivery_name,om.order_amount,om.order_payment,'' as parameterName,om.order_createdate, '' as ordercreatedate,");
                 sql.AppendFormat("oac.account_collection_time,oac.account_collection_money,oac.poundage,oac.return_collection_time,oac.return_collection_money,oac.return_poundage,oac.remark,");
-                sql.AppendFormat(" '' as oacamount ,'' as invoice_diff ");
+                sql.AppendFormat(" '' as oacamount ,'' as invoicetotal, '' as invoice_diff ");
                 sqlCondition.Append(" from  order_master om  ");
                 sqlCondition.Append(" left join order_account_collection oac   on om.order_id  = oac.order_id ");
                 sqlCondition.AppendFormat(" left join invoice_master_record imr  on imr.order_id=om.order_id   and invoice_attribute=1 ");
@@ -1158,7 +1158,8 @@ namespace BLL.gigade.Dao
                 Int64 Rpoun = 0;
                 Int64 Rcoll = 0;
                 Int64 totalMoney = 0;
-                Int64 imramount = 0;
+                Int64 freetax = 0;
+                Int64 taxamount = 0;
                 foreach (DataRow dr in dt.Rows)
                 {
                     var alist = parameterList.Find(m => m.ParameterCode == dr["order_payment"].ToString());
@@ -1211,12 +1212,16 @@ namespace BLL.gigade.Dao
                         }
                     }
                     dr["oacamount"] = totalMoney;
-                    imramount = 0;
-                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) && !string.IsNullOrEmpty(dr["imramount"].ToString()))
+                    freetax = 0; taxamount = 0;
+                    if (!string.IsNullOrEmpty(dr["free_tax"].ToString()) && !string.IsNullOrEmpty(dr["tax_amount"].ToString()))
                     {
-                        if (Int64.TryParse(dr["imramount"].ToString(), out imramount))
+                        if ((Int64.TryParse(dr["free_tax"].ToString(), out freetax)) && (Int64.TryParse(dr["tax_amount"].ToString(), out taxamount)))
                         {
-                            dr["invoice_diff"] = totalMoney - imramount;//J=E-H
+                            dr["invoicetotal"] = freetax + taxamount;
+                            if ((poun != 0 || coll != 0 || Rpoun != 0 || Rcoll != 0) && (freetax != 0 || taxamount != 0))
+                            {
+                                dr["invoice_diff"] = totalMoney - (freetax + taxamount);//J=E-H
+                            }
                         }
                     }
                 }
@@ -1347,7 +1352,8 @@ namespace BLL.gigade.Dao
                 sql.AppendFormat("  SUM(imr.free_tax) as free_tax,SUM(imr.sales_amount) as sales_amount,SUM(imr.tax_amount) as tax_amount,SUM(imr.total_amount) imramount,");
                 sql.AppendFormat("om.money_cancel,om.money_return,om.delivery_name,om.order_amount,om.order_payment,'' as parameterName,om.order_createdate, '' as ordercreatedate,");
                 sql.AppendFormat("oac.account_collection_time,oac.account_collection_money,oac.poundage,oac.return_collection_time,oac.return_collection_money,oac.return_poundage,oac.remark,");
-                sql.AppendFormat(" '' as oacamount , '' as invoice_diff ");
+                // sql.AppendFormat("(oac.account_collection_money+oac.poundage+oac.return_collection_money+oac.return_poundage)as oacamount ");
+                sql.AppendFormat(" '' as oacamount ,'' as invoicetotal, '' as invoice_diff ");
                 sql.Append(" from  order_master om  ");
                 sql.Append(" left join order_account_collection oac   on om.order_id  = oac.order_id ");
                 sql.AppendFormat(" left join invoice_master_record imr  on imr.order_id=om.order_id   and invoice_attribute=1 ");
@@ -1434,7 +1440,8 @@ namespace BLL.gigade.Dao
                 Int64 Rpoun = 0;
                 Int64 Rcoll = 0;
                 Int64 totalMoney = 0;
-                Int64 imramount = 0;
+                Int64 freetax = 0;
+                Int64 taxamount = 0;
                 foreach (DataRow dr in dt.Rows)
                 {
                     var alist = parameterList.Find(m => m.ParameterCode == dr["order_payment"].ToString());
@@ -1486,12 +1493,16 @@ namespace BLL.gigade.Dao
                         }
                     }
                     dr["oacamount"] = totalMoney;
-                    imramount = 0;
-                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) && !string.IsNullOrEmpty(dr["imramount"].ToString()))
+                    freetax = 0; taxamount = 0;
+                    if (!string.IsNullOrEmpty(dr["free_tax"].ToString()) && !string.IsNullOrEmpty(dr["tax_amount"].ToString()))
                     {
-                        if (Int64.TryParse(dr["imramount"].ToString(), out imramount))
+                        if ((Int64.TryParse(dr["free_tax"].ToString(), out freetax)) || (Int64.TryParse(dr["tax_amount"].ToString(), out taxamount)))
                         {
-                            dr["invoice_diff"] = totalMoney - imramount;//J=E-H
+                            dr["invoicetotal"] = freetax + taxamount;
+                            if ((poun != 0 || coll != 0 || Rpoun != 0 || Rcoll != 0) && (freetax != 0 || taxamount != 0))
+                            {
+                                dr["invoice_diff"] = totalMoney - (freetax + taxamount);//J=E-H
+                            }
                         }
                     }
                 }

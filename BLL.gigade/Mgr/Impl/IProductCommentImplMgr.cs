@@ -16,7 +16,7 @@ namespace BLL.gigade.Mgr.Impl
         ProductCommentQuery GetUsetInfo(Model.Query.ProductCommentQuery store);
         DataTable QueryTableName();
         DataTable GetChangeLogList(ProductCommentQuery query, out int totalCount);
-        BLL.gigade.Model.Custom.TableChangeLogCustom GetChangeLogDetailList(int pk_id,int comment_id_display, string create_time);
+        BLL.gigade.Model.Custom.TableChangeLogCustom GetChangeLogDetailList(int pk_id, string create_time);
         DataTable ProductCommentLogExport(ProductCommentQuery query);
     }
 }

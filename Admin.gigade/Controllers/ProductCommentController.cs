@@ -451,11 +451,11 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]))
                 {
-                    query.start_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["start_time"].ToString()).ToString("yyyy-MM-dd 00:00:00"));
+                    query.start_time = Convert.ToDateTime(Request.Params["start_time"]);
                 }
                 if (!string.IsNullOrEmpty(Request.Params["end_time"]))
                 {
-                    query.end_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+                    query.end_time = Convert.ToDateTime(Request.Params["end_time"]);
                 }
 
                 int totalCount = 0;
@@ -487,7 +487,6 @@ namespace Admin.gigade.Controllers
             {
                 _proCommentImpl = new ProductCommentMgr(mySqlConnectionString);
                 int pk_id = 0;
-                int comment_id_display = 0;
                 string create_time = string.Empty;
                 if (!string.IsNullOrEmpty(Request.Params["pk_id"]))
                 {
@@ -497,11 +496,7 @@ namespace Admin.gigade.Controllers
                 {
                     create_time = CommonFunction.DateTimeToString(Convert.ToDateTime(Request.Params["create_time"]));
                 }
-                if (!string.IsNullOrEmpty(Request.Params["comment_id_display"]))
-                {
-                    comment_id_display = Convert.ToInt32(Request.Params["comment_id_display"]);
-                }
-                BLL.gigade.Model.Custom.TableChangeLogCustom store = _proCommentImpl.GetChangeLogDetailList(pk_id,comment_id_display, create_time);
+                BLL.gigade.Model.Custom.TableChangeLogCustom store = _proCommentImpl.GetChangeLogDetailList(pk_id, create_time);
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";

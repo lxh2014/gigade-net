@@ -97,32 +97,16 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
     }
 });
 
-//查詢
 function search() {
-    //查詢條件
+    Ext.getCmp('condition').setValue(Ext.getCmp('condition').getValue().replace(/\s+/g, ','));
     var comb = Ext.getCmp('searchCondition');
-    //查詢內容
     var comc = Ext.getCmp('condition');
-    //品牌
-    var brand = Ext.getCmp('brand_id');
-    //選擇條件的值
-    var condition = comb.getValue();
-
-    comc.setValue(comc.getValue().replace(/\s+/g, ','));
-
-    //判斷選擇的查詢條件是否是品牌
-    if (condition == 3) {
-        if (!comb.isValid() || !brand.isValid()) {
-            return;
-        }
-    } else {
-        if (!comb.isValid() || !comc.isValid()) {
-            return;
-        }
+    if (!comb.isValid() && !comc.isValid()) {
+        return;
     }
     particularsStore.removeAll();
-    var value = condition == 3 ? brand.getValue() : comc.getValue();
-    //重新加載頁面
+    var condition = Ext.getCmp('searchCondition').getValue();
+    var value = condition == 3 ? Ext.getCmp('brand_id').getValue() : Ext.getCmp('condition').getValue();
     particularsStore.load({
         params: { ids: value, condition: condition }
     });
@@ -449,7 +433,7 @@ Ext.onReady(function () {
                 iconCls: 'ui-icon ui-icon-reset',
                 listeners: {
                     click: function () {
-                        Ext.getCmp("brand_id").setValue("").allowBlank = false;
+                        Ext.getCmp("brand_id").setValue("");
                         Ext.getCmp("condition").setValue("");
                     }
                 }

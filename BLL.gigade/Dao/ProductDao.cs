@@ -1008,13 +1008,9 @@ namespace BLL.gigade.Dao
                 strTbls.Append(" LEFT JOIN vendor v ON v.vendor_id = b.vendor_id ");
                 //連接查出未出貨數量
                 strTbls.Append(" LEFT JOIN product_item pi ON pi.product_id = a.product_id ");
-                strTbls.Append(@"LEFT JOIN (select ordetail.item_id,ordetail.buy_num,ordetail.detail_id from order_detail as ordetail
-INNER JOIN  deliver_detail as ddetail on ordetail.detail_id=ddetail.detail_id  
-and  ddetail.delivery_status in (0,1,2,3)
-and detail_status=2 
-LEFT JOIN order_slave AS oslave on  ordetail.slave_id=oslave.slave_id
-INNER JOIN order_master AS omaster on  omaster.order_id=oslave.order_id
-WHERE   ((order_payment=8 and money_collect_date=0) or money_collect_date<>0)) as odetail on  odetail.item_id = pi.item_id ");
+                strTbls.Append(@"LEFT JOIN (SELECT ordetail.item_id,ordetail.buy_num   from order_detail as ordetail
+INNER JOIN  deliver_detail as ddetail on ordetail.detail_id=ddetail.detail_id  and  ddetail.delivery_status in (0,1,2,3)
+and ordetail.detail_status=2) as odetail on  odetail.item_id = pi.item_id ");
                 //關聯查出排成名稱
                 strTbls.Append(" LEFT JOIN schedule_relation srelation on srelation.relation_id=a.product_id and srelation.relation_table='product' ");
                 strTbls.Append(" LEFT JOIN schedule sdule on sdule.schedule_id=srelation.schedule_id ");

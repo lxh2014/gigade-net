@@ -2576,18 +2576,18 @@ namespace Admin.gigade.Controllers
                                 }
                                 else
                                 {
-                                    string[] str = dt.Rows[j][1].ToString().Split('/');
-                                    int year = 0;
-                                    if (str[2].Length == 2)
-                                    {
-                                        year = Convert.ToInt32("20" + str[2]);
-                                    }
-                                    else
-                                    {
-                                        year = Convert.ToInt32(str[2]);
-                                    }
-                                    int month = Convert.ToInt32(str[0]);
-                                    int day = Convert.ToInt32(str[1]);
+                                string[] str = dt.Rows[j][1].ToString().Split('/');
+                                int year = 0;
+                                if (str[2].Length == 2)
+                                {
+                                    year = Convert.ToInt32("20" + str[2]);
+                                }
+                                else
+                                {
+                                    year = Convert.ToInt32(str[2]);
+                                }
+                                int month = Convert.ToInt32(str[0]);
+                                int day = Convert.ToInt32(str[1]);
                                     if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
                                     {
                                         model.account_collection_time = st;
@@ -2598,34 +2598,25 @@ namespace Admin.gigade.Controllers
                                     }
                                 }
                             }
-
-                            if (!string.IsNullOrEmpty(dt.Rows[j][2].ToString()))
+                        }
+                        if (!string.IsNullOrEmpty(dt.Rows[j][2].ToString()))
+                        {
+                            int account_collection_money = 0;
+                            if (int.TryParse(dt.Rows[j][2].ToString(), out account_collection_money))
                             {
-                                int account_collection_money = 0;
-                                if (int.TryParse(dt.Rows[j][2].ToString(), out account_collection_money))
-                                {
-                                    model.account_collection_money = account_collection_money;
-                                }
-                                else
-                                {
-                                    continue;
-                                }
+                                model.account_collection_money = account_collection_money;
                             }
                             else
                             {
                                 continue;
                             }
-                            if (!string.IsNullOrEmpty(dt.Rows[j][3].ToString()))
+                        }
+                        if (!string.IsNullOrEmpty(dt.Rows[j][3].ToString()))
+                        {
+                            int poundage = 0;
+                            if (int.TryParse(dt.Rows[j][3].ToString(), out poundage))
                             {
-                                int poundage = 0;
-                                if (int.TryParse(dt.Rows[j][3].ToString(), out poundage))
-                                {
-                                    model.poundage = poundage;
-                                }
-                                else
-                                {
-                                    continue;
-                                }
+                                model.poundage = poundage;
                             }
                             else
                             {
@@ -2671,42 +2662,33 @@ namespace Admin.gigade.Controllers
                                     }
                                 }
                             }
-                            if (!string.IsNullOrEmpty(dt.Rows[j][5].ToString()))
+                        }
+                        if (!string.IsNullOrEmpty(dt.Rows[j][5].ToString()))
+                        {
+                            int return_collection_money = 0;
+                            if (int.TryParse(dt.Rows[j][5].ToString(), out return_collection_money))
                             {
-                                int return_collection_money = 0;
-                                if (int.TryParse(dt.Rows[j][5].ToString(), out return_collection_money))
-                                {
-                                    model.return_collection_money = return_collection_money;
-                                }
-                                else
-                                {
-                                    continue;
-                                }
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                            if (!string.IsNullOrEmpty(dt.Rows[j][6].ToString()))
-                            {
-                                int return_poundage = 0;
-                                if (int.TryParse(dt.Rows[j][6].ToString(), out return_poundage))
-                                {
-                                    model.return_poundage = return_poundage;
-                                }
-                                else
-                                {
-                                    continue;
-                                }
+                                model.return_collection_money = return_collection_money;
                             }
                             else
                             {
                                 continue;
                             }
                         }
-
+                        if (!string.IsNullOrEmpty(dt.Rows[j][6].ToString()))
+                        {
+                            int return_poundage = 0;
+                            if (int.TryParse(dt.Rows[j][6].ToString(), out return_poundage))
+                            {
+                                model.return_poundage = return_poundage;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            }
                         model.remark = dt.Rows[j][7].ToString();
-                        if (model != null && !(model.account_collection_time == model.return_collection_time && model.return_collection_time == DateTime.MinValue))
+                        if (model != null)
                         {
                             oacli.Add(model);
                         }
@@ -3306,7 +3288,7 @@ namespace Admin.gigade.Controllers
                         }
                         dr["發票銷售額"] = _dt.Rows[i]["free_tax"];//F
                         dr["發票稅額"] = _dt.Rows[i]["tax_amount"];//G
-                        dr["發票總額"] = _dt.Rows[i]["imramount"];//F+G
+                        dr["發票總額"] = _dt.Rows[i]["invoicetotal"];//F+G
                         //if (!string.IsNullOrEmpty(dr["發票銷售額"].ToString()) && !string.IsNullOrEmpty(dr["發票稅額"].ToString()))
                         //{
                         //    dr["發票總額"] = Convert.ToInt32(dr["發票銷售額"]) + Convert.ToInt32(dr["發票稅額"]);//F+G

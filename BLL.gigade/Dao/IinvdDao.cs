@@ -403,7 +403,7 @@ LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where i.upc_id='{0}' ;", id);
                         {//刪除收貨上架表庫存,往iwms_record表添加數據
                             sb.AppendFormat("Delete from iinvd where row_id='{0}' ;", dt.Rows[0]["row_id"], int.Parse(dt.Rows[0]["prod_qty"].ToString()) - a.act_pick_qty);
                             sb.AppendFormat("INSERT INTO iwms_record (order_id,detail_id,act_pick_qty,cde_dt,create_date,create_user_id,made_dt,cde_dt_incr,cde_dt_shp) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}');", a.ord_id, a.ordd_id, value, CommonFunction.DateTimeToString(DateTime.Parse(cde_dt)), CommonFunction.DateTimeToString(DateTime.Now), a.change_user, CommonFunction.DateTimeToString(DateTime.Parse(made_date.ToString())), cde_dt_incr, cde_dt_shp);
-                            sb.AppendFormat("insert into istock_change(sc_trans_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_istock_why,sc_note) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}');", a.ord_id, dt.Rows[0]["item_id"], "3", sum, "-" + value.ToString(), sum - value, CommonFunction.DateTimeToString(DateTime.Now), a.change_user, 4,"理貨撿貨");
+                            sb.AppendFormat("insert into istock_change(sc_trans_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_istock_why,sc_note) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}');", a.ord_id, dt.Rows[0]["item_id"], "3", sum, "-" + value.ToString(), sum - value, CommonFunction.DateTimeToString(DateTime.Now), a.change_user, 4,"理貨檢貨");
                             sum = sum - value;
                         }
                         else if (int.Parse(dt.Rows[0]["prod_qty"].ToString()) > value)
@@ -412,7 +412,7 @@ LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where i.upc_id='{0}' ;", id);
                             {
                                 sb.AppendFormat("UPDATE iinvd SET prod_qty='{1}' where row_id='{0}' ;", dt.Rows[0]["row_id"], int.Parse(dt.Rows[0]["prod_qty"].ToString()) - value);
                                 sb.AppendFormat("INSERT INTO iwms_record (order_id,detail_id,act_pick_qty,cde_dt,create_date,create_user_id,made_dt,cde_dt_incr,cde_dt_shp) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}');", a.ord_id, a.ordd_id, value, CommonFunction.DateTimeToString(DateTime.Parse(cde_dt)), CommonFunction.DateTimeToString(DateTime.Now), a.change_user, CommonFunction.DateTimeToString(DateTime.Parse(made_date.ToString())), cde_dt_incr, cde_dt_shp);
-                                sb.AppendFormat("insert into istock_change(sc_trans_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_istock_why,sc_note) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}');", a.ord_id, dt.Rows[0]["item_id"], "3", sum, "-" + value.ToString(), sum - value, CommonFunction.DateTimeToString(DateTime.Now), a.change_user, 4, "理貨撿貨");
+                                sb.AppendFormat("insert into istock_change(sc_trans_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_istock_why,sc_note) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}');", a.ord_id, dt.Rows[0]["item_id"], "3", sum, "-" + value.ToString(), sum - value, CommonFunction.DateTimeToString(DateTime.Now), a.change_user, 4, "理貨檢貨");
                                 sum = sum - value;
                             }
                         }

@@ -370,20 +370,11 @@ Ext.onReady(function () {
                 disabledMin: true,
                 disabledSec: true,
                 format: 'Y-m-d H:i:s',
-                id: 'purchase_in_advance_end',//預計結束時間
+                id: 'purchase_in_advance_end',
                 allowBlank: false,
                 disabled: true,
                 value: tomRepeat,
-                minValue: new Date(),
-                listeners: {
-                    select: function (a, b, c) {
-                        var e_time = Ext.getCmp("e_time");
-                        if (b > e_time.getValue()) {
-                            Ext.getCmp("e_time").setValue("");
-                            Ext.Msg.alert(PROMPT, EXPECT_TIME_IS_ERROR);
-                        }
-                    }
-                }
+                minValue: new Date()
             }, {
                 xtype: 'datetimefield',
                 disabledMin: true,
@@ -399,7 +390,7 @@ Ext.onReady(function () {
                     select: function (a, b, c) {
                         var purchase_in_advance_end = Ext.getCmp("purchase_in_advance_end");
                         if (b < purchase_in_advance_end.getValue()) {
-                            Ext.getCmp("e_time").setValue("");
+                            Ext.getCmp("e_time").setValue(new Date().getDate() + 2);
                             Ext.Msg.alert(PROMPT, EXPECT_TIME_IS_ERROR);
                         }
                     }
