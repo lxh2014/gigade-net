@@ -5616,11 +5616,11 @@ namespace Admin.gigade.Controllers
                     }
                 }
                 DateTime time;
-                if (DateTime.TryParse(Request.Params["time_start"], out time))
+                if (DateTime.TryParse(Request.Params["start_time"], out time))//
                 {
                     query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
                 }
-                if (DateTime.TryParse(Request.Params["time_end"], out time))
+                if (DateTime.TryParse(Request.Params["end_time"], out time))
                 {
                     query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
                 }

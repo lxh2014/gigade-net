@@ -48,6 +48,7 @@
   <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="10" parameterName="即期品上架" remark="" kdate="" kuser="" used="" sort=""  topValue="3"/>
   <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="11" parameterName="贈品" remark="" kdate="" kuser="" used="" sort=""  topValue="3"/>
   <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="12" parameterName="出貨方式轉換，新建品號" remark="" kdate="" kuser="" used="" sort=""  topValue="3"/>
+  <parameter parameterType="Off_Grade" parameterProperty="" parameterCode="13" parameterName="缺貨系統下架再上架" remark="" kdate="" kuser="" used="" sort=""  topValue="3"/>
   <!--add by guodong1130w 2015/10/12 吉甲地推薦系統匯出Sheet名稱-->
   <parameter parameterType="RecommendedExcleSheetName" parameterProperty="" parameterCode="1" parameterName="會員" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
   <parameter parameterType="RecommendedExcleSheetName" parameterProperty="" parameterCode="2" parameterName="商品" remark="" kdate="" kuser="" used="" sort=""  topValue=""/>
