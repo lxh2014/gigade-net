@@ -15,6 +15,10 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+        public ActionResult Index()
+        {
+            return View();
+        }
 
     }
 }
