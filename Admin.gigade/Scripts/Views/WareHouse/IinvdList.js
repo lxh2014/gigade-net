@@ -114,7 +114,16 @@ Ext.onReady(function () {
                             forceSelection: false,
                             value: 2
                         },
-                        { xtype: 'textfield', allowBlank: true, id: 'searchcontent', name: 'searchcontent' },
+                        {
+                            xtype: 'textfield', allowBlank: true, id: 'searchcontent', name: 'searchcontent',
+                            listeners: {
+                                specialkey: function (field, e) {
+                                    if (e.getKey() == e.ENTER) {
+                                        Query();
+                                    }
+                                }
+                            }
+                        },
                         { xtype: 'label', margin: '2 0 0 10', text: '創建時間:' },
                         {
                             xtype: "datefield",

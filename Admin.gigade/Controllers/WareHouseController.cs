@@ -5616,11 +5616,11 @@ namespace Admin.gigade.Controllers
                     }
                 }
                 DateTime time;
-                if (!string.IsNullOrEmpty(Request.Params["start_time"]))//
+                if (!string.IsNullOrEmpty(Request.Params["start_time"]) && Request.Params["start_time"] != "1970-01-01 08:00:00")//
                 {
                     query.starttime = DateTime.Parse(DateTime.Parse(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
                 }
-                if (!string.IsNullOrEmpty(Request.Params["end_time"]))
+                if (!string.IsNullOrEmpty(Request.Params["end_time"]) && Request.Params["end_time"] != "1970-01-01 08:00:00")
                 {
                     query.endtime = DateTime.Parse(DateTime.Parse(Request.Params["end_time"]).ToString("yyyy-MM-dd 00:00:00"));
                 }
