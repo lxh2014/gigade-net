@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using BLL.gigade.Common;
 using System.Data;
+using System.Text.RegularExpressions;
 
 namespace BLL.gigade.Mgr
 {
@@ -18,12 +19,14 @@ namespace BLL.gigade.Mgr
       private ISerialImplDao _ISerialImpl;
       private IEdmGroupEmailImpIDao _IEdmGroupEmailMgr;
       private InspectionReportDao _inspectionReport;
+      private MySqlDao _mysql;
       public EdmGroupMgr(string connectionString)
       {
           _edmGroup = new EdmGroupDao(connectionString);
           _ISerialImpl = new SerialDao(connectionString);
           _IEdmGroupEmailMgr = new EdmGroupEmailDao(connectionString);
           _inspectionReport = new InspectionReportDao(connectionString);
+          _mysql = new MySqlDao(connectionString);
       }
 
       public List<EdmGroup> GetEdmGroupList(EdmGroup query, out int totalCount)
@@ -157,10 +160,24 @@ namespace BLL.gigade.Mgr
                       emailQuery.email_address = _dt.Rows[i][0].ToString();
                       //若不為 0、1、未指定或有錯誤時，預設皆為訂閱。
                       int n = 1;
-                      if (int.TryParse(_dt.Rows[i][1].ToString(), out n))
+                      if (_dt.Columns.Count == 2)
                       {
-                          groupMailQuery.email_status = Convert.ToUInt32(_dt.Rows[i][1].ToString());
-                          if (groupMailQuery.email_status != 1 && groupMailQuery.email_status != 0)
+                          if (_dt.Rows[i][1] != "")
+                          {
+                              if (int.TryParse(_dt.Rows[i][1].ToString(), out n))
+                              {
+                                  groupMailQuery.email_status = Convert.ToUInt32(_dt.Rows[i][1].ToString());
+                                  if (groupMailQuery.email_status != 1 && groupMailQuery.email_status != 0)
+                                  {
+                                      groupMailQuery.email_status = 1;
+                                  }
+                              }
+                              else
+                              {
+                                  groupMailQuery.email_status = 1;
+                              }
+                          }
+                          else
                           {
                               groupMailQuery.email_status = 1;
                           }
@@ -169,13 +186,20 @@ namespace BLL.gigade.Mgr
                       {
                           groupMailQuery.email_status = 1;
                       }
-                      if (_dt.Rows[i][2] == "")//或無指定，預設以電子信箱帳號代替。
+                      if (_dt.Columns.Count == 3)
                       {
-                          emailQuery.email_name = _dt.Rows[i][0].ToString().Substring(0, _dt.Rows[i][0].ToString().LastIndexOf("@"));
+                          if (_dt.Rows[i][2] == "")//或無指定，預設以電子信箱帳號代替。
+                          {
+                              emailQuery.email_name = _dt.Rows[i][0].ToString().Substring(0, _dt.Rows[i][0].ToString().LastIndexOf("@"));
+                          }
+                          else
+                          {
+                              emailQuery.email_name = _dt.Rows[i][2].ToString();
+                          }
                       }
                       else
                       {
-                          emailQuery.email_name = _dt.Rows[i][2].ToString();
+                          emailQuery.email_name = _dt.Rows[i][0].ToString().Substring(0, _dt.Rows[i][0].ToString().LastIndexOf("@"));
                       }
                       groupMailQuery.email_name = emailQuery.email_name;
                       //查看edm_mail中郵箱是否存在，如果重複則更新
@@ -222,7 +246,7 @@ namespace BLL.gigade.Mgr
               }
               if (arrList.Count > 0)
               {
-                  if (_inspectionReport.ExecSql(arrList))
+                  if (_mysql.ExcuteSqlsThrowException(arrList))
                   {
                 
                       json = "{success:'true'}";

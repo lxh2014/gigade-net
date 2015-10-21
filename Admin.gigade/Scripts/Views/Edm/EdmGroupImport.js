@@ -18,6 +18,7 @@
                 fieldLabel: '群組編號',
                 hidden:true,
             },
+
             {
                 xtype: 'filefield',
                 margin: '10 0 10 0',
@@ -42,8 +43,14 @@
                         }
                     }
             },
-
+              {
+                  xtype: 'displayfield',
+                  value: "<a href='#' onclick=DownTemplate() style='font-size:large' >點擊下載模板</>",
+                  margin:'0 0 0 78',
+              }
+              ,
              {
+                 xtype: 'displayfield',
                     html: '<ol><li>CSV檔案，一行一筆資料，首行略過不處理；若資料有異常，系統主動略過不處理。</li><li><li>欄位一：電子信箱位址。</li><li>欄位二：是否訂閱電子報，0（不訂閱），1（訂閱）。若不為 0、1、未指定或有錯誤時，預設皆為訂閱。</li><li>欄位三：信箱姓名，即收信人姓名，或無指定，預設以電子信箱帳號代替。</li><li>其它欄位：皆略過不處理。</li></li><li>若此郵件群組中已有相同信箱時，系統不重覆匯入，但欄位二、欄位三資訊，會以匯入檔案資訊取代。</li></ol>'
                  // bodyStyle: "padding:5px;background:#7DC64C",
                  ,
@@ -51,6 +58,8 @@
                  border: 0
 
              }
+             ,
+           
         ],
         buttons: [{
             text: '確定匯入',
@@ -91,7 +100,7 @@
         iconCls: 'icon-user-edit',
         id: 'ExportWin',
         width: 400,
-        height:320,
+        height:330,
         y: 100,
         layout: 'fit',
         items: [ExportFrm],
@@ -123,7 +132,7 @@
             'show': function () {
                 if (row) {
                     Ext.getCmp('group_id').setValue(row.data.group_id);
-                    editFrm.getForm().loadRecord(row);
+                    //editFrm.getForm().loadRecord(row);
                     //Ext.getCmp('group_id').show(true);
                     //Ext.getCmp('s_group_createdate').show(true);
                     //Ext.getCmp('s_group_updatedate').show(true);
@@ -133,6 +142,24 @@
     });
     ExportWin.show();
 }
-function updownmuban() {
-    window.open("/InspectionReport/UpdownTemplate");
+function DownTemplate() {
+    Ext.MessageBox.show({
+        msg: '正在匯出，請稍後....',
+        width: 300,
+        wait: true
+    });
+    Ext.Ajax.request({
+        url: "/Edm/DownTemplate",
+        timeout: 900000,
+        success: function (form, action) {
+            Ext.MessageBox.hide();
+            var result = Ext.decode(form.responseText);
+            if (result.success) {
+                window.location = '../../ImportUserIOExcel/' + result.fileName;
+            } else {
+                Ext.MessageBox.hide();
+                Ext.Msg.alert("提示信息", "匯出模板失敗！");
+            }
+        }
+    });
 }
