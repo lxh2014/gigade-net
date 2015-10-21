@@ -25,10 +25,12 @@ Ext.define('gridlistWLW', {
         { name: "combination_string", type: "string" },
         { name: "product_freight_set", type: "int" },//溫層 
          { name: "product_freight_set_string", type: "string" },//溫層顯示
-        { name: "process_type", type: "int" },//出貨方式
-         { name: "process_type_string", type: "string" },//出貨方式 商品出貨方式  1:實體商品   2:電子商品 (自動押單,不寄簡訊)
+        { name: "product_mode", type: "int" },//出貨方式
+         { name: "product_mode_string", type: "string" },//出貨方式 商品出貨方式  1:自出   2:寄倉 3 調度
         { name: "product_start", type: "int" },//商品上架時間
         { name: "product_start_string", type: "string" },//商品上架時間
+        { name: "product_fenlei_xiaolei", type: "string" },//商品上架時間
+        { name: "product_fenlei_dalei", type: "string" },//商品上架時間
 
     ],
 });
@@ -67,8 +69,9 @@ var OutProductStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
         {"txt":"全部","value":"100"},
-        { "txt": "實體商品", "value": "1" },
-        { "txt": "電子商品", "value": "2" },
+        { "txt": "自出", "value": "1" },
+        { "txt": "寄倉", "value": "2" },
+        { "txt": "調度", "value": "3" }
     ]
 });
 
@@ -87,7 +90,7 @@ WareHouseStore.on('beforeload', function () {
     Ext.apply(WareHouseStore.proxy.extraParams,
         {
             product_status: Ext.getCmp('product_status').getValue(),//商品狀態
-            process_type: Ext.getCmp('process_type').getValue(),
+            product_mode: Ext.getCmp('product_mode').getValue(),
             freight: Ext.getCmp('freight').getValue(),
             start_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s')),
             end_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s')),
@@ -119,11 +122,11 @@ Ext.onReady(function () {
                            {
                                xtype: 'datefield',
                                margin: '5 0 0 5',
-                               fieldLabel: '時間區間',
-                               labelWidth: 60,
+                               fieldLabel: '品牌建立時間',
+                               labelWidth: 80,
                                id: 'start_time',
                                format: 'Y-m-d',
-                               width: 170,
+                               width: 180,
                                value: Tomorrow(1 - new Date().getDate()),
                                editable: false,
                                listeners: {
@@ -218,8 +221,8 @@ Ext.onReady(function () {
            },
            {
                xtype: 'combobox',
-               name: 'process_type',
-               id: 'process_type',
+               name: 'product_mode',
+               id: 'product_mode',
                editable: false,
                fieldLabel: "出貨方式",
                labelWidth: 60,
@@ -281,11 +284,14 @@ Ext.onReady(function () {
                 { header: '商品名稱', dataIndex: 'product_name', width: 180, align: 'center' },
                 { header: '商品規格', dataIndex: 'product_spec', width: 120, align: 'center' }, 
                 { header: '商品類型', dataIndex: 'combination_string', width: 120, align: 'center' },//商品類型
+                { header: "分類--大類", dataIndex: "product_fenlei_dalei", align: 'center' },
+                 { header: "分類--小類", dataIndex: "product_fenlei_xiaolei", align: 'center' },
                 { header: "商品狀態", dataIndex: "product_status_string", align: 'center' },
-                 { header: "出貨方式", dataIndex: "process_type_string", align: 'center' },//出貨方式
+                 { header: "出貨方式", dataIndex: "product_mode_string", align: 'center' },//出貨方式
                 { header: "溫層", dataIndex: "product_freight_set_string", align: 'center' },
                  { header: "商品建立日期", dataIndex: 'product_createdate_string', align: 'center',width:180 },
-                { header: "商品上架時間", dataIndex: "product_start_string", align: 'center', width: 180 }
+                { header: "商品上架時間", dataIndex: "product_start_string", align: 'center', width: 180 },
+                 
 
         ],
         tbar: [
@@ -346,9 +352,9 @@ function Tomorrow(s) {
 function Export() {
     var freight = Ext.getCmp('freight').getValue();
     var product_status = Ext.getCmp('product_status').getValue();
-    var process_type = Ext.getCmp('process_type').getValue();
+    var product_mode = Ext.getCmp('product_mode').getValue();
     var start_time = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s'));
     var end_time = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'));
-    window.open("/WareHouse/ExportCSV?product_status=" + product_status + "&process_type=" + process_type + "&freight=" + freight + "&start_time=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d') + "&end_time=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d'));
+    window.open("/WareHouse/ExportCSV?product_status=" + product_status + "&product_mode=" + product_mode + "&freight=" + freight + "&start_time=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d') + "&end_time=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d'));
    
 }

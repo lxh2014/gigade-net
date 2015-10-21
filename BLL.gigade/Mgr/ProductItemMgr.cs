@@ -333,13 +333,17 @@ namespace BLL.gigade.Mgr
                     }
 
                     //出貨方式
-                    if (item.process_type == 1)
+                    if (item.product_mode == 1)
                     {
-                        item.process_type_string = "實體商品";
+                        item.product_mode_string = "自出";
                     }
-                    if (item.process_type == 2)
+                    if (item.product_mode == 2)
                     {
-                        item.process_type_string = "電子商品 (自動押單,不寄簡訊)";
+                        item.product_mode_string = "寄倉";
+                    }
+                    if (item.product_mode == 3)
+                    {
+                        item.product_mode_string = "調度";
                     }
                     //商品狀態
                     if (item.product_status == 0)
