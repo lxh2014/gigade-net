@@ -61,6 +61,20 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+
+        public ActionResult EdmContentNewReport()
+        {
+            int content_id = Convert.ToInt32(Request.Params["content_id"]);
+            ViewBag.contentId = content_id;
+            return View();
+        }
+
+        public ActionResult EdmSendListCountView()
+        {
+            int content_id = Convert.ToInt32(Request.Params["content_id"]);
+            ViewBag.contentId = content_id;
+            return View();
+        }
         
         #endregion
 
@@ -670,6 +684,11 @@ namespace Admin.gigade.Controllers
                             eslQuery.schedule_date = Convert.ToDateTime(Request.Params["schedule_date"]);
                             mQuery.schedule_date = eslQuery.schedule_date;
                         }
+
+                        if (!string.IsNullOrEmpty(Request.Params["email_group_id"]))
+                        {
+                            eslQuery.email_group_id = Convert.ToInt32(Request.Params["email_group_id"]);
+                        }
                         if (!string.IsNullOrEmpty(Request.Params["expire_date"]))
                         {
                             eslQuery.expire_date = Convert.ToDateTime(Request.Params["expire_date"]);
@@ -951,6 +970,7 @@ namespace Admin.gigade.Controllers
                     excelFile.SaveAs(newExcelName);
                     NPOI4ExcelHelper helper = new NPOI4ExcelHelper(newExcelName);
                     DataTable _dt = helper.ExcelToTableForXLSX();
+                    
                     _emailGroupMgr = new EmailGroupMgr(mySqlConnectionString);
                     if (_emailGroupMgr.ImportEmailList(_dt, group_id))
                     {
@@ -1041,6 +1061,239 @@ namespace Admin.gigade.Controllers
 
         #endregion
 
+        #region store
+        public HttpResponseBase EmailGroupStore()
+        {
+            string json = string.Empty;
+            try
+            {
+                EmailGroup query = new BLL.gigade.Model.EmailGroup();
+                query.group_id = 0;
+                query.group_name = "無";
+                List<EmailGroup> store = new List<EmailGroup>();
+                _emailGroupMgr = new EmailGroupMgr(mySqlConnectionString);
+                store = _emailGroupMgr.EmailGroupStore();
+                store.Insert(0, query);
+                json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+
+        
+        #endregion
+
+        #region 報表
+
+        #region form數據加載
+        public HttpResponseBase Load()
+        {
+            string json = string.Empty;
+            if (!string.IsNullOrEmpty(Request.Params["content_id"]))
+            {
+                int openAveragePrecent = 0;
+                int openAverageCount = 0;
+                int content_id = Convert.ToInt32(Request.Params["content_id"]);
+                List<EdmContentNew> store = new List<BLL.gigade.Model.EdmContentNew>();
+                EdmContentNew query = new BLL.gigade.Model.EdmContentNew();
+                EdmContentNew newQuery = new BLL.gigade.Model.EdmContentNew();
+                query.content_id = content_id;
+                int count = 0;
+                //電子報主旨和發送時間
+                newQuery = _edmContentNewMgr.GetECNList(query, out count).FirstOrDefault();
+                string date = newQuery.date.ToString("yyyy-MM-dd HH:mm:ss");
+                string subject = newQuery.subject;
+                //發信成功人數
+                int successCount = _edmContentNewMgr.GetSendMailSCount(content_id);
+                //發信失敗人數
+                int failCount = _edmContentNewMgr.GetSendMailFCount(content_id);
+                //總開信人數
+                int totalPersonCount = _edmContentNewMgr.GetSendMailCount(content_id);
+                //開總信次數
+                int totalCount = _edmContentNewMgr.GetSendCount(content_id);
+                //開信率
+                if (successCount == 0)
+                {
+                    openAveragePrecent = 0;
+                }
+                else
+                {
+                    openAveragePrecent = totalPersonCount / successCount;
+                }
+                //平均開信次數
+                if (totalPersonCount == 0)
+                {
+                    openAverageCount = 0;
+                }
+                else
+                {
+                    openAverageCount = totalCount / totalPersonCount;
+                }
+                json = "{success:true,successCount:'" + successCount + "',failCount:'" + failCount + "',totalPersonCount:'" + totalPersonCount + "',totalCount:'" + totalCount + "',openAveragePrecent:'" + openAveragePrecent + "',openAverageCount:'" + openAverageCount + "',subject:'" + subject + "',date:'" + date + "'}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+
+        #region 開信名單下載
+        public void ImportKXMD()
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["content_id"]))
+                {
+                    _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                    DataTable _dt = _edmContentNewMgr.KXMD(Convert.ToInt32(Request.Params["content_id"]));
+                    //DataTable _newDt = new DataTable();
+                    //_newDt.Columns.Add("群組代碼", typeof(string));
+                    //_newDt.Columns.Add("電子信箱地址", typeof(string));
+                    //_newDt.Columns.Add("收件人名稱", typeof(string));
+                    //for (int i = 0; i < _dt.Rows.Count; i++)
+                    //{
+                    //    DataRow newRow = _newDt.NewRow();
+                    //    newRow[0] = _dt.Rows[i]["group_id"];
+                    //    newRow[1] = _dt.Rows[i]["email_address"];
+                    //    newRow[2] = _dt.Rows[i]["name"];
+                    //    _newDt.Rows.Add(newRow);
+                    //}
+                    string fileName = "開信名單" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                    MemoryStream ms = ExcelHelperXhf.ExportDT(_dt, "");
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                    Response.BinaryWrite(ms.ToArray());
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+        }
+        #endregion
+
+        #region 未開信名單下載
+        public void ImportWKXMD()
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["content_id"]))
+                {
+                    _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                    DataTable _dt = _edmContentNewMgr.WKXMD(Convert.ToInt32(Request.Params["content_id"]));
+                    //DataTable _newDt = new DataTable();
+                    //_newDt.Columns.Add("群組代碼", typeof(string));
+                    //_newDt.Columns.Add("電子信箱地址", typeof(string));
+                    //_newDt.Columns.Add("收件人名稱", typeof(string));
+                    //for (int i = 0; i < _dt.Rows.Count; i++)
+                    //{
+                    //    DataRow newRow = _newDt.NewRow();
+                    //    newRow[0] = _dt.Rows[i]["group_id"];
+                    //    newRow[1] = _dt.Rows[i]["email_address"]; 
+                    //    newRow[2] = _dt.Rows[i]["name"];
+                    //    _newDt.Rows.Add(newRow);
+                    //}
+                    string fileName = "未開信名單" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                    MemoryStream ms = ExcelHelperXhf.ExportDT(_dt, "");
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                    Response.BinaryWrite(ms.ToArray());
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+        }
+        #endregion
+
+        #region 發信名單統計
+        public HttpResponseBase EdmSendListCount()
+        {
+            string json = string.Empty;
+            try
+            {
+                EdmTrace query = new EdmTrace();
+                if (!string.IsNullOrEmpty(Request.Params["content_id"]))
+                {
+                    query.content_id = Convert.ToInt32(Request.Params["content_id"]);
+                }
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                int totalCount = 0;
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                DataTable _dt = _edmContentNewMgr.FXMD(query);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(_dt, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
+
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+
+        #region 電子報統計報表
+         public HttpResponseBase EdmContentNewReportList()
+        {
+            string json = string.Empty;
+            try
+            {
+                EdmTrace query = new EdmTrace();
+                if (!string.IsNullOrEmpty(Request.Params["content_id"]))
+                {
+                    query.content_id = Convert.ToInt32(Request.Params["content_id"]);
+                }
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                int totalCount = 0;
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                DataTable _dt = _edmContentNewMgr.EdmContentNewReportList(query);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(_dt, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
+
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
         #endregion
     }
 }
