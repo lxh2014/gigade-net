@@ -13,7 +13,8 @@
         }
         return mystr;
     }
-    var CommentSatisfyStore = Ext.create('Ext.data.Store', {
+    
+    var CommentSatisfyStore_product_desc = Ext.create('Ext.data.Store', {
         fields: ['txt', 'value'],
         data: [
         { "txt": '非常滿意(5分)', "value": "5" },
@@ -21,7 +22,40 @@
         { "txt": '一般(3分)', "value": "3" },
         { "txt": '不滿意(2分)', "value": "2" },
         { "txt": '非常不滿意(1分)', "value": "1" },
-        
+
+        ]
+    });
+    var CommentSatisfyStore_seller_server = Ext.create('Ext.data.Store', {
+        fields: ['txt', 'value'],
+        data: [
+        { "txt": '非常滿意(5分)', "value": "5" },
+        { "txt": '滿意(4分)', "value": "4" },
+        { "txt": '一般(3分)', "value": "3" },
+        { "txt": '不滿意(2分)', "value": "2" },
+        { "txt": '非常不滿意(1分)', "value": "1" },
+
+        ]
+    });
+    var CommentSatisfyStore_logistics_deliver = Ext.create('Ext.data.Store', {
+        fields: ['txt', 'value'],
+        data: [
+        { "txt": '非常滿意(5分)', "value": "5" },
+        { "txt": '滿意(4分)', "value": "4" },
+        { "txt": '一般(3分)', "value": "3" },
+        { "txt": '不滿意(2分)', "value": "2" },
+        { "txt": '非常不滿意(1分)', "value": "1" },
+
+        ]
+    });
+    var CommentSatisfyStore_web_server = Ext.create('Ext.data.Store', {
+        fields: ['txt', 'value'],
+        data: [
+        { "txt": '非常滿意(5分)', "value": "5" },
+        { "txt": '滿意(4分)', "value": "4" },
+        { "txt": '一般(3分)', "value": "3" },
+        { "txt": '不滿意(2分)', "value": "2" },
+        { "txt": '非常不滿意(1分)', "value": "1" },
+
         ]
     });
 
@@ -74,7 +108,7 @@
               editable: false,
               id: 'product_desc',
               name: 'product_desc',
-              store: CommentSatisfyStore,
+              store: CommentSatisfyStore_product_desc,
               valueField: 'value',
               displayField: 'txt',
               //value: '0',
@@ -85,7 +119,7 @@
               editable: false,
               id: 'seller_server',
               name: 'seller_server',
-              store: CommentSatisfyStore,
+              store: CommentSatisfyStore_seller_server,
               valueField: 'value',
               displayField: 'txt',
               //value: '0',
@@ -96,7 +130,7 @@
               editable: false,
               id: 'logistics_deliver',
               name: 'logistics_deliver',
-              store: CommentSatisfyStore,
+              store: CommentSatisfyStore_logistics_deliver,
               valueField: 'value',
               displayField: 'txt',
               //value: '0',
@@ -107,7 +141,7 @@
               editable: false,
               id: 'web_server',
               name: 'web_server',
-              store: CommentSatisfyStore,
+              store: CommentSatisfyStore_web_server,
               valueField: 'value',
               displayField: 'txt',
               //value: '0',
