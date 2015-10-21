@@ -128,15 +128,16 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductCommentMgr.GetChangeLogList-->" + ex.Message, ex);
             }
         }
-        public Model.Custom.TableChangeLogCustom GetChangeLogDetailList(int pk_id, string create_time)
+        public Model.Custom.TableChangeLogCustom GetChangeLogDetailList(int pk_id,int comment_id_display, string create_time)
         {
             try
             {
-                DataTable _dt = _proCommentDao.GetChangeLogDetailList( pk_id, create_time);
+                DataTable _dt = _proCommentDao.GetChangeLogDetailList( pk_id,create_time);
                 Model.Custom.TableChangeLogCustom _model = new Model.Custom.TableChangeLogCustom();
                 if (_dt.Rows.Count > 0)
                 {
                     _model.pk_id = Convert.ToInt32(_dt.Rows[0]["pk_id"].ToString());
+                    _model.comment_id_display = comment_id_display;
                     _model.change_table = _dt.Rows[0]["change_table"].ToString();
                     List<Model.TableChangeLog> _list = new List<Model.TableChangeLog>();
                     foreach (DataRow item in _dt.Rows)
@@ -296,7 +297,7 @@ namespace BLL.gigade.Mgr
                     int pk_id = Convert.ToInt32(item["pk_id"]);
                     string create_time = Common.CommonFunction.DateTimeToString(Convert.ToDateTime(item["create_time"]));
 
-                    Model.Custom.TableChangeLogCustom tclc = GetChangeLogDetailList(pk_id, create_time);
+                    Model.Custom.TableChangeLogCustom tclc = GetChangeLogDetailList(pk_id,Convert.ToInt32(dr[0]), create_time);
                     dr[4] = tclc.tclModel[0].change_field.ToString();
                     dr[5] = tclc.tclModel[0].field_ch_name.ToString();
                     dr[6] = tclc.tclModel[0].old_value.ToString();
