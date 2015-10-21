@@ -194,7 +194,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
                         case PRODUCT_APPLY:// 申請審核 新建商品 下架商品  但是   失格商品 不可申請審核  || val.isModified("CanSel")
                             Ext.Array.each(selections, function (val) {
                                 //edit by zhuoqin0830w  2015/06/30   || val.data.off_grade == 1  失格商品 不可申請審核
-                                if ((val.data.product_status_id != 0 && val.data.product_status_id != 6) || val.data.product_id.length < 5 || val.data.off_grade == 1) {//edit 2015/04/22
+                                if ((val.data.product_status_id != 0 && val.data.product_status_id != 6 && val.data.product_status_id != 7) || val.data.product_id.length < 5 || val.data.off_grade == 1) {//edit 2015/04/22
                                     disabled = true;
                                 }
                             });
@@ -252,7 +252,7 @@ var site_sm = Ext.create('Ext.selection.CheckboxModel', {
                         case PRODUCT_APPLY://edit 2015/04/22  // 申請審核 新建商品 下架商品  但是   失格商品 不可申請審核  || val.isModified("CanSel")
                             Ext.Array.each(selections, function (val) {
                                 //edit by zhuoqin0830w  2015/06/30   || val.data.off_grade == 1  失格商品 不可申請審核
-                                if ((val.data.product_status_id != 0 && val.data.product_status_id != 6) || val.data.product_id.length < 5 || val.data.off_grade == 1) {
+                                if ((val.data.product_status_id != 0 && val.data.product_status_id != 6 && val.data.product_status_id !=7) || val.data.product_id.length < 5 || val.data.off_grade == 1) {
                                     disabled = true;
                                 }
                             });
