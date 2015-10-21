@@ -4412,7 +4412,6 @@
     <Content Include="Views\Vendor\VendorDetails.cshtml" />
     <Content Include="Views\Vendor\VendorBankList.cshtml" />
     <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
-
     <Content Include="Views\Vendor\VendorBankImport.cshtml" />
     <Content Include="Views\EdmNew\EmailGroup.cshtml" />
     <Content Include="Views\WareHouse\WaitLiaoWei.cshtml" />
@@ -4631,11 +4630,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-
-          <DevelopmentServerPort>9048</DevelopmentServerPort>
-
-      
-          <DevelopmentServerPort>2212</DevelopmentServerPort>
+          <DevelopmentServerPort>8337</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

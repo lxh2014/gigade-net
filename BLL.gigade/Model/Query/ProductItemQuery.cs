@@ -39,10 +39,18 @@ namespace BLL.gigade.Model.Query
 
         //等待料位報表
         public int process_type { get; set; }
-        public string  product_freight_set  { get; set; }
-        public string start_time { get; set; }
-        public string end_time { get; set; }
-
+        public uint  product_freight_set  { get; set; }
+        public string product_freight_set_string { get; set; }
+        public int start_time { get; set; }
+        public int end_time { get; set; }
+        public uint combination { get; set; }
+        public string combination_string { get; set; }
+        public string product_createdate_string { get; set; }
+        public uint product_createdate { get; set; }
+        public string product_start_string { get; set; }
+        public string process_type_string { get; set; }
+        public int delivery_freight_set { get; set; }
+        public uint product_start { get; set; }
 
         public ProductItemQuery()
         {
@@ -73,9 +81,18 @@ namespace BLL.gigade.Model.Query
             item_stock_end = 0;
             vendor_name_full_OR_vendor_id = string.Empty;
             process_type = 0;
-            product_freight_set = string.Empty;
-            start_time = string.Empty;
-            end_time = string.Empty;
+            product_freight_set = 0;
+            start_time = 0;
+            end_time = 0;
+            combination = 0;
+            combination_string = string.Empty;
+            product_freight_set_string = string.Empty;
+            product_createdate_string = string.Empty;
+            product_createdate = 0;
+            product_start_string = string.Empty;
+            process_type_string = string.Empty;
+            delivery_freight_set = 0;
+            product_start = 0;
         }
     }
 }

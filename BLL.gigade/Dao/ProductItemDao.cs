@@ -740,113 +740,61 @@ namespace BLL.gigade.Dao
 
 
 
-        //public List<ProductItemQuery> GetWaitLiaoWeiList(ProductItemQuery query, out int totalCount)// by yachao1120j 2015-10-20 等待料位報表
-        //{
-        //    //StringBuilder str = new StringBuilder();
-        //    //StringBuilder strcont = new StringBuilder();
-        //    //totalCount = 0;
+        public List<ProductItemQuery> GetWaitLiaoWeiList(ProductItemQuery query, out int totalCount)// by yachao1120j 2015-10-20 等待料位報表
+        {
+            StringBuilder str = new StringBuilder();
+            StringBuilder sqlCount = new StringBuilder();
+            StringBuilder strcont = new StringBuilder();
+            totalCount = 0;
 
-        //    //try
-        //    //{
-        //        //str.AppendFormat("SELECT p.product_id,p.product_name,pi.item_id,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1 ");
-        //        //str.AppendFormat(" ,CONCAT(p.spec_title_2,' ',ps2.spec_name) as Spec_Name_2 ,v.vendor_id,v.vendor_name_full, vb.brand_id ");
-        //        //str.Append(" ,vb.brand_name,tp1.parameterName as product_status_string,p.product_status,tp2.parameterName as sale_status_string,pi.item_stock,p.ignore_stock  ");
-        //        //strcont.AppendFormat("  from product_item pi ");
-        //        //strcont.AppendFormat(" left JOIN product p on p.product_id=pi.product_id ");
-        //        //strcont.AppendFormat(" INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id ");
-        //        //strcont.AppendFormat(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id ");
-        //        //strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
-        //        //strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
-        //        ////strcont.AppendFormat(" inner JOIN t_parametersrc tp on tp.parameterCode=p.product_status and  tp.parameterType='product_status' ");
-        //        //strcont.AppendFormat(" inner JOIN (SELECT parameterName,parameterCode from t_parametersrc where parameterType='product_status')  tp1 on tp1.parameterCode=p.product_status  ");
-        //        //strcont.AppendFormat(" INNER JOIN (SELECT parameterName,parameterCode from t_parametersrc where parameterType='sale_status' )  tp2 on tp2.parameterCode=p.sale_status ");
-        //        //strcont.AppendFormat(" where 1=1 ");
+            try
+            {
+                sqlCount.AppendFormat("SELECT count(pi.item_id) as totalCount ");
+                str.AppendFormat("select pi.item_id,p.product_createdate,p.product_name,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1,CONCAT(p.spec_title_2,'',ps2.spec_name) as Spec_Name_2 ,p.combination,p.product_status,p.process_type,dfsm.delivery_freight_set,p.product_start  ");
+                strcont.AppendFormat(" from  product_item pi ");
+                strcont.AppendFormat(" left join product p on p.product_id =pi.product_id ");
+                strcont.AppendFormat(" left join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set ");
+                strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
+                strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
+                strcont.AppendFormat(" where item_id NOT in (select item_id from iplas)  and p.product_id>10000  ");
+                if (query.process_type != 100)//  出貨方式  100 代表全部
+                {
+                    strcont.AppendFormat(" and p.process_type = '{0}' ", query.process_type);
+                }
+                if (query.product_freight_set != 100)//溫層  100 代表全部
+                {
+                    strcont.AppendFormat(" and p.product_freight_set = '{0}' ", query.product_freight_set);
+                }
+                if (query.product_status != 100)//商品狀態  100 代表全部
+                {
+                    strcont.AppendFormat(" and p.product_status ='{0}' ", query.product_status);
+                }
+                else 
+                {
+                    strcont.AppendFormat("and p.product_status in (0,1,2,5) ");
+                }
+                //開始日期 結束時間 都不為空的條件下
+               strcont.AppendFormat("  and p.product_start >='{0}' and p.product_start <='{1}'  ", query.start_time, (query.end_time));
+                str.Append(strcont);
 
-        //        //if (!string.IsNullOrEmpty(query.product_id_OR_product_name))//商品名稱或者商品編號或商品細項編號
-        //        //{
-        //        //    int ID = 0;
-        //        //    if (int.TryParse(query.product_id_OR_product_name, out ID))
-        //        //    {
-        //        //        if (query.product_id_OR_product_name.Length == 6)
-        //        //        {
-        //        //            strcont.AppendFormat("and pi.item_id='{0}'", query.product_id_OR_product_name);
-        //        //        }
-        //        //        else
-        //        //        {
-        //        //            strcont.AppendFormat("and p.product_id='{0}'", query.product_id_OR_product_name);
-        //        //        }
-        //        //        //strcont.AppendFormat(" and ( p.product_id = '{0}' or pi.item_id = '{1}') ", query.product_id_OR_product_name, query.product_id_OR_product_name);
-        //        //    }
-        //        //    else
-        //        //    {
-        //        //        strcont.AppendFormat(" and p.product_name LIKE '%{0}%'", query.product_id_OR_product_name);
-        //        //    }
-        //        //}
-        //        //if (!string.IsNullOrEmpty(query.vendor_name_full_OR_vendor_id))//供應商名稱或者供應商編號
-        //        //{
-        //        //    int ID = 0;
-        //        //    if (int.TryParse(query.vendor_name_full_OR_vendor_id, out ID))
-        //        //    {
-        //        //        strcont.AppendFormat(" and  v.vendor_id = '{0}' ", query.vendor_name_full_OR_vendor_id);
-        //        //    }
-        //        //    else
-        //        //    {
-        //        //        strcont.AppendFormat(" and v.vendor_name_full LIKE '%{0}%'", query.vendor_name_full_OR_vendor_id);
-        //        //    }
-        //        //}
+                if (query.IsPage)
+                {
+                    DataTable _dt = _access.getDataTable(sqlCount.ToString() + strcont.ToString());
+                    if (_dt.Rows.Count > 0)
+                    {
+                        totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
+                        str.AppendFormat(" limit {0},{1} ", query.Start, query.Limit);
+                    }
+                }
+                return _access.getDataTableForObj<ProductItemQuery>(str.ToString());// 獲取查詢記錄
 
-        //        //if (!string.IsNullOrEmpty(query.brand_id_OR_brand_name))//品牌名稱或者品牌編號
-        //        //{
-        //        //    int ID = 0;
-        //        //    if (int.TryParse(query.brand_id_OR_brand_name, out ID))
-        //        //    {
-        //        //        strcont.AppendFormat(" and vb.brand_id = '{0}'", query.brand_id_OR_brand_name);
-        //        //    }
-        //        //    else
-        //        //    {
-        //        //        strcont.AppendFormat(" and vb.brand_name LIKE '%{0}%'", query.brand_id_OR_brand_name);
-        //        //    }
-        //        //}
-        //        //if (query.product_status != 100)//商品狀態  10 代表全部
-        //        //{
-        //        //    strcont.AppendFormat("and p.product_status = '{0}'", query.product_status);
-        //        //}
-        //        //if (query.sale_status != 100)//  商品販售狀態  100 代表全部
-        //        //{
-        //        //    strcont.AppendFormat("and p.sale_status = '{0}'", query.sale_status);
-        //        //}
-        //        //if (query.item_stock_start <= query.item_stock_end)//库存数量开始--库存数量结束   
-        //        //{
-        //        //    strcont.AppendFormat("  and pi.item_stock >='{0}' and pi.item_stock <='{1}'  ", query.item_stock_start, query.item_stock_end);
-        //        //}
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->GetWaitLiaoWeiList-->" + ex.Message);
+            }
 
-        //        //strcont.AppendFormat("and p.ignore_stock = '{0}'", query.ignore_stock);//庫存為0時是否還能販售
-
-        //        //str.Append(strcont);
-
-        //        //if (query.IsPage)
-        //        //{
-        //        //    StringBuilder strpage = new StringBuilder();//  
-        //        //    StringBuilder strcontpage = new StringBuilder();
-        //        //    strpage.AppendFormat(" SELECT count(pi.item_id) as totalCount  ");
-        //        //    strpage.Append(strcont);
-        //        //    string sql = strpage.ToString();
-        //        //    DataTable _dt = _access.getDataTable(sql);
-        //        //    if (_dt.Rows.Count > 0)
-        //        //    {
-        //        //        totalCount = Convert.ToInt32(_dt.Rows[0][0]);
-        //        //        str.AppendFormat(" limit {0},{1}", query.Start, query.Limit);
-        //        //    }
-        //        //}
-        //        //return _access.getDataTableForObj<ProductItemQuery>(str.ToString());// 獲取查詢記錄
-
-        //    //}
-        //    //catch (Exception ex)
-        //    //{
-        //    //    throw new Exception("ProductItemDao-->GetWaitLiaoWeiList-->" + ex.Message);
-        //    //}
-
-        //}
+        }
 
     }
 }
