@@ -23,5 +23,7 @@ namespace BLL.gigade.Mgr.Impl
         DataTable GetDeliveryMsgList(DeliverMasterQuery deliver, out int totalCount);
         DataTable GetDeliveryMsgExcelList(DeliverMasterQuery deliver);
         int GetDeliverMasterCount(DeliverMasterQuery query);
+        DataTable GetDeliverMaster(string hourNum);
+
     }
 }

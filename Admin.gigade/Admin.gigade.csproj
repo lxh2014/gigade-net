@@ -237,6 +237,7 @@
     <Compile Include="Controllers\ReportManagementController.cs" />
     <Compile Include="Controllers\ScheduleServiceController.cs" />
     <Compile Include="Controllers\ScheduleParamerController.cs" />
+    <Compile Include="Controllers\ScheduleServiceWorkerController.cs" />
     <Compile Include="Controllers\SecretInfoController.cs" />
     <Compile Include="Controllers\SendProductController.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
@@ -4412,7 +4413,6 @@
     <Content Include="Views\Vendor\VendorDetails.cshtml" />
     <Content Include="Views\Vendor\VendorBankList.cshtml" />
     <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
-
     <Content Include="Views\Vendor\VendorBankImport.cshtml" />
     <Content Include="Views\EdmNew\EmailGroup.cshtml" />
     <Content Include="Views\WareHouse\WaitLiaoWei.cshtml" />
@@ -4631,10 +4631,6 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-
-          <DevelopmentServerPort>9048</DevelopmentServerPort>
-
-      
           <DevelopmentServerPort>2212</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
