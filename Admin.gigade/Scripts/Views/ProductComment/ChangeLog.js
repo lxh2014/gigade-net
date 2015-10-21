@@ -239,11 +239,12 @@ var gridlist = Ext.create('Ext.grid.Panel', {
     store: listStore,
     height: document.documentElement.clientHeight - 42,
     columns: [
+        
+        { header: '評價編號', dataIndex: 'comment_id', align: 'left', width: 166, menuDisabled: true, sortable: false, flex: 1 },
         {
             header: '主鍵值', dataIndex: 'pk_id', align: 'left', width: 166, menuDisabled: true, sortable: false, flex: 1,
             colName: 'col_pkid', hidden: true
         },
-        { header: '評價編號', dataIndex: 'comment_id', align: 'left', width: 166, menuDisabled: true, sortable: false, flex: 1 },
         { header: '創建人', dataIndex: 'user_name', align: 'left', width: 65, menuDisabled: true, sortable: false, flex: 1 },
         { header: '創建時間', dataIndex: 'create_time', align: 'left', width: 166, menuDisabled: true, sortable: false }
     ],
@@ -365,7 +366,7 @@ function Search()
         return;
     }
     Ext.getCmp("gridlist").show();
-    tableNameStore.removeAll();
+    //tableNameStore.removeAll();
     Ext.getCmp("gridlist").store.loadPage(1, {
         params: {
             table_name: Ext.getCmp('table_name').getValue(),
