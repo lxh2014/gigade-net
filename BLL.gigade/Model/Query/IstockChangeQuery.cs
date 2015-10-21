@@ -19,6 +19,7 @@ namespace BLL.gigade.Model.Query
         public DateTime endtime { get; set; }
         public string specname { get; set; }
         public int item_stock { get; set; }
+        public string specname2 { get; set; }
         public IstockChangeQuery()
         {
             typename = string.Empty;
@@ -30,6 +31,7 @@ namespace BLL.gigade.Model.Query
             endtime = DateTime.Now;
             specname = string.Empty;
             item_stock = 0;
+            specname2 = string.Empty;
         }
     }
 }

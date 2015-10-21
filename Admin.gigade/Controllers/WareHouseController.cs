@@ -5616,13 +5616,13 @@ namespace Admin.gigade.Controllers
                     }
                 }
                 DateTime time;
-                if (DateTime.TryParse(Request.Params["start_time"], out time))//
+                if (!string.IsNullOrEmpty(Request.Params["start_time"]))//
                 {
-                    query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                    query.starttime = DateTime.Parse(DateTime.Parse(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
                 }
-                if (DateTime.TryParse(Request.Params["end_time"], out time))
+                if (!string.IsNullOrEmpty(Request.Params["end_time"]))
                 {
-                    query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                    query.endtime = DateTime.Parse(DateTime.Parse(Request.Params["end_time"]).ToString("yyyy-MM-dd 00:00:00"));
                 }
                 query.IsPage = false;
                 _istockMgr = new IstockChangeMgr(mySqlConnectionString);
