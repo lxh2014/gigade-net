@@ -623,7 +623,7 @@ namespace Admin.gigade.Controllers
                         method = "1";
                     }
                     //若當前商品狀態不是新建商品或下架,則跳過申請
-                    if (update.Product_Status != 0 && update.Product_Status != 6)
+                    if (update.Product_Status != 0 && update.Product_Status != 6 && update.Product_Status!=7)
                     {
                         break;
                     }
