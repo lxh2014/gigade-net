@@ -111,8 +111,8 @@ OrderMasterExportStore.on('beforeload', function () {
                 Ext.getCmp("lblpoundage").setText(result.msg);
                 Ext.getCmp("lblAccount").setText(result.AccountMoney);
                 Ext.getCmp("ZMoney").setText(result.ZMoney);
-                Ext.getCmp("SalesAmount").setText(result.SalesAmount);
-                Ext.getCmp("FreeTax").setText(result.FreeTax);
+                //Ext.getCmp("SalesAmount").setText(result.SalesAmount);
+                //Ext.getCmp("FreeTax").setText(result.FreeTax);
                 Ext.getCmp("ZTax").setText(result.ZTax);
             } else {
 
@@ -562,22 +562,22 @@ Ext.onReady(function () {
             flex: 1.2,
             style: 'fontSize:15px ;color:red'
         },
-        {
-            xtype: 'label',
-            id: "SalesAmount",
-            margin: '0 10 0 5',
-            text: '',
-            flex: 1.5,
-            style: 'fontSize:15px ;color:red'
-        },
-        {
-            xtype: 'label',
-            id: "FreeTax",
-            margin: '0 10 0 5',
-            text: '',
-            flex: 1.2,
-            style: 'fontSize:15px ;color:red'
-        },
+        //{
+        //    xtype: 'label',
+        //    id: "SalesAmount",
+        //    margin: '0 10 0 5',
+        //    text: '',
+        //    flex: 1.5,
+        //    style: 'fontSize:15px ;color:red'
+        //},
+        //{
+        //    xtype: 'label',
+        //    id: "FreeTax",
+        //    margin: '0 10 0 5',
+        //    text: '',
+        //    flex: 1.2,
+        //    style: 'fontSize:15px ;color:red'
+        //},
         {
             xtype: 'label',
             id: "ZTax",
