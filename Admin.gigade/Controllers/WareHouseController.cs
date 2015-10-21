@@ -11425,46 +11425,131 @@ namespace Admin.gigade.Controllers
         #endregion
 
        // 等待料位報表
-        //public HttpResponseBase GetWaitLiaoWeiList()// createTime 2015/10/19 by yachao1120j
-        //{
-        //    string json = string.Empty;
-        //    int totalcount = 0;
-        //    ProductItemQuery query = new ProductItemQuery();
-        //    query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
-        //    query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
-        //    productitemMgr = new ProductItemMgr(mySqlConnectionString);
+        public HttpResponseBase GetWaitLiaoWeiList()// createTime 2015/10/19 by yachao1120j
+        {
+            string json = string.Empty;
+            int totalcount = 0;
+            ProductItemQuery query = new ProductItemQuery();
+            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+            productitemMgr = new ProductItemMgr(mySqlConnectionString);
 
-        //    if (!string.IsNullOrEmpty(Request.Params["process_type"]))
-        //    {
-        //        query.process_type = Convert.ToInt32(Request.Params["process_type"]);//出貨方式
-        //    }
-        //    if (!string.IsNullOrEmpty(Request.Params["freight"]))//溫層
-        //    {
-        //        query.product_freight_set = Request.Params["freight"];
-        //    }
-        //    if (!string.IsNullOrEmpty(Request.Params["product_status"]))
-        //    {
-        //        query.product_status = Convert.ToUInt32(Request.Params["product_status"]);//商品状态
-        //    }
-        //    if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
-        //    {
-        //        query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
-        //    }
-        //    if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
-        //    {
-        //        query.end_time = Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59");
-        //    }
-        //    List<ProductItemQuery> list = productitemMgr.GetWaitLiaoWeiList(query, out totalcount);
-        //    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-        //    timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-        //    timeConverter.DateTimeFormat = "yyyy-MM-dd";
-        //    json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
-        //    this.Response.Clear();
-        //    this.Response.Write(json);
-        //    this.Response.End();
-        //    return Response;
+            if (!string.IsNullOrEmpty(Request.Params["product_mode"]))
+            {
+                query.product_mode = Convert.ToInt32(Request.Params["product_mode"]);//出貨方式
+            }
+            if (!string.IsNullOrEmpty(Request.Params["freight"]))
+            {
+                query.product_freight_set = Convert.ToUInt32(Request.Params["freight"]);//溫層
+            }
+            if (!string.IsNullOrEmpty(Request.Params["product_status"]))
+            {
+                query.product_status = Convert.ToUInt32(Request.Params["product_status"]);//商品状态
+            }
+            if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
+            {
+                //query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
+                query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
+            }
+            if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
+            {
+                //query.end_time = Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59");
+                query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+            }
+            List<ProductItemQuery> list = productitemMgr.GetWaitLiaoWeiList(query, out totalcount);
+            IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+            timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return Response;
 
-        //}
+        }
 
+        //匯出 等待料位報表
+        public void ExportCSV() // createTime 2015/10/21 by yachao1120j
+        {
+            ProductItemQuery query = new ProductItemQuery();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["product_mode"]))
+                {
+                    query.product_mode = Convert.ToInt32(Request.Params["product_mode"]);//出貨方式
+                }
+                if (!string.IsNullOrEmpty(Request.Params["freight"]))
+                {
+                    query.product_freight_set = Convert.ToUInt32(Request.Params["freight"]);//溫層
+                }
+                if (!string.IsNullOrEmpty(Request.Params["product_status"]))
+                {
+                    query.product_status = Convert.ToUInt32(Request.Params["product_status"]);//商品状态
+                }
+                if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
+                {
+                    //query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
+                    query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
+                {
+                    //query.end_time = Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59");
+                    query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+                }
+                DataTable dtHZ = new DataTable();
+                int totalcount = 0;
+                query.IsPage = false;
+                string newExcelName = string.Empty;
+                dtHZ.Columns.Add("商品細項編號", typeof(String));
+                dtHZ.Columns.Add("商品名稱", typeof(String));
+                dtHZ.Columns.Add("商品規格", typeof(String));
+                dtHZ.Columns.Add("商品類型", typeof(String));
+                dtHZ.Columns.Add("分類--大類", typeof(String));
+                dtHZ.Columns.Add("分類--小類", typeof(String));
+                dtHZ.Columns.Add("商品狀態", typeof(String));
+                dtHZ.Columns.Add("出貨方式", typeof(String));
+                dtHZ.Columns.Add("溫層", typeof(String));
+                dtHZ.Columns.Add("商品建立日期", typeof(String));
+                dtHZ.Columns.Add("商品上架時間", typeof(String));
+                productitemMgr = new ProductItemMgr(mySqlConnectionString);
+                List<ProductItemQuery> list = productitemMgr.GetWaitLiaoWeiList(query, out totalcount);
+                if (list.Count > 0)
+                {
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        DataRow dr = dtHZ.NewRow();
+                        dr[0] = list[i].item_id;
+                        dr[1] = list[i].product_name;
+                        dr[2] = list[i].product_spec;
+                        dr[3] = list[i].combination_string;
+                        dr[4] = list[i].product_fenlei_dalei;
+                        dr[5] = list[i].product_fenlei_xiaolei;
+                        dr[6] = list[i].product_status_string;
+                        dr[7] = list[i].product_mode_string;
+                        dr[8] = list[i].product_freight_set_string;
+                        dr[9] = list[i].product_createdate_string;
+                        dr[10] = list[i].product_start_string;
+                        dtHZ.Rows.Add(dr);
+                    }
+                    string fileName = "等待料位報表匯出_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                    MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "");
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                    Response.BinaryWrite(ms.ToArray());
+                }
+                else
+                {
+                    Response.Clear();
+                    this.Response.Write("無數據存在<br/>");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+
+            }
+        }
     }
 }

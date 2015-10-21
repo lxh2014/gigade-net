@@ -127,6 +127,41 @@ namespace BLL.gigade.Dao
           {
               throw new Exception("EmailGroupDao-->UpdateEmailGroup-->" + sql.ToString() + ex.Message, ex);
           }
-      }                                         
+      }
+
+      public List<EmailGroup> EmailGroupStore()
+      {
+          StringBuilder sql = new StringBuilder();
+          try
+          {
+              sql.Append("select * from( select eg.group_id,eg.group_name,count(el.group_id) 'count' from email_group eg LEFT  JOIN email_list el on eg.group_id=el.group_id where 1=1 group by eg.group_id ) email where count!=0;");
+              return _access.getDataTableForObj<EmailGroup>(sql.ToString());
+          }
+          catch (Exception ex)
+          {
+              throw new Exception("EmailGroupDao-->UpdateEmailGroup-->" + sql.ToString() + ex.Message, ex);
+          }
+      }
+
+      public DataTable GetEmailList(int group_id)
+      {
+          StringBuilder sql = new StringBuilder();
+          DataTable _dt = new DataTable();
+          try
+          {
+              if (group_id != 0)
+              {
+                  sql.AppendFormat("select email_address,name from email_list where group_id='{0}';", group_id);
+                  _dt = _access.getDataTable(sql.ToString());
+              }
+              return _dt;
+
+          }
+          catch (Exception ex)
+          {
+
+              throw new Exception("EmailGroupDao-->GetEmailList-->" + sql.ToString() + ex.Message, ex);
+          }
+      }                             
     }
 }

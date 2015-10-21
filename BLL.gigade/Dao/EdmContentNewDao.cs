@@ -35,7 +35,11 @@ namespace BLL.gigade.Dao
                 sqlWhere.AppendFormat(" and edn.content_createdate between '{0}' and '{1}' ",CommonFunction.DateTimeToString(DateTime.Now.AddDays(-5)),CommonFunction.DateTimeToString(DateTime.Now));
                 if (query.group_id != 0)
                 {
-                    sqlWhere.AppendFormat(" and  edn.group_id='{0}' ",query.group_id);
+                    sqlWhere.AppendFormat(" and  edn.group_id='{0}'  ",query.group_id);
+                }
+                if (query.content_id != 0)
+                {
+                    sqlWhere.AppendFormat(" and  edn.content_id='{0}'  ", query.content_id);
                 }
                 DataTable _dt = _access.getDataTable(sqlCount.ToString() + sqlFrom.ToString() + sqlWhere.ToString());
                 if (_dt!=null&&_dt.Rows.Count > 0)
@@ -129,7 +133,7 @@ namespace BLL.gigade.Dao
             }
         }
 
-        public string InsertEdmSendLog(EdmSendLog query)
+        public DataTable InsertEdmSendLog(EdmSendLog query)
         {
             StringBuilder sql = new StringBuilder();
             query.Replace4MySQL();
@@ -137,8 +141,9 @@ namespace BLL.gigade.Dao
             try
             {
                 sql.Append("insert into edm_send_log (content_id,test_send,receiver_count,schedule_date,expire_date,createdate,create_userid)values(");
-                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}','{6}');",query.content_id,query.test_send,query.receiver_count,CommonFunction.DateTimeToString(query.schedule_date),CommonFunction.DateTimeToString(query.expire_date),CommonFunction.DateTimeToString(query.createdate),query.create_userid);
-                return sql.ToString();
+                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}','{6}');select @@identity", query.content_id, query.test_send, query.receiver_count, CommonFunction.DateTimeToString(query.schedule_date), CommonFunction.DateTimeToString(query.expire_date), CommonFunction.DateTimeToString(query.createdate), query.create_userid);
+
+                return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
             {
@@ -153,14 +158,14 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.Append("insert into  mail_request(priority,group_id,content_id,user_id,sender_address, ");
+                sql.Append("insert into  mail_request(priority,user_id,sender_address, ");
                 sql.Append(" sender_name,receiver_address,receiver_name,subject,  ");
                 sql.Append(" body, importance,schedule_date,valid_until_date, ");
-                sql.Append(" retry_count,last_sent,next_send,max_retry,sent_log,request_createdate,request_updatedate) values( ");
-                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',",query.priority,query.group_id,query.content_id,query.user_id,query.sender_address);
-                sql.AppendFormat("'{0}','{1}','{2}','{3}',",query.sender_name,query.receiver_address,query.receiver_name,query.subject);
-                sql.AppendFormat("'{0}','{1}','{2}','{3}',",query.body,query.importance, CommonFunction.DateTimeToString(query.schedule_date), CommonFunction.DateTimeToString(query.valid_until_date));
-                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}',NOW());", query.retry_count, CommonFunction.DateTimeToString(query.last_sent), CommonFunction.DateTimeToString(query.next_send), query.max_retry, query.sent_log, CommonFunction.DateTimeToString(DateTime.Now));
+                sql.Append(" retry_count,last_sent,next_send,max_retry,sent_log,request_createdate,request_updatedate,success_action,fail_action) values( ");
+                sql.AppendFormat("'{0}','{1}','{2}',", query.priority, query.user_id, query.sender_address);
+                sql.AppendFormat("'{0}','{1}','{2}','{3}',", query.sender_name, query.receiver_address, query.receiver_name, query.subject);
+                sql.AppendFormat("'{0}','{1}','{2}','{3}',", query.body, query.importance, CommonFunction.DateTimeToString(query.schedule_date), CommonFunction.DateTimeToString(query.valid_until_date));
+                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}',NOW(),'{6}','{7}');", query.retry_count, CommonFunction.DateTimeToString(query.last_sent), CommonFunction.DateTimeToString(query.next_send), query.max_retry, query.sent_log, CommonFunction.DateTimeToString(DateTime.Now), query.success_action, query.fail_action);
                 return sql.ToString();
             }
             catch (Exception ex)
@@ -169,12 +174,26 @@ namespace BLL.gigade.Dao
             }
         }
 
-        public DataTable GetOuterCustomer()
+        public DataTable GetOuterCustomer(int  group_id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("select  customer_email ,customer_id  from outer_customer;");
+                sql.AppendFormat("select  oc.customer_email ,oc.customer_id  from outer_customer oc LEFT JOIN outer_edm_subscription oes on oes.customer_id=oc.customer_id where oes.group_id='{0}';", group_id);
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetOuterCustomer-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetInnerCustomer(int group_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("select  u.user_email,es.user_id from edm_subscription es LEFT JOIN users u on es.user_id=u.user_id   where group_id='{0}';", group_id);
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
@@ -185,57 +204,70 @@ namespace BLL.gigade.Dao
 
         #region 統計資料
         //發信名單統計
-        public DataTable FXMD()
+        public DataTable FXMD(EdmTrace query)
         {
             StringBuilder sql = new StringBuilder();
+            StringBuilder sqlFrom = new StringBuilder();
+            StringBuilder sqlCount = new StringBuilder();
+            StringBuilder sqlWhere = new StringBuilder();
+            int totalCount = 0;
             try
             {
-                sql.AppendFormat("SELECT * FROM edm_trace INNER JOIN edm_trace_email ON edm_trace.email_id=edm_trace_email.email_id WHERE content_id='{0}' ;");
-                return _access.getDataTable(sql.ToString());
+                sqlCount.Append("select count(edm_trace.log_id ) as totalCount ");
+                sql.AppendFormat("SELECT edm_trace.log_id,edm_trace.content_id,edm_trace.email_id,edm_trace.first_traceback,edm_trace.last_traceback,edm_trace.count,edm_trace.success,edm_trace_email.email,edm_trace_email.name   ", query.content_id);
+                sqlFrom.Append("  FROM edm_trace INNER JOIN edm_trace_email ON edm_trace.email_id=edm_trace_email.email_id    ");
+                sqlWhere.AppendFormat(" where   WHERE content_id='{0}' ",query.content_id);
+                DataTable _dt = _access.getDataTable(sqlCount.ToString() + sqlFrom.ToString() + sqlWhere.ToString());
+                if (_dt != null && _dt.Rows.Count > 0)
+                {
+                    totalCount = Convert.ToInt32(_dt.Rows[0][0]);
+                }
+                sqlWhere.AppendFormat(" limit {0},{1} ; ",query.Start,query.Limit);
+                return _access.getDataTable(sql.ToString()+sqlFrom.ToString()+sqlWhere.ToString());
             }
             catch (Exception ex)
             {
-                throw new Exception("EdmContentNewDao-->GetOuterCustomer-->" + sql.ToString() + ex.Message, ex);
+                throw new Exception("EdmContentNewDao-->FXMD-->" + sql.ToString() + sqlFrom.ToString() + sqlWhere.ToString() + ex.Message, ex);
             }
         }
         //開信名單下載
-        public DataTable KXMD()
+        public DataTable KXMD(int content_id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT * FROM edm_trace INNER JOIN edm_trace_email ON edm_trace.email_id=edm_trace_email.email_id WHERE content_id=@contentId AND edm_trace.count>0 ;");
+                sql.AppendFormat(@"SELECT edm_trace.log_id,edm_trace.content_id,edm_trace.email_id,edm_trace.first_traceback,edm_trace.last_traceback,edm_trace.count,edm_trace.success,edm_trace_email.email,edm_trace_email.name FROM  edm_trace INNER JOIN edm_trace_email ON edm_trace.email_id=edm_trace_email.email_id WHERE edm_trace.content_id='{0}' AND edm_trace.count>0 ;",content_id);
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
             {
-                throw new Exception("EdmContentNewDao-->GetOuterCustomer-->" + sql.ToString() + ex.Message, ex);
+                throw new Exception("EdmContentNewDao-->KXMD-->" + sql.ToString() + ex.Message, ex);
             }
         }
         //未開信名單下載
-        public DataTable WKXMD()
+        public DataTable WKXMD(int content_id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT * FROM edm_trace
+                sql.AppendFormat(@"SELECT edm_trace.log_id,edm_trace.content_id,edm_trace.email_id,edm_trace.first_traceback,edm_trace.last_traceback,edm_trace.count,edm_trace.success,edm_trace_email.email,edm_trace_email.name FROM edm_trace
 INNER JOIN edm_trace_email ON edm_trace.email_id=edm_trace_email.email_id
-WHERE content_id=@contentId AND edm_trace.count=0;");
+WHERE edm_trace.content_id='{0}' AND edm_trace.count=0;", content_id);
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
             {
-                throw new Exception("EdmContentNewDao-->GetOuterCustomer-->" + sql.ToString() + ex.Message, ex);
+                throw new Exception("EdmContentNewDao-->WKXMD-->" + sql.ToString() + ex.Message, ex);
             }
         }
         //發信成功人數
-        public int GetSendMailSCount()
+        public int GetSendMailSCount(int content_id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT COUNT(*) FROM edm_trace
-WHERE content_id=@contentId AND edm_trace.success=0;");
+                sql.AppendFormat(@"SELECT COUNT(content_id) FROM edm_trace
+WHERE content_id='{0}' AND edm_trace.success=0;", content_id);
                 return int.Parse(_access.getDataTable(sql.ToString()).Rows[0][0].ToString());
             }
             catch (Exception ex)
@@ -244,13 +276,13 @@ WHERE content_id=@contentId AND edm_trace.success=0;");
             }
         }
         //發信失敗人數
-        public int GetSendMailFCount()
+        public int GetSendMailFCount(int content_id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT COUNT(*) FROM edm_trace
-WHERE content_id=@contentId AND edm_trace.success=0;");
+                sql.AppendFormat(@"SELECT COUNT(content_id) FROM edm_trace
+WHERE content_id='{0}' AND edm_trace.success=0;", content_id);
                 return int.Parse(_access.getDataTable(sql.ToString()).Rows[0][0].ToString());
             }
             catch (Exception ex)
@@ -259,14 +291,20 @@ WHERE content_id=@contentId AND edm_trace.success=0;");
             }
         }
         //總開信人數
-        public int GetSendMailCount()
+        public int GetSendMailCount(int content_id)
         {
             StringBuilder sql = new StringBuilder();
+            int result = 0;
             try
             {
-                sql.AppendFormat(@"SELECT SUM(edm_trace.count) FROM edm_trace
-WHERE content_id=@contentId AND edm_trace.count>0;");
-                return int.Parse(_access.getDataTable(sql.ToString()).Rows[0][0].ToString());
+                sql.AppendFormat(@"SELECT SUM(edm_trace.count) FROM edm_trace 
+WHERE content_id='{0}' AND edm_trace.count>0;", content_id);
+                DataTable _dt = _access.getDataTable(sql.ToString());
+               if (int.TryParse(_dt.Rows[0][0].ToString(), out result))
+               {
+                   result = Convert.ToInt32(_dt.Rows[0][0].ToString());
+               }
+                return result;
             }
             catch (Exception ex)
             {
@@ -274,14 +312,20 @@ WHERE content_id=@contentId AND edm_trace.count>0;");
             }
         }
         //總開信ci數
-        public int GetSendCount()
+        public int GetSendCount( int content_id)
         {
             StringBuilder sql = new StringBuilder();
+            int result = 0;
             try
             {
-                sql.AppendFormat(@"SELECT SUM(edm_trace.count) FROM edm_trace
-WHERE content_id=@contentId AND edm_trace.count>0;");
-                return int.Parse(_access.getDataTable(sql.ToString()).Rows[0][0].ToString());
+                sql.AppendFormat(@"SELECT SUM(edm_trace.count) FROM edm_trace 
+WHERE content_id='{0}' AND edm_trace.count>0;", content_id);
+                DataTable _dt = _access.getDataTable(sql.ToString());
+                if (int.TryParse(_dt.Rows[0][0].ToString(), out result))
+                {
+                    result = Convert.ToInt32(_dt.Rows[0][0].ToString());
+                }
+                return result;
             }
             catch (Exception ex)
             {
@@ -289,5 +333,63 @@ WHERE content_id=@contentId AND edm_trace.count>0;");
             }
         }
         #endregion
+
+        public DataTable InsertEdmTraceEmail(EdmTraceEmail query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" insert into edm_trace_email (`email`,`name`)values('{0}','{1}');select @@identity;", query.email, query.name);
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetOuterCustomer-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public string InsertEdmTrace(EdmTrace query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" insert into edm_trace (log_id,content_id,email_id,count,success) values('{0}','{1}','{2}','{3}','{4}');", query.log_id, query.content_id, query.email_id, query.count, query.success);
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->InsertEdmTrace-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+
+        public DataTable EdmTrace(EdmTrace query)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sqlFrom = new StringBuilder();
+            StringBuilder sqlCount = new StringBuilder();
+            StringBuilder sqlWhere = new StringBuilder();
+            int totalCount = 0;
+            try
+            {
+                sqlCount.Append(" select count(log_id)  as totalCount  ");
+                sql.Append(" select log_id,content_id,email_id,first_traceback,last_traceback,count,success   ");
+                sqlFrom.Append(" from edm_trace  ");
+                sqlWhere.AppendFormat(" where  content_id='{0}' ", query.content_id);
+                DataTable _dt = _access.getDataTable(sqlCount.ToString() + sqlFrom.ToString() + sqlWhere.ToString());
+                if (_dt != null && _dt.Rows.Count > 0)
+                {
+                    totalCount =Convert.ToInt32(_dt.Rows[0][0]);
+                }
+                sqlWhere.AppendFormat(" limit {0},{1};  ",query.Start,query.Limit);
+                return _access.getDataTable(sql.ToString()+sqlFrom.ToString()+sqlWhere.ToString());
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("EdmContentNewDao-->EdmTrace-->" + sql.ToString() + sqlFrom.ToString() + sqlWhere.ToString() + ex.Message, ex);
+            }
+        }
+
     }
 }
