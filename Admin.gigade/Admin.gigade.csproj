@@ -4421,6 +4421,7 @@
     <Content Include="Views\WareHouse\WaitLiaoWei.cshtml" />
     <Content Include="Views\MarketTally\Index.cshtml" />
     <Content Include="Views\MarketTally\MarketTally.cshtml" />
+    <Content Include="Template\OrderImport\t_orders.xlsx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4455,7 +4456,6 @@
     <Folder Include="Scripts\kindeditor\attached\" />
     <Folder Include="Scripts\Views\Bonus\" />
     <Folder Include="Template\EmailGroup\" />
-    <Folder Include="Template\OrderImport\" />
     <Folder Include="Template\VipUsers\" />
     <Folder Include="Views\Bonus\" />
     <Folder Include="Views\PromotionsAmountDiscount\" />

@@ -31,3 +31,8 @@ PROMPT = "提示",
     DISPATCH = "調度";
     DATE_IS_ZERO = "天數為0";
     DELIVER = "供應商";
+
+    // add by dongya 2015/10/19~2015/10/22
+    STOCK_DAYS = "缺貨下架天數";
+    STOCK_RESON = "缺貨系統下架";
+    INPUT_DAY = "請輸入天數";
