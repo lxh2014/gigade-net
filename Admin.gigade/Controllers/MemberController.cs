@@ -839,7 +839,10 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
                 {
                     query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
-
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_id"]))
+                {
+                    query.user_id = uint.Parse(Request.Params["user_id"]); 
                 }
 
                 usersMgr = new UsersMgr(mySqlConnectionString);
@@ -859,10 +862,12 @@ namespace Admin.gigade.Controllers
                     {
                         item.user_name = item.user_name.Substring(0, 1) + "**";
                     }
+                    //item.sum_bonus = item.normal_deduct_bonus + item.low_deduct_bonus;
+                    //item.sum_amount = item.normal_product + item.low_product;
                     //獲取客單價的上限
                     decimal s = item.sum_amount / item.cou;
                     int sint = Convert.ToInt32(s);
-                    item.aver_amount = s > sint ? sint + 1 : sint;
+                    item.aver_amount = s > sint ? sint + 1 : sint;                  
                     //獲取時間
                     item.reg_date = CommonFunction.GetNetTime(item.user_reg_date);
                     item.create_date = CommonFunction.GetNetTime(item.order_createdate);
@@ -908,10 +913,16 @@ namespace Admin.gigade.Controllers
                 {
                     query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
                 }
+                if (!string.IsNullOrEmpty(Request.Params["user_id"]))
+                {
+                    query.user_id = uint.Parse(Request.Params["user_id"]);
+                }
+
+                int totalCount = 0;
                 query.IsPage = false;
                 zMgr = new ZipMgr(mySqlConnectionString);
                 usersMgr = new UsersMgr(mySqlConnectionString);
-                stores = usersMgr.ExportVipListCsv(query);
+                stores = usersMgr.ExportVipListCsv(query,ref totalCount );
                 DataTable _vipdt = usersMgr.IsVipUserId(0);
                 DataTable newDt = new DataTable();
                 newDt.Columns.Add("user_id", typeof(string));
@@ -938,7 +949,7 @@ namespace Admin.gigade.Controllers
                 newDt.Columns.Add("HG", typeof(string));
                 newDt.Columns.Add("ht", typeof(string));
                 newDt.Columns.Add("ml_code", typeof(string));
-                newDt.Columns.Add("order_product_subtotal", typeof(string));
+                //newDt.Columns.Add("order_product_subtotal", typeof(string));
                 for (int i = 0; i < stores.Count; i++)
                 {
                     DataRow newRow = newDt.NewRow();
@@ -986,11 +997,11 @@ namespace Admin.gigade.Controllers
                     newRow["HG"] = stores[i].ct;
                     newRow["ht"] = stores[i].ht;
                     newRow["ml_code"] = stores[i].ml_code;
-                    newRow["order_product_subtotal"] = stores[i].order_product_subtotal;
+                    //newRow["order_product_subtotal"] = stores[i].order_product_subtotal;
                     newDt.Rows.Add(newRow);
                 }
                 // string[] columnName = { "編號", "會員狀態", "姓名", "性別", "VIP", "電子郵件", "年齡", "生日月份", "居住區", "註冊時間", "最近歸檔日", "最近購買日", "購買金額", "購買次數", "客單價", "購物金使用", "常溫商品總額", "常溫商品運費", "低溫商品總額", "低溫商品運費", "中信折抵", "HG折抵", "台新折抵" };
-                string[] columnName = { "編號", "會員狀態", "姓名", "性別", "VIP", "年齡", "生日月份", "註冊時間", "最近歸檔日", "最近購買日", "購買金額", "購買次數", "客單價", "購物金使用", "常溫商品總額", "常溫商品運費", "低溫商品總額", "低溫商品運費", "中信折抵", "HG折抵", "台新折抵", "會員等級", "近期累積金額" };
+                string[] columnName = { "編號", "會員狀態", "姓名", "性別", "VIP", "年齡", "生日月份", "註冊時間", "最近歸檔日", "最近購買日", "購買金額", "購買次數", "客單價", "購物金使用", "常溫商品總額", "常溫商品運費", "低溫商品總額", "低溫商品運費", "中信折抵", "HG折抵", "台新折抵", "會員等級"};//, "近期累積金額" };
 
                 string fileName = "Vip_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
                 string newFileName = Server.MapPath(excelPath) + fileName;

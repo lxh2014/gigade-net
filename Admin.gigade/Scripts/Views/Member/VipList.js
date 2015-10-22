@@ -97,7 +97,8 @@ var VipListStore = Ext.create('Ext.data.Store', {
 VipListStore.on('beforeload', function () {
     Ext.apply(VipListStore.proxy.extraParams, {
         dateOne: Ext.getCmp('dateOne').getValue(),
-        dateTwo: Ext.getCmp('dateTwo').getValue()
+        dateTwo: Ext.getCmp('dateTwo').getValue(),
+        user_id: Ext.getCmp('userID').getValue()
     })
 
 });
@@ -184,8 +185,8 @@ Ext.onReady(function () {
                 }
             },
             { header: "vip", dataIndex: 'vip', width: 50, align: 'center' },
-            { header: "會員等級", dataIndex: 'ml_code', width: 50, align: 'center' },
-            { header: "等級購買金額", dataIndex: 'order_product_subtotal', width: 100, align: 'center' },
+            { header: "會員等級", dataIndex: 'ml_code', width: 60, align: 'center' },
+            //{ header: "等級購買金額", dataIndex: 'order_product_subtotal', width: 100, align: 'center' },
             {
                 header: BIRTHDAY, dataIndex: 'user_birthday_year', width: 100, align: 'center',
                 renderer: function (val) {
@@ -221,10 +222,43 @@ Ext.onReady(function () {
         tbar: [
             {
                 text: '匯出CSV',
-                handler: ImportCsv,
+                handler: ExportCsv,
                 iconCls: 'icon-excel',
             },
            '->',
+           {
+               xtype: 'textfield',
+               fieldLabel: '會員編號',
+               id: 'userID',
+               name: 'userID',
+               regex: /^[0-9]*[1-9][0-9]*$/,
+               regexText: '請輸入數字類型的字符',
+               maxLength: 5,
+               maxLengthText: '最大長度為5',
+               allowBlank: true,
+              
+               emptyText: '請輸入會員編號(可以為空)',
+               listeners: {
+                   specialkey: function (field, e) {
+                       if (e.getKey() == e.ENTER) {
+                           Query();
+                       }
+                   },
+                   change: function () {
+                       if (!(/^[0-9]*[1-9][0-9]*$/).test(this.getValue()) || this.getValue().length > 5) {
+                           if (this.getValue().trim() == '') {
+                               Ext.getCmp('btnQuery').setDisabled(false);
+                           }
+                           else {
+                               Ext.getCmp('btnQuery').setDisabled(true);
+                           }                           
+                       }
+                       else {                          
+                           Ext.getCmp('btnQuery').setDisabled(false);
+                       }                                            
+                   }
+               }
+           },
           {
               xtype: "datefield",
               fieldLabel: "最近歸檔日期",
@@ -285,7 +319,20 @@ Ext.onReady(function () {
                 text: SEARCH,
                 iconCls: 'icon-search',
                 id: 'btnQuery',
+                disabled: false,
                 handler: Query
+            },
+            {
+                text: '重置',
+                iconCls: 'ui-icon ui-icon-reset',
+                id: 'btnReset',
+                disabled: false,
+                handler: 
+                    function () {
+                        Ext.getCmp('userID').setValue('');
+                        Ext.getCmp('dateOne').reset();
+                        Ext.getCmp('dateTwo').reset();
+                    }
             }
         ],
         listeners: {
@@ -375,16 +422,22 @@ function Tomorrow() {
 
 //查询
 Query = function () {
-
+    if (!(/^[0-9]*[1-9][0-9]*$/).test(Ext.getCmp('userID').getValue()) || Ext.getCmp('userID').getValue().length > 5) {
+        if (Ext.getCmp('userID').getValue().trim() != '') {
+            Ext.Msg.alert('提示信息','請輸入正確格式的會員編號！');
+            return false;
+        }        
+    }    
     VipListStore.removeAll();
     Ext.getCmp("VipListGrid").store.loadPage(1, {
         params: {
+            user_id: Ext.getCmp('userID').getValue(),
             dateOne: Ext.getCmp('dateOne').getValue(),
             dateTwo: Ext.getCmp('dateTwo').getValue()
         }
     });
 }
-function ImportCsv() {
+function ExportCsv() {
     Ext.MessageBox.show({
         msg: '正在匯出，請稍後....',
         width: 300,
@@ -395,7 +448,8 @@ function ImportCsv() {
         timeout: 600000,
         params: {
             dateOne: Ext.getCmp('dateOne').getValue(),
-            dateTwo: Ext.getCmp('dateTwo').getValue()
+            dateTwo: Ext.getCmp('dateTwo').getValue(),
+            user_id: Ext.getCmp('userID').getValue()
         },
         success: function (response) {
             Ext.MessageBox.hide();

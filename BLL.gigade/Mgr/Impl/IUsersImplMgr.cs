@@ -67,7 +67,7 @@ namespace BLL.gigade.Mgr.Impl
         List<Users> GetUserInfoByTest(string condition);// add by wangwei0216w 2014/10/27
 
         List<UserQuery> GetBonusList(UserQuery query, ref int totalCount);//add by shuangshuang0420j 2015.1.26 購物金資訊
-        List<UserVipListQuery> ExportVipListCsv(UserVipListQuery query);
+        List<UserVipListQuery> ExportVipListCsv(UserVipListQuery query, ref int totalCount);
         List<UserQuery> Query(Model.Custom.Users query);
 
         List<Users> GetUser(Users u);
