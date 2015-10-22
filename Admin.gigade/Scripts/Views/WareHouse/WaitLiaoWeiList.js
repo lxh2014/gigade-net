@@ -52,17 +52,17 @@ var WareHouseStore = Ext.create('Ext.data.Store', {//WareHouseStore
 });
 
 // 商品狀態
-var ProductStatusStore = Ext.create('Ext.data.Store', {
-    fields: ['txt', 'value'],
-    data: [
-        { "txt": "全部", "value": "100" },
-        { "txt": "新建立商品", "value": "0" },
-        { "txt": "申請審核", "value": "1" },
-        { "txt": "審核通過", "value": "2" },
-        { "txt": "上架", "value": "5" },
+//var ProductStatusStore = Ext.create('Ext.data.Store', {
+//    fields: ['txt', 'value'],
+//    data: [
+//        { "txt": "全部", "value": "100" },
+//        { "txt": "新建立商品", "value": "0" },
+//        { "txt": "申請審核", "value": "1" },
+//        { "txt": "審核通過", "value": "2" },
+//        { "txt": "上架", "value": "5" },
         
-    ]
-});
+//    ]
+//});
 
 // 出貨方式
 var OutProductStore = Ext.create('Ext.data.Store', {
@@ -89,7 +89,7 @@ var freightStore = Ext.create('Ext.data.Store', {
 WareHouseStore.on('beforeload', function () {
     Ext.apply(WareHouseStore.proxy.extraParams,
         {
-            product_status: Ext.getCmp('product_status').getValue(),//商品狀態
+            //product_status: Ext.getCmp('product_status').getValue(),//商品狀態
             product_mode: Ext.getCmp('product_mode').getValue(),
             freight: Ext.getCmp('freight').getValue(),
             start_time: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s')),
@@ -122,7 +122,7 @@ Ext.onReady(function () {
                            {
                                xtype: 'datefield',
                                margin: '5 0 0 5',
-                               fieldLabel: '品牌建立時間',
+                               fieldLabel: '商品建立時間',
                                labelWidth: 80,
                                id: 'start_time',
                                format: 'Y-m-d',
@@ -194,50 +194,88 @@ Ext.onReady(function () {
                                      }
                                  }
                              }
-                         },
+                },
+                    {
+                        xtype: 'combobox',
+                        name: 'product_mode',
+                        id: 'product_mode',
+                        editable: false,
+                        fieldLabel: "出貨方式",
+                        labelWidth: 60,
+                        margin: '5 0 0 5',
+                        store: OutProductStore,
+                        queryMode: 'local',
+                        submitValue: true,
+                        displayField: 'txt',
+                        valueField: 'value',
+                        typeAhead: true,
+                        forceSelection: false,
+                        value: 100,
+                        listeners: {
+                            specialkey: function (field, e) {
+                                if (e.getKey() == e.ENTER) {
+                                    Query();
+                                }
+                            }
+                        }
+                    },
                 ]
             },
-            {
-                xtype: 'fieldcontainer',
-                combineErrors: true,
-                layout: 'hbox',
-                items: [
-           {
-               xtype: 'combobox',
-               name: 'product_status',
-               id: 'product_status',
-               editable: false,
-               fieldLabel: "商品狀態",
-               labelWidth: 60,
-               margin: '5 0 0 5',
-               store: ProductStatusStore,
-               queryMode: 'local',
-               submitValue: true,
-               displayField: 'txt',
-               valueField: 'value',
-               typeAhead: true,
-               forceSelection: false,
-               value: 100
-           },
-           {
-               xtype: 'combobox',
-               name: 'product_mode',
-               id: 'product_mode',
-               editable: false,
-               fieldLabel: "出貨方式",
-               labelWidth: 60,
-               margin: '5 0 0 5',
-               store: OutProductStore,
-               queryMode: 'local',
-               submitValue: true,
-               displayField: 'txt',
-               valueField: 'value',
-               typeAhead: true,
-               forceSelection: false,
-               value: 100
-           },
-                ]
-            }
+           // {
+           //     xtype: 'fieldcontainer',
+           //     combineErrors: true,
+           //     layout: 'hbox',
+           //     items: [
+           ////{
+           ////    xtype: 'combobox',
+           ////    name: 'product_status',
+           ////    id: 'product_status',
+           ////    editable: false,
+           ////    fieldLabel: "商品狀態",
+           ////    labelWidth: 60,
+           ////    margin: '5 0 0 5',
+           ////    store: ProductStatusStore,
+           ////    queryMode: 'local',
+           ////    submitValue: true,
+           ////    displayField: 'txt',
+           ////    valueField: 'value',
+           ////    typeAhead: true,
+           ////    forceSelection: false,
+           ////    value: 100,
+           ////    listeners: {
+           ////        specialkey: function (field, e) {
+           ////            if (e.getKey() == e.ENTER) {
+           ////                Query();
+           ////            }
+           ////        }
+           ////    }
+           ////},
+           ////{
+           ////    xtype: 'combobox',
+           ////    name: 'product_mode',
+           ////    id: 'product_mode',
+           ////    editable: false,
+           ////    fieldLabel: "出貨方式",
+           ////    labelWidth: 60,
+           ////    margin: '5 0 0 5',
+           ////    store: OutProductStore,
+           ////    queryMode: 'local',
+           ////    submitValue: true,
+           ////    displayField: 'txt',
+           ////    valueField: 'value',
+           ////    typeAhead: true,
+           ////    forceSelection: false,
+           ////    value: 100,
+           ////    listeners: {
+           ////        specialkey: function (field, e) {
+           ////            if (e.getKey() == e.ENTER) {
+           ////                Query();
+           ////            }
+           ////        }
+           ////    }
+           ////},
+           //     ]
+           // }
         ],
         buttonAlign: 'left',
         buttons: [
@@ -351,10 +389,10 @@ function Tomorrow(s) {
 /************匯出到Exce************/
 function Export() {
     var freight = Ext.getCmp('freight').getValue();
-    var product_status = Ext.getCmp('product_status').getValue();
+    //var product_status = Ext.getCmp('product_status').getValue();
     var product_mode = Ext.getCmp('product_mode').getValue();
     var start_time = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s'));
     var end_time = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'));
-    window.open("/WareHouse/ExportCSV?product_status=" + product_status + "&product_mode=" + product_mode + "&freight=" + freight + "&start_time=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d') + "&end_time=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d'));
+    window.open("/WareHouse/ExportCSV?product_mode=" + product_mode + "&freight=" + freight + "&start_time=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d') + "&end_time=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d'));
    
 }

@@ -739,7 +739,6 @@ namespace BLL.gigade.Dao
         }
 
 
-
         public List<ProductItemQuery> GetWaitLiaoWeiList(ProductItemQuery query, out int totalCount)// by yachao1120j 2015-10-20 等待料位報表
         {
             StringBuilder str = new StringBuilder();
@@ -753,11 +752,9 @@ namespace BLL.gigade.Dao
                 str.AppendFormat("select pi.item_id,p.product_createdate,p.product_name,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1,CONCAT(p.spec_title_2,'',ps2.spec_name) as Spec_Name_2 ,p.combination,p.product_status,p.product_mode,dfsm.delivery_freight_set,p.product_start,tp2.parameterName as product_fenlei_dalei,tp1.parameterName as  product_fenlei_xiaolei  ");
                 strcont.AppendFormat(" from  product_item pi ");
                 strcont.AppendFormat(" left join product p on p.product_id =pi.product_id ");
-                strcont.AppendFormat(" LEFT JOIN vendor_brand vb on vb.brand_id=p.brand_id ");
                 strcont.AppendFormat(" left join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set ");
                 strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
                 strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
-               
                 strcont.AppendFormat(" inner JOIN (SELECT parameterName,parameterCode,topValue from t_parametersrc where parameterType='product_cate')  tp1 on tp1.parameterCode=p.cate_id   ");
                 strcont.AppendFormat(" inner JOIN (SELECT parameterName,parameterCode,topValue from t_parametersrc where parameterType='product_cate')  tp2 on tp2.parameterCode=tp1.topValue ");
                 strcont.AppendFormat(" where item_id NOT in (select item_id from iplas)  and p.product_id>10000  ");
@@ -770,16 +767,16 @@ namespace BLL.gigade.Dao
                 {
                     strcont.AppendFormat(" and dfsm.delivery_freight_set = '{0}' ", query.product_freight_set);
                 }
-                if (query.product_status != 100)//商品狀態  100 代表全部
-                {
-                    strcont.AppendFormat(" and p.product_status ='{0}' ", query.product_status);
-                }
-                else 
-                {
+                //if (query.product_status != 100)//商品狀態  100 代表全部
+                //{
+                //    strcont.AppendFormat(" and p.product_status ='{0}' ", query.product_status);
+                //}
+                //else 
+                //{
                     strcont.AppendFormat("and p.product_status in (0,1,2,5) ");
-                }
+                //}
                 //開始日期 結束時間 都不為空的條件下
-                strcont.AppendFormat("  and vb.brand_createdate >='{0}' and vb.brand_createdate  <='{1}'  ", (query.start_time), (query.end_time));
+                strcont.AppendFormat("  and p.product_createdate >='{0}' and p.product_createdate  <='{1}'  ", (query.start_time), (query.end_time));
                 str.Append(strcont);
 
                 if (query.IsPage)

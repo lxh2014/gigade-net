@@ -11442,10 +11442,10 @@ namespace Admin.gigade.Controllers
             {
                 query.product_freight_set = Convert.ToUInt32(Request.Params["freight"]);//溫層
             }
-            if (!string.IsNullOrEmpty(Request.Params["product_status"]))
-            {
-                query.product_status = Convert.ToUInt32(Request.Params["product_status"]);//商品状态
-            }
+            //if (!string.IsNullOrEmpty(Request.Params["product_status"]))
+            //{
+            //    query.product_status = Convert.ToUInt32(Request.Params["product_status"]);//商品状态
+            //}
             if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
             {
                 //query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
@@ -11481,10 +11481,10 @@ namespace Admin.gigade.Controllers
                 {
                     query.product_freight_set = Convert.ToUInt32(Request.Params["freight"]);//溫層
                 }
-                if (!string.IsNullOrEmpty(Request.Params["product_status"]))
-                {
-                    query.product_status = Convert.ToUInt32(Request.Params["product_status"]);//商品状态
-                }
+                //if (!string.IsNullOrEmpty(Request.Params["product_status"]))
+                //{
+                //    query.product_status = Convert.ToUInt32(Request.Params["product_status"]);//商品状态
+                //}
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
                 {
                     //query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
