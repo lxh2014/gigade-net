@@ -71,12 +71,13 @@ Ext.onReady(function () {
                 hidden: true,
                 colName: 'ignore_stock',
                 inputValue: '1'
-            }, {
+                },
+            {
                     xtype: 'numberfield',
-                    fieldLabel: "缺貨下架天數 ",
+                    fieldLabel: STOCK_DAYS,
                     name: 'outofstock_days_stopselling',
                     id: 'outofstock_days_stopselling',
-                    emptyText: "請輸入天數",
+                    emptyText: INPUT_DAY,
                     submitValue: true,
                     labelWidth: 90,
                     width: 170,

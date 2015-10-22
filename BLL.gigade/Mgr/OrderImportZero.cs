@@ -36,19 +36,19 @@ namespace BLL.gigade.Mgr
                 }
                 orderImportMgr = new OrderImportMgr(MySqlConnStr, CurChannel.channel_id);
 
-                var tmp = orderImportMgr.ReadExcelWatch<OrdersImport>(filePath, template, model_in);
+                var tmp = orderImportMgr.ReadExcelMatch<OrdersImport>(filePath, template, model_in).Where(o => o.agpesacttel != "").ToList();
 
-                ///移除訂單編號為空的記錄  edit by xinglu0624w 
-                if (tmp.Count() > 0)
-                {
-                    tmp.ForEach(m =>
-                    {
-                        if (string.IsNullOrEmpty(m.agpesacttel))
-                        {
-                            tmp.Remove(m);
-                        }
-                    });
-                }
+                /////移除訂單編號為空的記錄  edit by xinglu0624w 
+                //if (tmp.Count() > 0)
+                //{
+                //    tmp.ForEach(m =>
+                //    {
+                //        if (string.IsNullOrEmpty(m.agpesacttel))
+                //        {
+                //            tmp.Remove(m);
+                //        }
+                //    });
+                //}
 
                 ValidateOrders(tmp);
 

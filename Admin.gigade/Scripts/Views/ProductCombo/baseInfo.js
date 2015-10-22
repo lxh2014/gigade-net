@@ -333,7 +333,7 @@ Ext.onReady(function () {
                 disabledMin: true,
                 disabledSec: true,
                 format: 'Y-m-d H:i:s',
-                id: 'purchase_in_advance_end',
+                id: 'purchase_in_advance_end',//預計結束時間
                 allowBlank: false,
                 disabled: true,
                 value: tomRepeat,
@@ -341,7 +341,7 @@ Ext.onReady(function () {
                 listeners: {
                     select: function (a, b, c) {
                         var e_time = Ext.getCmp("e_time");
-                        if (b > e_time.getValue()) {
+                        if (b > e_time.getValue() && e_time.getValue() != null) {
                             Ext.getCmp("e_time").setValue("");
                             Ext.Msg.alert(PROMPT, EXPECT_TIME_IS_ERROR);
                         }

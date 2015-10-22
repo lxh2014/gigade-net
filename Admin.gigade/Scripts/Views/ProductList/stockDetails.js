@@ -252,7 +252,7 @@ function singleStockDetails(combination, product_id) {
     sinStockStore.load({ params: { 'product_id': product_id} });
 
     chekPanel = Ext.create("Ext.form.Panel", {
-        height: 50,
+        height: 90,
         width: 800,
         border: false,
         items: [{
@@ -265,7 +265,16 @@ function singleStockDetails(combination, product_id) {
                 hidden: true,
                 colName: 'ignore_stock',
                 inputValue: '1'
-            }, {
+            },
+            {
+                xtype: 'displayfield',
+                fieldLabel: STOCK_DAYS,
+                name: 't_outofstock_days_stopselling',//爲了解決重複問題
+                id: 't_outofstock_days_stopselling',
+                readOnly: true,
+                value:0
+            },
+            {
                 boxLabel: SHORTAGE,
                 id: 'shortage',
                 readOnly: true,
@@ -287,6 +296,10 @@ function singleStockDetails(combination, product_id) {
                         if (reStr && reStr.data) {
                             if (reStr.data.Ignore_Stock == 1) Ext.getCmp("ignore_stock").setValue(true); else Ext.getCmp("ignore_stock").setValue(false); 
                             if (reStr.data.Shortage == 1) Ext.getCmp("shortage").setValue(true); else Ext.getCmp("shortage").setValue(false);
+                            if (reStr.data.outofstock_days_stopselling>0)
+                            {
+                                Ext.getCmp("t_outofstock_days_stopselling").setValue(reStr.data.outofstock_days_stopselling);
+                            }
                         }
                     }   
                 });
