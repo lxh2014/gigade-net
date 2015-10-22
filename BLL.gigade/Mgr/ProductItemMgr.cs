@@ -22,6 +22,7 @@ using BLL.gigade.Model.Query;
 using System.Data;
 using BLL.gigade.Model.Custom;
 using System.Collections;
+using BLL.gigade.Common;
 
 namespace BLL.gigade.Mgr
 {
@@ -298,5 +299,91 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductItemMgr-->UpdateItemStock" + ex.Message, ex);
             }
         }
+
+        public List<ProductItemQuery> GetWaitLiaoWeiList(ProductItemQuery query, out int totalCount)// 等待料位報表
+        {
+            try
+            {
+                List<ProductItemQuery> store = new List<ProductItemQuery>();
+                store = _productItemDao.GetWaitLiaoWeiList(query, out totalCount);
+                foreach (var item in store)
+                {
+                    item.product_createdate_string = CommonFunction.GetNetTime(item.product_createdate).ToString("yyyy-MM-dd HH:mm:ss");
+                    item.product_start_string = CommonFunction.GetNetTime(item.product_start).ToString("yyyy-MM-dd HH:mm:ss");
+                    item.product_spec = item.Spec_Name_1;
+                    item.product_spec += string.IsNullOrEmpty(item.Spec_Name_1) ? item.Spec_Name_2 : (string.IsNullOrEmpty(item.Spec_Name_2) ? "" : " / " + item.Spec_Name_2);
+
+
+                    //商品類型
+                    if (item.combination == 1)
+                    {
+                        item.combination_string = "單一商品";
+                    }
+                    if (item.combination == 2)
+                    {
+                        item.combination_string = "固定組合";
+                    }
+                    if (item.combination == 3)
+                    {
+                        item.combination_string = "任選組合";
+                    }
+                    if (item.combination == 4)
+                    {
+                        item.combination_string = "群組搭配";
+                    }
+
+                    //出貨方式
+                    if (item.product_mode == 1)
+                    {
+                        item.product_mode_string = "自出";
+                    }
+                    if (item.product_mode == 2)
+                    {
+                        item.product_mode_string = "寄倉";
+                    }
+                    if (item.product_mode == 3)
+                    {
+                        item.product_mode_string = "調度";
+                    }
+                    //商品狀態
+                    if (item.product_status == 0)
+                    {
+                        item.product_status_string = "新建立商品";
+                    }
+                    if (item.product_status == 1)
+                    {
+                        item.product_status_string = "申請審核";
+                    }
+                    if (item.product_status == 2)
+                    {
+                        item.product_status_string = "審核通過";
+                    }
+                    if (item.product_status == 5)
+                    {
+                        item.product_status_string = "上架";
+                    }
+                    //溫層
+                    if (item.delivery_freight_set == 1)
+                    {
+                        item.product_freight_set_string = "常溫";
+                    }
+                    if (item.delivery_freight_set == 2)
+                    {
+                        item.product_freight_set_string = "冷凍";
+                    }
+
+
+                }
+
+                return store;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemMgr->GetWaitLiaoWeiList" + ex.Message);
+            }
+        }
+
+        
     }
 }

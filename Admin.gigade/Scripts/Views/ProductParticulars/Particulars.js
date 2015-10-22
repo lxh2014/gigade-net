@@ -97,16 +97,32 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
     }
 });
 
+//查詢
 function search() {
-    Ext.getCmp('condition').setValue(Ext.getCmp('condition').getValue().replace(/\s+/g, ','));
+    //查詢條件
     var comb = Ext.getCmp('searchCondition');
+    //查詢內容
     var comc = Ext.getCmp('condition');
-    if (!comb.isValid() && !comc.isValid()) {
-        return;
+    //品牌
+    var brand = Ext.getCmp('brand_id');
+    //選擇條件的值
+    var condition = comb.getValue();
+
+    comc.setValue(comc.getValue().replace(/\s+/g, ','));
+
+    //判斷選擇的查詢條件是否是品牌
+    if (condition == 3) {
+        if (!comb.isValid() || !brand.isValid()) {
+            return;
+        }
+    } else {
+        if (!comb.isValid() || !comc.isValid()) {
+            return;
+        }
     }
     particularsStore.removeAll();
-    var condition = Ext.getCmp('searchCondition').getValue();
-    var value = condition == 3 ? Ext.getCmp('brand_id').getValue() : Ext.getCmp('condition').getValue();
+    var value = condition == 3 ? brand.getValue() : comc.getValue();
+    //重新加載頁面
     particularsStore.load({
         params: { ids: value, condition: condition }
     });
@@ -245,6 +261,8 @@ Ext.onReady(function () {
                     select: function (combo, record) {
                         particularsStore.getAt(currentRow).set("Cde_dt_shp", record[0].data.particularsCome);
                         particularsStore.getAt(currentRow).set("Cde_dt_var", record[0].data.particularsCollect);
+                        //當保存期限被選擇的時候 自動勾選有效期控制  add by zhuoqin0830w  2015/10/19
+                        particularsStore.getAt(currentRow).set("Pwy_dte_ctl_bool", true);
                     }
                 }
             }, menuDisabled: true, sortable: false
@@ -315,21 +333,46 @@ Ext.onReady(function () {
             ]
         }, {
             xtype: 'checkcolumn',
-            header: EFFECTIVE_CONTROL_TIME_LIMIT, menuDisabled: true, sortable: false,//有效期控制
+            header: EFFECTIVE_CONTROL_TIME_LIMIT,
+            menuDisabled: true,
+            sortable: false,//有效期控制
             dataIndex: 'Pwy_dte_ctl_bool',
             id: 'Pwy_dte_ctl_bool',
             width: 70,
-            editor: {
-                xtype: 'checkbox'
+            //editor: {
+            //    xtype: 'checkbox'
+            //},
+            //避免用戶二次點擊才能生效  edit by zhuoqin0830w  2015/10/19
+            listeners: {
+                click: function (a, b, c) {
+                    if (particularsStore.getAt(c).get("Pwy_dte_ctl_bool")) {
+                        particularsStore.getAt(c).set("Pwy_dte_ctl_bool", false);
+                    } else {
+                        particularsStore.getAt(c).set("Pwy_dte_ctl_bool", true);
+                    }
+                }
             }
         },
         {
             xtype: 'checkcolumn',
             header: WAIT_DELETE,//等待刪除
-            dataIndex: 'Pend_del_bool', menuDisabled: true, sortable: false,
+            dataIndex: 'Pend_del_bool',
+            id: 'Pend_del_bool',
+            menuDisabled: true,
+            sortable: false,
             width: 60,
-            editor: {
-                xtype: 'checkbox'
+            //editor: {
+            //    xtype: 'checkbox'
+            //},
+            //避免用戶二次點擊才能生效  edit by zhuoqin0830w  2015/10/19
+            listeners: {
+                click: function (a, b, c) {
+                    if (particularsStore.getAt(c).get("Pend_del_bool")) {
+                        particularsStore.getAt(c).set("Pend_del_bool", false);
+                    } else {
+                        particularsStore.getAt(c).set("Pend_del_bool", true);
+                    }
+                }
             }
         }],
         dockedItems: [{
@@ -406,7 +449,7 @@ Ext.onReady(function () {
                 iconCls: 'ui-icon ui-icon-reset',
                 listeners: {
                     click: function () {
-                        Ext.getCmp("brand_id").setValue("");
+                        Ext.getCmp("brand_id").setValue("").allowBlank = false;
                         Ext.getCmp("condition").setValue("");
                     }
                 }

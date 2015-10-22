@@ -127,7 +127,7 @@ namespace BLL.gigade.Model.Custom
         //庫存數 add by guodong1130w 2015/09/16 
         public int Item_Stock { get; set; }
         //未出貨數量 add by guodong1130w 2015/09/16 
-        public int bnum { get; set; }
+        public Int64 bnum { get; set; }
         //排成設定 add by guodong1130w 2015/09/16 
         public string  schedule_name { get; set; }
         /// <summary>
@@ -264,6 +264,7 @@ namespace BLL.gigade.Model.Custom
 
         public string itemIds { get; set; }/// add by wwei0216w2015/8/12
         public string remark { get; set; }//添加商品上下架備註欄位 add by mingwei0727w 2015/09/25
+        public int outofstock_days_stopselling { get; set; }// add by dongya 2015/10/16
         public QueryandVerifyCustom()
         {
              //_imgsrc =string.Empty;
@@ -342,6 +343,7 @@ namespace BLL.gigade.Model.Custom
             Item_Stock = 0;
              bnum =0;
              schedule_name = string.Empty;
+             outofstock_days_stopselling = 0;
         }
     }
 }

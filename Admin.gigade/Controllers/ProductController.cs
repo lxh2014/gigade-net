@@ -726,6 +726,7 @@ namespace Admin.gigade.Controllers
                 p = _productMgr.Query(Query)[0];
                 p.Shortage = int.Parse(Value[1]);
                 p.Ignore_Stock = int.Parse(Value[0]);
+                p.outofstock_days_stopselling=int.Parse(Value[2]);
                 json = "{success:true,msg:'" + Resources.Product.SAVE_SUCCESS + "'}";
                 try
                 {
@@ -765,6 +766,7 @@ namespace Admin.gigade.Controllers
 
                     pTemp.Ignore_Stock = int.Parse(Value[0]);
                     pTemp.Shortage = int.Parse(Value[1]);
+                    pTemp.outofstock_days_stopselling = int.Parse(Value[2]);
                     pTemp.Writer_Id = writeId;
                     pTemp.Combo_Type = COMBO_TYPE;
                     if (!string.IsNullOrEmpty(Request.Form["OldProductId"]))

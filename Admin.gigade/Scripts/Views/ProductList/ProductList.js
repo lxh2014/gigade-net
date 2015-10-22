@@ -35,6 +35,8 @@ pro.push({ name: 'off_grade', type: 'int' });
 pro.push({ name: 'purchase_in_advance', type: 'int' });
 //2015/08/12
 pro.push({ name: 'itemIds', type: 'string' });
+//add by dongya   2015/10/16
+pro.push({ name: 'outofstock_days_stopselling', type: 'int' });
 
 Ext.define('GIGADE.PRODUCT', {
     extend: 'Ext.data.Model',
@@ -109,6 +111,8 @@ site.push(m_prod_classify);
 site.push(off_grade);
 //添加預購商品 guodong1130w 2015/9/16添加
 site.push(m_purchase_in_advance);
+
+site.push(m_outofstock_days_stopselling);
 
 Ext.define('GIGADE.SITEPRODUCT', {
     extend: 'Ext.data.Model',
@@ -190,7 +194,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
                         case PRODUCT_APPLY:// 申請審核 新建商品 下架商品  但是   失格商品 不可申請審核  || val.isModified("CanSel")
                             Ext.Array.each(selections, function (val) {
                                 //edit by zhuoqin0830w  2015/06/30   || val.data.off_grade == 1  失格商品 不可申請審核
-                                if ((val.data.product_status_id != 0 && val.data.product_status_id != 6) || val.data.product_id.length < 5 || val.data.off_grade == 1) {//edit 2015/04/22
+                                if ((val.data.product_status_id != 0 && val.data.product_status_id != 6 && val.data.product_status_id != 7) || val.data.product_id.length < 5 || val.data.off_grade == 1) {//edit 2015/04/22
                                     disabled = true;
                                 }
                             });
@@ -248,7 +252,7 @@ var site_sm = Ext.create('Ext.selection.CheckboxModel', {
                         case PRODUCT_APPLY://edit 2015/04/22  // 申請審核 新建商品 下架商品  但是   失格商品 不可申請審核  || val.isModified("CanSel")
                             Ext.Array.each(selections, function (val) {
                                 //edit by zhuoqin0830w  2015/06/30   || val.data.off_grade == 1  失格商品 不可申請審核
-                                if ((val.data.product_status_id != 0 && val.data.product_status_id != 6) || val.data.product_id.length < 5 || val.data.off_grade == 1) {
+                                if ((val.data.product_status_id != 0 && val.data.product_status_id != 6 && val.data.product_status_id !=7) || val.data.product_id.length < 5 || val.data.off_grade == 1) {
                                     disabled = true;
                                 }
                             });
@@ -534,6 +538,7 @@ Ext.onReady(function () {
     proColumns.push(c_pro_mode);
     proColumns.push(c_pro_tax);
     proColumns.push(c_pro_sort);
+    proColumns.push(c_pro_days);//add by dongya 2015/10/16
     proColumns.push(c_pro_create);
     proColumns.push(c_pro_start);
     proColumns.push(c_pro_end);
@@ -588,6 +593,7 @@ Ext.onReady(function () {
     siteColumns.push(c_prod_classify);
     //添加是否失格  add  by zhuoqin0830w 2015/06/30
     siteColumns.push(c_off_grade);
+    siteColumns.push(c_pro_days);
 
     var siteProGrid = Ext.create('Ext.grid.Panel', {
         hidden: true,

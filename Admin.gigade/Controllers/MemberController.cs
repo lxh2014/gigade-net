@@ -25,7 +25,7 @@ namespace Admin.gigade.Controllers
     public class MemberController : Controller
     {
 
-        string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];//郵件服務器的設置
+        static string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];//郵件服務器的設置
         string FromName = ConfigurationManager.AppSettings["FromNameGigade"];//發件人姓名
         string EmailTile = ConfigurationManager.AppSettings["EmailTileGigade"];//郵件標題
         static string excelPath = ConfigurationManager.AppSettings["ImportUserIOExcel"];//關於導入的excel文件的限制
@@ -54,7 +54,7 @@ namespace Admin.gigade.Controllers
         string ftppwd = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.ftppwd);//ftp密碼
         string promoPath = ConfigurationManager.AppSettings["promoPath"];//圖片地址
         string imgLocalPath = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.local);//ftp地址
-        private string imgLocalServerPath = ConfigurationManager.AppSettings["imgLocalServerPath"];//aimg.gigade100.com 
+        private string imgLocalServerPath = ConfigurationManager.AppSettings["imgLocalServerPath"];//aimg.gigade100.com
         private IConfigImplMgr _configMgr;
         private ShippingVoucherMgr ShippingVoucherMgr;
         private VipUserMgr _vipuserMgr;
@@ -1847,10 +1847,25 @@ namespace Admin.gigade.Controllers
         public HttpResponseBase UsersList()
         {
             List<UsersListQuery> stores = new List<UsersListQuery>();
-
+            List<SiteConfig> configs = new List<SiteConfig>();
+            SiteConfig con = new SiteConfig();
             string json = string.Empty;
             try
             {
+                string path = Server.MapPath(xmlPath);
+                if (System.IO.File.Exists(path))
+                {
+                    siteConfigMgr = new SiteConfigMgr(path);
+                    configs = siteConfigMgr.Query();
+                }
+                foreach (SiteConfig site in configs)
+                {
+                    if (site.Name == "DoMain_Name")
+                    {
+                        con = site;
+                        break;
+                    }
+                }
                 UsersListQuery query = new UsersListQuery();
 
                 query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
@@ -1889,6 +1904,8 @@ namespace Admin.gigade.Controllers
                 Parametersrc pa = new Parametersrc();
                 foreach (var item in stores)
                 {
+                    string[] url = con.Value.Split('/');
+                    item.user_url = "http://" + url[0] + "/ecservice_jump.php";//?uid=" + item.user_id;
                     if (Convert.ToBoolean(Request.Params["isSecret"]))
                     {
                         if (!string.IsNullOrEmpty(item.user_name))

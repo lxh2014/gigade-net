@@ -21,7 +21,8 @@ Ext.define('gigade.OrderMasterExportList', {
     { name: "remark", type: "string" },
     { name: "imramount", type: "int" },
     { name: "oacamount", type: "int" },
-    { name: "tax_amount", type: "int" }
+    { name: "tax_amount", type: "int" },
+    { name: "invoice_diff", type: "string" }
     ]
 });
 var OrderMasterExportStore = Ext.create('Ext.data.Store', {
@@ -50,6 +51,32 @@ var DateAllQueryStore = Ext.create('Ext.data.Store', {
 
     ]
 });
+
+/*********參數表model***********/
+Ext.define("gigade.paraModel", {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: 'parameterCode', type: 'string' },
+        { name: 'parameterName', type: 'string' }
+    ]
+});
+
+//付款方式
+var paymentStore = Ext.create("Ext.data.Store", {
+    model: 'gigade.paraModel',
+    proxy: {
+        type: 'ajax',
+        url: '/Parameter/QueryPara?paraType=payment',
+        noCache: false,
+        getMethod: function () { return 'get'; },
+        actionMethods: 'post',
+        reader: {
+            type: 'json',
+            root: 'items'
+        }
+    }
+});
+paymentStore.load();
 //加載前先獲取ddl的值
 OrderMasterExportStore.on('beforeload', function () {
     var orderTimeStart = dateFormat(Ext.getCmp('orderTimeStart').getValue());
@@ -63,7 +90,8 @@ OrderMasterExportStore.on('beforeload', function () {
         order_id: t_order_id,
         dateType: Ext.getCmp('date_type').getValue(),
         show_type: show_type,
-        invoice_type: invoice_type
+        invoice_type: invoice_type,
+        payment: Ext.getCmp('payment').getValue()
     });
     Ext.Ajax.request({
         url: '/Order/OrderMasterHuiZong',
@@ -74,7 +102,8 @@ OrderMasterExportStore.on('beforeload', function () {
             order_id: t_order_id,
             dateType: Ext.getCmp('date_type').getValue(),
             show_type: show_type,
-            invoice_type: invoice_type
+            invoice_type: invoice_type,
+            payment: Ext.getCmp('payment').getValue()
         },
         success: function (form, action) {
             var result = Ext.decode(form.responseText);
@@ -82,8 +111,8 @@ OrderMasterExportStore.on('beforeload', function () {
                 Ext.getCmp("lblpoundage").setText(result.msg);
                 Ext.getCmp("lblAccount").setText(result.AccountMoney);
                 Ext.getCmp("ZMoney").setText(result.ZMoney);
-                Ext.getCmp("SalesAmount").setText(result.SalesAmount);
-                Ext.getCmp("FreeTax").setText(result.FreeTax);
+                //Ext.getCmp("SalesAmount").setText(result.SalesAmount);
+                //Ext.getCmp("FreeTax").setText(result.FreeTax);
                 Ext.getCmp("ZTax").setText(result.ZTax);
             } else {
 
@@ -99,16 +128,16 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
             if (selections.length == 0 || (selections.length != 0 && selections[0].data.account_collection_time == "" && selections[0].data.return_collection_time == "")) {
-              //  Ext.getCmp("pcGift").down('#edit').setDisabled(true);
+                //  Ext.getCmp("pcGift").down('#edit').setDisabled(true);
                 Ext.getCmp("pcGift").down('#delete').setDisabled(true);
             } else {
-               // Ext.getCmp("pcGift").down('#edit').setDisabled(false);
+                // Ext.getCmp("pcGift").down('#edit').setDisabled(false);
                 Ext.getCmp("pcGift").down('#delete').setDisabled(false);
             }
 
             Ext.getCmp("pcGift").down('#edit').setDisabled(selections.length == 0);
             //Ext.getCmp("pcGift").down('#delete').setDisabled(selections.length == 0);
-        
+
         }
     }
 });
@@ -301,24 +330,24 @@ Ext.onReady(function () {
             combineErrors: true,
             layout: 'hbox',
             id: 'type',
-            items: [
-            {
-                xtype: 'textfield',
-                allowBlank: true,
-                id: 't_order_id',
-                //padding: "0 0 5 0",
+            items: [{
+                xtype: 'combobox',
+                fieldLabel: "付款方式",
+                id: 'payment',
+                queryMode: 'local',
+                name: 'payment',
+                allowBlank: false,
                 margin: "0 5 0 0",
-                name: 't_order_id',
-                fieldLabel: '付款單號',
-                labelWidth: 100,
-                listeners: {
-                    specialkey: function (field, e) {
-                        if (e.getKey() == e.ENTER) {
-                            Query();
-                        }
-                    }
-                }
+                editable: false,
+                typeAhead: true,
+                forceSelection: false,
+                store: paymentStore,
+                displayField: 'parameterName',
+                valueField: 'parameterCode',
+                value: '0',
+                emptyText: "請選擇"
             },
+
             {
                 xtype: 'radiogroup',
                 id: 'show_type',
@@ -338,7 +367,29 @@ Ext.onReady(function () {
                 ]
             }
             ]
-        },
+        }, {
+            xtype: 'fieldcontainer',
+            combineErrors: true,
+            layout: 'hbox',
+            id: '3',
+            items: [
+            {
+                xtype: 'textfield',
+                allowBlank: true,
+                id: 't_order_id',
+                //padding: "0 0 5 0",
+                margin: "0 5 0 0",
+                name: 't_order_id',
+                fieldLabel: '付款單號',
+                labelWidth: 100,
+                listeners: {
+                    specialkey: function (field, e) {
+                        if (e.getKey() == e.ENTER) {
+                            Query();
+                        }
+                    }
+                }
+            },
         {
             xtype: 'radiogroup',
             id: 'invoice_type',
@@ -355,6 +406,8 @@ Ext.onReady(function () {
             { id: 'invo_1', boxLabel: "全部", inputValue: '0', checked: true },
             { id: 'invo_2', boxLabel: "已開", inputValue: '1' },
             { id: 'invo_3', boxLabel: "未開", inputValue: '2' }
+            ]
+        }
             ]
         }
         ],
@@ -387,7 +440,8 @@ Ext.onReady(function () {
                     Ext.getCmp('t_order_id').setValue("");
                     Ext.getCmp('date_type').setValue(0);
                     Ext.getCmp('show_type').reset();
-                    Ext.getCmp('invoice_type').reset();
+                    Ext.getCmp('invoice_type').reset(); payment
+                    Ext.getCmp('payment').setValue('0');
                 }
             }
         }
@@ -423,16 +477,16 @@ Ext.onReady(function () {
             }
         },
         columns: [
-        { header: '編號', dataIndex: 'row_id', width: 100, align: 'center' },
+        { header: '編號', dataIndex: 'row_id', hidden: true, width: 100, align: 'center' },
         { header: '付款單號', dataIndex: 'order_id', width: 100, align: 'center' },
-        { header: '訂購人', dataIndex: 'order_name', width: 100, align: 'center' },
+        { header: '訂購人', dataIndex: 'order_name', width: 80, align: 'center' },
         { header: '訂單應收金額', dataIndex: 'order_amount', width: 100, align: 'center' },
         { header: '紅利折抵金額', dataIndex: 'deduct_card_bonus', width: 100, align: 'center' },
         { header: '付款方式', dataIndex: 'parameterName', width: 100, align: 'center' },
         { header: '付款單成立日期', dataIndex: 'ordercreatedate', width: 100, align: 'center' },
         { header: '銀行入帳日期', dataIndex: 'account_collection_time', width: 100, align: 'center' },
         {
-            header: '手續費', dataIndex: 'poundage', width: 100, align: 'center'
+            header: '手續費', dataIndex: 'poundage', width: 80, align: 'center'
         },
         { header: '入帳金額', dataIndex: 'account_collection_money', width: 100, align: 'center' },
         { header: '退貨入帳日期', dataIndex: 'return_collection_time', width: 100, align: 'center' },
@@ -440,12 +494,13 @@ Ext.onReady(function () {
             header: '退貨入賬手續費', dataIndex: 'return_poundage', width: 100, align: 'center'
         },
         { header: '退貨入帳金額', dataIndex: 'return_collection_money', width: 100, align: 'center' },
-        { header: '入帳總額', dataIndex: 'oacamount', width: 100, align: 'center' },
+        { header: '入帳總額', dataIndex: 'oacamount', width: 90, align: 'center' },
         { header: '開立發票日期', dataIndex: 'invoicedate', width: 100, align: 'center' },
-        { header: '發票銷售額', dataIndex: 'free_tax', width: 100, align: 'center' },
-        { header: '發票稅額', dataIndex: 'tax_amount', width: 100, align: 'center' },
-        { header: '發票總額', dataIndex: 'imramount', width: 100, align: 'center' },
-        { header: '備註', dataIndex: 'remark', width: 100, align: 'center' }
+        { header: '發票銷售額', dataIndex: 'free_tax', hidden: true, width: 90, align: 'center' },
+        { header: '發票稅額', dataIndex: 'tax_amount', hidden: true, width: 90, align: 'center' },
+        { header: '發票總額', dataIndex: 'imramount', width: 90, align: 'center' },
+        { header: '發票金額差異', dataIndex: 'invoice_diff', width: 100, align: 'center' },
+        { header: '備註', dataIndex: 'remark', width: 90, align: 'center' }
         ],
         tbar: [
 
@@ -466,7 +521,10 @@ Ext.onReady(function () {
                 if (Ext.getCmp('date_type').getValue() == 0 && Ext.getCmp('t_order_id').getValue() == "") {
                     Ext.Msg.alert(INFORMATION, "請輸入查詢條件匯出！");
                 } else {
-                    window.open("/Order/OrderMasterExport?orderTimeStart=" + orderTimeStart + "&orderTimeEnd=" + orderTimeEnd + "&dateType=" + Ext.getCmp('date_type').getValue() + "&order_id=" + Ext.getCmp('t_order_id').getValue() + "&show_type=" + Ext.htmlEncode(Ext.getCmp("show_type").getValue().show_type) + "&invoice_type=" + Ext.htmlEncode(Ext.getCmp("invoice_type").getValue().invoice_type));
+                    window.open("/Order/OrderMasterExport?orderTimeStart=" + orderTimeStart + "&orderTimeEnd=" + orderTimeEnd
+                        + "&dateType=" + Ext.getCmp('date_type').getValue() + "&order_id=" + Ext.getCmp('t_order_id').getValue()
+                          + "&payment=" + Ext.getCmp('payment').getValue() + "&show_type=" + Ext.htmlEncode(Ext.getCmp("show_type").getValue().show_type)
+                        + "&invoice_type=" + Ext.htmlEncode(Ext.getCmp("invoice_type").getValue().invoice_type));
                 }
             }
         }
@@ -504,22 +562,22 @@ Ext.onReady(function () {
             flex: 1.2,
             style: 'fontSize:15px ;color:red'
         },
-        {
-            xtype: 'label',
-            id: "SalesAmount",
-            margin: '0 10 0 5',
-            text: '',
-            flex: 1.5,
-            style: 'fontSize:15px ;color:red'
-        },
-        {
-            xtype: 'label',
-            id: "FreeTax",
-            margin: '0 10 0 5',
-            text: '',
-            flex: 1.2,
-            style: 'fontSize:15px ;color:red'
-        },
+        //{
+        //    xtype: 'label',
+        //    id: "SalesAmount",
+        //    margin: '0 10 0 5',
+        //    text: '',
+        //    flex: 1.5,
+        //    style: 'fontSize:15px ;color:red'
+        //},
+        //{
+        //    xtype: 'label',
+        //    id: "FreeTax",
+        //    margin: '0 10 0 5',
+        //    text: '',
+        //    flex: 1.2,
+        //    style: 'fontSize:15px ;color:red'
+        //},
         {
             xtype: 'label',
             id: "ZTax",

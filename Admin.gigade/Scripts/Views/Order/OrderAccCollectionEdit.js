@@ -84,7 +84,7 @@
                         collM.allowBlank = false;
                         collP.allowBlank = false;
                         collM.setDisabled(false);
-                        collP.setDisabled(false);
+                        collP.setDisabled(false);                     
                     } else {
                         collM.setValue(0);
                         collP.setValue(0);
@@ -104,37 +104,15 @@
             id: 'account_collection_money',
             allowDecimals: false,
             disabled: true,
-            value: 0,
             fieldLabel: '入賬金額'
         },
-        //{
-        //    xtype: 'numberfield',
-        //    name: 'amount_account_collection_money',
-        //    id: 'amount_account_collection_money',
-        //    allowDecimals: false,
-        //    allowBlank: false,
-        //    value: 0,
-        //    fieldLabel: '入賬總額'
-        //},
-        //{
-        //    xtype: 'numberfield',
-        //    name: 'amount_invoice',
-        //    id: 'amount_invoice',
-        //    allowDecimals: false,
-        //    allowBlank: false,
-        //    value: 0,
-        //    fieldLabel: '發票總額'
-        //},
         {
             xtype: 'numberfield',
             name: 'poundage',
             id: 'poundage',
-            value: 0,
             disabled: true,
             fieldLabel: '手續費'
         },
-
-
          {
              xtype: 'datetimefield',
              name: 'return_collection_time',
@@ -185,7 +163,6 @@
             xtype: 'textfield',
             name: 'remark',
             id: 'remark',
-            allowBlank: true,
             submitValue: true,
             fieldLabel: '備註'
         }],
@@ -245,7 +222,7 @@
                 else {//如果是編輯
                     if (Ext.getCmp('order_id').getValue() == row.data.order_id) {
                         if (form.isValid()) {
-                           
+
                             form.submit({
                                 params: {
                                     row_id: Ext.htmlEncode(Ext.getCmp('row_id').getValue()),

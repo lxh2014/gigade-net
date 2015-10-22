@@ -10,6 +10,7 @@ namespace BLL.gigade.Model.Custom
         public int vendor_id { get; set; }
         public string vendor_name_full { get; set; }
         public int pk_id { get; set; }
+        public int comment_id_display { get; set; }
         public string change_table { get; set; }
         public string change_table_function { get; set; }
         public List<TableChangeLog> tclModel { get; set; }
@@ -19,6 +20,7 @@ namespace BLL.gigade.Model.Custom
             vendor_id = 0;
             vendor_name_full = string.Empty;
             pk_id = 0;
+            comment_id_display = 0;
             change_table = string.Empty; 
             change_table_function = string.Empty; 
             tclModel = new List<TableChangeLog>();

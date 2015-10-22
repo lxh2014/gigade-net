@@ -45,10 +45,6 @@ namespace BLL.gigade.Dao.Impl
         int GetOffGradeCount(string vendorId);
         int UnGrade(string vendorId, string active);
         List<Vendor> GetArrayDaysInfo(uint brand_id);
-        List<VendorBank> QueryBank(VendorBank query, ref int totalCount);
-        string SaveBank(VendorBank model);
-        List<VendorBank> GetVendorBank(VendorBank model);
-        int UpdateBank(VendorBank model);
-        int UpdateActiveBank(VendorBank model);
+      
     }
 }

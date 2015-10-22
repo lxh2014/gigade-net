@@ -59,5 +59,6 @@ namespace BLL.gigade.Dao.Impl
         List<ProductItemQuery> GetProductItemByID(ProductItemQuery query);//根據item_id查詢商品規格以及商品的信息add chaojie1124j2015/8/31       
         List<ProductItemQuery> GetInventoryQueryList(ProductItemQuery query, out int totalCount);
         string UpdateItemStock(ProductItem query);//料位庫存調整的時候，商品庫存也做相應的調整add chaojie1124j2015/9/17
+        List<ProductItemQuery> GetWaitLiaoWeiList(ProductItemQuery query, out int totalCount);
     }
 }
