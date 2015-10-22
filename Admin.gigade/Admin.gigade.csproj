@@ -1837,6 +1837,7 @@
     <Content Include="Scripts\Ext4.0\ux\DataView\DragSelector.css" />
     <Content Include="Scripts\Ext4.0\ux\DataView\DragSelector.js" />
     <Content Include="Scripts\Ext4.0\ux\DataView\LabelEditor.js" />
+    <Content Include="Scripts\jquery-2.1.4.min.js" />
     <Content Include="Scripts\kendo\2014.2.716\angular.min.js" />
     <Content Include="Scripts\kendo\2014.2.716\jquery-1.9.1.js" />
     <Content Include="Scripts\kendo\2014.2.716\jquery.min.js" />

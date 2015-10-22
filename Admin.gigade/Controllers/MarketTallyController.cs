@@ -15,7 +15,7 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
-        public ActionResult Index()
+        public ActionResult MarketTally()
         {
             return View();
         }
