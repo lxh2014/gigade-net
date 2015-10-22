@@ -28,5 +28,7 @@ namespace BLL.gigade.Dao.Impl
        DataTable GetVnndorId(string name);
 
        int GetDeliverMasterCount(DeliverMasterQuery deliver);
+       DataTable GetDeliverMaster(string hourNum);
+
     }
 }

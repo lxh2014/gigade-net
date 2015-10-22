@@ -237,6 +237,7 @@
     <Compile Include="Controllers\ReportManagementController.cs" />
     <Compile Include="Controllers\ScheduleServiceController.cs" />
     <Compile Include="Controllers\ScheduleParamerController.cs" />
+    <Compile Include="Controllers\ScheduleServiceWorkerController.cs" />
     <Compile Include="Controllers\SecretInfoController.cs" />
     <Compile Include="Controllers\SendProductController.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
@@ -1846,7 +1847,9 @@
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsList.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewReport.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmSend.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmSendListCount.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateEdit.js" />
@@ -4412,8 +4415,8 @@
     <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
     <Content Include="Views\Vendor\VendorBankImport.cshtml" />
     <Content Include="Views\EdmNew\EmailGroup.cshtml" />
-    <Content Include="Views\WareHouse\WaitLiaoWei.cshtml" />
-    <None Include="Web.Debug.config">
+    <Content Include="Views\WareHouse\WaitLiaoWei.cshtml" />    <Content Include="Views\EdmNew\EdmContentNewReport.cshtml" />
+    <Content Include="Views\EdmNew\EdmSendListCountView.cshtml" />    <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <None Include="Web.Release.config">
@@ -4628,7 +4631,9 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>8337</DevelopmentServerPort>
+
+          <DevelopmentServerPort>2212</DevelopmentServerPort>
+
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

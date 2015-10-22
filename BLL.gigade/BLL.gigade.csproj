@@ -1162,6 +1162,7 @@
     <Compile Include="Mgr\ScheduleParamerMgr.cs" />
     <Compile Include="Mgr\ScheduleRelationMgr.cs" />
     <Compile Include="Mgr\ScheduleServiceMgr.cs" />
+    <Compile Include="Mgr\Schedules\DeliverStatusMgr.cs" />
     <Compile Include="Mgr\SecretAccountSetMgr.cs" />
     <Compile Include="Mgr\SecretInfoLogMgr.cs" />
     <Compile Include="Mgr\SerialMgr.cs" />
@@ -1313,6 +1314,8 @@
     <Compile Include="Model\EdmTest.cs" />
     <Compile Include="Model\EdmSubscription.cs" />
     <Compile Include="Model\EdmTemplate.cs" />
+    <Compile Include="Model\EdmTrace.cs" />
+    <Compile Include="Model\EdmTraceEmail.cs" />
     <Compile Include="Model\ElementMap.cs" />
     <Compile Include="Model\EmailBlockList.cs" />
     <Compile Include="Model\EmailBlockLog.cs" />

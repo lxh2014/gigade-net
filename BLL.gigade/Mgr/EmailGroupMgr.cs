@@ -93,6 +93,18 @@ namespace BLL.gigade.Mgr
        
      }
 
+     public List<EmailGroup> EmailGroupStore()
+     {
+         try
+         {
+             return _emailGroupDao.EmailGroupStore();
+         }
+         catch (Exception ex)
+         {
+             throw new Exception("EmailGroupDao-->EmailGroupStore-->" + ex.Message, ex);
+         }
+     }
+
 
 
 

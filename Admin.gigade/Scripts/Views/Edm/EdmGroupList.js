@@ -348,28 +348,29 @@ Import = function () {
     ImportFunction(row[0], EdmGroupStore);
 }
 function Export(group_id) {
-    Ext.MessageBox.show({
-        msg: '正在匯出，請稍後....',
-        width: 300,
-        wait: true
-    });
-    Ext.Ajax.request({
-        url: "/Edm/Export",
-        timeout: 900000,
-        params: {
-            group_id: group_id
-        },
-        success: function (form, action) {
-            Ext.MessageBox.hide();
-            var result = Ext.decode(form.responseText);
-            if (result.success) {
-                window.location = '../../ImportUserIOExcel/' + result.fileName;
-            } else {
-                Ext.MessageBox.hide();
-                Ext.Msg.alert("提示信息", "匯出失敗或沒有數據！");
-            }
-        }
-    });
+    window.open("/Edm/Export?group_id=" + group_id);
+    //Ext.MessageBox.show({
+    //    msg: '正在匯出，請稍後....',
+    //    width: 300,
+    //    wait: true
+    //});
+    //Ext.Ajax.request({
+    //    url: "/Edm/Export",
+    //    timeout: 900000,
+    //    params: {
+    //        group_id: group_id
+    //    },
+    //    success: function (form, action) {
+    //        Ext.MessageBox.hide();
+    //        var result = Ext.decode(form.responseText);
+    //        if (result.success) {
+    //            window.location = '../../ImportUserIOExcel/' + result.fileName;
+    //        } else {
+    //            Ext.MessageBox.hide();
+    //            Ext.Msg.alert("提示信息", "匯出失敗或沒有數據！");
+    //        }
+    //    }
+    //});
 }
 
 function TranToDetial(url, group_id) {

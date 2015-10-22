@@ -1369,33 +1369,34 @@ namespace Admin.gigade.Controllers
                 _edmGroup = new EdmGroupMgr(mySqlConnectionString);
                 DataTable _dt = _edmGroup.Export(query);
                 string fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "." + "csv";
-                string newFileName = Server.MapPath(excelPath_export + fileName);
-                string[] colName = { "電子信箱", "訂閱狀態", "姓名" };
-                         
                 DataTable _newdt = new DataTable();
                 DataRow dr;
-                _newdt.Columns.Add("email_address", typeof(string));
-                _newdt.Columns.Add("email_status", typeof(string));
-                _newdt.Columns.Add("email_name", typeof(string));
+                _newdt.Columns.Add("電子信箱", typeof(string));
+                _newdt.Columns.Add("訂閱狀態", typeof(string));
+                _newdt.Columns.Add("姓名", typeof(string));
                 for (int i = 0; i < _dt.Rows.Count; i++)
                 {
                     dr = _newdt.NewRow();
                     _newdt.Rows.Add(dr);
-                    _newdt.Rows[i]["email_address"] = _dt.Rows[i]["email_address"];
-                    _newdt.Rows[i]["email_name"] = _dt.Rows[i]["email_name"];
+                    _newdt.Rows[i]["電子信箱"] = _dt.Rows[i]["email_address"];
+                    _newdt.Rows[i]["姓名"] = _dt.Rows[i]["email_name"];
                     uint email_status = Convert.ToUInt32(_dt.Rows[i]["email_status"].ToString());
                     if (email_status == 1)
                     {
-                        _newdt.Rows[i]["email_status"] = "已訂閱";
+                        _newdt.Rows[i]["訂閱狀態"] = "已訂閱";
                     }
                     else
                     {
-                        _newdt.Rows[i]["email_status"] = "未訂閱";
+                        _newdt.Rows[i]["訂閱狀態"] = "未訂閱";
                     }
                 }
-
-                CsvHelper.ExportDataTableToCsv(_newdt, newFileName, colName, true);
-                json = "{success:true,fileName:\'" + fileName + "\'}";
+                StringWriter sw = ExcelHelperXhf.SetCsvFromData(_newdt, fileName);
+                Response.Clear();
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                Response.ContentType = "application/ms-excel";
+                Response.ContentEncoding = Encoding.Default;
+                Response.Write(sw);
+                Response.End();
             }
             catch (Exception ex)
             {
@@ -1429,6 +1430,45 @@ namespace Admin.gigade.Controllers
                     _edmGroup = new EdmGroupMgr(mySqlConnectionString);
                     json = _edmGroup.Import(_dt, query);
                 }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        public HttpResponseBase DownTemplate()
+        {
+            string json = string.Empty;
+            try
+            {
+                string fileName = "名單管理匯入模板" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "." + "csv";
+        
+                DataTable _newdt = new DataTable();
+                _newdt.Columns.Add("電子信箱", typeof(string));
+                _newdt.Columns.Add("訂閱狀態", typeof(string));
+                _newdt.Columns.Add("姓名", typeof(string));
+                DataRow dr = _newdt.NewRow();
+                dr["電子信箱"] = "example@gimg.tw";
+                dr["訂閱狀態"] = "1";
+                dr["姓名"] = "example";
+                _newdt.Rows.Add(dr);
+
+                StringWriter sw = ExcelHelperXhf.SetCsvFromData(_newdt, fileName);
+                Response.Clear();
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                Response.ContentType = "application/ms-excel";
+                Response.ContentEncoding = Encoding.Default;
+                Response.Write(sw);
+                Response.End();
             }
             catch (Exception ex)
             {
