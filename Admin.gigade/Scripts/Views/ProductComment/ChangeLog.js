@@ -212,8 +212,8 @@ var searchfrm = Ext.create('Ext.form.Panel', {
         handler: function ()
         {
             Ext.getCmp('comment_id').setValue(null);
-            Ext.getCmp('date_one').setValue(null);
-            Ext.getCmp('date_two').setValue(null);
+            Ext.getCmp('date_one').setValue(Tomorrow(1 - new Date().getDate()));
+            Ext.getCmp('date_two').setValue(Tomorrow(0));
 
         }
     },

@@ -70,7 +70,16 @@ namespace BLL.gigade.Mgr
         {
             try
             {
-                return _usersDao.GetVipList(vipList, ref totalCount);
+                string userIdString = _usersDao.GetViplistUserId(vipList);
+                if (!string.IsNullOrEmpty(userIdString))
+                {
+                    return _usersDao.GetVipList(vipList, userIdString, ref totalCount);
+                }
+                else
+                {
+                    List<Model.Query.UserVipListQuery> list = new List<UserVipListQuery>();
+                    return list;
+                }                
             }
             catch (Exception ex)
             {
@@ -214,11 +223,23 @@ namespace BLL.gigade.Mgr
         }
 
 
-        public List<UserVipListQuery> ExportVipListCsv(UserVipListQuery query)
+        public List<UserVipListQuery> ExportVipListCsv(UserVipListQuery query,ref int totalCount)
         {
+           
+            
             try
             {
-                return _usersDao.ExportVipListCsv(query);
+                string userIdString = _usersDao.GetViplistUserId(query);
+                if (!string.IsNullOrEmpty(userIdString))
+                {
+                    //return _usersDao.ExportVipListCsv(query, userIdString);
+                    return _usersDao.GetVipList(query, userIdString,ref totalCount);
+                }
+                else
+                {
+                    List<Model.Query.UserVipListQuery> list = new List<UserVipListQuery>();
+                    return list;
+                }               
             }
             catch (Exception ex)
             {

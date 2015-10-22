@@ -451,7 +451,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]))
                 {
-                    query.start_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["start_time"].ToString()).ToString("yyyy-MM-dd 00:00:00"));
+                    query.start_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["end_time"]))
                 {
@@ -537,11 +537,13 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(Request.Params["start_time"]))
             {
-                query.start_time = Convert.ToDateTime(Request.Params["start_time"]);
+                //query.start_time = Convert.ToDateTime(Request.Params["start_time"]);
+                query.start_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
             }
             if (!string.IsNullOrEmpty(Request.Params["end_time"]))
             {
-                query.end_time = Convert.ToDateTime(Request.Params["end_time"]);
+                //query.end_time = Convert.ToDateTime(Request.Params["end_time"]);
+                query.end_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
             }
             try
             {
