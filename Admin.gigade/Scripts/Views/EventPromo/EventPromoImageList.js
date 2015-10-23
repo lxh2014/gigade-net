@@ -307,7 +307,7 @@ Ext.onReady(function () {
             }
         }
         ],
-        tbar: [      
+        tbar: [
         {
             xtype: 'button',
             text: ADD,
@@ -332,22 +332,22 @@ Ext.onReady(function () {
             hidden: true,
             handler: onDeleteClick
         }, '->',
-          {
-              xtype: 'button',
-              text: '允許多圖',
-              id: 'allowMulti',
-              iconCls: 'icon-user-edit',
-             // disabled: true,
-              handler: onAllowMultiClick
-          },
-            {
-                xtype: 'button',
-                text: '禁止多圖',
-                id: 'forbidMulti',
-                iconCls: 'icon-user-edit',
-              //  disabled: true,
-                handler: onForbidMultiClick
-            }
+        {
+            xtype: 'button',
+            text: '允許多圖',
+            id: 'allowMulti',
+            iconCls: 'icon-user-edit',
+            // disabled: true,
+            handler: onAllowMultiClick
+        },
+        {
+            xtype: 'button',
+            text: '禁止多圖',
+            id: 'forbidMulti',
+            iconCls: 'icon-user-edit',
+            //  disabled: true,
+            handler: onForbidMultiClick
+        }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: EventPromoImageListStore,
@@ -385,6 +385,14 @@ Ext.onReady(function () {
 //查询
 Query = function () {
     EventPromoImageListStore.removeAll();
+    if (!Ext.getCmp('id').regex.test(Ext.getCmp('id').getValue())) {
+        Ext.Msg.alert(INFORMATION, "請輸入有效字符串");
+        return;
+    }
+    if (Ext.getCmp('name').getValue() != "" && Ext.getCmp('name').getValue().trim() == "") {
+        Ext.Msg.alert(INFORMATION, "請輸入有效字符串");
+        return;
+    }
     if (Ext.getCmp('dateCon').getValue() != "0") {
         if (Ext.getCmp('timestart').getValue() == ("" || null)) {
             Ext.Msg.alert(INFORMATION, "請選擇查詢日期");
@@ -397,6 +405,7 @@ Query = function () {
     }
     if (Ext.getCmp('dateCon').getValue() == "0" && (Ext.getCmp('timestart').getValue() != null || Ext.getCmp('timeend').getValue() != null)) {
         Ext.Msg.alert(INFORMATION, "請選擇日期條件");
+        return;
     }
     else {
         Ext.getCmp("gdList").store.loadPage(1);
@@ -415,7 +424,7 @@ function UpdateStatus(id) {
         data: {
             "id": id,
             "status": activeValue,
-            "multi":multi
+            "multi": multi
         },
         type: "POST",
         dataType: "json",
@@ -465,7 +474,7 @@ onAddClick = function () {
     editFunction(null, EventPromoImageListStore, multi);
 }
 onEditClick = function () {
-    var row = Ext.getCmp("gdList").getSelectionModel().getSelection();   
+    var row = Ext.getCmp("gdList").getSelectionModel().getSelection();
     if (row.length == 0) {
         Ext.Msg.alert(INFORMATION, NO_SELECTION);
     }
@@ -475,7 +484,7 @@ onEditClick = function () {
     else if (row.length == 1) {
         IsModifiable(row[0].data.pb_id);
         if (modifiable) {
-            editFunction(row[0], EventPromoImageListStore,multi);
+            editFunction(row[0], EventPromoImageListStore, multi);
         }
     }
 }
@@ -553,8 +562,7 @@ setNextMonth = function (source, n) {
     }
     return s;
 }
-onAllowMultiClick = function ()
-{
+onAllowMultiClick = function () {
     multi = 1;
     Ext.Msg.alert(INFORMATION, '您將允許一個品牌添加多張促銷圖片');
     Ext.getCmp('allowMulti').hide();
@@ -587,7 +595,7 @@ AllowMultiOrNot = function () {
             if (result.msg == '0') {
                 //0是禁止多圖狀態，此時應該顯示可以多圖的按鈕
                 Ext.getCmp('forbidMulti').hide();
-                Ext.getCmp('allowMulti').show();              
+                Ext.getCmp('allowMulti').show();
             }
             else {
                 Ext.getCmp('forbidMulti').show();
@@ -617,7 +625,7 @@ ChangeImageMode = function () {
                 Ext.getCmp('forbidMulti').hide();
                 Ext.getCmp('allowMulti').show();
             }
-            else if (result.id != '0') {              
+            else if (result.id != '0') {
                 Ext.Msg.alert(INFORMATION, '品牌編號: ' + result.id + ',在指定的時段內正在使用其他促銷圖片, 請確認');
                 multi = 1;
                 changeError = 1;
@@ -625,9 +633,9 @@ ChangeImageMode = function () {
                 Ext.getCmp('allowMulti').hide();
             }
         },
-        failure: function () {           
+        failure: function () {
             Ext.Msg.alert(INFORMATION, FAILURE);
-            multi = 1;            
+            multi = 1;
         }
     });
 }
