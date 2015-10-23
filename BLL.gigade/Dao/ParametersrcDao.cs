@@ -441,6 +441,25 @@ namespace BLL.gigade.Dao
                 throw new Exception("ParametersrcDao-->GetElementType-->" + strSql.ToString() + ex.Message, ex);
             }
         }
+        /// <summary>
+        /// chaojie1124j add by 2015/10/22庫存調整，參數狀態為禁用的不顯示
+        /// </summary>
+        /// <param name="types"></param>
+        /// <returns></returns>
+        public List<Parametersrc> GetKindTypeByStatus(string types)
+        {
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+                strSql.AppendFormat("select parametercode,parameterName,remark from t_parametersrc where parameterType='{0}' and used!=0 ", types);
+                return _accessMySql.getDataTableForObj<Parametersrc>(strSql.ToString());
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("ParametersrcDao-->GetElementType-->" + strSql.ToString() + ex.Message, ex);
+            }
+        }
 
         #region 庫調參數維護
         public List<Parametersrc> GetIialgParametersrcList(Parametersrc store, out int totalCount)
