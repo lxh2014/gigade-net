@@ -1,16 +1,141 @@
 ﻿@{
     ViewBag.Title = "MarketTally";
 }
-
-<!DOCTYPE html>
-
-<html>
 <head>
-    <title>MarketTally</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes " />
+
+<script src="../../Scripts/jquery-2.1.4.min.js"></script>
+<link href="../../Scripts/Bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<script src="../../Scripts/Bootstrap/bootstrap.min.js"></script>
+
+    <title></title>
 </head>
-<body>
-    <div>
-        
+
+
+<div class="container">
+    <h2>提示：輸入工作代號走寄蒼流程，輸入訂單編號走調度流程!</h2>
+    <br />
+    <select class="btn btn-default btn-lg combobox">
+        <option value="0">常溫</option>
+        <option value="1">冷凍</option>
+    </select>
+    <p></p>
+    <div class="row">
+      <div class="col-xs-2">
+        <select class="form-control input-lg" >
+            <option value="0">常溫</option>
+            <option value="1">冷凍</option>
+        </select>
+      </div>  
     </div>
-</body>
-</html>
+    <p></p>
+
+@*<div class="input-group">
+  <span class="input-group-addon" id="basic-addon1">請輸入工作代號/訂單號</span>
+  <input type="text" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+</div>*@
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="input-group">
+      <span class="input-group-btn">
+        <button class="btn btn-default btn-lg" type="button">工作代號/訂單號</button>
+      </span>
+      <input type="text" class="form-control input-lg" id="number" placeholder="例如 N20151001011200/123456">
+      <span class="input-group-btn">
+        <button class="btn btn-default btn-lg " id="ok" type="button">確定</button>
+      </span>
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-6 -->
+</div><!-- /.row -->
+</div>
+
+<div class="modal fade MarketTally-modal-alert" role="dialog" aria-labelledby="gridSystemModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 class="modal-title" >提示</h3>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">         
+          <h4 id="MessageContentId">錯誤提示</h4>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script type="text/javascript">
+  $(document).ready(function(){
+      $('#ok').on('click', function ()
+      {
+          var number = document.getElementById("number").value.trim();
+          if (number.length != 15)
+          {
+              $('#MessageContentId').text("請輸入正確的工作編號!");
+              $('.MarketTally-modal-alert').modal('toggle')
+              return false;                                                                                                                                                                                         
+          }
+  
+          $.get('/WareHouse/GetAseldMasterAssgCount', { number: number }, function (data)
+          {
+              //$('#result').text(data);
+              //console.log(data);
+              //alert(data);
+              var result = eval("(" + data + ")");
+              if (result.success)
+              {
+                  if (result.data > 0)
+                  {
+                      //alert("result.success == true")
+                      document.location.href = "/MarketTally/MarketTallyWD?number=" + number;
+                  }
+                  else
+                  {
+                      $('#MessageContentId').text("工作編碼中沒有寄倉商品!");
+                      $('.MarketTally-modal-alert').modal('toggle')
+                  }
+              }
+              
+          }).error(function ()
+          {
+              $('#MessageContentId').text("查詢失敗!");
+              $('.MarketTally-modal-alert').modal('toggle')
+          })
+
+          ////////////
+
+          //$.ajax({
+          //    url: "/WareHouse/GetAseldMasterAssgCount",
+          //    data: {
+          //        "number": number
+          //    },
+          //    type: "POST",
+          //    dataType: "text",
+          //    success: function (msg)
+          //    {
+          //        alert("success")
+          //        var result = eval("(" + msg + ")");
+          //        if (result.success == "true")
+          //        {
+          //            alert("result.success == true")
+          //        }
+          //        else
+          //        {
+          //            alert("result.success == false")
+          //        }
+          //    },
+          //    error: function (msg)
+          //    {
+          //        alert("服务器异常")
+          //    }
+          //});
+
+          /////////
+      })
+  });
+</script>

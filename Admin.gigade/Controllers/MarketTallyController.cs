@@ -19,6 +19,10 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+        public ActionResult MarketTallyWD()
+        {
+            return View();
+        }
 
     }
 }

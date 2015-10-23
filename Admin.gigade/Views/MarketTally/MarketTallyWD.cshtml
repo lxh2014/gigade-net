@@ -1,0 +1,136 @@
+﻿@{
+    ViewBag.Title = "MarketTallyWD";
+}
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes " />
+
+<script src="../../Scripts/jquery-2.1.4.min.js"></script>
+<link href="../../Scripts/Bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<script src="../../Scripts/Bootstrap/bootstrap.min.js"></script>
+
+    <title></title>
+</head>
+
+
+<div class="container">
+    
+    <h3>工作代號： <span class="label label-info">N20151023111209</span></h3>
+    <h3>出貨單號： <span class="label label-info">D00058828</span></h3>
+    <h3>訂單號&nbsp&nbsp&nbsp： <span class="label label-info" >143630005</span></h3>
+    <h3>撿貨料位： <span class="label label-info">AA099A88</span></h3>
+    @*<h3>工作代號： <span class="label label-primary">N20151023111209</span></h3>
+    <h3>工作代號： <span class="label label-success">N20151023111209</span></h3>
+    <h3>工作代號： <span class="label label-info">N20151023111209</span></h3>
+    <h3>工作代號： <span class="label label-warning">N20151023111209</span></h3>
+    <h3>工作代號： <span class="label label-danger">N20151023111209</span></h3>*@
+
+    <br />
+@*<div class="row">
+  <div class="col-lg-8">
+    <div class="input-group">
+      <span class="input-group-btn">
+        <button class="btn btn-default btn-lg" type="button">料位條碼</button>
+      </span>
+      <input type="text" class="form-control input-lg" placeholder="請輸入料位條碼...">
+      <span class="input-group-btn">
+        <button class="btn btn-default btn-lg " id="ok" type="button">確定</button>
+      </span>
+
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-8 -->
+</div><!-- /.row -->*@
+
+
+   
+@*<div class="row">
+  <div class="col-lg-8">
+    <div class="input-group">
+      <span class="input-group-btn">
+        <button class="btn btn-default btn-lg" type="button">產品條碼/商品細項編號</button>
+      </span>
+      <input type="text" class="form-control input-lg" placeholder="請輸入產品條碼/商品細項編號...">
+      <span class="input-group-btn">
+        <button class="btn btn-default btn-lg " id="ok2" type="button">確定</button>
+      </span>
+
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-8 -->
+</div><!-- /.row -->*@
+    <br />
+<div class="row">
+  <div class="col-lg-8">
+    <div class="input-group " id="productitem_group">
+      <span class="input-group-btn">
+        <button class="btn btn-default btn-lg "  type="button">產品條碼/商品細項編號</button>
+      </span>
+      <input type="text" class="form-control input-lg" id="productitem" placeholder="請輸入產品條碼/商品細項編號...">
+
+      <span class="glyphicon " id="inputGroupSuccess1Status5" aria-hidden="true"></span>
+      <span id="inputGroupSuccess1Status2" class="sr-only">(success)</span>
+      @*<span class="input-group-btn">
+        <button class="btn btn-default btn-lg " id="ok" type="button">確定</button>
+      </span>*@
+
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-8 -->
+</div><!-- /.row -->
+     <h3 hidden="hidden" id="productname">品名： <span class="label label-info ">(134462)佳瑞發天然健康食品-【2015/03/11即期品】蔬果脆片</span></h3>
+    <br />
+
+@*<div class="form-group has-success has-feedback">
+  <label class="control-label" for="inputGroupSuccess1">Input group with success</label>
+  <div class="input-group">
+    <span class="input-group-addon">111</span>
+    <input type="text" class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">
+  </div>
+  <span class="glyphicon glyphicon-ok " id="" aria-hidden="true"></span>
+  <span id="inputGroupSuccess1Status" class="sr-only">(success)</span>
+</div>*@
+
+
+</div>
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        $('#productitem').on('input', function (e)
+        {
+            //alert(document.getElementById("productitem").value.trim());
+            if (document.getElementById("productitem").value == "")
+            {
+                $('#productitem_group').attr("class", "input-group ");
+                $('#productname').attr("hidden", "hidden");
+                $('#inputGroupSuccess1Status5').attr("class", "glyphicon");
+                return false;
+            }
+            else if (document.getElementById("productitem").value.trim() == "123456")
+            {
+                $('#productitem_group').attr("class", "input-group has-success ");
+                $('#productname').removeAttr("hidden");
+                $('#inputGroupSuccess1Status5').attr("class", "glyphicon glyphicon-ok form-control-feedback");
+            }
+            else
+            {
+                $('#productitem_group').attr("class", "input-group has-error ");
+                $('#productname').attr("hidden", "hidden");
+                $('#inputGroupSuccess1Status5').attr("class", "glyphicon glyphicon-remove form-control-feedback");
+            }
+        })
+        $('#ok').on('click', function ()
+        {
+            //alert("確定");
+            $('#productitem_group').attr("class", "input-group has-success ");
+            $('#productname').removeAttr("hidden");
+            $('#inputGroupSuccess1Status5').attr("class", "glyphicon glyphicon-ok form-control-feedback");
+            
+        })
+        $('#ok2').on('click', function ()
+        {
+            //alert("確定");
+
+            $('#productitem_group').attr("class", "input-group has-error ");
+            $('#inputGroupSuccess1Status5').attr("class", "glyphicon glyphicon-remove form-control-feedback");
+
+        })
+    });
+</script>

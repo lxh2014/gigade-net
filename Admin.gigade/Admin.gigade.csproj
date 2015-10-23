@@ -690,9 +690,9 @@
     <Content Include="Locale\zh-TW\SiteManager\lang.js" />
     <Content Include="Locale\zh-TW\TrialProdCate\TrialProdCateLang.js" />
     <Content Include="Locale\zh-TW\Vote\Lang.js" />
-    <Content Include="Scripts\Bootstrap\bootstrap.css" />
+    <Content Include="Scripts\Bootstrap\css\bootstrap.css" />
     <Content Include="Scripts\Bootstrap\bootstrap.js" />
-    <Content Include="Scripts\Bootstrap\bootstrap.min.css" />
+    <Content Include="Scripts\Bootstrap\css\bootstrap.min.css" />
     <Content Include="Scripts\Bootstrap\bootstrap.min.js" />
     <Content Include="Scripts\Common\ManageButton.js" />
     <Content Include="Scripts\ext-5.1.0\.sencha\package\Boot.js" />
@@ -1997,6 +1997,7 @@
     <Content Include="Scripts\Views\Website\BannerNewsList.js" />
     <Content Include="Scripts\Views\Website\BannernewssiteList.js" />
     <Content Include="Template\ProductDetail\product_detail_safe.txt" />
+    <Content Include="Views\MarketTally\Message.js" />
     <Content Include="XML\Exceptional.xml" />
     <Content Include="XML\ItemPrice.xml" />
     <Content Include="XML\ParticularsSrc.xml">
@@ -2009,6 +2010,11 @@
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-rtl-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\resources\Readme.md" />
     <None Include="Properties\PublishProfiles\gigade.pubxml" />
+    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.woff2" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all-vsdoc.js" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all.min.intellisense.js" />
     <Content Include="Scripts\kendo\2014.2.716\kendo.all.min.js" />
@@ -4420,6 +4426,7 @@
     <Content Include="Views\WareHouse\WaitLiaoWei.cshtml" />
     <Content Include="Views\MarketTally\Index.cshtml" />
     <Content Include="Views\MarketTally\MarketTally.cshtml" />
+    <Content Include="Views\MarketTally\MarketTallyWD.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
