@@ -395,7 +395,11 @@ namespace BLL.gigade.Common
                     PdfPCell cell = new PdfPCell(new Phrase("", new Font(basefont, defaultFontSize, Font.BOLD)));
                     cell.VerticalAlignment = Element.ALIGN_MIDDLE;
                     cell.HorizontalAlignment = Element.ALIGN_CENTER;//水平居中
-                    if (j / cols % rows == 0)
+                    if (rows == 1)
+                    {
+
+                    }
+                    else if (j / cols % rows == 0)
                     {
                         cell.DisableBorderSide(2); //1，2，4，8 分别对应每行的上，下，左，右四个边框．
                     }
@@ -417,7 +421,11 @@ namespace BLL.gigade.Common
                         PdfPCell cell = new PdfPCell(new Phrase(dtSource.Rows[i][j].ToString(), font));
                         cell.VerticalAlignment = Element.ALIGN_MIDDLE;
                         cell.HorizontalAlignment = Element.ALIGN_RIGHT;//水平居右
-                        if (j / cols % rows == 0)
+                        if (rows == 1)
+                        {
+
+                        }
+                        else if (j / cols % rows == 0)
                         {
                             cell.DisableBorderSide(2); //1，2，4，8 分别对应每行的上，下，左，右四个边框．
                         }
@@ -437,7 +445,11 @@ namespace BLL.gigade.Common
                         PdfPCell cell = new PdfPCell(new Phrase("", font));
                         cell.VerticalAlignment = Element.ALIGN_MIDDLE;
                         cell.HorizontalAlignment = Element.ALIGN_RIGHT;//水平居右
-                        if (j / cols % rows == 0)
+                        if (rows == 1)
+                        {
+
+                        }
+                        else if (j / cols % rows == 0)
                         {
                             cell.DisableBorderSide(2); //1，2，4，8 分别对应每行的上，下，左，右四个边框．
                         }
@@ -532,7 +544,11 @@ namespace BLL.gigade.Common
                     PdfPCell cell = new PdfPCell(new Phrase("", new Font(basefont, defaultFontSize, Font.BOLD)));
                     cell.VerticalAlignment = Element.ALIGN_MIDDLE;
                     cell.HorizontalAlignment = Element.ALIGN_CENTER;//水平居中
-                    if (j / cols % rows == 0)
+                    if (rows == 1)
+                    {
+
+                    }
+                    else if (j / cols % rows == 0)
                     {
                         cell.DisableBorderSide(2); //1，2，4，8 分别对应每行的上，下，左，右四个边框．
                     }
@@ -554,7 +570,11 @@ namespace BLL.gigade.Common
                         PdfPCell cell = new PdfPCell(new Phrase(dtSource.Rows[i][j].ToString(), font));
                         cell.VerticalAlignment = Element.ALIGN_MIDDLE;
                         cell.HorizontalAlignment = Element.ALIGN_RIGHT;//水平居右
-                        if (j / cols % rows == 0)
+                        if (rows == 1)
+                        {
+
+                        }
+                        else if (j / cols % rows == 0)
                         {
                             cell.DisableBorderSide(2); //1，2，4，8 分别对应每行的上，下，左，右四个边框．
                         }
@@ -574,7 +594,11 @@ namespace BLL.gigade.Common
                         PdfPCell cell = new PdfPCell(new Phrase("", font));
                         cell.VerticalAlignment = Element.ALIGN_MIDDLE;
                         cell.HorizontalAlignment = Element.ALIGN_RIGHT;//水平居右
-                        if (j / cols % rows == 0)
+                        if (rows == 1)
+                        {
+
+                        }
+                        else if (j / cols % rows == 0)
                         {
                             cell.DisableBorderSide(2); //1，2，4，8 分别对应每行的上，下，左，右四个边框．
                         }
@@ -605,7 +629,7 @@ namespace BLL.gigade.Common
         } 
         #endregion
 
-        #region 導出DataTable数据到PDF +void ExportDataTableToPDF(DataTable dtSource, string FileName,float[] arrColWidth, PdfPTable pdftable, string title, string header, int cols)
+        #region 導出DataTable数据到PDF +void ExportDataTableToPDF(DataTable dtSource,bool isColumnName, string FileName, float[] arrColWidth, PdfPTable pdftable, string title, string header, int cols,uint count)
         /// <summary>
         /// 導出DataTable数据到PDF 
         /// </summary>
@@ -691,7 +715,11 @@ namespace BLL.gigade.Common
                         PdfPCell cell = new PdfPCell(new Phrase("", new Font(basefont, defaultFontSize)));
                         cell.VerticalAlignment = Element.ALIGN_MIDDLE;
                         cell.HorizontalAlignment = Element.ALIGN_CENTER;//水平居中
-                        if (j / cols % rows == 0)
+                        if (rows == 1)
+                        {
+
+                        }
+                        else if (j / cols % rows == 0)
                         {
                             cell.DisableBorderSide(2); //1，2，4，8 分别对应每行的上，下，左，右四个边框．
                         }
@@ -716,8 +744,11 @@ namespace BLL.gigade.Common
                         PdfPCell cell = new PdfPCell(new Phrase(dtSource.Rows[i][j].ToString(), font));
                         cell.VerticalAlignment = Element.ALIGN_MIDDLE;
                         cell.HorizontalAlignment = Element.ALIGN_RIGHT;//水平居右
-                        
-                        if (j / cols % rows == 0)
+                        if (rows == 1)
+                        {
+
+                        }
+                        else if (j / cols % rows == 0)
                         {
                             cell.DisableBorderSide(2); //1，2，4，8 分别对应每行的上，下，左，右四个边框．
                         }
@@ -747,7 +778,11 @@ namespace BLL.gigade.Common
                         PdfPCell cell = new PdfPCell(new Phrase("", font));
                         cell.VerticalAlignment = Element.ALIGN_MIDDLE;
                         cell.HorizontalAlignment = Element.ALIGN_RIGHT;//水平居右
-                        if (j / cols % rows == 0)
+                        if (rows == 1)
+                        {
+
+                        }
+                        else if (j / cols % rows == 0)
                         {
                             cell.DisableBorderSide(2); //1，2，4，8 分别对应每行的上，下，左，右四个边框．
                         }
@@ -771,6 +806,198 @@ namespace BLL.gigade.Common
 
                 }
                 document.Add(table);
+                ////關閉document
+                //writer.Flush();
+                //writer.CloseStream = true;
+                document.Close();  //
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("PdfManagement-->ExportDataTableToPDF-->" + ex.Message);
+            }
+        }
+        #endregion
+
+        #region 導出DataTable数据到PDF +void (DataTable dtSource, bool isColumnName, string FileName, float[] arrColWidth, PdfPTable pdftable,PdfPTable pdffooter, string title, string header, int cols, uint count)
+        /// <summary>
+        /// 導出DataTable数据到PDF 
+        /// </summary>
+        /// <param name="dtSource">表名</param>
+        /// <param name="isColumnName">是否顯示列名</param>
+        /// <param name="FileName">文件完整路徑</param>
+        /// <param name="arrColWidth">列寬比例數組，數組長度必須等於DataTable列數；</param>
+        /// <param name="pdftable">公共模块</param>
+        /// <param name="pdffooter">落款</param>
+        /// <param name="title">標題</param>        
+        /// <param name="header">頁眉</param>
+        /// <param name="rows">表頭分rows列显示</param>
+        /// <param name="count">每頁最多顯示count組記錄</param>
+        public void ExportDataTableToPDF(DataTable dtSource, bool isColumnName, string FileName, float[] arrColWidth, PdfPTable pdftable,PdfPTable pdffooter, string title, string header, int cols, uint count)
+        {
+            try
+            {
+                //創建實例
+                document = new Document(PageSize.A4.Rotate());
+                PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(FileName, FileMode.Create));
+                OpenDocument();
+                //設置title和頁眉
+                writer.PageEvent = new HeaderAndFooterEvent();
+                HeaderAndFooterEvent.basefont = basefont;
+                HeaderAndFooterEvent.header = header;
+                HeaderAndFooterEvent.isPdfTable = true;
+                HeaderAndFooterEvent.pdftable = pdftable;
+                HeaderAndFooterEvent.PAGE_NUMBER = true;
+                HeaderAndFooterEvent.tpl = writer.DirectContent.CreateTemplate(100, 100);
+                if (!string.IsNullOrEmpty(title))
+                {
+                    document.Add(HeaderAndFooterEvent.InsertTitleContent(title));
+                }
+                //添加table
+                int rows = (int)(dtSource.Columns.Count / cols);
+                if (dtSource.Columns.Count % cols != 0)
+                {
+                    rows = rows + 1;
+                }
+                PdfPTable table = new PdfPTable(cols);
+                table.WidthPercentage = 100;
+                //沒有傳遞列寬比例時，獲取默認列表比較
+                float[] newArrColWidth = new float[dtSource.Columns.Count];
+                for (int i = 0; i < dtSource.Columns.Count; i++)
+                {
+                    if (arrColWidth.Length > i)
+                    {
+                        newArrColWidth[i] = arrColWidth[i];
+                    }
+                    else
+                    {
+                        newArrColWidth[i] = newArrColWidth[i - cols];
+                    }
+                }
+
+                table.SetWidths(arrColWidth);
+                //列名代表表頭
+                #region 是否顯示列名
+                if (isColumnName)
+                {
+                    for (int i = 0; i < dtSource.Columns.Count; i++)
+                    {
+                        PdfPCell cell = new PdfPCell(new Phrase(dtSource.Columns[i].ColumnName, new Font(basefont, defaultFontSize, Font.BOLD)));
+                        cell.VerticalAlignment = Element.ALIGN_MIDDLE;
+                        cell.HorizontalAlignment = Element.ALIGN_CENTER;//水平居中
+                        if (i / cols % rows == 0)
+                        {
+                            cell.DisableBorderSide(2); //1，2，4，8 分别对应每行的上，下，左，右四个边框．
+                        }
+                        else if (i / cols % (rows - 1) == 0)
+                        {
+                            cell.DisableBorderSide(1);
+                        }
+                        else
+                        {
+                            cell.DisableBorderSide(1);
+                            cell.DisableBorderSide(2);
+                        }
+                        table.AddCell(cell);
+
+                    }
+                    for (int j = dtSource.Columns.Count; j < cols * rows; j++)
+                    {
+                        PdfPCell cell = new PdfPCell(new Phrase("", new Font(basefont, defaultFontSize)));
+                        cell.VerticalAlignment = Element.ALIGN_MIDDLE;
+                        cell.HorizontalAlignment = Element.ALIGN_CENTER;//水平居中
+                        if (rows == 1)
+                        {
+
+                        }
+                        else if (j / cols % rows == 0)
+                        {
+                            cell.DisableBorderSide(2); //1，2，4，8 分别对应每行的上，下，左，右四个边框．
+                        }
+                        else if (j / cols % (rows - 1) == 0)
+                        {
+                            cell.DisableBorderSide(1);
+                        }
+                        else
+                        {
+                            cell.DisableBorderSide(1);
+                            cell.DisableBorderSide(2);
+                        }
+                        table.AddCell(cell);
+                    }
+                }
+                #endregion
+                document.Add(pdftable);
+                for (int i = 0; i < dtSource.Rows.Count; i++)
+                {
+                    for (int j = 0; j < dtSource.Columns.Count; j++)
+                    {
+                        PdfPCell cell = new PdfPCell(new Phrase(dtSource.Rows[i][j].ToString(), font));
+                        cell.VerticalAlignment = Element.ALIGN_MIDDLE;
+                        cell.HorizontalAlignment = Element.ALIGN_RIGHT;//水平居右
+                        if (rows == 1)
+                        {
+
+                        }
+                        else if (j / cols % rows == 0)
+                        {
+                            cell.DisableBorderSide(2); //1，2，4，8 分别对应每行的上，下，左，右四个边框．
+                        }
+                        else if (j / cols % (rows - 1) == 0)
+                        {
+                            cell.DisableBorderSide(1);
+                        }
+                        else
+                        {
+                            cell.DisableBorderSide(1);
+                            cell.DisableBorderSide(2);
+                        }
+
+                        table.AddCell(cell);
+                    }
+                    if (dtSource.Columns.Count == cols * rows)
+                    {
+                        if ((i + 1) % count == 0 && i != dtSource.Rows.Count - 1)
+                        {
+                            document.Add(table);
+                            table.Rows.Clear();
+                            document.NewPage();
+                        }
+                    }
+                    for (int j = dtSource.Columns.Count; j < cols * rows; j++)
+                    {
+                        PdfPCell cell = new PdfPCell(new Phrase("", font));
+                        cell.VerticalAlignment = Element.ALIGN_MIDDLE;
+                        cell.HorizontalAlignment = Element.ALIGN_RIGHT;//水平居右
+                        if (rows == 1)
+                        {
+
+                        }
+                        else if (j / cols % rows == 0)
+                        {
+                            cell.DisableBorderSide(2); //1，2，4，8 分别对应每行的上，下，左，右四个边框．
+                        }
+                        else if (j / cols % (rows - 1) == 0)
+                        {
+                            cell.DisableBorderSide(1);
+                        }
+                        else
+                        {
+                            cell.DisableBorderSide(1);
+                            cell.DisableBorderSide(2);
+                        }
+                        table.AddCell(cell);
+                        if ((i + 1) % count == 0 && i != dtSource.Rows.Count - 1 && j == cols * rows - 1)
+                        {
+                            document.Add(table);
+                            table.Rows.Clear();
+                            document.NewPage();
+                        }
+                    }
+
+                }
+                document.Add(table);
+
+                document.Add(pdffooter);
                 ////關閉document
                 //writer.Flush();
                 //writer.CloseStream = true;
