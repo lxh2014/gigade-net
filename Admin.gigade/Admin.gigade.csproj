@@ -1852,7 +1852,9 @@
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsList.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewReport.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmSend.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmSendListCount.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateEdit.js" />
@@ -4417,9 +4419,7 @@
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
     <Content Include="Views\ScheduleService\Index.cshtml" />
     <Content Include="Views\Vendor\VendorDetails.cshtml" />
-
     <Content Include="Views\EventPromo\EventPromoImageList.cshtml" />
-
     <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
     <Content Include="Views\Vendor\VendorBankImport.cshtml" />
     <Content Include="Views\EdmNew\EmailGroup.cshtml" />
@@ -4427,7 +4427,8 @@
     <Content Include="Views\MarketTally\Index.cshtml" />
     <Content Include="Views\MarketTally\MarketTally.cshtml" />
     <Content Include="Template\OrderImport\t_orders.xlsx" />
-
+    <Content Include="Views\EdmNew\EdmContentNewReport.cshtml" />
+    <Content Include="Views\EdmNew\EdmSendListCountView.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4642,9 +4643,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-
           <DevelopmentServerPort>2224</DevelopmentServerPort>
-
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
