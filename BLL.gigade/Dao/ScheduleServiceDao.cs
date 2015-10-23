@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
+using BLL.gigade.Common;
+using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using DBAccess;
 
@@ -21,7 +24,7 @@ namespace BLL.gigade.Dao
               StringBuilder sql = new StringBuilder();
               try
               {
-                  sql.AppendFormat("SELECT * FROM `schedule_master` WHERE schedule_state = '{0}' AND  next_execute_time<='{1}' and next_execute_time > 0 ;", query.schedule_state, Common.CommonFunction.GetPHPTime(DateTime.Now.ToString()));
+                  sql.AppendFormat("SELECT `rowid`, `schedule_code`, `schedule_name`, `schedule_api`, `schedule_description`, `schedule_state`, `previous_execute_time`, `next_execute_time`, `schedule_period_id`, `create_user`, `create_time`, `change_user`, `change_time` FROM `schedule_master` WHERE schedule_state = '{0}' AND  next_execute_time<='{1}' and next_execute_time > 0 ;", query.schedule_state, Common.CommonFunction.GetPHPTime(DateTime.Now.ToString()));
 
                   return _access.getDataTableForObj<ScheduleMasterQuery>(sql.ToString());
               }
@@ -30,154 +33,19 @@ namespace BLL.gigade.Dao
                   throw new Exception("ScheduleServiceDao-->GetExeScheduleMasterList-->" + ex.Message, ex);
               }
           }
-
-          public List<ScheduleMasterQuery> GetScheduleMasterList(ScheduleMasterQuery query)
-          {
-              StringBuilder sql = new StringBuilder();
-              StringBuilder str = new StringBuilder();
-              try
-              {
-                  sql.AppendFormat(" SELECT sm.rowid,sm.schedule_code,sm.schedule_name,sm.schedule_api,sm.schedule_description,sm.schedule_state,sm.previous_execute_time,sm.next_execute_time,sm.schedule_period_id, mu1.user_username as create_username,sm.create_time,mu2.user_username as change_username,sm.change_time  FROM schedule_master sm ");
-                  str.Append(" LEFT JOIN manage_user mu1 on mu1.user_id=sm.create_user ");
-                  str.Append(" LEFT JOIN manage_user mu2 on mu2.user_id=sm.change_user ");
-                  sql.Append(str.ToString());
-                  return _access.getDataTableForObj<ScheduleMasterQuery>(sql.ToString());
-              }
-              catch (Exception ex)
-              {
-                  throw new Exception("ScheduleServiceDao-->GetScheduleMasterList-->" + ex.Message, ex);
-              }
-          }
-
-          public List<ScheduleConfigQuery> GetScheduleConfigList(ScheduleConfigQuery query)
-          {
-              StringBuilder sql = new StringBuilder();
-               StringBuilder sqlCondi = new StringBuilder();
-              try
-              {
-                  sql.AppendFormat("SELECT sc.schedule_code,sc.parameterCode,sc.value,sc.description, mu1.user_username as create_username,sc.create_time, mu2.user_username as change_username,sc.change_time  FROM schedule_config sc ");
-                  sqlCondi.Append(" LEFT JOIN schedule_master sm on sm.schedule_code=sc.schedule_code ");
-                  sqlCondi.Append(" LEFT JOIN manage_user mu1 on mu1.user_id=sc.create_user ");
-                  sqlCondi.Append(" LEFT JOIN manage_user mu2 on mu2.user_id=sc.change_user ");
-                  sqlCondi.Append(" where 1=1 ");
-                  if (!string.IsNullOrEmpty(query.schedule_code))
-                  {
-                      sqlCondi.AppendFormat(" and sm.schedule_code='{0}' ", query.schedule_code);
-                  }
-                  sql.Append(sqlCondi.ToString());
-                  return _access.getDataTableForObj<ScheduleConfigQuery>(sql.ToString());
-              }
-              catch (Exception ex)
-              {
-                  throw new Exception("ScheduleServiceDao-->GetScheduleMasterList-->" + ex.Message, ex);
-              }
-          }
-
-          public List<SchedulePeriodQuery> GetSchedulePeriodList(SchedulePeriodQuery query)
-          {
-              StringBuilder sql = new StringBuilder();
-              StringBuilder sqlCondi = new StringBuilder();
-              try
-              {
-                  sql.AppendFormat("SELECT sp.schedule_code,sp.period_type,sp.period_nums,sp.begin_datetime,sp.current_nums,sp.limit_nums,mu1.user_username as create_username,mu2.user_username as change_username,sp.create_time,sp.change_time  FROM schedule_period sp");
-                  sqlCondi.Append(" LEFT JOIN schedule_master sm on sm.schedule_code=sp.schedule_code ");
-                  sqlCondi.Append(" LEFT JOIN manage_user mu1 on mu1.user_id=sp.create_user ");
-                  sqlCondi.Append(" LEFT JOIN manage_user mu2 on mu2.user_id=sp.change_user ");
-                  sqlCondi.Append(" where 1=1 ");
-                  if (!string.IsNullOrEmpty(query.schedule_code))
-                  {
-                      sqlCondi.AppendFormat(" and sm.schedule_code='{0}' ", query.schedule_code);
-                  }
-                  sql.Append(sqlCondi.ToString());
-                  return _access.getDataTableForObj<SchedulePeriodQuery>(sql.ToString());
-              }
-              catch (Exception ex)
-              {
-                  throw new Exception("ScheduleServiceDao-->GetSchedulePeriodList-->" + ex.Message, ex);
-              }
-          }
-
-          public string UpdateStats_Schedule_master(ScheduleMasterQuery query)  // master 狀態更新
-          {
-              StringBuilder strSql = new StringBuilder();
-              try
-              {
-                  strSql.AppendFormat(@"Update schedule_master set schedule_state='{0}' WHERE rowid='{1}'", query.schedule_state, query.rowid);
-                  return strSql.ToString();
-              }
-              catch (Exception ex)
-              {
-                  throw new Exception("ScheduleServiceDao-->UpdateStats_Schedule_master-->" + ex.Message + strSql.ToString(), ex);
-              }
-          }
-
-          //插入schedule_master信息
-          public int ScheduleMasterInfoInsert(ScheduleMasterQuery query)
-          {
-              StringBuilder sql = new StringBuilder();
-              query.Replace4MySQL();
-              try
-              {
-                  sql.Append("insert into schedule_master ( schedule_code, schedule_name, schedule_api,schedule_description,schedule_state,schedule_period_id,create_user,change_user, create_time, change_time, previous_execute_time,next_execute_time) values ");
-                  sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}')", query.schedule_code, query.schedule_name, query.schedule_api, query.schedule_description,query.schedule_state, query.schedule_period_id, query.create_user, query.change_user, query.create_time, query.change_time, query.previous_execute_time,query.next_execute_time);
-
-                  return _access.execCommand(sql.ToString());
-              }
-              catch (Exception ex)
-              {
-                  throw new Exception("ScheduleServiceDao-->ScheduleMasterInfoInsert-->" + sql.ToString() + ex.Message);
-              }
-          }
-          //更新人员信息
-          public int ScheduleMasterInfoUpdate(ScheduleMasterQuery query)
-          {
-              StringBuilder sql = new StringBuilder();
-              query.Replace4MySQL();
-              try
-              {
-                  sql.AppendFormat("update schedule_master set schedule_code = '{0}', schedule_name = '{1}', schedule_api = '{2}',schedule_description='{3}',schedule_state='{4}',schedule_period_id='{5}',create_user='{6}',change_user='{7}',create_time='{8}',change_time='{9}', previous_execute_time='{10}', next_execute_time='{11}' where rowid='{12}'", query.schedule_code, query.schedule_name, query.schedule_api, query.schedule_description, query.schedule_state, query.schedule_period_id, query.create_user, query.change_user, query.create_time, query.change_time, query.previous_execute_time, query.next_execute_time,query.rowid);
-                  return _access.execCommand(sql.ToString());
-              }
-              catch (Exception ex)
-              {
-                  throw new Exception("ScheduleServiceDao-->ScheduleMasterInfoUpdate-->" + sql.ToString() + ex.Message);
-              }
-          }
-
-
-          //可以多行刪除數據 
-          public int ScheduleMasterDelete(string ids)
-          {
-              StringBuilder sql = new StringBuilder();
-              // query.Replace4MySQL();
-              try
-              {
-                  sql.AppendFormat("DELETE FROM schedule_master WHERE rowid in ({0})", ids);
-
-                  return _access.execCommand(sql.ToString());
-              }
-              catch (Exception ex)
-              {
-                  throw new Exception("ScheduleServiceDao-->ScheduleMasterDelete-->" + sql.ToString() + ex.Message);
-              }
-          }
-
-
-
-
-          public ScheduleMasterQuery GetExeScheduleMaster(ScheduleMasterQuery query)
+          public ScheduleMasterQuery GetScheduleMaster(ScheduleMasterQuery query)
           {
               StringBuilder sql = new StringBuilder();
               try
               {
-                  sql.AppendFormat("SELECT * FROM `schedule_master` WHERE schedule_code = '{0}';", query.schedule_code);
+                  sql.AppendFormat("SELECT `rowid`, `schedule_code`, `schedule_name`, `schedule_api`, `schedule_description`, `schedule_state`, `previous_execute_time`, `next_execute_time`, `schedule_period_id`, `create_user`, `create_time`, `change_user`, `change_time` FROM `schedule_master` WHERE schedule_code = '{0}';", query.schedule_code);
 
                   return _access.getSinggleObj<ScheduleMasterQuery>(sql.ToString());
               }
               catch (Exception ex)
               {
 
-                  throw new Exception("ScheduleServiceDao-->GetExeScheduleMaster-->" + ex.Message, ex);
+                  throw new Exception("ScheduleServiceDao-->GetScheduleMaster-->" + ex.Message, ex);
               }
           }
           public List<ScheduleConfigQuery> GetScheduleConfig(ScheduleConfigQuery query)
@@ -185,7 +53,7 @@ namespace BLL.gigade.Dao
               StringBuilder sql = new StringBuilder();
               try
               {
-                  sql.AppendFormat("SELECT * FROM `schedule_config` WHERE schedule_code = '{0}';", query.schedule_code);
+                  sql.AppendFormat("SELECT `rowid`, `schedule_code`, `parameterCode`, `parameterName`, `value`, `create_user`, `create_time`, `change_user`, `change_time` FROM `schedule_config` WHERE schedule_code = '{0}';", query.schedule_code);
                   return _access.getDataTableForObj<ScheduleConfigQuery>(sql.ToString());
               }
               catch (Exception ex)
@@ -223,28 +91,12 @@ namespace BLL.gigade.Dao
                   throw new Exception("ScheduleServiceDao-->GetSchedulePeriodBySchedule-->" + ex.Message, ex);
               }
           }
-          public int UpdateScheduleServicePeriod(SchedulePeriodQuery query)
-          {
-              StringBuilder sql = new StringBuilder();
-              try
-              {
-                  sql.AppendFormat("SELECT * FROM `schedule_config` WHERE schedule_code = '{0}';", query.schedule_code);
-                  return _access.execCommand(sql.ToString());
-              }
-              catch (Exception ex)
-              {
-
-                  throw new Exception("ScheduleServiceDao-->UpdateScheduleServicePeriod-->" + ex.Message, ex);
-              }
-          }
-
-
           public int UpdateScheduleMaster(ScheduleMasterQuery query)
           {
               StringBuilder sql = new StringBuilder();
               try
               {
-                  sql.AppendFormat(@"UPDATE `schedule_master` SET `schedule_code`='{0}', `schedule_name`='{1}', `schedule_api`='{2}', `schedule_description`='{3}', `schedule_state`='{4}', `previous_execute_time`='{5}', `next_execute_time`='{6}',`schedule_period_id`='{7}', `create_user`='{8}', `create_time`='{9}', `change_user`='{10}', `change_time`='{11}' WHERE `rowid`='{12}';", query.schedule_code, query.schedule_name, query.schedule_api, query.schedule_description, query.schedule_state, query.previous_execute_time, query.next_execute_time, query.schedule_period_id, query.create_user, query.create_time, query.change_user, Common.CommonFunction.GetPHPTime(DateTime.Now.ToString()), query.rowid);
+                  sql.AppendFormat(@"UPDATE `schedule_master` SET `schedule_code`='{0}', `schedule_name`='{1}', `schedule_api`='{2}', `schedule_description`='{3}', `schedule_state`='{4}', `previous_execute_time`='{5}', `next_execute_time`='{6}',`schedule_period_id`='{7}', `create_user`='{8}', `create_time`='{9}', `change_user`='{10}', `change_time`='{11}' WHERE `rowid`='{12}';", query.schedule_code, query.schedule_name, query.schedule_api, query.schedule_description, query.schedule_state, query.previous_execute_time, query.next_execute_time, query.schedule_period_id, query.create_user, query.create_time, query.change_user, Common.CommonFunction.GetPHPTime(), query.rowid);
                   return _access.execCommand(sql.ToString());
               }
               catch (Exception ex)
@@ -282,5 +134,441 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                   throw new Exception("ScheduleServiceDao-->AddScheduleLog-->" + ex.Message, ex);
               }
           }
+
+          public List<ScheduleMasterQuery> GetScheduleMasterList(ScheduleMasterQuery query)// 得到 master表中的記錄
+          {
+              StringBuilder sql = new StringBuilder();
+              StringBuilder str = new StringBuilder();
+              try
+              {
+                  sql.AppendFormat(" SELECT sm.rowid,sm.schedule_code,sm.schedule_name,sm.schedule_api,sm.schedule_description,sm.schedule_state,sm.previous_execute_time,sm.next_execute_time,sm.schedule_period_id, mu1.user_username as create_username,sm.create_time,mu2.user_username as change_username,sm.change_time  FROM schedule_master sm ");
+                  str.Append(" LEFT JOIN manage_user mu1 on mu1.user_id=sm.create_user ");
+                  str.Append(" LEFT JOIN manage_user mu2 on mu2.user_id=sm.change_user ");
+                  sql.Append(str.ToString());
+                  return _access.getDataTableForObj<ScheduleMasterQuery>(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->GetScheduleMasterList-->" + ex.Message, ex);
+              }
+          }
+
+          public List<ScheduleConfigQuery> GetScheduleConfigList(ScheduleConfigQuery query)// 得到 config表中的記錄
+          {
+              StringBuilder sql = new StringBuilder();
+               StringBuilder sqlCondi = new StringBuilder();
+              try
+              {
+                  sql.AppendFormat("SELECT  sc.rowid,sc.schedule_code,sc.parameterCode,sc.value,sc.parameterName, mu1.user_username as create_username,sc.create_time, mu2.user_username as change_username,sc.change_time  FROM schedule_config sc ");
+                  sqlCondi.Append(" LEFT JOIN schedule_master sm on sm.schedule_code=sc.schedule_code ");
+                  sqlCondi.Append(" LEFT JOIN manage_user mu1 on mu1.user_id=sc.create_user ");
+                  sqlCondi.Append(" LEFT JOIN manage_user mu2 on mu2.user_id=sc.change_user ");
+                  sqlCondi.Append(" where 1=1 ");
+                  if (!string.IsNullOrEmpty(query.schedule_code))
+                  {
+                      sqlCondi.AppendFormat(" and sm.schedule_code='{0}' ", query.schedule_code);
+                  }
+                  sql.Append(sqlCondi.ToString());
+                  return _access.getDataTableForObj<ScheduleConfigQuery>(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->GetScheduleMasterList-->" + ex.Message, ex);
+              }
+          }
+
+          public List<SchedulePeriodQuery> GetSchedulePeriodList(SchedulePeriodQuery query)// 得到 period表中的記錄
+          {
+              StringBuilder sql = new StringBuilder();
+              StringBuilder sqlCondi = new StringBuilder();
+              try
+              {
+                  sql.AppendFormat("SELECT sp.rowid,sp.schedule_code,sp.period_type,sp.period_nums,sp.begin_datetime,sp.current_nums,sp.limit_nums,mu1.user_username as create_username,mu2.user_username as change_username,sp.create_time,sp.change_time  FROM schedule_period sp");
+                  sqlCondi.Append(" LEFT JOIN schedule_master sm on sm.schedule_code=sp.schedule_code ");
+                  sqlCondi.Append(" LEFT JOIN manage_user mu1 on mu1.user_id=sp.create_user ");
+                  sqlCondi.Append(" LEFT JOIN manage_user mu2 on mu2.user_id=sp.change_user ");
+                  sqlCondi.Append(" where 1=1 ");
+                  if (!string.IsNullOrEmpty(query.schedule_code))
+                  {
+                      sqlCondi.AppendFormat(" and sm.schedule_code='{0}' ", query.schedule_code);
+                  }
+                  sql.Append(sqlCondi.ToString());
+                  return _access.getDataTableForObj<SchedulePeriodQuery>(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->GetSchedulePeriodList-->" + ex.Message, ex);
+              }
+          }
+
+          public List<ScheduleLogQuery> GetScheduleLogList(ScheduleLogQuery query, out int totalCount)// 得到 period表中的記錄
+          {
+              StringBuilder sql = new StringBuilder();
+              StringBuilder sqlCondi = new StringBuilder();
+              StringBuilder sqlCount = new StringBuilder();
+              totalCount = 0;
+              try
+              {
+                  sqlCount.AppendFormat("SELECT count(rowid) as totalCount ");
+                  sql.AppendFormat("select sl.rowid,sl.schedule_code,mu1.user_username as create_username,sl.create_time,sl.ipfrom ");
+                  sqlCondi.Append(" from schedule_log sl LEFT JOIN manage_user mu1 on mu1.user_id=sl.create_user ");
+                  sqlCondi.Append(" where 1=1 ");
+                  if (!string.IsNullOrEmpty(query.schedule_code))
+                  {
+                      sqlCondi.AppendFormat(" and sl.schedule_code='{0}' ", query.schedule_code);
+                  }
+                  if (query.start_time != 0)
+                  {
+                      sqlCondi.AppendFormat(" and sl.create_time >= '{0}' ", query.start_time);
+                  }
+                  if (query.end_time != 0)
+                  {
+                      sqlCondi.AppendFormat(" and sl.create_time <= '{0}' ", query.end_time);
+                  }
+                  sql.Append(sqlCondi.ToString());
+                  if (query.IsPage)
+                  {
+                      //StringBuilder strpage = new StringBuilder();
+                      //StringBuilder strcontpage = new StringBuilder();
+                      //strpage.AppendFormat(" SELECT count(rowid) as totalCount FROM schedule_log  ");
+                      DataTable _dt = _access.getDataTable(sqlCount.ToString()+ sqlCondi.ToString());
+                      if (_dt.Rows.Count > 0)
+                      {
+                          totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
+                          sql.AppendFormat(" order by rowid desc  limit {0},{1} ", query.Start, query.Limit);
+                      }
+                  }
+                  return _access.getDataTableForObj<ScheduleLogQuery>(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->GetScheduleLogList-->" + ex.Message, ex);
+              }
+          }
+
+          public string UpdateStats_Schedule_master(ScheduleMasterQuery query)  // master 狀態更新
+          {
+              StringBuilder strSql = new StringBuilder();
+              try
+              {
+                  strSql.AppendFormat(@"Update schedule_master set schedule_state='{0}',change_user='{1}',change_time='{2}' WHERE rowid='{3}'", query.schedule_state,query.change_user, CommonFunction.GetPHPTime(), query.rowid);
+                  return strSql.ToString();
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->UpdateStats_Schedule_master-->" + ex.Message + strSql.ToString(), ex);
+              }
+          }
+
+          public int ScheduleMasterInfoInsert(ScheduleMasterQuery query) //插入schedule_master信息
+          {
+              StringBuilder sql = new StringBuilder();
+              query.Replace4MySQL();
+              try
+              {
+
+                  sql.Append("insert into schedule_master ( schedule_code, schedule_name, schedule_api,schedule_description,schedule_state,schedule_period_id,create_user,change_user, create_time, change_time, previous_execute_time,next_execute_time) values ");
+                  sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}')", query.schedule_code, query.schedule_name, query.schedule_api, query.schedule_description, query.schedule_state, query.schedule_period_id, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), CommonFunction.GetPHPTime(), query.previous_execute_time, query.next_execute_time);
+
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->ScheduleMasterInfoInsert-->" + sql.ToString() + ex.Message);
+              }
+          }
+
+          public int ScheduleMasterInfoUpdate(ScheduleMasterQuery query)//更新schedule_master信息
+          {
+              StringBuilder sql = new StringBuilder();
+              query.Replace4MySQL();
+              try
+              {
+                  sql.AppendFormat("update schedule_master set schedule_code = '{0}', schedule_name = '{1}', schedule_api = '{2}',schedule_description='{3}',schedule_state='{4}',schedule_period_id='{5}',create_user='{6}',change_user='{7}',change_time='{8}', previous_execute_time='{9}', next_execute_time='{10}' where rowid='{11}'", query.schedule_code, query.schedule_name, query.schedule_api, query.schedule_description, query.schedule_state, query.schedule_period_id, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), query.previous_execute_time, query.next_execute_time, query.rowid);
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->ScheduleMasterInfoUpdate-->" + sql.ToString() + ex.Message);
+              }
+          }
+
+          public int ScheduleConfigInfoInsert(ScheduleConfigQuery query) //插入schedule_config信息
+          {
+              StringBuilder sql = new StringBuilder();
+              query.Replace4MySQL();
+              try
+              {
+                  sql.Append("insert into schedule_config ( schedule_code, parameterCode, value,parameterName,create_user,change_user, create_time, change_time) values ");
+                  sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}')", query.schedule_code, query.parameterCode, query.value, query.parameterName, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), CommonFunction.GetPHPTime(DateTime.Now.ToString()));
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->ScheduleMasterInfoInsert-->" + sql.ToString() + ex.Message);
+              }
+          }
+
+          public int ScheduleConfigInfoUpdate(ScheduleConfigQuery query) //更新schedule_config信息
+          {
+              StringBuilder sql = new StringBuilder();
+              query.Replace4MySQL();
+              try
+              {
+                  sql.AppendFormat("update schedule_config set schedule_code = '{0}', parameterCode = '{1}', value = '{2}',parameterName='{3}',create_user='{4}',change_user='{5}',change_time='{6}' where rowid='{7}' ", query.schedule_code, query.parameterCode, query.value, query.parameterName, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), query.rowid);
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->ScheduleMasterInfoUpdate-->" + sql.ToString() + ex.Message);
+              }
+          }
+
+          public int SchedulePeriodInfoInsert(SchedulePeriodQuery query)//插入schedule_period信息
+          {
+              StringBuilder sql = new StringBuilder();
+              query.Replace4MySQL();
+              try
+              {
+                  sql.Append("insert into schedule_period ( schedule_code,period_type,period_nums,current_nums,limit_nums,begin_datetime,create_user,change_user, create_time, change_time) values ");
+                  sql.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}')", query.schedule_code, query.period_type, query.period_nums, query.current_nums, query.limit_nums, query.begin_datetime, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), CommonFunction.GetPHPTime(DateTime.Now.ToString()));
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->SchedulePeriodInfoInsert-->" + sql.ToString() + ex.Message);
+              }
+          }
+
+          public int SchedulePeriodInfoUpdate(SchedulePeriodQuery query) //更新schedule_period信息
+          {
+              StringBuilder sql = new StringBuilder();
+              query.Replace4MySQL();
+              try
+              {
+                  sql.AppendFormat("update schedule_period set schedule_code = '{0}', period_type = '{1}', period_nums = '{2}',current_nums='{3}',create_user='{4}',change_user='{5}',change_time='{6}',limit_nums='{7}' where rowid='{8}' ", query.schedule_code, query.period_type, query.period_nums, query.current_nums, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), query.limit_nums, query.rowid);
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->SchedulePeriodInfoUpdate-->" + sql.ToString() + ex.Message);
+              }
+          }
+
+          public int ScheduleMasterDelete(string ids)//可以多行刪除數據_master
+          {
+              StringBuilder sql = new StringBuilder();
+              // query.Replace4MySQL();
+              try
+              {
+                  sql.AppendFormat("DELETE FROM schedule_master WHERE rowid in ({0})", ids);
+
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->ScheduleMasterDelete-->" + sql.ToString() + ex.Message);
+              }
+          }
+
+          public int ScheduleConfigDelete(string ids)//可以多行刪除數據_config
+          {
+              StringBuilder sql = new StringBuilder();
+              // query.Replace4MySQL();
+              try
+              {
+                  sql.AppendFormat("DELETE FROM schedule_config WHERE rowid in ({0})", ids);
+
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->ScheduleConfigDelete-->" + sql.ToString() + ex.Message);
+              }
+          }
+
+          public int SchedulePeriodDelete(string ids)//可以多行刪除數據_period
+          {
+              StringBuilder sql = new StringBuilder();
+              // query.Replace4MySQL();
+              try
+              {
+                  sql.AppendFormat("DELETE FROM schedule_period WHERE rowid in ({0})", ids);
+
+                  return _access.execCommand(sql.ToString());
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->SchedulePeriodDelete-->" + sql.ToString() + ex.Message);
+              }
+          }
+
+        #region
+
+          //清除過期信件
+          public int ValidUntilDate()
+          {
+              StringBuilder sql = new StringBuilder();
+              StringBuilder sql1 = new StringBuilder();
+              List<MailRequest> MR = new List<MailRequest>();
+              try
+              {
+                  sql1.AppendFormat("SELECT request_id,priority,user_id,sender_address,sender_name,receiver_address,receiver_name,`subject`,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,request_createdate,request_updatedate from mail_request where valid_until_date<'{0}'  ;", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                  MR = _access.getDataTableForObj<MailRequest>(sql1.ToString());
+                  sql.Append(InsertLog(MR, "mail expired", 0));
+                  if (sql.Length > 0)
+                  {
+                      return _access.execCommand(sql.ToString());
+                  }
+                  return 0;
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->SchedulePeriodDelete-->" + sql.ToString() + ex.Message);
+              }          
+          }
+          //清除重複過多次數的信件
+          public int MaxRetry()
+          {
+              StringBuilder sql = new StringBuilder();
+              StringBuilder sql1 = new StringBuilder();
+              List<MailRequest> MR = new List<MailRequest>();
+              try
+              {
+                  sql1.AppendFormat("SELECT request_id,priority,user_id,sender_address,sender_name,receiver_address,receiver_name,`subject`,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,request_createdate,request_updatedate from mail_request where retry_count<>0 and retry_count >= max_retry;");
+                  MR = _access.getDataTableForObj<MailRequest>(sql1.ToString());
+                  sql.Append(InsertLog(MR, "retry count exceeded", 0));
+                  if (sql.Length > 0)
+                  {
+                      return _access.execCommand(sql.ToString());
+                  }
+                  return 0;
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->SchedulePeriodDelete-->" + sql.ToString() + ex.Message);
+              }
+          }
+        //
+          public bool SendEMail(MailHelper mail)
+          {
+              DataTable dt = new DataTable();
+              StringBuilder sql = new StringBuilder();
+              StringBuilder sql1 = new StringBuilder();
+              StringBuilder sql2 = new StringBuilder();
+              List<MailRequest> MR = new List<MailRequest>();
+
+              //MailHelper mail = new MailHelper();
+              try
+              {
+                  sql1.AppendFormat("SELECT request_id,priority,user_id,sender_address,sender_name,receiver_address,receiver_name,`subject`,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,request_createdate,request_updatedate,body,success_action,fail_action from mail_request where schedule_date<'{0}'   order by next_send,priority,valid_until_date;", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                  MR = _access.getDataTableForObj<MailRequest>(sql1.ToString());
+                  int next_time = int.Parse(_access.getDataTable("SELECT parameterCode from t_parametersrc WHERE parameterType='next_send';").Rows[0][0].ToString());
+                  sql2.Append("SELECT email_address from email_block_list;");
+                  dt = _access.getDataTable(sql2.ToString());
+                  foreach (var item in MR)
+                  {
+                      bool black = true;
+                      //擋信名單排除
+                      for (int i = 0; i < dt.Rows.Count; i++)
+                      {
+                          if (item.receiver_address.ToString() == dt.Rows[i][0].ToString())
+                          {
+                              //刪除擋信名單的數據
+                              sql.Append(InsertLog(item, "blocked email", 0));
+                              black = false;
+                              if (sql.Length > 0)
+                              {
+                                  _access.execCommand(sql.ToString());
+                                  sql.Clear();
+                              }
+                          }
+                      }
+                      if (black)
+                      {//是不是擋信名單的email
+                          try
+                          {
+                              if (mail.SendMailAction(item.receiver_address.ToString(), item.subject.ToString(), item.body.ToString(), item.sender_address, item.sender_name))
+                              {
+                                  //sql.Append(item.success_action + ";");
+                                  //發送成功刪除原數據新增log
+                                  sql.Append(InsertLog(item, "success", 1));
+                              }
+                              else
+                              {
+                                  //發送失敗更新數據
+                                  sql.AppendFormat("update mail_request set retry_count ='{1}',next_send='{2}',sent_log='{3}' where request_id='{0}' ;", item.request_id, item.retry_count + 1, DateTime.Now.AddMinutes(next_time), "not errow massage");
+                                  //sql.Append(item.fail_action + ";");
+                              }
+                              if (sql.Length > 0)
+                              {
+                                  _access.execCommand(sql.ToString());
+                                  sql.Clear();
+                              }
+                          }
+                          catch (Exception ex)
+                          {
+                              item.sent_log = ex.ToString();
+                              item.Replace4MySQL();
+                              //發送失敗更新數據
+                              sql.AppendFormat("update mail_request set retry_count ='{1}',next_send='{2}',sent_log='{3}' where request_id='{0}' ;", item.request_id, item.retry_count + 1, DateTime.Now.AddMinutes(next_time).ToString("yyyy-MM-dd HH:mm:ss"), item.sent_log);
+                              _access.execCommand(sql.ToString());
+                          }
+                      }
+                  }
+                  return true;
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->SchedulePeriodDelete-->" + sql.ToString() + ex.Message);
+              }
+          }
+          #region 刪除mailrequest 新增log
+          public string InsertLog(List<MailRequest> q, string mail_result, int send)
+          {
+              StringBuilder sb = new StringBuilder();
+             
+              string id = "";
+              try
+              {
+                  if (q.Count > 0)
+                  {
+                      foreach (var m in q)
+                      {
+                          m.Replace4MySQL();
+                          sb.AppendFormat("insert into mail_log (priority,user_id,send_address,sender_name,receiver_address,receiver_name,subject,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,send_result,request_createdate,request_updatedate,log_createdate) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}',NOW(),NOW(),NOW());", m.priority, m.user_id, m.sender_address, m.sender_name, m.receiver_address, m.receiver_name, m.subject, m.importance, CommonFunction.DateTimeToString(m.schedule_date), CommonFunction.DateTimeToString(m.valid_until_date), m.retry_count, CommonFunction.DateTimeToString(m.last_sent),m.sent_log, mail_result);
+                          id += m.request_id + ",";
+                      }
+                  }
+
+                  if (id.Length > 1)
+                  {
+                      id = id.Substring(0, id.Length - 1);
+                      sb.AppendFormat("Delete from mail_request where request_id in ({0});", id);
+                  }
+                  return sb.ToString();
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->InsertLog1-->" + sb.ToString() + ex.Message);
+              }       
+          }
+
+          public string InsertLog(MailRequest m, string mail_result, int send)
+          {
+              StringBuilder sb = new StringBuilder();
+              try
+              {
+                  sb.AppendFormat("insert into mail_log (priority,user_id,send_address,sender_name,receiver_address,receiver_name,subject,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,send_result,request_createdate,request_updatedate,log_createdate) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}',NOW(),NOW(),NOW());", m.priority, m.user_id, m.sender_address, m.sender_name, m.receiver_address, m.receiver_name, m.subject, m.importance, CommonFunction.DateTimeToString(m.schedule_date), CommonFunction.DateTimeToString(m.valid_until_date), m.retry_count, CommonFunction.DateTimeToString(m.last_sent), m.sent_log, mail_result);
+                  sb.AppendFormat("Delete from mail_request where request_id in ({0});",m.request_id);
+                  return sb.ToString();
+              }
+              catch (Exception ex)
+              {
+                  throw new Exception("ScheduleServiceDao-->InsertLog2-->" + sb.ToString() + ex.Message);
+              }       
+          }
+          #endregion
+        #endregion
     }
 }

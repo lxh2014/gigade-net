@@ -97,6 +97,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
             Ext.getCmp("pcGift").down('#edit').setDisabled(selections.length == 0);
+            Ext.getCmp("pcGift").down('#update').setDisabled(selections.length == 0);
             //  Ext.getCmp("pcGift").down('#remove').setDisabled(selections.length == 0);
         }
     }
@@ -599,6 +600,7 @@ Ext.onReady(function () {
         {
             header: '狀態',
             dataIndex: 'status',
+            colName: 'col_status',
             align: 'center',
             id: 'commentControlActive',
             hidden: true,
@@ -619,6 +621,7 @@ Ext.onReady(function () {
         tbar: [
         { xtype: 'button', text: ADD, id: 'add', hidden: true, iconCls: 'icon-user-add', handler: onAddClick },
         { xtype: 'button', text: '回覆', id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
+        { xtype: 'button', text: '編輯用戶評價', id: 'update', iconCls: 'icon-user-edit',hidden:true, disabled: true, handler: onUpdateClick },
         '->',
         {
             xtype: 'button',
@@ -700,12 +703,18 @@ Ext.onReady(function () {
             emptyMsg: NOTHING_DISPLAY
         }),
         listeners: {
+            viewready: function ()
+            {
+                setShow(pcGift, 'colName');
+            },
             scrollershow: function (scroller) {
                 if (scroller && scroller.scrollEl) {
                     scroller.clearManagedListeners();
                     scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
                 }
+
             },
+        
             //edit:function(editor,e){
             //    var comment_id = e.record.data.comment_id;
             //    var value = e.value;
@@ -736,13 +745,20 @@ Ext.onReady(function () {
         renderTo: Ext.getBody(),
         // autoScroll: true,
         listeners: {
-            resize: function () {
+            resize: function ()
+            {
                 pcGift.width = document.documentElement.clientWidth;
                 this.doLayout();
+            },
+            afterrender: function ()
+            {
+                ToolAuthorityQuery(function () { })
             }
+
         }
     });
     ToolAuthority();
+
     //ProductCommentStore.load({ params: { start: 0, limit: 25 } });
 });
 
@@ -771,7 +787,7 @@ function SecretLogin(rid, info_id, info_type) {//secretcopy
 onAddClick = function () {
     editFunction(null, ProductCommentStore);
 }
-//修改
+//回覆
 onEditClick = function () {
     var row = Ext.getCmp("pcGift").getSelectionModel().getSelection();
     if (row.length == 0) {
@@ -780,6 +796,21 @@ onEditClick = function () {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
         editFunction(row[0], ProductCommentStore);
+    }
+}
+//編輯
+onUpdateClick = function ()
+{
+    var row = Ext.getCmp("pcGift").getSelectionModel().getSelection();
+    if (row.length == 0)
+    {
+        Ext.Msg.alert(INFORMATION, NO_SELECTION);
+    } else if (row.length > 1)
+    {
+        Ext.Msg.alert(INFORMATION, ONE_SELECTION);
+    } else if (row.length == 1)
+    {
+        updateFunction(row[0], ProductCommentStore);
     }
 }
 

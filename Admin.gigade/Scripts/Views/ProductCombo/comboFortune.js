@@ -1,5 +1,10 @@
-﻿var PRODUCT_ID = '';
-
+﻿/*  
+ * 
+ * 文件名称：comboFortune.js 
+ * 摘    要：組合商品修改和新增 抽獎頁面
+ * 
+ */
+var PRODUCT_ID = '';
 
 function saveTemp() {
     var mask;
@@ -11,6 +16,7 @@ function saveTemp() {
     if (!save()) {
         return;
     }
+
     if (PRODUCT_ID == '') {
         Ext.Ajax.request({
             url: '/ProductCombo/Temp2Pro',
@@ -24,7 +30,7 @@ function saveTemp() {
                     mask.hide();
                     if (data.success) {
                         Ext.Msg.alert(INFORMATION, data.msg, function () {
-                            if (window.parent.GetCopyProductId()!= '') {
+                            if (window.parent.GetCopyProductId() != '') {
                                 //window.parent.history.go(-1);
                                 window.parent.parent.Ext.getCmp('ContentPanel').activeTab.close();
                             } else {
@@ -36,20 +42,28 @@ function saveTemp() {
                         Ext.Msg.alert(INFORMATION, data.msg);
                     }
                 }
-
             }
         });
     }
 }
 
 function save() {
+    //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    var mask;
+    if (!mask) {
+        mask = new Ext.LoadMask(Ext.getBody(), { msg: WAIT });
+    }
+    mask.show();
+    //添加disabled屬性  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    window.parent.setMoveEnable(false);
+
     var form = Ext.getCmp('fortunePanel').getForm();
     var result = true;
     if (form.isValid()) {
         Ext.Ajax.request({
             url: '/ProductCombo/fortuneSave',
             method: 'POST',
-            async: false,
+            async: window.parent.GetProductId() == '' ? false : true,
             params: {
                 ProductId: PRODUCT_ID,
                 OldProductId: window.parent.GetCopyProductId(),
@@ -58,6 +72,7 @@ function save() {
             },
             success: function (response, opts) {
                 var resText = eval("(" + response.responseText + ")");
+                mask.hide();
                 if (PRODUCT_ID != '') {
                     if (resText.success) {
                         Ext.Msg.alert(NOTICE, SAVE_SUCCESS);
@@ -70,17 +85,19 @@ function save() {
                     if (!resText.success) {
                         Ext.Msg.alert(NOTICE, SAVE_FAIL);
                         result = false;
-                        window.parent.setMoveEnable(true);
                     }
                 }
+                window.parent.setMoveEnable(true);
             },
             failure: function (response, opts) {
+                mask.hide();
                 Ext.Msg.alert(NOTICE, SAVE_FAIL);
                 window.parent.setMoveEnable(true);
                 result = false;
             }
         });
     } else {
+        mask.hide();
         window.parent.setMoveEnable(true);
         result = false;
     }
@@ -131,9 +148,7 @@ var fortunePanel = Ext.create('Ext.form.Panel', {
     }
 });
 
-
 Ext.onReady(function () {
-
     PRODUCT_ID = window.parent.GetProductId();
 
     Ext.create('Ext.container.Viewport', {
@@ -149,7 +164,4 @@ Ext.onReady(function () {
             }
         }
     });
-
 });
-
-

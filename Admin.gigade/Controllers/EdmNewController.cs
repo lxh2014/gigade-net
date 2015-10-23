@@ -28,12 +28,11 @@ namespace Admin.gigade.Controllers
         string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];//郵件服務器的設置
         public EdmGroupNewMgr edmgroupmgr;
         public EdmTemplateMgr edmtemplatemgr;        //
-        public EmailBlockListMgr _emailBlockListMgr;        HttpWebRequest httpReq;
-        HttpWebResponse httpResp;
-        string strBuff = "";
-        char[] cbuffer = new char[256];
-        int byteRead = 0;        // GET: /EdmNew/
-        private static EdmListConditionMainMgr _edmListConditionMgr;
+        public EmailBlockListMgr _emailBlockListMgr;
+        private EmailGroupMgr _emailGroupMgr;
+      
+       // GET: /EdmNew/
+      
         #region view
         //電子報類型
         public ActionResult Index()
@@ -57,6 +56,12 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+
+        public ActionResult EmailGroup()
+        {
+            return View();
+        }
+        
         #endregion
 
         #region 電子報類型
@@ -79,7 +84,7 @@ namespace Admin.gigade.Controllers
                 List<EdmGroupNewQuery> list = edmgroupmgr.GetEdmGroupNewList(query, out totalcount);
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-               // timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                // timeConverter.DateTimeFormat = "yyyy-MM-dd";
                 json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
             }
             catch (Exception ex)
@@ -94,17 +99,17 @@ namespace Admin.gigade.Controllers
             this.Response.Write(json);
             this.Response.End();
             return Response;
- 
+
         }
         #endregion
 
-        #region 狀態啟用 
+        #region 狀態啟用
         public HttpResponseBase UpdateStats()
         {
             string json = string.Empty;
             try
             {
-                edmgroupmgr = new EdmGroupNewMgr (mySqlConnectionString);
+                edmgroupmgr = new EdmGroupNewMgr(mySqlConnectionString);
                 EdmGroupNewQuery query = new EdmGroupNewQuery();
 
                 if (!string.IsNullOrEmpty(Request.Params["id"]))
@@ -140,7 +145,7 @@ namespace Admin.gigade.Controllers
             {
                 EdmGroupNewQuery query = new EdmGroupNewQuery();
                 edmgroupmgr = new EdmGroupNewMgr(mySqlConnectionString);
-               
+
                 if (!string.IsNullOrEmpty(Request.Params["group_id"]))
                 {
                     query.group_id = Convert.ToInt32(Request.Params["group_id"]);
@@ -155,7 +160,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["trial_url"]))
                 {
-                    query.trial_url=Request.Params["trial_url"];
+                    query.trial_url = Request.Params["trial_url"];
                 }
                 if (!string.IsNullOrEmpty(Request.Params["sort_order"]))
                 {
@@ -192,7 +197,7 @@ namespace Admin.gigade.Controllers
             this.Response.Write(json);
             this.Response.End();
             return Response;
- 
+
         }
 
         #endregion
@@ -216,7 +221,7 @@ namespace Admin.gigade.Controllers
                 List<EdmTemplateQuery> list = edmtemplatemgr.GetEdmTemplateList(query, out totalcount);
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-               // timeConverter.DateTimeFormat = "yyyy-MM-dd ";
+                // timeConverter.DateTimeFormat = "yyyy-MM-dd ";
                 json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
             }
             catch (Exception ex)
@@ -231,7 +236,7 @@ namespace Admin.gigade.Controllers
             this.Response.Write(json);
             this.Response.End();
             return Response;
- 
+
         }
 
         //EdmTemplate 中的狀態啟用
@@ -337,7 +342,7 @@ namespace Admin.gigade.Controllers
         #endregion
 
         #region 電子報
-       
+
         #region 電子報列表
         public HttpResponseBase GetECNList()
         {
@@ -416,8 +421,8 @@ namespace Admin.gigade.Controllers
                     query.template_data = Request.Params["template_data"];
                 }
                 query.content_create_userid = (Session["caller"] as Caller).user_id;
-                query.content_update_userid= (Session["caller"] as Caller).user_id;
-                 json=_edmContentNewMgr.SaveEdmContentNew(query);
+                query.content_update_userid = (Session["caller"] as Caller).user_id;
+                json = _edmContentNewMgr.SaveEdmContentNew(query);
             }
             catch (Exception ex)
             {
@@ -510,7 +515,7 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
 
-        
+
         #endregion
 
         #region edit_url
@@ -550,8 +555,8 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        
-        #region
+
+        #region ContentUrl
         public HttpResponseBase GetContentUrl()
         {
             string json = string.Empty;
@@ -592,12 +597,12 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        #region
+        #region 發送電子報 （測試發送/正式發送）
         public HttpResponseBase SendEdm()
         {
             string json = string.Empty;
-            EdmSendLog eslQuery=new EdmSendLog ();
-           MailRequest mQuery=new MailRequest ();
+            EdmSendLog eslQuery = new EdmSendLog();
+            MailRequest mQuery = new MailRequest();
             try
             {
                 _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
@@ -623,9 +628,9 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["body"]))
                 {
-                    mQuery.body =  Request.Params["body"];
+                    mQuery.body = Request.Params["body"];
                 }
-               
+
                 eslQuery.create_userid = (Session["caller"] as Caller).user_id;
                 mQuery.user_id = eslQuery.create_userid;
                 if (!string.IsNullOrEmpty(Request.Params["testSend"]))
@@ -650,9 +655,9 @@ namespace Admin.gigade.Controllers
 
                         #endregion
                         MailHelper mail = new MailHelper();
-                        mail.SendMailAction("shiwei0620j@gimg.tw", mQuery.subject, mQuery.body + "   ");
+                        mail.SendMailAction((Session["caller"] as Caller).user_email, mQuery.subject, mQuery.body + "   ");
                         {
-                      json= _edmContentNewMgr.MailAndRequest(eslQuery, mQuery);
+                            json = _edmContentNewMgr.MailAndRequest(eslQuery, mQuery);
                         }
                     }
                     else//正式發送，寫入排程所用表
@@ -846,6 +851,195 @@ namespace Admin.gigade.Controllers
 
 
 
+
+        #endregion
+
+        #region 信箱名單管理
+        #region 列表頁
+        public HttpResponseBase EmailGroupList()
+        {
+            string json = string.Empty;
+
+            try
+            {
+                EmailGroup query = new EmailGroup();
+                List<EmailGroup> store = new List<EmailGroup>();
+                if (!string.IsNullOrEmpty(Request.Params["group_name"]))
+                {
+                    query.group_name = Request.Params["group_name"];
+                }
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                int totalCount = 0;
+                _emailGroupMgr = new EmailGroupMgr(mySqlConnectionString);
+                store = _emailGroupMgr.EmailGroupList(query, out totalCount);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+
+        }
+        #endregion
+
+        #region 新增/編輯
+        public HttpResponseBase SaveEmailGroup()
+        {
+            string json = string.Empty;
+            EmailGroup query = new EmailGroup();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["group_id"]))
+                {
+                    query.group_id = Convert.ToInt32(Request.Params["group_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["group_name"]))
+                {
+                    query.group_name =Request.Params["group_name"];
+                }
+                query.group_create_userid = (Session["caller"] as Caller).user_id;
+                query.group_update_userid = (Session["caller"] as Caller).user_id;
+                _emailGroupMgr = new EmailGroupMgr(mySqlConnectionString);
+                if (_emailGroupMgr.SaveEmailGroup(query))
+                {
+                    json = "{success:true}";
+                }
+                else
+                {
+                    json = "{success:false}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+
+        #region 匯入
+        public HttpResponseBase ImportExcel()
+        {
+            string json = string.Empty;
+            string excelPath = "../Template/EmailGroup/";
+            try
+            {
+                if (Request.Files.Count > 0)
+                {
+                    int group_id = Convert.ToInt32(Request.Params["group_id"]);
+                    HttpPostedFileBase excelFile = Request.Files["ImportExcel"];
+                    FileManagement fileManagement = new FileManagement();
+                    string newExcelName = Server.MapPath(excelPath) + "email_group" + fileManagement.NewFileName(excelFile.FileName);
+                    excelFile.SaveAs(newExcelName);
+                    NPOI4ExcelHelper helper = new NPOI4ExcelHelper(newExcelName);
+                    DataTable _dt = helper.ExcelToTableForXLSX();
+                    _emailGroupMgr = new EmailGroupMgr(mySqlConnectionString);
+                    if (_emailGroupMgr.ImportEmailList(_dt, group_id))
+                    {
+                        json = "{success:true}";
+                    }
+                    else
+                    {
+                        json = "{success:false}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+
+        #region 匯出
+        public void ExportExcel()
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["group_id"]))
+                {
+                   _emailGroupMgr = new EmailGroupMgr(mySqlConnectionString);
+                  DataTable _dt=  _emailGroupMgr.Export(Convert.ToInt32(Request.Params["group_id"]));
+                  DataTable _newDt = new DataTable();
+                  _newDt.Columns.Add("群組代碼", typeof(string));
+                  _newDt.Columns.Add("電子信箱地址", typeof(string));
+                  _newDt.Columns.Add("收件人名稱", typeof(string));
+                  for (int i = 0; i < _dt.Rows.Count; i++)
+                  {
+                      DataRow newRow = _newDt.NewRow();
+                      newRow[0] = _dt.Rows[i]["group_id"];
+                      newRow[1] = _dt.Rows[i]["email_address"];
+                      newRow[2] = _dt.Rows[i]["name"];
+                      _newDt.Rows.Add(newRow);
+                  }
+                  string fileName = "email_group" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                  MemoryStream ms = ExcelHelperXhf.ExportDT(_newDt, "");
+                  Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                  Response.BinaryWrite(ms.ToArray());
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+        }
+        #endregion
+
+        #region 模版
+
+        public void ExportTemplateExcel()
+        {
+            try
+            {
+                DataTable _dt = new DataTable();
+                _dt.Columns.Add("電子信箱地址", typeof(string));
+                _dt.Columns.Add("收件人名稱", typeof(string));
+                DataRow newRow = _dt.NewRow();
+                _dt.Rows.Add();
+                string fileName = "email_group_template" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                MemoryStream ms = ExcelHelperXhf.ExportDT(_dt, "");
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                Response.BinaryWrite(ms.ToArray());
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+        }
+
+        #endregion
 
         #endregion
     }

@@ -34,7 +34,7 @@ namespace BLL.gigade.Mgr.Impl
         int Add(Model.Query.VendorQuery model);
 
         string QueryContanct(Vendor query);
-      int IsExitEmail(string email);
+        int IsExitEmail(string email);
         Vendor Login(Vendor query);
         int Add_Login_Attempts(int vendor_id);
         void Modify_Vendor_Status(int vendor_id, int status);
@@ -44,5 +44,7 @@ namespace BLL.gigade.Mgr.Impl
         int GetOffGradeCount(string vendorId);
         int UnGrade(string vendorId, string active, List<TableChangeLog> list);
         List<Vendor> GetArrayDaysInfo(uint brand_id);
+        string ImportVendorBank(DataTable dt);
+        string GetVendorBank(string code);
     }
 }

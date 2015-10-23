@@ -55,7 +55,7 @@ namespace BLL.gigade.Dao
                 strSql.Append("page_content_3,product_keywords,product_recommend,product_password,product_total_click,expect_time,product_image,product_createdate,product_updatedate,");
                 strSql.Append("product_ipfrom,goods_area,goods_image1,goods_image2,city,bag_check_money,combination,bonus_percent,default_bonus_percent,bonus_percent_start,");
                 strSql.Append("bonus_percent_end,tax_type,cate_id,fortune_quota,fortune_freight,product_media,ignore_stock,shortage,stock_alarm,show_listprice,expect_msg,");
-                strSql.Append("show_in_deliver,prepaid,process_type,product_type,vb.vendor_id,p.prod_classify,cp.course_id,p.safe_stock_amount,p.deliver_days,p.min_purchase_amount,p.extra_days, p.mobile_image,p.product_alt,purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end,rpat.expend_day,rpat.months from product_temp p ");  // edit by zhuoqin0830w 增加5個欄位  ,p.safe_stock_amount,p.deliver_days,p.min_purchase_amount,p.extra_days 
+                strSql.Append("show_in_deliver,prepaid,process_type,product_type,vb.vendor_id,p.prod_classify,cp.course_id,p.safe_stock_amount,p.deliver_days,p.min_purchase_amount,p.extra_days, p.mobile_image,p.product_alt,purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end,rpat.expend_day,rpat.months,p.outofstock_days_stopselling from product_temp p ");  // edit by zhuoqin0830w 增加5個欄位  ,p.safe_stock_amount,p.deliver_days,p.min_purchase_amount,p.extra_days 
 
                 //edit by wwei0216w 2015/3/18 查詢屬性多了一個mobile_image列
                 strSql.Append("left join vendor_brand vb ON p.brand_id = vb.brand_id ");
@@ -232,6 +232,7 @@ namespace BLL.gigade.Dao
                     strSql.AppendFormat(" ,ignore_stock='{0}'", proTemp.Ignore_Stock);
                     strSql.AppendFormat(" ,shortage='{0}'", proTemp.Shortage);
                     strSql.AppendFormat(" ,stock_alarm='{0}'", proTemp.stock_alarm);
+                    strSql.AppendFormat(" ,outofstock_days_stopselling='{0}'", proTemp.outofstock_days_stopselling);
                 }
                 if (page == "pic")
                 {
@@ -302,7 +303,7 @@ namespace BLL.gigade.Dao
             strSql.Append("product_keywords,product_recommend,product_password,product_total_click,expect_time,product_image,product_createdate,");
             strSql.Append("product_updatedate,product_ipfrom,goods_area,goods_image1,goods_image2,city,bag_check_money,combination,bonus_percent,default_bonus_percent,bonus_percent_start,");
             strSql.Append("bonus_percent_end,tax_type,cate_id,fortune_quota,fortune_freight,product_media,ignore_stock,shortage,stock_alarm,price_type,user_id,show_listprice,expect_msg,");
-            strSql.Append("create_channel,show_in_deliver,prepaid,process_type,product_type,prod_classify,safe_stock_amount, deliver_days,min_purchase_amount,extra_days,off_grade,mobile_image,product_alt,purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end )");//add by wwei0216w 2015/4/9 臨時表導入正式表 中添加 product_alt
+            strSql.Append("create_channel,show_in_deliver,prepaid,process_type,product_type,prod_classify,safe_stock_amount, deliver_days,min_purchase_amount,extra_days,off_grade,mobile_image,product_alt,purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end,outofstock_days_stopselling )");//add by wwei0216w 2015/4/9 臨時表導入正式表 中添加 product_alt
 
             strSql.Append(" select {0} as productId,brand_id,product_vendor_code,product_name,prod_name,prod_sz,product_price_list,product_spec,spec_title_1,spec_title_2,");
             strSql.Append("product_freight_set,product_buy_limit,product_status,product_hide,product_mode,product_sort,product_start,product_end,page_content_1,page_content_2,");
@@ -310,7 +311,7 @@ namespace BLL.gigade.Dao
             strSql.Append("product_updatedate,product_ipfrom,goods_area,goods_image1,goods_image2,city,bag_check_money,combination,bonus_percent,default_bonus_percent,bonus_percent_start,");
             strSql.Append("bonus_percent_end,tax_type,cate_id,fortune_quota,fortune_freight,product_media,ignore_stock,shortage,stock_alarm,price_type,writer_id,show_listprice,expect_msg,");
             //strSql.Append("create_channel,show_in_deliver,prepaid,process_type,product_type,prod_classify,safe_stock_amount, deliver_days,min_purchase_amount,extra_days,mobile_image,product_alt ");//add by wwei0216w 2015/4/9
-            strSql.AppendFormat("create_channel,show_in_deliver,prepaid,process_type,product_type,prod_classify,safe_stock_amount, deliver_days,min_purchase_amount,extra_days,{0} AS off_grade,mobile_image,product_alt,purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end ", proTemp.Combo_Type == 2 ? -1 : proTemp.off_grade);//edit by wwei0216w 2015/6/30 添加off_grade列的插入
+            strSql.AppendFormat("create_channel,show_in_deliver,prepaid,process_type,product_type,prod_classify,safe_stock_amount, deliver_days,min_purchase_amount,extra_days,{0} AS off_grade,mobile_image,product_alt,purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end,outofstock_days_stopselling ", proTemp.Combo_Type == 2 ? -1 : proTemp.off_grade);//edit by wwei0216w 2015/6/30 添加off_grade列的插入
 
             strSql.AppendFormat(" from product_temp where writer_id={0} and combo_type={1} and create_channel={2}", proTemp.Writer_Id, proTemp.Combo_Type, proTemp.Create_Channel);
             strSql.AppendFormat(" and product_id='{0}'", proTemp.Product_Id);
@@ -332,13 +333,13 @@ namespace BLL.gigade.Dao
             strSql.Append("product_freight_set,product_buy_limit,product_status,product_hide,product_mode,product_sort,product_start,product_end,page_content_1,page_content_2,");
             strSql.Append("page_content_3,product_keywords,product_recommend,product_password,product_total_click,expect_time,product_image,product_createdate,product_updatedate,");
             strSql.Append("product_ipfrom,goods_area,goods_image1,goods_image2,city,bag_check_money,combination,bonus_percent,default_bonus_percent,bonus_percent_start,");
-            strSql.Append("bonus_percent_end,tax_type,cate_id,fortune_quota,fortune_freight,product_media,combo_type,stock_alarm,price_type,show_listprice,expect_msg,product_type,process_type,sale_status,prepaid,show_in_deliver,create_channel,prod_classify,deliver_days,min_purchase_amount,safe_stock_amount,extra_days,mobile_image,product_alt,purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end )");//edit 2014/09/24  //商品複製新增欄位  add by zhuoqin0830w  2015/03/17
+            strSql.Append("bonus_percent_end,tax_type,cate_id,fortune_quota,fortune_freight,product_media,combo_type,stock_alarm,price_type,show_listprice,expect_msg,product_type,process_type,sale_status,prepaid,show_in_deliver,create_channel,prod_classify,deliver_days,min_purchase_amount,safe_stock_amount,extra_days,mobile_image,product_alt,purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end,outofstock_days_stopselling )");//edit 2014/09/24  //商品複製新增欄位  add by zhuoqin0830w  2015/03/17
 
             strSql.AppendFormat(" select {0} as writer_id,product_id,brand_id,product_vendor_code,product_name,prod_name,prod_sz,product_price_list,product_spec,spec_title_1,spec_title_2,", proTemp.Writer_Id);
             strSql.AppendFormat("product_freight_set,product_buy_limit,{0} as product_status,product_hide,product_mode,product_sort,product_start,product_end,page_content_1,page_content_2,", proTemp.Product_Status);
             strSql.Append("page_content_3,product_keywords,product_recommend,product_password,product_total_click,expect_time,product_image,product_createdate,product_updatedate,");
             strSql.Append("product_ipfrom,goods_area,goods_image1,goods_image2,city,bag_check_money,combination,bonus_percent,default_bonus_percent,bonus_percent_start,");
-            strSql.AppendFormat("bonus_percent_end,tax_type,cate_id,fortune_quota,fortune_freight,product_media,{0} as combo_type,stock_alarm,price_type,show_listprice,expect_msg,product_type,process_type,sale_status,prepaid,show_in_deliver,{1} as create_channel,prod_classify,deliver_days,min_purchase_amount,safe_stock_amount,extra_days,mobile_image,product_alt,purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end from product ", proTemp.Combo_Type, proTemp.Create_Channel);//商品複製新增欄位  add by zhuoqin0830w  2015/03/17
+            strSql.AppendFormat("bonus_percent_end,tax_type,cate_id,fortune_quota,fortune_freight,product_media,{0} as combo_type,stock_alarm,price_type,show_listprice,expect_msg,product_type,process_type,sale_status,prepaid,show_in_deliver,{1} as create_channel,prod_classify,deliver_days,min_purchase_amount,safe_stock_amount,extra_days,mobile_image,product_alt,purchase_in_advance,purchase_in_advance_start,purchase_in_advance_end,outofstock_days_stopselling from product ", proTemp.Combo_Type, proTemp.Create_Channel);//商品複製新增欄位  add by zhuoqin0830w  2015/03/17
             strSql.AppendFormat("where product_id='{0}'", proTemp.Product_Id);
             return strSql.ToString();
         }

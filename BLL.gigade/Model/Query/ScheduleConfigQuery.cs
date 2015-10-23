@@ -11,6 +11,7 @@ namespace BLL.gigade.Model.Query
         public string change_username { get; set; }
         public string show_create_time { get; set; }
         public string show_change_time { get; set; }
+        public string schedule_code_config { get; set; }
 
         public ScheduleConfigQuery()
         {
@@ -18,6 +19,7 @@ namespace BLL.gigade.Model.Query
             change_username = string.Empty;
             show_create_time = string.Empty;
             show_change_time = string.Empty;
+            schedule_code_config = string.Empty;
         }
     }
 }

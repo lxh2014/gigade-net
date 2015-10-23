@@ -364,25 +364,25 @@ namespace Admin.gigade.Controllers
                         query.answer_user = ((Caller)Session["caller"]).user_id;
                         query.delay_reason = Request.Params["delay_reason"].ToString();
                         _productconsultMgr.UpdateAnswerStatus(query);
+
                         json = "{success:true}";
                     }
-
+                    
                     else
                     {
-
+                        query.answer_status = 3;
+                        if (!string.IsNullOrEmpty(Request.Params["status"]))
+                        {
+                            query.status = Convert.ToInt32(Request.Params["status"]);
+                        }
+                        if (!string.IsNullOrEmpty(Request.Params["is_sendEmail"]))
+                        {
+                            query.is_sendEmail = Convert.ToInt32(Request.Params["is_sendEmail"]);
+                        }
                         if (!string.IsNullOrEmpty(Request.Params["consult_answer"]))
                         {
                             query.consult_answer = Request.Params["consult_answer"].ToString();
                         }
-                        if (Convert.ToInt32(Request.Params["answer_status"]) == 3)
-                        {
-                            query.status = 0;
-                        }
-                        if (Convert.ToInt32(Request.Params["answer_status"]) == 1)
-                        {
-                            query.status = 1;
-                        }
-                        query.answer_status = 3;
                         query.answer_date = DateTime.Now;
                         query.answer_user = ((Caller)Session["caller"]).user_id;
                         int i = _productconsultMgr.SaveProductConsultAnswer(query);

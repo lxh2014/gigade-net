@@ -101,6 +101,7 @@
         iconCls: 'icon-user-edit',
         id: 'editWin',
         width: 400,
+        height: 400,
         layout: 'fit',
         items: [editFrm],
         constrain: true,

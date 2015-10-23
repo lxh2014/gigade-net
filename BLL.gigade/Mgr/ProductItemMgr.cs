@@ -22,6 +22,7 @@ using BLL.gigade.Model.Query;
 using System.Data;
 using BLL.gigade.Model.Custom;
 using System.Collections;
+using BLL.gigade.Common;
 
 namespace BLL.gigade.Mgr
 {
@@ -128,7 +129,8 @@ namespace BLL.gigade.Mgr
                     stb.Append("{success:true,items:[");
                     foreach (var item in result)
                     {
-                        item.Arrive_Days += defaultArriveDays;
+                        //ediy by wwei0216w 分開顯示Arrive_Days + defaultArriveDays 所以不需要計算和 2015/10/12
+                        //item.Arrive_Days += defaultArriveDays;
                         stb.Append("{");
                         stb.AppendFormat("\"spec_title_1\":\"{0}\",\"spec_title_2\":\"{1}\",\"item_stock\":\"{2}\",\"item_alarm\":\"{3}\",\"barcode\":\"{4}\",\"spec_id_1\":\"{5}\",\"spec_id_2\":\"{6}\",\"item_id\":\"{7}\",\"item_code\":\"{8}\",\"erp_id\":\"{9}\",\"remark\":\"{10}\",\"arrive_days\":\"{11}\",\"default_arrive_days\":\"{12}\"", item.Spec_Name_1, item.Spec_Name_2, item.Item_Stock, item.Item_Alarm, item.Barcode, item.Spec_Id_1, item.Spec_Id_2, item.Item_Id, item.Item_Code, item.Erp_Id, item.Remark, item.Arrive_Days, defaultArriveDays);//edit by xiangwang0413w 2014/06/18 (增加ERP廠商編號erp_id)  // add by zhuoqin0830w 2014/02/05 增加備註  //add by zhuoqin0830w 2014/03/20 增加運達天數
                         stb.Append("}");
@@ -297,5 +299,91 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductItemMgr-->UpdateItemStock" + ex.Message, ex);
             }
         }
+
+        public List<ProductItemQuery> GetWaitLiaoWeiList(ProductItemQuery query, out int totalCount)// 等待料位報表
+        {
+            try
+            {
+                List<ProductItemQuery> store = new List<ProductItemQuery>();
+                store = _productItemDao.GetWaitLiaoWeiList(query, out totalCount);
+                foreach (var item in store)
+                {
+                    item.product_createdate_string = CommonFunction.GetNetTime(item.product_createdate).ToString("yyyy-MM-dd HH:mm:ss");
+                    item.product_start_string = CommonFunction.GetNetTime(item.product_start).ToString("yyyy-MM-dd HH:mm:ss");
+                    item.product_spec = item.Spec_Name_1;
+                    item.product_spec += string.IsNullOrEmpty(item.Spec_Name_1) ? item.Spec_Name_2 : (string.IsNullOrEmpty(item.Spec_Name_2) ? "" : " / " + item.Spec_Name_2);
+
+
+                    //商品類型
+                    if (item.combination == 1)
+                    {
+                        item.combination_string = "單一商品";
+                    }
+                    if (item.combination == 2)
+                    {
+                        item.combination_string = "固定組合";
+                    }
+                    if (item.combination == 3)
+                    {
+                        item.combination_string = "任選組合";
+                    }
+                    if (item.combination == 4)
+                    {
+                        item.combination_string = "群組搭配";
+                    }
+
+                    //出貨方式
+                    if (item.product_mode == 1)
+                    {
+                        item.product_mode_string = "自出";
+                    }
+                    if (item.product_mode == 2)
+                    {
+                        item.product_mode_string = "寄倉";
+                    }
+                    if (item.product_mode == 3)
+                    {
+                        item.product_mode_string = "調度";
+                    }
+                    //商品狀態
+                    if (item.product_status == 0)
+                    {
+                        item.product_status_string = "新建立商品";
+                    }
+                    if (item.product_status == 1)
+                    {
+                        item.product_status_string = "申請審核";
+                    }
+                    if (item.product_status == 2)
+                    {
+                        item.product_status_string = "審核通過";
+                    }
+                    if (item.product_status == 5)
+                    {
+                        item.product_status_string = "上架";
+                    }
+                    //溫層
+                    if (item.delivery_freight_set == 1)
+                    {
+                        item.product_freight_set_string = "常溫";
+                    }
+                    if (item.delivery_freight_set == 2)
+                    {
+                        item.product_freight_set_string = "冷凍";
+                    }
+
+
+                }
+
+                return store;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemMgr->GetWaitLiaoWeiList" + ex.Message);
+            }
+        }
+
+        
     }
 }

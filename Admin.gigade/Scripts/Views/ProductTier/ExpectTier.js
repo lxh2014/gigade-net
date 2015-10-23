@@ -314,11 +314,14 @@ var pcFrm = Ext.create('Ext.form.Panel', {
             store: pcStore,
             listeners: {
                 change: function (chose) {
+
                     Ext.getCmp('mst').setText("");
                     Ext.getCmp('ms').setText("");
-                    switch (Ext.getCmp('pc_type').getValue()) {
+                    Ext.getCmp('irrms').setText("");
 
+                    switch (Ext.getCmp('pc_type').getValue()) {
                         case '1':
+                            Ext.getCmp('weeks').allowBlank = true;
                             Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#cxsj').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(false);
@@ -326,6 +329,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                             Ext.getCmp('irregularGrid').setDisabled(true);
                             break;
                         case '2':
+                            Ext.getCmp('weeks').allowBlank = false;
                             Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#pl').setDisabled(false);
                             Ext.getCmp('pcFrm').down('#cxsj').setDisabled(false);
@@ -333,6 +337,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                             Ext.getCmp('irregularGrid').setDisabled(true);
                             break;
                         case '3':
+                            Ext.getCmp('weeks').allowBlank = true;
                             Ext.getCmp('pcFrm').down('#jzxyc').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#pl').setDisabled(true);
                             Ext.getCmp('pcFrm').down('#cxsj').setDisabled(false);
@@ -374,6 +379,9 @@ var pcFrm = Ext.create('Ext.form.Panel', {
             margin: '10 10 15 10',
             listeners: {
                 change: function () {
+                    if (Ext.getCmp('pcFrm').down('#datatime').getValue() == null) {
+                        return;
+                    }
                     messages = SCHEDULE_WILL_IN + Ext.Date.format(Ext.getCmp('pcFrm').down('#datatime').getValue(), 'Y/m/d') + DATE_EXECUTE + '。';
                     Ext.getCmp('pcFrm').down('#ms').setText(messages);
                 }
@@ -400,52 +408,52 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                 change: function () {
                     switch (Ext.getCmp('runwhen').getValue()) {
                         case '2D':
-                            Ext.getCmp('pcFrm').down('#everyday').show();
                             Ext.getCmp('repeatday').allowBlank = false;
+                            Ext.getCmp('pcFrm').down('#everyday').show();
 
-                            Ext.getCmp('pcFrm').down('#everyweeks').hide();
                             Ext.getCmp('repeatweek').allowBlank = true;
                             Ext.getCmp('weeks').allowBlank = true;
+                            Ext.getCmp('pcFrm').down('#everyweeks').hide();
 
-                            Ext.getCmp('pcFrm').down('#everymonths').hide();
                             Ext.getCmp('nr').allowBlank = true;
                             Ext.getCmp('cfjg').allowBlank = true;
                             Ext.getCmp('njg').allowBlank = true;
                             Ext.getCmp('dijizhou').allowBlank = true;
                             Ext.getCmp('naxietian').allowBlank = true;
                             Ext.getCmp('ncfjg').allowBlank = true;
+                            Ext.getCmp('pcFrm').down('#everymonths').hide();
                             break;
                         case '2W':
-                            Ext.getCmp('pcFrm').down('#everyday').hide();
                             Ext.getCmp('repeatday').allowBlank = true;
+                            Ext.getCmp('pcFrm').down('#everyday').hide();
 
-                            Ext.getCmp('pcFrm').down('#everyweeks').show();
                             Ext.getCmp('repeatweek').allowBlank = false;
                             Ext.getCmp('weeks').allowBlank = false;
+                            Ext.getCmp('pcFrm').down('#everyweeks').show();
 
-                            Ext.getCmp('pcFrm').down('#everymonths').hide();
                             Ext.getCmp('nr').allowBlank = true;
                             Ext.getCmp('cfjg').allowBlank = true;
                             Ext.getCmp('njg').allowBlank = true;
                             Ext.getCmp('dijizhou').allowBlank = true;
                             Ext.getCmp('naxietian').allowBlank = true;
                             Ext.getCmp('ncfjg').allowBlank = true;
+                            Ext.getCmp('pcFrm').down('#everymonths').hide();
                             break;
                         case '2M':
-                            Ext.getCmp('pcFrm').down('#everyday').hide();
                             Ext.getCmp('repeatday').allowBlank = true;
+                            Ext.getCmp('pcFrm').down('#everyday').hide();
 
-                            Ext.getCmp('pcFrm').down('#everyweeks').hide();
                             Ext.getCmp('repeatweek').allowBlank = true;
                             Ext.getCmp('weeks').allowBlank = true;
+                            Ext.getCmp('pcFrm').down('#everyweeks').hide();
 
-                            Ext.getCmp('pcFrm').down('#everymonths').show();
                             Ext.getCmp('nr').allowBlank = false;
                             Ext.getCmp('cfjg').allowBlank = false;
                             Ext.getCmp('njg').allowBlank = false;
                             Ext.getCmp('dijizhou').allowBlank = false;
                             Ext.getCmp('naxietian').allowBlank = false;
                             Ext.getCmp('ncfjg').allowBlank = false;
+                            Ext.getCmp('pcFrm').down('#everymonths').show();
                             break;
                     }
                     messages = SCHEDULE_WILL_IN + Ext.getCmp('runwhen').getRawValue() + EXECUTE + '。';
@@ -730,448 +738,186 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                 }]
             }]
         }]
-    },
-    /* {
-            xtype: 'fieldset',
-            title: '每日頻率',
-            id: 'mtpl',
-            layout: 'anchor',
-            padding: '8 8 8 8',
-            items: [{
-                xtype: 'container',
-                layout: 'column',
-                id: 'zhixingyici',
-                items: [{
-                    xtype: 'radiofield',
-                    boxLabel: '執行一次於',
-                    width: 100,
-                    name: 'in',
-                    inputValue: 'h',
-                    id: 'zxycradio',
-                    checked: true,
-                    listeners: {
-                        change: function (chack) {
-                            if (chack.checked) {
-                                Ext.getCmp('ro_hou').setDisabled(false);
-                                Ext.getCmp('ro_min').setDisabled(false);
-                                Ext.getCmp('ro_sen').setDisabled(false);
-                                Ext.getCmp('cfnh').setDisabled(true);
-                                Ext.getCmp('cfhms').setDisabled(true);
-                                Ext.getCmp('s_hour').setDisabled(true);
-                                Ext.getCmp('s_min').setDisabled(true);
-                                Ext.getCmp('s_sen').setDisabled(true);
-                                Ext.getCmp('e_hour').setDisabled(true);
-                                Ext.getCmp('e_min').setDisabled(true);
-                                Ext.getCmp('e_sen').setDisabled(true);
-
-                                messagesrep = '于當天' + Ext.getCmp('ro_hou').getValue() + ':' + Ext.getCmp('ro_min').getValue() + ':' + Ext.getCmp('ro_sen').getValue() + '執行一次。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-
-                            } else {
-                                Ext.getCmp('ro_hou').setDisabled(true);
-                                Ext.getCmp('ro_min').setDisabled(true);
-                                Ext.getCmp('ro_sen').setDisabled(true);
-                                Ext.getCmp('cfnh').setDisabled(false);
-                                Ext.getCmp('cfhms').setDisabled(false);
-                                Ext.getCmp('s_hour').setDisabled(false);
-                                Ext.getCmp('s_min').setDisabled(false);
-                                Ext.getCmp('s_sen').setDisabled(false);
-                                Ext.getCmp('e_hour').setDisabled(false);
-                                Ext.getCmp('e_min').setDisabled(false);
-                                Ext.getCmp('e_sen').setDisabled(false);
-
-                                messagesrep = '于當天' + Ext.getCmp('s_hour').getValue() + ':' + Ext.getCmp('s_min').getValue() + ':' + Ext.getCmp('s_sen').getValue() + ' ~ ' + Ext.getCmp('e_hour').getValue() + ':' + Ext.getCmp('e_min').getValue() + ':' + Ext.getCmp('e_sen').getValue() + '內，每' + Ext.getCmp('cfnh').getValue() + Ext.getCmp('cfhms').getRawValue() + '重複執行。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-
-                            }
-                        }
+    }, {
+        xtype: 'fieldset',
+        title: CONTINUE_TIME,//持續時間
+        id: 'cxsj',
+        layout: 'column',
+        padding: '10 10 10 10',
+        items: [{
+            xtype: 'datefield',
+            format: 'Y/m/d',
+            fieldLabel: BEGIN_TIME,//開始時間
+            allowBlank: false,
+            labelWidth: 64,
+            width: 220,
+            margin: '0 0 0 15',
+            id: 'cs_time',
+            listeners: {
+                change: function () {
+                    if (Ext.getCmp('cs_time').getValue() == null) {
+                        return;
                     }
-                }, {
-                    xtype: 'numberfield',
-                    width: 43,
-                    minValue: 00,
-                    maxValue: 23,
-                    margin: '0 0 0 1',
-                    id: 'ro_hou',
-                    listeners: {
-                        change: function () {
-                            if (!Ext.getCmp('noendtime').checked) {
-                                messagesrep = '于當天' + Ext.getCmp('ro_hou').getValue() + ':' + Ext.getCmp('ro_min').getValue() + ':' + Ext.getCmp('ro_sen').getValue() + '執行一次。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            } else {
-                                messagesrep = '于當天' + Ext.getCmp('s_hour').getValue() + ':' + Ext.getCmp('s_min').getValue() + ':' + Ext.getCmp('s_sen').getValue() + ' ~ ' + Ext.getCmp('e_hour').getValue() + ':' + Ext.getCmp('e_min').getValue() + ':' + Ext.getCmp('e_sen').getValue() + '內，每' + Ext.getCmp('cfnh').getValue() + Ext.getCmp('cfhms').getRawValue() + '重複執行。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            }
+                    Ext.getCmp("ce_time").setMinValue(this.getValue());
+                    if (Ext.getCmp('noendtime').checked) {
+                        if (Ext.getCmp('cs_time').getValue() == null) {
+                            return;
                         }
-                    }
-                }, {
-                    xtype: 'numberfield',
-                    fieldLabel: ' ',
-                    labelWidth: 3,
-                    width: 50,
-                    minValue: 00,
-                    maxValue: 59,
-                    margin: '0 0 0 1',
-                    id: 'ro_min',
-                    listeners: {
-                        change: function () {
-                            if (!Ext.getCmp('noendtime').checked) {
-                                messagesrep = '于當天' + Ext.getCmp('ro_hou').getValue() + ':' + Ext.getCmp('ro_min').getValue() + ':' + Ext.getCmp('ro_sen').getValue() + '執行一次。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            } else {
-                                messagesrep = '于當天' + Ext.getCmp('s_hour').getValue() + ':' + Ext.getCmp('s_min').getValue() + ':' + Ext.getCmp('s_sen').getValue() + ' ~ ' + Ext.getCmp('e_hour').getValue() + ':' + Ext.getCmp('e_min').getValue() + ':' + Ext.getCmp('e_sen').getValue() + '內，每' + Ext.getCmp('cfnh').getValue() + Ext.getCmp('cfhms').getRawValue() + '重複執行。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            }
+                        messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
+                        Ext.getCmp('mst').setText('');
+                        Ext.getCmp('mst').setText(messagestime);
+                    } else {
+                        if (Ext.getCmp('cs_time').getValue() == null) {
+                            return;
                         }
-                    }
-                }, {
-                    xtype: 'numberfield',
-                    fieldLabel: ' ',
-                    labelWidth: 3,
-                    width: 50,
-                    minValue: 00,
-                    maxValue: 59,
-                    margin: '0 0 0 1',
-                    id: 'ro_sen',
-                    listeners: {
-                        change: function () {
-                            if (!Ext.getCmp('noendtime').checked) {
-                                messagesrep = '于當天' + Ext.getCmp('ro_hou').getValue() + ':' + Ext.getCmp('ro_min').getValue() + ':' + Ext.getCmp('ro_sen').getValue() + '執行一次。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            } else {
-                                messagesrep = '于當天' + Ext.getCmp('s_hour').getValue() + ':' + Ext.getCmp('s_min').getValue() + ':' + Ext.getCmp('s_sen').getValue() + ' ~ ' + Ext.getCmp('e_hour').getValue() + ':' + Ext.getCmp('e_min').getValue() + ':' + Ext.getCmp('e_sen').getValue() + '內，每' + Ext.getCmp('cfnh').getValue() + Ext.getCmp('cfhms').getRawValue() + '重複執行。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            }
+                        if (Ext.getCmp('ce_time').getValue() == null) {
+                            return;
                         }
+                        messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
+                        Ext.getCmp('mst').setText('');
+                        Ext.getCmp('mst').setText(messagestime);
                     }
-                }]
-            }, {
-                xtype: 'container',
-                layout: 'column',
-                id: 'cyzxy',
-                margin: '10 0 0 0',
-                items: [{
-                    xtype: 'radiofield',
-                    boxLabel: '重複執行於每',
-                    width: 100,
-                    name: 'in',
-                    inputValue: 'j',
-                    id: 'cfzxradio'
-                }, {
-                    xtype: 'numberfield',
-                    width: 67,
-                    minValue: 1,
-                    maxValue: 59,
-                    disabled: true,
-                    id: 'cfnh',
-                    listeners: {
-                        change: function () {
-                            if (Ext.getCmp('noendtime').checked) {
-                                messagesrep = '于當天' + Ext.getCmp('ro_hou').getValue() + ':' + Ext.getCmp('ro_min').getValue() + ':' + Ext.getCmp('ro_sen').getValue() + '執行一次。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            } else {
-                                messagesrep = '于當天' + Ext.getCmp('s_hour').getValue() + ':' + Ext.getCmp('s_min').getValue() + ':' + Ext.getCmp('s_sen').getValue() + ' ~ ' + Ext.getCmp('e_hour').getValue() + ':' + Ext.getCmp('e_min').getValue() + ':' + Ext.getCmp('e_sen').getValue() + '內，每' + Ext.getCmp('cfnh').getValue() + Ext.getCmp('cfhms').getRawValue() + '重複執行。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            }
+                }
+            }
+        }, {
+            xtype: 'datefield',
+            format: 'Y/m/d',
+            fieldLabel: END_TIME,//結束時間
+            allowBlank: false,
+            labelWidth: 64,
+            width: 220,
+            margin: '0 0 0 20',
+            id: 'ce_time',
+            listeners: {
+                change: function () {
+                    if (Ext.getCmp('cs_time').getValue() == null) {
+                        return;
+                    }
+                    Ext.getCmp("cs_time").setMaxValue(this.getValue());
+                    if (Ext.getCmp('noendtime').checked) {
+                        if (Ext.getCmp('cs_time').getValue() == null) {
+                            return;
                         }
-                    }
-                }, {
-                    xtype: 'combobox',
-                    allowBlank: false,
-                    id: 'cfhms',
-                    disabled: true,
-                    displayField: 'name',
-                    valueField: 'abbr',
-                    width: 60,
-                    margin: '0 0 0 15',
-                    editable: false,
-                    value: 1,
-                    store: timeStore,
-                    listeners: {
-                        select: function () {
-                            if (Ext.getCmp('noendtime').checked) {
-                                messagesrep = '于當天' + Ext.getCmp('ro_hou').getValue() + ':' + Ext.getCmp('ro_min').getValue() + ':' + Ext.getCmp('ro_sen').getValue() + '執行一次。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            } else {
-                                messagesrep = '于當天' + Ext.getCmp('s_hour').getValue() + ':' + Ext.getCmp('s_min').getValue() + ':' + Ext.getCmp('s_sen').getValue() + ' ~ ' + Ext.getCmp('e_hour').getValue() + ':' + Ext.getCmp('e_min').getValue() + ':' + Ext.getCmp('e_sen').getValue() + '內，每' + Ext.getCmp('cfnh').getValue() + Ext.getCmp('cfhms').getRawValue() + '重複執行。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            }
+                        messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + '。';
+                        Ext.getCmp('mst').setText('');
+                        Ext.getCmp('mst').setText(messagestime);
+                    } else {
+                        if (Ext.getCmp('cs_time').getValue() == null) {
+                            return;
                         }
-                    }
-                }, {
-                    xtype: 'numberfield',
-                    fieldLabel: '開始時間',
-                    labelWidth: 64,
-                    width: 110,
-                    minValue: 00,
-                    maxValue: 23,
-                    margin: '0 0 0 15',
-                    disabled: true,
-                    id: 's_hour',
-                    listeners: {
-                        change: function () {
-                            if (Ext.getCmp('noendtime').checked) {
-                                messagesrep = '于當天' + Ext.getCmp('ro_hou').getValue() + ':' + Ext.getCmp('ro_min').getValue() + ':' + Ext.getCmp('ro_sen').getValue() + '執行一次。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            } else {
-                                messagesrep = '于當天' + Ext.getCmp('s_hour').getValue() + ':' + Ext.getCmp('s_min').getValue() + ':' + Ext.getCmp('s_sen').getValue() + ' ~ ' + Ext.getCmp('e_hour').getValue() + ':' + Ext.getCmp('e_min').getValue() + ':' + Ext.getCmp('e_sen').getValue() + '內，每' + Ext.getCmp('cfnh').getValue() + Ext.getCmp('cfhms').getRawValue() + '重複執行。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            }
+                        if (Ext.getCmp('ce_time').getValue() == null) {
+                            return;
                         }
+                        messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d ') + '。';
+                        Ext.getCmp('mst').setText('');
+                        Ext.getCmp('mst').setText(messagestime);
                     }
-                }, {
-                    xtype: 'numberfield',
-                    fieldLabel: ' ',
-                    labelWidth: 3,
-                    width: 50,
-                    minValue: 00,
-                    maxValue: 59,
-                    margin: '0 0 0 1',
-                    disabled: true,
-                    id: 's_min',
-                    listeners: {
-                        change: function () {
-                            if (Ext.getCmp('noendtime').checked) {
-                                messagesrep = '于當天' + Ext.getCmp('ro_hou').getValue() + ':' + Ext.getCmp('ro_min').getValue() + ':' + Ext.getCmp('ro_sen').getValue() + '執行一次。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            } else {
-                                messagesrep = '于當天' + Ext.getCmp('s_hour').getValue() + ':' + Ext.getCmp('s_min').getValue() + ':' + Ext.getCmp('s_sen').getValue() + ' ~ ' + Ext.getCmp('e_hour').getValue() + ':' + Ext.getCmp('e_min').getValue() + ':' + Ext.getCmp('e_sen').getValue() + '內，每' + Ext.getCmp('cfnh').getValue() + Ext.getCmp('cfhms').getRawValue() + '重複執行。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            }
+                }
+            }
+        }, {
+            xtype: 'checkbox',
+            boxLabel: NON_END_TIME,//沒有結束時間
+            width: 100,
+            inputValue: 'noentime',
+            id: 'noendtime',
+            margin: '0 0 0 20',
+            listeners: {
+                change: function (chack) {
+                    if (chack.checked) {
+                        Ext.getCmp('ce_time').setDisabled(true);
+                        Ext.getCmp("ce_time").setValue('');
+                        if (Ext.getCmp('cs_time').getValue() == null) {
+                            return;
                         }
-                    }
-                }, {
-                    xtype: 'numberfield',
-                    fieldLabel: ' ',
-                    labelWidth: 3,
-                    width: 50,
-                    minValue: 00,
-                    maxValue: 59,
-                    margin: '0 0 0 1',
-                    disabled: true,
-                    id: 's_sen',
-                    listeners: {
-                        change: function () {
-                            if (Ext.getCmp('noendtime').checked) {
-                                messagesrep = '于當天' + Ext.getCmp('ro_hou').getValue() + ':' + Ext.getCmp('ro_min').getValue() + ':' + Ext.getCmp('ro_sen').getValue() + '執行一次。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            } else {
-                                messagesrep = '于當天' + Ext.getCmp('s_hour').getValue() + ':' + Ext.getCmp('s_min').getValue() + ':' + Ext.getCmp('s_sen').getValue() + ' ~ ' + Ext.getCmp('e_hour').getValue() + ':' + Ext.getCmp('e_min').getValue() + ':' + Ext.getCmp('e_sen').getValue() + '內，每' + Ext.getCmp('cfnh').getValue() + Ext.getCmp('cfhms').getRawValue() + '重複執行。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            }
+                        messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
+                        Ext.getCmp('mst').setText('');
+                        Ext.getCmp('mst').setText(messagestime);
+                    } else {
+                        Ext.getCmp('ce_time').setDisabled(false);
+                        if (Ext.getCmp('cs_time').getValue() == null) {
+                            return;
                         }
+                        messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
+                        Ext.getCmp('mst').setText('');
+                        Ext.getCmp('mst').setText(messagestime);
                     }
-                }, {
-                    xtype: 'numberfield',
-                    fieldLabel: '結束時間',
-                    labelWidth: 64,
-                    width: 110,
-                    minValue: 00,
-                    maxValue: 23,
-                    margin: '0 0 0 15',
-                    disabled: true,
-                    id: 'e_hour',
-                    listeners: {
-                        change: function () {
-                            if (Ext.getCmp('noendtime').checked) {
-                                messagesrep = '于當天' + Ext.getCmp('ro_hou').getValue() + ':' + Ext.getCmp('ro_min').getValue() + ':' + Ext.getCmp('ro_sen').getValue() + '執行一次。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            } else {
-                                messagesrep = '于當天' + Ext.getCmp('s_hour').getValue() + ':' + Ext.getCmp('s_min').getValue() + ':' + Ext.getCmp('s_sen').getValue() + ' ~ ' + Ext.getCmp('e_hour').getValue() + ':' + Ext.getCmp('e_min').getValue() + ':' + Ext.getCmp('e_sen').getValue() + '內，每' + Ext.getCmp('cfnh').getValue() + Ext.getCmp('cfhms').getRawValue() + '重複執行。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            }
-                        }
-                    }
-                }, {
-                    xtype: 'numberfield',
-                    fieldLabel: ' ',
-                    labelWidth: 3,
-                    width: 50,
-                    minValue: 00,
-                    maxValue: 59,
-                    margin: '0 0 0 1',
-                    disabled: true,
-                    id: 'e_min',
-                    listeners: {
-                        change: function () {
-                            if (Ext.getCmp('noendtime').checked) {
-                                messagesrep = '于當天' + Ext.getCmp('ro_hou').getValue() + ':' + Ext.getCmp('ro_min').getValue() + ':' + Ext.getCmp('ro_sen').getValue() + '執行一次。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            } else {
-                                messagesrep = '于當天' + Ext.getCmp('s_hour').getValue() + ':' + Ext.getCmp('s_min').getValue() + ':' + Ext.getCmp('s_sen').getValue() + ' ~ ' + Ext.getCmp('e_hour').getValue() + ':' + Ext.getCmp('e_min').getValue() + ':' + Ext.getCmp('e_sen').getValue() + '內，每' + Ext.getCmp('cfnh').getValue() + Ext.getCmp('cfhms').getRawValue() + '重複執行。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            }
-                        }
-                    }
-                }, {
-                    xtype: 'numberfield',
-                    fieldLabel: ' ',
-                    labelWidth: 3,
-                    width: 50,
-                    minValue: 00,
-                    maxValue: 59,
-                    margin: '0 0 0 1',
-                    disabled: true,
-                    id: 'e_sen',
-                    listeners: {
-                        change: function () {
-                            if (Ext.getCmp('noendtime').checked) {
-                                messagesrep = '于當天' + Ext.getCmp('ro_hou').getValue() + ':' + Ext.getCmp('ro_min').getValue() + ':' + Ext.getCmp('ro_sen').getValue() + '執行一次。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            } else {
-                                messagesrep = '于當天' + Ext.getCmp('s_hour').getValue() + ':' + Ext.getCmp('s_min').getValue() + ':' + Ext.getCmp('s_sen').getValue() + ' ~ ' + Ext.getCmp('e_hour').getValue() + ':' + Ext.getCmp('e_min').getValue() + ':' + Ext.getCmp('e_sen').getValue() + '內，每' + Ext.getCmp('cfnh').getValue() + Ext.getCmp('cfhms').getRawValue() + '重複執行。';
-                                Ext.getCmp('mscf').setText(messagesrep);
-                            }
-                        }
-                    }
-                }]
-            }]
-        },*/
-       {
-           xtype: 'fieldset',
-           title: CONTINUE_TIME,//持續時間
-           id: 'cxsj',
-           layout: 'column',
-           padding: '10 10 10 10',
-           items: [{
-               xtype: 'datefield',
-               format: 'Y/m/d',
-               fieldLabel: BEGIN_TIME,//開始時間
-               allowBlank: false,
-               labelWidth: 64,
-               width: 220,
-               margin: '0 0 0 15',
-               id: 'cs_time',
-               listeners: {
-                   change: function () {
-                       Ext.getCmp("ce_time").setMinValue(this.getValue());
-                       if (Ext.getCmp('noendtime').checked) {
-                           messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
-                           Ext.getCmp('mst').setText('');
-                           Ext.getCmp('mst').setText(messagestime);
-                       } else {
-                           messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
-                           Ext.getCmp('mst').setText('');
-                           Ext.getCmp('mst').setText(messagestime);
-                       }
-                   }
-               }
-           }, {
-               xtype: 'datefield',
-               format: 'Y/m/d',
-               fieldLabel: END_TIME,//結束時間
-               allowBlank: false,
-               labelWidth: 64,
-               width: 220,
-               margin: '0 0 0 20',
-               id: 'ce_time',
-               listeners: {
-                   change: function () {
-                       Ext.getCmp("cs_time").setMaxValue(this.getValue());
-                       if (Ext.getCmp('noendtime').checked) {
-                           messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + '。';
-                           Ext.getCmp('mst').setText('');
-                           Ext.getCmp('mst').setText(messagestime);
-                       } else {
-                           messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d ') + '。';
-                           Ext.getCmp('mst').setText('');
-                           Ext.getCmp('mst').setText(messagestime);
-                       }
-                   }
-               }
-           }, {
-               xtype: 'checkbox',
-               boxLabel: NON_END_TIME,//沒有結束時間
-               width: 100,
-               inputValue: 'noentime',
-               id: 'noendtime',
-               margin: '0 0 0 20',
-               listeners: {
-                   change: function (chack) {
-                       if (chack.checked) {
-                           Ext.getCmp('ce_time').setDisabled(true);
-                           Ext.getCmp("ce_time").setValue('');
-                           messagestime = BEGIN_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d ') + '。';
-                           Ext.getCmp('mst').setText('');
-                           Ext.getCmp('mst').setText(messagestime);
-                       } else {
-                           Ext.getCmp('ce_time').setDisabled(false);
-                           messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';
-                           Ext.getCmp('mst').setText('');
-                           Ext.getCmp('mst').setText(messagestime);
-                       }
-                   }
-               }
-           }]
-       }, {
-           xtype: 'fieldset',
-           title: '不規律執行',//不規律執行
-           id: 'bglzx',
-           layout: 'column',
-           padding: '10 10 10 10',
-           disabled: true,
-           items: [{
-               xtype: 'combobox',
-               fieldLabel: '執行于',//執行于(每週)
-               allowBlank: false,
-               id: 'irregularwhen',
-               displayField: 'irregularname',
-               valueField: 'irregulartype',
-               labelWidth: 54,
-               width: 150,
-               margin: '10 10 15 10',
-               editable: false,
-               value: 'w',
-               store: irregularStore
-           }, irregularGrid]
-       }, {
-           xtype: 'container',
-           layout: 'column',
-           id: 'wenben',
-           height: 19,
-           items: [{
+                }
+            }
+        }]
+    }, {
+        xtype: 'fieldset',
+        title: '不規律執行',//不規律執行
+        id: 'bglzx',
+        layout: 'column',
+        padding: '10 10 10 10',
+        disabled: true,
+        items: [{
+            xtype: 'combobox',
+            fieldLabel: '執行于',//執行于(每週)
+            allowBlank: false,
+            id: 'irregularwhen',
+            displayField: 'irregularname',
+            valueField: 'irregulartype',
+            labelWidth: 54,
+            width: 150,
+            margin: '10 10 15 10',
+            editable: false,
+            value: 'w',
+            store: irregularStore
+        }, irregularGrid]
+    }, {
+        xtype: 'container',
+        layout: 'column',
+        id: 'wenben',
+        height: 19,
+        items: [{
+            xtype: 'label',
+            id: 'ms',
+            text: messages
+        },
+           //{
+           //    xtype: 'label',
+           //    id: 'mscf',
+           //    text: messagesrep
+           //},
+           {
                xtype: 'label',
-               id: 'ms',
-               text: messages
+               id: 'irrms',
+               text: irrmessages
            },
-              //{
-              //    xtype: 'label',
-              //    id: 'mscf',
-              //    text: messagesrep
-              //},
-              {
-                  xtype: 'label',
-                  id: 'irrms',
-                  text: irrmessages
-              },
-             {
-                 xtype: 'label',
-                 id: 'mst',
-                 text: messagestime
-             }]
-       }],
+          {
+              xtype: 'label',
+              id: 'mst',
+              text: messagestime
+          }]
+    }],
     buttons: [{
         text: SAVE,//保存
         id: 'btnSave',
-        //formBind: true,
-        //disabled: true,
         handler: function () {
             var myMask = new Ext.LoadMask(Ext.getBody(), {
                 msg: 'Loading...'
             });
-            myMask.show();
+            var tempType = Ext.getCmp('pc_type').getValue();
             var parames = getParams();
-            if (parames.error) {
-                Ext.Msg.alert(INFORMATION, parames.msg);
+            var tempFlag = true;////定義一個臨時變量用來作為是否  傳遞 到後臺的判斷依據
+            var form = this.up('form').getForm();
+            if (tempType == "2" || tempType == "1") {////如果執行類型為 單次 或者 重複 執行
+                tempFlag = form.isValid();///啟用form驗證
             }
-            else {
-                var form = this.up('form').getForm();
-                if (form.isValid()) {
+            if (parames.error) {
+                tempFlag = false;
+                Ext.Msg.alert(INFORMATION, parames.msg);
+                myMask.hide();
+            } else {
+                if (tempFlag) {
+                    myMask.show();
                     form.submit({
                         params: parames,
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
                             if (result.success) {
+                                irregulartimeStore.removeAll();
                                 addPc.hide();
                                 tierStore.load();
                                 Ext.Msg.alert(INFORMATION, SAVE_SUCCESS);
@@ -1264,7 +1010,7 @@ function Tier_Load(record) {
 
             Ext.getCmp('cs_time').setRawValue(record.data.duration_start);
 
-            if (record.data.duration_end == "0001/01/01" || record.data.duration_end == "") {
+            if (record.data.duration_end == "0001/01/01" || record.data.duration_end == "" || record.data.duration_end == "9999/12/31") {
                 Ext.getCmp('noendtime').setValue(true);
                 Ext.getCmp('ce_time').setRawValue("");
             } else {
@@ -1284,12 +1030,12 @@ function Tier_Load(record) {
 
             Ext.getCmp('cs_time').setRawValue(record.data.duration_start);
 
-            if (record.data.duration_end == "0001/01/01" || record.data.duration_end == "") {
+            if (record.data.duration_end == "0001/01/01" || record.data.duration_end == "" || record.data.duration_end == "9999/12/31") {
                 Ext.getCmp('noendtime').setValue(true);
                 Ext.getCmp('ce_time').setRawValue("");
             } else {
-                Ext.getCmp('noendtime').setValue(false);
                 Ext.getCmp('ce_time').setRawValue(record.data.duration_end);
+                Ext.getCmp('noendtime').setValue(false);
             }
             irregulartimeStoreLoad(record);
             break;
@@ -1403,7 +1149,7 @@ function getParams() {
             //beginDay = (beginDay - 1) * 24 + source.items[0].data.startHour///獲得頭數據的小時數
             if (source.items.length == 0) {
                 params.error = true;
-                params.msg = "數據不能為空";
+                params.msg = EMPTYDATA;
                 break;
             }
             for (var i = 0; i < source.items.length; i++) {     ///循环遍歷panel中的數據
@@ -1422,7 +1168,7 @@ function getParams() {
                 //    params.msg = THE + (i + 1) + "觸發時間必須處於合理範圍";
                 //    break;
                 //}
-                  
+
                 startTemp = (startTemp - 1) * 24 + source.items[i].data.startHour;
                 endTemp = (endTemp - 1) * 24 + source.items[i].data.endHour;
                 if (endTemp <= startTemp) ///判斷每行的開始時間是否大於結束時間

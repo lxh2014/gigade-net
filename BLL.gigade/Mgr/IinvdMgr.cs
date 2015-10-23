@@ -128,19 +128,28 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IinvdMgr-->GetIinvdList-->" + ex.Message, ex);
             }
         }
-        public int IsUpd(Iinvd i)
+        public int IsUpd(Iinvd i,int type=0)/*chaojie1124j添加，區分是庫存調整，還是收貨上架*/
         {
             try
             {
                 IstockChange m = new IstockChange();
                 m.item_id = i.item_id;
-                m.sc_trans_type = 1;
+                if (type == 1)//收貨上架
+                {
+                    m.sc_trans_type = 1;//1.收貨上架,2表示庫調
+                    m.sc_istock_why = 3;//3.收貨上架，2.庫調，1.庫鎖
+                }
+                if (type == 0)//庫存調整
+                {
+                    m.sc_trans_type = 2;
+                    m.sc_istock_why = 2;//2表示庫調
+                }
                 m.sc_num_old = GetProqtyByItemid(int.Parse(i.item_id.ToString()));
                 m.sc_num_chg = i.prod_qty;
                 m.sc_num_new = GetProqtyByItemid(int.Parse(i.item_id.ToString())) + i.prod_qty;
                 m.sc_time = i.change_dtim;
                 m.sc_user = i.create_user;
-                m.sc_istock_why = 2;//2表示庫調
+               
                 _istockdao.insert(m);
                 return _ivddao.IsUpd(i);
             }
@@ -480,6 +489,17 @@ namespace BLL.gigade.Mgr
             catch (Exception ex)
             {
                 throw new Exception("IinvdMgr-->GetProqtyByItemid-->" + ex.Message, ex);
+            }
+        }
+        public List<IinvdQuery> GetSearchIinvd(Model.Query.IinvdQuery ivd)
+        {
+            try
+            {
+                return _ivddao.GetSearchIinvd(ivd);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->GetSearchIinvd-->" + ex.Message, ex);
             }
         }
     }

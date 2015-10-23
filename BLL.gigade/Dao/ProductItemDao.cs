@@ -403,6 +403,10 @@ namespace BLL.gigade.Dao
             {
                 sbSqlCondition.AppendFormat(" and pi.erp_id = '{0}' ", query.Erp_Id);
             }
+            if (query.sale_status!=100)
+            {
+                sbSqlCondition.AppendFormat(" and p.sale_status = '{0}' ", query.sale_status);
+            }
             //if (!string.IsNullOrEmpty(query.vendor_name))
             //{
             //    sbSqlCondition.AppendFormat(" and (v.vendor_name_full like '%{0}%' or v.vendor_name_simple like '%{0}%') ", query.vendor_name);
@@ -491,11 +495,11 @@ namespace BLL.gigade.Dao
                     ProductSpec spec2 = _specDao.query(Convert.ToInt32(dr["spec_id_2"].ToString()));
                     if (spec1 != null)
                     {
-                        dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString())?"":dr["spec_title_1"]+spec1.spec_name;
+                        dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString())?"":dr["spec_title_1"]+":"+spec1.spec_name;
                     }
                     if (spec2 != null)
                     {
-                        dr["spec_title_2"] = string.IsNullOrEmpty(dr["spec_title_2"].ToString()) ? "" : dr["spec_title_2"] + spec2.spec_name;
+                        dr["spec_title_2"] = string.IsNullOrEmpty(dr["spec_title_2"].ToString()) ? "" : dr["spec_title_2"] +":"+ spec2.spec_name;
                     }
                     dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString()) ? "" : dr["spec_title_1"].ToString() +"  "+ dr["spec_title_2"];
                 }
@@ -733,5 +737,69 @@ namespace BLL.gigade.Dao
             }  
 
         }
+
+
+
+
+        public List<ProductItemQuery> GetWaitLiaoWeiList(ProductItemQuery query, out int totalCount)// by yachao1120j 2015-10-20 等待料位報表
+        {
+            StringBuilder str = new StringBuilder();
+            StringBuilder sqlCount = new StringBuilder();
+            StringBuilder strcont = new StringBuilder();
+            totalCount = 0;
+
+            try
+            {
+                sqlCount.AppendFormat("SELECT count(pi.item_id) as totalCount ");
+                str.AppendFormat("select pi.item_id,p.product_createdate,p.product_name,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1,CONCAT(p.spec_title_2,'',ps2.spec_name) as Spec_Name_2 ,p.combination,p.product_status,p.product_mode,dfsm.delivery_freight_set,p.product_start,tp2.parameterName as product_fenlei_dalei,tp1.parameterName as  product_fenlei_xiaolei  ");
+                strcont.AppendFormat(" from  product_item pi ");
+                strcont.AppendFormat(" left join product p on p.product_id =pi.product_id ");
+                strcont.AppendFormat(" left join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set ");
+                strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
+                strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
+                strcont.AppendFormat(" inner JOIN (SELECT parameterName,parameterCode,topValue from t_parametersrc where parameterType='product_cate')  tp1 on tp1.parameterCode=p.cate_id   ");
+                strcont.AppendFormat(" inner JOIN (SELECT parameterName,parameterCode,topValue from t_parametersrc where parameterType='product_cate')  tp2 on tp2.parameterCode=tp1.topValue ");
+                strcont.AppendFormat(" where item_id NOT in (select item_id from iplas)  and p.product_id>10000  ");
+
+                if (query.product_mode != 100)//  出貨方式  100 代表全部
+                {
+                    strcont.AppendFormat(" and p.product_mode = '{0}' ", query.product_mode);
+                }
+                if (query.product_freight_set != 100)//溫層  100 代表全部
+                {
+                    strcont.AppendFormat(" and dfsm.delivery_freight_set = '{0}' ", query.product_freight_set);
+                }
+                //if (query.product_status != 100)//商品狀態  100 代表全部
+                //{
+                //    strcont.AppendFormat(" and p.product_status ='{0}' ", query.product_status);
+                //}
+                //else 
+                //{
+                strcont.AppendFormat("and p.product_status in (0,1,2,5) ");
+                //}
+                //開始日期 結束時間 都不為空的條件下
+                strcont.AppendFormat("  and p.product_createdate >='{0}' and p.product_createdate  <='{1}'  ", (query.start_time), (query.end_time));
+                str.Append(strcont);
+
+                if (query.IsPage)
+                {
+                    DataTable _dt = _access.getDataTable(sqlCount.ToString() + strcont.ToString());
+                    if (_dt.Rows.Count > 0)
+                    {
+                        totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
+                        str.AppendFormat(" limit {0},{1} ", query.Start, query.Limit);
+                    }
+                }
+                return _access.getDataTableForObj<ProductItemQuery>(str.ToString());// 獲取查詢記錄
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->GetWaitLiaoWeiList-->" + ex.Message);
+            }
+
+        }
+
+
     }
 }

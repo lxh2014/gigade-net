@@ -16,7 +16,7 @@ namespace BLL.gigade.Mgr.Impl
         DataTable Getprodubybar(string id);
         int Islocid(string id, string zid, string prod_id);
         List<Model.Query.IinvdQuery> GetIinvdList(Model.Query.IinvdQuery ivd, out int totalCount);
-        int IsUpd(Iinvd m);
+        int IsUpd(Iinvd m,int type=0);/*chaojie1124j 2015/10/8添加type用來判斷庫存調整和收貨上架*/
         int Selnum(Iinvd m);
         int UpdateIinvdLock(Iinvd nvd,IialgQuery q);
         DataTable ExportExcel(IinvdQuery vd);
@@ -44,5 +44,6 @@ namespace BLL.gigade.Mgr.Impl
         DataTable getproduct(IinvdQuery m);
         DataTable GetIinvdCountBook(IinvdQuery m);
         int GetProqtyByItemid(int item_id);
+        List<IinvdQuery> GetSearchIinvd(Model.Query.IinvdQuery ivd);
     }
 }

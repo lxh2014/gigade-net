@@ -16,6 +16,7 @@ using System.Xml;
 using gigadeExcel.Comment;
 using System.Data;
 using BLL.gigade.Common;
+using System.Net;
 
 namespace Admin.gigade.Controllers
 {
@@ -44,6 +45,11 @@ namespace Admin.gigade.Controllers
         private ISiteConfigImplMgr _siteConfigMgr;
         private IProductRemoveReasonImplMgr _proRemoveMgr;
 
+        private IRecommendedExcleImplMgr _recommendedExcleMgr;
+        private IParametersrcImplMgr _iParametersrcImplMgr;
+        string ftpuser = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.ftpuser);//ftp用戶名
+        string ftppwd = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.ftppwd);//ftp密碼
+        string RecommendExcleLocalPath = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.local);//ftp地址
         public ActionResult Index()
         {
             return View();
@@ -941,150 +947,166 @@ namespace Admin.gigade.Controllers
         }
 
 
-        #region 設定有關商品自動下架等功能
+        #region 設定有關商品自動下架等功能  product_status 7 表示缺货系统下架
         public string SetProductRmoveDown()
         {
+
             int resultone = 0;
             int resulttwo = 0;
             int resultthree = 0;
+            string startRunInfo = "";
+            string endRunInfo = "";
             try
             {
-                _proRemoveMgr = new ProductRemoveReasonMgr(connectionString);
-
-                ProductRemoveReason prr = new ProductRemoveReason();
-                ProductRemoveReason prrtwo = new ProductRemoveReason();
-                Product pt = new Product();
-                ProductStatusHistory psh = new ProductStatusHistory();
-
-                #region 往临时表中插入数据/或者更新数据  sql可以统一执行
-                //獲取到上架商品庫存<=0,並且排除掉庫存為0可販賣機暫停售賣的商品
-                DataTable _dt = _proRemoveMgr.GetStockLessThanZero();
-                //获取到临时表中的数据
-                DataTable _dttwo = _proRemoveMgr.GetProductRemoveReasonList();
-                //判断临时表是否存在,如果不存在,则插入数据
-                StringBuilder str = new StringBuilder();
-                if (_dt.Rows.Count > 0)
+                if (Request.Url.Host == "mng.gigade100.com")//判断是否为正式线
                 {
-                    for (int i = 0; i < _dt.Rows.Count; i++)
-                    {
-                        DataRow[] dr = _dttwo.Select("item_id=" + _dt.Rows[i]["item_id"]);
-                        if (dr.Length <= 0)//小于等于0  无需处理编辑数据,因为获取的库存都是等于或者小于0的
-                        {
-                            prr.create_name = "system";
-                            prr.create_time = Convert.ToInt32(CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(DateTime.Now)));
-                            prr.item_id = Convert.ToUInt32(_dt.Rows[i]["item_id"]);
-                            prr.product_num = Convert.ToInt32(_dt.Rows[i]["item_stock"]);
-                            str.AppendFormat(_proRemoveMgr.InsertProductRemoveReason(prr));
-                        }
-                    }
-                }
-                //获取出临时表中要删除的数据 
-                DataTable _dtthree = _proRemoveMgr.GetDeleteProductRemoveReasonList();
-                for (int b = 0; b < _dtthree.Rows.Count; b++)
-                {
-                    prr.item_id=Convert.ToUInt32(_dtthree.Rows[b]["item_id"]);
-                    str.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prr));
-                }
-                if (str.ToString().Length > 0)
-                {
-                    resultone = _proRemoveMgr.ProductRemoveReasonTransact(str.ToString());
+                    return "{success:false,data:'',msg:'未驗收，暫不執行！'}";
                 }
                 else
                 {
-                    resultone = 1;
-                }
-                #endregion
+                    startRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown Start";
+                    _proRemoveMgr = new ProductRemoveReasonMgr(connectionString);
 
-                #region 缺货商品下架
-                DataTable _dtNew = _proRemoveMgr.GetStockMsg();
-                StringBuilder strsql = new StringBuilder();
-                if (_dtNew.Rows.Count > 0)
-                {
-                    for (int j = 0; j < _dtNew.Rows.Count; j++)
+                    ProductRemoveReason prr = new ProductRemoveReason();
+                    ProductRemoveReason prrtwo = new ProductRemoveReason();
+                    Product pt = new Product();
+                    ProductStatusHistory psh = new ProductStatusHistory();
+
+                    #region 往临时表中插入数据/或者更新数据  sql可以统一执行
+                    //獲取到上架商品庫存<=0,並且排除掉庫存為0可販賣機暫停售賣的商品
+                    DataTable _dt = _proRemoveMgr.GetStockLessThanZero();
+                    //获取到临时表中的数据
+                    DataTable _dttwo = _proRemoveMgr.GetProductRemoveReasonList();
+                    //判断临时表是否存在,如果不存在,则插入数据
+                    StringBuilder str = new StringBuilder();
+                    if (_dt.Rows.Count > 0)
                     {
-                        int time = Convert.ToInt32(_dtNew.Rows[j]["create_time"]);
-                        DateTime dttime = CommonFunction.GetNetTime(time);
-                        TimeSpan ts = DateTime.Now - dttime;
-                        prrtwo.item_id = Convert.ToUInt32(_dtNew.Rows[j]["item_id"]);
-                        pt.Product_Id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
-                        pt.Product_Status = 7;//7为缺货系统下架
-                        psh.product_id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
-                        psh.user_id = 2;
-                        psh.create_time = DateTime.Now;
-                        psh.type = 9;//缺货系统下架
-                        psh.product_status = 7;
-                        psh.remark = "系统账号插入";
-                        if (ts.Days >= (_dtNew.Rows[j]["outofstock_days_stopselling"] == "" ? 0 : Convert.ToInt32(_dtNew.Rows[j]["outofstock_days_stopselling"])))//表示可以下架,执行下架工作
+                        for (int i = 0; i < _dt.Rows.Count; i++)
                         {
-                            //改变product表中商品的状态
-                            strsql.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
-                            //网记录表中插入一条数据
-                            strsql.AppendFormat(_proRemoveMgr.InsertIntoProductStatusHistory(psh));
-                            //删除临时表中的数据
-                            strsql.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prrtwo));
+                            DataRow[] dr = _dttwo.Select("product_id=" + _dt.Rows[i]["product_id"]);
+                            if (dr.Length <= 0)//小于等于0  无需处理编辑数据,因为获取的库存都是等于或者小于0的
+                            {
+                                prr.create_name = "system";
+                                prr.create_time = Convert.ToInt32(CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(DateTime.Now)));
+                                prr.product_id = Convert.ToUInt32(_dt.Rows[i]["product_id"]);
+                                prr.product_num = Convert.ToInt32(_dt.Rows[i]["item_stock"]);
+                                str.AppendFormat(_proRemoveMgr.InsertProductRemoveReason(prr));
+                            }
                         }
                     }
-                }
-                if (strsql.ToString().Length > 0)
-                {
-                    resulttwo = _proRemoveMgr.ProductRemoveReasonTransact(strsql.ToString());
-                }
-                else
-                {
-                    resulttwo = 1;
-                }
-                #endregion
-
-                #region 缺货商品状态改为申请审核
-                DataTable _dtOutofStock = _proRemoveMgr.GetOutofStockMsg();
-                StringBuilder strslqmsg = new StringBuilder();
-                StringBuilder strslqmsgtwo = new StringBuilder();
-                if (_dtOutofStock.Rows.Count > 0)
-                {
-                    for (int z = 0; z < _dtOutofStock.Rows.Count; z++)
+                    //获取出临时表中要删除的数据 
+                    DataTable _dtthree = _proRemoveMgr.GetDeleteProductRemoveReasonList();
+                    for (int b = 0; b < _dtthree.Rows.Count; b++)
                     {
-                        if (Convert.ToInt32(_dtOutofStock.Rows[z]["item_stock"]) > 0)
+                        prr.product_id = Convert.ToUInt32(_dtthree.Rows[b]["product_id"]);
+                        str.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prr));
+                    }
+                    if (str.ToString().Length > 0)
+                    {
+                        resultone = _proRemoveMgr.ProductRemoveReasonTransact(str.ToString());
+                    }
+                    else
+                    {
+                        resultone = 1;
+                    }
+                    #endregion
+
+                    #region 缺货商品下架
+                    DataTable _dtNew = _proRemoveMgr.GetStockMsg();
+                    StringBuilder strsql = new StringBuilder();
+                    if (_dtNew.Rows.Count > 0)
+                    {
+                        for (int j = 0; j < _dtNew.Rows.Count; j++)
                         {
-                            pt.Product_Id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);
-                            pt.Product_Status = 1;//1表示申请审核
-                            _proRemoveMgr.UpdateProductStatus(pt);
-                            psh.product_id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);
+                            int time = Convert.ToInt32(_dtNew.Rows[j]["create_time"]);
+                            DateTime dttime = CommonFunction.GetNetTime(time);
+                            TimeSpan ts = DateTime.Now - dttime;
+                            prrtwo.product_id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
+                            pt.Product_Id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
+                            pt.Product_Status = 7;//7为缺货系统下架
+                            psh.product_id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
                             psh.user_id = 2;
                             psh.create_time = DateTime.Now;
-                            psh.type = 1;//1表示申请审核
-                            psh.product_status = 1;//申请审核
+                            psh.type = 9;//缺货系统下架
+                            psh.product_status = 7;
                             psh.remark = "系统账号插入";
-                            strslqmsg.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
-                            strslqmsg.AppendFormat(_proRemoveMgr.InsertIntoProductStatusHistory(psh));
+                            if (ts.Days >= (_dtNew.Rows[j]["outofstock_days_stopselling"] == "" ? 0 : Convert.ToInt32(_dtNew.Rows[j]["outofstock_days_stopselling"])))//表示可以下架,执行下架工作
+                            {
+                                //改变product表中商品的状态
+                                strsql.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
+                                //网记录表中插入一条数据
+                                strsql.AppendFormat(_proRemoveMgr.InsertIntoProductStatusHistory(psh));
+                                //删除临时表中的数据
+                                strsql.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prrtwo));
+                            }
                         }
-                        prr.item_id = Convert.ToUInt32(_dtOutofStock.Rows[z]["item_id"]);//根据item_id删除数据
-                        strslqmsgtwo.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prr));
                     }
-                }
-
-                if (strslqmsg.ToString().Length > 0)
-                {
-                    resultthree = _proRemoveMgr.ProductRemoveReasonTransact(strslqmsg.ToString() + strslqmsgtwo.ToString());
-                }
-                else
-                {
-                    if (strslqmsgtwo.ToString().Length > 0)
+                    if (strsql.ToString().Length > 0)
                     {
-                        _proRemoveMgr.ProductRemoveReasonTransact(strslqmsgtwo.ToString());
+                        resulttwo = _proRemoveMgr.ProductRemoveReasonTransact(strsql.ToString());
                     }
-                    resultthree = 1;
-                }
-                #endregion
+                    else
+                    {
+                        resulttwo = 1;
+                    }
+                    #endregion
 
-                if (resultone > 0 && resulttwo > 0 && resultthree > 0)
-                {
-                    DataTable _excelMsg = _proRemoveMgr.GetStockMsg();
-                    ExeclProductRmoveDownMsg(_excelMsg);
-                    return "{success:true}";
-                }
-                else
-                {
-                    return "{success:false}";
+                    #region 缺货商品状态改为申请审核
+                    DataTable _dtOutofStock = _proRemoveMgr.GetOutofStockMsg();
+                    StringBuilder strslqmsg = new StringBuilder();
+                    StringBuilder strslqmsgtwo = new StringBuilder();
+                    if (_dtOutofStock.Rows.Count > 0)
+                    {
+                        for (int z = 0; z < _dtOutofStock.Rows.Count; z++)
+                        {
+                            if (Convert.ToInt32(_dtOutofStock.Rows[z]["item_stock"]) > 0)
+                            {
+                                pt.Product_Id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);
+                                pt.Product_Status = 1;//1表示申请审核
+                                _proRemoveMgr.UpdateProductStatus(pt);
+                                psh.product_id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);
+                                psh.user_id = 2;
+                                psh.create_time = DateTime.Now;
+                                psh.type = 1;//1表示申请审核
+                                psh.product_status = 1;//申请审核
+                                psh.remark = "系统账号插入";
+                                strslqmsg.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
+                                strslqmsg.AppendFormat(_proRemoveMgr.InsertIntoProductStatusHistory(psh));
+                            }
+                            prr.product_id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);//根据product_id删除数据
+                            strslqmsgtwo.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prr));
+                        }
+                    }
+
+                    if (strslqmsg.ToString().Length > 0)
+                    {
+                        resultthree = _proRemoveMgr.ProductRemoveReasonTransact(strslqmsg.ToString() + strslqmsgtwo.ToString());
+                    }
+                    else
+                    {
+                        if (strslqmsgtwo.ToString().Length > 0)
+                        {
+                            _proRemoveMgr.ProductRemoveReasonTransact(strslqmsgtwo.ToString());
+                        }
+                        resultthree = 1;
+                    }
+                    #endregion
+
+                    if (resultone > 0 && resulttwo > 0 && resultthree > 0)
+                    {
+                        SaleStatus();
+                        DataTable _excelMsg = _proRemoveMgr.GetStockMsg();
+                        ExeclProductRmoveDownMsg(_excelMsg);
+                        endRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown End ";
+                        WriterInfo("SetProductRmoveDown-Success", startRunInfo, endRunInfo);
+                        return "{success:true}";
+                    }
+                    else
+                    {
+                        endRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown End ";
+                        WriterInfo("SetProductRmoveDown-Fail", startRunInfo, endRunInfo);
+                        return "{success:false}";
+                    }
                 }
             }
             catch (Exception ex)
@@ -1093,7 +1115,9 @@ namespace Admin.gigade.Controllers
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
-                return "{success:false}";
+                endRunInfo = DateTime.Now.ToString() + "SetProductRmoveDown: " + ex.Message;
+                WriterInfo("SetProductRmoveDown", startRunInfo, endRunInfo);
+                return "{success:false,data:'',msg:" + ex.Message + "}";
             }
         }
         #endregion
@@ -1107,7 +1131,7 @@ namespace Admin.gigade.Controllers
                 List<DataTable> Elist = new List<DataTable>();
                 List<bool> comName = new List<bool>();
                 DataTable _dtExeclone = new DataTable();
-                _dtExeclone.Columns.Add("细项编号");
+                _dtExeclone.Columns.Add("商品编号");
                 _dtExeclone.Columns.Add("商品状态");
                 _dtExeclone.Columns.Add("库存为0是否贩售");
                 _dtExeclone.Columns.Add("暂停贩卖商品");
@@ -1116,7 +1140,7 @@ namespace Admin.gigade.Controllers
                 for (int w = 0; w < _dtMsg.Rows.Count; w++)
                 {
                     DataRow drMsg = _dtExeclone.NewRow();
-                    drMsg["细项编号"] = _dtMsg.Rows[w]["item_id"];
+                    drMsg["商品编号"] = _dtMsg.Rows[w]["product_id"];
                     drMsg["商品状态"] = _dtMsg.Rows[w]["product_status"];
                     drMsg["库存为0是否贩售"] = _dtMsg.Rows[w]["shortage"] == "0" ? "是" : "否";
                     drMsg["暂停贩卖商品"] = _dtMsg.Rows[w]["ignore_stock"] == "0" ? "是" : "否";
@@ -1143,5 +1167,191 @@ namespace Admin.gigade.Controllers
                 log.Error(logMessage);
             }
         }
+        #region 吉甲地推薦系統匯出
+        // 吉甲地推薦系統匯出 guodong1130w 2015/10/9
+        public string OutExcleForRecommended()
+        {
+            try
+            {
+                //獲取傳參并封裝到對象
+                RecommendedOutPra rop = new RecommendedOutPra();
+                string outType = Request.Params["outType"].ToString();
+                string outTime = Request.Params["outTime"].ToString();
+                if (!string.IsNullOrEmpty(outType))
+                {
+                    rop.outType = outType;
+                    DateTime dtnow = DateTime.Now;
+                    rop.nowMonth = dtnow.Month.ToString();
+                    rop.nowYear = dtnow.Year.ToString();
+                }
+                if (!string.IsNullOrEmpty(outTime))
+                {
+                    rop.outTime = outTime;
+                }
+                //導出方法
+                _recommendedExcleMgr = new RecommendedExcleMgr(connectionString);
+                //獲取XML裏面的Sheetname
+                string strXml = "../XML/ParameterSrc.xml";
+                _iParametersrcImplMgr = new ParameterMgr(Server.MapPath(strXml), ParaSourceType.XML);
+                List<Parametersrc> liparsrc = _iParametersrcImplMgr.QueryUsed(new Parametersrc { ParameterType = "RecommendedExcleSheetName" }).ToList();
+                //導出文件名稱
+                List<string> strPath = new List<string>();
+                List<string> strNewPath = new List<string>();
+                DateTime nowtime = DateTime.Now;
+                //導出EXCLE  分別導出6種
+                List<MemoryStream> msVipUser = _recommendedExcleMgr.GetVipUserInfo(rop, liparsrc[0].parameterName);
+                OutExcleForRecommendedByMs(msVipUser, liparsrc[0].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
+                List<MemoryStream> msProduct = _recommendedExcleMgr.GetProductInfo(rop, liparsrc[1].parameterName);
+                OutExcleForRecommendedByMs(msProduct, liparsrc[1].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
+                List<MemoryStream> msOrder = _recommendedExcleMgr.GetOrderInfo(rop, liparsrc[2].parameterName);
+                OutExcleForRecommendedByMs(msOrder, liparsrc[2].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
+                List<MemoryStream> msOrderDetail = _recommendedExcleMgr.GetOrderDetailInfo(rop, liparsrc[3].parameterName);
+                OutExcleForRecommendedByMs(msOrderDetail, liparsrc[3].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
+                List<MemoryStream> msCategory = _recommendedExcleMgr.GetCategoryInfo(rop, liparsrc[4].parameterName);
+                OutExcleForRecommendedByMs(msCategory, liparsrc[4].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
+                List<MemoryStream> msBrand = _recommendedExcleMgr.GetBrandInfo(rop, liparsrc[5].parameterName);
+                OutExcleForRecommendedByMs(msBrand, liparsrc[5].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
+                #region
+                //打包壓縮文件
+                string zipfifilename = "吉甲地推薦系統匯出.zip";
+                string strZipPath = Server.MapPath("../ImportUserIOExcel/" + zipfifilename + "");
+                string strZipTopDirectoryPath = Server.MapPath("../ImportUserIOExcel/");
+                int intZipLevel = 6;
+                string strPassword = "";
+                SharpZipLibHelp szlh = new SharpZipLibHelp();
+                szlh.Zip(strZipPath, strZipTopDirectoryPath, intZipLevel, strPassword, strPath);
+                //下載
+                downLoad(strZipPath, zipfifilename);
+                //下載完後刪除本次的緩存文件
+                DeleteFileByPath(strPath);
+                #endregion
+                return "{success:true}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                return "{success:false,data:'',msg:" + ex.Message + "}";
+            }
+        }
+        //導出Exlce
+        public void OutExcleForRecommendedByMs(List<MemoryStream> ms, string exclename, out  List<string> strPath, DateTime dtnow)
+        {
+            strPath = new List<string>();
+            for (int i = 0; i < ms.Count; i++)
+            {
+                string fileName = "吉甲地推薦系統" + exclename + "匯出" + dtnow.ToString("yyyyMMddHHmmss") + ".xls";
+                string serverPath = Server.MapPath("../ImportUserIOExcel/" + fileName);
+                FileStream fs = new FileStream(serverPath, FileMode.OpenOrCreate);
+                BinaryWriter w = new BinaryWriter(fs);
+                w.Write(ms[i].ToArray());
+                fs.Close();
+                ms[i].Close();
+                //上傳FTP
+                //UploadFTP(RecommendExcleLocalPath, serverPath, ftpuser, ftppwd);
+                //記錄本次導出文件
+                strPath.Add(serverPath);
+            }
+        }
+        //新增導出地址
+        public List<string> AddstrPath(List<string> strPath, List<string> strNewPath)
+        {
+            for (int i = 0; i < strNewPath.Count; i++)
+            {
+                strPath.Add(strNewPath[i]);
+            }
+            return strPath;
+        }
+        /// <summary>
+        /// 上傳FTP方法
+        /// </summary>
+        /// <param name="ftpServerIP">服务器ip</param>
+        /// <param name="filename">为本地文件的绝对路径</param>
+        /// <param name="ftpUserID">用戶名</param>
+        /// <param name="ftpPassword">密碼</param>
+        private void UploadFTP(string ftpServerIP, string filename, string ftpUserID, string ftpPassword)
+        {
+            FileInfo fileInf = new FileInfo(filename);
+            string uri = string.Format("{0}/{1}", ftpServerIP, fileInf.Name);
+            FtpWebRequest reqFTP;
+            // 根据uri创建FtpWebRequest对象 
+            reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(uri));
+            // ftp用户名和密码
+            reqFTP.Credentials = new NetworkCredential(ftpUserID, ftpPassword);
+            // 默认为true，连接不会被关闭
+            // 在一个命令之后被执行
+            reqFTP.KeepAlive = false;
+            // 指定执行什么命令
+            reqFTP.Method = WebRequestMethods.Ftp.UploadFile;
+            // 指定数据传输类型
+            reqFTP.UseBinary = true;
+            // 上传文件时通知服务器文件的大小
+            reqFTP.ContentLength = fileInf.Length;
+            // 缓冲大小设置为2kb
+            int buffLength = 2048;
+            byte[] buff = new byte[buffLength];
+            int contentLen;
+            // 打开一个文件流 (System.IO.FileStream) 去读上传的文件
+            FileStream fs = fileInf.OpenRead();
+            try
+            {
+                // 把上传的文件写入流
+                Stream strm = reqFTP.GetRequestStream();
+                // 每次读文件流的2kb
+                contentLen = fs.Read(buff, 0, buffLength);
+                // 流内容没有结束
+                while (contentLen != 0)
+                {
+                    // 把内容从file stream 写入 upload stream
+                    strm.Write(buff, 0, contentLen);
+                    contentLen = fs.Read(buff, 0, buffLength);
+                }
+                // 关闭两个流
+                strm.Close();
+                fs.Close();
+            }
+            catch (Exception ex)
+            {
+                // MessageBox.Show(ex.Message, "Upload Error");
+                Response.Write("Upload Error：" + ex.Message);
+            }
+        }
+        //文件下載方法
+        private void downLoad(string path, string filename)
+        {
+            FileInfo fi = new FileInfo(path);
+            if (fi.Exists)
+            {
+                Response.Clear();
+                Response.AddHeader("Content-Disposition", "attachment;filename=" + Server.UrlEncode(filename));
+                Response.AddHeader("Content-Length", fi.Length.ToString());
+                Response.ContentType = "application/octet-stream;charset=gb2321";
+                Response.WriteFile(fi.FullName);
+                Response.Flush();
+                Response.Close();
+            }
+        }
+        //刪除指定文件
+        public void DeleteFileByPath(List<string> strPath) 
+        {
+            foreach (string path in strPath)
+            {
+                FileInfo file = new FileInfo(path);//指定文件路径
+                if (file.Exists)//判断文件是否存在
+                {
+                    file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
+                    file.Delete();//删除文件
+                }
+            }
+        }
+        #endregion
     }
 }

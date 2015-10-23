@@ -60,6 +60,23 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductCommentMgr-->ProductCommentSave-->" + ex.Message, ex);
             }
         }
+        /// <summary>
+        /// 修改評價滿意度
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public int ProductCommentSatisfySave(ProductCommentQuery query)
+        {
+            try
+            {
+                return _proCommentDao.ProductCommentSatisfySave(query);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("ProductCommentMgr-->ProductCommentSatisfySave-->" + ex.Message, ex);
+            }
+        }
 
 
         public ProductCommentQuery GetUsetInfo(ProductCommentQuery store)
@@ -111,15 +128,16 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductCommentMgr.GetChangeLogList-->" + ex.Message, ex);
             }
         }
-        public Model.Custom.TableChangeLogCustom GetChangeLogDetailList(int pk_id, string create_time)
+        public Model.Custom.TableChangeLogCustom GetChangeLogDetailList(int pk_id,int comment_id_display, string create_time)
         {
             try
             {
-                DataTable _dt = _proCommentDao.GetChangeLogDetailList( pk_id, create_time);
+                DataTable _dt = _proCommentDao.GetChangeLogDetailList( pk_id,create_time);
                 Model.Custom.TableChangeLogCustom _model = new Model.Custom.TableChangeLogCustom();
                 if (_dt.Rows.Count > 0)
                 {
                     _model.pk_id = Convert.ToInt32(_dt.Rows[0]["pk_id"].ToString());
+                    _model.comment_id_display = comment_id_display;
                     _model.change_table = _dt.Rows[0]["change_table"].ToString();
                     List<Model.TableChangeLog> _list = new List<Model.TableChangeLog>();
                     foreach (DataRow item in _dt.Rows)
@@ -127,6 +145,7 @@ namespace BLL.gigade.Mgr
                         Model.TableChangeLog _log = new Model.TableChangeLog();
                         if (item["change_table"].ToString() == "comment_detail")
                         {
+                            _model.change_table_function = "評價回覆";
                             if (item["change_field"].ToString() == "answer_is_show")
                             {
                                 //item["old_value"]=item["old_value"].ToString() == "0" ? "否" : "是";                      
@@ -137,6 +156,10 @@ namespace BLL.gigade.Mgr
                                 if (item["old_value"].ToString() == "1")
                                 {
                                     item["old_value"] = "是";
+                                }
+                                if (item["old_value"].ToString() == "-1")
+                                {
+                                    item["old_value"] = "";
                                 }
                                 if (item["new_value"].ToString() == "0")
                                 {
@@ -174,6 +197,56 @@ namespace BLL.gigade.Mgr
                                 {
                                     item["new_value"] = "發送失敗";
                                 }
+                            }
+                        }
+                        else if (item["change_table"].ToString() == "comment_num")
+                        {
+                            _model.change_table_function = "商品評價";
+                            if (item["change_field"].ToString() == "logistics_deliver" || item["change_field"].ToString() == "web_server" || item["change_field"].ToString() == "seller_server" || item["change_field"].ToString() == "product_desc")
+                            {
+                                
+                                if (item["new_value"].ToString() == "1")
+                                {
+                                    item["new_value"] = "非常不滿意(1分)";
+                                }
+                                else if (item["new_value"].ToString() == "2")
+                                {
+                                    item["new_value"] = "不滿意(2分)";
+                                }
+                                else if (item["new_value"].ToString() == "3")
+                                {
+                                    item["new_value"] = "一般(3分)";
+                                }
+                                else if (item["new_value"].ToString() == "4")
+                                {
+                                    item["new_value"] = "滿意(4分)";
+                                }
+                                else if (item["new_value"].ToString() == "5")
+                                {
+                                    item["new_value"] = "非常滿意(5分)";
+                                }
+
+                                if (item["old_value"].ToString() == "1")
+                                {
+                                    item["old_value"] = "非常不滿意(1分)";
+                                }
+                                else if (item["old_value"].ToString() == "2")
+                                {
+                                    item["old_value"] = "不滿意(2分)";
+                                }
+                                else if (item["old_value"].ToString() == "3")
+                                {
+                                    item["old_value"] = "一般(3分)";
+                                }
+                                else if (item["old_value"].ToString() == "4")
+                                {
+                                    item["old_value"] = "滿意(4分)";
+                                }
+                                else if (item["old_value"].ToString() == "5")
+                                {
+                                    item["old_value"] = "非常滿意(5分)";
+                                }
+
                             }
                         }
                         _log.change_field = item["change_field"].ToString();
@@ -224,7 +297,7 @@ namespace BLL.gigade.Mgr
                     int pk_id = Convert.ToInt32(item["pk_id"]);
                     string create_time = Common.CommonFunction.DateTimeToString(Convert.ToDateTime(item["create_time"]));
 
-                    Model.Custom.TableChangeLogCustom tclc = GetChangeLogDetailList(pk_id, create_time);
+                    Model.Custom.TableChangeLogCustom tclc = GetChangeLogDetailList(pk_id,Convert.ToInt32(dr[0]), create_time);
                     dr[4] = tclc.tclModel[0].change_field.ToString();
                     dr[5] = tclc.tclModel[0].field_ch_name.ToString();
                     dr[6] = tclc.tclModel[0].old_value.ToString();

@@ -132,6 +132,15 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+        /// <summary>
+        /// 供應商銀行信息匯入
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult VendorBankImport()
+        {
+            return View();
+        }
+
         #endregion
 
         #region 供應商查詢
@@ -2635,7 +2644,7 @@ namespace Admin.gigade.Controllers
                     dr[42] = dr_v["contact_email_2"].ToString();
 
                     dr[43] = ContactTypeToStr(dr_v["contact_type_3"].ToString());
-                                        
+
                     dr[44] = dr_v["contact_name_3"].ToString();
                     dr[45] = dr_v["contact_phone_1_3"].ToString();
                     dr[46] = dr_v["contact_mobile_3"].ToString();
@@ -3436,7 +3445,7 @@ namespace Admin.gigade.Controllers
             try
             {
                 int totalCount = 0;
-                stores = _vendorMgr.VendorQueryAll(new Vendor());
+                stores = _vendorMgr.VendorQueryList(new Vendor());
                 json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(stores) + "}";//返回json數據
             }
             catch (Exception ex)
@@ -3536,28 +3545,28 @@ namespace Admin.gigade.Controllers
             int resultzip = 0;
             if (!string.IsNullOrEmpty(Request.Params["big_code"]))
             {
-               zip.bigcode = Request.Params["big_code"];
-               resultzip = 1;
-            }
-             if (!string.IsNullOrEmpty(Request.Params["c_midcode"]))
-            {
-                zip.middlecode=Request.Params["c_midcode"];
+                zip.bigcode = Request.Params["big_code"];
                 resultzip = 1;
             }
-             if (!string.IsNullOrEmpty(Request.Params["c_zipcode"]))
+            if (!string.IsNullOrEmpty(Request.Params["c_midcode"]))
             {
-                zip.zipcode =Request.Params["c_zipcode"];
+                zip.middlecode = Request.Params["c_midcode"];
                 resultzip = 1;
             }
-           
+            if (!string.IsNullOrEmpty(Request.Params["c_zipcode"]))
+            {
+                zip.zipcode = Request.Params["c_zipcode"];
+                resultzip = 1;
+            }
+
             string jsonStr = string.Empty;
             try
             {
                 zMgr = new ZipMgr(connectionString);
                 zipList = zMgr.GetZipList(zip);
-                if (zipList.Count > 0&& resultzip>0)
+                if (zipList.Count > 0 && resultzip > 0)
                 {
-                    jsonStr = "{success:true,msg:\"" + zipList[0].big +"  "+ zipList[0].middle +"  "+ zipList[0].zipcode + "/" + zipList[0].small.Trim() + "\"}";
+                    jsonStr = "{success:true,msg:\"" + zipList[0].big + "  " + zipList[0].middle + "  " + zipList[0].zipcode + "/" + zipList[0].small.Trim() + "\"}";
                 }
                 else
                 {
@@ -3929,10 +3938,10 @@ namespace Admin.gigade.Controllers
             {
                 if (!string.IsNullOrEmpty(Request.Params["vendor_id"]))
                 {
-                   
+
                     ven.vendor_id = Convert.ToUInt32(Request.QueryString["vendor_id"]);
                     ven = _vendorMgr.GetSingle(ven);
-                    
+
                 }
                 if (ContactType.Keys.Contains(ven.contact_type_1))
                 {
@@ -4022,30 +4031,30 @@ namespace Admin.gigade.Controllers
             list = paraMgr.GetElementType(types);
             string VendorTypeName = "";
 
-           
+
 
             string jsonStr = string.Empty;
             try
             {
-                    if (!string.IsNullOrEmpty(vendorType))
+                if (!string.IsNullOrEmpty(vendorType))
+                {
+                    string[] vendor_types = vendorType.Split(',');
+                    for (int i = 0; i < vendor_types.Length; i++)
                     {
-                        string[] vendor_types = vendorType.Split(',');
-                        for (int i = 0; i < vendor_types.Length; i++)
+                        for (int j = 0; j < list.Count; j++)
                         {
-                            for (int j = 0; j < list.Count; j++)
+                            if (list[j].ParameterCode == vendor_types[i].ToString())
                             {
-                                if (list[j].ParameterCode == vendor_types[i].ToString())
-                                {
-                                    VendorTypeName += list[j].parameterName + ",";
-                                }
+                                VendorTypeName += list[j].parameterName + ",";
                             }
-
                         }
-                        VendorTypeName = VendorTypeName.Substring(0, VendorTypeName.Length - 1);
+
                     }
+                    VendorTypeName = VendorTypeName.Substring(0, VendorTypeName.Length - 1);
+                }
 
                 jsonStr = "{success:true,msg:\"" + VendorTypeName + "\"}";
-               
+
             }
             catch (Exception ex)
             {
@@ -5147,7 +5156,7 @@ namespace Admin.gigade.Controllers
                 if (brandId != 0)
                 {
                     _vendorBrand = new VendorBrandMgr(connectionString);
-                    if (_vendorBrand.DelPromoPic(brandId,type) > 0)
+                    if (_vendorBrand.DelPromoPic(brandId, type) > 0)
                     {
                         json = "{success:true}";
                     }
@@ -5170,6 +5179,91 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+        #endregion
+
+        #region 供應商銀行信息管理
+        /// <summary>
+        /// 銀行信息匯入
+        /// </summary>
+        /// <returns></returns>
+        [CustomHandleError]
+        [HttpPost]
+        public HttpResponseBase ImportVendorBank()
+        {
+
+            string json = "{success:false}";
+            try
+            {
+                if (Request.Files["importFile"] != null && Request.Files["importFile"].ContentLength > 0)
+                {
+                    HttpPostedFileBase excelFile = Request.Files["importFile"];
+                    FileManagement fileManagement = new FileManagement();
+                    string i = excelFile.FileName;
+                    string newExcelName = Server.MapPath(excelPath_export) + "供應商銀行代碼" + fileManagement.NewFileName(excelFile.FileName);//處理文件名，獲取新的文件名
+                    string oldExcelName = excelFile.FileName.Split('\\').LastOrDefault();
+                    excelFile.SaveAs(newExcelName);//上傳文件
+                    DataTable dt = new DataTable();
+                    NPOI4ExcelHelper helper = new NPOI4ExcelHelper(newExcelName);
+                    dt = helper.SheetData();
+                    string s = dt.Rows[0][0].ToString();
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        _vendorMgr = new VendorMgr(connectionString);
+                        string result = _vendorMgr.ImportVendorBank(dt);
+                        if (result == "")
+                        {
+                            json = "{success:true,error:\"0\"}";
+                        }
+                        else
+                        {
+                            json = "{success:true,error:\"" + result + "\"}";
+                        }
+                    }
+                    FileInfo file = new FileInfo(newExcelName);
+                    file.Delete();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,error:\"" + BLL.gigade.Common.CommonFunction.MySqlException(ex) + "\"}";
+
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+
+        /// <summary>
+        /// 根據bankcode獲取bankname
+        /// </summary>
+        /// <returns></returns>
+        public JsonResult GetBankName()
+        {
+            try
+            {
+                string code = Request.Params["bankCode"].ToString();
+                _vendorMgr = new VendorMgr(connectionString);
+                return Json(new { success = "true", name = _vendorMgr.GetVendorBank(code) });
+
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                return Json(new { success = "false" });
+            }
+
+        }
+
         #endregion
     }
 }

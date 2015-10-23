@@ -43,8 +43,8 @@ namespace BLL.gigade.Dao.Impl
         string ReturnHistoryCon(VendorQuery model);
         string UpdateVendor(Vendor model);
         int GetOffGradeCount(string vendorId);
-        int UnGrade(string vendorId,string active);
+        int UnGrade(string vendorId, string active);
         List<Vendor> GetArrayDaysInfo(uint brand_id);
+      
     }
 }
- 

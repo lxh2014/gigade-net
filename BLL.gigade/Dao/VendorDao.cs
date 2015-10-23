@@ -233,7 +233,7 @@ namespace BLL.gigade.Dao
 
         #region 獲取所有供應商（用作下拉列表框）+List<Vendor> VendorQueryAll(Vendor query)
         /// <summary>
-        /// 獲取所有未失格的供應商（用作下拉列表框）
+        /// 獲取所有有效的供應商（用作下拉列表框）
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -251,7 +251,7 @@ namespace BLL.gigade.Dao
                 cost_percent,creditcard_1_percent,creditcard_3_percent,sales_limit,bonus_percent,agreement_createdate,agreement_start,agreement_end,checkout_type,
                 checkout_other,bank_code,bank_name,bank_number,bank_account,freight_low_limit,freight_low_money,freight_normal_limit,freight_normal_money,
                 freight_return_low_money,freight_return_normal_money,vendor_note,vendor_confirm_code,vendor_login_attempts,assist,dispatch,product_mode,
-                product_manage,gigade_bunus_percent,gigade_bunus_threshold,procurement_days,self_send_days,stuff_ware_days,dispatch_days,vendor_type,kuser,kdate FROM vendor WHERE vendor_status!=3 ");
+                product_manage,gigade_bunus_percent,gigade_bunus_threshold,procurement_days,self_send_days,stuff_ware_days,dispatch_days,vendor_type,kuser,kdate FROM vendor WHERE vendor_status = 1 ");
                 if (query.assist != 0)
                 {
                     sbSql.AppendFormat(" AND assist = 1 ");
@@ -273,7 +273,7 @@ namespace BLL.gigade.Dao
             StringBuilder sbSql = new StringBuilder();
             try
             {
-                sbSql.Append(@" SELECT vendor_id,vendor_name_full,vendor_name_simple FROM vendor WHERE vendor_status!=3 ");
+                sbSql.Append(@" SELECT vendor_id,vendor_name_full,vendor_name_simple FROM vendor WHERE vendor_status = 1 ");
                 if (query.assist != 0)
                 {
                     sbSql.AppendFormat(" AND assist = 1 ");
@@ -431,7 +431,7 @@ namespace BLL.gigade.Dao
                 sql.Append(mySqlCmd.CommandText);
                 i += mySqlCmd.ExecuteNonQuery();
                 #endregion
-               
+
                 #region 處理userhistory表
                 mySqlCmd.CommandText = _userhistoryDao.Save(model);
                 sql.Append(mySqlCmd.CommandText);
@@ -794,6 +794,8 @@ where p.off_grade<> 1 or p.product_status not in(6,99);", vendorId);
                 throw new Exception("vendorDao.GetArrayDaysInfo" + ex.Message, ex);
             }
         }
+
+
 
     }
 }

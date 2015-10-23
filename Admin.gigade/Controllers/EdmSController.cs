@@ -43,7 +43,7 @@ namespace Admin.gigade.Controllers
                 store = _edmlistmainMgr.GetConditionList();
                 item.elcm_id = 0;
                 item.elcm_name = "無";
-                store.Add(item);
+                //store.Add(item);
                 store.Insert(0, item);
               //  store.Insert(0,
                 json = "{success:true" + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented) + "}";

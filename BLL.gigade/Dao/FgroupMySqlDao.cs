@@ -23,7 +23,10 @@ namespace BLL.gigade.Dao
         public List<Fgroup> QueryAll()
         {
 
-            return _access.getDataTableForObj<Fgroup>("select a.rowid,groupname,groupcode,count(b.rowid) as callid,remark from t_fgroup a left join t_groupcaller b on a.rowid=b.groupid group by a.rowid,groupname,groupcode,remark");
+            return _access.getDataTableForObj<Fgroup>(@"select a.rowid,groupname,groupcode,count(b.rowid) as callid,remark from t_fgroup a 
+left join  (SELECT tg.rowid,tg.groupId FROM manage_user mu LEFT JOIN t_groupcaller tg on mu.user_email=tg.callid WHERE mu.user_status!=0 and mu.user_status!=2)as b 
+on a.rowid=b.groupid 
+group by a.rowid ,groupname,groupcode,remark;");
         }
 
         public List<Fgroup> Query(string callid, string groupCode)
@@ -33,7 +36,7 @@ namespace BLL.gigade.Dao
 
         public List<ManageUser> QueryCallid()
         {
-            return _access.getDataTableForObj<ManageUser>("select user_username as name,user_email as callid from manage_user where user_status = '1'");
+            return _access.getDataTableForObj<ManageUser>("select user_username as name,user_email as callid from manage_user where user_status != 0 and user_status !=2 ");
         }
 
         public int Save(Fgroup fg)
@@ -95,11 +98,29 @@ namespace BLL.gigade.Dao
 
         }
 
+        public DataTable GetFgroupLists()
+        {
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+                strSql.Append("select mu.user_id,mu.user_username from t_fgroup tfg  ");
+                strSql.Append(" LEFT JOIN t_groupcaller tg on  tfg.rowid=tg.groupid ");
+                strSql.Append(" left join manage_user mu on mu.user_email=tg.callid");
+                strSql.Append(" where groupCode='picking' ;");
+                return _access.getDataTable(strSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(" FgroupDao-->GetFgroupLists-->" + ex.Message + strSql.ToString(), ex);
+            }
+
+        }
+
         public DataTable GetUsersByGroupId(int groupid)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat(@"SELECT mu.user_username,mu.user_email,tf.groupName FROM t_fgroup tf LEFT JOIN t_groupcaller tg on tg.groupId=tf.rowid 
-LEFT JOIN manage_user mu on tg.callid=mu.user_email WHERE tf.rowid='{0}';", groupid);
+LEFT JOIN manage_user mu on tg.callid=mu.user_email WHERE  mu.user_status!=0 and mu.user_status !=2 and tf.rowid='{0}';", groupid);
             try
             {
                 return _access.getDataTable(sb.ToString());
@@ -160,5 +181,7 @@ WHERE tft.topValue =0 and tf.rowid='{0}' and tftg.groupId='{0}') as thistb LEFT 
                 throw new Exception(" FgroupDao-->GetSingle-->" + ex.Message + strSql.ToString(), ex);
             }
         }
+
+       
     }
 }

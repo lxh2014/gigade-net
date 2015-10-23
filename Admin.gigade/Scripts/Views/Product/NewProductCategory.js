@@ -1,9 +1,14 @@
-﻿var PRODUCT_ID = '', OLD_PRODUCT_ID = '';
+﻿/*  
+ * 
+ * 文件名称：NewProductCategory.js 
+ * 摘    要：單一商品與組合商品修改和新增 新類別頁面
+ * 
+ */
+var PRODUCT_ID = '', OLD_PRODUCT_ID = '';
 var oldresultStr = '';
 var re = /}{/g;
 
 var categoryNews = Ext.create('Ext.data.Store', {
-
     fields: ['ParameterCode', 'parameterName', 'ParameterProperty'],
     autoLoad: true,
     proxy: {
@@ -17,24 +22,22 @@ var categoryNews = Ext.create('Ext.data.Store', {
     }
 });
 
-
 //newtreeStore
 var newtreeStore = Ext.create('Ext.data.TreeStore', {
     proxy: {
         type: 'ajax',
-        url: '/Product/GetCatagory?categoryType=2&coboType='+coboType,
+        url: '/Product/GetCatagory?categoryType=2&coboType=' + coboType,
         getMethod: function () { return 'get'; },
         actionMethods: 'post'
     },
     root: {
-       // text: '新的類別分類',
+        // text: '新的類別分類',
         expanded: true,
         children: [
 
         ]
     }
 });
-
 
 var categoryPanel = Ext.create('Ext.form.Panel', {
     id: 'reportNewProduct',
@@ -114,16 +117,15 @@ newStageCategoryPanel = Ext.create('Ext.tree.Panel', {
 Ext.onReady(function () {
     PRODUCT_ID = window.parent.GetProductId();
     OLD_PRODUCT_ID = window.parent.GetCopyProductId();
-
     Ext.create('Ext.container.Viewport', {
         id: 'cateViewport',
         layout: 'vbox',
-        items: [categoryPanel,newStageCategoryPanel],
+        items: [categoryPanel, newStageCategoryPanel],
         renderTo: Ext.getBody(),
         autoScroll: true,
         listeners: {
             resize: function () {
-                Ext.getCmp('newStageCategoryPanel').setHeight(document.documentElement.clientHeight-97);
+                Ext.getCmp('newStageCategoryPanel').setHeight(document.documentElement.clientHeight - 97);
                 this.doLayout();
             },
             beforerender: function (view) {
@@ -131,7 +133,6 @@ Ext.onReady(function () {
             }
         }
     });
-
 
     function setChecked(node, checked) {
         node.expand();
@@ -144,21 +145,15 @@ Ext.onReady(function () {
     newStageCategoryPanel.on('checkchange', function (node, checked) {
         setChecked(node, checked);
     });
-
     newtreeStore.load({ params: { ProductId: PRODUCT_ID, OldProductId: OLD_PRODUCT_ID } });
 })
 
-
-
 function getdata() {
     var data = newStageCategoryPanel.getChecked();
-
     if (data.length == 0) {
         return "[]";
     }
-
     var resultStr = '';
-
     if (data.length > 0) {
         resultStr += "[";
         for (var i = 0, j = data.length; i < j; i++) {
@@ -171,22 +166,43 @@ function getdata() {
 }
 
 function save(functionid) {
+    //添加 遮罩層  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    var mask;
+    if (!mask) {
+        mask = new Ext.LoadMask(Ext.getBody(), { msg: '請稍等...' });
+    }
+    mask.show();
+    //添加disabled屬性  避免用戶多次點擊  edit by zhuoqin0830w  2015/09/24
+    window.parent.setMoveEnable(false);
+
     var obj = Ext.getCmp('reportNew');
     if (!obj.getValue()) {
         obj.markInvalid(INPUT_PLEASE);
         window.parent.setMoveEnable(true);
+        mask.hide();
         return false;
     }
-    var prodClassify= obj.getValue();
+    var prodClassify = obj.getValue();
     var currentCategoryId = obj.valueModels[0].data.ParameterProperty;
     var node = newStageCategoryPanel.getRootNode().findChild("id", currentCategoryId, true);
-    var firstCheckdNode = node.findChildBy(function (e) { return e.isLeaf()&&e.data.checked }, this, true);
+
+    //判斷 數據是否加載完成
+    if (!node) {
+        window.parent.setMoveEnable(true);
+        mask.hide();
+        return;
+    }
+
+    var firstCheckdNode = node.findChildBy(function (e) {
+        return e.isLeaf() && e.data.checked
+    }, this, true);
 
     if (!firstCheckdNode) {
         Ext.Msg.alert(NOTICE, PARALLELISM_PROD_CLASSIFY_MUST_CHECK_ONE_MESSAGE);
+        window.parent.setMoveEnable(true);
+        mask.hide();
         return;
     }
-    
 
     var resultStr = getdata();
     var asyncResult = true;
@@ -194,7 +210,7 @@ function save(functionid) {
     Ext.Ajax.request({
         url: '/Product/tempCategoryAdd?categoryType=2',
         method: 'POST',
-        async: false,
+        async: window.parent.GetProductId() == '' ? false : true,
         params: {
             'coboType': coboType,
             'ProductId': PRODUCT_ID,
@@ -207,6 +223,7 @@ function save(functionid) {
         },
         success: function (response, opts) {
             var resText = eval("(" + response.responseText + ")");
+            mask.hide();
             if (PRODUCT_ID != '') {
                 if (resText.success) {
                     Ext.Msg.alert(NOTICE, SAVE_SUCCESS);
@@ -217,19 +234,19 @@ function save(functionid) {
             } else {
                 if (!resText.success) {
                     Ext.Msg.alert(NOTICE, resText.msg ? resText.msg : SAVE_FAIL);
-                    window.parent.setMoveEnable(true);
                     asyncResult = false;
                 }
             }
-            if (resText.success)
+            window.parent.setMoveEnable(true);
+            if (resText.success) {
                 newStageCategoryPanel.doLayout();
+            }
         },
         failure: function (response, opts) {
             Ext.Msg.alert(NOTICE, SAVE_FAIL);
             window.parent.setMoveEnable(true);
             asyncResult = false;
         }
-
     });
     return asyncResult;
 }

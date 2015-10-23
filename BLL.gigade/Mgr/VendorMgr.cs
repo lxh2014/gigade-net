@@ -22,6 +22,9 @@ using BLL.gigade.Dao;
 using System.Data;
 using BLL.gigade.Model.Query;
 using System.Collections;
+using MySql.Data.MySqlClient;
+using System.Text.RegularExpressions;
+
 namespace BLL.gigade.Mgr
 {
     public class VendorMgr : IVendorImplMgr
@@ -213,14 +216,14 @@ namespace BLL.gigade.Mgr
                 if (list != null)
                 {
                     foreach (TableChangeLog t in list)
-                    { 
-                         TableChangeLogDao _logDao = new TableChangeLogDao(connStr);
-                         t.change_table = "vendor";                        
-                         t.create_time = model.created;
-                         t.create_user = (int)model.kuser_id;
-                         t.pk_id = (int)model.vendor_id;
-                         t.user_type = model.user_type;
-                         _list.Add(_logDao.insert(t));
+                    {
+                        TableChangeLogDao _logDao = new TableChangeLogDao(connStr);
+                        t.change_table = "vendor";
+                        t.create_time = model.created;
+                        t.create_user = (int)model.kuser_id;
+                        t.pk_id = (int)model.vendor_id;
+                        t.user_type = model.user_type;
+                        _list.Add(_logDao.insert(t));
                     }
                 }
                 #endregion
@@ -388,8 +391,129 @@ namespace BLL.gigade.Mgr
             }
             catch (Exception ex)
             {
-                throw new Exception("VendorMgr-->GetArrayDaysInfo"+ex.Message,ex);
+                throw new Exception("VendorMgr-->GetArrayDaysInfo" + ex.Message, ex);
             }
         }
+
+        #region 供應商銀行信息
+
+        public string ImportVendorBank(DataTable dt)
+        {
+            try
+            {
+                string result = "";
+                ArrayList _list = new ArrayList();
+                string user_email = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_email;
+                ParametersrcDao _paraDao = new ParametersrcDao(connStr);
+                string faCode = ""; int topValue = 0;
+                foreach (DataRow dr in dt.Rows)
+                {
+
+                    Regex reg = new Regex("^[0-9]{7}$");
+                    if (reg.IsMatch(dr[0].ToString()))
+                    {
+                        string sumCode = dr[0].ToString().Substring(0, 3);
+                        var blist = _paraDao.Query(new Parametersrc { ParameterType = "BankBranchName", ParameterCode = dr[0].ToString() });
+                        if (blist == null || blist.Count == 0)//不存在則保存總行數據
+                        {
+                            //查看總行是否已存在
+                            if (faCode != sumCode)
+                            {
+                                var alist = _paraDao.Query(new Parametersrc { ParameterType = "BankName", ParameterCode = sumCode });
+                                if (alist == null || alist.Count == 0)//不存在則保存總行數據
+                                {
+                                    Parametersrc para = new Parametersrc();
+                                    para.ParameterType = "BankName";
+                                    para.ParameterCode = sumCode;
+                                    para.parameterName = dr[1].ToString().Split('-')[0].ToString();
+                                    para.remark = para.parameterName;
+                                    para.Kdate = DateTime.Now;
+                                    para.Kuser = user_email;
+                                    para.Used = 1;
+                                    _list.Add(_paraDao.Save(para));
+
+                                }
+                                faCode = sumCode;
+                            }
+                        }
+                        else
+                        {
+                            result += dr[0].ToString() + "有重複匯入,";
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        result += dr[0].ToString() + ',';
+                    }
+                }
+
+                if (string.IsNullOrEmpty(result))//匯入數據無異常
+                {
+                    //執行保存總行信息的事務
+
+                    if (_mysqlDao.ExcuteSqlsThrowException(_list))
+                    {
+                        _list.Clear();
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            string sumCode = dr[0].ToString().Substring(0, 3);
+                            //查看總行是否已存在
+                            if (faCode != sumCode)
+                            {
+                                topValue = _paraDao.Query(new Parametersrc { ParameterCode = sumCode, ParameterType = "BankName" }).FirstOrDefault().Rowid;
+                                faCode = sumCode;
+                            }
+                            Parametersrc paraBranch = new Parametersrc();
+                            paraBranch.ParameterType = "BankBranchName";
+                            paraBranch.ParameterCode = dr[0].ToString();
+                            paraBranch.parameterName = dr[1].ToString().Split('-')[1].ToString();
+                            paraBranch.remark = dr[1].ToString();
+                            paraBranch.Kdate = DateTime.Now;
+                            paraBranch.Kuser = user_email;
+                            paraBranch.Used = 1;
+                            paraBranch.TopValue = topValue.ToString();
+                            _list.Add(_paraDao.Save(paraBranch));
+
+                        }
+                        _mysqlDao.ExcuteSqlsThrowException(_list);
+                    }
+
+                }
+
+                return result.TrimEnd(',');
+
+            }
+            catch (MySqlException ex)
+            {
+                throw new Exception(ex.Number.ToString() + ":VendorMgr-->ImportVendorBank-->" + ex.Message, ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("VendorMgr-->ImportVendorBank" + ex.Message, ex);
+            }
+        }
+
+        public string GetVendorBank(string code)
+        {
+            try
+            {
+                ParametersrcDao paraDao = new ParametersrcDao(connStr);
+                List<Parametersrc> list = paraDao.Query(new Parametersrc { ParameterCode = code, ParameterType = "BankBranchName" });
+                if (list != null && list.Count > 0)
+                {
+                    return list[0].remark;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("VendorMgr-->GetVendorBank" + ex.Message, ex);
+            }
+        }
+        #endregion
     }
 }

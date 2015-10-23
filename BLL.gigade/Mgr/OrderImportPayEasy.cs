@@ -15,7 +15,7 @@ using BLL.gigade.Dao;
 
 namespace BLL.gigade.Mgr
 {
-    public class OrderImportPayEasy: IOrderImport
+    public class OrderImportPayEasy : IOrderImport
     {
         private OrderImportMgr orderImportMgr;
         private ChannelMgr channelMgr;
@@ -30,7 +30,7 @@ namespace BLL.gigade.Mgr
         /// 構造函數
         /// </summary>
         public OrderImportPayEasy()
-        {         
+        {
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace BLL.gigade.Mgr
         /// </summary>
         /// <param name="filePath">文件路徑</param>
         /// <returns>記錄Exel文件內容的List集合</returns>
-        public List<OrdersImport> ReadExcel2Page(string filePath, string template, string model_in) 
+        public List<OrdersImport> ReadExcel2Page(string filePath, string template, string model_in)
         {
             try
             {
@@ -48,24 +48,27 @@ namespace BLL.gigade.Mgr
                 }
                 orderImportMgr = new OrderImportMgr(MySqlConnStr, CurChannel.channel_id);
 
-                var tmp = orderImportMgr.ReadExcelWatch<OrdersImport>(filePath, template, model_in);
+                //添加 排除條件  排除 空的 廠商編號 和 空的 訂單編號
+                var tmp = orderImportMgr.ReadExcelMatch<OrdersImport>(filePath, template, model_in).Where(o => o.dmtshxuid != "" && o.chlitpdno != "").ToList();
+
                 if (tmp.Count() > 0)
                 {
-                    tmp.ForEach(m =>
+                    tmp.Where(w => w.dmtshxuid != "" && w.chlitpdno != "").ToList().ForEach(m =>
                     {
                         //edit by wangwei0216w 2014/8/15 暫時設置訂購人與收購人是同一個人,默認宅配方式
                         m.ordpesnm = m.agpesnm;
                         m.shipco = "宅配";
 
-                        ///移除訂單編號為空的記錄  edit by xinglu0624w 
-                        if (string.IsNullOrEmpty(m.chlitpdno) || string.IsNullOrEmpty(m.dmtshxuid))
-                        {
-                            tmp.Remove(m);
-                        }
+                        ////移除訂單編號為空的記錄  edit by xinglu0624w 
+                        //if (string.IsNullOrEmpty(m.chlitpdno) || string.IsNullOrEmpty(m.dmtshxuid))
+                        //{
+                        //    order.Remove(m);
+                        //}
                     });
-                } 
-     
+                }
+
                 var orderGroup = from g in tmp group g by g.dmtshxuid; // 訂單分組
+
                 #region 訂單分組
                 foreach (var group in orderGroup)
                 {
@@ -80,12 +83,14 @@ namespace BLL.gigade.Mgr
                         orders.Remove(o);
                         tmp.Remove(o);
                     }
-                    else {
+                    else
+                    {
                         //單一商品需要計算sumup   //Int32.Parse(p.qty) *   sumup 表示在excel文檔中的總價  購買數量 乘以 單價
                         orders.ForEach(p => Excel_Price_Sum += Int32.Parse(p.sumup)); // edit by zhuoqin0830w  2015/07/23
                     }
 
                     ValidateOrders(orders);
+
                     #region 數據分析
                     foreach (var item in orders)
                     {
@@ -171,7 +176,6 @@ namespace BLL.gigade.Mgr
                 }
                 #endregion
 
-
                 return tmp;
             }
             catch (Exception ex)
@@ -209,7 +213,7 @@ namespace BLL.gigade.Mgr
         /// <param name="chkRecord"></param>
         /// <param name="totalCount"></param>
         /// <returns></returns>
-        public int Import2DB(List<OrdersImport> all, string pdfFile, string importType, string chkRecord,int siteId, ref int totalCount)
+        public int Import2DB(List<OrdersImport> all, string pdfFile, string importType, string chkRecord, int siteId, ref int totalCount)
         {
             orderImportMgr = new OrderImportMgr(MySqlConnStr, CurChannel.channel_id);
             int successCount = 0;

@@ -164,7 +164,7 @@ var taxStore = Ext.create('Ext.data.Store', {
 //申請類型Store
 var ApplyTypeStore = Ext.create('Ext.data.Store', {
     fields: ["name", "code"],
-    data: [{ name: VALUE_ALL, code: '-1' }, { name: PRODUCT_NEW, code: '0' }, { name: PRODUCT_DOWN, code: '6' }]
+    data: [{ name: VALUE_ALL, code: '-1' }, { name: PRODUCT_NEW, code: '0' }, { name: PRODUCT_DOWN, code: '6' }, { name: STOCK_RESON, code: '7' }]
 });
 
 var r_all = { name: DATE_ALL, code: '' },
@@ -352,7 +352,17 @@ var type = {
                     Ext.getCmp("combination").setValue(ComboStore.data.items[0].data.parameterCode);
                 }
             });
-        }
+        },
+            select: function (val)
+            {
+                if (Ext.getCmp('combination').getValue() == 1)//add by dongya 2015/10/22
+                {
+                    Ext.getCmp('outofstock_time_days').show();
+                }
+                else {
+                    Ext.getCmp('outofstock_time_days').hide();
+                }
+            }
     }
 };
 
@@ -398,6 +408,8 @@ var product_type = {
     emptyText: SELECT,
     fieldLabel: PRODUCT_TYPES
 }
+
+
 
 var type_status = {
     xtype: 'fieldcontainer',
@@ -551,7 +563,8 @@ var start_end = {
         editable: false,
         vtype: 'daterange',
         startDateField: 'time_start'
-    }]
+    }
+    ]
 };
 
 var key_query = {
@@ -707,9 +720,11 @@ var m_prod_classify = { name: 'Prod_Classify', type: 'int' };
 //添加是否失格  add  by zhuoqin0830w 2015/06/30
 var off_grade = { name: 'off_grade', type: 'int' };
 //添加預購商品 guodong1130w 2015/9/16添加
-var m_purchase_in_advance = { name: 'purchase_in_advance',type:'int' }
-
-
+var m_purchase_in_advance = { name: 'purchase_in_advance', type: 'int' }
+//add by dongya   2015/10/16
+var m_outofstock_days_stopselling = { name: 'outofstock_days_stopselling', type: 'int' }
+//add by dongya   2015/10/22
+var m_outofstock_create_time = { name: 'outofstock_create_time', type: 'int' }
 /*******************GRID COLUMNS***********************/
 var c_pro_base = [
     { header: PRODUCT_IMAGE, colName: 'product_image', hidden: true, xtype: 'templatecolumn', tpl: '<div style="width:50px;height:50px"><img width="50px" height="50px" src="{product_image}" /><div>', width: 60, align: 'center', sortable: false, menuDisabled: true },
@@ -783,6 +798,28 @@ var c_pro_mode = {
 var c_pro_tax = {
     header: TAX_TYPE, colName: 'tax_type', hidden: true, dataIndex: 'tax_type', width: 60, align: 'center',
     renderer: function (val) { switch (val) { case '1': return TAX_NEED; case '3': return TAX_NO } }, sortable: false, menuDisabled: true
+};
+//缺货下架天数
+var c_pro_days = {
+    header: STOCK_DAYS, colName: 'outofstock_days_stopselling', hidden: true, dataIndex: 'outofstock_days_stopselling', width: 80, align: 'center', sortable: false, menuDisabled: true, renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+        if (record.data.combination == SILGLE_PROD) {//表示如果為單一商品
+            return value;
+        }
+        else {
+            return "";
+        }
+    }
+};
+//缺貨日期
+var c_pro_date = {
+    header: "缺貨時間", colName: 'outofstock_create_time', hidden: true, dataIndex: 'outofstock_create_time', width: 80, align: 'center', sortable: false, menuDisabled: true, renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+        if (record.data.combination == SILGLE_PROD) {//表示如果為單一商品
+            return value == '0' ? '' : Ext.Date.format(new Date(value * 1000), 'Y/m/d <br/> H:i:s');
+        }
+        else {
+            return "";
+        }
+    }
 };
 //排序
 var c_pro_sort = {
