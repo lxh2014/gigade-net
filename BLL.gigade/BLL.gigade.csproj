@@ -271,6 +271,7 @@
     <Compile Include="Dao\PromoShareConditionDao.cs" />
     <Compile Include="Dao\PromoShareConditionTypeDao.cs" />
     <Compile Include="Dao\PromoShareMasterDao.cs" />
+    <Compile Include="Dao\PromotionBannerDao.cs" />
     <Compile Include="Dao\RecommendedExcleDao.cs" />
     <Compile Include="Dao\RecommendedProductAttributeDao.cs" />
     <Compile Include="Dao\ScheduleDao.cs" />
@@ -811,6 +812,7 @@
     <Compile Include="Mgr\PromoShareConditionMgr.cs" />
     <Compile Include="Mgr\PromoShareConditionTypeMgr.cs" />
     <Compile Include="Mgr\PromoShareMasterMgr.cs" />
+    <Compile Include="Mgr\PromotionBannerMgr.cs" />
     <Compile Include="Mgr\RecommendedExcleMgr.cs" />
     <Compile Include="Mgr\RecommendedProductAttributeMgr.cs" />
     <Compile Include="Mgr\ScheduleItemMgr.cs" />
@@ -1314,6 +1316,8 @@
     <Compile Include="Model\EdmTest.cs" />
     <Compile Include="Model\EdmSubscription.cs" />
     <Compile Include="Model\EdmTemplate.cs" />
+    <Compile Include="Model\EdmTrace.cs" />
+    <Compile Include="Model\EdmTraceEmail.cs" />
     <Compile Include="Model\ElementMap.cs" />
     <Compile Include="Model\EmailBlockList.cs" />
     <Compile Include="Model\EmailBlockLog.cs" />
@@ -1369,6 +1373,7 @@
     <Compile Include="Model\PromoShareCondition.cs" />
     <Compile Include="Model\PromoShareConditionType.cs" />
     <Compile Include="Model\PromoShareMaster.cs" />
+    <Compile Include="Model\PromotionBanner.cs" />
     <Compile Include="Model\Query\BannerNewsContentQuery.cs" />
     <Compile Include="Model\Query\AppcategoryQuery.cs" />
     <Compile Include="Model\Query\AppmessageQuery.cs" />
@@ -1431,6 +1436,7 @@
     <Compile Include="Model\Query\PromoShareConditionQuery.cs" />
     <Compile Include="Model\Query\PromoShareConditionTypeQuery.cs" />
     <Compile Include="Model\Query\PromoShareMasterQuery.cs" />
+    <Compile Include="Model\Query\PromotionBannerQuery.cs" />
     <Compile Include="Model\Query\ScheduleConfigQuery.cs" />
     <Compile Include="Model\Query\ScheduleQuery.cs" />
     <Compile Include="Model\OrderAccumAmount.cs" />

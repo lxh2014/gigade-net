@@ -112,6 +112,10 @@ namespace BLL.gigade
         {
             throw new NotImplementedException();
         }
+        public List<Model.Parametersrc> GetKindTypeByStatus(string types)
+        {
+            throw new NotImplementedException();
+        }
 
         public bool Save(List<Parametersrc> saveList)
         {
