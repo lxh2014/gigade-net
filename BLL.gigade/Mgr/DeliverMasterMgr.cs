@@ -926,5 +926,17 @@ namespace BLL.gigade.Mgr
                 throw new Exception("DeliverMasterMgr-->GetDeliverMasterCount-->" + ex.Message, ex);
             }
         }
+        public DataTable GetDeliverMaster(string hourNum)
+        {
+            try
+            {
+                return _ideliver.GetDeliverMaster(hourNum);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("DeliverMasterMgr-->GetDeliverMaster-->" + ex.Message, ex);
+            }
+        }
+
     }
 }

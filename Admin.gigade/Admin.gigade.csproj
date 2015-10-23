@@ -238,6 +238,7 @@
     <Compile Include="Controllers\ReportManagementController.cs" />
     <Compile Include="Controllers\ScheduleServiceController.cs" />
     <Compile Include="Controllers\ScheduleParamerController.cs" />
+    <Compile Include="Controllers\ScheduleServiceWorkerController.cs" />
     <Compile Include="Controllers\SecretInfoController.cs" />
     <Compile Include="Controllers\SendProductController.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
