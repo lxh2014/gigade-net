@@ -1902,6 +1902,9 @@
     <Content Include="Scripts\Views\MemberEvent\MemberLevelWin.js" />
     <Content Include="Scripts\Views\Member\GroupUserAdd.js" />
     <Content Include="Scripts\Views\Member\ShippingVoucher.js" />
+    <Content Include="Scripts\Views\EventPromo\EventPromoImageEdit.js" />
+    <Content Include="Scripts\Views\EventPromo\EventPromoImageList.js" />
+    <Content Include="Scripts\Views\EventPromo\EventPromoImageRelation.js" />
     <Content Include="Scripts\Views\OrderManage\Logistics.js" />
     <Content Include="Scripts\Views\OrderManage\OrderDetailManage.js" />
     <Content Include="Scripts\Views\OrderManage\OrderReturn.js" />
@@ -4399,6 +4402,7 @@
     <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
     <Content Include="Views\ScheduleService\Index.cshtml" />
     <Content Include="Views\Vendor\VendorDetails.cshtml" />
+    <Content Include="Views\EventPromo\EventPromoImageList.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4613,7 +4617,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>50877</DevelopmentServerPort>
+          <DevelopmentServerPort>2224</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
