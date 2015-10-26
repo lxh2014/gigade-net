@@ -74,6 +74,7 @@ namespace BLL.gigade.Model.Query
          //add by guodong1130w 2015/09/16 預購商品篩選
         public int purchase_in_advance { get; set; }
 
+        public int outofstock_days_stopselling { get; set; }
         public QueryVerifyCondition()
         {
             product_name = string.Empty;
@@ -110,6 +111,8 @@ namespace BLL.gigade.Model.Query
             off_grade = 0;
             //add by guodong1130w 2015/09/16 預購商品篩選
             purchase_in_advance = 0;
+            //add by dongya 2015/10/22 缺貨下架天數
+            outofstock_days_stopselling = 0;
         }
     }
 }

@@ -1,0 +1,65 @@
+﻿@*@model  IEnumerable<Bootstrap.Models.Student>*@
+@*@model   IEnumerable<Bootstrap.Models.Student>*@
+@{
+   //ViewBag.Title="Index";@ViewData["id"]
+}
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes " />
+    <!--<script src="Scripts/jquery-2.1.4.js"></script>
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="Scripts/bootstrap.min.js"></script>-->
+    <script src="../../Scripts/jquery-2.1.4.min.js"></script>
+
+<link href="../../Scripts/Bootstrap/bootstrap.min.css" rel="stylesheet" />
+<script src="../../Scripts/Bootstrap/bootstrap.min.js"></script>
+   
+    <title></title>
+</head>
+<div class="container">
+    <h1>112 </h1>
+    <h3>Products</h3>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>
+                    Product Name
+                </th>
+                <th>
+                    Unit Price
+                </th>
+                <th>
+                    Units In Stock
+                </th>
+                <th>
+                    Discontinued
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @*@foreach (var item in Model)
+            {
+                //var item = Model;
+                var type = "active";
+                <tr class="@type">
+                    <td>
+                        @Html.DisplayFor(modelitem => item.ProductName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelitem => item.UnitPrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelitem => item.UnitsInStock)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelitem => item.Discontinued)
+                    </td>
+                </tr>
+            }*@
+            
+            
+        </tbody>
+    </table>
+
+</div>

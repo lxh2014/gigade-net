@@ -378,7 +378,7 @@ Ext.onReady(function () {
                 listeners: {
                     select: function (a, b, c) {
                         var e_time = Ext.getCmp("e_time");
-                        if (b > e_time.getValue()) {
+                        if (b > e_time.getValue() && e_time.getValue() != null) {
                             Ext.getCmp("e_time").setValue("");
                             Ext.Msg.alert(PROMPT, EXPECT_TIME_IS_ERROR);
                         }

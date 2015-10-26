@@ -112,6 +112,7 @@ function search() {
 
     //判斷選擇的查詢條件是否是品牌
     if (condition == 3) {
+        brand.allowBlank = false;
         if (!comb.isValid() || !brand.isValid()) {
             return;
         }
@@ -395,6 +396,8 @@ Ext.onReady(function () {
                     select: function (combo, records) {
                         var brand = Ext.getCmp('brand_id');
                         var condition = Ext.getCmp('condition');
+                        brand.setValue("");
+                        condition.setValue("");
                         if (records[0].data.conditionId == 3) {
                             brand.show();
                             condition.hide();
@@ -449,6 +452,7 @@ Ext.onReady(function () {
                 iconCls: 'ui-icon ui-icon-reset',
                 listeners: {
                     click: function () {
+                        particularsStore.removeAll();
                         Ext.getCmp("brand_id").setValue("").allowBlank = false;
                         Ext.getCmp("condition").setValue("");
                     }

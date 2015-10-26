@@ -40,7 +40,8 @@ namespace BLL.gigade.Dao.Impl
         /// <returns></returns>
 
         int SaveUserPhone(UserQuery u);
-        List<Model.Query.UserVipListQuery> GetVipList(Model.Query.UserVipListQuery uvlq, ref int totalCount);
+        string GetViplistUserId(Model.Query.UserVipListQuery uvlq);
+        List<Model.Query.UserVipListQuery> GetVipList(Model.Query.UserVipListQuery uvlq, string userIdString, ref int totalCount);
 
         #region 獲取normal，low，ct，ht
         //UserVipListQuery GetNormalProd(UserVipListQuery uvlq);
@@ -53,7 +54,7 @@ namespace BLL.gigade.Dao.Impl
         List<Users> GetUserInfoByTest(string condition); //add by wangwei0216w 2014/10/28
         string UpdateFirstTime(uint user_id);
         List<UserQuery> GetBonusList(UserQuery query, out int totalCount);//add by shuangshuang0420j 2015.1.26 購物金資訊
-        List<Model.Query.UserVipListQuery> ExportVipListCsv(UserVipListQuery query);
+        //List<Model.Query.UserVipListQuery> ExportVipListCsv(UserVipListQuery query,string userIdString);
 
         List<UserQuery> Query(Model.Custom.Users query);
         List<Users> GetUser(Users u);

@@ -1427,44 +1427,8 @@ namespace Admin.gigade.Controllers
                     file.SaveAs(newFileName);
                     DataTable _dt = CsvHelper.ReadCsvToDataTable_CN(newFileName, true);
                     _edmGroup = new EdmGroupMgr(mySqlConnectionString);
-                     json = _edmGroup.Import(_dt, query);
+                    json = _edmGroup.Import(_dt, query);
                 }
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:false}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
-
-        public HttpResponseBase DownTemplate()
-        {
-            string json = string.Empty;
-            try
-            {
-                string fileName = "名單管理匯入模板"+DateTime.Now.ToString("yyyyMMdd_HHmmss") + "." + "csv";
-                string newFileName = Server.MapPath(excelPath_export + fileName);
-                string[] colName = { "電子信箱", "訂閱狀態", "姓名" };
-
-                DataTable _newdt = new DataTable();
-                _newdt.Columns.Add("電子信箱", typeof(string));
-                _newdt.Columns.Add("訂閱狀態", typeof(string));
-                _newdt.Columns.Add("姓名", typeof(string));
-                DataRow dr = _newdt.NewRow();
-                dr["電子信箱"] = "example@gimg.tw";
-                dr["訂閱狀態"] = "1";
-                dr["姓名"] = "example";
-                _newdt.Rows.Add(dr);
-                 
-                CsvHelper.ExportDataTableToCsv(_newdt, newFileName, colName, true);
-                json = "{success:true,fileName:\'" + fileName + "\'}";
             }
             catch (Exception ex)
             {
