@@ -25,6 +25,7 @@ namespace BLL.gigade.Model.Query
         public DateTime eventstatrtime { get; set; }
         public DateTime eventendtime { get; set; }
         public uint creator { get; set; }
+        public uint vendorstatus { get; set; }
 
         public VendorBrandSetQuery()
         {
@@ -35,6 +36,7 @@ namespace BLL.gigade.Model.Query
             eventstatrtime = DateTime.MinValue;
             eventendtime = DateTime.MinValue;
             creator = 0;
+            vendorstatus = 0;
         }
     }
 }
