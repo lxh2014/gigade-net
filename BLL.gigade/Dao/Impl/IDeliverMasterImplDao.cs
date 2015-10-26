@@ -26,7 +26,7 @@ namespace BLL.gigade.Dao.Impl
        DataTable GetDeliveryMsgList(DeliverMasterQuery deliver, out int totalCount);
        DataTable GetDeliveryMsgExcelList(DeliverMasterQuery deliver);
        DataTable GetVnndorId(string name);
-
+       DataTable GetDeliverMaster(string hourNum);
        int GetDeliverMasterCount(DeliverMasterQuery deliver);
     }
 }

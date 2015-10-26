@@ -49,5 +49,6 @@ namespace BLL.gigade.Dao.Impl
         DataTable GetTP(Parametersrc p);
         string Getmail(string p);
         List<Parametersrc> ReturnParametersrcList();
+        List<Parametersrc> GetKindTypeByStatus(string types);
     }
 }

@@ -109,6 +109,7 @@ Ext.onReady(function () {
                                         var result = Ext.decode(form.responseText);
                                         if (result.success) {
                                             Ext.getCmp('doc_no').setValue(result.msg);
+                                            Ext.getCmp('KT_no').setValue(result.msg);
                                         }
                                     }
                                 });
@@ -328,6 +329,33 @@ Ext.onReady(function () {
                     }
                 ]
             },
+             {
+                 xtype: 'fieldcontainer',
+                 combineErrors: true,
+                 layout: 'hbox',
+                 items: [
+                     {
+                         xtype: 'textfield',
+                         fieldLabel: '庫調單號',
+                         width: 255,
+                         id: 'KT_no',
+                         colName: 'KT_no',
+                         submitValue: false,
+                         regex: /^[K][0-9]{14}$/,
+                         name: 'KT_no'
+                     },
+                    {
+                        xtype: 'displayfield',
+                        width: 48
+                    },
+                    {
+                        xtype: 'button',
+                        icon: '../../../Content/img/icons/excel.gif',
+                        text: "打印庫調單",
+                        handler: PrintKT
+                    }
+                 ]
+             },
             {
                 xtype: 'fieldcontainer',
                 combineErrors: true,
@@ -362,6 +390,7 @@ Ext.onReady(function () {
                                 Ext.getCmp('po_id').setValue("");
                                 KucunTiaozhengStore.removeAll();
                                 Ext.getCmp("KucunTiaozhengGrid").down('#add_new_message').setDisabled(true);
+                                Ext.getCmp('KT_no').setValue(Ext.getCmp('doc_no').getValue());
                             }
                         }
                     }
@@ -638,6 +667,28 @@ Query = function () {
            
         //});
        
+    }
+}
+
+PrintKT = function ()
+{
+    var KtNO = Ext.getCmp('KT_no');
+
+    if (KtNO.getValue().trim().length == 0) {
+        Ext.Msg.alert("提示", "請輸入庫調單號");
+    }
+    else if (!KtNO.isValid())
+    {
+        Ext.Msg.alert("提示", "庫調單號格式錯誤!");
+    }
+    else
+    {
+        Ext.MessageBox.confirm("提示", "該單號是否庫調完成？", function (btn) {
+            if (btn == "yes") {
+                window.open("/WareHouse/KTPrintPDF?KT_NO=" + KtNO.getValue());
+                window.location.reload();
+            }
+        })
     }
 }
 //加

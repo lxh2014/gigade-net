@@ -14,6 +14,9 @@ using Admin.gigade.CustomError;
 using System.Collections;
 using BLL.gigade.Model.Custom;
 using BLL.gigade.Dao;
+using BLL.gigade.Common;
+using System.Configuration;
+using System.IO;
 
 namespace Admin.gigade.Controllers
 {
@@ -32,6 +35,26 @@ namespace Admin.gigade.Controllers
         private EventPromoAdditionalPriceMgr epapMgr;
         private EventPromoAdditionalPriceProductMgr epappMgr;
         private EventPromoAdditionalPriceGroupMgr epapgMgr;
+        private PromotionBannerMgr _promotionBannerMgr;
+
+        static string excelPath_export = ConfigurationManager.AppSettings["ImportUserIOExcel"];//關於導入的excel文件的限制
+
+        static string excelPath = ConfigurationManager.AppSettings["ImportCompareExcel"];//關於導入的excel文件的限制
+        private InvoiceMasterRecordMgr _imrMgr;
+
+        string vendorPath = ConfigurationManager.AppSettings["vendorPath"];
+        string vendorOriginalPath = "/brand_story/a/";
+        //string vendor400Path = "/brand_story/400x400/";   //在前台如果各种尺寸的图档没有的时候，前台会自动产生！！！
+        string brandPath = "/brand_master/a/";
+        string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];//圖片的限制條件，格式，最大、小值
+        string ftpuser = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.ftpuser);//ftp用戶名
+        string ftppwd = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.ftppwd);//ftp密碼
+        string imgLocalPath = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.local);//ftp地址
+        string imgServerPath = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server);//"http://192.168.71.159:8080"
+        string specPath = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.vendorPath);//圖片保存路徑
+        private string imgLocalServerPath = ConfigurationManager.AppSettings["imgLocalServerPath"];//aimg.gigade100.com 
+        string defaultImg = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server) + "/product/nopic_50.jpg";
+        BLL.gigade.Common.HashEncrypt hash = new BLL.gigade.Common.HashEncrypt();   //用於添密
         #region 視圖
         public ActionResult UserCondition()
         {
@@ -69,6 +92,12 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+
+        public ActionResult EventPromoImageList()
+        {
+            return View();
+        }
+
         #endregion
 
         #region 會員條件設定
@@ -361,7 +390,7 @@ namespace Admin.gigade.Controllers
                     pid = Convert.ToInt32(Request.Params["product_id"]);
                 }
                 string prodName = string.Empty;
-                if(pid!=0)
+                if (pid != 0)
                 {
                     prodName = _prodMgr.GetNameForID(pid, 0, 0, 1);
                 }
@@ -1144,7 +1173,502 @@ namespace Admin.gigade.Controllers
 
         }
         #endregion
-    
+
+        #endregion
+
+        #region 促銷圖片
+        public HttpResponseBase AllowMultiOrNot()
+        {
+            string json = string.Empty;
+            PromotionBannerQuery query = new PromotionBannerQuery();
+            _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
+            try
+            {
+                int id = 0;               
+                if (!string.IsNullOrEmpty(Request.Params["change"]))
+                {
+                    if (Request.Params["change"] == "true")
+                    {
+                        query.changeMode = 1;
+                    }
+                }
+                int result = _promotionBannerMgr.AllowMultiOrNot(query, out id);
+                if (id == 0)
+                {
+                    json = "{success:true,msg:\"" + result + "\"}";
+                }
+                else
+                {
+                    if (query.changeMode == 0)
+                    {
+                        json = "{success:true,msg:\"" + result + "\"}";
+                    }
+                    else
+                    {
+                        json = "{success:false,msg:\"" + result + "\",id:\"" + id + "\"}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+
+
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+
+        public HttpResponseBase GetPromotionBannerList()
+        {
+            string json = string.Empty;
+            int totalCount = 0;
+            PromotionBannerQuery query = new PromotionBannerQuery();
+            List<PromotionBannerQuery> store = new List<PromotionBannerQuery>();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["dateCon"]))
+                {
+                    query.dateCon = Convert.ToInt32(Request.Params["dateCon"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_start"]))
+                {
+                    query.date_start =Convert.ToDateTime( Request.Params["date_start"]);
+                    query.date_start = Convert.ToDateTime(query.date_start.ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_end"]))
+                {
+                    query.date_end =Convert.ToDateTime( Request.Params["date_end"]);
+                    query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["activeStatus"]))
+                {
+                    query.pb_status = Convert.ToInt32(Request.Params["activeStatus"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["showStatus"]))
+                {
+                    query.showStatus = Convert.ToInt32(Request.Params["showStatus"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["brand_name"]))
+                {
+                    query.brand_name = Request.Params["brand_name"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["brand_id"]))
+                {
+                    query.brand_id = Request.Params["brand_id"];
+                }
+                _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
+                store = _promotionBannerMgr.GetPromotionBannerList(query, out totalCount);
+                foreach (var item in store)
+                {
+                    if (!string.IsNullOrEmpty(item.pb_image))
+                    {
+                        string folder5 = item.pb_image.Substring(0, 2) + "/"; //圖片名前兩碼
+                        string folder6 = item.pb_image.Substring(2, 2) + "/"; //圖片名第三四碼
+                        item.pb_image = imgServerPath + brandPath + folder5 + folder6 + item.pb_image;
+                    }
+                    else
+                    {
+                        item.pb_image = defaultImg;
+                    }
+                }
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
+            }
+
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+
+
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+        public JsonResult UpdateStatus()
+        {
+            string json = string.Empty;
+            int brand_id;
+            PromotionBannerQuery query = new PromotionBannerQuery();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["id"]))
+                {
+                    query.pb_id = Convert.ToInt32(Request.Params["id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["status"]))
+                {
+                    query.pb_status = Convert.ToInt32(Request.Params["status"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["multi"]))
+                {
+                    query.multi =  Convert.ToInt32(Request.Params["multi"]);
+                }
+                query.pb_muser = Convert.ToInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id);
+                _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
+                int i = _promotionBannerMgr.UpdateStatus(query,out brand_id);
+                if (i > 0)
+                {
+                    return Json(new { success = "true", error = "" });
+                }
+                else if (i == -1)
+                {
+                    return Json(new { success = "false", error = "-1" }); //促銷圖片已過期，不可修改
+                }
+                else if (i == -2)
+                {
+                    return Json(new { success = "false", error = "-2", id = brand_id }); //品牌編號已存在促銷圖，不可重複添加
+                }
+                else
+                {
+                    return Json(new { success = "false", error = "0" });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                return Json(new { success = "false", msg = "" });
+            }
+        }
+        public HttpResponseBase AddorEdit()
+        {
+            string json = string.Empty;
+            string errorInfo = string.Empty;
+            int brand_id = 0;
+            try
+            {
+                _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
+                int i = 0;
+                PromotionBannerQuery query = new PromotionBannerQuery();
+                PromotionBannerQuery oldquery = new PromotionBannerQuery();
+                if (!string.IsNullOrEmpty(Request.Params["pb_id"]))
+                {
+                    oldquery = _promotionBannerMgr.GetModelById(Convert.ToInt32(Request.Params["pb_id"]));
+                    query.pb_image = oldquery.pb_image;
+                }            
+                #region 上傳圖片
+                string path = Server.MapPath(xmlPath);
+                SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+                SiteConfig extention_config = _siteConfigMgr.GetConfigByName("PIC_Extention_Format");
+                SiteConfig minValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MinValue");
+                SiteConfig maxValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MaxValue");
+                SiteConfig admin_userName = _siteConfigMgr.GetConfigByName("ADMIN_USERNAME");
+                SiteConfig admin_passwd = _siteConfigMgr.GetConfigByName("ADMIN_PASSWD");
+                //擴展名、最小值、最大值
+                string extention = extention_config.Value == "" ? extention_config.DefaultValue : extention_config.Value;
+                string minValue = minValue_config.Value == "" ? minValue_config.DefaultValue : minValue_config.Value;
+                string maxValue = maxValue_config.Value == "" ? maxValue_config.DefaultValue : maxValue_config.Value;
+                string localPromoPath = imgLocalPath + brandPath;//圖片存儲地址
+                FileManagement fileLoad = new FileManagement();
+                for (int j = 0; j < Request.Files.Count; j++)
+                {
+                    string fileName = string.Empty;//當前文件名
+                    HttpPostedFileBase file = Request.Files[j];
+                    fileName = Path.GetFileName(file.FileName);
+                    if (string.IsNullOrEmpty(fileName))
+                    {
+                        continue;
+                    }
+
+                    fileLoad = new FileManagement();
+                    string oldFileName = string.Empty;  //舊文件名
+                    string fileExtention = string.Empty;//當前文件的擴展名
+                    bool result = false;
+                    string NewFileName = string.Empty;
+                    string ServerPath = string.Empty;
+                    string newRand = string.Empty;
+                    string ErrorMsg = string.Empty;
+
+                    newRand = hash.Md5Encrypt(fileLoad.NewFileName(fileName) + DateTime.Now.ToString(), "32");
+                    fileExtention = fileName.Substring(fileName.LastIndexOf(".")).ToLower();
+                    NewFileName = newRand + fileExtention;
+
+                    string folder1 = NewFileName.Substring(0, 2) + "/"; //圖片名前兩碼
+                    string folder2 = NewFileName.Substring(2, 2) + "/"; //圖片名第三四碼
+
+                    FTP f_cf = new FTP();
+                    localPromoPath = imgLocalPath + brandPath + folder1 + folder2;  //圖片存儲地址
+                    string s = localPromoPath.Substring(0, localPromoPath.Length - (brandPath + folder1 + folder2).Length + 1);
+                    f_cf.MakeMultiDirectory(s, (brandPath + folder1 + folder2).Substring(1, (brandPath + folder1 + folder2).Length - 2).Split('/'), ftpuser, ftppwd);
+                    ServerPath = Server.MapPath(imgLocalServerPath + brandPath + folder1 + folder2);
+                    fileName = NewFileName;
+                    NewFileName = localPromoPath + NewFileName;//絕對路徑
+                    Resource.CoreMessage = new CoreResource("Product");//尋找product.resx中的資源文件
+
+                    //上傳
+                    result = fileLoad.UpLoadFile(file, ServerPath, NewFileName, extention, int.Parse(maxValue), int.Parse(minValue), ref ErrorMsg, ftpuser, ftppwd);
+                    if (result)//上傳成功
+                    {
+                        query.pb_image = fileName;
+                    }
+                    else
+                    {
+                        errorInfo += "第" + (i + 1) + "張" + ErrorMsg + "</br>";
+                    }
+                }
+                #endregion               
+                if (!string.IsNullOrEmpty(Request.Params["image_link"]))
+                {
+                    query.pb_image_link = Request.Params["image_link"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["begin_time"]))
+                {
+                    query.pb_startdate = Convert.ToDateTime(Request.Params["begin_time"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["end_time"]))
+                {
+                    query.pb_enddate = Convert.ToDateTime(Request.Params["end_time"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["vb_ids"]))
+                {
+                    query.brand_id = Request.Params["vb_ids"].Substring(0,Request.Params["vb_ids"].LastIndexOf(','));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["multi"]))
+                {
+                    query.multi = Convert.ToInt32(Request.Params["multi"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["pb_id"]))
+                {
+                    //編輯
+                    query.pb_id = Convert.ToInt32(Request.Params["pb_id"]);
+                    query.pb_muser = Convert.ToInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id);
+                    int result = _promotionBannerMgr.UpdateImageInfo(query, out brand_id);
+                    if (result > 0)
+                    {
+                        json = "{success:true}";
+                    }
+                    else if (result == -1)
+                    {
+                        json = "{success:false,msg:\"" + brand_id + "\"}";//brand_id重複
+                    }
+                    else
+                    {
+                        json = "{success:false}";
+                    }
+                }
+                else
+                {
+                    //新增
+                    query.pb_kuser = Convert.ToInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id);
+                    query.pb_muser = Convert.ToInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id);
+                    i = _promotionBannerMgr.AddImageInfo(query, out brand_id);
+                    if (i > 0)
+                    {
+                        json = "{success:true}";
+                    }
+                    else if (i == -1)
+                    {
+                        json = "{success:false,msg:\""+ brand_id +"\"}";//brand_id重複
+                    }
+                    else
+                    {
+                        json = "{success:false}";
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+
+
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+        public HttpResponseBase GetRelationList()
+        {
+            string json = string.Empty;
+            PromotionBannerQuery query = new PromotionBannerQuery();
+            List<VendorBrand> store = new List<VendorBrand>();
+            try
+            {
+                _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
+                if (!string.IsNullOrEmpty(Request.Params["pb_id"]))
+                {
+                    query.pb_id = Convert.ToInt32(Request.Params["pb_id"]);
+                }
+                store = _promotionBannerMgr.GetBrandList(query);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
+            }
+
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+
+
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+        public HttpResponseBase DeleteImage()
+        {
+            string json = string.Empty;
+            _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
+            PromotionBannerQuery query = new PromotionBannerQuery();            
+             try
+             {
+                 if (!string.IsNullOrEmpty(Request.Params["ids"]))
+                 {
+                     foreach (string item in Request.Params["ids"].Split('|'))
+                     {
+                         if (!string.IsNullOrEmpty(item))
+                         {
+                             query.pb_id = Convert.ToInt32(item);
+                             int result = _promotionBannerMgr.DeleteImage(query);
+                             if (result > 0)
+                             {                               
+                                 continue;
+                             }
+                             else {
+                                 json = "{success:false}";
+                                 break;
+                             }
+                         }
+                     }
+                     json = "{success:true}";
+                 }
+                 else
+                 {
+                     json = "{success:false}";
+                 }
+             }
+             catch (Exception ex)
+             {
+                 Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                 log.Error(logMessage);
+                 json = "{success:false}";
+             }
+
+
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }     
+        public HttpResponseBase IsModifiable()
+        {
+            string json = string.Empty;
+            _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
+            PromotionBannerQuery query = new PromotionBannerQuery();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["pb_id"]))
+                {
+                    query.pb_id = Convert.ToInt32(Request.Params["pb_id"]);
+                }
+                bool i = _promotionBannerMgr.IsModifiable(query);
+                if (i)
+                {
+                    json = "{success:true}";
+                }
+                else
+                {
+                    json = "{success:false,msg:\"-1\"}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+        public HttpResponseBase GetBrandName()
+        {
+            string json = string.Empty;
+            _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
+            PromotionBannerQuery query = new PromotionBannerQuery();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["brand_id"]))
+                {
+                    query.singleBrand_id = Convert.ToInt32(Request.Params["brand_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["startdate"]))
+                {
+                    query.date_start = Convert.ToDateTime(Request.Params["startdate"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["enddate"]))
+                {
+                    query.date_end = Convert.ToDateTime(Request.Params["enddate"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["multi"]))
+                {
+                    query.multi = Convert.ToInt32(Request.Params["multi"]);
+                }
+                if (query.singleBrand_id == 0)
+                {
+                    json = "{success:false,msg:\"-1\"}";
+                }
+                else
+                {
+                    string name = _promotionBannerMgr.GetBrandName(query);
+                    if (name == "-1")
+                    {
+                        json = "{success:false,msg:\"-1\"}";
+                    }
+                    else if (name == "-2")
+                    {
+                        json = "{success:false,msg:\"-2\"}";
+                    }
+                    else
+                    {
+                        json = "{success:true,msg:\""+ name +" \"}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }
         #endregion
 
     }
