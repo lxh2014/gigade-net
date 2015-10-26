@@ -47,7 +47,7 @@ namespace BLL.gigade.Model
         public DateTime Story_Createdate { get; set; }
         public int Story_Update { get; set; }//品牌故事創建者
         public DateTime Story_Updatedate { get; set; }
-
+        public string short_description { get; set; }
         public VendorBrand()
         {
             Brand_Id = 0;
@@ -77,6 +77,7 @@ namespace BLL.gigade.Model
             Story_Createdate = DateTime.MinValue;
             Story_Update = 0;
             Story_Updatedate = DateTime.MinValue;
+            short_description = string.Empty;
         }
     }
 }

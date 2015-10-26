@@ -5615,14 +5615,16 @@ namespace Admin.gigade.Controllers
                         query.upc_id = id;
                     }
                 }
-                DateTime time;
-                if (DateTime.TryParse(Request.Params["time_start"], out time))
+
+                if (!string.IsNullOrEmpty(Request.Params["start_time"]) && Request.Params["start_time"] != "1970-01-01")//
                 {
-                    query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                    query.starttime = DateTime.Parse(DateTime.Parse(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
                 }
-                if (DateTime.TryParse(Request.Params["time_end"], out time))
+
+                if (!string.IsNullOrEmpty(Request.Params["end_time"]) && Request.Params["end_time"] != "1970-01-01")
                 {
-                    query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                    query.endtime = DateTime.Parse(DateTime.Parse(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+
                 }
                 query.IsPage = false;
                 _istockMgr = new IstockChangeMgr(mySqlConnectionString);
@@ -7588,6 +7590,402 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+
+        public void KTPrintPDF()
+        {
+            PdfHelper pdf = new PdfHelper();
+            List<string> pdfList = new List<string>();
+            float[] arrColWidth = new float[] { 60, 60, 100, 60, 50, 30, 60, 60, 60, 60, 60 };
+            int index = 0;
+            string newFileName = string.Empty;
+            string newName = string.Empty;
+            string json = string.Empty;
+            IialgQuery q = new IialgQuery();
+            if (!string.IsNullOrEmpty(Request.Params["KT_NO"].Trim().ToUpper()))//by zhaozhi0623j add 20151006
+            {
+                q.doc_no = Request.Params["KT_NO"].Trim().ToUpper();
+            }
+            try
+            {
+                List<IialgQuery> store = new List<IialgQuery>();
+                _iagMgr = new IialgMgr(mySqlConnectionString);
+                int totalCount = 0;
+                q.IsPage = false;
+                store = _iagMgr.GetIialgList(q, out totalCount);
+                int rid = 0;
+                DataTable _dtBody = new DataTable();
+               
+                if (store.Count > 0)
+                {
+                    _dtBody.Columns.Add("商品細項編號", typeof(string));
+                    _dtBody.Columns.Add("主料位", typeof(string));
+                    _dtBody.Columns.Add("商品名稱", typeof(string));
+                    _dtBody.Columns.Add("規格", typeof(string));
+                    _dtBody.Columns.Add("調整原因", typeof(string));
+                    _dtBody.Columns.Add("數量", typeof(string));
+                    _dtBody.Columns.Add("调整料位", typeof(string));
+                    _dtBody.Columns.Add("原有效日期", typeof(string));
+                    _dtBody.Columns.Add("有效日期", typeof(string));
+                    _dtBody.Columns.Add("前置單號", typeof(string));
+                    _dtBody.Columns.Add("備註", typeof(string));
+                    for (int i = 0; i < store.Count;i++ )
+                    {
+                        store[i].id = rid++;
+                        store[i].qty = store[i].qty_o + store[i].adj_qty;
+                        DataRow newRow = _dtBody.NewRow();
+                        newRow["商品細項編號"] = store[i].item_id;
+                        newRow["主料位"] = store[i].loc_id;
+                        newRow["商品名稱"] = store[i].product_name;
+                        newRow["規格"] = string.IsNullOrEmpty(store[i].prod_sz) ? " " : store[i].prod_sz;
+                        newRow["調整原因"] = string.IsNullOrEmpty(store[i].iarc_id) ? " " : store[i].iarc_id;
+                        newRow["數量"] = store[i].adj_qty;
+                        newRow["调整料位"] = store[i].loc_R;
+                        newRow["原有效日期"] = store[i].cde_dt.ToString("yyyy-MM-dd").Substring(0, 10) == "0001-01-01" ? " " : store[i].cde_dt.ToString().Substring(0, 10);
+                        newRow["有效日期"] = store[i].c_cde_dt.ToString("yyyy-MM-dd").Substring(0, 10) == "0001-01-01" ? " " : store[i].c_cde_dt.ToString().Substring(0, 10);
+                        newRow["前置單號"] =string.IsNullOrEmpty( store[i].po_id)?" ":store[i].po_id;
+                        newRow["備註"] = string.IsNullOrEmpty(store[i].remarks) ? " " : store[i].remarks;
+
+                        _dtBody.Rows.Add(newRow);
+                    }
+                }
+                string UsingName = " ";
+                String UsingTime = " ";
+                if (store.Count > 0)
+                {
+                    UsingName = store[0].name;
+                    UsingTime = store[0].create_dtim.ToString("yyyy/MM/dd");
+                }
+                BaseFont bf = BaseFont.CreateFont("C:\\WINDOWS\\Fonts\\simsun.ttc,1", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                iTextSharp.text.Font fontChinese = new iTextSharp.text.Font(bf, 8, iTextSharp.text.Font.UNDERLINE, iTextSharp.text.BaseColor.RED);
+                iTextSharp.text.Font font = new iTextSharp.text.Font(bf, 12, iTextSharp.text.Font.BOLD, new iTextSharp.text.BaseColor(0, 0, 0));//黑  
+                string filename = "庫存調整" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                Document document = new Document(PageSize.A4.Rotate());
+                string newPDFName = Server.MapPath(excelPath) + filename;
+                PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(newPDFName, FileMode.Create));
+                document.Open();
+
+                #region 庫存調整單頭
+
+                PdfPTable ptable = new PdfPTable(11);
+
+
+                ptable.WidthPercentage = 100;//表格寬度
+                ptable.SetTotalWidth(arrColWidth);
+                PdfPCell cell = new PdfPCell();
+
+                cell = new PdfPCell(new Phrase("執行人員:" + UsingName, new iTextSharp.text.Font(bf,10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.Colspan = 3;
+                cell.DisableBorderSide(1);
+                cell.DisableBorderSide(2);
+                cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 10)));
+                cell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
+                cell.Colspan = 8;
+                cell.DisableBorderSide(1);
+                cell.DisableBorderSide(2);
+                cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+
+                cell = new PdfPCell(new Phrase("執行日期:" + UsingTime, new iTextSharp.text.Font(bf,10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.Colspan = 3;
+                cell.DisableBorderSide(1);
+                cell.DisableBorderSide(2);
+                cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 10)));
+                cell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
+                cell.Colspan = 8;
+                cell.DisableBorderSide(1);
+                cell.DisableBorderSide(2);
+                cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+
+                cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 4)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.Colspan = 11;
+                //cell.DisableBorderSide(1);
+                cell.DisableBorderSide(2);
+                //cell.DisableBorderSide(4);
+                //cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 15)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.Colspan = 3;
+                cell.DisableBorderSide(1);
+                cell.DisableBorderSide(2);
+                //cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("  庫存調整單", new iTextSharp.text.Font(bf, 15)));
+                cell.VerticalAlignment = Element.ALIGN_CENTER;//字體水平居左
+                cell.Colspan = 8;
+                cell.DisableBorderSide(1);
+                cell.DisableBorderSide(2);
+                cell.DisableBorderSide(4);
+               // cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+
+                cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.Colspan = 3;
+                cell.DisableBorderSide(1);
+                cell.DisableBorderSide(2);
+               // cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("單號" + ":" + q.doc_no, new iTextSharp.text.Font(bf, 10)));// ipoStore[a].po_type_desc
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.Colspan = 8;
+                cell.DisableBorderSide(1);
+                cell.DisableBorderSide(2);
+                cell.DisableBorderSide(4);
+               // cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 4)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.Colspan = 11;
+                cell.DisableBorderSide(1);
+                //cell.DisableBorderSide(2);
+               // cell.DisableBorderSide(4);
+                //cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+
+                cell = new PdfPCell(new Phrase("商品細項編號", new iTextSharp.text.Font(bf, 10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+              
+                //cell.DisableBorderSide(1);
+               // cell.DisableBorderSide(2);
+                //cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("主料位", new iTextSharp.text.Font(bf, 10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+
+                //cell.DisableBorderSide(1);
+               // cell.DisableBorderSide(2);
+                //cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("商品名稱", new iTextSharp.text.Font(bf, 10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+
+                //cell.DisableBorderSide(1);
+               // cell.DisableBorderSide(2);
+                //cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("規格", new iTextSharp.text.Font(bf, 10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+
+                //cell.DisableBorderSide(1);
+               // cell.DisableBorderSide(2);
+                //cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("調整原因", new iTextSharp.text.Font(bf, 10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+
+                //cell.DisableBorderSide(1);
+               // cell.DisableBorderSide(2);
+                //cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("數量", new iTextSharp.text.Font(bf,10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+
+                //cell.DisableBorderSide(1);
+                //cell.DisableBorderSide(2);
+                //cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("调整料位", new iTextSharp.text.Font(bf, 10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+
+                //cell.DisableBorderSide(1);
+               // cell.DisableBorderSide(2);
+                //cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("原有效日期", new iTextSharp.text.Font(bf, 10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+
+                //cell.DisableBorderSide(1);
+               // cell.DisableBorderSide(2);
+                //cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("有效日期", new iTextSharp.text.Font(bf, 10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+
+                //cell.DisableBorderSide(1);
+               // cell.DisableBorderSide(2);
+                //cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("前置單號", new iTextSharp.text.Font(bf, 10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+
+                //cell.DisableBorderSide(1);
+               // cell.DisableBorderSide(2);
+                //cell.DisableBorderSide(4);
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("備註", new iTextSharp.text.Font(bf, 10)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+
+                //cell.DisableBorderSide(1);
+               // cell.DisableBorderSide(2);
+                //cell.DisableBorderSide(4);
+                //cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+
+                //cell.UseAscender = true;
+                //cell.HorizontalAlignment = Element.ALIGN_CENTER;//字體垂直居中
+                //cell.VerticalAlignment = Element.ALIGN_MIDDLE;//字體水平居中
+                //cell.BorderWidth = 0.1f;
+                //cell.BorderColor = new BaseColor(0, 0, 0);
+
+                #endregion
+
+                  #region 庫存調整單尾
+
+                PdfPTable ptablefoot = new PdfPTable(11);
+
+
+                    ptablefoot.WidthPercentage = 100;//表格寬度
+                    ptablefoot.SetTotalWidth(arrColWidth);
+                    PdfPCell footcell = new PdfPCell();
+                    footcell.UseAscender = true;
+                    footcell.HorizontalAlignment = Element.ALIGN_CENTER;//字體垂直居中
+                    footcell.VerticalAlignment = Element.ALIGN_MIDDLE;//字體水平居中
+                    footcell.BorderWidth = 0.1f;
+                    footcell.BorderColor = new BaseColor(0, 0, 0);
+                    footcell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf,15)));
+                    footcell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                    //footcell.HorizontalAlignment = Element.ALIGN_LEFT;//水平居右
+                    footcell.Colspan = 11;
+                    footcell.DisableBorderSide(1);
+                    footcell.DisableBorderSide(2);
+                    footcell.DisableBorderSide(4);
+                    footcell.DisableBorderSide(8);
+                    ptablefoot.AddCell(footcell);
+                   
+
+                    footcell = new PdfPCell(new Phrase("印表日期:" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), new iTextSharp.text.Font(bf, 10)));
+                    footcell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居右
+                   // footcell.HorizontalAlignment = Element.ALIGN_LEFT;//水平居右
+                    footcell.Colspan = 3;
+                    footcell.DisableBorderSide(1);
+                    footcell.DisableBorderSide(2);
+                    footcell.DisableBorderSide(4);
+                    footcell.DisableBorderSide(8);
+                    ptablefoot.AddCell(footcell);
+                    footcell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 10)));
+                    footcell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居右
+                    // footcell.HorizontalAlignment = Element.ALIGN_LEFT;//水平居右
+                    footcell.Colspan = 1;
+                    footcell.DisableBorderSide(1);
+                    footcell.DisableBorderSide(2);
+                    footcell.DisableBorderSide(4);
+                    footcell.DisableBorderSide(8);
+                    ptablefoot.AddCell(footcell);
+                    
+                    footcell = new PdfPCell(new Phrase("印表人:" + (System.Web.HttpContext.Current.Session["caller"] as Caller).user_username, new iTextSharp.text.Font(bf, 10)));
+                    footcell.VerticalAlignment = Element.ALIGN_RIGHT;//水平居右
+                    footcell.Colspan = 2;
+                    footcell.DisableBorderSide(1);
+                    footcell.DisableBorderSide(2);
+                    footcell.DisableBorderSide(4);
+                    footcell.DisableBorderSide(8);
+                    ptablefoot.AddCell(footcell);
+                    footcell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 10)));
+                    footcell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居右
+                    // footcell.HorizontalAlignment = Element.ALIGN_LEFT;//水平居右
+                    footcell.Colspan = 3;
+                    footcell.DisableBorderSide(1);
+                    footcell.DisableBorderSide(2);
+                    footcell.DisableBorderSide(4);
+                    footcell.DisableBorderSide(8);
+                    ptablefoot.AddCell(footcell);
+                
+                    footcell = new PdfPCell(new Phrase("主管簽核:__________________", new iTextSharp.text.Font(bf, 10)));
+                    footcell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
+                    footcell.Colspan = 2;
+                    footcell.DisableBorderSide(1);
+                    footcell.DisableBorderSide(2);
+                    footcell.DisableBorderSide(4);
+                    footcell.DisableBorderSide(8);
+                    ptablefoot.AddCell(footcell);
+                  
+                   
+                #endregion
+                if (store.Count == 0)
+                {
+                    document = new Document(PageSize.A4.Rotate());
+                    if (!document.IsOpen())
+                    {
+                        document.Open();
+                    }
+                    cell = new PdfPCell(new Phrase(" ", font));
+                    cell.Colspan = 4;
+                    cell.VerticalAlignment = Element.ALIGN_CENTER;//字體水平居左
+                    cell.DisableBorderSide(8);
+                    ptable.AddCell(cell);
+
+                    cell = new PdfPCell(new Phrase("此庫調單庫調數據不存在!", font));
+                    cell.Colspan = 7;
+                    cell.DisableBorderSide(4);
+                    cell.VerticalAlignment = Element.ALIGN_CENTER;//字體水平居左
+                    ptable.AddCell(cell);
+
+                   
+                   // document.Add(ptable);
+                    //document.Add(ptablefoot); 
+                    newFileName = newPDFName + "_part" + index++ + "." + "pdf";
+                    pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 11, uint.Parse(store.Count.ToString()));/*第一7是列，第二個是行*/
+                    pdfList.Add(newFileName);
+                   
+                }
+                else 
+                {
+                    newFileName = newPDFName + "_part" + index++ + "." + "pdf";
+
+                    pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 11, uint.Parse(store.Count.ToString()));/*第一7是列，第二個是行*/
+                    pdfList.Add(newFileName);
+                    
+                }
+
+
+                //newFileName = newPDFName + "_part" + index++ + "." + "pdf";
+                //pdf.ExportDataTableToPDF(newFileName, ptable, "", "");
+                //pdfList.Add(newFileName);
+
+                //document.Add(ptable);
+                //document.NewPage();
+                newFileName = newPDFName + "." + "pdf";
+                pdf.MergePDF(pdfList, newFileName);
+
+                Response.Clear();
+                Response.Charset = "gb2312";
+                Response.ContentEncoding = System.Text.Encoding.UTF8;
+                Response.AddHeader("Content-Disposition", "attach-ment;filename=" + filename + ".pdf");
+                Response.WriteFile(newFileName);
+
+            }
+             catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
         #endregion
         #region 獲取庫調編號
         public HttpResponseBase Getkutiaonumber()
@@ -7622,8 +8020,7 @@ namespace Admin.gigade.Controllers
             {
                 List<Parametersrc> store = new List<Parametersrc>();
                 _psrcMgr = new ParameterMgr(mySqlConnectionString);
-                store = _psrcMgr.GetAllKindType(types);
-
+                store = _psrcMgr.GetKindTypeByStatus(types);
                 json = "{success:true,'msg':'user',data:" + JsonConvert.SerializeObject(store) + "}";//返回json數據
             }
             catch (Exception ex)
@@ -11071,7 +11468,7 @@ namespace Admin.gigade.Controllers
                         ////////
                         newFileName = newPDFName + "_part" + index++ + "." + "pdf";
 
-                        pdf.ExportDataTableToPDF(Ipod_dt, false, newFileName, arrColWidth, ptable, "", "", 7, 7);
+                        pdf.ExportDataTableToPDF(Ipod_dt, false, newFileName, arrColWidth, ptable, "", "", 7, 7);/*第一7是列，第二個是行*/
                         pdfList.Add(newFileName);
 
                     }

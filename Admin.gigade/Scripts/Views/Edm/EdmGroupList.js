@@ -9,7 +9,7 @@ Ext.define('gigade.EdmGroup', {
         { name: "s_group_createdate", type: "string" },
         { name: "s_group_updatedate", type: "string" },
         { name: "total_content", type: "int" },
-        
+
     ]
 });
 var EdmGroupStore = Ext.create('Ext.data.Store', {
@@ -38,8 +38,8 @@ EdmGroupStore.on('beforeload', function () {
 var EdmSearchStore = Ext.create('Ext.data.Store', {
     fields: ["txt", "value"],
     data: [
-    {"txt":"群組編號","value":"0"},
-    {"txt": "群組名稱", "value": "1" },
+    { "txt": "群組編號", "value": "0" },
+    { "txt": "群組名稱", "value": "1" },
     ]
 });
 var dateStore = Ext.create('Ext.data.Store', {
@@ -130,7 +130,7 @@ Ext.onReady(function () {
                         store: dateStore,
                     },
                     {
-                        xtype: 'datetimefield',                        
+                        xtype: 'datetimefield',
                         id: 'start',
                         name: 'start',
                         margin: '0 5 0 5',
@@ -203,7 +203,7 @@ Ext.onReady(function () {
                         handler: function () {
                             Ext.getCmp('selectType').reset();
                             Ext.getCmp('search_con').reset();
-                            Ext.getCmp('start').reset();                            
+                            Ext.getCmp('start').reset();
                             Ext.getCmp('end').reset();
                             Ext.getCmp('dateType').reset();
                         }
@@ -224,7 +224,7 @@ Ext.onReady(function () {
             { header: "群組編號", dataIndex: 'group_id', width: 150, align: 'center' },
             { header: "群組名稱", dataIndex: 'group_name', width: 150, align: 'center' },
             {
-                header: "名單數", dataIndex: 'group_total_email', width: 120, align: 'center', id: 'security_group_total_email',hidden:true,
+                header: "名單數", dataIndex: 'group_total_email', width: 120, align: 'center', id: 'security_group_total_email', hidden: true,
                 xtype: 'templatecolumn', tpl: EditTpl
             },
              { header: "電子報數", dataIndex: 'total_content', width: 120, align: 'center' },
@@ -270,7 +270,7 @@ Ext.onReady(function () {
     });
     Ext.create('Ext.container.Viewport', {
         layout: 'vbox',
-        items: [frm,EdmGroup],
+        items: [frm, EdmGroup],
         renderTo: Ext.getBody(),
         autoScroll: true,
         listeners: {
@@ -281,7 +281,7 @@ Ext.onReady(function () {
         }
     });
     ToolAuthority();
-   // MailGroupStore.load({ params: { start: 0, limit: 25 } });
+    // MailGroupStore.load({ params: { start: 0, limit: 25 } });
 });
 
 //*********新增********//
@@ -311,7 +311,7 @@ onRemoveClick = function (group_id) {
     else {
         Ext.Msg.confirm("確認信息", Ext.String.format("刪除選中 {0} 條數據？", row.length), function (btn) {
             if (btn == 'yes') {
-                var rowIDs =group_id+ '|';
+                var rowIDs = group_id + '|';
                 //for (var i = 0; i < row.length; i++) {
                 //    rowIDs += row[i].data.group_id + '|';
                 //}
@@ -348,28 +348,29 @@ Import = function () {
     ImportFunction(row[0], EdmGroupStore);
 }
 function Export(group_id) {
-    Ext.MessageBox.show({
-        msg: '正在匯出，請稍後....',
-        width: 300,
-        wait: true
-    });
-    Ext.Ajax.request({
-        url: "/Edm/Export",
-        timeout: 900000,
-        params: {
-            group_id: group_id
-        },
-        success: function (form, action) {
-            Ext.MessageBox.hide();
-            var result = Ext.decode(form.responseText);
-            if (result.success) {
-                window.location = '../../ImportUserIOExcel/' + result.fileName;
-            } else {
-                Ext.MessageBox.hide();
-                Ext.Msg.alert("提示信息", "匯出失敗或沒有數據！");
-            }
-        }
-    });
+    window.open("/Edm/Export?group_id=" + group_id);
+    //Ext.MessageBox.show({
+    //    msg: '正在匯出，請稍後....',
+    //    width: 300,
+    //    wait: true
+    //});
+    //Ext.Ajax.request({
+    //    url: "/Edm/Export",
+    //    timeout: 900000,
+    //    params: {
+    //        group_id: group_id
+    //    },
+    //    success: function (form, action) {
+    //        Ext.MessageBox.hide();
+    //        var result = Ext.decode(form.responseText);
+    //        if (result.success) {
+    //            window.location = '../../ImportUserIOExcel/' + result.fileName;
+    //        } else {
+    //            Ext.MessageBox.hide();
+    //            Ext.Msg.alert("提示信息", "匯出失敗或沒有數據！");
+    //        }
+    //    }
+    //});
 }
 
 function TranToDetial(url, group_id) {

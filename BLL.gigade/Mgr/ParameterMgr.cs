@@ -310,6 +310,10 @@ namespace BLL.gigade.Mgr
         {
             return _paraDao.GetAllKindType(types);
         }
+        public List<Parametersrc> GetKindTypeByStatus(string types)
+        {
+            return _paraDao.GetKindTypeByStatus(types);
+        }
 
         public List<Parametersrc> GetIialgParametersrcList(Parametersrc store, out int totalCount)
         {
