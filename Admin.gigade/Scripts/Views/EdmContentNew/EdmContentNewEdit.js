@@ -8,7 +8,7 @@
         ]
     });
     var EdmGroupNewStore = Ext.create("Ext.data.Store", {
-       autoLoad:true,
+        autoLoad: true,
         model: 'gigade.edm_group_new',
         proxy: {
             type: 'ajax',
@@ -19,7 +19,7 @@
             }
         }
     });
- 
+
 
     Ext.define('gigade.mailSender', {
         extend: 'Ext.data.Model',
@@ -28,7 +28,7 @@
             { name: 'sender_email', type: 'string' }
         ]
     });
-    var MailSenderStore= Ext.create("Ext.data.Store", {
+    var MailSenderStore = Ext.create("Ext.data.Store", {
         autoLoad: true,
         model: 'gigade.mailSender',
         proxy: {
@@ -216,7 +216,7 @@
                 editable: false,
                 allowBlank: false,
                 lastQuery: '',
-             
+
             },
             {
                 xtype: 'combobox',
@@ -230,17 +230,17 @@
                 name: 'group_id',
                 editable: false,
                 lastQuery: '',
-              
+
             },
             {
                 xtype: 'combobox',
                 fieldLabel: '郵件重要度',
                 store: importanceStore,
                 displayField: 'txt',
-                valueField:'value',
+                valueField: 'value',
                 id: 'importance',
                 name: 'importance',
-                value:1,
+                value: 1,
                 editable: false,
                 lastQuery: '',
             },
@@ -260,7 +260,7 @@
                 id: 'template_id',
                 name: 'template_id',
                 editable: false,
-                lastQuery:'',
+                lastQuery: '',
                 editable: false,
                 listeners: {
                     'select': function () {
@@ -282,7 +282,7 @@
                             },
                             failure: function () {
                                 myMask.hide();
-                                Ext.Msg.alert("提示信息","獲取網頁出現異常！");
+                                Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
                             }
                         });
                     }
@@ -402,6 +402,6 @@
     });
     editWin.show();
     function initRow(row) {
-       $('textarea[name=kendoEditor]').data("kendoEditor").value(row.data.template_data);
+        $('textarea[name=kendoEditor]').data("kendoEditor").value(row.data.template_data);
     }
 }

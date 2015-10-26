@@ -1852,7 +1852,9 @@
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsList.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewReport.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmSend.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmSendListCount.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateEdit.js" />
@@ -4422,6 +4424,8 @@
     <Content Include="Views\MarketTally\Index.cshtml" />
     <Content Include="Views\MarketTally\MarketTally.cshtml" />
     <Content Include="Template\OrderImport\t_orders.xlsx" />
+    <Content Include="Views\EdmNew\EdmContentNewReport.cshtml" />
+    <Content Include="Views\EdmNew\EdmSendListCountView.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
