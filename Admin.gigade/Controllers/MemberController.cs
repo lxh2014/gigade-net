@@ -904,7 +904,7 @@ namespace Admin.gigade.Controllers
             UserVipListQuery query = new UserVipListQuery();
             List<UserVipListQuery> stores = new List<UserVipListQuery>();
             try
-            {
+            {              
                 if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
                 {
                     query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
@@ -982,7 +982,14 @@ namespace Admin.gigade.Controllers
                     //}
                     newRow["user_reg_date"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(stores[i].user_reg_date));
                     newRow["order_createdate"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(stores[i].order_createdate));
-                    newRow["last_time"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(stores[i].last_time));
+                    if (stores[i].last_time == Convert.ToUInt32(CommonFunction.GetPHPTime("1970-1-1 8:00")))
+                    {
+                        newRow["last_time"] = "";
+                    }
+                    else
+                    {
+                        newRow["last_time"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(stores[i].last_time));
+                    }
                     newRow["sum_amount"] = stores[i].sum_amount;
                     newRow["cou"] = stores[i].cou;
                     decimal s = stores[i].sum_amount / stores[i].cou;
