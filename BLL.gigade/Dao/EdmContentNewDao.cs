@@ -215,8 +215,8 @@ namespace BLL.gigade.Dao
             {
 
                 sqlCount.Append("select count(et.content_id) as totalCount ");
-                sql.AppendFormat(" SELECT et.success,ete.`name`,ete.email, '' as 'pic',et.count,ml.request_createdate  as 'request_createdate',et.first_traceback,et.last_traceback    ", query.content_id);
-                sqlFrom.Append(" from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id  LEFT JOIN mail_log ml ON et.content_id=ml.content_id AND ete.email=ml.receiver_address ");
+                sql.AppendFormat(" SELECT et.success,ete.`name`,ete.email,et.count,et.send_date,et.first_traceback,et.last_traceback    ", query.content_id);
+                sqlFrom.Append(" from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id ");
                 sqlWhere.AppendFormat(" WHERE et.content_id='{0}'   ", query.content_id);
                 DataTable _dt = _access.getDataTable(sqlCount.ToString() + sqlFrom.ToString() + sqlWhere.ToString());
                 if (_dt != null && _dt.Rows.Count > 0)
@@ -237,7 +237,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@" SELECT et.success,ete.`name`,ete.email,ete.email_id, et.count,ml.request_createdate  as 'request_createdate',et.first_traceback,et.last_traceback   from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id  LEFT JOIN mail_log ml ON et.content_id=ml.content_id AND ete.email=ml.receiver_address  WHERE et.content_id='{0}' and et.count>0 and et.success=1;", content_id);
+                sql.AppendFormat(@" SELECT et.success,ete.`name`,ete.email,ete.email_id, et.count,ml.request_createdate  as 'request_createdate',et.first_traceback,et.last_traceback   from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id  WHERE et.content_id='{0}' and et.count>0 and et.success=1;", content_id);
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
@@ -251,7 +251,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT et.success,ete.`name`,ete.email,ete.email_id, et.count,ml.request_createdate  as 'request_createdate',et.first_traceback,et.last_traceback   from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id  LEFT JOIN mail_log ml ON et.content_id=ml.content_id AND ete.email=ml.receiver_address  WHERE et.content_id='{0}' and et.count=0 and et.success=0;", content_id);
+                sql.AppendFormat(@"SELECT et.success,ete.`name`,ete.email,ete.email_id, et.count,et.send_date  as 'request_createdate',et.first_traceback,et.last_traceback   from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id  WHERE et.content_id='{0}' and et.count=0 and et.success=0;", content_id);
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
@@ -352,7 +352,7 @@ WHERE content_id='{0}' AND edm_trace.count>0;", content_id);
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(" insert into edm_trace (log_id,content_id,email_id,count,success) values('{0}','{1}','{2}','{3}','{4}');", query.log_id, query.content_id, query.email_id, query.count, query.success);
+                sql.AppendFormat(" insert into edm_trace (log_id,content_id,email_id,first_traceback,last_traceback,count,success) values('{0}','{1}','{2}',NOW(),NOW(),'{3}','{4}');", query.log_id, query.content_id, query.email_id, query.count, query.success);
                 return sql.ToString();
             }
             catch (Exception ex)
