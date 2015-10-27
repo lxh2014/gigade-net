@@ -490,13 +490,14 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                           {
                               if (mail.SendMailAction(item.receiver_address.ToString(), item.subject.ToString(), item.body.ToString(), item.sender_address, item.sender_name))
                               {
-                                  //sql.Append(item.success_action + ";");
+                                  sql.Append(item.success_action);
                                   //發送成功刪除原數據新增log
                                   sql.Append(InsertLog(item, "success", 1));
                               }
                               else
                               {
                                   //發送失敗更新數據
+                                  sql.Append(item.fail_action);
                                   sql.AppendFormat("update mail_request set retry_count ='{1}',next_send='{2}',sent_log='{3}' where request_id='{0}' ;", item.request_id, item.retry_count + 1, DateTime.Now.AddMinutes(next_time), "not errow massage");
                                   //sql.Append(item.fail_action + ";");
                               }
@@ -510,6 +511,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                           {
                               item.sent_log = ex.ToString();
                               item.Replace4MySQL();
+                              sql.Append(item.fail_action);
                               //發送失敗更新數據
                               sql.AppendFormat("update mail_request set retry_count ='{1}',next_send='{2}',sent_log='{3}' where request_id='{0}' ;", item.request_id, item.retry_count + 1, DateTime.Now.AddMinutes(next_time).ToString("yyyy-MM-dd HH:mm:ss"), item.sent_log);
                               _access.execCommand(sql.ToString());

@@ -311,9 +311,7 @@ namespace BLL.gigade.Mgr
                     item.product_createdate_string = CommonFunction.GetNetTime(item.product_createdate).ToString("yyyy-MM-dd HH:mm:ss");
                     item.product_start_string = CommonFunction.GetNetTime(item.product_start).ToString("yyyy-MM-dd HH:mm:ss");
                     item.product_spec = item.Spec_Name_1;
-                    item.product_spec += string.IsNullOrEmpty(item.Spec_Name_1) ? item.Spec_Name_2 : (string.IsNullOrEmpty(item.Spec_Name_2) ? "" : " / " + item.Spec_Name_2);
-
-
+                    item.product_spec += string.IsNullOrEmpty(item.Spec_Name_1.Trim()) ? item.Spec_Name_2 : (string.IsNullOrEmpty(item.Spec_Name_2.Trim()) ? "" : " / " + item.Spec_Name_2);
                     //商品類型
                     if (item.combination == 1)
                     {
