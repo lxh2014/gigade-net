@@ -689,5 +689,17 @@ namespace BLL.gigade.Mgr
             }
         }
 
+        public DataTable CreatedateAndLogId()
+        {
+            try
+            {
+                return _edmContentNewDao.CreatedateAndLogId();
+            }
+            catch (Exception ex)
+            {
+             throw new Exception("EdmContentNewMgr-->FXMD-->" + ex.Message, ex);
+            }
+        }
+
     }
 }

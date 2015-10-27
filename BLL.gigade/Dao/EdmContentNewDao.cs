@@ -237,7 +237,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@" SELECT et.success,ete.`name`,ete.email,ete.email_id, et.count,ml.request_createdate  as 'request_createdate',et.first_traceback,et.last_traceback   from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id  WHERE et.content_id='{0}' and et.count>0 and et.success=1;", content_id);
+                sql.AppendFormat(@" SELECT et.success,ete.`name`,ete.email,ete.email_id, et.count,et.send_date,et.first_traceback,et.last_traceback   from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id  WHERE et.content_id='{0}' and et.count>0 and et.success=1;", content_id);
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
@@ -251,7 +251,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT et.success,ete.`name`,ete.email,ete.email_id, et.count,et.send_date  as 'request_createdate',et.first_traceback,et.last_traceback   from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id  WHERE et.content_id='{0}' and et.count=0 and et.success=0;", content_id);
+                sql.AppendFormat(@"SELECT et.success,ete.`name`,ete.email,ete.email_id, et.count,et.send_date  from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id  WHERE et.content_id='{0}' and et.count=0 and et.success=0;", content_id);
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
@@ -392,6 +392,24 @@ WHERE content_id='{0}' AND edm_trace.count>0;", content_id);
 
                 throw new Exception("EdmContentNewDao-->EdmTrace-->" + sql.ToString() + sqlFrom.ToString() + sqlWhere.ToString() + ex.Message, ex);
             }
+        }
+
+        public DataTable CreatedateAndLogId()
+        {
+            DataTable _dt = new DataTable();
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" select log_id,createdate from edm_send_log where test_send=0;");
+                _dt = _access.getDataTable(sql.ToString());
+                return _dt;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("EdmContentNewDao-->EdmTrace-->" + sql.ToString()+ex.Message, ex);
+            }
+            return _dt;
         }
 
     }

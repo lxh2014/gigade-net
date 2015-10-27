@@ -43,6 +43,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
             Ext.getCmp("EmailGroup").down('#edit').setDisabled(selections.length == 0);
+            Ext.getCmp("EmailGroup").down('#delete').setDisabled(selections.length == 0);
         }
     }
 });
@@ -73,6 +74,7 @@ Ext.onReady(function () {
         tbar: [
         { xtype: 'button', text: '新增', id: 'add', hidden: false, iconCls: 'icon-user-add', handler: onAddClick },
         { xtype: 'button', text: '編輯', id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
+        { xtype: 'button', text: '刪除', id: 'delete', hidden: false, iconCls: 'ui-icon ui-icon-user-delete', disabled: true, handler: onDeleteClick },
       
          '->',
          {
@@ -143,6 +145,51 @@ onEditClick = function () {
         editFunction(row[0], EmailGroupStore);
     }
 }
+
+onDeleteClick = function () {
+    var row = Ext.getCmp("EmailGroup").getSelectionModel().getSelection();
+    if (row.length < 0) {
+        Ext.Msg.alert("提示信息", "沒有選擇一行！");
+    }
+    else {
+        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+        myMask.show();
+        Ext.Msg.confirm("確認信息", Ext.String.format("刪除選中 {0} 條數據？", row.length), function (btn) {
+            if (btn == 'yes') {
+                var rowIDs = '';
+                for (var i = 0; i < row.length; i++) {
+                    rowIDs += row[i].data.group_id + "∑";
+                }
+                Ext.Ajax.request({
+                    url: '/EdmNew/DelEmailGroupList',
+                    method: 'post',
+                    params: { rowID: rowIDs },
+                    success: function (form, action) {
+                        myMask.hide();
+                        var result = Ext.decode(form.responseText);
+                        if (result.success) {
+                            Ext.Msg.alert("提示信息", "刪除成功！");
+                        }
+                        else {
+                            Ext.Msg.alert("提示信息", "刪除失敗！");
+                        }
+                         EmailGroupStore.load();
+                    },
+                    failure: function () {
+                        myMask.hide();
+                        Ext.Msg.alert("提示信息", "刪除失敗！");
+                        EmailGroupStore.load();
+                    }
+                });
+            }
+            else {
+                myMask.hide();
+            }
+        });
+    }
+}
+
+
 function Search() {
     EmailGroupStore.removeAll();
     

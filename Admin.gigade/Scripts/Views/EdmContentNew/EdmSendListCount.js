@@ -44,6 +44,7 @@
         bodyPadding: 10,
         width: document.documentElement.clientWidth,
         items: [
+         
                 {
                     xtype: 'displayfield',
                     value: '<span style="color:white;color:green;font-size:20px;margin-left: 200px">開　信　狀　況　統　計　摘　要</span>'
