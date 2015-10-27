@@ -156,7 +156,6 @@
     <Compile Include="Controllers\DeliveryStoreController.cs" />
     <Compile Include="Controllers\DispatchingSystemController.cs" />
     <Compile Include="Controllers\EdmController.cs" />
-    <Compile Include="Controllers\EdmGroupNewQuery.cs" />
     <Compile Include="Controllers\EdmNewController.cs" />
     <Compile Include="Controllers\EdmSController.cs" />
     <Compile Include="Controllers\ElementController.cs" />
@@ -179,6 +178,7 @@
     <Compile Include="Controllers\InspectionReportController.cs" />
     <Compile Include="Controllers\MailSendController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\MarketTallyController.cs" />
     <Compile Include="Controllers\MemberEventController.cs" />
     <Compile Include="Controllers\MattersCalendarController.cs" />
     <Compile Include="Controllers\OpenController.cs" />
@@ -236,7 +236,9 @@
     <Compile Include="Controllers\PromotionsUserController.cs" />
     <Compile Include="Controllers\RedirectController.cs" />
     <Compile Include="Controllers\ReportManagementController.cs" />
+    <Compile Include="Controllers\ScheduleServiceController.cs" />
     <Compile Include="Controllers\ScheduleParamerController.cs" />
+    <Compile Include="Controllers\ScheduleServiceWorkerController.cs" />
     <Compile Include="Controllers\SecretInfoController.cs" />
     <Compile Include="Controllers\SendProductController.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
@@ -689,6 +691,10 @@
     <Content Include="Locale\zh-TW\SiteManager\lang.js" />
     <Content Include="Locale\zh-TW\TrialProdCate\TrialProdCateLang.js" />
     <Content Include="Locale\zh-TW\Vote\Lang.js" />
+    <Content Include="Scripts\Bootstrap\bootstrap.css" />
+    <Content Include="Scripts\Bootstrap\bootstrap.js" />
+    <Content Include="Scripts\Bootstrap\bootstrap.min.css" />
+    <Content Include="Scripts\Bootstrap\bootstrap.min.js" />
     <Content Include="Scripts\Common\ManageButton.js" />
     <Content Include="Scripts\ext-5.1.0\.sencha\package\Boot.js" />
     <Content Include="Scripts\ext-5.1.0\bootstrap-files.js" />
@@ -1832,6 +1838,7 @@
     <Content Include="Scripts\Ext4.0\ux\DataView\DragSelector.css" />
     <Content Include="Scripts\Ext4.0\ux\DataView\DragSelector.js" />
     <Content Include="Scripts\Ext4.0\ux\DataView\LabelEditor.js" />
+    <Content Include="Scripts\jquery-2.1.4.min.js" />
     <Content Include="Scripts\kendo\2014.2.716\angular.min.js" />
     <Content Include="Scripts\kendo\2014.2.716\jquery-1.9.1.js" />
     <Content Include="Scripts\kendo\2014.2.716\jquery.min.js" />
@@ -1846,10 +1853,18 @@
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsList.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewReport.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmSend.js" />
+    <Content Include="Scripts\Views\EdmContentNew\EdmSendListCount.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateList.js" />
+    <Content Include="Scripts\Views\EdmNew\EmailBlockEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EmailBlockList.js" />
+    <Content Include="Scripts\Views\EdmNew\EmailGroupEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EmailGroupImport.js" />
+    <Content Include="Scripts\Views\EdmNew\EmailGroupList.js" />
     <Content Include="Scripts\Views\EdmS\Edmlist.js" />
     <Content Include="Scripts\Views\Edm\BlackList.js" />
     <Content Include="Scripts\Views\Edm\BlackListEdit.js" />
@@ -1899,6 +1914,9 @@
     <Content Include="Scripts\Views\MemberEvent\MemberLevelWin.js" />
     <Content Include="Scripts\Views\Member\GroupUserAdd.js" />
     <Content Include="Scripts\Views\Member\ShippingVoucher.js" />
+    <Content Include="Scripts\Views\EventPromo\EventPromoImageEdit.js" />
+    <Content Include="Scripts\Views\EventPromo\EventPromoImageList.js" />
+    <Content Include="Scripts\Views\EventPromo\EventPromoImageRelation.js" />
     <Content Include="Scripts\Views\OrderManage\Logistics.js" />
     <Content Include="Scripts\Views\OrderManage\OrderDetailManage.js" />
     <Content Include="Scripts\Views\OrderManage\OrderReturn.js" />
@@ -1911,6 +1929,7 @@
     <Content Include="Scripts\Views\ProductClick\ProductClickCondition.js" />
     <Content Include="Scripts\Views\ProductClick\ProductClickList.js" />
     <Content Include="Scripts\Views\ProductComment\ChangeLog.js" />
+    <Content Include="Scripts\Views\ProductComment\ProductCommentUpdate.js" />
     <Content Include="Scripts\Views\ProductHistory\ParticularsHistory.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeEdit.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeList.js" />
@@ -1924,6 +1943,11 @@
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsList.js" />
     <Content Include="Scripts\Views\Redirect\RedirectView.js" />
     <Content Include="Scripts\Views\ReportManagement\OderMessageSearch.js" />
+    <Content Include="Scripts\Views\ScheduleService\SchedeleLogSearch.js" />
+    <Content Include="Scripts\Views\ScheduleService\ScheduleConfigEdit.js" />
+    <Content Include="Scripts\Views\ScheduleService\ScheduleMasterEdit.js" />
+    <Content Include="Scripts\Views\ScheduleService\SchedulePeriodEdit.js" />
+    <Content Include="Scripts\Views\ScheduleService\ScheduleService.js" />
     <Content Include="Scripts\Views\SecretInfo\SecretResetPwd.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverMasterList.js" />
     <Content Include="Scripts\Views\Service\OrderQuestionAdd.js" />
@@ -1944,9 +1968,12 @@
     <Content Include="Scripts\Views\Ticket\TicketReturnList.js" />
     <Content Include="Scripts\Views\Ticket\TicketVerification.js" />
     <Content Include="Scripts\Views\UserLevelLog\UserLevelLogList.js" />
+    <Content Include="Scripts\Views\Vendor\VendorBankImport.js" />
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryEdit.js" />
     <Content Include="Scripts\Views\Vendor\VendorBrandStoryList.js" />
     <Content Include="Scripts\Views\Vendor\VendorChangeLog.js" />
+    <Content Include="Scripts\Views\Vendor\VendorChild.js" />
+    <Content Include="Scripts\Views\Vendor\VendorDetail.js" />
     <Content Include="Scripts\Views\VipUserGroup\edit.js" />
     <Content Include="Scripts\Views\VipUserGroup\GCCInfo.js" />
     <Content Include="Scripts\Views\VipUserGroup\list.js" />
@@ -1966,6 +1993,7 @@
     <Content Include="Scripts\Views\WareHouse\IpoList.js" />
     <Content Include="Scripts\Views\WareHouse\IstockChangeList.js" />
     <Content Include="Scripts\Views\WareHouse\IwmsRecord.js" />
+    <Content Include="Scripts\Views\WareHouse\WaitLiaoWeiList.js" />
     <Content Include="Scripts\Views\Website\BannerCategoryList.js" />
     <Content Include="Scripts\Views\Website\BannerImageEdit.js" />
     <Content Include="Scripts\Views\Website\BannerImageHistoryDetail.js" />
@@ -1977,13 +2005,16 @@
     <Content Include="Template\ProductDetail\product_detail_safe.txt" />
     <Content Include="XML\Exceptional.xml" />
     <Content Include="XML\ItemPrice.xml" />
-    <Content Include="XML\ParticularsSrc.xml" />
+    <Content Include="XML\ParticularsSrc.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="XML\ProductItemHistory.xml" />
     <Content Include="XML\SaleSum.xml" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\config.rb" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-rtl-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\resources\Readme.md" />
+    <None Include="Properties\PublishProfiles\giagade-web.pubxml" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all-vsdoc.js" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all.min.intellisense.js" />
     <Content Include="Scripts\kendo\2014.2.716\kendo.all.min.js" />
@@ -3896,7 +3927,6 @@
     <Content Include="Scripts\kindeditor\asp.net\upload_json.ashx" />
     <Content Include="Content\kendo\2014.2.716\images\kendoui.ttf" />
     <Content Include="Content\kendo\2014.2.716\images\kendoui.woff" />
-    <None Include="Properties\PublishProfiles\config1.pubxml" />
     <Content Include="Scripts\kendo\2014.2.716\jquery.min.map" />
     <Content Include="Scripts\kendo\2014.2.716\kendo.all.min.js.map" />
     <Content Include="Scripts\kendo\2014.2.716\kendo.angular.min.js.map" />
@@ -4383,11 +4413,23 @@
     <Content Include="Views\WareHouse\IpodList.cshtml" />
     <Content Include="Views\EdmNew\Index.cshtml" />
     <Content Include="Views\EdmNew\EdmContentNew.cshtml" />
-<<<<<<< HEAD
     <Content Include="Views\EdmNew\EdmTemplate.cshtml" />
-=======
-    <Content Include="Web.config" />
->>>>>>> a28008a1d8b50dba9bab029b50dd32428e4d2960
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Views\EdmNew\EmailBlockList.cshtml" />
+    <Content Include="Views\ScheduleService\Index.cshtml" />
+    <Content Include="Views\Vendor\VendorDetails.cshtml" />
+    <Content Include="Views\EventPromo\EventPromoImageList.cshtml" />
+    <Content Include="Views\ScheduleService\Schedule_Log_Seacrh.cshtml" />
+    <Content Include="Views\Vendor\VendorBankImport.cshtml" />
+    <Content Include="Views\EdmNew\EmailGroup.cshtml" />
+    <Content Include="Views\WareHouse\WaitLiaoWei.cshtml" />
+    <Content Include="Views\MarketTally\Index.cshtml" />
+    <Content Include="Views\MarketTally\MarketTally.cshtml" />
+    <Content Include="Template\OrderImport\t_orders.xlsx" />
+    <Content Include="Views\EdmNew\EdmContentNewReport.cshtml" />
+    <Content Include="Views\EdmNew\EdmSendListCountView.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4421,7 +4463,7 @@
     <Folder Include="Models\" />
     <Folder Include="Scripts\kindeditor\attached\" />
     <Folder Include="Scripts\Views\Bonus\" />
-    <Folder Include="Template\OrderImport\" />
+    <Folder Include="Template\EmailGroup\" />
     <Folder Include="Template\VipUsers\" />
     <Folder Include="Views\Bonus\" />
     <Folder Include="Views\PromotionsAmountDiscount\" />
@@ -4515,6 +4557,7 @@
     <Content Include="App_GlobalResources\Login.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>Login.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -4535,6 +4578,7 @@
     <Content Include="App_GlobalResources\ProductItemMap.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>ProductItemMap.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -4548,6 +4592,7 @@
     <Content Include="App_GlobalResources\OrderAdd.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>OrderAdd.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -4574,6 +4619,7 @@
     <Content Include="App_GlobalResources\Promotion.resx">
       <Generator>GlobalResourceProxyGenerator</Generator>
       <LastGenOutput>Promotion.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <PropertyGroup>
@@ -4598,7 +4644,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>11804</DevelopmentServerPort>
+          <DevelopmentServerPort>2224</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

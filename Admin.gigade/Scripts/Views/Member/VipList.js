@@ -221,7 +221,7 @@ Ext.onReady(function () {
         ],
         tbar: [
             {
-                text: '匯出CSV',
+                text: '匯出會員購買記錄排行CSV',
                 handler: ExportCsv,
                 iconCls: 'icon-excel',
             },
@@ -233,8 +233,6 @@ Ext.onReady(function () {
                name: 'userID',
                regex: /^[0-9]*[1-9][0-9]*$/,
                regexText: '請輸入數字類型的字符',
-               maxLength: 5,
-               maxLengthText: '最大長度為5',
                allowBlank: true,
               
                emptyText: '請輸入會員編號(可以為空)',
@@ -245,7 +243,7 @@ Ext.onReady(function () {
                        }
                    },
                    change: function () {
-                       if (!(/^[0-9]*[1-9][0-9]*$/).test(this.getValue()) || this.getValue().length > 5) {
+                       if (!(/^[0-9]*[1-9][0-9]*$/).test(this.getValue())) {
                            if (this.getValue().trim() == '') {
                                Ext.getCmp('btnQuery').setDisabled(false);
                            }
@@ -261,7 +259,7 @@ Ext.onReady(function () {
            },
           {
               xtype: "datefield",
-              fieldLabel: "最近歸檔日期",
+              fieldLabel: "歸檔訂單創建日期",
               id: 'dateOne',
               name: 'dateOne',
               format: 'Y-m-d',

@@ -69,7 +69,13 @@
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
                             if (result.success) {
-                                Ext.Msg.alert("提示", "匯入完成!");
+                                if (result.wrongCount != 0) {
+                                    var zz = result.totalCount - result.wrongCount;
+                                    Ext.Msg.alert("提示信息", "共" + result.totalCount + "條數據<br/>匯入成功" + zz + "條<br/>匯入失敗" + result.wrongCount + "條<br/><a href='#' onclick='DownWrongList()'>點擊下載未能匯入數據</a>");
+                                }
+                                else {
+                                    Ext.Msg.alert("提示信息","全部成功匯入！");
+                                }
                                 ExportWin.close();
                                 store.load();
                             }
@@ -123,7 +129,7 @@
             'show': function () {
                 if (row) {
                     Ext.getCmp('group_id').setValue(row.data.group_id);
-                    editFrm.getForm().loadRecord(row);
+                    //editFrm.getForm().loadRecord(row);
                     //Ext.getCmp('group_id').show(true);
                     //Ext.getCmp('s_group_createdate').show(true);
                     //Ext.getCmp('s_group_updatedate').show(true);
@@ -135,4 +141,9 @@
 }
 function downLoadTemplate() {
     window.open("/EdmNew/ExportTemplateExcel");
+}
+
+function DownWrongList()
+{
+    window.open("/EdmNew/DownWrongList");
 }
