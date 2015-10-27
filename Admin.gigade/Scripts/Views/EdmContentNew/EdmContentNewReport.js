@@ -25,6 +25,34 @@
         }
     });
 
+
+    Ext.define('gigade.CreatedateAndLogId', {
+        extend: 'Ext.data.Model',
+        fields: [
+        { name: "log_id", type: "int" },
+        { name: "createdate", type: "string" },
+         ]
+    });
+    CreatedateAndLogIdStore = Ext.create('Ext.data.Store', {
+        model: 'gigade.CreatedateAndLogId',
+        autoLoad:true,
+        proxy: {
+            type: 'ajax',
+            url: '/EdmNew/CreatedateAndLogId',
+            reader: {
+                type: 'json',
+                root: 'data',
+            }
+        }
+    });
+
+
+
+
+
+
+
+
     EdmContentNewReportStore.on('beforeload', function () {
         Ext.apply(EdmContentNewReportStore.proxy.extraParams,
         {
@@ -39,6 +67,10 @@
         bodyPadding: 10,
         width: document.documentElement.clientWidth,
         items: [
+               {
+                   xtype: 'combobox',
+                   fieldLabel: '電子報統計報表',
+               },
                 {
                     xtype: 'displayfield',
                     value: '<span style="color:white;color:green;font-size:20px;margin-left: 200px">開　信　狀　況　統　計　摘　要</span>'

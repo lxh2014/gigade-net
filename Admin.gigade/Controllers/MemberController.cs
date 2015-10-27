@@ -904,7 +904,7 @@ namespace Admin.gigade.Controllers
             UserVipListQuery query = new UserVipListQuery();
             List<UserVipListQuery> stores = new List<UserVipListQuery>();
             try
-            {
+            {              
                 if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
                 {
                     query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
@@ -982,7 +982,14 @@ namespace Admin.gigade.Controllers
                     //}
                     newRow["user_reg_date"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(stores[i].user_reg_date));
                     newRow["order_createdate"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(stores[i].order_createdate));
-                    newRow["last_time"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(stores[i].last_time));
+                    if (stores[i].last_time == Convert.ToUInt32(CommonFunction.GetPHPTime("1970-1-1 8:00")))
+                    {
+                        newRow["last_time"] = "";
+                    }
+                    else
+                    {
+                        newRow["last_time"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(stores[i].last_time));
+                    }
                     newRow["sum_amount"] = stores[i].sum_amount;
                     newRow["cou"] = stores[i].cou;
                     decimal s = stores[i].sum_amount / stores[i].cou;
@@ -1001,7 +1008,7 @@ namespace Admin.gigade.Controllers
                     newDt.Rows.Add(newRow);
                 }
                 // string[] columnName = { "編號", "會員狀態", "姓名", "性別", "VIP", "電子郵件", "年齡", "生日月份", "居住區", "註冊時間", "最近歸檔日", "最近購買日", "購買金額", "購買次數", "客單價", "購物金使用", "常溫商品總額", "常溫商品運費", "低溫商品總額", "低溫商品運費", "中信折抵", "HG折抵", "台新折抵" };
-                string[] columnName = { "編號", "會員狀態", "姓名", "性別", "VIP", "年齡", "生日月份", "註冊時間", "最近歸檔日", "最近購買日", "購買金額", "購買次數", "客單價", "購物金使用", "常溫商品總額", "常溫商品運費", "低溫商品總額", "低溫商品運費", "中信折抵", "HG折抵", "台新折抵", "會員等級"};//, "近期累積金額" };
+                string[] columnName = { "會員編號", "會員狀態", "姓名", "性別", "VIP", "年齡", "生日月份", "註冊時間", "最近歸檔日", "最近購買日", "購買金額", "購買次數", "客單價", "購物金使用", "常溫商品總額", "常溫商品運費", "低溫商品總額", "低溫商品運費", "中信折抵", "HG折抵", "台新折抵", "會員等級"};//, "近期累積金額" };
 
                 string fileName = "Vip_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
                 string newFileName = Server.MapPath(excelPath) + fileName;
