@@ -323,24 +323,26 @@ namespace BLL.gigade.Dao
 
                 //order_status=99表示訂單已歸檔
                 //得到常溫商品總額集合sbNPro
-                StringBuilder sbNPro = new StringBuilder("");                
-                sbNPro.Append(@" select om.user_id,sum(od.single_money * od.buy_num ) as normal_product ,sum(od.deduct_bonus) as normal_deduct_bonus");                        
+                StringBuilder sbNPro = new StringBuilder("");
+                sbNPro.Append(@" select om.user_id,sum(od.single_money * (case  when od.item_mode=0  then od.buy_num 
+                when od.item_mode=2 then od.parent_num end)) as normal_product ,sum(od.deduct_bonus) as normal_deduct_bonus");                        
                 sbNPro.Append(" from order_master om  ");
                 sbNPro.Append(" left join order_slave os on os.order_id = om.order_id");
                 sbNPro.Append(" left join order_detail od on od.slave_id = os.slave_id");
                 sbNPro.AppendFormat(@" where od.product_freight_set in (1,3) and od.detail_status = 4  and om.order_status = 99 
-                                    and od.item_mode in (0,1) and om.user_id in ({0}) ", userIdString);
+                                    and od.item_mode in (0,2) and om.user_id in ({0}) ", userIdString);
                 sbNPro.Append(timelimit);
                 sbNPro.Append("  group by om.user_id ");
 
                 //得到低溫商品總額集合sbLPro
                 StringBuilder sbLPro = new StringBuilder("");
-                sbLPro.Append(@" select om.user_id,sum(od.single_money * od.buy_num) as low_product,sum(od.deduct_bonus) as low_deduct_bonus ");
+                sbLPro.Append(@" select om.user_id,sum(od.single_money * (case  when od.item_mode=0  then od.buy_num 
+                when od.item_mode=2 then od.parent_num end)) as low_product,sum(od.deduct_bonus) as low_deduct_bonus ");
                 sbLPro.Append(" from order_master om ");
                 sbLPro.Append(" left join order_slave os on os.order_id = om.order_id");
                 sbLPro.Append(" left join order_detail od on od.slave_id = os.slave_id");
                 sbLPro.AppendFormat(@" where od.product_freight_set in (2,4,5,6) and od.detail_status = 4  and om.order_status = 99 
-                                    and od.item_mode in (0,1) and om.user_id in ({0}) ", userIdString);
+                                    and od.item_mode in (0,2) and om.user_id in ({0}) ", userIdString);
                 sbLPro.Append(timelimit);
                 sbLPro.Append(" group by om.user_id ");
 

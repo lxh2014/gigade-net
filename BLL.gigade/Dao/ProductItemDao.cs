@@ -738,10 +738,6 @@ namespace BLL.gigade.Dao
 
         }
 
-
-
-
-
         public List<ProductItemQuery> GetWaitLiaoWeiList(ProductItemQuery query, out int totalCount)// by yachao1120j 2015-10-20 等待料位報表
         {
             StringBuilder str = new StringBuilder();
@@ -771,18 +767,9 @@ namespace BLL.gigade.Dao
                 {
                     strcont.AppendFormat(" and dfsm.delivery_freight_set = '{0}' ", query.product_freight_set);
                 }
-                //if (query.product_status != 100)//商品狀態  100 代表全部
-                //{
-                //    strcont.AppendFormat(" and p.product_status ='{0}' ", query.product_status);
-                //}
-                //else 
-                //{
                 strcont.AppendFormat("and p.product_status in (0,1,2,5) ");
-                //}
-                //開始日期 結束時間 都不為空的條件下
                 strcont.AppendFormat("  and p.product_createdate >='{0}' and p.product_createdate  <='{1}'  ", (query.start_time), (query.end_time));
                 str.Append(strcont);
-
                 if (query.IsPage)
                 {
                     DataTable _dt = _access.getDataTable(sqlCount.ToString() + strcont.ToString());
