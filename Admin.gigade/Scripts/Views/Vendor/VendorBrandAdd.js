@@ -8,12 +8,32 @@ function addFunction(RowID, VendorBrandsetaddStore) {
         var name = ShopClassStore.getAt(i).get("class_id");
         Shopclass.push({ boxLabel: boxLabel, name: name, inputValue: name });
     };
-    var VendorID = ""; 
+    var VendorID = "";
     var BrandID = "";
     if (RowID != null) {
         VendorID = RowID.data.Vendor_Id;
-    } 
-
+    }
+    //供應商Model
+    Ext.define("gigade.Vendor", {
+        extend: 'Ext.data.Model',
+        fields: [
+            { name: "vendor_id", type: "string" },
+            { name: "vendor_name_simple", type: "string" }]
+    });
+    //供應商Store
+    var VendorStore = Ext.create('Ext.data.Store', {
+        model: 'gigade.Vendor',
+        autoLoad: true,
+        proxy: {
+            type: 'ajax',
+            url: "/Vendor/GetVendor",
+            actionMethods: 'post',
+            reader: {
+                type: 'json',
+                root: 'data'
+            }
+        }
+    });
     var firstForm = Ext.widget('form',
     {
         id: 'editFrm1',
@@ -56,6 +76,7 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                             Brand_Msg_Start_Time: Ext.htmlEncode(Ext.getCmp('Brand_Msg_Start_Time').getValue()),
                             Brand_Msg_End_Time: Ext.htmlEncode(Ext.getCmp('Brand_Msg_End_Time').getValue()),
                             cucumberbrand: Ext.htmlEncode(Ext.getCmp("Cucumber_Brand").getValue().Brand),
+                            short_description: Ext.htmlEncode(Ext.getCmp('short_description').getValue()),
                             imagestatus: Ext.htmlEncode(Ext.getCmp("Image_Status").getValue().Hidden),
                             imagelinkmode: Ext.htmlEncode(Ext.getCmp("Image_Link_Mode").getValue().Mode),
                             imagelinkurl: Ext.htmlEncode(Ext.getCmp('Image_Link_Url').getValue()),
@@ -115,7 +136,8 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                         xtype: 'combobox',
                         fieldLabel: '供應商簡稱<font color="red">*</font>',
                         allowBlank: false,
-                        editable: false,
+                        editable: true,
+                        queryMode: 'local',
                         hidden: false,
                         id: 'Vendor_Id',
                         name: 'Vendor_Id',
@@ -232,6 +254,14 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                         { boxLabel: '大陸區品牌', id: 'cb2', inputValue: '2' },
                         { boxLabel: '小農品牌 ', id: 'cb3', inputValue: '3' }
                         ]
+                    },
+                    {
+                        xtype: 'textareafield',
+                        fieldLabel: '短文字說明 (300字內)',
+                        id: 'short_description',
+                        name: 'short_description',
+                        anchor: '90%',
+                        maxLength: 300
                     }
                 ]
             },
@@ -283,7 +313,7 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                     { boxLabel: '新視窗開啟', id: 'cn2', inputValue: '0' }
                     ]
                 },
-               
+
                 {
                     xtype: 'filefield',
                     fieldLabel: '形象圖片',
@@ -440,7 +470,11 @@ function addFunction(RowID, VendorBrandsetaddStore) {
             }
         }
     });
-    editWin.show();
+    VendorStore.load({
+        callback: function () {
+            editWin.show();
+        }
+    })
     function imgFadeBig(img, width, height) {
         var e = this.event;
         if (img.split('/').length != 5) {
