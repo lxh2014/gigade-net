@@ -755,8 +755,8 @@ namespace BLL.gigade.Dao
                 strcont.AppendFormat(" INNER JOIN v_product_item_noloc v on v.item_id=pi.item_id ");
                 strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
                 strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
-                strcont.AppendFormat(" inner JOIN (SELECT parameterName,parameterCode,topValue from t_parametersrc where parameterType='product_cate')  tp1 on tp1.parameterCode=p.cate_id   ");
-                strcont.AppendFormat(" inner JOIN (SELECT parameterName,parameterCode,topValue from t_parametersrc where parameterType='product_cate')  tp2 on tp2.parameterCode=tp1.topValue ");
+                strcont.AppendFormat(" inner JOIN t_parametersrc  tp1 on tp1.parameterCode=p.cate_id  and tp1.parameterType='product_cate'  ");
+                strcont.AppendFormat(" inner JOIN  t_parametersrc  tp2 on tp2.parameterCode=tp1.topValue  and tp2.parameterType='product_cate' ");
                 strcont.AppendFormat(" where 1=1  and p.product_id>10000  ");
 
                 if (query.product_mode != 100)//  出貨方式  100 代表全部
