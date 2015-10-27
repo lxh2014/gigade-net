@@ -30,7 +30,7 @@ namespace Admin.gigade.Controllers
         public EdmTemplateMgr edmtemplatemgr;        //
         public EmailBlockListMgr _emailBlockListMgr;
         private EmailGroupMgr _emailGroupMgr;
-
+        private static DataTable _newDt = new DataTable();
         // GET: /EdmNew/
 
         #region view
@@ -958,7 +958,7 @@ namespace Admin.gigade.Controllers
         public HttpResponseBase ImportExcel()
         {
             string json = string.Empty;
-            string excelPath = "../Template/EmailGroup/";
+            string excelPath = "../ImportUserIOExcel/";
             try
             {
                 if (Request.Files.Count > 0)
@@ -969,17 +969,22 @@ namespace Admin.gigade.Controllers
                     string newExcelName = Server.MapPath(excelPath) + "email_group" + fileManagement.NewFileName(excelFile.FileName);
                     excelFile.SaveAs(newExcelName);
                     NPOI4ExcelHelper helper = new NPOI4ExcelHelper(newExcelName);
-                    DataTable _dt = helper.ExcelToTableForXLSX();
-
+                    DataTable _dt = helper.SheetData();
                     _emailGroupMgr = new EmailGroupMgr(mySqlConnectionString);
-                    if (_emailGroupMgr.ImportEmailList(_dt, group_id))
+                    _newDt.Clear();
+                    int totalCount = 0;
+                    _newDt = _emailGroupMgr.ImportEmailList(_dt, group_id, out totalCount);//匯入失敗的數據
+                    if (_newDt.Rows.Count > 0 && _newDt != null)
                     {
-                        json = "{success:true}";
+                        int totalCountData = totalCount;
+                        int wrongCount = _newDt.Rows.Count;
+                        json = "{success:true,totalCount:'" + totalCountData + "',wrongCount:'" + wrongCount + "'}";
                     }
                     else
                     {
-                        json = "{success:false}";
+                        json = "{success:true,wrongCount:'" + 0 + "'}";
                     }
+                  
                 }
             }
             catch (Exception ex)
@@ -994,6 +999,26 @@ namespace Admin.gigade.Controllers
             this.Response.Write(json);
             this.Response.End();
             return this.Response;
+        }
+
+        public void DownWrongList()
+        {
+            string json = string.Empty;
+            try
+            {
+                string fileName = "信箱名單匯入錯誤列表" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                MemoryStream ms = ExcelHelperXhf.ExportDT( _newDt, "");
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                Response.BinaryWrite(ms.ToArray());
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,data:" + "" + "}";
+            }
         }
         #endregion
 
@@ -1108,6 +1133,7 @@ namespace Admin.gigade.Controllers
                 List<EdmContentNew> store = new List<BLL.gigade.Model.EdmContentNew>();
                 EdmContentNew query = new BLL.gigade.Model.EdmContentNew();
                 EdmContentNew newQuery = new BLL.gigade.Model.EdmContentNew();
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
                 query.content_id = content_id;
                 int count = 0;
                 int successCount = 0;
