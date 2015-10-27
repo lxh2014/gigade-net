@@ -769,9 +769,7 @@ namespace BLL.gigade.Dao
                 }
                 strcont.AppendFormat("and p.product_status in (0,1,2,5) ");
                 strcont.AppendFormat("  and p.product_createdate >='{0}' and p.product_createdate  <='{1}'  ", (query.start_time), (query.end_time));
-                strcont.Append(" order by pi.item_id  ");
                 str.Append(strcont);
-
                 if (query.IsPage)
                 {
                     DataTable _dt = _access.getDataTable(sqlCount.ToString() + strcont.ToString());
