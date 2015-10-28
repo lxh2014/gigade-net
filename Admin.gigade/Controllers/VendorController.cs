@@ -947,14 +947,14 @@ namespace Admin.gigade.Controllers
                     {
                         venQuery.freight_return_normal_money = 0;
                     }
-                    //if (!string.IsNullOrEmpty(Request.Params["assist"].ToString()))
-                    //{
-                    //    venQuery.assist = Convert.ToUInt32(Request.Params["assist"].ToString());
-                    //}
-                    //else
-                    //{
-                    //    venQuery.assist = 0;
-                    //}
+                    if (!string.IsNullOrEmpty(Request.Params["assist"].ToString()))
+                    {
+                        venQuery.assist = Convert.ToUInt32(Request.Params["assist"].ToString());
+                    }
+                    else
+                    {
+                        venQuery.assist = 0;
+                    }
                     //if (!string.IsNullOrEmpty(Request.Params["dispatch"].ToString()))
                     //{
                     //    venQuery.dispatch = Convert.ToUInt32(Request.Params["dispatch"].ToString());
@@ -1623,14 +1623,14 @@ namespace Admin.gigade.Controllers
                     {
                         venQuery.freight_return_normal_money = 0;
                     }
-                    //if (uint.TryParse(Request.Params["assist"].ToString(), out isUint))
-                    //{
-                    //    venQuery.assist = Convert.ToUInt32(Request.Params["assist"].ToString());
-                    //}
-                    //else
-                    //{
-                    //    venQuery.assist = 0;
-                    //}
+                    if (uint.TryParse(Request.Params["assist"].ToString(), out isUint))
+                    {
+                        venQuery.assist = Convert.ToUInt32(Request.Params["assist"].ToString());
+                    }
+                    else
+                    {
+                        venQuery.assist = venQuery.assist;
+                    }
                     //if (uint.TryParse(Request.Params["dispatch"].ToString(), out isUint))
                     //{
                     //    venQuery.dispatch = Convert.ToUInt32(Request.Params["dispatch"].ToString());
@@ -3048,6 +3048,10 @@ namespace Admin.gigade.Controllers
                 {
                     query.Cucumber_Brand = uint.Parse(Request.Params["cucumberbrand"].ToString());
                 }
+                if (!string.IsNullOrEmpty(Request.Params["short_description"]))
+                {
+                    query.short_description = Request.Params["short_description"].ToString();
+                }
                 if (!string.IsNullOrEmpty(Request.Params["promotionbannerimagelink"]))
                 {
                     query.Promotion_Banner_Image_Link = Request.Params["promotionbannerimagelink"].ToString();
@@ -4230,6 +4234,14 @@ namespace Admin.gigade.Controllers
                 catch (Exception)
                 {
                     query.Promotion_Banner_Image_Link = oldquery.Promotion_Banner_Image_Link;
+                }
+                try
+                {
+                    query.short_description = Request.Params["short_description"].ToString();
+                }
+                catch (Exception)
+                {
+                    query.short_description = oldquery.short_description;
                 }
                 query.Image_Name = oldquery.Image_Name;
                 query.Resume_Image = oldquery.Resume_Image;

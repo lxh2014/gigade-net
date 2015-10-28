@@ -109,22 +109,12 @@ namespace BLL.gigade.Dao
                     return queryUserID;
                 }
                 StringBuilder sbuser = new StringBuilder();
-                //////List<Model.Query.UserVipListQuery> sbuserList = new List<UserVipListQuery>();
                 DataTable sbuserDT = new DataTable();
-                //////sbuser.Append(" select  0 as normal_product,0 as low_product,0 as ct,0 as ht,0 as sum_bonus,0 as sum_amount, ");
-                sbuser.Append(" select ");
-                sbuser.Append(" u.user_id,count(om.order_id) as cou,u.user_name ,u.ml_code, ");
-                sbuser.Append(" u.user_phone,u.user_mobile,u.user_gender,u.user_birthday_year,u.user_birthday_month,");
-                sbuser.Append(" u.user_birthday_day,u.user_type,u.adm_note,u.send_sms_ad,u.paper_invoice, u.user_password,u.user_reg_date,");
-
-                sbuser.Append(" sum(om.order_freight_low) as freight_low ,sum(om.order_freight_normal) as freight_normal, ");
-                sbuser.Append(" max( om.order_createdate ) as order_createdate,");
-                sbuser.Append(" round(sum(om.deduct_happygo_convert * om.deduct_happygo)) as happygo ");
+                sbuser.Append(" select u.user_id ");               
                 sbuser.Append(" from order_master om inner join users u on u.user_id = om.user_id ");
                 sbuser.Append(" where om.order_status = 99 ");
                 sbuser.Append(timelimit);
                 sbuser.Append("  group by om.user_id ");
-                //////sbuserList = _accessMySql.getDataTableForObj<Model.Query.UserVipListQuery>(sbuser.ToString());
                 sbuserDT = _accessMySql.getDataTable(sbuser.ToString());
 
                 //如果查到的table的數據條數為零，返回空字符串
@@ -297,8 +287,7 @@ namespace BLL.gigade.Dao
 
         #endregion        
         //create by shuangshuang0420j 20140923 17:44
-        public List<Model.Query.UserVipListQuery> GetVipList(Model.Query.UserVipListQuery uvlq,string userIdString, ref int totalCount)
-        //public DataTable GetVipList(Model.Query.UserVipListQuery uvlq, string userIdString, ref int totalCount)
+        public List<Model.Query.UserVipListQuery> GetVipList(Model.Query.UserVipListQuery uvlq,string userIdString, ref int totalCount)       
         {
             
             StringBuilder sql = new StringBuilder();
@@ -316,12 +305,8 @@ namespace BLL.gigade.Dao
                     timelimit += string.Format(" and om.order_createdate <='{0}' ", uvlq.create_dateTwo);
                 }
                 StringBuilder sbuser = new StringBuilder();
-                //////StringBuilder sbuser25 = new StringBuilder();
-                //////StringBuilder sbuserAll = new StringBuilder();
-                //////List<Model.Query.UserVipListQuery> sbuserList = new List<UserVipListQuery> ();
-                //////sbuser.Append(" select  0 as normal_product,0 as low_product,0 as ct,0 as ht,0 as sum_bonus,0 as sum_amount, ");
                 sbuser.Append(" select  ");
-                sbuser.Append(" u.user_id,count(om.order_id) as cou,u.user_name ,u.ml_code, ");
+                sbuser.Append(" u.user_id,u.user_status,u.last_time,count(om.order_id) as cou,u.user_name ,u.ml_code, ");
                 sbuser.Append(" u.user_phone,u.user_mobile,u.user_gender,u.user_birthday_year,u.user_birthday_month,");
                 sbuser.Append(" u.user_birthday_day,u.user_type,u.adm_note,u.send_sms_ad,u.paper_invoice, u.user_password,u.user_reg_date,");                
                 
@@ -334,19 +319,13 @@ namespace BLL.gigade.Dao
                 sbuser.Append(timelimit);
                 sbuser.Append("  group by om.user_id ");
                 
-                
-                //////sbuser25.Append(sbuser);
-                //////sbuser25.AppendFormat(" and om.user_id in ({0}) ", userIdString);
-                //////sbuser25.Append(timelimit);
-                //////sbuser25.Append("  group by om.user_id ");
-                //////sbuserList = _accessMySql.getDataTableForObj<Model.Query.UserVipListQuery>(sbuser25.ToString());
+                        
 
                 //order_status=99表示訂單已歸檔
                 //得到常溫商品總額集合sbNPro
                 StringBuilder sbNPro = new StringBuilder("");
-                //////List<Model.Query.UserVipListQuery> sbNProList = new List<UserVipListQuery>();
-                sbNPro.Append(@" select om.user_id,sum(single_money * (case  when od.item_mode=0  then od.buy_num 
-                   when od.item_mode=2 then od.parent_num end)) as normal_product ,sum(od.deduct_bonus) as normal_deduct_bonus");
+                sbNPro.Append(@" select om.user_id,sum(od.single_money * (case  when od.item_mode=0  then od.buy_num 
+                when od.item_mode=2 then od.parent_num end)) as normal_product ,sum(od.deduct_bonus) as normal_deduct_bonus");                        
                 sbNPro.Append(" from order_master om  ");
                 sbNPro.Append(" left join order_slave os on os.order_id = om.order_id");
                 sbNPro.Append(" left join order_detail od on od.slave_id = os.slave_id");
@@ -354,13 +333,11 @@ namespace BLL.gigade.Dao
                                     and od.item_mode in (0,2) and om.user_id in ({0}) ", userIdString);
                 sbNPro.Append(timelimit);
                 sbNPro.Append("  group by om.user_id ");
-                //////sbNProList = _accessMySql.getDataTableForObj<Model.Query.UserVipListQuery>(sbNPro.ToString());
 
                 //得到低溫商品總額集合sbLPro
                 StringBuilder sbLPro = new StringBuilder("");
-                //////List<Model.Query.UserVipListQuery> sbLProList = new List<UserVipListQuery>();
-                sbLPro.Append(@" select om.user_id,sum(single_money * (case  when od.item_mode=0  then od.buy_num 
-                   when od.item_mode=2 then od.parent_num end)) as low_product,sum(od.deduct_bonus) as low_deduct_bonus ");
+                sbLPro.Append(@" select om.user_id,sum(od.single_money * (case  when od.item_mode=0  then od.buy_num 
+                when od.item_mode=2 then od.parent_num end)) as low_product,sum(od.deduct_bonus) as low_deduct_bonus ");
                 sbLPro.Append(" from order_master om ");
                 sbLPro.Append(" left join order_slave os on os.order_id = om.order_id");
                 sbLPro.Append(" left join order_detail od on od.slave_id = os.slave_id");
@@ -368,27 +345,22 @@ namespace BLL.gigade.Dao
                                     and od.item_mode in (0,2) and om.user_id in ({0}) ", userIdString);
                 sbLPro.Append(timelimit);
                 sbLPro.Append(" group by om.user_id ");
-                //////sbLProList = _accessMySql.getDataTableForObj<Model.Query.UserVipListQuery>(sbLPro.ToString());
 
                 //得到ct集合sbCT
                 StringBuilder sbCT = new StringBuilder("");
-                //////List<Model.Query.UserVipListQuery> sbCTList = new List<UserVipListQuery>();
                 sbCT.Append(" select om.user_id, sum(opc.offsetamt) as ct ");
                 sbCT.Append(" from order_master om inner join order_payment_ct opc on om.order_id = opc.lidm ");
                 sbCT.AppendFormat(@" where   om.order_status = 99 and om.user_id in ({0}) ", userIdString);
                 sbCT.Append(timelimit);
                 sbCT.Append("  group by om.user_id ");
-                //////sbCTList = _accessMySql.getDataTableForObj<Model.Query.UserVipListQuery>(sbCT.ToString());
 
                 //得到ht集合sbHT
                 StringBuilder sbHT = new StringBuilder("");
-                //////List<Model.Query.UserVipListQuery> sbHTList = new List<UserVipListQuery>();
                 sbHT.Append(" select om.user_id, sum(oph.redem_discount_amount) as ht");
                 sbHT.Append(" from order_master om inner join order_payment_hitrust oph on om.order_id = oph.order_id");
                 sbHT.AppendFormat(@" where  om.order_status = 99 and om.user_id in ({0}) ", userIdString);
                 sbHT.Append(timelimit);
                 sbHT.Append("  group by om.user_id ");
-                //////sbHTList = _accessMySql.getDataTableForObj<Model.Query.UserVipListQuery>(sbHT.ToString());
 
 
                 #region 手動插入數據
@@ -460,6 +432,7 @@ namespace BLL.gigade.Dao
                     Model.Query.UserVipListQuery query = new UserVipListQuery();
 
                     query.user_id = Convert.ToUInt32(vipListDT.Rows[i]["user_id"]);
+                    query.user_status = Convert.ToUInt32(vipListDT.Rows[i]["user_status"]);
                     query.cou = Convert.ToInt64(vipListDT.Rows[i]["cou"]);
                     query.user_name = Convert.ToString(vipListDT.Rows[i]["user_name"]);
                     query.ml_code = Convert.ToString(vipListDT.Rows[i]["ml_code"]);
@@ -475,6 +448,7 @@ namespace BLL.gigade.Dao
                     query.paper_invoice = Convert.ToBoolean(vipListDT.Rows[i]["paper_invoice"]);
                     query.user_password = Convert.ToString(vipListDT.Rows[i]["user_password"]);
                     query.user_reg_date = Convert.ToUInt32(vipListDT.Rows[i]["user_reg_date"]);
+                    query.last_time = Convert.ToUInt32(vipListDT.Rows[i]["last_time"]);
                     query.freight_low = Convert.ToDecimal(vipListDT.Rows[i]["freight_low"]);
                     query.freight_normal = Convert.ToDecimal(vipListDT.Rows[i]["freight_normal"]);
                     query.order_createdate = Convert.ToUInt32(vipListDT.Rows[i]["order_createdate"]);
@@ -488,33 +462,7 @@ namespace BLL.gigade.Dao
                     store.Add(query);
                 }
                 return store;
-                
-               
-
-////                //得到數據總條數
-////                totalCount = 0;
-////                sbuserAll = sbuser.Append(timelimit);
-////                sbuserAll.Append(" group by om.user_id ");
-////                string sqlForCount = "select count(user_id) as totalCount from (" + sbuserAll + ") s ";
-////                System.Data.DataTable _dt = _accessMySql.getDataTable(sqlForCount);
-////                if (_dt != null)
-////                {
-////                    totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
-////                }
-////                //sbuser.AppendFormat(" limit {0},{1}", uvlq.Start, uvlq.Limit);//分頁
-//////                sql.Append(@" select b.*,n.normal_product,l.low_product,c.ct,h.ht,
-//////                           IFNULL(n.normal_deduct_bonus,0)+IFNULL(l.low_deduct_bonus,0) as sum_bonus,
-//////                           IFNULL(n.normal_product,0)+IFNULL(l.low_product,0)  as sum_amount  ");
-//////                sql.AppendFormat(" from  ( {0} ) b ", sbuser);
-//////                sql.AppendFormat(" left join ( {0} )  n on n.user_id = b.user_id", sbNPro);
-//////                sql.AppendFormat(" left join ( {0} )  l on l.user_id = b.user_id", sbLPro);
-//////                sql.AppendFormat(" left join ( {0} )  c on c.user_id = b.user_id", sbCT);
-//////                sql.AppendFormat(" left join  ( {0} )  h on h.user_id = b.user_id", sbHT);
-//////                sql.AppendFormat(" where 1=1   order by sum_amount DESC");
-//////                sql.AppendFormat(" limit {0},{1}", uvlq.Start, uvlq.Limit);//分頁
-////                //return _accessMySql.getDataTableForObj<Model.Query.UserVipListQuery>(sql.ToString());
-////                return sbuserList;
-                
+                                              
             }
             catch (Exception ex)
             {

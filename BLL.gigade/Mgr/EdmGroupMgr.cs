@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using BLL.gigade.Common;
 using System.Data;
+using System.Text.RegularExpressions;
 
 namespace BLL.gigade.Mgr
 {
@@ -147,6 +148,7 @@ namespace BLL.gigade.Mgr
           EdmGroupQuery query = new EdmGroupQuery();
           List<EdmEmail> emailStore = new List<EdmEmail>();
           List<EdmGroupEmailQuery> groupMailStore = new List<EdmGroupEmailQuery>();
+          string regex = @"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$";
           try
           {
               query.group_id = groupMailQuery.group_id;
@@ -154,13 +156,18 @@ namespace BLL.gigade.Mgr
               {
                   if (_dt.Rows[i][0] != "")
                   {
+                     if( Regex.IsMatch(_dt.Rows[i][0].ToString(), regex))
+                     {
                       emailQuery.email_address = _dt.Rows[i][0].ToString();
                       //若不為 0、1、未指定或有錯誤時，預設皆為訂閱。
+
+                      #region 有2列
                       int n = 1;
-                      if (_dt.Columns.Count == 2)
+                      if (_dt.Columns.Count >= 2)
                       {
                           if (_dt.Rows[i][1] != "")
                           {
+                              #region MyRegion
                               if (int.TryParse(_dt.Rows[i][1].ToString(), out n))
                               {
                                   groupMailQuery.email_status = Convert.ToUInt32(_dt.Rows[i][1].ToString());
@@ -173,6 +180,7 @@ namespace BLL.gigade.Mgr
                               {
                                   groupMailQuery.email_status = 1;
                               }
+                              #endregion
                           }
                           else
                           {
@@ -183,6 +191,8 @@ namespace BLL.gigade.Mgr
                       {
                           groupMailQuery.email_status = 1;
                       }
+                      #endregion
+                      #region 有3列
                       if (_dt.Columns.Count == 3)
                       {
                           if (_dt.Rows[i][2] == "")//或無指定，預設以電子信箱帳號代替。
@@ -198,9 +208,13 @@ namespace BLL.gigade.Mgr
                       {
                           emailQuery.email_name = _dt.Rows[i][0].ToString().Substring(0, _dt.Rows[i][0].ToString().LastIndexOf("@"));
                       }
+                      #endregion
+
                       groupMailQuery.email_name = emailQuery.email_name;
                       //查看edm_mail中郵箱是否存在，如果重複則更新
                       emailStore = _IEdmGroupEmailMgr.getList(emailQuery);
+                      #region 存在,更新
+                      
                       if (emailStore.Count > 0)//存在,更新
                       {
                           emailQuery.email_id = emailStore[0].email_id;
@@ -221,6 +235,9 @@ namespace BLL.gigade.Mgr
                               arrList.Add(_edmGroup.insertEGEInfo(groupMailQuery));
                           }
                       }
+                      #endregion
+                      #region 不存在新增
+   
                       else//不存在新增
                       {
                           //1 新增edm_email表
@@ -239,6 +256,8 @@ namespace BLL.gigade.Mgr
                           groupMailQuery.email_id = emailQuery.email_id;
                           arrList.Add(_edmGroup.insertEGEInfo(groupMailQuery));
                       }
+                      #endregion
+                     }
                   }
               }
               if (arrList.Count > 0)

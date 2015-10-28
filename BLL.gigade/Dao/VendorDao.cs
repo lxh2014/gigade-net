@@ -154,6 +154,7 @@ namespace BLL.gigade.Dao
             sql.AppendFormat(@",bank_number,bank_account,freight_normal_money,freight_normal_limit,");
             sql.AppendFormat(@"freight_return_normal_money,freight_low_money,freight_low_limit,");
             sql.AppendFormat(@"freight_return_low_money,product_manage,user_username,");
+            sql.AppendFormat(@"assist,");
             sql.AppendFormat(@"contact_name_1,contact_phone_1_1,contact_mobile_1,contact_email_1,");
             sql.AppendFormat(@"contact_type_2,contact_name_2,contact_phone_1_2,contact_mobile_2,contact_email_2,");
             sql.AppendFormat(@"contact_type_3,contact_name_3,contact_phone_1_3,contact_mobile_3,contact_email_3,");

@@ -600,7 +600,7 @@ function editFunction(rowID) {
                                                 freight_normal_limit: Ext.htmlEncode(Ext.getCmp("freight_normal_limit").getValue()),
                                                 freight_normal_money: Ext.htmlEncode(Ext.getCmp("freight_normal_money").getValue()),
                                                 freight_return_normal_money: Ext.htmlEncode(Ext.getCmp("freight_return_normal_money").getValue()),
-                                                // assist: Ext.htmlEncode(Ext.getCmp("assist").getValue().assist),
+                                                assist: Ext.htmlEncode(Ext.getCmp("assist").getValue().assist),
                                                 //  dispatch: Ext.htmlEncode(Ext.getCmp("dispatch").getValue().dispatch),
                                                 // product_mode: Ext.htmlEncode(Ext.getCmp("product_mode").getValue().product_mode),
                                                 procurement_days: Ext.htmlEncode(Ext.getCmp("procurement_days").getValue()),
@@ -730,7 +730,7 @@ function editFunction(rowID) {
                                         freight_normal_limit: Ext.htmlEncode(Ext.getCmp("freight_normal_limit").getValue()),
                                         freight_normal_money: Ext.htmlEncode(Ext.getCmp("freight_normal_money").getValue()),
                                         freight_return_normal_money: Ext.htmlEncode(Ext.getCmp("freight_return_normal_money").getValue()),
-                                        // assist: Ext.htmlEncode(Ext.getCmp("assist").getValue().assist),
+                                        assist: Ext.htmlEncode(Ext.getCmp("assist").getValue().assist),
                                         //  dispatch: Ext.htmlEncode(Ext.getCmp("dispatch").getValue().dispatch),
                                         // product_mode: Ext.htmlEncode(Ext.getCmp("product_mode").getValue().product_mode),
                                         procurement_days: Ext.htmlEncode(Ext.getCmp("procurement_days").getValue()),
@@ -849,7 +849,7 @@ function editFunction(rowID) {
                                 freight_normal_limit: Ext.htmlEncode(Ext.getCmp("freight_normal_limit").getValue()),
                                 freight_normal_money: Ext.htmlEncode(Ext.getCmp("freight_normal_money").getValue()),
                                 freight_return_normal_money: Ext.htmlEncode(Ext.getCmp("freight_return_normal_money").getValue()),
-                                // assist: Ext.htmlEncode(Ext.getCmp("assist").getValue().assist),
+                                assist: Ext.htmlEncode(Ext.getCmp("assist").getValue().assist),
                                 //  dispatch: Ext.htmlEncode(Ext.getCmp("dispatch").getValue().dispatch),
                                 // product_mode: Ext.htmlEncode(Ext.getCmp("product_mode").getValue().product_mode),
                                 procurement_days: Ext.htmlEncode(Ext.getCmp("procurement_days").getValue()),
@@ -1590,28 +1590,27 @@ function editFunction(rowID) {
                         minValue: 0
                     }
                 ]
+            },
+            {
+                xtype: 'radiogroup',
+                hidden: false,
+                id: 'assist',
+                name: 'assist',
+                fieldLabel: '出貨模式',
+                colName: 'assist',
+                defaults: {
+                    name: 'assist',
+                    margin: '5 8 0 0'
+                },
+                width: 400,
+                lableWidth: 70,
+                columns: 2,
+                vertical: true,
+                items: [
+                  { boxLabel: '廠商自行管理', id: 'cs_self', inputValue: '0', checked: true },
+                  { boxLabel: '協助轉單', id: 'help', inputValue: '1' }
+                ]
             }
-
-            //{
-            //    xtype: 'radiogroup',
-            //    hidden: false,
-            //    id: 'assist',
-            //    name: 'assist',
-            //    fieldLabel: '出貨模式',
-            //    colName: 'assist',
-            //    defaults: {
-            //        name: 'assist',
-            //        margin: '5 8 0 0'
-            //    },
-            //    width: 400,
-            //    lableWidth: 70,
-            //    columns: 2,
-            //    vertical: true,
-            //    items: [
-            //      { boxLabel: '廠商自行管理', id: 'cs_self', inputValue: '0', checked: true },
-            //      { boxLabel: '協助轉單', id: 'help', inputValue: '1' }
-            //    ]
-            //},
             //{
             //    xtype: 'radiogroup',
             //    hidden: false,
@@ -1876,6 +1875,41 @@ function editFunction(rowID) {
                                         success: function (form, action) {
                                             var result = Ext.decode(form.responseText);
                                             if (result.success) {
+                                                if (result.name == "") {
+                                                    Ext.Msg.alert(INFORMATION, "請確認該銀行代碼是否存在！ ");
+                                                }
+                                                else if (name.getValue() == "") {
+                                                    name.setValue(result.name);
+                                                }
+                                                else if (result.name != name.getValue()) {
+                                                    Ext.MessageBox.confirm(CONFIRM, "是否用【" + result.name + "】替換現有銀行名稱？", function (btn) {
+                                                        if (btn === "yes") {
+                                                            name.setValue(result.name);
+                                                        }
+
+                                                    });
+                                                }
+
+                                            }
+                                        }
+                                    });
+                                }
+                            },
+                            specialkey: function (field, e) {
+                                if (e.getKey() == e.ENTER) {
+                                    var code = Ext.getCmp('bank_code').getValue();
+                                    var name = Ext.getCmp('bank_name');
+                                    if (code != "") {
+                                        Ext.Ajax.request({
+                                            url: "/Vendor/GetBankName",
+                                            method: 'post',
+                                            async: false, //true為異步，false為同步
+                                            params: {
+                                                bankCode: code
+                                            },
+                                            success: function (form, action) {
+                                                var result = Ext.decode(form.responseText);
+                                                if (result.success) {
                                                     if (result.name == "") {
                                                         Ext.Msg.alert(INFORMATION, "請確認該銀行代碼是否存在！ ");
                                                     }
@@ -1891,9 +1925,10 @@ function editFunction(rowID) {
                                                         });
                                                     }
 
+                                                }
                                             }
-                                        }
-                                    });
+                                        });
+                                    }
                                 }
                             }
                         }
@@ -2271,7 +2306,7 @@ function editFunction(rowID) {
                                    freight_normal_limit: Ext.htmlEncode(Ext.getCmp("freight_normal_limit").getValue()),
                                    freight_normal_money: Ext.htmlEncode(Ext.getCmp("freight_normal_money").getValue()),
                                    freight_return_normal_money: Ext.htmlEncode(Ext.getCmp("freight_return_normal_money").getValue()),
-                                   // assist: Ext.htmlEncode(Ext.getCmp("assist").getValue().assist),
+                                   assist: Ext.htmlEncode(Ext.getCmp("assist").getValue().assist),
                                    //  dispatch: Ext.htmlEncode(Ext.getCmp("dispatch").getValue().dispatch),
                                    // product_mode: Ext.htmlEncode(Ext.getCmp("product_mode").getValue().product_mode),
                                    procurement_days: Ext.htmlEncode(Ext.getCmp("procurement_days").getValue()),
@@ -2475,6 +2510,15 @@ function editFunction(rowID) {
                 Ext.getCmp("vendor_status").setDisabled(true)
                 break;
         }
+        switch (row.data.assist) {
+            case 0:
+                Ext.getCmp("cs_self").setValue(true);
+                break;
+            case 1:
+                Ext.getCmp("help").setValue(true);
+                break;
+        }
+
         if (row.data.product_manage == 0) {
             Ext.getCmp("manage_name").setValue("0");
         }

@@ -123,6 +123,8 @@ namespace BLL.gigade.Mgr
 
         public string MailAndRequest(EdmSendLog eslQuery, MailRequest MRquery)
         {
+            eslQuery.Replace4MySQL();
+            MRquery.Replace4MySQL();
             string json = string.Empty;
             ArrayList arrList = new ArrayList();
             try
@@ -369,19 +371,19 @@ namespace BLL.gigade.Mgr
 
                     else if ((_dt != null && _dt.Rows.Count > 0) && (_emailDt != null && _emailDt.Rows.Count > 0))
                     {
-                        for (int i = 0; i < _dt.Rows.Count; i++)
+                        for (int i = 0; i < _emailDt.Rows.Count; i++)
                         {
                             int norepeat = 0;
                             string email_address = string.Empty;
-                            for (int j = 0; j < _emailDt.Rows.Count; j++)
+                            for (int j = 0; j < _dt.Rows.Count; j++)
                             {
-                                if (_emailDt.Rows[j]["email_address"].ToString() != _dt.Rows[i]["user_email"].ToString())
+                                if (_dt.Rows[j]["user_email"].ToString() != _emailDt.Rows[i]["email_address"].ToString())
                                 {
                                     norepeat++;
-                                    email_address = _emailDt.Rows[j]["email_address"].ToString();
+                                    email_address = _emailDt.Rows[i]["email_address"].ToString();
                                 }
                             }
-                            if (norepeat == _emailDt.Rows.Count)//證明不重複
+                            if (norepeat == _dt.Rows.Count)//證明不重複
                             {
                                 DataRow dr = _dt.NewRow();
                                 dr["user_name"] = "";
@@ -528,7 +530,11 @@ namespace BLL.gigade.Mgr
 
                             et.email_id = email_id;
                             arrList.Add(_edmContentNewDao.InsertEdmTrace(et));
-                            MRquery.success_action = "update edm_trace set success=1 where log_id='" + log_id + "' and  content_id='" + eslQuery.content_id + "' and email_id='" + email_id + "';";
+                            MRquery.success_action = "update edm_trace set success=1,send_date=NOW()  where log_id=" + log_id + " and  content_id=" + eslQuery.content_id + " and email_id=" + email_id + ";";
+                            MRquery.fail_action = "update edm_trace set success=0,send_date=NOW()  where log_id=" + log_id + " and  content_id=" + eslQuery.content_id + " and email_id=" + email_id + ";";
+                            string url = "<img src='http://www.gigade100.com/edm.php?c=" + eslQuery.content_id + "&e=" + email_id + "&l="+log_id+"'/>";
+                            MRquery.body = MRquery.body + url;
+                          
                             arrList.Add(_edmContentNewDao.InsertEmailRequest(MRquery));
 
                         }
@@ -551,48 +557,48 @@ namespace BLL.gigade.Mgr
             }
         }
 
-        public int GetSendMailSCount(int content_id)
+        public int GetSendMailSCount(int content_id,int log_id)
         {
 
             try
             {
-                return _edmContentNewDao.GetSendMailSCount(content_id);
+                return _edmContentNewDao.GetSendMailSCount(content_id, log_id);
             }
             catch (Exception ex)
             {
                 throw new Exception("EdmContentNewMgr-->GetSendMailSCount-->" + ex.Message, ex);
             }
         }
-        public int GetSendMailFCount(int content_id)
+        public int GetSendMailFCount(int content_id, int log_id)
         {
 
             try
             {
-                return _edmContentNewDao.GetSendMailFCount(content_id);
+                return _edmContentNewDao.GetSendMailFCount(content_id,log_id);
             }
             catch (Exception ex)
             {
                 throw new Exception("EdmContentNewMgr-->GetSendMailFCount-->" + ex.Message, ex);
             }
         }
-        public int GetSendMailCount(int content_id)
+        public int GetSendMailCount(int content_id,int  log_id)
         {
 
             try
             {
-                return _edmContentNewDao.GetSendMailCount(content_id);
+                return _edmContentNewDao.GetSendMailCount(content_id, log_id);
             }
             catch (Exception ex)
             {
                 throw new Exception("EdmContentNewMgr-->GetSendMailCount-->" + ex.Message, ex);
             }
         }
-        public int GetSendCount(int content_id)
+        public int GetSendCount(int content_id,int log_id)
         {
 
             try
             {
-                return _edmContentNewDao.GetSendCount(content_id);
+                return _edmContentNewDao.GetSendCount(content_id,log_id);
             }
             catch (Exception ex)
             {
@@ -605,11 +611,11 @@ namespace BLL.gigade.Mgr
         /// </summary>
         /// <param name="content_id"></param>
         /// <returns></returns>
-        public DataTable KXMD(int content_id)
+        public DataTable KXMD(int content_id,int log_id)
         {
             try
             {
-                return _edmContentNewDao.KXMD(content_id);
+                return _edmContentNewDao.KXMD(content_id,log_id);
             }
             catch (Exception ex)
             {
@@ -623,11 +629,11 @@ namespace BLL.gigade.Mgr
         /// </summary>
         /// <param name="content_id"></param>
         /// <returns></returns>
-        public DataTable WKXMD(int content_id)
+        public DataTable WKXMD(int content_id,int log_id)
         {
             try
             {
-                return _edmContentNewDao.WKXMD(content_id);
+                return _edmContentNewDao.WKXMD(content_id,log_id);
             }
             catch (Exception ex)
             {
@@ -644,7 +650,7 @@ namespace BLL.gigade.Mgr
                 DataTable _innerCustomer = _edmContentNewDao.GetInnerCustomer(group_id);
                 for (int i = 0; i < _innerCustomer.Rows.Count; i++)
                 {
-                    DataRow dr = _innerCustomer.NewRow();
+                    DataRow dr = _outerCustomer.NewRow();
                     dr["customer_email"] = _innerCustomer.Rows[i]["user_email"];
                     dr["customer_id"] = _innerCustomer.Rows[i]["user_id"];
                     _outerCustomer.Rows.Add(dr);
@@ -680,6 +686,30 @@ namespace BLL.gigade.Mgr
             {
 
                 throw new Exception("EdmContentNewMgr-->EdmContentNewReportList-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable CreatedateAndLogId()
+        {
+            try
+            {
+                return _edmContentNewDao.CreatedateAndLogId();
+            }
+            catch (Exception ex)
+            {
+             throw new Exception("EdmContentNewMgr-->FXMD-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetScheduleDate(int content_id, int log_id)
+        {
+            try
+            {
+                return _edmContentNewDao.GetScheduleDate(content_id, log_id);
+            }
+            catch (Exception ex)
+            {
+           throw new Exception("EdmContentNewMgr-->FXMD-->" + ex.Message, ex);
             }
         }
 

@@ -1485,15 +1485,15 @@ namespace Admin.gigade.Controllers
                         string upc_type = store[i].upc_type_flg;
                         if (upc_type.Equals("1"))
                         {
-                            newRow[3] = "國際碼";
+                            newRow[3] = "國際條碼";
                         }
                         if (upc_type.Equals("2"))
                         {
-                            newRow[3] = "店內碼";
+                            newRow[3] = "吉甲地店內碼";
                         }
                         if (upc_type.Equals("3"))
                         {
-                            newRow[3] = "舊店內碼";
+                            newRow[3] = "供應商店內碼";
                         }
                     }
                     else { newRow[3] = ""; }
@@ -11943,7 +11943,6 @@ namespace Admin.gigade.Controllers
 
             }
         }
-
 
     }
 }

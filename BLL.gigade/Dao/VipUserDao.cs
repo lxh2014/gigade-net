@@ -86,7 +86,7 @@ namespace BLL.gigade.Dao
             StringBuilder strSql = new StringBuilder();
             try
             {
-                strSql.AppendFormat(@"UPDATE vip_user set status={0},update_id={1},updatedate={2} WHERE v_id={3};", query.status, query.update_id, query.updatedate, query.v_id);
+                strSql.AppendFormat(@"UPDATE vip_user set status={0},update_id={1},updatedate={2},source=2 WHERE v_id={3};", query.status, query.update_id, query.updatedate, query.v_id);
                 return strSql.ToString();
             }
             catch (Exception ex)
