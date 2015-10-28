@@ -835,11 +835,11 @@ namespace BLL.gigade.Dao
                 }
                 if (!string.IsNullOrEmpty(query.loc_id))
                 {
-                    sbSqlCondition.AppendFormat(" and ip.loc_id>'{0}' ", query.loc_id);
+                    sbSqlCondition.AppendFormat(" and ip.loc_id>='{0}' ", query.loc_id);
                 }
                 if (!string.IsNullOrEmpty(query.loc_id2))
                 {
-                    sbSqlCondition.AppendFormat(" and ip.loc_id<'{0}' ", query.loc_id2);
+                    sbSqlCondition.AppendFormat(" and ip.loc_id<='{0}' ", query.loc_id2);
                 }
                 if (query.IsPage)
                 {
