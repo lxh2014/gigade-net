@@ -197,7 +197,7 @@ Ext.onReady(function () {
                     {
                         xtype: 'combobox',
                         id: 'searchState',
-                        fieldLabel: '狀態',
+                        fieldLabel: '訂閱狀態',
                         labelWidth: 60,
                         //  width: 190,
                         margin: '0 5 0 0',
