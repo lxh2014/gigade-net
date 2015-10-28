@@ -57,7 +57,7 @@ namespace BLL.gigade.Mgr
                             totalCount++;
                             if (Regex.IsMatch(_dt.Rows[i][0].ToString(), regex))
                             {
-                                if (!_emailGroupDao.IsExistEmail(_dt.Rows[i][0].ToString()))
+                                if (!_emailGroupDao.IsExistEmail(_dt.Rows[i][0].ToString(), group_id))
                                 {
                                     query.email_address = _dt.Rows[i][0].ToString();
                                     query.name = _dt.Rows[i][1].ToString();
@@ -162,6 +162,41 @@ namespace BLL.gigade.Mgr
             catch (Exception ex)
             {
                 throw new Exception("EmailGroupDao-->EmailGroupStore-->" + ex.Message, ex);
+            }
+        }
+
+
+        public string DelEmailGroupList(List<EmailGroup> list)
+        {
+            ArrayList arrList = new ArrayList();
+            string json = "{success:true}";
+            try
+            {
+                if (list.Count > 0)
+                {
+                    foreach (var item in list)
+                    {
+                        arrList.Add(_emailGroupDao.DeleteEmailList(item.group_id));
+                        arrList.Add(_emailGroupDao.DeleteEmailGroup(item.group_id));
+                    }
+                }
+                if (arrList.Count > 0)
+                {
+                    if (_mySqlDao.ExcuteSqlsThrowException(arrList))
+                    {
+                        json = "{success:true}";
+                    }
+                    else
+                    {
+                        json = "{success:false}";
+                    }
+                }
+                return json;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("EmailGroupDao-->DelEmailGroupList-->" + ex.Message, ex);
             }
         }
 

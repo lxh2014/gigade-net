@@ -371,19 +371,19 @@ namespace BLL.gigade.Mgr
 
                     else if ((_dt != null && _dt.Rows.Count > 0) && (_emailDt != null && _emailDt.Rows.Count > 0))
                     {
-                        for (int i = 0; i < _dt.Rows.Count; i++)
+                        for (int i = 0; i < _emailDt.Rows.Count; i++)
                         {
                             int norepeat = 0;
                             string email_address = string.Empty;
-                            for (int j = 0; j < _emailDt.Rows.Count; j++)
+                            for (int j = 0; j < _dt.Rows.Count; j++)
                             {
-                                if (_emailDt.Rows[j]["email_address"].ToString() != _dt.Rows[i]["user_email"].ToString())
+                                if (_dt.Rows[j]["user_email"].ToString() != _emailDt.Rows[i]["email_address"].ToString())
                                 {
                                     norepeat++;
-                                    email_address = _emailDt.Rows[j]["email_address"].ToString();
+                                    email_address = _emailDt.Rows[i]["email_address"].ToString();
                                 }
                             }
-                            if (norepeat == _emailDt.Rows.Count)//證明不重複
+                            if (norepeat == _dt.Rows.Count)//證明不重複
                             {
                                 DataRow dr = _dt.NewRow();
                                 dr["user_name"] = "";
@@ -557,48 +557,48 @@ namespace BLL.gigade.Mgr
             }
         }
 
-        public int GetSendMailSCount(int content_id)
+        public int GetSendMailSCount(int content_id,int log_id)
         {
 
             try
             {
-                return _edmContentNewDao.GetSendMailSCount(content_id);
+                return _edmContentNewDao.GetSendMailSCount(content_id, log_id);
             }
             catch (Exception ex)
             {
                 throw new Exception("EdmContentNewMgr-->GetSendMailSCount-->" + ex.Message, ex);
             }
         }
-        public int GetSendMailFCount(int content_id)
+        public int GetSendMailFCount(int content_id, int log_id)
         {
 
             try
             {
-                return _edmContentNewDao.GetSendMailFCount(content_id);
+                return _edmContentNewDao.GetSendMailFCount(content_id,log_id);
             }
             catch (Exception ex)
             {
                 throw new Exception("EdmContentNewMgr-->GetSendMailFCount-->" + ex.Message, ex);
             }
         }
-        public int GetSendMailCount(int content_id)
+        public int GetSendMailCount(int content_id,int  log_id)
         {
 
             try
             {
-                return _edmContentNewDao.GetSendMailCount(content_id);
+                return _edmContentNewDao.GetSendMailCount(content_id, log_id);
             }
             catch (Exception ex)
             {
                 throw new Exception("EdmContentNewMgr-->GetSendMailCount-->" + ex.Message, ex);
             }
         }
-        public int GetSendCount(int content_id)
+        public int GetSendCount(int content_id,int log_id)
         {
 
             try
             {
-                return _edmContentNewDao.GetSendCount(content_id);
+                return _edmContentNewDao.GetSendCount(content_id,log_id);
             }
             catch (Exception ex)
             {
@@ -611,11 +611,11 @@ namespace BLL.gigade.Mgr
         /// </summary>
         /// <param name="content_id"></param>
         /// <returns></returns>
-        public DataTable KXMD(int content_id)
+        public DataTable KXMD(int content_id,int log_id)
         {
             try
             {
-                return _edmContentNewDao.KXMD(content_id);
+                return _edmContentNewDao.KXMD(content_id,log_id);
             }
             catch (Exception ex)
             {
@@ -629,11 +629,11 @@ namespace BLL.gigade.Mgr
         /// </summary>
         /// <param name="content_id"></param>
         /// <returns></returns>
-        public DataTable WKXMD(int content_id)
+        public DataTable WKXMD(int content_id,int log_id)
         {
             try
             {
-                return _edmContentNewDao.WKXMD(content_id);
+                return _edmContentNewDao.WKXMD(content_id,log_id);
             }
             catch (Exception ex)
             {
@@ -686,6 +686,30 @@ namespace BLL.gigade.Mgr
             {
 
                 throw new Exception("EdmContentNewMgr-->EdmContentNewReportList-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable CreatedateAndLogId()
+        {
+            try
+            {
+                return _edmContentNewDao.CreatedateAndLogId();
+            }
+            catch (Exception ex)
+            {
+             throw new Exception("EdmContentNewMgr-->FXMD-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetScheduleDate(int content_id, int log_id)
+        {
+            try
+            {
+                return _edmContentNewDao.GetScheduleDate(content_id, log_id);
+            }
+            catch (Exception ex)
+            {
+           throw new Exception("EdmContentNewMgr-->FXMD-->" + ex.Message, ex);
             }
         }
 

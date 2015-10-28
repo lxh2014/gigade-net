@@ -175,12 +175,12 @@ namespace BLL.gigade.Dao
         /// </summary>
         /// <param name="emailAddress"></param>
         /// <returns>為true存在，false則不存在</returns>
-        public bool IsExistEmail(string emailAddress)
+        public bool IsExistEmail(string emailAddress,int group_id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(" select email_address from email_list where email_address='{0}';  ",emailAddress);
+                sql.AppendFormat(" select email_address from email_list where email_address='{0}' and group_id='{1}';", emailAddress, group_id);
                 DataTable _dt = _access.getDataTable(sql.ToString());
                 if (_dt != null && _dt.Rows.Count > 0)
                 {
@@ -195,6 +195,34 @@ namespace BLL.gigade.Dao
             {
 
                 throw new Exception("EmailGroupDao-->IsExistEmail-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public string DeleteEmailList(int group_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" set sql_safe_updates = 0;delete from email_list where group_id='{0}';set sql_safe_updates = 1;", group_id);
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EmailGroupDao-->DeleteEmailList-->" + ex.Message+sql.ToString(), ex);
+            }
+        }
+
+        public string DeleteEmailGroup(int group_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" set sql_safe_updates = 0;delete from email_group where group_id='{0}';set sql_safe_updates = 1;", group_id);
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EmailGroupDao-->EmailGroup-->" + ex.Message+sql.ToString(), ex);
             }
         }
     }
