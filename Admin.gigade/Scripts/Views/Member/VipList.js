@@ -95,6 +95,10 @@ var VipListStore = Ext.create('Ext.data.Store', {
 
 //加載前先獲取ddl的值
 VipListStore.on('beforeload', function () {
+    if (Ext.getCmp('dateOne').getValue() == null && Ext.getCmp('userID').getValue()=='') {
+        Ext.Msg.alert('提示信息', '請輸入查詢條件');
+        return false;
+    }
     Ext.apply(VipListStore.proxy.extraParams, {
         dateOne: Ext.getCmp('dateOne').getValue(),
         dateTwo: Ext.getCmp('dateTwo').getValue(),
@@ -221,7 +225,7 @@ Ext.onReady(function () {
         ],
         tbar: [
             {
-                text: '匯出CSV',
+                text: '匯出會員購買記錄排行CSV',
                 handler: ExportCsv,
                 iconCls: 'icon-excel',
             },
@@ -233,8 +237,6 @@ Ext.onReady(function () {
                name: 'userID',
                regex: /^[0-9]*[1-9][0-9]*$/,
                regexText: '請輸入數字類型的字符',
-               maxLength: 5,
-               maxLengthText: '最大長度為5',
                allowBlank: true,
               
                emptyText: '請輸入會員編號(可以為空)',
@@ -245,7 +247,7 @@ Ext.onReady(function () {
                        }
                    },
                    change: function () {
-                       if (!(/^[0-9]*[1-9][0-9]*$/).test(this.getValue()) || this.getValue().length > 5) {
+                       if (!(/^[0-9]*[1-9][0-9]*$/).test(this.getValue())) {
                            if (this.getValue().trim() == '') {
                                Ext.getCmp('btnQuery').setDisabled(false);
                            }
@@ -261,14 +263,14 @@ Ext.onReady(function () {
            },
           {
               xtype: "datefield",
-              fieldLabel: "最近歸檔日期",
+              fieldLabel: "歸檔訂單創建日期",
               id: 'dateOne',
               name: 'dateOne',
               format: 'Y-m-d',
-              allowBlank: false,
+              allowBlank: true,
               editable: false,            
               submitValue: true,
-              value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
+              //value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
               listeners: {
                   select: function (a, b, c) {
                       var start = Ext.getCmp("dateOne");
@@ -291,10 +293,10 @@ Ext.onReady(function () {
               format: 'Y-m-d',
               id: 'dateTwo',
               name: 'dateTwo',
-              allowBlank: false,
+              allowBlank: true,
               editable: false,
               submitValue: true,
-              value: Tomorrow(),
+              //value: Tomorrow(),
               listeners: {
                   select: function (a, b, c) {
                       var start = Ext.getCmp("dateOne");
@@ -422,12 +424,17 @@ function Tomorrow() {
 
 //查询
 Query = function () {
-    if (!(/^[0-9]*[1-9][0-9]*$/).test(Ext.getCmp('userID').getValue()) || Ext.getCmp('userID').getValue().length > 5) {
+    if (!(/^[0-9]*[1-9][0-9]*$/).test(Ext.getCmp('userID').getValue())) {
         if (Ext.getCmp('userID').getValue().trim() != '') {
             Ext.Msg.alert('提示信息','請輸入正確格式的會員編號！');
             return false;
         }        
-    }    
+    }
+    if (Ext.getCmp('userID').getValue().trim() == '' && Ext.getCmp('dateOne').getValue() == null)
+    {
+        Ext.Msg.alert('提示信息', '請輸入查詢條件');
+        return false;
+    } 
     VipListStore.removeAll();
     Ext.getCmp("VipListGrid").store.loadPage(1, {
         params: {

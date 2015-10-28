@@ -123,6 +123,8 @@ namespace BLL.gigade.Mgr
 
         public string MailAndRequest(EdmSendLog eslQuery, MailRequest MRquery)
         {
+            eslQuery.Replace4MySQL();
+            MRquery.Replace4MySQL();
             string json = string.Empty;
             ArrayList arrList = new ArrayList();
             try
@@ -528,7 +530,11 @@ namespace BLL.gigade.Mgr
 
                             et.email_id = email_id;
                             arrList.Add(_edmContentNewDao.InsertEdmTrace(et));
-                            MRquery.success_action = "update edm_trace set success=1 where log_id='" + log_id + "' and  content_id='" + eslQuery.content_id + "' and email_id='" + email_id + "';";
+                            MRquery.success_action = "update edm_trace set success=1,send_date=NOW()  where log_id=" + log_id + " and  content_id=" + eslQuery.content_id + " and email_id=" + email_id + ";";
+                            MRquery.fail_action = "update edm_trace set success=0,send_date=NOW()  where log_id=" + log_id + " and  content_id=" + eslQuery.content_id + " and email_id=" + email_id + ";";
+                            string url = "<img src='http://www.gigade100.com/edm.php?c=" + eslQuery.content_id + "&e=" + email_id + "&l="+log_id+"'/>";
+                            MRquery.body = MRquery.body + url;
+                          
                             arrList.Add(_edmContentNewDao.InsertEmailRequest(MRquery));
 
                         }
@@ -644,7 +650,7 @@ namespace BLL.gigade.Mgr
                 DataTable _innerCustomer = _edmContentNewDao.GetInnerCustomer(group_id);
                 for (int i = 0; i < _innerCustomer.Rows.Count; i++)
                 {
-                    DataRow dr = _innerCustomer.NewRow();
+                    DataRow dr = _outerCustomer.NewRow();
                     dr["customer_email"] = _innerCustomer.Rows[i]["user_email"];
                     dr["customer_id"] = _innerCustomer.Rows[i]["user_id"];
                     _outerCustomer.Rows.Add(dr);
@@ -680,6 +686,18 @@ namespace BLL.gigade.Mgr
             {
 
                 throw new Exception("EdmContentNewMgr-->EdmContentNewReportList-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable CreatedateAndLogId()
+        {
+            try
+            {
+                return _edmContentNewDao.CreatedateAndLogId();
+            }
+            catch (Exception ex)
+            {
+             throw new Exception("EdmContentNewMgr-->FXMD-->" + ex.Message, ex);
             }
         }
 

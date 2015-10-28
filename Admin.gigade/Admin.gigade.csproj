@@ -1933,6 +1933,7 @@
     <Content Include="Scripts\Views\ProductHistory\ParticularsHistory.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeEdit.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeList.js" />
+    <Content Include="Scripts\Views\ProductPurchase\StatusListLowerShelf.js" />
     <Content Include="Scripts\Views\ProductPurchase\SuggestPurchaseList.js" />
     <Content Include="Scripts\Views\ProductSearch\ProductSearchList.js" />
     <Content Include="Scripts\Views\ProductTier\ExpectTier.js" />
@@ -2014,7 +2015,7 @@
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-rtl-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\resources\Readme.md" />
-    <None Include="Properties\PublishProfiles\gigade.pubxml" />
+    <None Include="Properties\PublishProfiles\giagade-web.pubxml" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all-vsdoc.js" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all.min.intellisense.js" />
     <Content Include="Scripts\kendo\2014.2.716\kendo.all.min.js" />
@@ -4430,6 +4431,7 @@
     <Content Include="Template\OrderImport\t_orders.xlsx" />
     <Content Include="Views\EdmNew\EdmContentNewReport.cshtml" />
     <Content Include="Views\EdmNew\EdmSendListCountView.cshtml" />
+    <Content Include="Views\ProductPurchase\StatusLowerShelf.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -195,7 +195,23 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductItemMgr-->GetSuggestPurchaseInfo-->" + ex.Message,ex);
             }
         }
-
+        /// <summary>
+        /// chaojie1124j add by 2015/10/26 實現下架狀態明細表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="TotalCount"></param>
+        /// <returns></returns>
+        public DataTable GetStatusListLowerShelf(ProductQuery query, out int TotalCount)//List<ProductQuery>
+        {
+            try
+            {
+                return productItemDao.GetStatusListLowerShelf(query, out TotalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemMgr-->GetStatusListLowerShelf-->" + ex.Message, ex);
+            }
+        }
         public ProductItemCustom GetProductArriveDay(ProductItem pi,string type)
         {
             try
@@ -311,9 +327,7 @@ namespace BLL.gigade.Mgr
                     item.product_createdate_string = CommonFunction.GetNetTime(item.product_createdate).ToString("yyyy-MM-dd HH:mm:ss");
                     item.product_start_string = CommonFunction.GetNetTime(item.product_start).ToString("yyyy-MM-dd HH:mm:ss");
                     item.product_spec = item.Spec_Name_1;
-                    item.product_spec += string.IsNullOrEmpty(item.Spec_Name_1) ? item.Spec_Name_2 : (string.IsNullOrEmpty(item.Spec_Name_2) ? "" : " / " + item.Spec_Name_2);
-
-
+                    item.product_spec += string.IsNullOrEmpty(item.Spec_Name_1.Trim()) ? item.Spec_Name_2 : (string.IsNullOrEmpty(item.Spec_Name_2.Trim()) ? "" : " / " + item.Spec_Name_2);
                     //商品類型
                     if (item.combination == 1)
                     {
