@@ -738,29 +738,27 @@ namespace BLL.gigade.Dao
 
         }
 
-
-
-
         public List<ProductItemQuery> GetWaitLiaoWeiList(ProductItemQuery query, out int totalCount)// by yachao1120j 2015-10-20 等待料位報表
         {
-            List<ProductItemQuery> LiaoWeiList=new List<ProductItemQuery>();
-            List<ProductItemQuery> LiaoWeiList_new = new List<ProductItemQuery>();
-            List<ProductItemQuery> liaoWei=new List<ProductItemQuery>();//新建的相交之後的list集合
             StringBuilder str = new StringBuilder();
-            StringBuilder str_new = new StringBuilder();
             StringBuilder sqlCount = new StringBuilder();
             StringBuilder strcont = new StringBuilder();
             totalCount = 0;
 
             try
             {
-                sqlCount.AppendFormat("SELECT count(pi.item_id) as totalCount ");//分頁
-                str.AppendFormat("select   pi.item_id,p.product_createdate,p.product_name,p.spec_title_1,pi.spec_id_1,pi.spec_id_2 ,p.spec_title_2,p.combination,p.product_status,p.product_mode,dfsm.delivery_freight_set,p.product_start,p.cate_id ");
+                sqlCount.AppendFormat("SELECT count(pi.item_id) as totalCount ");
+                str.AppendFormat("select pi.item_id,p.product_createdate,p.product_name,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1,CONCAT(p.spec_title_2,'',ps2.spec_name) as Spec_Name_2 ,p.combination,p.product_status,p.product_mode,dfsm.delivery_freight_set,p.product_start,tp2.parameterName as product_fenlei_dalei,tp1.parameterName as  product_fenlei_xiaolei  ");
                 strcont.AppendFormat(" from  product_item pi ");
                 strcont.AppendFormat(" inner join product p on p.product_id =pi.product_id ");
                 strcont.AppendFormat(" inner join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set ");
-                //strcont.AppendFormat(" where item_id NOT in (select item_id from iplas)  and p.product_id>10000  ");
-                strcont.AppendFormat(" where 1=1 and p.product_id>10000  ");
+                strcont.AppendFormat(" INNER JOIN v_product_item_noloc v on v.item_id=pi.item_id ");
+                strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
+                strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
+                strcont.AppendFormat(" inner JOIN t_parametersrc  tp1 on tp1.parameterCode=p.cate_id  and tp1.parameterType='product_cate'  ");
+                strcont.AppendFormat(" inner JOIN  t_parametersrc  tp2 on tp2.parameterCode=tp1.topValue  and tp2.parameterType='product_cate' ");
+                strcont.AppendFormat(" where 1=1  and p.product_id>10000  ");
+
                 if (query.product_mode != 100)//  出貨方式  100 代表全部
                 {
                     strcont.AppendFormat(" and p.product_mode = '{0}' ", query.product_mode);
@@ -771,122 +769,106 @@ namespace BLL.gigade.Dao
                 }
                 strcont.AppendFormat("and p.product_status in (0,1,2,5) ");
                 strcont.AppendFormat("  and p.product_createdate >='{0}' and p.product_createdate  <='{1}'  ", (query.start_time), (query.end_time));
-                strcont.Append(" order by pi.item_id  ");
                 str.Append(strcont);
-
-                str_new.Append(" SELECT item_id from iplas ORDER BY item_id  ");
                 if (query.IsPage)
                 {
                     DataTable _dt = _access.getDataTable(sqlCount.ToString() + strcont.ToString());
-
                     if (_dt.Rows.Count > 0)
                     {
                         totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
                         str.AppendFormat(" limit {0},{1} ", query.Start, query.Limit);
                     }
                 }
-                IProductSpecImplDao _specDao = new ProductSpecDao(connStr);
-                 LiaoWeiList=_access.getDataTableForObj<ProductItemQuery>(str.ToString());// 獲取查詢記錄
+                return _access.getDataTableForObj<ProductItemQuery>(str.ToString());// 獲取查詢記錄
 
-                 LiaoWeiList_new = _access.getDataTableForObj<ProductItemQuery>(str_new.ToString());// 得到iplas中的item_id
-               
-                 //int j = 0;
-                 //for (int i = 0; i < LiaoWeiList_new.Count; i++)
-                 //{
-                 //    for (int m = 0; m < LiaoWeiList.Count; m++)
-                 //    {
-                 //        do
-                 //        {
-                 //            if (LiaoWeiList_new[i].item_id == LiaoWeiList[m].item_id)
-                 //            {
-                                
-                 //                j++;
-                 //                continue;
-                 //            }
-                 //            else
-                 //            {
-                 //                liaoWei[i].item_id += LiaoWeiList[m].item_id;
-                 //            }
-                 //        } while (j <= LiaoWeiList.Count);
-                 //    }
-                    
-                 //}
-                //////////////////////////
-                 foreach (ProductItemQuery item in LiaoWeiList)
-                 {
-                     for (int i=0;i< LiaoWeiList_new.Count;i++)
-                     {
-                         if (item.item_id == LiaoWeiList_new[i].item_id)
-                         {
-                             continue;
-                         }
-                         if (i == LiaoWeiList_new.Count - 1)
-                         {
-                             liaoWei.Add(item);
-                         }
-                         
-                     }
-                 }
-
-
-                /////////////////////////
-                 DataTable _dtProType = new DataTable();
-                 str.Clear();
-                 str.Append(" select tp.parameterName as xiaolei_name,tp1.parameterName as dalei_name,tp.parameterCode as xiaolei_code,");
-                 str.Append(" tp1.parameterCode as dalei_code from t_parametersrc as tp ");
-                 str.Append(" inner join t_parametersrc as tp1 on tp.topValue = tp1.parameterCode ");
-                 str.Append(" where tp.parameterType='product_cate' and tp1.parameterType='product_cate' ");
-                 _dtProType = _access.getDataTable(str.ToString());
-
-                 //for (int i = 0; i < LiaoWeiList.Count; i++)
-                 //{
-                 //    ProductSpec spec1 = _specDao.query(Convert.ToInt32(LiaoWeiList[i].spec_id_1));
-                 //    ProductSpec spec2 = _specDao.query(Convert.ToInt32(LiaoWeiList[i].spec_id_2));
-                 //    if (spec1 != null)
-                 //    {
-                 //        LiaoWeiList[i].Spec_Name_1 = string.IsNullOrEmpty(LiaoWeiList[i].spec_title_1) ? "" : LiaoWeiList[i].spec_title_1 + ":" + spec1.spec_name;
-                 //    }
-                 //    if (spec2 != null)
-                 //    {
-                 //        LiaoWeiList[i].Spec_Name_2 = string.IsNullOrEmpty(LiaoWeiList[i].spec_title_2) ? "" : LiaoWeiList[i].spec_title_2 + ":" + spec1.spec_name;
-                 //    }
-
-                 //        DataRow[] rows = _dtProType.Select("xiaolei_code='" + LiaoWeiList[i].cate_id + "'");
-                 //        foreach (DataRow row in rows)//
-                 //        {
-                 //            LiaoWeiList[i].product_fenlei_xiaolei=rows[0]["xiaolei_name"].ToString();
-                 //            LiaoWeiList[i].product_fenlei_dalei=rows[0]["dalei_name"].ToString();
-                 //        }   
-                 //}
-                 //return LiaoWeiList;
-
-                 for (int i = 0; i < liaoWei.Count; i++)
-                 {
-                     ProductSpec spec1 = _specDao.query(Convert.ToInt32(liaoWei[i].spec_id_1));
-                     ProductSpec spec2 = _specDao.query(Convert.ToInt32(liaoWei[i].spec_id_2));
-                     if (spec1 != null)
-                     {
-                         liaoWei[i].Spec_Name_1 = string.IsNullOrEmpty(liaoWei[i].spec_title_1) ? "" : liaoWei[i].spec_title_1 + ":" + spec1.spec_name;
-                     }
-                     if (spec2 != null)
-                     {
-                         liaoWei[i].Spec_Name_2 = string.IsNullOrEmpty(liaoWei[i].spec_title_2) ? "" : liaoWei[i].spec_title_2 + ":" + spec1.spec_name;
-                     }
-
-                     DataRow[] rows = _dtProType.Select("xiaolei_code='" + liaoWei[i].cate_id + "'");
-                     foreach (DataRow row in rows)//
-                     {
-                         liaoWei[i].product_fenlei_xiaolei = rows[0]["xiaolei_name"].ToString();
-                         liaoWei[i].product_fenlei_dalei = rows[0]["dalei_name"].ToString();
-                     }
-                 }
-                 return liaoWei;
             }
             catch (Exception ex)
             {
                 throw new Exception("ProductItemDao-->GetWaitLiaoWeiList-->" + ex.Message);
             }
 
+        }
+        /// <summary>
+        /// chaojie1124j add by 2015/10/26 實現下架狀態明細表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="TotalCount"></param>
+        /// <returns></returns>
+        public DataTable GetStatusListLowerShelf(ProductQuery query, out int TotalCount)
+        {
+            StringBuilder sqlClumn = new StringBuilder();
+            StringBuilder sqlCondi = new StringBuilder();
+            StringBuilder sbSqlCondition = new StringBuilder();
+            TotalCount = 0;
+            try
+            {
+                sqlClumn.Append(" select p.product_id,p.product_name,ip.loc_id,pi.item_id,p.combination ,dfsm.delivery_freight_set as product_freight,p.product_status,pi.item_stock,subTtotal.iinvd_stock as iinvd_stock, ");
+                sqlClumn.Append(" p.prepaid,p.shortage,'' as product_status_string ");
+                //  sqlClumn.Append(" select p.product_id,p.product_name,ip.loc_id)
+                sqlCondi.Append(" from product_item pi ");
+                sqlCondi.Append(" left join iplas ip on ip.item_id=pi.item_id  ");
+                sqlCondi.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=pi.item_id ");
+                sqlCondi.Append(" left join product p on pi.product_id=p.product_id ");
+                sqlCondi.Append(" left join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set  ");
+                //  sqlCondi.Append(" left join t_parametersrc tps on tps.parameterCode=dfsm.delivery_freight_set and tps.parameterType='product_freight' ");
+                sbSqlCondition.Append(" where 1=1 ");
+                sbSqlCondition.Append(" and (p.product_status=6 or p.product_status=99) and p.product_id>10000 ");
+                if (query.Shortage != -1)
+                {
+                    sbSqlCondition.AppendFormat(" and p.shortage='{0}' ", query.Shortage);
+                }
+                if (query.Product_Id != 0)
+                {
+                    sbSqlCondition.AppendFormat(" and (p.product_id='{0}' or p.product_name like '%{0}%' ) ", query.Product_Id);
+                }
+                if (query.item_id != 0)
+                {
+                    sbSqlCondition.AppendFormat(" and (pi.item_id='{0}' or p.product_name like '%{0}%' ) ", query.item_id);
+                }
+                if (!string.IsNullOrEmpty(query.Product_Name))
+                {
+                    sbSqlCondition.AppendFormat(" and  p.product_name like '%{0}%' ", query.Product_Name);
+                }
+                if (query.product_freight != 0)
+                {
+                    sbSqlCondition.AppendFormat(" and  dfsm.delivery_freight_set='{0}' ", query.product_freight);
+                }
+                if (!string.IsNullOrEmpty(query.loc_id))
+                {
+                    sbSqlCondition.AppendFormat(" and ip.loc_id>'{0}' ", query.loc_id);
+                }
+                if (!string.IsNullOrEmpty(query.loc_id2))
+                {
+                    sbSqlCondition.AppendFormat(" and ip.loc_id<'{0}' ", query.loc_id2);
+                }
+                if (query.IsPage)
+                {
+                    DataTable dt = _dbAccess.getDataTable("select count(pi.item_id) as totalCount " + sqlCondi.ToString() + sbSqlCondition.ToString());
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        TotalCount = Convert.ToInt32(dt.Rows[0]["totalCount"]);
+                    }
+
+                    sbSqlCondition.AppendFormat(" limit {0},{1} ", query.Start, query.Limit);
+                }
+                DataTable dtResult = _dbAccess.getDataTable(sqlClumn.ToString() + sqlCondi.ToString() + sbSqlCondition.ToString());
+                IParametersrcImplDao _parameterDao = new ParametersrcDao(connStr);
+                List<Parametersrc> parameterStatus = _parameterDao.QueryParametersrcByTypes("product_status");
+
+                foreach (DataRow dr in dtResult.Rows)
+                {
+                    var slist = parameterStatus.Find(m => m.ParameterType == "product_status" && m.ParameterCode == dr["Product_Status"].ToString());// dr["product_status"].ToString()
+                    if (slist != null)
+                    {
+                        dr["product_status_string"] = slist.parameterName;
+                    }
+                }
+                return dtResult;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->GetStatusListLowerShelf-->" + ex.Message + "", ex);
+            }
         }
 
 

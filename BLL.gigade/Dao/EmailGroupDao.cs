@@ -41,7 +41,7 @@ namespace BLL.gigade.Dao
                 {
                     totalCount = Convert.ToInt32(_dt.Rows[0][0]);
                 }
-                sqlWhere.Append(" group by el.group_id  ");
+                sqlWhere.Append(" group by eg.group_id desc ");
                 sqlWhere.AppendFormat("limit {0},{1};", query.Start, query.Limit);
                 return _access.getDataTableForObj<EmailGroup>(sql.ToString() + sqlFrom.ToString() + sqlWhere.ToString());
             }
@@ -56,14 +56,21 @@ namespace BLL.gigade.Dao
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public string ImportEmailList(EmailGroup query)
+        public bool ImportEmailList(EmailGroup query)
         {
             StringBuilder sql = new StringBuilder();
             query.Replace4MySQL();
             try
             {
                 sql.AppendFormat("insert into email_list (group_id,email_address,name) values('{0}','{1}','{2}');", query.group_id, query.email_address, query.name);
-                return sql.ToString();
+                if (_access.execCommand(sql.ToString()) > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -161,6 +168,61 @@ namespace BLL.gigade.Dao
             {
 
                 throw new Exception("EmailGroupDao-->GetEmailList-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        /// <summary>
+        /// 查看email是否已經存在
+        /// </summary>
+        /// <param name="emailAddress"></param>
+        /// <returns>為true存在，false則不存在</returns>
+        public bool IsExistEmail(string emailAddress,int group_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" select email_address from email_list where email_address='{0}' and group_id='{1}';", emailAddress, group_id);
+                DataTable _dt = _access.getDataTable(sql.ToString());
+                if (_dt != null && _dt.Rows.Count > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("EmailGroupDao-->IsExistEmail-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public string DeleteEmailList(int group_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" set sql_safe_updates = 0;delete from email_list where group_id='{0}';set sql_safe_updates = 1;", group_id);
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EmailGroupDao-->DeleteEmailList-->" + ex.Message+sql.ToString(), ex);
+            }
+        }
+
+        public string DeleteEmailGroup(int group_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" set sql_safe_updates = 0;delete from email_group where group_id='{0}';set sql_safe_updates = 1;", group_id);
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EmailGroupDao-->EmailGroup-->" + ex.Message+sql.ToString(), ex);
             }
         }
     }

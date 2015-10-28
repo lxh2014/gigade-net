@@ -5604,7 +5604,7 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        #region 退款狀態
+        #region 退貨狀態
         public HttpResponseBase CheckOrderId()
         {
             string json = string.Empty;

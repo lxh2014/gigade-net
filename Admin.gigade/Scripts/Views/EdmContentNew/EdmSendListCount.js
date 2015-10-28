@@ -5,11 +5,10 @@
         fields: [
         { name: "success", type: "int" },
         { name: "name", type: "string" },
-        { name: "pic", type: "string" },
         { name: "first_traceback", type: "string" },
         { name: "last_traceback", type: "string" },
         { name: "count", type: "int" },
-       { name: "request_createdate", type: "stirng" },
+       { name: "send_date", type: "stirng" },
          { name: "email", type: "stirng" },
 
 
@@ -45,6 +44,7 @@
         bodyPadding: 10,
         width: document.documentElement.clientWidth,
         items: [
+         
                 {
                     xtype: 'displayfield',
                     value: '<span style="color:white;color:green;font-size:20px;margin-left: 200px">開　信　狀　況　統　計　摘　要</span>'
@@ -200,15 +200,11 @@
                    {
                        header: "信箱", dataIndex: 'email', width: 260, align: 'center'
                    },
-
-                {
-                    header: " 圖表", dataIndex: 'pic', width: 80, align: 'center'
-                },
                  {
                      header: "開信次數", dataIndex: 'count', width: 80, align: 'center'
                  },
                   {
-                      header: "寄送時間", dataIndex: 'request_createdate', width: 150, align: 'center'
+                      header: "寄送時間", dataIndex: 'send_date', width: 150, align: 'center'
                   },
 
                 {
