@@ -45,9 +45,16 @@ namespace BLL.gigade.Dao
                 {
                     sbwhere.AppendFormat(" and ege.email_name like '%{0}%'", query.search_con.ToString());
                 }
-                if (query.email_status != 0)
+                if (query.email_status != 3)
                 {
-                    sbwhere.AppendFormat(" and ege.email_status = '{0}'", query.email_status);
+                    if (query.email_status == 1)
+                    {
+                        sbwhere.AppendFormat(" and ege.email_status = '1' ");
+                    }
+                    else if (query.email_status == 0 || query.email_status == 2)
+                    {
+                        sbwhere.AppendFormat(" and (ege.email_status = '0' or ege.email_status ='2')");
+                    }
                 }
                 
                 sbcount.Append("select count(ege.email_id) as totalCount ");
