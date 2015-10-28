@@ -55,7 +55,7 @@
                 vertical: true,
                 items: [
                    { boxLabel: '訂閱', id: 'rdo1', name: 'email_status', inputValue: '1',checked:true },
-                   { boxLabel: '取消', id: 'rdo2', name: 'email_status', inputValue: '2' }
+                   { boxLabel: '取消', id: 'rdo2', name: 'email_status', inputValue: '0' }
                 ]
             },
             {
