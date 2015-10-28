@@ -863,7 +863,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["endIloc"].Trim()))
                 {
-                    query.loc_id2 = Request.Params["endIloc"].Trim();
+                    query.loc_id2 = Request.Params["endIloc"].Trim()+"Z";
                 }
                 if (!string.IsNullOrEmpty(Request.Params["fright_set"]))
                 {
@@ -938,7 +938,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["endIloc"].Trim()))
                 {
-                    query.loc_id2 = Request.Params["endIloc"].Trim();
+                    query.loc_id2 = Request.Params["endIloc"].Trim() + "Z";
                 }
                 if (!string.IsNullOrEmpty(Request.Params["fright_set"]))
                 {
