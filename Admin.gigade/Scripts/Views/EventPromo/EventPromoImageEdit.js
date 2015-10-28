@@ -18,16 +18,16 @@ Ext.apply(Ext.form.field.VTypes, {
 });
 
 function editFunction(row, store,multi) {
-    Ext.define('gigade.VendorBrand', {
+    Ext.define('gigade.PromotionBannerRelation', {
         extend: 'Ext.data.Model',
         fields: [
         { name: "pb_id", type: "int" },
-        { name: "Brand_Id", type: "int" },
-        { name: "Brand_Name", type: "string" }
+        { name: "brand_id", type: "int" },
+        { name: "brand_name", type: "string" }
         ]
     });
     var pbBrandStore = Ext.create('Ext.data.Store', {
-        model: 'gigade.VendorBrand',
+        model: 'gigade.PromotionBannerRelation',
         autoLoad: false,
         proxy: {
             type: 'ajax',
@@ -67,8 +67,8 @@ function editFunction(row, store,multi) {
                     Ext.Msg.confirm("注意", "確認刪除？", function (btn) {
                         if (btn === 'yes') {
                             var i = rowIndex;
-                            del_ids += Ext.getCmp("brand_Grid").store.data.items[i].data.Brand_Id + "|";
-                            del_names += Ext.getCmp("brand_Grid").store.data.items[i].data.Brand_Name + "|";
+                            del_ids += Ext.getCmp("brand_Grid").store.data.items[i].data.brand_id + "|";
+                            del_names += Ext.getCmp("brand_Grid").store.data.items[i].data.brand_name + "|";
                             pbBrandStore.removeAt(rowIndex);
                         }
                     });
@@ -77,11 +77,11 @@ function editFunction(row, store,multi) {
             ]
         },
         {
-            header: '品牌編號', dataIndex: 'Brand_Id', flex: 1, align: 'center'
+            header: '品牌編號', dataIndex: 'brand_id', flex: 1, align: 'center'
         },
 
         {
-            header: '品牌名稱', dataIndex: 'Brand_Name', flex: 3, align: 'center'
+            header: '品牌名稱', dataIndex: 'brand_name', flex: 3, align: 'center'
         }
         ]
     });
@@ -147,7 +147,7 @@ function editFunction(row, store,multi) {
              {
                  xtype: 'panel',
                  margin: '0 0 0 15',
-                 hidden:multi==1?true:false,
+                 hidden: multi == 1 ? true : false,
                  bodyStyle: "color:red;padding:5px;background:#DFE9F6",
                  border: false,
                  html: "注意事項：請勿添加已有促銷圖片的品牌編號！"
@@ -204,6 +204,7 @@ function editFunction(row, store,multi) {
                 submitValue: true,
                 enable: false,
                 editable: false,
+                time: { hour: 00, min: 00, sec: 00 },
                 value: Tomorrow(),
                 listeners: {
                     select: function (a, b, c) {
@@ -230,7 +231,8 @@ function editFunction(row, store,multi) {
                 anchor: '90%',
                 submitValue: true,
                 editable: false,
-                value:setNextMonth(Tomorrow(),1),
+                time: { hour: 23, min: 59, sec: 59 },
+                value: setNextMonth(Tomorrow(), 1),
                 listeners: {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("pb_startdate");
@@ -256,11 +258,15 @@ function editFunction(row, store,multi) {
             disabled: true,
             handler: function () {
                 var form = this.up('form').getForm();
+                if (Ext.getCmp('pb_image') == "" || Ext.getCmp('pb_startdate') == null || Ext.getCmp('pb_enddate') == null)
+                {
+                    Ext.getCmp("save").setDisabled(true); 
+                }
                 if (form.isValid()) {
                     var InsertValues = "";
                     var brand_con = Ext.getCmp("brand_Grid").store.data.items;
                     for (var a = 0; a < brand_con.length; a++) {
-                        var vb_id = brand_con[a].get("Brand_Id");
+                        var vb_id = brand_con[a].get("brand_id");
                         InsertValues += vb_id + ',';
                     }
                     var pb_id = Ext.htmlEncode(Ext.getCmp('pb_id').getValue());
@@ -278,7 +284,7 @@ function editFunction(row, store,multi) {
                             image_link: image_link,
                             begin_time: begin_time,
                             end_time: end_time,
-                            multi:multi
+                            multi: multi
                         },
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
@@ -358,6 +364,7 @@ function editFunction(row, store,multi) {
                     frm.getForm().loadRecord(row);
                     pbBrandStore.loadPage(1);
                     initForm(row);
+                    Ext.getCmp("save").setDisabled(false);
                 }
                 else {
                     frm.getForm().reset();
@@ -376,7 +383,7 @@ function editFunction(row, store,multi) {
         }
         else {
             for (var i = 0; i < pbBrandStore.data.length; i++) {
-                if (brand_id == pbBrandStore.data.items[i].data.Brand_Id) {
+                if (brand_id == pbBrandStore.data.items[i].data.brand_id) {
                     Ext.Msg.alert(INFORMATION, "該品牌編號已添加，請確認");
                     return;
                 }
@@ -396,8 +403,8 @@ function editFunction(row, store,multi) {
             GetBrandName();
             if (add) {
                 pbBrandStore.add({
-                    Brand_Id: brand_id,
-                    Brand_Name: brand_name
+                    brand_id: brand_id,
+                    brand_name: brand_name
                 });
                 Ext.getCmp('b_id').reset();
             }
@@ -408,7 +415,7 @@ function delBrand(id) {
     del_ids += id = "|";
     var brands = Ext.getCmp("brand_Grid").store.data.items;
     for (var i = 0; i < brand_con.length; i++) {
-        var vb_id = brand_con[i].get("Brand_Id");
+        var vb_id = brand_con[i].get("brand_id");
         storeValues += vb_id + ',';
     }
 }
@@ -445,6 +452,7 @@ GetBrandName = function () {
         method: 'post',
         async: false,
         params: {
+            pb_id: Ext.getCmp("pb_id").getValue(),
             brand_id: brand_id,
             startdate: Ext.getCmp("pb_startdate").getValue(),
             enddate: Ext.getCmp("pb_enddate").getValue(),

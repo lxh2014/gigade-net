@@ -36,6 +36,7 @@ namespace Admin.gigade.Controllers
         private EventPromoAdditionalPriceProductMgr epappMgr;
         private EventPromoAdditionalPriceGroupMgr epapgMgr;
         private PromotionBannerMgr _promotionBannerMgr;
+        private PromotionBannerRelationMgr _promotionBannerRelationMgr;
 
         static string excelPath_export = ConfigurationManager.AppSettings["ImportUserIOExcel"];//關於導入的excel文件的限制
 
@@ -1257,11 +1258,11 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["brand_name"]))
                 {
-                    query.brand_name = Request.Params["brand_name"];
+                    query.brand_name = Request.Params["brand_name"].Trim(); ;
                 }
                 if (!string.IsNullOrEmpty(Request.Params["brand_id"]))
                 {
-                    query.brand_id = Request.Params["brand_id"];
+                    query.brandIDS = Request.Params["brand_id"];
                 }
                 _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
                 store = _promotionBannerMgr.GetPromotionBannerList(query, out totalCount);
@@ -1351,6 +1352,7 @@ namespace Admin.gigade.Controllers
             string json = string.Empty;
             string errorInfo = string.Empty;
             int brand_id = 0;
+            bool result = false;
             try
             {
                 _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
@@ -1388,8 +1390,7 @@ namespace Admin.gigade.Controllers
 
                     fileLoad = new FileManagement();
                     string oldFileName = string.Empty;  //舊文件名
-                    string fileExtention = string.Empty;//當前文件的擴展名
-                    bool result = false;
+                    string fileExtention = string.Empty;//當前文件的擴展名                 
                     string NewFileName = string.Empty;
                     string ServerPath = string.Empty;
                     string newRand = string.Empty;
@@ -1437,7 +1438,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["vb_ids"]))
                 {
-                    query.brand_id = Request.Params["vb_ids"].Substring(0,Request.Params["vb_ids"].LastIndexOf(','));
+                    query.brandIDS = Request.Params["vb_ids"].Substring(0, Request.Params["vb_ids"].LastIndexOf(','));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["multi"]))
                 {
@@ -1448,12 +1449,12 @@ namespace Admin.gigade.Controllers
                     //編輯
                     query.pb_id = Convert.ToInt32(Request.Params["pb_id"]);
                     query.pb_muser = Convert.ToInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id);
-                    int result = _promotionBannerMgr.UpdateImageInfo(query, out brand_id);
-                    if (result > 0)
+                    result = _promotionBannerMgr.UpdateImageInfo(query, out brand_id);
+                    if (result)
                     {
                         json = "{success:true}";
                     }
-                    else if (result == -1)
+                    else if (result == false && brand_id != 0)
                     {
                         json = "{success:false,msg:\"" + brand_id + "\"}";//brand_id重複
                     }
@@ -1467,12 +1468,12 @@ namespace Admin.gigade.Controllers
                     //新增
                     query.pb_kuser = Convert.ToInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id);
                     query.pb_muser = Convert.ToInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id);
-                    i = _promotionBannerMgr.AddImageInfo(query, out brand_id);
-                    if (i > 0)
+                    result = _promotionBannerMgr.AddImageInfo(query, out brand_id);
+                    if (result)
                     {
                         json = "{success:true}";
                     }
-                    else if (i == -1)
+                    else if (result == false && brand_id != 0)
                     {
                         json = "{success:false,msg:\""+ brand_id +"\"}";//brand_id重複
                     }
@@ -1501,16 +1502,24 @@ namespace Admin.gigade.Controllers
         public HttpResponseBase GetRelationList()
         {
             string json = string.Empty;
-            PromotionBannerQuery query = new PromotionBannerQuery();
-            List<VendorBrand> store = new List<VendorBrand>();
+            PromotionBannerRelationQuery query = new PromotionBannerRelationQuery();
+            List<PromotionBannerRelationQuery> store = new List<PromotionBannerRelationQuery>();
             try
             {
-                _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
+                _promotionBannerRelationMgr = new PromotionBannerRelationMgr(mySqlConnectionString);
                 if (!string.IsNullOrEmpty(Request.Params["pb_id"]))
                 {
                     query.pb_id = Convert.ToInt32(Request.Params["pb_id"]);
                 }
-                store = _promotionBannerMgr.GetBrandList(query);
+                if (!string.IsNullOrEmpty(Request.Params["id"]))
+                {
+                    query.brand_id = Convert.ToInt32(Request.Params["id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["name"]))
+                {
+                    query.brand_name = Request.Params["name"].Trim();
+                }
+                store = _promotionBannerRelationMgr.GetRelationList(query);
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
@@ -1545,12 +1554,13 @@ namespace Admin.gigade.Controllers
                          if (!string.IsNullOrEmpty(item))
                          {
                              query.pb_id = Convert.ToInt32(item);
-                             int result = _promotionBannerMgr.DeleteImage(query);
-                             if (result > 0)
-                             {                               
+                             bool result = _promotionBannerMgr.DeleteImage(query);
+                             if (result)
+                             {
                                  continue;
                              }
-                             else {
+                             else
+                             {
                                  json = "{success:false}";
                                  break;
                              }
@@ -1619,6 +1629,10 @@ namespace Admin.gigade.Controllers
             PromotionBannerQuery query = new PromotionBannerQuery();
             try
             {
+                if (!string.IsNullOrEmpty(Request.Params["pb_id"]))
+                {
+                    query.pb_id = Convert.ToInt32(Request.Params["pb_id"]);
+                }
                 if (!string.IsNullOrEmpty(Request.Params["brand_id"]))
                 {
                     query.singleBrand_id = Convert.ToInt32(Request.Params["brand_id"]);
