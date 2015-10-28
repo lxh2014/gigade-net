@@ -100,6 +100,19 @@ namespace BLL.gigade.Mgr
             }
         }
         #endregion
+        #region
+        public List<AseldQuery> GetAseldListByUpc(Aseld ase)
+        {
+            try
+            {
+                return _aseldDao.GetAseldListByUpc(ase);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldMgr-->GetAseldListByUpc-->" + ex.Message, ex);
+            }
+        }
+        #endregion
         public string UpdTicker(string m)
         {
             try

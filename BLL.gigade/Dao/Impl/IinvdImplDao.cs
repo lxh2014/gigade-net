@@ -14,6 +14,7 @@ namespace BLL.gigade.Dao.Impl
         DataTable Getprodubybar(string id);
         int Islocid(string id,string zid, string prod_id);
         List<Model.Query.IinvdQuery> GetIinvdList(Model.Query.IinvdQuery ivd, out int totalCount);
+        List<Model.Query.IinvdQuery> GetIinvdListByUpc(Model.Query.IinvdQuery ivd, string upc_id, out int totalCount);
         int IsUpd(Iinvd m);
         int Upd(Iinvd m);
         int Selnum(Iinvd m); 

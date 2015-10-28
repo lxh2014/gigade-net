@@ -4427,6 +4427,8 @@
     <Content Include="Views\MarketTally\Index.cshtml" />
     <Content Include="Views\MarketTally\MarketTally.cshtml" />
     <Content Include="Views\MarketTally\MarketTallyWD.cshtml" />
+    <None Include="Views\MarketTally\MarketTallyWDProduct.cshtml" />
+    <Content Include="Views\MarketTally\副本 MarketTallyWDProduct.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

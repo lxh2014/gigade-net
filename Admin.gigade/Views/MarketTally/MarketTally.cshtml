@@ -14,18 +14,19 @@
 
 
 <div class="container">
-    <h2>提示：輸入工作代號走寄蒼流程，輸入訂單編號走調度流程!</h2>
+    <h2>提示：請輸入工作代號!</h2>
     <br />
-    <select class="btn btn-default btn-lg combobox">
+    <br />
+   @* <select class="btn btn-default btn-lg combobox">
         <option value="0">常溫</option>
         <option value="1">冷凍</option>
     </select>
-    <p></p>
+    <p></p>*@
     <div class="row">
       <div class="col-xs-2">
         <select class="form-control input-lg" >
-            <option value="0">常溫</option>
-            <option value="1">冷凍</option>
+            <option value="2">冷凍</option>
+            <option value="1">常溫</option>
         </select>
       </div>  
     </div>
@@ -40,11 +41,11 @@
   <div class="col-lg-8">
     <div class="input-group">
       <span class="input-group-btn">
-        <button class="btn btn-default btn-lg" type="button">工作代號/訂單號</button>
+        <button class="btn btn-default btn-lg" type="button">工作代號</button>
       </span>
-      <input type="text" class="form-control input-lg" id="number" placeholder="例如 N20151001011200/123456">
+      <input type="text" class="form-control input-lg" id="number" placeholder="例如 N20151001011200">
       <span class="input-group-btn">
-        <button class="btn btn-default btn-lg " id="ok" type="button">確定</button>
+        <button class="btn btn-default btn-lg " id="numberbutton" type="button">確定</button>
       </span>
     </div><!-- /input-group -->
   </div><!-- /.col-lg-6 -->
@@ -60,7 +61,7 @@
       </div>
       <div class="modal-body">
         <div class="container-fluid">         
-          <h4 id="MessageContentId">錯誤提示</h4>
+          <h4 id="MessageContentId" class="text-center">錯誤提示</h4>
         </div>
       </div>
       <div class="modal-footer">
@@ -69,29 +70,30 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
 <script type="text/javascript">
-  $(document).ready(function(){
-      $('#ok').on('click', function ()
+    $(document).ready(function ()
+    {
+      {
+          $("#number").focus();
+      }
+      $('#numberbutton').on('click', function ()
       {
           var number = document.getElementById("number").value.trim();
           if (number.length != 15)
           {
-              $('#MessageContentId').text("請輸入正確的工作編號!");
+              $('#MessageContentId').text("請輸入正確的工作代號!");
               $('.MarketTally-modal-alert').modal('toggle')
               return false;                                                                                                                                                                                         
           }
   
-          $.get('/WareHouse/GetAseldMasterAssgCount', { number: number }, function (data)
+          $.get('/MarketTally/GetAseldMasterAssgCount', { number: number }, function (data)
           {
-              //$('#result').text(data);
-              //console.log(data);
-              //alert(data);
               var result = eval("(" + data + ")");
               if (result.success)
               {
                   if (result.data > 0)
                   {
-                      //alert("result.success == true")
                       document.location.href = "/MarketTally/MarketTallyWD?number=" + number;
                   }
                   else

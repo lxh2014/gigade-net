@@ -1,0 +1,215 @@
+﻿@{
+    ViewBag.Title = "MarketTallyWD";
+}
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes " />
+
+<script src="../../Scripts/jquery-2.1.4.min.js"></script>
+<link href="../../Scripts/Bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="../../Scripts/Bootstrap/css/bootstrap-table.min.css" rel="stylesheet" />
+<script src="../../Scripts/Bootstrap/bootstrap.min.js"></script>
+<script src="../../Scripts/Bootstrap/bootstrap-table.min.js"></script>
+
+    <title></title>
+</head>
+
+
+<div class="container">
+    <h2>提示：請輸入出貨單號!</h2>
+    <br />
+    <h3>工作代號： <span class="label label-info">@ViewBag.number</span></h3>
+    <h3>產品條碼： <span class="label label-info">@ViewBag.upc</span></h3>
+
+
+    <div>
+        <h3 >品名：&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp  <span class="label label-info " id="productname">(134462)佳瑞發天然健康食品-【2015/03/11即期品】蔬果脆片</span></h3>
+        <h3 >撿貨數量： <span class="label label-info " id="out_qty">5</span></h3>
+        <h3 >實際撿貨量統計： <span class="label label-danger " id="act_pick_qty">0</span></h3>
+        <h3 class="hidden">出貨單號： <input class="form-control " id="deliver_code_display"/></h3>
+        <br />  
+        @*data-url="/MarketTally/GetStockByUpc?upc_id="+@ViewBag.upc data-toggle="table"class="hidden"*@
+        <table class="table table-bordered table-striped table-hover" id="stock_table" >
+            <thead class="lead">
+                <tr>
+                    <th data-field="row_id" data-halign="center" data-align="center" data-valign="middle"  data-visible="false">row_id
+                    </th>
+                    <th data-field="item_id" data-halign="center" data-align="center" data-valign="middle"  data-visible="false">item_id
+                    </th>
+                    <th data-field="cde_dt" data-halign="center" data-align="center" data-valign="middle" >有效日期
+                    </th>
+                    <th data-field="made_date" data-halign="center" data-align="center" data-valign="middle" >製造日期
+                    </th>
+                    <th data-field="prod_qty" data-halign="center" data-align="center" data-valign="middle" >庫存數量
+                    </th>
+                    <th data-field="vendor_id" data-halign="center" data-align="center" data-valign="middle"  data-visible="false">vendor_id
+                    </th>
+                    <th data-field="cde_dt_shp" data-halign="center" data-align="center"  data-valign="middle" data-visible="false">cde_dt_shp
+                    </th>
+                    <th data-field="pick_num" data-halign="center" data-align="center" data-valign="middle"  data-formatter="nameFormatter"  data-events="operateEvents">撿貨數量
+
+                    </th>
+                </tr>
+            </thead>
+            @*        <tbody>
+        </tbody>*@
+        </table>
+
+        <br />
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="input-group " id="delivercode_group">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default btn-lg " type="button">出貨單號</button>
+                    </span>
+                    <input type="text" class="form-control input-lg" id="delivercode" placeholder="請輸入出貨單號...">
+
+                    <span class="glyphicon " id="inputGroupStatus_delivercode" aria-hidden="true"></span>
+                </div>
+                <!-- /input-group -->
+            </div>
+            <!-- /.col-lg-8 -->
+        </div>
+        <!-- /.row -->
+        <br />
+        <button class="btn btn-default btn-lg disabled " id="amsure" type="button">確認撿貨</button>
+    </div>
+</div>
+
+<div class="modal fade MarketTallyWDProduct-modal-alert" role="dialog" aria-labelledby="gridSystemModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 class="modal-title" >提示</h3>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">         
+          <h4 id="MessageContentId" class="text-center">錯誤提示</h4>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+    function nameFormatter(value, row, index)
+    {
+        return '<input type="number"  min="0" class="form-control" id="pick_num' + index + '"  placeholder="0">';
+    }
+    window.operateEvents = {
+        'input .form-control': function (e, value, row, index)
+        {
+            
+            var result = eval("(" + JSON.stringify($('#stock_table').bootstrapTable('getData')) + ")");
+            var sum = 0;
+            for(var i=0;i<result.length;i++)
+            {
+                // alert($('#pick_num0').val());
+                //alert(i)
+                //alert($('#pick_num' + i).val());
+                if ($('#pick_num' + i).val() != "")
+                {
+                    sum = sum + parseInt($('#pick_num' + i).val());
+                }
+                if ($('#pick_num' + i).val()=="-")
+                {
+                    alert("-")
+                }
+            }
+
+            $('#act_pick_qty').text(sum);
+
+            //alert($("#pick_num1").val());
+        },
+       
+       
+    };
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        //頁面加載時調用
+        {
+            {
+                $("#delivercode").focus();
+            }
+            var upc = '@ViewBag.upc'
+            var number='@ViewBag.number'
+            $.get('/MarketTally/GetAseldByUpc', { assg_id: number, upc_id: upc }, function (data)
+            {
+                var result = eval("(" + data + ")");
+                if (result.success)
+                {
+                    if (result.totalCount > 0)
+                    {
+
+                        var prod = "";
+                        if (result.data[0].prod_sz != "")
+                        {
+                            prod = "(" + result.data[0].prod_sz + ")";
+                        }
+
+                        $("#productname").text(result.data[0].description + prod);
+                        $("#out_qty").text(result.data[0].out_qty);
+                        $("#act_pick_qty").text(result.data[0].act_pick_qty); 
+                        $("#deliver_code_display").val(result.data[0].deliver_code);
+                        //alert(result.data[0].deliver_code);
+                        //document.getElementById("hid_ord_qty").value = result.data[0].ord_qty;
+                        //document.location.href = "/MarketTally/MarketTallyWDProduct?number=" + number + "&upc=" + upc;
+                        //alert(result.data[0].description + prod)
+                    }
+                    else
+                    {
+                        $('#MessageContentId').text("當前工作代號中沒有該產品條碼!");
+                        $('.MarketTallyWDProduct-modal-alert').modal('toggle');
+                        $('.MarketTallyWDProduct-modal-alert').on('hidden.bs.modal', function (e)
+                        {
+                            document.location.href = "/MarketTally/MarketTally";
+                        })
+
+                    }
+                }
+
+            }).error(function ()
+            {
+                $('#MessageContentId').text("查詢失敗!");
+                $('.MarketTallyWDProduct-modal-alert').modal('toggle')
+            });
+            $('#stock_table').attr("data-url", "/MarketTally/GetStockByUpc?upc_id="+'@ViewBag.upc');
+            $('#stock_table').bootstrapTable();
+        }
+
+        $('#delivercode').on('input', function (e)
+        {
+            if ($("#delivercode").val() == "")
+            {
+                $('#delivercode_group').attr("class", "input-group "); 
+                $('#inputGroupStatus_delivercode').attr("class", "glyphicon");
+
+                $('#amsure').attr("class", "btn btn-default btn-lg disabled");
+                return false;
+            }
+            else if ($("#delivercode").val().trim() == $("#deliver_code_display").val().trim())
+            {
+                $('#delivercode_group').attr("class", "input-group has-success ");
+                $('#inputGroupStatus_delivercode').attr("class", "glyphicon glyphicon-ok form-control-feedback");
+
+                $('#amsure').attr("class", "btn btn-success btn-lg ");
+                
+            }
+            else
+            {
+                $('#delivercode_group').attr("class", "input-group has-error ");
+                $('#inputGroupStatus_delivercode').attr("class", "glyphicon glyphicon-remove form-control-feedback");
+
+                $('#amsure').attr("class", "btn btn-default btn-lg disabled");
+            }
+        })
+
+    });
+</script>

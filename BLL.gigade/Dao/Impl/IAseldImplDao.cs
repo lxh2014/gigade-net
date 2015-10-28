@@ -22,6 +22,7 @@ namespace BLL.gigade.Dao.Impl
         DataTable GetOrderProductInformation(AseldQuery ase);
         string UpdTicker(string id);
         List<AseldQuery> GetAseldList(Aseld ase);
+        List<AseldQuery> GetAseldListByUpc(Aseld ase);
         string UpdAseld(Aseld a);
         int SelCom(Aseld a);
         int SelComA(Aseld a);

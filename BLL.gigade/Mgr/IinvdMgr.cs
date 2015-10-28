@@ -128,6 +128,31 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IinvdMgr-->GetIinvdList-->" + ex.Message, ex);
             }
         }
+        public List<IinvdQuery> GetIinvdListByUpc(IinvdQuery ivd, string upc_id, out int totalCount)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(ivd.serchcontent))
+                {
+                    switch (ivd.serch_type)
+                    {
+                        case 1:
+                            ivd.serchcontent = _iplasdao.Getlocid(ivd.serchcontent.ToString());
+                            break;
+                        case 2:
+                            ivd.serchcontent = _iplasdao.Getprodbyupc(ivd.serchcontent.ToString()).Rows[0]["item_id"].ToString();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                return _ivddao.GetIinvdListByUpc(ivd,upc_id, out totalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->GetIinvdListByUpc-->" + ex.Message, ex);
+            }
+        }
         public int IsUpd(Iinvd i,int type=0)/*chaojie1124j添加，區分是庫存調整，還是收貨上架*/
         {
             try
