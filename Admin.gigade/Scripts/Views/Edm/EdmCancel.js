@@ -64,7 +64,7 @@ Ext.onReady(function () {
                                     else {
                                         Ext.getCmp('mail').reset();
                                         if (result.msg == '0') {
-                                            Ext.Msg.alert(INFORMATION, "該Email不存在！");
+                                            Ext.Msg.alert(INFORMATION, "該Email沒有訂閱電子報！");
                                         }
                                         else if (result.msg == '1') {
                                             Ext.Msg.alert(INFORMATION, "已取消電子報，但用戶不是會員，無法加入黑名單！");
