@@ -1116,6 +1116,48 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
+        #region 刪除
+        public HttpResponseBase DelEmailGroupList()
+        {
+            string json = string.Empty;
+            EmailGroup query = new EmailGroup();
+            List<EmailGroup> list = new List<EmailGroup>();
+            try
+            {
+                 _emailGroupMgr =  new EmailGroupMgr(mySqlConnectionString);
+                if (!string.IsNullOrEmpty(Request.Form["rowID"]))
+                {
+                    string rowIDs = Request.Form["rowID"];
+                    if (rowIDs.IndexOf("∑") != -1)
+                    {
+                        foreach (string id in rowIDs.Split('∑'))
+                        {
+                            if (!string.IsNullOrEmpty(id))
+                            {
+                                query = new EmailGroup();
+                                query.group_id =Convert.ToInt32(id);
+                                list.Add(query);
+                            }
+                        }
+                    }
+                }
+                json = _emailGroupMgr.DelEmailGroupList(list);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+
 
         #endregion
 
@@ -1234,16 +1276,16 @@ namespace Admin.gigade.Controllers
                         {
                             newRow[4] = Convert.ToInt32(_dt.Rows[i]["count"]);
                         }
-                        if (_dt.Rows[i]["request_createdate"] == "")
+                        if (_dt.Rows[i]["send_date"] == "")
                         {
                             newRow[5] = "";
                         }
                         else
                         {
                             DateTime request_createdate;
-                            if (DateTime.TryParse(_dt.Rows[i]["request_createdate"].ToString(), out request_createdate))
+                            if (DateTime.TryParse(_dt.Rows[i]["send_date"].ToString(), out request_createdate))
                             {
-                                newRow[5] = Convert.ToDateTime(_dt.Rows[i]["request_createdate"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
+                                newRow[5] = Convert.ToDateTime(_dt.Rows[i]["send_date"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
                             }
                             else
                             {
@@ -1322,8 +1364,7 @@ namespace Admin.gigade.Controllers
                     _newDt.Columns.Add("信箱編號", typeof(string));
                     _newDt.Columns.Add("開信次數", typeof(string));
                     _newDt.Columns.Add("寄信時間", typeof(string));
-                    _newDt.Columns.Add("首次開信時間", typeof(string));
-                    _newDt.Columns.Add("最近開信時間", typeof(string));
+                 
                     for (int i = 0; i < _dt.Rows.Count; i++)
                     {
                         #region 轉換dt
@@ -1355,16 +1396,16 @@ namespace Admin.gigade.Controllers
                         {
                             newRow[4] = Convert.ToInt32(_dt.Rows[i]["count"]);
                         }
-                        if (_dt.Rows[i]["request_createdate"] == "")
+                        if (_dt.Rows[i]["send_date"] == "")
                         {
                             newRow[5] = "";
                         }
                         else
                         {
                             DateTime request_createdate;
-                            if (DateTime.TryParse(_dt.Rows[i]["request_createdate"].ToString(), out request_createdate))
+                            if (DateTime.TryParse(_dt.Rows[i]["send_date"].ToString(), out request_createdate))
                             {
-                                newRow[5] = Convert.ToDateTime(_dt.Rows[i]["request_createdate"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
+                                newRow[5] = Convert.ToDateTime(_dt.Rows[i]["send_date"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
                             }
                             else
                             {
@@ -1372,42 +1413,7 @@ namespace Admin.gigade.Controllers
                             }
 
                         }
-                        if (_dt.Rows[i]["first_traceback"] == "")
-                        {
-                            newRow[6] = "";
-                        }
-                        else
-                        {
-                            DateTime first_traceabck;
-                            if (DateTime.TryParse(_dt.Rows[i]["first_traceback"].ToString(), out first_traceabck))
-                            {
-                                newRow[6] = Convert.ToDateTime(_dt.Rows[i]["first_traceback"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
-                            }
-                            else
-                            {
-                                newRow[6] = "";
-                            }
-
-
-                        }
-                        if (_dt.Rows[i]["last_traceback"] == "")
-                        {
-                            newRow[7] = "";
-                        }
-                        else
-                        {
-                            DateTime first_traceabck;
-                            if (DateTime.TryParse(_dt.Rows[i]["last_traceback"].ToString(), out first_traceabck))
-                            {
-                                newRow[7] = Convert.ToDateTime(_dt.Rows[i]["last_traceback"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
-                            }
-                            else
-                            {
-                                newRow[7] = "";
-                            }
-
-
-                        }
+ 
                         _newDt.Rows.Add(newRow);
                         #endregion
                     }
@@ -1538,6 +1544,32 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
+
+        public HttpResponseBase CreatedateAndLogId()
+        {
+            string json = string.Empty;
+            try
+            {
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                DataTable _dt = _edmContentNewMgr.CreatedateAndLogId();
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,data:" + JsonConvert.SerializeObject(_dt, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,data:[]}";
+            }
+
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
         #endregion
     }
 }

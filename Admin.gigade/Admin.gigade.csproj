@@ -1933,6 +1933,7 @@
     <Content Include="Scripts\Views\ProductHistory\ParticularsHistory.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeEdit.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeList.js" />
+    <Content Include="Scripts\Views\ProductPurchase\StatusListLowerShelf.js" />
     <Content Include="Scripts\Views\ProductPurchase\SuggestPurchaseList.js" />
     <Content Include="Scripts\Views\ProductSearch\ProductSearchList.js" />
     <Content Include="Scripts\Views\ProductTier\ExpectTier.js" />
@@ -4430,6 +4431,7 @@
     <Content Include="Template\OrderImport\t_orders.xlsx" />
     <Content Include="Views\EdmNew\EdmContentNewReport.cshtml" />
     <Content Include="Views\EdmNew\EdmSendListCountView.cshtml" />
+    <Content Include="Views\ProductPurchase\StatusLowerShelf.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
