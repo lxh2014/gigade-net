@@ -812,10 +812,15 @@ namespace BLL.gigade.Dao
                 sqlCondi.Append(" inner join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set  ");
                 //  sqlCondi.Append(" left join t_parametersrc tps on tps.parameterCode=dfsm.delivery_freight_set and tps.parameterType='product_freight' ");
                 sbSqlCondition.Append(" where 1=1 ");
-                sbSqlCondition.Append(" and (p.product_status=6 or p.product_status=99) and p.product_id>10000 ");
-                if (query.Shortage != -1)
+                sbSqlCondition.Append(" and p.product_id>10000  ");
+                if (query.Shortage != 0)
                 {
-                    sbSqlCondition.AppendFormat(" and p.shortage='{0}' ", query.Shortage);
+                   sbSqlCondition.AppendFormat(" and ((p.product_status=6 or p.product_status=99)or p.shortage='{0}' ) ", query.Shortage);
+                   
+                }
+                else 
+                {
+                    sbSqlCondition.AppendFormat(" and (p.product_status=6 or p.product_status=99) ");
                 }
                 if (query.Product_Id != 0)
                 {

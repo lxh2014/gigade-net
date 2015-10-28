@@ -828,7 +828,6 @@ namespace Admin.gigade.Controllers
             int totalCount = 0;
             try
             {
-                query.Shortage = -1;
                 if (!string.IsNullOrEmpty(Request.Params["Short"]))
                 {
                     query.Shortage = int.Parse(Request.Params["Short"]);
@@ -903,7 +902,6 @@ namespace Admin.gigade.Controllers
             DataTable dtExcel = new DataTable();
             try
             {
-                query.Shortage = -1;
                 if (!string.IsNullOrEmpty(Request.Params["Short"]))
                 {
                     query.Shortage = int.Parse(Request.Params["Short"]);
