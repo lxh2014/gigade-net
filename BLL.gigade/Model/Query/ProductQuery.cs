@@ -47,6 +47,12 @@ namespace BLL.gigade.Model.Query
         public string create_username { get; set; }//存儲建立人姓名 add by shuangshuang0420j 20150513 13:37
         public DateTime time_start { get; set; }//存儲查詢開始時間 add by shuangshuang0420j 20150513 13:37
         public DateTime time_end { get; set; }//存儲查詢結束時間 add by shuangshuang0420j 20150513 13:37
+
+        public int item_stock { set; get; }//前台庫存量chaojie1124j 2015/10/27
+        public string iinvd_stock { set; get; }//後台庫存量chaojie1124j 2015/10/27
+        public string product_status_string { set; get; }//商品狀態chaojie1124j 2015/10/27
+        public int product_freight { set; get; }//溫層delivery_freight_set_mapping
+        public string loc_id2 { set; get; }//走道範圍，料位範圍chaojie1124j 2015/10/27
         public ProductQuery()
         {
             isjoincate = false;
@@ -74,6 +80,11 @@ namespace BLL.gigade.Model.Query
 
             vendor_status = 0;//供應商狀態
             brand_status = 0;//品牌狀態
+            item_stock = 0;
+            iinvd_stock = "0";
+            product_status_string = string.Empty;
+            product_freight = 0;
+            loc_id2 = string.Empty;
         }
     }
 }
