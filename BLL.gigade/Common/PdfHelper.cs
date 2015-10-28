@@ -933,7 +933,7 @@ namespace BLL.gigade.Common
                     {
                         PdfPCell cell = new PdfPCell(new Phrase(dtSource.Rows[i][j].ToString(), font));
                         cell.VerticalAlignment = Element.ALIGN_MIDDLE;
-                        cell.HorizontalAlignment = Element.ALIGN_RIGHT;//水平居右
+                        cell.HorizontalAlignment = Element.ALIGN_LEFT;//水平居左
                         if (rows == 1)
                         {
 
@@ -967,7 +967,7 @@ namespace BLL.gigade.Common
                     {
                         PdfPCell cell = new PdfPCell(new Phrase("", font));
                         cell.VerticalAlignment = Element.ALIGN_MIDDLE;
-                        cell.HorizontalAlignment = Element.ALIGN_RIGHT;//水平居右
+                        cell.HorizontalAlignment = Element.ALIGN_CENTER;//水平居右
                         if (rows == 1)
                         {
 
