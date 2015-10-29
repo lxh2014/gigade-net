@@ -195,7 +195,23 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductItemMgr-->GetSuggestPurchaseInfo-->" + ex.Message,ex);
             }
         }
-
+        /// <summary>
+        /// chaojie1124j add by 2015/10/26 實現下架狀態明細表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="TotalCount"></param>
+        /// <returns></returns>
+        public DataTable GetStatusListLowerShelf(ProductQuery query, out int TotalCount)//List<ProductQuery>
+        {
+            try
+            {
+                return productItemDao.GetStatusListLowerShelf(query, out TotalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemMgr-->GetStatusListLowerShelf-->" + ex.Message, ex);
+            }
+        }
         public ProductItemCustom GetProductArriveDay(ProductItem pi,string type)
         {
             try

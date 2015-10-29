@@ -64,7 +64,7 @@ Ext.onReady(function () {
                                     else {
                                         Ext.getCmp('mail').reset();
                                         if (result.msg == '0') {
-                                            Ext.Msg.alert(INFORMATION, "該Email不存在！");
+                                            Ext.Msg.alert(INFORMATION, "該Email沒有訂閱電子報！");
                                         }
                                         else if (result.msg == '1') {
                                             Ext.Msg.alert(INFORMATION, "已取消電子報，但用戶不是會員，無法加入黑名單！");
@@ -96,7 +96,7 @@ Ext.onReady(function () {
                                         Ext.Msg.alert(INFORMATION, "已取消電子報，但用戶不是會員，無法加入黑名單！");
                                     }
                                     else if (Ext.decode(action.response.responseText).msg == '2') {
-                                        Ext.MessageBox.confirm(CONFIRM, "已取消電子報且该邮箱在黑名单中的状态为：解除。是否將狀態改變為鎖定？", function (btn) {
+                                        Ext.MessageBox.confirm(CONFIRM, "已取消電子報且該郵箱在黑名單中的狀態為：解除。是否將狀態改變為鎖定？", function (btn) {
                                             if (btn == "yes") {
                                                 Ext.getCmp('vid').setValue( Ext.decode(action.response.responseText).vid),
                                                 ok();
