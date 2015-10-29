@@ -748,10 +748,11 @@ namespace BLL.gigade.Dao
             try
             {
                 sqlCount.AppendFormat("SELECT count(pi.item_id) as totalCount ");
-                str.AppendFormat("select pi.item_id,p.product_createdate,p.product_name,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1,CONCAT(p.spec_title_2,'',ps2.spec_name) as Spec_Name_2 ,p.combination,p.product_status,p.product_mode,dfsm.delivery_freight_set,p.product_start,tp2.parameterName as product_fenlei_dalei,tp1.parameterName as  product_fenlei_xiaolei  ");
+                str.AppendFormat("select pi.item_id,p.product_createdate,p.product_name,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1,CONCAT(p.spec_title_2,'',ps2.spec_name) as Spec_Name_2 ,p.combination,p.product_status,p.product_mode,dfsm.delivery_freight_set,p.product_start,tp2.parameterName as product_fenlei_dalei,tp1.parameterName as  product_fenlei_xiaolei,i.po_id  ");
                 strcont.AppendFormat(" from  product_item pi ");
                 strcont.AppendFormat(" inner join product p on p.product_id =pi.product_id ");
                 strcont.AppendFormat(" inner join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set ");
+                strcont.AppendFormat(" LEFT JOIN ipod i on i.prod_id=pi.item_id ");
                 strcont.AppendFormat(" INNER JOIN v_product_item_noloc v on v.item_id=pi.item_id ");
                 strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
                 strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");

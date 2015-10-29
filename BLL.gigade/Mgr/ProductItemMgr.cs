@@ -369,8 +369,11 @@ namespace BLL.gigade.Mgr
                     {
                         item.product_freight_set_string = "冷凍";
                     }
-
-
+                    //採購單單號
+                    if (!string.IsNullOrEmpty(item.po_id))
+                    {
+                        item.po_id = " " + item.po_id;
+                    }             
                 }
 
                 return store;

@@ -59,6 +59,8 @@ namespace BLL.gigade.Model.Query
         public string cate_id { get; set; }
         public string spec_title_1 { get; set; }
         public string spec_title_2 { get; set; }
+        public string plas_id_string { get; set; }
+        public string po_id { get; set; }
         public ProductItemQuery()
         {
             stockScope = 0;
@@ -107,6 +109,8 @@ namespace BLL.gigade.Model.Query
             cate_id = string.Empty ;
             spec_title_1 = string.Empty;
             spec_title_2 = string.Empty;
+            plas_id_string = string.Empty ;
+            po_id = string.Empty;
 
         }
     }
