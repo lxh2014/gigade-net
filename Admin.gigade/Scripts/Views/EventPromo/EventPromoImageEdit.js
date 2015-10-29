@@ -184,7 +184,7 @@ function editFunction(row, store,multi) {
             },
             {
                 xtype: 'textfield',
-                fieldLabel: '圖片連接地址',
+                fieldLabel: '圖片連結地址',
                 id: 'pb_image_link',
                 name: 'pb_image_link',
                 vtype: 'url',
