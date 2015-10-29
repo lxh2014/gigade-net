@@ -7643,7 +7643,7 @@ namespace Admin.gigade.Controllers
                         newRow["調整原因"] = string.IsNullOrEmpty(store[i].iarc_id) ? " " : store[i].iarc_id;
                         newRow["數量"] = store[i].adj_qty;
                         newRow["调整料位"] = store[i].loc_R;
-                        newRow["有效日期"] = store[i].cde_dt.ToString("yyyy-MM-dd").Substring(0, 10) == "0001-01-01" ? " " : store[i].cde_dt.ToString().Substring(0, 10);
+                        newRow["有效日期"] = store[i].cde_dt.ToString("yyyy-MM-dd").Substring(0, 10) == "0001-01-01" ? " " : store[i].cde_dt.ToString("yyyy-MM-dd").Substring(0, 10);
                         newRow["前置單號"] =string.IsNullOrEmpty( store[i].po_id)?" ":store[i].po_id;
                         newRow["備註"] = string.IsNullOrEmpty(store[i].remarks) ? " " : store[i].remarks;
 
