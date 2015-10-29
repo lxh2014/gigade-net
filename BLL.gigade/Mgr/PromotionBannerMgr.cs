@@ -397,6 +397,10 @@ namespace BLL.gigade.Mgr
             try
             {
                 DataTable Using_Image = _promotionBannerDao.ShowUsingImage();
+                if (Using_Image==null||Using_Image.Rows.Count==0)
+                {
+                    return 0;
+                }
                 StringBuilder bids = new StringBuilder();
                 string pb_ids = string.Empty;
                 for (int a = 0; a < Using_Image.Rows.Count; a++)
@@ -430,28 +434,31 @@ namespace BLL.gigade.Mgr
                         }
                     }
                 }
-                List<PromotionBannerRelationQuery> pbr_store = _promotionBannerRelationDao.GetBrandIds(pb_ids, string.Empty);
-                if (pbr_store.Count > 0)
+                if (pb_ids != string.Empty)
                 {
-                    for (int i = 0; i < pbr_store.Count; i++)
+                    List<PromotionBannerRelationQuery> pbr_store = _promotionBannerRelationDao.GetBrandIds(pb_ids, string.Empty);
+                    if (pbr_store.Count > 0)
                     {
-                        List<PromotionBannerRelationQuery> pbr_store_two = _promotionBannerRelationDao.GetBrandIds(pb_ids, pbr_store[i].brand_id.ToString());
-                        if (pbr_store_two.Count > 1)
+                        for (int i = 0; i < pbr_store.Count; i++)
                         {
-                            query.singleBrand_id = pbr_store[i].brand_id;
-                            List<PromotionBannerQuery> model = _promotionBannerDao.GetModelById(pbr_store[i].pb_id);
-                            if (model != null) 
+                            List<PromotionBannerRelationQuery> pbr_store_two = _promotionBannerRelationDao.GetBrandIds(pb_ids, pbr_store[i].brand_id.ToString());
+                            if (pbr_store_two.Count > 1)
                             {
-                                query.date_start = model[0].pb_startdate;
-                                query.date_end = model[0].pb_enddate;
-                                query.pb_id = pbr_store[i].pb_id;
-                                DataTable repet_dt = _promotionBannerDao.GetUsingImageInTimeArea(query);
-                                if (repet_dt.Rows.Count > 0)
+                                query.singleBrand_id = pbr_store[i].brand_id;
+                                List<PromotionBannerQuery> model = _promotionBannerDao.GetModelById(pbr_store[i].pb_id);
+                                if (model != null)
                                 {
-                                    id = pbr_store[i].brand_id;
-                                    return result = 1; //品牌编号在該促銷圖片顯示期間已有其他促銷圖片 且已啟用
+                                    query.date_start = model[0].pb_startdate;
+                                    query.date_end = model[0].pb_enddate;
+                                    query.pb_id = pbr_store[i].pb_id;
+                                    DataTable repet_dt = _promotionBannerDao.GetUsingImageInTimeArea(query);
+                                    if (repet_dt.Rows.Count > 0)
+                                    {
+                                        id = pbr_store[i].brand_id;
+                                        return result = 1; //品牌编号在該促銷圖片顯示期間已有其他促銷圖片 且已啟用
+                                    }
                                 }
-                            }                          
+                            }
                         }
                     }
                 }
