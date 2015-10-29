@@ -1576,11 +1576,16 @@ namespace Admin.gigade.Controllers
             string json = string.Empty;
             try
             {
-                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
-                DataTable _dt = _edmContentNewMgr.CreatedateAndLogId();
-                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                json = "{success:true,data:" + JsonConvert.SerializeObject(_dt, Formatting.Indented, timeConverter) + "}";
+                if (!string.IsNullOrEmpty(Request.Params["content_id"]))
+                {
+                    int content_id = Convert.ToInt32(Request.Params["content_id"]);
+                    DataTable _dt = _edmContentNewMgr.CreatedateAndLogId(content_id);
+                    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                    timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                    json = "{success:true,data:" + JsonConvert.SerializeObject(_dt, Formatting.Indented, timeConverter)
+
++ "}";
+                }
             }
             catch (Exception ex)
             {

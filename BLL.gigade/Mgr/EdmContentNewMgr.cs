@@ -689,11 +689,11 @@ namespace BLL.gigade.Mgr
             }
         }
 
-        public DataTable CreatedateAndLogId()
+        public DataTable CreatedateAndLogId(int content_id)
         {
             try
             {
-                return _edmContentNewDao.CreatedateAndLogId();
+                return _edmContentNewDao.CreatedateAndLogId(content_id);
             }
             catch (Exception ex)
             {
