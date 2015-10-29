@@ -100,13 +100,21 @@
                  allowBlank: false,
                  value: Ext.getCmp('ktloc_id').getValue()
              },
+             {
+                 xtype: 'numberfield',
+                 fieldLabel: "數量",
+                 name: 'prod_qty',
+                 id: 'prod_qty',
+                 minValue: 1,
+                 allowBlank: false
+             },
             {
-                xtype: 'numberfield',
-                fieldLabel: "數量",
-                name: 'prod_qty',
-                id: 'prod_qty',
-                minValue: 1,
-                allowBlank: false
+                xtype: 'textfield',
+                fieldLabel: "庫調單號",
+                name: 'doc_num',
+                id: 'doc_num',
+                value: Ext.getCmp('doc_no').getValue(),
+                hidden:true
             },
             {
                 xtype: 'fieldcontainer',
@@ -343,6 +351,7 @@
                                              loc_id: Ext.getCmp('loc_id').getValue(),//主料位
                                              cde_dt_var: Ext.htmlEncode(Ext.getCmp('cde_dt_var').getValue()),
                                              cde_dt_incr: cde_dt_incr,
+                                             doc_num:Ext.getCmp('doc_num').getValue(),//庫調單號
                                              iarc_id: Ext.getCmp('iarc_id').getValue(),
                                              vendor_id: vendor_id
                                          },

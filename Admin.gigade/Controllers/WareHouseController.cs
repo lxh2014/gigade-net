@@ -1485,15 +1485,15 @@ namespace Admin.gigade.Controllers
                         string upc_type = store[i].upc_type_flg;
                         if (upc_type.Equals("1"))
                         {
-                            newRow[3] = "國際碼";
+                            newRow[3] = "國際條碼";
                         }
                         if (upc_type.Equals("2"))
                         {
-                            newRow[3] = "店內碼";
+                            newRow[3] = "吉甲地店內碼";
                         }
                         if (upc_type.Equals("3"))
                         {
-                            newRow[3] = "舊店內碼";
+                            newRow[3] = "供應商店內碼";
                         }
                     }
                     else { newRow[3] = ""; }
@@ -2740,6 +2740,10 @@ namespace Admin.gigade.Controllers
                 ia.create_dtim = DateTime.Now;
                 ia.create_user = m.create_user;
                 ia.doc_no = "P" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                if (!string.IsNullOrEmpty(Request.Params["doc_num"]))
+                {
+                    ia.doc_no = Request.Params["doc_num"];
+                }
                 ia.made_dt = m.made_date;
                 ia.cde_dt = m.cde_dt;
                 #endregion
@@ -7595,7 +7599,7 @@ namespace Admin.gigade.Controllers
         {
             PdfHelper pdf = new PdfHelper();
             List<string> pdfList = new List<string>();
-            float[] arrColWidth = new float[] { 60, 60, 100, 60, 50, 30, 60, 60, 60, 60, 60 };
+            float[] arrColWidth = new float[] { 60, 60, 100, 60, 50, 30, 60, 60,60, 60 };
             int index = 0;
             string newFileName = string.Empty;
             string newName = string.Empty;
@@ -7624,7 +7628,6 @@ namespace Admin.gigade.Controllers
                     _dtBody.Columns.Add("調整原因", typeof(string));
                     _dtBody.Columns.Add("數量", typeof(string));
                     _dtBody.Columns.Add("调整料位", typeof(string));
-                    _dtBody.Columns.Add("原有效日期", typeof(string));
                     _dtBody.Columns.Add("有效日期", typeof(string));
                     _dtBody.Columns.Add("前置單號", typeof(string));
                     _dtBody.Columns.Add("備註", typeof(string));
@@ -7640,8 +7643,7 @@ namespace Admin.gigade.Controllers
                         newRow["調整原因"] = string.IsNullOrEmpty(store[i].iarc_id) ? " " : store[i].iarc_id;
                         newRow["數量"] = store[i].adj_qty;
                         newRow["调整料位"] = store[i].loc_R;
-                        newRow["原有效日期"] = store[i].cde_dt.ToString("yyyy-MM-dd").Substring(0, 10) == "0001-01-01" ? " " : store[i].cde_dt.ToString().Substring(0, 10);
-                        newRow["有效日期"] = store[i].c_cde_dt.ToString("yyyy-MM-dd").Substring(0, 10) == "0001-01-01" ? " " : store[i].c_cde_dt.ToString().Substring(0, 10);
+                        newRow["有效日期"] = store[i].cde_dt.ToString("yyyy-MM-dd").Substring(0, 10) == "0001-01-01" ? " " : store[i].cde_dt.ToString("yyyy-MM-dd").Substring(0, 10);
                         newRow["前置單號"] =string.IsNullOrEmpty( store[i].po_id)?" ":store[i].po_id;
                         newRow["備註"] = string.IsNullOrEmpty(store[i].remarks) ? " " : store[i].remarks;
 
@@ -7666,7 +7668,7 @@ namespace Admin.gigade.Controllers
 
                 #region 庫存調整單頭
 
-                PdfPTable ptable = new PdfPTable(11);
+                PdfPTable ptable = new PdfPTable(10);
 
 
                 ptable.WidthPercentage = 100;//表格寬度
@@ -7675,7 +7677,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("執行人員:" + UsingName, new iTextSharp.text.Font(bf,10)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 3;
+                cell.Colspan = 2;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -7692,7 +7694,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("執行日期:" + UsingTime, new iTextSharp.text.Font(bf,10)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 3;
+                cell.Colspan = 2;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -7709,14 +7711,14 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 4)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 10;
                 //cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 //cell.DisableBorderSide(4);
                 //cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 15)));
-                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.VerticalAlignment = Element.ALIGN_CENTER;//字體水平居左
                 cell.Colspan = 3;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
@@ -7725,7 +7727,7 @@ namespace Admin.gigade.Controllers
                 ptable.AddCell(cell);
                 cell = new PdfPCell(new Phrase("  庫存調整單", new iTextSharp.text.Font(bf, 15)));
                 cell.VerticalAlignment = Element.ALIGN_CENTER;//字體水平居左
-                cell.Colspan = 8;
+                cell.Colspan = 7;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -7733,7 +7735,7 @@ namespace Admin.gigade.Controllers
                 ptable.AddCell(cell);
 
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 10)));
-                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.VerticalAlignment = Element.ALIGN_CENTER;//字體水平居左
                 cell.Colspan = 3;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
@@ -7741,8 +7743,8 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
                 cell = new PdfPCell(new Phrase("單號" + ":" + q.doc_no, new iTextSharp.text.Font(bf, 10)));// ipoStore[a].po_type_desc
-                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 8;
+                cell.VerticalAlignment = Element.ALIGN_CENTER;//字體水平居左
+                cell.Colspan = 7;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -7750,7 +7752,7 @@ namespace Admin.gigade.Controllers
                 ptable.AddCell(cell);
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 4)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 10;
                 cell.DisableBorderSide(1);
                 //cell.DisableBorderSide(2);
                // cell.DisableBorderSide(4);
@@ -7813,14 +7815,7 @@ namespace Admin.gigade.Controllers
                 //cell.DisableBorderSide(4);
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("原有效日期", new iTextSharp.text.Font(bf, 10)));
-                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-
-                //cell.DisableBorderSide(1);
-               // cell.DisableBorderSide(2);
-                //cell.DisableBorderSide(4);
-                cell.DisableBorderSide(8);
-                ptable.AddCell(cell);
+                
                 cell = new PdfPCell(new Phrase("有效日期", new iTextSharp.text.Font(bf, 10)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
 
@@ -7835,7 +7830,7 @@ namespace Admin.gigade.Controllers
                 //cell.DisableBorderSide(1);
                // cell.DisableBorderSide(2);
                 //cell.DisableBorderSide(4);
-                cell.DisableBorderSide(8);
+                //cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
                 cell = new PdfPCell(new Phrase("備註", new iTextSharp.text.Font(bf, 10)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
@@ -7856,7 +7851,7 @@ namespace Admin.gigade.Controllers
 
                   #region 庫存調整單尾
 
-                PdfPTable ptablefoot = new PdfPTable(11);
+                PdfPTable ptablefoot = new PdfPTable(10);
 
 
                     ptablefoot.WidthPercentage = 100;//表格寬度
@@ -7870,7 +7865,7 @@ namespace Admin.gigade.Controllers
                     footcell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf,15)));
                     footcell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     //footcell.HorizontalAlignment = Element.ALIGN_LEFT;//水平居右
-                    footcell.Colspan = 11;
+                    footcell.Colspan = 10;
                     footcell.DisableBorderSide(1);
                     footcell.DisableBorderSide(2);
                     footcell.DisableBorderSide(4);
@@ -7881,7 +7876,7 @@ namespace Admin.gigade.Controllers
                     footcell = new PdfPCell(new Phrase("印表日期:" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), new iTextSharp.text.Font(bf, 10)));
                     footcell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居右
                    // footcell.HorizontalAlignment = Element.ALIGN_LEFT;//水平居右
-                    footcell.Colspan = 3;
+                    footcell.Colspan = 2;
                     footcell.DisableBorderSide(1);
                     footcell.DisableBorderSide(2);
                     footcell.DisableBorderSide(4);
@@ -7949,7 +7944,7 @@ namespace Admin.gigade.Controllers
                    // document.Add(ptable);
                     //document.Add(ptablefoot); 
                     newFileName = newPDFName + "_part" + index++ + "." + "pdf";
-                    pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 11, uint.Parse(store.Count.ToString()));/*第一7是列，第二個是行*/
+                    pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 10, uint.Parse(store.Count.ToString()));/*第一7是列，第二個是行*/
                     pdfList.Add(newFileName);
                    
                 }
@@ -7957,7 +7952,7 @@ namespace Admin.gigade.Controllers
                 {
                     newFileName = newPDFName + "_part" + index++ + "." + "pdf";
 
-                    pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 11, uint.Parse(store.Count.ToString()));/*第一7是列，第二個是行*/
+                    pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 10, uint.Parse(store.Count.ToString()));/*第一7是列，第二個是行*/
                     pdfList.Add(newFileName);
                     
                 }
@@ -11896,6 +11891,7 @@ namespace Admin.gigade.Controllers
                 int totalcount = 0;
                 query.IsPage = false;
                 string newExcelName = string.Empty;
+                dtHZ.Columns.Add("料位編號", typeof(String));
                 dtHZ.Columns.Add("商品細項編號", typeof(String));
                 dtHZ.Columns.Add("商品名稱", typeof(String));
                 dtHZ.Columns.Add("商品規格", typeof(String));
@@ -11907,6 +11903,7 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("溫層", typeof(String));
                 dtHZ.Columns.Add("商品建立日期", typeof(String));
                 dtHZ.Columns.Add("商品上架時間", typeof(String));
+                dtHZ.Columns.Add("採購單單號", typeof(String));
                 productitemMgr = new ProductItemMgr(mySqlConnectionString);
                 List<ProductItemQuery> list = productitemMgr.GetWaitLiaoWeiList(query, out totalcount);
                 if (list.Count > 0)
@@ -11914,17 +11911,19 @@ namespace Admin.gigade.Controllers
                     for (int i = 0; i < list.Count; i++)
                     {
                         DataRow dr = dtHZ.NewRow();
-                        dr[0] = list[i].item_id;
-                        dr[1] = list[i].product_name;
-                        dr[2] = list[i].product_spec;
-                        dr[3] = list[i].combination_string;
-                        dr[4] = list[i].product_fenlei_dalei;
-                        dr[5] = list[i].product_fenlei_xiaolei;
-                        dr[6] = list[i].product_status_string;
-                        dr[7] = list[i].product_mode_string;
-                        dr[8] = list[i].product_freight_set_string;
-                        dr[9] = list[i].product_createdate_string;
-                        dr[10] = list[i].product_start_string;
+                        dr[0] = list[i].plas_id_string;
+                        dr[1] = list[i].item_id;
+                        dr[2] = list[i].product_name;
+                        dr[3] = list[i].product_spec;
+                        dr[4] = list[i].combination_string;
+                        dr[5] = list[i].product_fenlei_dalei;
+                        dr[6] = list[i].product_fenlei_xiaolei;
+                        dr[7] = list[i].product_status_string;
+                        dr[8] = list[i].product_mode_string;
+                        dr[9] = list[i].product_freight_set_string;
+                        dr[10] = list[i].product_createdate_string;
+                        dr[11] = list[i].product_start_string;
+                        dr[12] = list[i].po_id;
                         dtHZ.Rows.Add(dr);
                     }
                     string fileName = "等待料位報表匯出_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";

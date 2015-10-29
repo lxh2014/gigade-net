@@ -149,6 +149,7 @@
     <Compile Include="Controllers\BackDoorController.cs" />
     <Compile Include="Controllers\BoilerRelationController.cs" />
     <Compile Include="Controllers\BrandController.cs" />
+    <Compile Include="Controllers\BrandLogoSortController.cs" />
     <Compile Include="Controllers\ChannelController.cs" />
     <Compile Include="Controllers\ChinatrustController.cs" />
     <Compile Include="Controllers\ConsumeStatisticController.cs" />
@@ -1844,6 +1845,8 @@
     <Content Include="Scripts\kendo\2014.2.716\jquery.min.js" />
     <Content Include="Scripts\Views\AppService\AppCategoryEdit.js" />
     <Content Include="Scripts\Views\AppService\AppCategoryList.js" />
+    <Content Include="Scripts\Views\BrandLogoSort\BrandLogoSortEdit.js" />
+    <Content Include="Scripts\Views\BrandLogoSort\BrandLogoSortList.js" />
     <Content Include="Scripts\Views\ConsumeStatistic\List.js" />
     <Content Include="Scripts\Views\DeliveryStore\DeliveryStorePlace.js" />
     <Content Include="Scripts\Views\DeliveryStore\DeliveryStorePlaceEdit.js" />
@@ -1933,6 +1936,7 @@
     <Content Include="Scripts\Views\ProductHistory\ParticularsHistory.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeEdit.js" />
     <Content Include="Scripts\Views\ProductPurchase\ArrivalNoticeList.js" />
+    <Content Include="Scripts\Views\ProductPurchase\StatusListLowerShelf.js" />
     <Content Include="Scripts\Views\ProductPurchase\SuggestPurchaseList.js" />
     <Content Include="Scripts\Views\ProductSearch\ProductSearchList.js" />
     <Content Include="Scripts\Views\ProductTier\ExpectTier.js" />
@@ -4430,6 +4434,8 @@
     <Content Include="Template\OrderImport\t_orders.xlsx" />
     <Content Include="Views\EdmNew\EdmContentNewReport.cshtml" />
     <Content Include="Views\EdmNew\EdmSendListCountView.cshtml" />
+    <Content Include="Views\ProductPurchase\StatusLowerShelf.cshtml" />
+    <Content Include="Views\BrandLogoSort\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4644,7 +4650,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>2224</DevelopmentServerPort>
+          <DevelopmentServerPort>11529</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

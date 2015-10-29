@@ -12,7 +12,7 @@ var pageSize = 25;
 Ext.define('gridlistWLW', {
     extend: 'Ext.data.Model',
     fields: [
-
+        {name:"plas_id_string",type:"int"},//料位編號
         { name: "product_id", type: "int" },//商品編號
         { name: "product_name", type: "string" },//商品名稱
         { name: "item_id", type: "int" },//商品細項編號
@@ -32,6 +32,7 @@ Ext.define('gridlistWLW', {
         { name: "product_start_string", type: "string" },//商品上架時間
         { name: "product_fenlei_xiaolei", type: "string" },//商品上架時間
         { name: "product_fenlei_dalei", type: "string" },//商品上架時間
+        { name: "po_id", type: "string" },//採購單單號
 
     ],
 });
@@ -319,7 +320,8 @@ Ext.onReady(function () {
         frame: true,
         flex: 9.4,
         columns: [
-             { header: '商品細項編號', dataIndex: 'item_id', align: 'center' },
+                { header: '料位編號', dataIndex: 'plas_id_string', align: 'center',hidden:true },
+                { header: '商品細項編號', dataIndex: 'item_id', align: 'center' },
                 { header: '商品名稱', dataIndex: 'product_name', width: 180, align: 'center' },
                 { header: '商品規格', dataIndex: 'product_spec', width: 120, align: 'center' },
                 { header: '商品類型', dataIndex: 'combination_string', width: 120, align: 'center' },//商品類型
@@ -330,7 +332,7 @@ Ext.onReady(function () {
                 { header: "溫層", dataIndex: "product_freight_set_string", align: 'center' },
                  { header: "商品建立日期", dataIndex: 'product_createdate_string', align: 'center', width: 180 },
                 { header: "商品上架時間", dataIndex: "product_start_string", align: 'center', width: 180 },
-
+                { header: "採購單單號", dataIndex: "po_id", align: 'center', width: 180 },
 
         ],
         tbar: [

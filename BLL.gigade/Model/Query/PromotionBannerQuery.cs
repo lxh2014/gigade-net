@@ -16,7 +16,8 @@ namespace BLL.gigade.Model.Query
         public int showStatus { get; set; }
         public int singleBrand_id { get; set; }
         public int multi { get; set; }
-        public int changeMode { get; set; }
+        public int changeMode { get; set; }       
+        public string brandIDS { get; set; }
         public PromotionBannerQuery()
         {
             createusername = string.Empty;
@@ -29,6 +30,7 @@ namespace BLL.gigade.Model.Query
             singleBrand_id = 0;
             multi = 0;// 0不允許多圖 1允許多圖
             changeMode = 0;// 0不改變模式 1改變模式
+            brandIDS = string.Empty;
         }
     }
 }

@@ -5462,17 +5462,23 @@ namespace Admin.gigade.Controllers
         {
             //結帳總金額扣除批次出貨運費
             int M_Account_Amount = Convert.ToInt32(tempTemp.Rows[0]["m_account_amount"]);
+
+            int M_Account_Amount_total = M_Account_Amount;
+            int jicang = 0;
             if (!string.IsNullOrEmpty(tempTemp.Rows[0]["m_bag_check_money"].ToString()))
             {
-                M_Account_Amount = M_Account_Amount - Convert.ToInt32(tempTemp.Rows[0]["m_bag_check_money"]);
+                if (int.TryParse(tempTemp.Rows[0]["m_bag_check_money"].ToString(), out jicang))
+                {
+                    M_Account_Amount_total = M_Account_Amount_total - jicang;
+                }
             }
             if (tempFreightDelivery_Normal != 0)
             {
-                M_Account_Amount += tempFreightDelivery_Normal;
+                M_Account_Amount_total += tempFreightDelivery_Normal;
             }
             if (tempFreightDelivery_Low != 0)
             {
-                M_Account_Amount += tempFreightDelivery_Low;
+                M_Account_Amount_total += tempFreightDelivery_Low;
             }
             string dispatch = string.Empty;
             if (vendorQuery.dispatch == 1)
@@ -5501,13 +5507,14 @@ namespace Admin.gigade.Controllers
             dr2[0] = "供應商編號：" + vendorQuery.vendor_code;
             dr3[0] = "供應商名稱:" + vendorQuery.vendor_name_simple;
             dr4[0] = "報表輸出時間:" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
             dr5[0] = "結帳金額:" + M_Account_Amount;
             dr6[0] = "廠商業績獎金：" + 0;
 
-            dr6[2] = "寄倉：" + tempTemp.Rows[0]["m_bag_check_money"].ToString();
+            dr6[2] = "寄倉：-" + jicang;
             dr6[3] = "調度常溫運費：" + tempFreightDelivery_Normal;
             dr6[5] = "調度低溫運費：" + tempFreightDelivery_Low;
-            dr7[0] = "廠商帳款總計：" + (M_Account_Amount - 0);
+            dr7[0] = "廠商帳款總計：" + (M_Account_Amount_total + 0);//總計金額應該是結帳金額+獎金-寄倉費+調度常溫運費+調度低溫運費
             dr8[0] = "出貨模式：" + dispatch;
             dr9[0] = "歸檔日期";
             dr9[1] = "訂單日期";
@@ -5583,7 +5590,6 @@ namespace Admin.gigade.Controllers
             for (int i = 0; i < liStore.Count; i++)
             {
                 DataRow dr = dtHZ.NewRow();
-                int rtt = 0;
                 int tt = 0;
                 VendorAccountCustom item = liStore[i];
                 if ((i > 0 && (item.slave_id != liStore[i - 1].slave_id || item.order_id != liStore[i - 1].order_id)) || i == 0)
@@ -5684,19 +5690,18 @@ namespace Admin.gigade.Controllers
                     dr[23] = item.Deduct_Account;
                     dr[24] = item.Single_Money;
                     dr[25] = item.Single_Money * item.Buy_Num;
+                    if (item.tax_type == 3)
+                    {
+                        if (item.Event_Cost == 0)
+                        {
 
-                    if (item.Event_Cost == 0)
-                    {
-
-                        tt = Convert.ToInt32(item.Single_Cost * item.Buy_Num);
-                    }
-                    else
-                    {
-                        tt = Convert.ToInt32(item.Event_Cost * item.Buy_Num);
-                    }
-                    if (item.money_creditcard_1 != 0 && paymentarr.Contains(item.Order_Payment.ToString()))
-                    {
-                        rtt = Convert.ToInt32(Math.Round(item.Single_Money * item.Buy_Num * item.creditcard_1_percent * 0.01));
+                            tt = Convert.ToInt32(item.Single_Cost * item.Buy_Num);
+                        }
+                        else
+                        {
+                            tt = Convert.ToInt32(item.Event_Cost * item.Buy_Num);
+                        }
+                        mianx += tt;
                     }
                 }
                 dr[26] = "";
@@ -5715,13 +5720,11 @@ namespace Admin.gigade.Controllers
                 if (item.tax_type == 1)
                 {
                     item.taxtype = "應稅";
-                    yingTotal += (tt - rtt);
 
                 }
                 else if (item.tax_type == 3)
                 {
                     item.taxtype = "免稅";
-                    mianx += (tt - rtt);
                 }
 
                 dr[30] = item.taxtype;
@@ -5758,7 +5761,7 @@ namespace Admin.gigade.Controllers
                 dtHZ.Rows.Add(dre);
                 DataRow drFre = dtHZ.NewRow();
                 drFre[12] = "運費";
-                fritotal = tempFreightDelivery_Low + tempFreightDelivery_Normal - (Convert.ToInt32(tempTemp.Rows[0]["m_bag_check_money"].ToString()));
+                fritotal = tempFreightDelivery_Low + tempFreightDelivery_Normal - (Convert.ToInt32(tempTemp.Rows[0]["m_bag_check_money"].ToString())) + 0;
                 drFre[13] = fritotal;
                 if (drFre[13].ToString() != "0")
                 {
@@ -5767,45 +5770,57 @@ namespace Admin.gigade.Controllers
                     drFreTotal[13] = account_amount + fritotal;
                     dtHZ.Rows.Add(drFreTotal);
                 }
+                yingTotal = account_amount + fritotal - mianx;
                 DataRow drT1 = dtHZ.NewRow();
                 int year = Convert.ToInt32(Request.Params["dateOne"].ToString());
                 int month = Convert.ToInt32(Request.Params["dateTwo"].ToString());
                 DateTime dtime = new DateTime(year, month, 1);
 
-                drT1[0] = "※" + Request.Params["dateTwo"].ToString() + "月對帳表出貨日期範圍為：" + dtime.AddDays(-10).ToShortDateString() + "～" + dtime.AddMonths(1).AddDays(-11).ToShortDateString();
+                drT1[0] = "※" + Request.Params["dateTwo"].ToString() + "月對帳表出貨日期(+10天)：" + dtime.AddDays(-10).ToShortDateString() + "～" + dtime.AddMonths(1).AddDays(-11).ToShortDateString() + "(到店取貨(+15天):" + dtime.AddDays(-15).ToShortDateString() + "～" + dtime.AddMonths(1).AddDays(-16).ToShortDateString() + ")";
                 dtHZ.Rows.Add(drT1);
                 DataRow drT2 = dtHZ.NewRow();
                 drT2[0] = "※發票抬頭：吉甲地好市集股份有限公司，統編：25137186。";
                 dtHZ.Rows.Add(drT2);
                 DataRow drT3 = dtHZ.NewRow();
-                drT3[0] = "※正本發票或發據請寄至:115台北市南港區八德路四段768巷9號3樓之1(林秀婷小姐收)，02-2783-3183#612。";
+                drT3[0] = "※正本發票或發據請寄至:115台北市南港區八德路四段768巷9號3樓之1(會計部收)，02-2783-3183。";
                 dtHZ.Rows.Add(drT3);
+                DataRow drT7 = dtHZ.NewRow();
+                drT7[0] = "※" + Request.Params["dateTwo"].ToString() + "月對帳表(" + dtime.AddMonths(1).Month + "月對帳時程)：";
+                dtHZ.Rows.Add(drT7);
+                DataRow drT4 = dtHZ.NewRow();
+                drT4[0] = "1.對帳表提供:吉甲地提供對帳表，月初前3工作日";
+                dtHZ.Rows.Add(drT4);
+                DataRow drT5 = dtHZ.NewRow();
+                drT5[0] = "2.對帳:廠商對帳OK後正本請款發票/收據寄達至吉甲地(每月10前,遇假日順延一日)";
+                dtHZ.Rows.Add(drT5);
+                DataRow drT6 = dtHZ.NewRow();
+                drT6[0] = "3.付款:吉甲地廠商款付款，每月最後一工作日";
+                dtHZ.Rows.Add(drT6);
 
-                //DataRow drShuiBei = dtHZ.NewRow();
-                //drShuiBei[13] = "稅別";
-                //drShuiBei[14] = "免稅";
-                //drShuiBei[15] = "應稅";
-                //drShuiBei[16] = "統計";
-                //dtHZ.Rows.Add(drShuiBei);
-                //DataRow DrXS = dtHZ.NewRow();
-                //DrXS[13] = "銷售額";
-                //DrXS[14] = mianx;
-                //yingTotal += Convert.ToInt32(freight_delivery_normal + freight_delivery_low - freight_return_normal - freight_return_low + fritotal);
-                //DrXS[15] = Math.Round(yingTotal / 1.05);
-                //DrXS[16] = "/";
-                //dtHZ.Rows.Add(DrXS);
-                //DataRow DrS = dtHZ.NewRow();
-                //DrS[13] = "稅額";
-                //DrS[14] = 0;
-                //DrS[15] = Math.Round(yingTotal / 1.05 * 0.05);
-                //DrS[16] = "/";
-                //dtHZ.Rows.Add(DrS);
-                //DataRow DrZong = dtHZ.NewRow();
-                //DrZong[13] = "發票金額";
-                //DrZong[14] = mianx;
-                //DrZong[15] = yingTotal;
-                //DrZong[16] = mianx + yingTotal;
-                //dtHZ.Rows.Add(DrZong);
+                DataRow drShuiBei = dtHZ.NewRow();
+                drShuiBei[13] = "稅別";
+                drShuiBei[14] = "免稅";
+                drShuiBei[15] = "應稅";
+                drShuiBei[16] = "統計";
+                dtHZ.Rows.Add(drShuiBei);
+                DataRow DrXS = dtHZ.NewRow();
+                DrXS[13] = "銷售額";
+                DrXS[14] = mianx;
+                DrXS[15] = Math.Round(yingTotal / 1.05);
+                DrXS[16] = "/";
+                dtHZ.Rows.Add(DrXS);
+                DataRow DrS = dtHZ.NewRow();
+                DrS[13] = "稅額";
+                DrS[14] = 0;
+                DrS[15] = yingTotal - Math.Round(yingTotal / 1.05);
+                DrS[16] = "/";
+                dtHZ.Rows.Add(DrS);
+                DataRow DrZong = dtHZ.NewRow();
+                DrZong[13] = "發票金額";
+                DrZong[14] = mianx;
+                DrZong[15] = yingTotal;
+                DrZong[16] = mianx + yingTotal;
+                dtHZ.Rows.Add(DrZong);
             }
             else if (type == 2)
             {
