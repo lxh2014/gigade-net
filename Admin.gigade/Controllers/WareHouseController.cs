@@ -7643,7 +7643,7 @@ namespace Admin.gigade.Controllers
                         newRow["調整原因"] = string.IsNullOrEmpty(store[i].iarc_id) ? " " : store[i].iarc_id;
                         newRow["數量"] = store[i].adj_qty;
                         newRow["调整料位"] = store[i].loc_R;
-                        newRow["有效日期"] = store[i].cde_dt.ToString("yyyy-MM-dd").Substring(0, 10) == "0001-01-01" ? " " : store[i].cde_dt.ToString().Substring(0, 10);
+                        newRow["有效日期"] = store[i].cde_dt.ToString("yyyy-MM-dd").Substring(0, 10) == "0001-01-01" ? " " : store[i].cde_dt.ToString("yyyy-MM-dd").Substring(0, 10);
                         newRow["前置單號"] =string.IsNullOrEmpty( store[i].po_id)?" ":store[i].po_id;
                         newRow["備註"] = string.IsNullOrEmpty(store[i].remarks) ? " " : store[i].remarks;
 
@@ -11891,6 +11891,7 @@ namespace Admin.gigade.Controllers
                 int totalcount = 0;
                 query.IsPage = false;
                 string newExcelName = string.Empty;
+                dtHZ.Columns.Add("料位編號", typeof(String));
                 dtHZ.Columns.Add("商品細項編號", typeof(String));
                 dtHZ.Columns.Add("商品名稱", typeof(String));
                 dtHZ.Columns.Add("商品規格", typeof(String));
@@ -11902,6 +11903,7 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("溫層", typeof(String));
                 dtHZ.Columns.Add("商品建立日期", typeof(String));
                 dtHZ.Columns.Add("商品上架時間", typeof(String));
+                dtHZ.Columns.Add("採購單單號", typeof(String));
                 productitemMgr = new ProductItemMgr(mySqlConnectionString);
                 List<ProductItemQuery> list = productitemMgr.GetWaitLiaoWeiList(query, out totalcount);
                 if (list.Count > 0)
@@ -11909,17 +11911,19 @@ namespace Admin.gigade.Controllers
                     for (int i = 0; i < list.Count; i++)
                     {
                         DataRow dr = dtHZ.NewRow();
-                        dr[0] = list[i].item_id;
-                        dr[1] = list[i].product_name;
-                        dr[2] = list[i].product_spec;
-                        dr[3] = list[i].combination_string;
-                        dr[4] = list[i].product_fenlei_dalei;
-                        dr[5] = list[i].product_fenlei_xiaolei;
-                        dr[6] = list[i].product_status_string;
-                        dr[7] = list[i].product_mode_string;
-                        dr[8] = list[i].product_freight_set_string;
-                        dr[9] = list[i].product_createdate_string;
-                        dr[10] = list[i].product_start_string;
+                        dr[0] = list[i].plas_id_string;
+                        dr[1] = list[i].item_id;
+                        dr[2] = list[i].product_name;
+                        dr[3] = list[i].product_spec;
+                        dr[4] = list[i].combination_string;
+                        dr[5] = list[i].product_fenlei_dalei;
+                        dr[6] = list[i].product_fenlei_xiaolei;
+                        dr[7] = list[i].product_status_string;
+                        dr[8] = list[i].product_mode_string;
+                        dr[9] = list[i].product_freight_set_string;
+                        dr[10] = list[i].product_createdate_string;
+                        dr[11] = list[i].product_start_string;
+                        dr[12] = list[i].po_id;
                         dtHZ.Rows.Add(dr);
                     }
                     string fileName = "等待料位報表匯出_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";

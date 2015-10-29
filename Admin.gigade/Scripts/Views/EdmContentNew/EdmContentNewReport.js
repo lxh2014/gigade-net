@@ -50,8 +50,12 @@
 
 
 
-
-
+    CreatedateAndLogIdStore.on('beforeload', function () {
+        Ext.apply(CreatedateAndLogIdStore.proxy.extraParams,
+        {
+            content_id: document.getElementById('content_id').value,
+        });
+    });
 
     EdmContentNewReportStore.on('beforeload', function () {
         Ext.apply(EdmContentNewReportStore.proxy.extraParams,

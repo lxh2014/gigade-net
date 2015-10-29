@@ -75,11 +75,10 @@ var yunsongtype = Ext.create('Ext.data.Store', {
 });
 function Query(x) {
  
-    var form = this.up('form').getForm();
-
-    if (form.isValid()) {
-      
-    
+    var searchcon = Ext.getCmp('searchcontent');
+    var start = Ext.getCmp('startIloc');
+    var end = Ext.getCmp('endIloc');
+    if (searchcon.isValid() && start.isValid() && end.isValid) {
             StatusStore.removeAll();
             var checked = Ext.getCmp("Istock").items;
             var check = "";
@@ -274,11 +273,11 @@ Ext.onReady(function () {
         columns: [
              // new Ext.grid.RowNumberer(),//自動顯示行號
              { header: "商品編號", dataIndex: 'product_id', width: 100, align: 'center' },
-            { header: "商品名稱", dataIndex: 'product_name', width: 80, align: 'center' },
-            { header: "料位編號", dataIndex: 'loc_id', width: 100, align: 'center' },
-            { header: "商品細項編號", dataIndex: 'item_id', width: 80, align: 'center' },
+            { header: "商品名稱", dataIndex: 'product_name', width: 170, align: 'center' },
+            { header: "主料位編號", dataIndex: 'loc_id', width: 100, align: 'center' },
+            { header: "商品細項編號", dataIndex: 'item_id', width: 120, align: 'center' },
             {
-                header: "組合Y/N", dataIndex: 'combination', width: 60, align: 'center',
+                header: "組合Y/N", dataIndex: 'combination', width: 80, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     switch (value) {
                         case 1:
@@ -295,7 +294,7 @@ Ext.onReady(function () {
             { header: "前台庫存量", dataIndex: 'item_stock', width: 80, align: 'center' },
             { header: "後台庫存量", dataIndex: 'iinvd_stock', width: 80, align: 'center' },
             {
-                header: "溫層", dataIndex: 'product_freight', width: 150, align: 'center',
+                header: "溫層", dataIndex: 'product_freight', width: 100, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (value == 1) {
                         return "常溫";

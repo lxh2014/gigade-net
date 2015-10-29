@@ -47,6 +47,13 @@
             }
         }
     });
+
+    CreatedateAndLogIdStore02.on('beforeload', function () {
+        Ext.apply(CreatedateAndLogIdStore02.proxy.extraParams,
+        {
+            content_id: document.getElementById('content_id').value,
+        });
+    });
     EdmSendListCountStore.on('beforeload', function () {
         Ext.apply(EdmSendListCountStore.proxy.extraParams,
         {

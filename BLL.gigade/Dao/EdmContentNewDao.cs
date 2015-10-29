@@ -29,7 +29,7 @@ namespace BLL.gigade.Dao
             try
             {
                 sqlCount.AppendFormat("select count(edn.content_id) as countTotal ");
-                sql.AppendFormat("select edn.content_id,edn.group_id,`subject`,esl.count,esl.date,edn.sender_id,ms.sender_email,ms.sender_name,edn.importance,edn.template_id,edn.template_data,et.edit_url,et.content_url   ");
+                sql.AppendFormat("select edn.content_id,edn.group_id,`subject`,esl.count,esl.date,edn.sender_id,ms.sender_email,ms.sender_name,edn.importance,edn.template_id,edn.template_data,'' as 'template_data_send', et.edit_url,et.content_url   ");
                 sqlFrom.AppendFormat("from edm_content_new edn LEFT JOIN  (SELECT content_id,COUNT(content_id) as count,MAX(schedule_date) as date from edm_send_log WHERE test_send=0 GROUP BY content_id)  esl ON edn.content_id=esl.content_id LEFT JOIN mail_sender ms on edn.sender_id=ms.sender_id LEFT JOIN edm_template et on et.template_id=edn.template_id ");
                 sqlWhere.AppendFormat(" where 1=1 ");
                 sqlWhere.AppendFormat(" and edn.content_createdate between '{0}' and '{1}' ", CommonFunction.DateTimeToString(DateTime.Now.AddDays(-5)), CommonFunction.DateTimeToString(DateTime.Now));
@@ -251,7 +251,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT et.success,ete.`name`,ete.email,ete.email_id, et.count,et.send_date  from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id  WHERE et.content_id='{0}'  and et.log_id='{1}' and et.count=0 and et.success=0;", content_id,log_id);
+                sql.AppendFormat(@"SELECT et.success,ete.`name`,ete.email,ete.email_id, et.count,et.send_date  from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id  WHERE et.content_id='{0}'  and et.log_id='{1}' and et.count=0 and et.success=1;", content_id,log_id);
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
@@ -394,13 +394,13 @@ WHERE content_id='{0}'  and log_id='{1}'   AND edm_trace.count>0;", content_id, 
             }
         }
 
-        public DataTable CreatedateAndLogId()
+        public DataTable CreatedateAndLogId(int content_id)
         {
             DataTable _dt = new DataTable();
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(" select log_id,createdate from edm_send_log where test_send=0 order by createdate desc ;");
+                sql.AppendFormat(" select log_id,createdate from edm_send_log where test_send=0  and  content_id='{0}' order by createdate desc ;",content_id);
                 _dt = _access.getDataTable(sql.ToString());
                 return _dt;
             }
@@ -422,6 +422,20 @@ WHERE content_id='{0}'  and log_id='{1}'   AND edm_trace.count>0;", content_id, 
             catch (Exception ex)
             {
                 throw new Exception("EdmContentNewDao-->GetScheduleDate-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetPraraData()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.Append("SELECT parameterName from t_parametersrc WHERE parameterType='edm_type';");
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetPraraData-->" + sql.ToString() + ex.Message, ex);
             }
         }
 

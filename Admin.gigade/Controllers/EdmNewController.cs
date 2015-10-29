@@ -580,6 +580,7 @@ namespace Admin.gigade.Controllers
             string json = string.Empty;
             string template_data = string.Empty;
             string contentJson = string.Empty;
+            string replaceStr = string.Empty;
             try
             {
                 if (!string.IsNullOrEmpty(Request.Params["content_url"]))
@@ -587,7 +588,7 @@ namespace Admin.gigade.Controllers
                     #region 獲取網頁內容方法
                     string url = Request.Params["content_url"].ToString();
                     HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
-                    httpRequest.Timeout = 5000;
+                    httpRequest.Timeout = 9000;
                     httpRequest.Method = "GET";
                     HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
                     StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
@@ -598,7 +599,18 @@ namespace Admin.gigade.Controllers
                 {
                     template_data = Request.Params["template_data"];
                 }
-                json = contentJson + " " + template_data;
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                DataTable _dt = _edmContentNewMgr.GetPraraData();
+                if (_dt != null && _dt.Rows.Count > 0)
+                {
+                    replaceStr = _dt.Rows[0][0].ToString();
+                }
+                else
+                {
+                    replaceStr = "&nbsp;&nbsp;";
+                }
+                contentJson=contentJson.Replace(replaceStr,template_data);
+                json = contentJson;
             }
             catch (Exception ex)
             {
@@ -1576,11 +1588,16 @@ namespace Admin.gigade.Controllers
             string json = string.Empty;
             try
             {
-                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
-                DataTable _dt = _edmContentNewMgr.CreatedateAndLogId();
-                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                json = "{success:true,data:" + JsonConvert.SerializeObject(_dt, Formatting.Indented, timeConverter) + "}";
+                if (!string.IsNullOrEmpty(Request.Params["content_id"]))
+                {
+                    int content_id = Convert.ToInt32(Request.Params["content_id"]);
+                    DataTable _dt = _edmContentNewMgr.CreatedateAndLogId(content_id);
+                    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                    timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                    json = "{success:true,data:" + JsonConvert.SerializeObject(_dt, Formatting.Indented, timeConverter)
+
++ "}";
+                }
             }
             catch (Exception ex)
             {

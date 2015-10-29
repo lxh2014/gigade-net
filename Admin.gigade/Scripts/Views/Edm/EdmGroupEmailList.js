@@ -6,9 +6,9 @@ var secret_info = "user_id;user_name;user_email";
 var EdmEmailStatusStore = Ext.create('Ext.data.Store', {
     fields: ["txt", "value"],
     data: [
-    { "txt": "全部狀態", "value": "0" },
+    { "txt": "全部狀態", "value": "3" },
     { "txt": "Y", "value": "1" },
-    { "txt": "N", "value": "2" },
+    { "txt": "N", "value": "0" },
     ]
 });
 var EdmSearchStore = Ext.create('Ext.data.Store', {
@@ -180,7 +180,7 @@ Ext.onReady(function () {
         '->',
         {
             xtype: 'combobox', fieldLabel: '訂閱狀態', labelWidth: 60, width: 180, id: 'email_status_search', editable: false,
-            displayField: 'txt', valueField: 'value', emptyText: '請選擇', value: '0', store: EdmEmailStatusStore,
+            displayField: 'txt', valueField: 'value', emptyText: '請選擇', value: '3', store: EdmEmailStatusStore,
             listeners: {
                 specialkey: function (field, e)
                 {
@@ -228,7 +228,7 @@ Ext.onReady(function () {
             iconCls: 'ui-icon ui-icon-reset',
             handler: function ()
             {
-                Ext.getCmp('email_status_search').setValue('0');
+                Ext.getCmp('email_status_search').setValue('3');
                 Ext.getCmp('selectType').setValue(null);
                 Ext.getCmp('search_con').setValue('');
             }

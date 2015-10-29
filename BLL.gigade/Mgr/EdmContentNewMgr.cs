@@ -689,11 +689,11 @@ namespace BLL.gigade.Mgr
             }
         }
 
-        public DataTable CreatedateAndLogId()
+        public DataTable CreatedateAndLogId(int content_id)
         {
             try
             {
-                return _edmContentNewDao.CreatedateAndLogId();
+                return _edmContentNewDao.CreatedateAndLogId(content_id);
             }
             catch (Exception ex)
             {
@@ -710,6 +710,18 @@ namespace BLL.gigade.Mgr
             catch (Exception ex)
             {
            throw new Exception("EdmContentNewMgr-->FXMD-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetPraraData()
+        {
+            try
+            {
+                return _edmContentNewDao.GetPraraData();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetPraraData-->" + ex.Message, ex);
             }
         }
 
