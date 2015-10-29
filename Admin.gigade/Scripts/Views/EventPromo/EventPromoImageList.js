@@ -6,8 +6,7 @@ changeError = 0;
 Ext.define('gigade.PromotionBanner', {
     extend: 'Ext.data.Model',
     fields: [
-    { name: 'pb_id', type: 'int' },
-    { name: 'brand_id', type: 'string' },
+    { name: 'pb_id', type: 'int' },  
     { name: 'pb_image', type: 'string' },
     { name: 'pb_image_link', type: 'string' },
     { name: 'pb_startdate', type: 'string' },
@@ -284,7 +283,7 @@ Ext.onReady(function () {
 
         },
         {
-            header: "連結地址", dataIndex: 'pb_image_link', flex: 2, align: 'center',
+            header: "圖片連結地址", dataIndex: 'pb_image_link', flex: 2, align: 'center',
             renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                 return Ext.String.format('<a href="{0}" target="bank">{1}</a>', value, value);
             }
@@ -337,7 +336,7 @@ Ext.onReady(function () {
             text: '允許多圖',
             id: 'allowMulti',
             iconCls: 'icon-user-edit',
-            // disabled: true,
+            hidden: true,
             handler: onAllowMultiClick
         },
         {
@@ -345,7 +344,7 @@ Ext.onReady(function () {
             text: '禁止多圖',
             id: 'forbidMulti',
             iconCls: 'icon-user-edit',
-            //  disabled: true,
+            hidden: true,
             handler: onForbidMultiClick
         }
         ],
