@@ -153,7 +153,7 @@
                     var email_status = row.data.email_status.toString();
                     if (email_status == 1) {
                         Ext.getCmp('rdo1').setValue(true);
-                    } else if (email_status == 2) {
+                    } else{
                         Ext.getCmp('rdo2').setValue(true);
                     }
                 }
