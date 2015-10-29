@@ -81,13 +81,17 @@ namespace BLL.gigade.Dao
             }
         }
        
-        public List<PromotionBannerRelationQuery> GetBrandIds(string pb_ids)
+        public List<PromotionBannerRelationQuery> GetBrandIds(string pb_ids,string brand_id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT brand_id from promotion_banner_relation WHERE pb_id in ({0})", pb_ids);
-                
+                sql.AppendFormat(@"SELECT brand_id,pb_id from promotion_banner_relation WHERE pb_id in ({0})", pb_ids);
+                if (brand_id != string.Empty)
+                {
+                    sql.AppendFormat("AND brand_id={0}", brand_id);
+                }
+                sql.AppendFormat(" ORDER BY pb_id");
                 return _accessMySql.getDataTableForObj<PromotionBannerRelationQuery>(sql.ToString());
             }
             catch (Exception ex)

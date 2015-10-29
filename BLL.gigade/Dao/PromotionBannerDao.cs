@@ -69,9 +69,13 @@ namespace BLL.gigade.Dao
                         sql.AppendFormat(" ");
                         break;
                 }
+                if (query.singleBrand_id != 0)
+                {
+                    sql.AppendFormat(" AND pbr.brand_id = '{0}' ", query.singleBrand_id);
+                }
                 if (query.brandIDS != string.Empty)
                 {
-                    sql.AppendFormat(" AND pbr.brand_id='{0}' ", query.brandIDS);
+                    sql.AppendFormat(" AND pbr.brand_id in '{0}' ", query.brandIDS);
                 }
                 if (query.brand_name != string.Empty)
                 {
@@ -247,10 +251,14 @@ namespace BLL.gigade.Dao
             query.Replace4MySQL();
             try
             {
-                sql.AppendFormat(@"SELECT pb_id,pb_status from promotion_banner WHERE pb_status=1");
+                sql.AppendFormat(@"SELECT DISTINCT pb.pb_id,pb_status,pb_startdate,pb_enddate from promotion_banner pb INNER JOIN promotion_banner_relation pbr on pb.pb_id=pbr.pb_id WHERE pb_status=1 ");
                 if (query.pb_id != 0)
                 {
-                    sql.AppendFormat(" AND pb_id!={0}", query.pb_id);
+                    sql.AppendFormat(" AND pbr.pb_id!={0}", query.pb_id);
+                }
+                if (query.singleBrand_id != 0)
+                {
+                    sql.AppendFormat(" AND pbr.brand_id={0}", query.singleBrand_id);
                 }
                 if (CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_start)) < CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(DateTime.Now)))
                 {
@@ -267,6 +275,7 @@ namespace BLL.gigade.Dao
                     sql.AppendFormat("  OR( pb_startdate<='{0}' AND pb_enddate >= '{1}'))", CommonFunction.DateTimeToString(query.date_start), CommonFunction.DateTimeToString(query.date_end));
 
                 }
+                sql.AppendFormat(" ORDER BY pb.pb_id");
                 return _accessMySql.getDataTable(sql.ToString());
             }
             catch (Exception ex)

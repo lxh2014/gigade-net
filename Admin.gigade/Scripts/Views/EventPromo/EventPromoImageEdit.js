@@ -290,8 +290,12 @@ function editFunction(row, store,multi) {
                             var result = Ext.decode(action.response.responseText);
                             myMask.hide();
                             if (result.success) {
-                                Ext.Msg.alert(INFORMATION, SUCCESS);
-                                EventPromoImageListStore.load();
+                                if (result.msg != "undefined") {
+                                    Ext.Msg.alert(INFORMATION, result.msg);
+                                }
+                                else {
+                                    Ext.Msg.alert(INFORMATION, SUCCESS);
+                                }EventPromoImageListStore.load();
                                 editWin.close();
                             }
                             else if (result.msg > 1) {
@@ -393,8 +397,8 @@ function editFunction(row, store,multi) {
             for (var a = 0; a < bids.length; a++) {
                 if (brand_id == bids[a]) {
                     pbBrandStore.add({
-                        Brand_Id: brand_id,
-                        Brand_Name: bnames[a]
+                        brand_id: brand_id,
+                        brand_name: bnames[a]
                     });
                     Ext.getCmp('b_id').reset();
                     return;

@@ -16,7 +16,7 @@ namespace BLL.gigade.Model.Query
         public int showStatus { get; set; }
         public int singleBrand_id { get; set; }
         public int multi { get; set; }
-        public int changeMode { get; set; }
+        public int changeMode { get; set; }       
         public string brandIDS { get; set; }
         public PromotionBannerQuery()
         {

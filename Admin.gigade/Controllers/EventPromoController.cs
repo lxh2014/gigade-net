@@ -1262,7 +1262,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["brand_id"]))
                 {
-                    query.brandIDS = Request.Params["brand_id"];
+                    query.singleBrand_id = Convert.ToInt32(Request.Params["brand_id"]);
                 }
                 _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
                 store = _promotionBannerMgr.GetPromotionBannerList(query, out totalCount);
@@ -1420,7 +1420,7 @@ namespace Admin.gigade.Controllers
                     }
                     else
                     {
-                        errorInfo += "第" + (i + 1) + "張" + ErrorMsg + "</br>";
+                        errorInfo += ErrorMsg;
                     }
                 }
                 #endregion               
@@ -1450,13 +1450,18 @@ namespace Admin.gigade.Controllers
                     query.pb_id = Convert.ToInt32(Request.Params["pb_id"]);
                     query.pb_muser = Convert.ToInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id);
                     result = _promotionBannerMgr.UpdateImageInfo(query, out brand_id);
-                    if (result)
+                    if (result && string.IsNullOrEmpty(errorInfo))
                     {
-                        json = "{success:true}";
+                        json = "{success:true}"; 
                     }
                     else if (result == false && brand_id != 0)
                     {
                         json = "{success:false,msg:\"" + brand_id + "\"}";//brand_id重複
+                    }
+
+                    else if (result && !string.IsNullOrEmpty(errorInfo))
+                    {
+                        json = "{success:true,msg:\"數據保存成功<br/>但圖片保存失敗 <br/>" + errorInfo + "\"}";
                     }
                     else
                     {
@@ -1475,7 +1480,11 @@ namespace Admin.gigade.Controllers
                     }
                     else if (result == false && brand_id != 0)
                     {
-                        json = "{success:false,msg:\""+ brand_id +"\"}";//brand_id重複
+                        json = "{success:false,msg:\"" + brand_id + "\"}";//brand_id重複
+                    }
+                    else if (!string.IsNullOrEmpty(errorInfo))
+                    {
+                        json = "{success:true,msg:\"數據保存成功<br/>但圖片保存失敗 <br/>" + errorInfo + "\"}";
                     }
                     else
                     {
