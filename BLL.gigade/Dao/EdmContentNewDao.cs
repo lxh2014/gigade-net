@@ -251,7 +251,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT et.success,ete.`name`,ete.email,ete.email_id, et.count,et.send_date  from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id  WHERE et.content_id='{0}'  and et.log_id='{1}' and et.count=0 and et.success=0;", content_id,log_id);
+                sql.AppendFormat(@"SELECT et.success,ete.`name`,ete.email,ete.email_id, et.count,et.send_date  from edm_trace et LEFT JOIN edm_trace_email ete ON et.email_id=ete.email_id  WHERE et.content_id='{0}'  and et.log_id='{1}' and et.count=0 and et.success=1;", content_id,log_id);
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
@@ -394,13 +394,13 @@ WHERE content_id='{0}'  and log_id='{1}'   AND edm_trace.count>0;", content_id, 
             }
         }
 
-        public DataTable CreatedateAndLogId()
+        public DataTable CreatedateAndLogId(int content_id)
         {
             DataTable _dt = new DataTable();
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(" select log_id,createdate from edm_send_log where test_send=0 order by createdate desc ;");
+                sql.AppendFormat(" select log_id,createdate from edm_send_log where test_send=0  and  content_id='{0}' order by createdate desc ;",content_id);
                 _dt = _access.getDataTable(sql.ToString());
                 return _dt;
             }
