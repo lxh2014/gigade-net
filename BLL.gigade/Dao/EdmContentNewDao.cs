@@ -164,7 +164,7 @@ namespace BLL.gigade.Dao
                 sql.Append(" retry_count,last_sent,next_send,max_retry,sent_log,request_createdate,request_updatedate,success_action,fail_action) values( ");
                 sql.AppendFormat("'{0}','{1}','{2}',", query.priority, query.user_id, query.sender_address);
                 sql.AppendFormat("'{0}','{1}','{2}','{3}',", query.sender_name, query.receiver_address, query.receiver_name, query.subject);
-                sql.AppendFormat("'{0}','{1}','{2}','{3}',", query.body, query.importance, CommonFunction.DateTimeToString(query.schedule_date), CommonFunction.DateTimeToString(query.valid_until_date));
+                sql.AppendFormat("'{0}','{1}','{2}','{3}',", query.bodyData, query.importance, CommonFunction.DateTimeToString(query.schedule_date), CommonFunction.DateTimeToString(query.valid_until_date));
                 sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}','{5}',NOW(),'{6}','{7}');", query.retry_count, CommonFunction.DateTimeToString(query.last_sent), CommonFunction.DateTimeToString(query.next_send), query.max_retry, query.sent_log, CommonFunction.DateTimeToString(DateTime.Now), query.success_action, query.fail_action);
                 return sql.ToString();
             }
@@ -425,12 +425,12 @@ WHERE content_id='{0}'  and log_id='{1}'   AND edm_trace.count>0;", content_id, 
             }
         }
 
-        public DataTable GetPraraData()
+        public DataTable GetPraraData(int parameterCode )
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.Append("SELECT parameterName from t_parametersrc WHERE parameterType='edm_type';");
+                sql.AppendFormat("SELECT parameterName from t_parametersrc WHERE parameterType='edm_type' and parameterCode='{0}';", parameterCode);
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
