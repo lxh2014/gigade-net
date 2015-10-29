@@ -29,7 +29,7 @@ namespace BLL.gigade.Dao
             try
             {
                 sqlCount.AppendFormat("select count(edn.content_id) as countTotal ");
-                sql.AppendFormat("select edn.content_id,edn.group_id,`subject`,esl.count,esl.date,edn.sender_id,ms.sender_email,ms.sender_name,edn.importance,edn.template_id,edn.template_data,et.edit_url,et.content_url   ");
+                sql.AppendFormat("select edn.content_id,edn.group_id,`subject`,esl.count,esl.date,edn.sender_id,ms.sender_email,ms.sender_name,edn.importance,edn.template_id,edn.template_data,'' as 'template_data_send', et.edit_url,et.content_url   ");
                 sqlFrom.AppendFormat("from edm_content_new edn LEFT JOIN  (SELECT content_id,COUNT(content_id) as count,MAX(schedule_date) as date from edm_send_log WHERE test_send=0 GROUP BY content_id)  esl ON edn.content_id=esl.content_id LEFT JOIN mail_sender ms on edn.sender_id=ms.sender_id LEFT JOIN edm_template et on et.template_id=edn.template_id ");
                 sqlWhere.AppendFormat(" where 1=1 ");
                 sqlWhere.AppendFormat(" and edn.content_createdate between '{0}' and '{1}' ", CommonFunction.DateTimeToString(DateTime.Now.AddDays(-5)), CommonFunction.DateTimeToString(DateTime.Now));
@@ -422,6 +422,20 @@ WHERE content_id='{0}'  and log_id='{1}'   AND edm_trace.count>0;", content_id, 
             catch (Exception ex)
             {
                 throw new Exception("EdmContentNewDao-->GetScheduleDate-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetPraraData()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.Append("SELECT parameterName from t_parametersrc WHERE parameterType='edm_type';");
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetPraraData-->" + sql.ToString() + ex.Message, ex);
             }
         }
 

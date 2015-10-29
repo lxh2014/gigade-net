@@ -713,5 +713,17 @@ namespace BLL.gigade.Mgr
             }
         }
 
+        public DataTable GetPraraData()
+        {
+            try
+            {
+                return _edmContentNewDao.GetPraraData();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetPraraData-->" + ex.Message, ex);
+            }
+        }
+
     }
 }
