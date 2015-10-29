@@ -20,6 +20,7 @@ var pbr_Store = Ext.create('Ext.data.Store', {
 });
 RelationFunction = function (row) {
     pbr_Store.on('beforeload', function () {
+        pbr_Store.removeAll();
         Ext.apply(pbr_Store.proxy.extraParams,
         {
             pb_id: row.data.pb_id,

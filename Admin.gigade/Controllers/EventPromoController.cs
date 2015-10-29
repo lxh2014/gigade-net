@@ -1234,6 +1234,8 @@ namespace Admin.gigade.Controllers
             List<PromotionBannerQuery> store = new List<PromotionBannerQuery>();
             try
             {
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
                 if (!string.IsNullOrEmpty(Request.Params["dateCon"]))
                 {
                     query.dateCon = Convert.ToInt32(Request.Params["dateCon"]);
@@ -1277,6 +1279,10 @@ namespace Admin.gigade.Controllers
                     else
                     {
                         item.pb_image = defaultImg;
+                    }
+                    if (!string.IsNullOrEmpty(item.pb_image_link))
+                    {
+                        item.pb_image_link = item.pb_image_link.Replace("''", "'");
                     }
                 }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
@@ -1361,9 +1367,13 @@ namespace Admin.gigade.Controllers
                 PromotionBannerQuery oldquery = new PromotionBannerQuery();
                 if (!string.IsNullOrEmpty(Request.Params["pb_id"]))
                 {
-                    oldquery = _promotionBannerMgr.GetModelById(Convert.ToInt32(Request.Params["pb_id"]));
-                    query.pb_image = oldquery.pb_image;
-                }            
+                    oldquery.pb_id = Convert.ToInt32(Request.Params["pb_id"]);
+                    List<PromotionBannerQuery> oldModel = _promotionBannerMgr.GetModelById(oldquery.pb_id);
+                    if (oldModel != null)
+                    {
+                        query.pb_image = oldModel[0].pb_image;
+                    }
+                }
                 #region 上傳圖片
                 string path = Server.MapPath(xmlPath);
                 SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
@@ -1474,7 +1484,7 @@ namespace Admin.gigade.Controllers
                     query.pb_kuser = Convert.ToInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id);
                     query.pb_muser = Convert.ToInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id);
                     result = _promotionBannerMgr.AddImageInfo(query, out brand_id);
-                    if (result)
+                    if (result && string.IsNullOrEmpty(errorInfo))
                     {
                         json = "{success:true}";
                     }
@@ -1482,7 +1492,7 @@ namespace Admin.gigade.Controllers
                     {
                         json = "{success:false,msg:\"" + brand_id + "\"}";//brand_id重複
                     }
-                    else if (!string.IsNullOrEmpty(errorInfo))
+                    else if (result && !string.IsNullOrEmpty(errorInfo))
                     {
                         json = "{success:true,msg:\"數據保存成功<br/>但圖片保存失敗 <br/>" + errorInfo + "\"}";
                     }

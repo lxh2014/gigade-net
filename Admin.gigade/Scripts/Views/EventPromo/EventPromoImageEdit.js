@@ -1,6 +1,6 @@
 ﻿var brand_name = "";
 var add = false;
-var excels = ['jpg', 'png', 'jpeg', 'gif', 'bmp']; //['xls', 'xlsx'];
+var excels = ['jpg', 'png', 'jpeg', 'gif']; //['xls', 'xlsx'];
 var image = "";
 var del_ids = "";
 var del_names = "";

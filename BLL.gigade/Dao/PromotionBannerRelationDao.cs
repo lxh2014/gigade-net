@@ -19,6 +19,7 @@ namespace BLL.gigade.Dao
         }
         public List<PromotionBannerRelationQuery> GetRelationList(PromotionBannerRelationQuery query)
         {
+            query.Replace4MySQL();
             StringBuilder sql = new StringBuilder();
             try
             {

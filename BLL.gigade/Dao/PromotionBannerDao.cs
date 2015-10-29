@@ -204,13 +204,13 @@ namespace BLL.gigade.Dao
         #endregion
 
         #region 通過pb_id獲取單個促銷圖片的信息
-        public PromotionBannerQuery GetModelById(int id)
+        public List<PromotionBannerQuery> GetModelById(int id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT pb_id,pb_image,pb_image_link,pb_startdate,pb_enddate,pb_status,pb_kdate,(SELECT user_username FROM manage_user WHERE manage_user.user_id=pb.pb_kuser ) as createusername,pb_mdate,(SELECT user_username FROM manage_user WHERE manage_user.user_id=pb.pb_muser ) as updateusername FROM promotion_banner pb WHERE pb_id={0}", id);
-                return _accessMySql.getSinggleObj<PromotionBannerQuery>(sql.ToString());
+                sql.AppendFormat(@"SELECT pb.pb_id,pb_image,pb_image_link,pb_startdate,pb_enddate,pb_status,pb_kdate,(SELECT user_username FROM manage_user WHERE manage_user.user_id=pb.pb_kuser ) as createusername,pb_mdate,(SELECT user_username FROM manage_user WHERE manage_user.user_id=pb.pb_muser ) as updateusername,pbr.brand_id AS singleBrand_id FROM promotion_banner pb LEFT JOIN promotion_banner_relation pbr on pb.pb_id=pbr.pb_id WHERE pb.pb_id={0} ", id);
+                return _accessMySql.getDataTableForObj<PromotionBannerQuery>(sql.ToString());
             }
             catch (Exception ex)
             {
