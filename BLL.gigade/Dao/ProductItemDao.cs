@@ -748,10 +748,11 @@ namespace BLL.gigade.Dao
             try
             {
                 sqlCount.AppendFormat("SELECT count(pi.item_id) as totalCount ");
-                str.AppendFormat("select pi.item_id,p.product_createdate,p.product_name,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1,CONCAT(p.spec_title_2,'',ps2.spec_name) as Spec_Name_2 ,p.combination,p.product_status,p.product_mode,dfsm.delivery_freight_set,p.product_start,tp2.parameterName as product_fenlei_dalei,tp1.parameterName as  product_fenlei_xiaolei  ");
+                str.AppendFormat("select pi.item_id,p.product_createdate,p.product_name,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1,CONCAT(p.spec_title_2,'',ps2.spec_name) as Spec_Name_2 ,p.combination,p.product_status,p.product_mode,dfsm.delivery_freight_set,p.product_start,tp2.parameterName as product_fenlei_dalei,tp1.parameterName as  product_fenlei_xiaolei,i.po_id  ");
                 strcont.AppendFormat(" from  product_item pi ");
                 strcont.AppendFormat(" inner join product p on p.product_id =pi.product_id ");
                 strcont.AppendFormat(" inner join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set ");
+                strcont.AppendFormat(" LEFT JOIN ipod i on i.prod_id=pi.item_id ");
                 strcont.AppendFormat(" INNER JOIN v_product_item_noloc v on v.item_id=pi.item_id ");
                 strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
                 strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
@@ -807,15 +808,20 @@ namespace BLL.gigade.Dao
                 //  sqlClumn.Append(" select p.product_id,p.product_name,ip.loc_id)
                 sqlCondi.Append(" from product_item pi ");
                 sqlCondi.Append(" left join iplas ip on ip.item_id=pi.item_id  ");
-                sqlCondi.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=pi.item_id ");
-                sqlCondi.Append(" left join product p on pi.product_id=p.product_id ");
-                sqlCondi.Append(" left join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set  ");
+                sqlCondi.Append(" inner join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=pi.item_id ");
+                sqlCondi.Append(" inner join product p on pi.product_id=p.product_id ");
+                sqlCondi.Append(" inner join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set  ");
                 //  sqlCondi.Append(" left join t_parametersrc tps on tps.parameterCode=dfsm.delivery_freight_set and tps.parameterType='product_freight' ");
                 sbSqlCondition.Append(" where 1=1 ");
-                sbSqlCondition.Append(" and (p.product_status=6 or p.product_status=99) and p.product_id>10000 ");
-                if (query.Shortage != -1)
+                sbSqlCondition.Append(" and p.product_id>10000  ");
+                if (query.Shortage != 0)
                 {
-                    sbSqlCondition.AppendFormat(" and p.shortage='{0}' ", query.Shortage);
+                   sbSqlCondition.AppendFormat(" and ((p.product_status=6 or p.product_status=99)or p.shortage='{0}' ) ", query.Shortage);
+                   
+                }
+                else 
+                {
+                    sbSqlCondition.AppendFormat(" and (p.product_status=6 or p.product_status=99) ");
                 }
                 if (query.Product_Id != 0)
                 {
@@ -835,11 +841,11 @@ namespace BLL.gigade.Dao
                 }
                 if (!string.IsNullOrEmpty(query.loc_id))
                 {
-                    sbSqlCondition.AppendFormat(" and ip.loc_id>'{0}' ", query.loc_id);
+                    sbSqlCondition.AppendFormat(" and ip.loc_id>='{0}' ", query.loc_id);
                 }
                 if (!string.IsNullOrEmpty(query.loc_id2))
                 {
-                    sbSqlCondition.AppendFormat(" and ip.loc_id<'{0}' ", query.loc_id2);
+                    sbSqlCondition.AppendFormat(" and ip.loc_id<='{0}' ", query.loc_id2);
                 }
                 if (query.IsPage)
                 {

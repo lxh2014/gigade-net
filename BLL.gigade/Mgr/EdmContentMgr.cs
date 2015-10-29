@@ -167,9 +167,13 @@ namespace BLL.gigade.Mgr
                             #region 將取消電子報的時間和人員加入會員生活信息表（user_life）edit by shuangshuang0420j 20150814 11:00
                             //將取消電子報的時間和人員加入會員生活信息表（user_life）edit by shuangshuang0420j 20150814 11:00
                             UserLifeDao _userLifeDao = new UserLifeDao(conn);
-                           
+                            UserLife modelUF = new UserLife();
+                            modelUF = _userLifeDao.GetSingle(userID, "cancel_edm_time");
+                            if (modelUF != null)
+                            {
+                                _accessMySql.execCommand(_userLifeDao.UpdateEdmTime(userID, 0, (int)update_id));
+                            }
                             _accessMySql.execCommand(_userLifeDao.UpdateEdmTime(userID, phpTime, (int)update_id));
-
                             #endregion
                             if (temail != null && temail.Rows.Count > 0)
                             {

@@ -163,7 +163,7 @@ namespace BLL.gigade.Mgr
 
                       #region 有2列
                       int n = 1;
-                      if (_dt.Columns.Count == 2)
+                      if (_dt.Columns.Count >= 2)
                       {
                           if (_dt.Rows[i][1] != "")
                           {

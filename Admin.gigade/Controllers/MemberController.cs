@@ -954,7 +954,18 @@ namespace Admin.gigade.Controllers
                 {
                     DataRow newRow = newDt.NewRow();
                     newRow["user_id"] = stores[i].user_id;
-                    newRow["user_status"] = stores[i].user_status;
+                    //newRow["user_status"] = stores[i].user_status;
+                    switch (stores[i].user_status)
+                    {
+                        case 0: newRow["user_status"] = "未啟用";
+                                break;
+                        case 1: newRow["user_status"] = "已啟用";
+                                break;
+                        case 2: newRow["user_status"] = "停用";
+                                break;
+                        case 5: newRow["user_status"] = "簡易會員";
+                                break;
+                    }
                     newRow["user_name"] = stores[i].user_name;
                     newRow["user_gender"] = stores[i].user_gender == 0 ? "小姐" : "先生";
                     newRow["VIP"] = "N";
@@ -982,14 +993,15 @@ namespace Admin.gigade.Controllers
                     //}
                     newRow["user_reg_date"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(stores[i].user_reg_date));
                     newRow["order_createdate"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(stores[i].order_createdate));
-                    if (stores[i].last_time == Convert.ToUInt32(CommonFunction.GetPHPTime("1970-1-1 8:00")))
-                    {
-                        newRow["last_time"] = "";
-                    }
-                    else
-                    {
-                        newRow["last_time"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(stores[i].last_time));
-                    }
+                    newRow["last_time"] = newRow["order_createdate"];
+                    //if (stores[i].last_time == Convert.ToUInt32(CommonFunction.GetPHPTime("1970-1-1 8:00")))
+                    //{
+                    //    newRow["last_time"] = "";
+                    //}
+                    //else
+                    //{
+                    //    newRow["last_time"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(stores[i].last_time));
+                    //}
                     newRow["sum_amount"] = stores[i].sum_amount;
                     newRow["cou"] = stores[i].cou;
                     decimal s = stores[i].sum_amount / stores[i].cou;
