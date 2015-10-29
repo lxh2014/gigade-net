@@ -290,12 +290,13 @@ function editFunction(row, store,multi) {
                             var result = Ext.decode(action.response.responseText);
                             myMask.hide();
                             if (result.success) {
-                                if (result.msg != "undefined") {
+                                if (result.msg != undefined) {
                                     Ext.Msg.alert(INFORMATION, result.msg);
                                 }
                                 else {
                                     Ext.Msg.alert(INFORMATION, SUCCESS);
-                                }EventPromoImageListStore.load();
+                                }
+                                EventPromoImageListStore.load();
                                 editWin.close();
                             }
                             else if (result.msg > 1) {
