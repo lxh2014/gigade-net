@@ -515,6 +515,30 @@ where 1=1 ");
                 throw new Exception("IupcDao-->GetIupcByItemID-->" + ex.Message + sb.ToString() + sqlCondi.ToString(), ex);
             }
         }
+        public List<IupcQuery> GetIupcByType(IupcQuery query)
+        {
+            StringBuilder sb = new StringBuilder();
+            StringBuilder sqlCondi = new StringBuilder();
+            try
+            {
+                sb.AppendFormat("SELECT upc_id FROM iupc ");
+                sqlCondi.Append(" where 1=1");
+                if (query.item_id != 0)
+                {
+                    sqlCondi.AppendFormat(" and  item_id='{0}' ", query.item_id);
+                }
+                if (query.item_id != 0)
+                {
+                    sqlCondi.AppendFormat(" and  upc_type_flg='{0}' ", query.upc_type_flg);
+                }
+                sqlCondi.Append(" ORDER BY create_dtim DESC;");
+                return _access.getDataTableForObj<IupcQuery>(sb.ToString() + sqlCondi.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IupcDao-->GetIupcByType-->" + ex.Message + sb.ToString() + sqlCondi.ToString(), ex);
+            }
+        }
     }
 }
  

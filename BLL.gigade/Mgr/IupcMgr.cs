@@ -157,5 +157,16 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IupcMgr-->GetIupcByItemID-->" + ex.Message, ex);
             }
         }
+        public List<IupcQuery> GetIupcByType(IupcQuery query)
+        {
+            try
+            {
+                return _iupcdao.GetIupcByType(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IupcMgr-->GetIupcByType-->" + ex.Message, ex);
+            }
+        }
     }
 }
