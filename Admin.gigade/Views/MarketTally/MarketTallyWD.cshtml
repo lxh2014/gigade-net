@@ -16,7 +16,7 @@
 
 
 <div class="container">
-    <h2>提示：請輸入產品條碼!</h2>
+    <h1>提示：請輸入產品條碼!</h1>
     <br />
     <h3>工作代號： <span class="label label-info">@ViewBag.number</span></h3>
     <br />
@@ -26,10 +26,10 @@
       <span class="input-group-btn">
         <button class="btn btn-default btn-lg "  type="button">產品條碼</button>
       </span>
-      <input type="text" class="form-control input-lg" id="upc" placeholder="請輸入產品條碼...">
+      <input type="text" class="form-control input-lg" id="upc" onKeypress= "javascript:if(event.keyCode==13) onUpcButtonClick();"  placeholder="請輸入產品條碼...">
       
       <span class="input-group-btn">
-      <button class="btn btn-default btn-lg " id="upcbutton" type="button">確定</button>
+      <button class="btn btn-default btn-lg " id="upcbutton" onClick="onUpcButtonClick()" type="button">確定</button>
       </span>
       @*<span class="glyphicon " id="inputGroupStatus_productitem" aria-hidden="true"></span>*@
 
@@ -38,7 +38,7 @@
 </div><!-- /.row --> 
 </div>
 
-<div class="modal fade MarketTallyWD-modal-alert" role="dialog" aria-labelledby="gridSystemModalLabel">
+<div class="modal fade MarketTally-modal-alert" role="dialog" aria-labelledby="gridSystemModalLabel">
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -51,7 +51,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+        <button type="button" class="btn btn-default" id="modal-dialog-close" data-dismiss="modal">關閉</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -64,7 +64,7 @@
         {
             $("#upc").focus();
         }
-        $('#upcbutton').on('click', function ()
+        onUpcButtonClick = function ()
         {
             var upc = document.getElementById("upc").value.trim();
             var number='@ViewBag.number'
@@ -81,16 +81,18 @@
                     else
                     {
                         $('#MessageContentId').text("當前工作代號中沒有該產品條碼!");
-                        $('.MarketTallyWD-modal-alert').modal('toggle')
+                        $('.MarketTally-modal-alert').modal('toggle')
+                        $('#modal - dialog - close').focus();
                     }
                 }
 
             }).error(function ()
             {
                 $('#MessageContentId').text("查詢失敗!");
-                $('.MarketTallyWD-modal-alert').modal('toggle')
+                $('.MarketTally-modal-alert').modal('toggle')
+                $('#modal - dialog - close').focus();
             })
-        })
+        }
 
 
         //$('#productitem').on('input', function (e)

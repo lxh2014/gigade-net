@@ -690,6 +690,8 @@
     <Content Include="Locale\zh-TW\SiteManager\lang.js" />
     <Content Include="Locale\zh-TW\TrialProdCate\TrialProdCateLang.js" />
     <Content Include="Locale\zh-TW\Vote\Lang.js" />
+    <Content Include="Scripts\Bootstrap\bootstrap-table.min.js" />
+    <Content Include="Scripts\Bootstrap\css\bootstrap-table.min.css" />
     <Content Include="Scripts\Bootstrap\css\bootstrap.css" />
     <Content Include="Scripts\Bootstrap\bootstrap.js" />
     <Content Include="Scripts\Bootstrap\css\bootstrap.min.css" />
@@ -1997,7 +1999,6 @@
     <Content Include="Scripts\Views\Website\BannerNewsList.js" />
     <Content Include="Scripts\Views\Website\BannernewssiteList.js" />
     <Content Include="Template\ProductDetail\product_detail_safe.txt" />
-    <Content Include="Views\MarketTally\Message.js" />
     <Content Include="XML\Exceptional.xml" />
     <Content Include="XML\ItemPrice.xml" />
     <Content Include="XML\ParticularsSrc.xml">
@@ -4424,11 +4425,11 @@
     <Content Include="Views\Vendor\VendorBankImport.cshtml" />
     <Content Include="Views\EdmNew\EmailGroup.cshtml" />
     <Content Include="Views\WareHouse\WaitLiaoWei.cshtml" />
-    <Content Include="Views\MarketTally\Index.cshtml" />
     <Content Include="Views\MarketTally\MarketTally.cshtml" />
     <Content Include="Views\MarketTally\MarketTallyWD.cshtml" />
-    <None Include="Views\MarketTally\MarketTallyWDProduct.cshtml" />
-    <Content Include="Views\MarketTally\副本 MarketTallyWDProduct.cshtml" />
+    <Content Include="Views\MarketTally\MarketTallyWDProduct.cshtml">
+      <SubType>Code</SubType>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
