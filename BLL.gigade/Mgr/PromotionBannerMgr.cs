@@ -63,7 +63,7 @@ namespace BLL.gigade.Mgr
         }
 
         #region 更改促銷圖片信息
-        public bool UpdateImageInfo(PromotionBannerQuery query, out int brand_id)
+        public bool UpdateImageInfo(PromotionBannerQuery query, out uint brand_id)
         {
             brand_id = 0;
             ArrayList arr = new ArrayList();
@@ -97,7 +97,7 @@ namespace BLL.gigade.Mgr
                     {
                         if (bids[i] != string.Empty)
                         {
-                            pbr_query.brand_id = Convert.ToInt32(bids[i]);
+                            pbr_query.brand_id = Convert.ToUInt32(bids[i]);
                             arr.Add(_promotionBannerRelationDao.AddBrand(pbr_query));
                         }
                     }
@@ -114,7 +114,7 @@ namespace BLL.gigade.Mgr
         #endregion
 
         #region 新增促銷圖片
-        public bool AddImageInfo(PromotionBannerQuery query, out int brand_id)
+        public bool AddImageInfo(PromotionBannerQuery query, out uint brand_id)
         {
             brand_id = 0;
             ArrayList arr = new ArrayList();
@@ -150,7 +150,7 @@ namespace BLL.gigade.Mgr
                         {
                             if (bids[i] != string.Empty)
                             {
-                                pbr_query.brand_id = Convert.ToInt32(bids[i]);
+                                pbr_query.brand_id = Convert.ToUInt32(bids[i]);
                                 arr.Add(_promotionBannerRelationDao.AddBrand(pbr_query));
                             }
                         }
@@ -170,7 +170,7 @@ namespace BLL.gigade.Mgr
         #endregion
 
         #region 更改促銷圖片狀態
-        public int UpdateStatus(PromotionBannerQuery query, out int brand_id)
+        public int UpdateStatus(PromotionBannerQuery query, out uint brand_id)
         {
             try
             {
@@ -275,7 +275,7 @@ namespace BLL.gigade.Mgr
                 brandIDS = brandIDS.Substring(0, brandIDS.LastIndexOf(','));
                 if (model != null && brandIDS != string.Empty)
                 {
-                    int id = 0;
+                    uint id = 0;
                     List<VendorBrand> vb_store = _vendorBrandDao.GetBrandListByIds(brandIDS, id);
                     return vb_store;
                 }
@@ -308,7 +308,7 @@ namespace BLL.gigade.Mgr
         #endregion
 
         #region 檢查品牌編號是否已有促銷圖片且已啟用，有的話返回品牌編號
-        public void AllowShowOrNot(PromotionBannerQuery query, string[] bids, out int brand_id)
+        public void AllowShowOrNot(PromotionBannerQuery query, string[] bids, out uint brand_id)
         {
             brand_id = 0;
             try
@@ -327,13 +327,13 @@ namespace BLL.gigade.Mgr
                     {
                         if (bids[a] != string.Empty)
                         {
-                            query.singleBrand_id = Convert.ToInt32(bids[a]);
+                            query.singleBrand_id = Convert.ToUInt32(bids[a]);
                         }
                         for (int b = 0; b < pbr_store.Count; b++)
                         {
                             if (query.singleBrand_id == pbr_store[b].brand_id)
                             {
-                                brand_id = query.singleBrand_id;
+                                brand_id = (uint)query.singleBrand_id;
                                 return;
                                 //品牌编号在該促銷圖片顯示期間已有其他促銷圖片 且已啟用
                             }
@@ -356,7 +356,7 @@ namespace BLL.gigade.Mgr
                 VendorBrandQuery vb_query = new VendorBrandQuery();
                 vb_query.Brand_Id = (uint)query.singleBrand_id;
                 List<VendorBrand> exits = _vendorBrandDao.GetVendorBrand(vb_query);//查詢是否有這個品牌編號
-                int brand_id = 0;
+                uint brand_id = 0;
                 string brand_name = string.Empty;
                 if (exits.Count != 0)
                 {
@@ -390,7 +390,7 @@ namespace BLL.gigade.Mgr
         #endregion
 
         #region 是否允許一個品牌有多張促銷圖片
-        public int AllowMultiOrNot(PromotionBannerQuery query, out int id)
+        public int AllowMultiOrNot(PromotionBannerQuery query, out uint id)
         {
             int result = 0;
             id = 0;
@@ -442,7 +442,16 @@ namespace BLL.gigade.Mgr
                         for (int i = 0; i < pbr_store.Count; i++)
                         {
                             List<PromotionBannerRelationQuery> pbr_store_two = _promotionBannerRelationDao.GetBrandIds(pb_ids, pbr_store[i].brand_id.ToString());
-                            if (pbr_store_two.Count > 1)
+                            bool condition = false;
+                            if (!string.IsNullOrEmpty(pbr_store[i].brand_id.ToString()))
+                            {
+                                condition = pbr_store_two.Count > 0 ? true : false;
+                            }
+                            else
+                            {
+                                condition = pbr_store_two.Count > 1 ? true : false;
+                            }
+                            if (condition)
                             {
                                 query.singleBrand_id = pbr_store[i].brand_id;
                                 List<PromotionBannerQuery> model = _promotionBannerDao.GetModelById(pbr_store[i].pb_id);
