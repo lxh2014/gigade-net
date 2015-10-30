@@ -12,7 +12,7 @@ var boolPassword = true;//標記是否需要輸入密碼
 
 
 ShopClassStore.load();
-VendorStore.load();
+//VendorStore.load();
 
 /**********************************************************************群組管理主頁面**************************************************************************************/
 //品牌管理Model
@@ -42,7 +42,9 @@ Ext.define('gigade.Fares', {
         { name: "class_name", type: "string" },
         { name: "classIds", type: "string" },
         { name: "vendor_name_simple", type: "string" }, //供應商名稱
-        { name: "Event", type: "string" }
+        { name: "Event", type: "string" },
+        { name: "vendorstatus", type: "int" },
+        { name: "short_description", type: "string" }
     ]
 });
 //品牌列表數據
@@ -157,7 +159,7 @@ Ext.onReady(function () {
             { header: "品牌編號", dataIndex: 'Brand_Id', width: 80, align: 'center' },
             { header: "館別", dataIndex: 'class_name', width: 200, align: 'center' },
             {
-                header: "供應商", dataIndex: 'vendor_name_simple', width: 150, align: 'center',
+                header: "供應商簡稱", dataIndex: 'vendor_name_simple', width: 150, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {//secretcopy
                     return "<span onclick='SecretLogin(" + record.data.Brand_Id + ")'  >" + value + "</span>";
                 }
@@ -217,7 +219,8 @@ Ext.onReady(function () {
         tbar: [
             { xtype: 'button', text: ADD, id: 'add', iconCls: 'icon-user-add', handler: onAddClick },
             {
-                xtype: 'button', text: EDIT, id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick},
+                xtype: 'button', text: EDIT, id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick
+            },
             '->',
            { xtype: 'combobox', editable: false, fieldLabel: "查詢條件", labelWidth: 59, id: 'serchs', width: 200, store: DDLStore, displayField: 'txt', valueField: 'value', value: 0 },
            {
@@ -231,7 +234,7 @@ Ext.onReady(function () {
                }
            },
            {
-               text: SEARCH, iconCls: 'icon-search', id: 'btnQuery', handler: Query              
+               text: SEARCH, iconCls: 'icon-search', id: 'btnQuery', handler: Query
            },
            {
                text: '重置', id: 'reset', iconCls: 'ui-icon ui-icon-reset', handler: function () {
@@ -304,7 +307,7 @@ onEditClick = function () {
     } else if (row.length > 1) {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
-        if (VendorStore.findExact("vendor_id", row[0].data.Vendor_Id, 0) > -1) {
+        if (row[0].data.vendorstatus == 1) {
             var secret_type = "7";//參數表中的"供應商查詢列表"
             var url = "/Vendor/VendorBrandList/Edit";
             var ralated_id = row[0].data.Brand_Id;
@@ -316,12 +319,10 @@ onEditClick = function () {
                     editFunction(ralated_id);
                 }
             }
-        }
-        else {
-            Ext.Msg.alert(INFORMATION, "失格供應商下的品牌不可編輯！");
+        } else {
+            Ext.Msg.alert(INFORMATION, "失格或停用供應商下的品牌不可編輯！");
         }
     }
-
 }
 
 //訂單編號跳轉

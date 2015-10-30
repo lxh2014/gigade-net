@@ -1009,6 +1009,7 @@ function addFunction(row, store) {
                             plas_loc_id: Ext.htmlEncode(Ext.getCmp('loc_id').getValue()),//上架料位
                             loc_id: Ext.htmlEncode(Ext.getCmp('loc_id').getValue()),//主料位
                             iarc_id:'PC',
+                            doc_num: '',//不存值
                             cde_dt_var: cde_dt_var,
                             cde_dt_incr: cde_dt_incr,
                             vendor_id: vendor_id

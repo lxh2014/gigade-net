@@ -27,7 +27,7 @@ Ext.define('GIGADE.Log', {
 var Schedule_Log_Store = Ext.create('Ext.data.Store', {
     model: 'GIGADE.Log',
     pageSize: pageSize,
-   // autoLoad: true,
+   // autoLoad: true,//自動加載
     autoDestroy: true,
     proxy: {
         type: 'ajax',
@@ -96,7 +96,7 @@ Ext.onReady(function () {
                 fieldLabel: '排程Code',
                 id: 'schedule_code_config',
                 name: 'schedule_code_config',
-                allowBlank: false,
+               // allowBlank: false,
                 displayField: 'schedule_code',
                 valueField: 'schedule_code',
                 store: Schedule_Code_Store,
@@ -164,7 +164,15 @@ Ext.onReady(function () {
                handler: function () {
                    Query();
                }
-           },
+            },
+              {
+                  text: '重置',
+                  iconCls: 'ui-icon ui-icon-reset',
+                  handler: function () {
+                      Comeback();
+
+                  }
+              }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: Schedule_Log_Store,
@@ -196,6 +204,12 @@ Ext.onReady(function () {
     });
 })
 
+/*************************************************************************************重置按鈕*************************************************************************************************/
+function Comeback() {
+    Ext.getCmp('schedule_code_config').setValue('');
+    Ext.getCmp('start_time').reset();
+    Ext.getCmp('end_time').reset();
+}
 /*************************************************************************************查询信息*************************************************************************************************/
 
 function Query(x) {

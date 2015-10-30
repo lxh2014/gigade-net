@@ -97,16 +97,33 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
     }
 });
 
+//查詢
 function search() {
-    Ext.getCmp('condition').setValue(Ext.getCmp('condition').getValue().replace(/\s+/g, ','));
+    //查詢條件
     var comb = Ext.getCmp('searchCondition');
+    //查詢內容
     var comc = Ext.getCmp('condition');
-    if (!comb.isValid() && !comc.isValid()) {
-        return;
+    //品牌
+    var brand = Ext.getCmp('brand_id');
+    //選擇條件的值
+    var condition = comb.getValue();
+
+    comc.setValue(comc.getValue().replace(/\s+/g, ','));
+
+    //判斷選擇的查詢條件是否是品牌
+    if (condition == 3) {
+        brand.allowBlank = false;
+        if (!comb.isValid() || !brand.isValid()) {
+            return;
+        }
+    } else {
+        if (!comb.isValid() || !comc.isValid()) {
+            return;
+        }
     }
     particularsStore.removeAll();
-    var condition = Ext.getCmp('searchCondition').getValue();
-    var value = condition == 3 ? Ext.getCmp('brand_id').getValue() : Ext.getCmp('condition').getValue();
+    var value = condition == 3 ? brand.getValue() : comc.getValue();
+    //重新加載頁面
     particularsStore.load({
         params: { ids: value, condition: condition }
     });
@@ -245,6 +262,8 @@ Ext.onReady(function () {
                     select: function (combo, record) {
                         particularsStore.getAt(currentRow).set("Cde_dt_shp", record[0].data.particularsCome);
                         particularsStore.getAt(currentRow).set("Cde_dt_var", record[0].data.particularsCollect);
+                        //當保存期限被選擇的時候 自動勾選有效期控制  add by zhuoqin0830w  2015/10/19
+                        particularsStore.getAt(currentRow).set("Pwy_dte_ctl_bool", true);
                     }
                 }
             }, menuDisabled: true, sortable: false
@@ -315,21 +334,46 @@ Ext.onReady(function () {
             ]
         }, {
             xtype: 'checkcolumn',
-            header: EFFECTIVE_CONTROL_TIME_LIMIT, menuDisabled: true, sortable: false,//有效期控制
+            header: EFFECTIVE_CONTROL_TIME_LIMIT,
+            menuDisabled: true,
+            sortable: false,//有效期控制
             dataIndex: 'Pwy_dte_ctl_bool',
             id: 'Pwy_dte_ctl_bool',
             width: 70,
-            editor: {
-                xtype: 'checkbox'
+            //editor: {
+            //    xtype: 'checkbox'
+            //},
+            //避免用戶二次點擊才能生效  edit by zhuoqin0830w  2015/10/19
+            listeners: {
+                click: function (a, b, c) {
+                    if (particularsStore.getAt(c).get("Pwy_dte_ctl_bool")) {
+                        particularsStore.getAt(c).set("Pwy_dte_ctl_bool", false);
+                    } else {
+                        particularsStore.getAt(c).set("Pwy_dte_ctl_bool", true);
+                    }
+                }
             }
         },
         {
             xtype: 'checkcolumn',
             header: WAIT_DELETE,//等待刪除
-            dataIndex: 'Pend_del_bool', menuDisabled: true, sortable: false,
+            dataIndex: 'Pend_del_bool',
+            id: 'Pend_del_bool',
+            menuDisabled: true,
+            sortable: false,
             width: 60,
-            editor: {
-                xtype: 'checkbox'
+            //editor: {
+            //    xtype: 'checkbox'
+            //},
+            //避免用戶二次點擊才能生效  edit by zhuoqin0830w  2015/10/19
+            listeners: {
+                click: function (a, b, c) {
+                    if (particularsStore.getAt(c).get("Pend_del_bool")) {
+                        particularsStore.getAt(c).set("Pend_del_bool", false);
+                    } else {
+                        particularsStore.getAt(c).set("Pend_del_bool", true);
+                    }
+                }
             }
         }],
         dockedItems: [{
@@ -352,6 +396,8 @@ Ext.onReady(function () {
                     select: function (combo, records) {
                         var brand = Ext.getCmp('brand_id');
                         var condition = Ext.getCmp('condition');
+                        brand.setValue("");
+                        condition.setValue("");
                         if (records[0].data.conditionId == 3) {
                             brand.show();
                             condition.hide();
@@ -406,7 +452,8 @@ Ext.onReady(function () {
                 iconCls: 'ui-icon ui-icon-reset',
                 listeners: {
                     click: function () {
-                        Ext.getCmp("brand_id").setValue("");
+                        particularsStore.removeAll();
+                        Ext.getCmp("brand_id").setValue("").allowBlank = false;
                         Ext.getCmp("condition").setValue("");
                     }
                 }
@@ -434,15 +481,33 @@ Ext.onReady(function () {
                         var particulars = [];
                         var upDataStore = particularsStore.getUpdatedRecords();//僅獲得修改后的行 add by wwei0216w 2015/6/24
                         var sumday = 0;
+                        if (!upDataStore.length) {
+                            myMask.hide();
+                            Ext.Msg.alert(INFORMATION, NON_DATA_EDIT);//沒有數據被修改
+                            return;
+                        }
                         for (var i = 0, j = upDataStore.length ; i < j; i++) {
                             var record = upDataStore[i];
                             //2015/09/09 guodong1130w增加有效期控制判斷
-                            sumday = record.get("Cde_dt_shp") + record.get("Cde_dt_var") + record.get("Cde_dt_incr");
+                            var Cde_dt_shp = record.get("Cde_dt_shp");
+                            var Cde_dt_var = record.get("Cde_dt_var");
+                            var Cde_dt_incr = record.get("Cde_dt_incr");
+
+                            sumday = Cde_dt_shp + Cde_dt_var + Cde_dt_incr;
+
                             if (sumday > 0 && record.get("Pwy_dte_ctl_bool") == false) {
                                 Ext.Msg.alert(INFORMATION, SAVEWRONGMESSAGE);
                                 myMask.hide();
                                 return;
                             }
+
+                            //add by zhuoqin0830w  2015/10/12  添加判斷  效期天數、允出天數、允收天數若不能為0
+                            if (Cde_dt_shp == 0 || Cde_dt_var == 0 || Cde_dt_incr == 0) {
+                                Ext.Msg.alert(INFORMATION, SAVE_TIME_LIMIT_IS_NULL);
+                                myMask.hide();
+                                return;
+                            }
+
                             particulars.push({
                                 "Product_id": record.get("Product_id"),//add by wwei0216w 註:後臺需要product_id作為歷史繼續查詢時的查詢條件 2015/7/6 
                                 "item_id": record.get("Item_id"),
@@ -467,9 +532,6 @@ Ext.onReady(function () {
                         }
                         particulars = JSON.stringify(particulars);
                         if (particulars == "[]") {
-                            if (particularsStore.count() > 0) {
-                                Ext.Msg.alert(INFORMATION, SUCCESS)
-                            }
                             myMask.hide();
                             return;
                         }

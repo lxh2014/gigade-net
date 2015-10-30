@@ -139,6 +139,7 @@
     <Compile Include="Dao\BoilerrelationDao.cs" />
     <Compile Include="Dao\BonusMasterDao.cs" />
     <Compile Include="Dao\BonusTypeDao.cs" />
+    <Compile Include="Dao\BrandLogoSortDao.cs" />
     <Compile Include="Dao\BrowseDataDao.cs" />
     <Compile Include="Dao\BonusRecordDao.cs" />
     <Compile Include="Dao\CalendarDao.cs" />
@@ -238,6 +239,7 @@
     <Compile Include="Dao\Impl\IParticularsSrcImplDao.cs" />
     <Compile Include="Dao\Impl\IProductOrderTempImplDao.cs" />
     <Compile Include="Dao\Impl\IProductRemoveReasonImplDao.cs" />
+    <Compile Include="Dao\Impl\IRecommendedExcleImplDao.cs" />
     <Compile Include="Dao\Impl\IScheduleItemImplDao.cs" />
     <Compile Include="Dao\Impl\IScheduleRelationImplDao.cs" />
     <Compile Include="Dao\Impl\IUserForbidImplDao.cs" />
@@ -270,6 +272,9 @@
     <Compile Include="Dao\PromoShareConditionDao.cs" />
     <Compile Include="Dao\PromoShareConditionTypeDao.cs" />
     <Compile Include="Dao\PromoShareMasterDao.cs" />
+    <Compile Include="Dao\PromotionBannerDao.cs" />
+    <Compile Include="Dao\PromotionBannerRelationDao.cs" />
+    <Compile Include="Dao\RecommendedExcleDao.cs" />
     <Compile Include="Dao\RecommendedProductAttributeDao.cs" />
     <Compile Include="Dao\ScheduleDao.cs" />
     <Compile Include="Dao\IinvdDao.cs" />
@@ -690,6 +695,7 @@
     <Compile Include="Mgr\BannerSiteMgr.cs" />
     <Compile Include="Mgr\BoilerrelationMgr.cs" />
     <Compile Include="Mgr\BonusTypeMgr.cs" />
+    <Compile Include="Mgr\BrandLogoSortMgr.cs" />
     <Compile Include="Mgr\BrowseDataMgr.cs" />
     <Compile Include="Mgr\BonusRecordMgr.cs" />
     <Compile Include="Mgr\CalendarMgr.cs" />
@@ -776,6 +782,7 @@
     <Compile Include="Mgr\Impl\IParticularsSrcImplMgr.cs" />
     <Compile Include="Mgr\Impl\IProductOrderTempImplMgr.cs" />
     <Compile Include="Mgr\Impl\IProductRemoveReasonImplMgr.cs" />
+    <Compile Include="Mgr\Impl\IRecommendedExcleImplMgr.cs" />
     <Compile Include="Mgr\Impl\IScheduleItemImplMgr.cs" />
     <Compile Include="Mgr\Impl\IScheduleRelationImplMgr.cs" />
     <Compile Include="Mgr\Impl\IUserForbidImplMgr.cs" />
@@ -808,6 +815,9 @@
     <Compile Include="Mgr\PromoShareConditionMgr.cs" />
     <Compile Include="Mgr\PromoShareConditionTypeMgr.cs" />
     <Compile Include="Mgr\PromoShareMasterMgr.cs" />
+    <Compile Include="Mgr\PromotionBannerMgr.cs" />
+    <Compile Include="Mgr\PromotionBannerRelationMgr.cs" />
+    <Compile Include="Mgr\RecommendedExcleMgr.cs" />
     <Compile Include="Mgr\RecommendedProductAttributeMgr.cs" />
     <Compile Include="Mgr\ScheduleItemMgr.cs" />
     <Compile Include="Mgr\ScheduleMgr.cs" />
@@ -1158,6 +1168,7 @@
     <Compile Include="Mgr\ScheduleParamerMgr.cs" />
     <Compile Include="Mgr\ScheduleRelationMgr.cs" />
     <Compile Include="Mgr\ScheduleServiceMgr.cs" />
+    <Compile Include="Mgr\Schedules\DeliverStatusMgr.cs" />
     <Compile Include="Mgr\SecretAccountSetMgr.cs" />
     <Compile Include="Mgr\SecretInfoLogMgr.cs" />
     <Compile Include="Mgr\SerialMgr.cs" />
@@ -1255,6 +1266,7 @@
     <Compile Include="Model\boilerrelation.cs" />
     <Compile Include="Model\BonusRecord.cs" />
     <Compile Include="Model\BonusType.cs" />
+    <Compile Include="Model\BrandLogoSort.cs" />
     <Compile Include="Model\BrowseData.cs" />
     <Compile Include="Model\BtobEmp.cs" />
     <Compile Include="Model\Calendar.cs" />
@@ -1309,6 +1321,8 @@
     <Compile Include="Model\EdmTest.cs" />
     <Compile Include="Model\EdmSubscription.cs" />
     <Compile Include="Model\EdmTemplate.cs" />
+    <Compile Include="Model\EdmTrace.cs" />
+    <Compile Include="Model\EdmTraceEmail.cs" />
     <Compile Include="Model\ElementMap.cs" />
     <Compile Include="Model\EmailBlockList.cs" />
     <Compile Include="Model\EmailBlockLog.cs" />
@@ -1346,7 +1360,8 @@
     <Compile Include="Model\ItemIpoCreateLog.cs" />
     <Compile Include="Model\IwmsRrecord.cs" />
     <Compile Include="Model\LogisticsDetail.cs" />
-    <Compile Include="Model\MailRequest.cs" />
+    <Compile Include="Model\MailLog.cs" />
+    <Compile Include="Model\MailRequest .cs" />
     <Compile Include="Model\MailSend.cs" />
     <Compile Include="Model\MailSender.cs" />
     <Compile Include="Model\MemberEvent.cs" />
@@ -1363,6 +1378,8 @@
     <Compile Include="Model\PromoShareCondition.cs" />
     <Compile Include="Model\PromoShareConditionType.cs" />
     <Compile Include="Model\PromoShareMaster.cs" />
+    <Compile Include="Model\PromotionBanner.cs" />
+    <Compile Include="Model\PromotionBannerRelation.cs" />
     <Compile Include="Model\Query\BannerNewsContentQuery.cs" />
     <Compile Include="Model\Query\AppcategoryQuery.cs" />
     <Compile Include="Model\Query\AppmessageQuery.cs" />
@@ -1425,6 +1442,8 @@
     <Compile Include="Model\Query\PromoShareConditionQuery.cs" />
     <Compile Include="Model\Query\PromoShareConditionTypeQuery.cs" />
     <Compile Include="Model\Query\PromoShareMasterQuery.cs" />
+    <Compile Include="Model\Query\PromotionBannerQuery.cs" />
+    <Compile Include="Model\Query\PromotionBannerRelationQuery.cs" />
     <Compile Include="Model\Query\ScheduleConfigQuery.cs" />
     <Compile Include="Model\Query\ScheduleQuery.cs" />
     <Compile Include="Model\OrderAccumAmount.cs" />
@@ -1451,6 +1470,7 @@
     <Compile Include="Model\Query\ZipQuery.cs" />
     <Compile Include="Model\Query\SchedulePeriodQuery.cs" />
     <Compile Include="Model\Query\ScheduleLogQuery.cs" />
+    <Compile Include="Model\RecommendedOutPra.cs" />
     <Compile Include="Model\RecommendedProductAttribute.cs" />
     <Compile Include="Model\RecommendedRroductAttributeTemp.cs" />
     <Compile Include="Model\Schedule.cs" />

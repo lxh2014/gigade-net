@@ -1,5 +1,26 @@
 ﻿
 function editFunction(rowID) {
+    //供應商Model
+    Ext.define("gigade.Vendor", {
+        extend: 'Ext.data.Model',
+        fields: [
+            { name: "vendor_id", type: "string" },
+            { name: "vendor_name_simple", type: "string" }]
+    });
+    //供應商Store
+    var VendorStore = Ext.create('Ext.data.Store', {
+        model: 'gigade.Vendor',
+        autoLoad: false,
+        proxy: {
+            type: 'ajax',
+            url: "/Vendor/GetVendor",
+            actionMethods: 'post',
+            reader: {
+                type: 'json',
+                root: 'data'
+            }
+        }
+    });
     var row = null;
     var mycount = ShopClassStore.getCount();
     var Shopclass = [];
@@ -82,6 +103,7 @@ function editFunction(rowID) {
                             begin_time: Ext.htmlEncode(Ext.getCmp('begin_time').getValue()),
                             end_time: Ext.htmlEncode(Ext.getCmp('end_time').getValue()),
                             cucumberbrand: Ext.htmlEncode(Ext.getCmp("Cucumber_Brand").getValue().Brand),
+                            short_description: Ext.htmlEncode(Ext.getCmp('short_description').getValue()),
                             imagestatus: Ext.htmlEncode(Ext.getCmp("Image_Status").getValue().Hidden),
                             imagelinkmode: Ext.htmlEncode(Ext.getCmp("Image_Link_Mode").getValue().Mode),
                             imagelinkurl: Ext.htmlEncode(Ext.getCmp('Image_Link_Url').getValue()),
@@ -148,9 +170,10 @@ function editFunction(rowID) {
                 },
                 {
                     xtype: 'combobox',
-                    fieldLabel: '供應商<font color="red">*</font>',
+                    fieldLabel: '供應商簡稱<font color="red">*</font>',
                     allowBlank: false,
-                    editable: false,
+                    editable: true,
+                    queryMode: 'local',
                     hidden: false,
                     id: 'Vendor_Id',
                     name: 'Vendor_Id',
@@ -159,6 +182,7 @@ function editFunction(rowID) {
                     valueField: 'vendor_id',
                     typeAhead: true,
                     forceSelection: false,
+                    lastQuery: '',
                     anchor: '90%',
                     emptyText: 'SELECT'
                 },
@@ -268,7 +292,15 @@ function editFunction(rowID) {
                     { boxLabel: '大陸區品牌', id: 'cb2', inputValue: '2' },
                     { boxLabel: '小農品牌 ', id: 'cb3', inputValue: '3' }
                     ]
-                }
+                },
+                 {
+                     xtype: 'textareafield',
+                     fieldLabel: '短文字說明 (300字內)',
+                     id: 'short_description',
+                     name: 'short_description',
+                     anchor: '90%',
+                     maxLength: 300
+                 }
                 ]
             },
             {//形象圖管理
@@ -537,12 +569,15 @@ function editFunction(rowID) {
     //editWins.show();
 
     if (rowID !== null) {
-
         edit_VendorBrandStore.load({
             params: { relation_id: rowID },
             callback: function () {
                 row = edit_VendorBrandStore.getAt(0);
-                editWins.show();
+                VendorStore.load({
+                    callback: function () {
+                        editWins.show();
+                    }
+                })
             }
         });
 

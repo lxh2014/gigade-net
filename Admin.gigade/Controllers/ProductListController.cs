@@ -623,7 +623,7 @@ namespace Admin.gigade.Controllers
                         method = "1";
                     }
                     //若當前商品狀態不是新建商品或下架,則跳過申請
-                    if (update.Product_Status != 0 && update.Product_Status != 6)
+                    if (update.Product_Status != 0 && update.Product_Status != 6 && update.Product_Status!=7)
                     {
                         break;
                     }
@@ -1226,6 +1226,11 @@ namespace Admin.gigade.Controllers
                 {
                     query.combination = int.Parse(Request.Form["combination"]);
                 }
+                if (!string.IsNullOrEmpty(Request.Form["outofstock_time_days"]))//add by dongya 2015/10/22
+                {
+                    query.outofstock_days_stopselling = int.Parse(Request.Form["outofstock_time_days"]);
+                }
+                
                 if (!string.IsNullOrEmpty(Request.Form["product_status"]))
                 {
                     query.product_status = int.Parse(Request.Form["product_status"]);

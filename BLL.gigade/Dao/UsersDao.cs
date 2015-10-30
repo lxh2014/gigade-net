@@ -79,10 +79,217 @@ namespace BLL.gigade.Dao
             return sql.ToString();
         }
 
-        #region 獲得會員購買記錄排行+List<Model.Query.UserVipListQuery> GetVipList(Model.Query.UserVipListQuery uvlq, ref int totalCount)
-        //create by shuangshuang0420j 20140923 17:44
-        public List<Model.Query.UserVipListQuery> GetVipList(Model.Query.UserVipListQuery uvlq, ref int totalCount)
+        #region 獲得會員購買記錄排行 
+        //create by zhaozhi0623j 20151016 18:01
+        #region 會員消費記錄排行排序GetViplistUserId(Model.Query.UserVipListQuery uvlq)
+        /// <summary>
+        /// 會員消費記錄排行排序 查詢滿足條件的id，並根據消費總額sum_amount排序
+        /// </summary>
+        public string GetViplistUserId(Model.Query.UserVipListQuery uvlq)
         {
+            StringBuilder userId = new StringBuilder();
+            string userIdString = string.Empty;
+            string queryUserID = string.Empty;
+            string timelimit = string.Empty;
+            //添加搜索條件
+            
+            try
+            {
+                if (uvlq.create_dateOne != 0)
+                {
+                    timelimit += string.Format(" and om.order_createdate >='{0}' ", uvlq.create_dateOne);
+                }
+                if (uvlq.create_dateTwo != 0)
+                {
+                    timelimit += string.Format(" and om.order_createdate <='{0}' ", uvlq.create_dateTwo);
+                }
+                if (uvlq.user_id != 0)
+                {
+                    queryUserID = Convert.ToString(uvlq.user_id);
+                    return queryUserID;
+                }
+                StringBuilder sbuser = new StringBuilder();
+                DataTable sbuserDT = new DataTable();
+                sbuser.Append(" select u.user_id ");               
+                sbuser.Append(" from order_master om inner join users u on u.user_id = om.user_id ");
+                sbuser.Append(" where om.order_status = 99 ");
+                sbuser.Append(timelimit);
+                sbuser.Append("  group by om.user_id ");
+                sbuserDT = _accessMySql.getDataTable(sbuser.ToString());
+
+                //如果查到的table的數據條數為零，返回空字符串
+                if (sbuserDT.Rows.Count == 0)
+                {
+                    return userIdString;
+                }  
+                //獲取查詢到的所有user_id
+                for (int i = 0; i < sbuserDT.Rows.Count; i++)
+                {
+                    userId.AppendFormat("{0},", Convert.ToInt32(sbuserDT.Rows[i]["user_id"]));
+                }               
+                userIdString = userId.ToString().Substring(0, userId.Length - 1);
+               
+                return userIdString;
+                #region 會員消費記錄排序，得到前25條數據的user_id
+                //                //得到常溫商品總額集合sbNPro
+                //                StringBuilder sbNPro = new StringBuilder("");
+                //                //List<Model.Query.UserVipListQuery> sbNProList = new List<UserVipListQuery>();
+                //                DataTable sbNProDT = new DataTable();
+                //                sbNPro.Append(" select om.user_id,sum(single_money * buy_num) as normal_product ,sum(od.deduct_bonus) as normal_deduct_bonus");
+                //                sbNPro.Append(" from order_master om  ");
+                //                sbNPro.Append(" left join order_slave os on os.order_id = om.order_id");
+                //                sbNPro.Append(" left join order_detail od on od.slave_id = os.slave_id");
+                //                sbNPro.AppendFormat(@" where od.product_freight_set in (1,3) and od.detail_status = 4  and om.order_status = 99 
+                //                                    and od.item_mode in (0,2) and om.user_id in ({0}) ", userIdString);
+                //                sbNPro.Append(timelimit);
+                //                sbNPro.Append("  group by om.user_id ");
+                //                //sbNProList = _accessMySql.getDataTableForObj<Model.Query.UserVipListQuery>(sbNPro.ToString());
+                //                sbNProDT = _accessMySql.getDataTable(sbNPro.ToString());
+
+                //                //得到低溫商品總額集合sbLPro
+                //                StringBuilder sbLPro = new StringBuilder("");
+                //                //List<Model.Query.UserVipListQuery> sbLProList = new List<UserVipListQuery>();
+                //                DataTable sbLProDT = new DataTable();
+                //                sbLPro.Append(" select om.user_id,sum(single_money * buy_num) as low_product,sum(od.deduct_bonus) as low_deduct_bonus ");
+                //                sbLPro.Append(" from order_master om ");
+                //                sbLPro.Append(" left join order_slave os on os.order_id = om.order_id");
+                //                sbLPro.Append(" left join order_detail od on od.slave_id = os.slave_id");
+                //                sbLPro.AppendFormat(@" where od.product_freight_set in (2,4,5,6) and od.detail_status = 4  and om.order_status = 99 
+                //                                    and od.item_mode in (0,2) and om.user_id in ({0}) ", userIdString);
+                //                sbLPro.Append(timelimit);
+                //                sbLPro.Append(" group by om.user_id ");
+                //                //sbLProList = _accessMySql.getDataTableForObj<Model.Query.UserVipListQuery>(sbLPro.ToString());
+                //                sbLProDT = _accessMySql.getDataTable(sbLPro.ToString());
+
+
+                //                //foreach (var sbuserItem in sbuserList)
+                //                //{
+                //                //    foreach (var sbNProItem in sbNProList)
+                //                //    {
+                //                //        if (sbuserItem.user_id == sbNProItem.user_id)
+                //                //        {
+                //                //            if(String.IsNullOrEmpty(sbuserItem.sum_amount.ToString()))
+                //                //            {
+                //                //             sbuserItem.sum_amount = 0;
+                //                //            }
+                //                //             if(String.IsNullOrEmpty(sbuserItem.sum_bonus.ToString()))
+                //                //            {
+                //                //             sbuserItem.sum_bonus = 0;
+                //                //            }
+                //                //            sbuserItem.normal_product = sbNProItem.normal_product;
+                //                //            sbuserItem.normal_deduct_bonus = sbNProItem.normal_deduct_bonus;
+                //                //            sbuserItem.sum_amount + =  sbNProItem.normal_product;
+                //                //            sbuserItem.sum_bonus + =  sbNProItem.normal_deduct_bonus;
+                //                //        }
+                //                //    }
+                //                //    foreach (var sbLProItem in sbLProList)
+                //                //    {
+                //                //        if (sbuserItem.user_id == sbLProItem.user_id)
+                //                //        {
+                //                //            if(String.IsNullOrEmpty(sbuserItem.sum_amount.ToString()))
+                //                //            {
+                //                //             sbuserItem.sum_amount = 0;
+                //                //            }
+                //                //             if(String.IsNullOrEmpty(sbuserItem.sum_bonus.ToString()))
+                //                //            {
+                //                //             sbuserItem.sum_bonus = 0;
+                //                //            }
+                //                //            sbuserItem.low_product = sbLProItem.low_product;
+                //                //            sbuserItem.low_deduct_bonus = sbLProItem.low_deduct_bonus;
+                //                //            sbuserItem.sum_amount + =  sbLProItem.low_product;
+                //                //            sbuserItem.sum_bonus + =  sbLProItem.low_deduct_bonus;
+                //                //        }
+                //                //    }                
+                //                //}
+
+                //                for (int i = 0; i < sbuserDT.Rows.Count; i++)
+                //                {
+                //                    for (int j = 0; j < sbNProDT.Rows.Count; j++)
+                //                    {
+                //                        if (Convert.ToDecimal(sbuserDT.Rows[i]["user_id"]) == Convert.ToDecimal(sbNProDT.Rows[j]["user_id"]))
+                //                        {
+                //                            sbuserDT.Rows[i]["normal_product"] = sbNProDT.Rows[j]["normal_product"];
+                //                            sbuserDT.Rows[i]["sum_amount"] = Convert.ToDecimal(sbuserDT.Rows[i]["sum_amount"]) + Convert.ToDecimal(sbNProDT.Rows[j]["normal_product"]);
+                //                        }
+                //                    }
+                //                    for (int k = 0; k < sbLProDT.Rows.Count; k++)
+                //                    {
+                //                        if (Convert.ToDecimal(sbuserDT.Rows[i]["user_id"]) == Convert.ToDecimal(sbLProDT.Rows[k]["user_id"]))
+                //                        {
+                //                            sbuserDT.Rows[i]["low_product"] = sbLProDT.Rows[k]["low_product"];
+                //                            sbuserDT.Rows[i]["sum_amount"] = Convert.ToDecimal(sbuserDT.Rows[i]["sum_amount"]) + Convert.ToDecimal(sbLProDT.Rows[k]["low_product"]);
+                //                        }
+                //                    }
+                //                }
+                //                //DataTable排序
+                //                #region 獲得DataTable，按照會員消費總額排序（降序）
+                //                DataRow row = sbuserDT.NewRow();
+                //                DataTable _dt = new DataTable();
+                //                DataTable paixunDT = new DataTable();
+                //                int id = 0;
+                //                _dt = sbuserDT;
+                //                object sumAmountObj = null;
+                //                object userIdObj = null;
+
+                //                paixunDT.Columns.Add("user_id", typeof(int));
+                //                paixunDT.Columns.Add("sum_amount", typeof(decimal));
+
+                //                for (int i = 1; i < _dt.Rows.Count; i++)
+                //                {
+                //                    for (int j = 0; j < _dt.Rows.Count - i; j++)
+                //                    {
+                //                        if (Convert.ToDecimal(_dt.Rows[j]["sum_amount"]) >= Convert.ToDecimal(_dt.Rows[j + 1]["sum_amount"]))
+                //                        {
+
+                //                            sumAmountObj = _dt.Rows[j + 1]["sum_amount"];
+                //                            userIdObj = _dt.Rows[j + 1]["user_id"];
+                //                            _dt.Rows[j + 1]["sum_amount"] = _dt.Rows[j]["sum_amount"];
+                //                            _dt.Rows[j + 1]["user_id"] = _dt.Rows[j]["user_id"];
+                //                            _dt.Rows[j]["sum_amount"] = sumAmountObj;
+                //                            _dt.Rows[j]["user_id"] = userIdObj;
+
+                //                        }
+                //                    }
+                //                    id = Convert.ToInt32(_dt.Rows[_dt.Rows.Count - i]["user_id"]);
+                //                    for (int k = 0; k < sbuserDT.Rows.Count; k++)
+                //                    {
+                //                        if (Convert.ToInt32(sbuserDT.Rows[k]["user_id"]) == id)
+                //                        {
+                //                            row = sbuserDT.Rows[k];
+                //                        }
+                //                    }
+
+                //                    DataRow dr = paixunDT.NewRow();
+                //                    dr[0] = row["user_id"];
+                //                    dr[1] = row["sum_amount"];
+                //                    paixunDT.Rows.Add(dr);
+                //                }
+                //                //paixunDT.Rows.Add(sbuserDT.Rows[0]) ;   
+                //                #endregion
+
+                //                StringBuilder userId25 = new StringBuilder();
+                //                string userIdString25 = string.Empty;
+                //                for (int m = uvlq.Start; m <= uvlq.Limit; m++)
+                //                {
+                //                    userId25.AppendFormat("{0},", Convert.ToInt32(paixunDT.Rows[m]["user_id"]));
+                //                }
+                //                userIdString25 = userId25.ToString();
+                //                userIdString25 = userIdString25.Substring(0, userIdString25.Length - 1);
+                //                return userIdString25; 
+                #endregion
+            
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("UsersDao-->GetViplistUserId-->" + ex.Message , ex);
+            }
+        }
+
+        #endregion        
+        //create by shuangshuang0420j 20140923 17:44
+        public List<Model.Query.UserVipListQuery> GetVipList(Model.Query.UserVipListQuery uvlq,string userIdString, ref int totalCount)       
+        {
+            
             StringBuilder sql = new StringBuilder();
             try
             {
@@ -98,89 +305,164 @@ namespace BLL.gigade.Dao
                     timelimit += string.Format(" and om.order_createdate <='{0}' ", uvlq.create_dateTwo);
                 }
                 StringBuilder sbuser = new StringBuilder();
-                sbuser.Append(" select  u.user_id,count(om.order_id) as cou,u.user_name ,u.ml_code, ");
-                sbuser.Append("u.user_phone,u.user_mobile,u.user_gender,u.user_birthday_year,u.user_birthday_month,");
-                sbuser.Append(" u.user_birthday_day,u.user_type,u.adm_note,u.send_sms_ad,u.paper_invoice, u.user_password,u.user_reg_date,");
-                sbuser.Append(" sum(om.order_amount) as sum_amount ,");
-                sbuser.Append(" sum(deduct_bonus) as sum_bonus,sum(om.order_freight_normal) as freight_normal,");
-                sbuser.Append(" sum(om.order_freight_low) as freight_low , max( om.order_createdate ) as order_createdate, ");
+                sbuser.Append(" select  ");
+                sbuser.Append(" u.user_id,u.user_status,u.last_time,count(om.order_id) as cou,u.user_name ,u.ml_code, ");
+                sbuser.Append(" u.user_phone,u.user_mobile,u.user_gender,u.user_birthday_year,u.user_birthday_month,");
+                sbuser.Append(" u.user_birthday_day,u.user_type,u.adm_note,u.send_sms_ad,u.paper_invoice, u.user_password,u.user_reg_date,");                
+                
+                sbuser.Append(" sum(om.order_freight_low) as freight_low ,sum(om.order_freight_normal) as freight_normal, ");
+                sbuser.Append(" max( om.order_createdate ) as order_createdate,");
                 sbuser.Append(" round(sum(om.deduct_happygo_convert * om.deduct_happygo)) as happygo ");
                 sbuser.Append(" from order_master om inner join users u on u.user_id = om.user_id ");
-                sbuser.Append(" where om.order_status = 99  ");
+                sbuser.Append(" where om.order_status = 99 ");
+                sbuser.AppendFormat(" and om.user_id in ({0}) ", userIdString);
                 sbuser.Append(timelimit);
-                sbuser.Append("  group by om.user_id order by sum(om.order_amount) desc ");
+                sbuser.Append("  group by om.user_id ");
+                
+                        
 
-                ////order_status=99表示訂單已歸檔
-                //得到常溫商品總額
+                //order_status=99表示訂單已歸檔
+                //得到常溫商品總額集合sbNPro
                 StringBuilder sbNPro = new StringBuilder("");
-                sbNPro.Append(" select om.user_id,sum(single_money * buy_num) as normal_product ");
+                sbNPro.Append(@" select om.user_id,sum(od.single_money * (case  when od.item_mode=0  then od.buy_num 
+                when od.item_mode=2 then od.parent_num end)) as normal_product ,sum(od.deduct_bonus) as normal_deduct_bonus");                        
                 sbNPro.Append(" from order_master om  ");
                 sbNPro.Append(" left join order_slave os on os.order_id = om.order_id");
                 sbNPro.Append(" left join order_detail od on od.slave_id = os.slave_id");
-                sbNPro.Append(" where od.product_freight_set in (1,3) and od.detail_status = 4  and om.order_status = 99 ");
+                sbNPro.AppendFormat(@" where od.product_freight_set in (1,3) and od.detail_status = 4  and om.order_status = 99 
+                                    and od.item_mode in (0,2) and om.user_id in ({0}) ", userIdString);
                 sbNPro.Append(timelimit);
-                sbNPro.Append("  group by om.user_id order by sum(om.order_amount) desc ");
-                //得到低溫商品總額
+                sbNPro.Append("  group by om.user_id ");
+
+                //得到低溫商品總額集合sbLPro
                 StringBuilder sbLPro = new StringBuilder("");
-                sbLPro.Append(" select om.user_id,sum(single_money * buy_num) as low_product ");
+                sbLPro.Append(@" select om.user_id,sum(od.single_money * (case  when od.item_mode=0  then od.buy_num 
+                when od.item_mode=2 then od.parent_num end)) as low_product,sum(od.deduct_bonus) as low_deduct_bonus ");
                 sbLPro.Append(" from order_master om ");
                 sbLPro.Append(" left join order_slave os on os.order_id = om.order_id");
                 sbLPro.Append(" left join order_detail od on od.slave_id = os.slave_id");
-                sbLPro.Append(" where od.product_freight_set in (2,4,5,6) and od.detail_status = 4  and om.order_status = 99 ");
+                sbLPro.AppendFormat(@" where od.product_freight_set in (2,4,5,6) and od.detail_status = 4  and om.order_status = 99 
+                                    and od.item_mode in (0,2) and om.user_id in ({0}) ", userIdString);
                 sbLPro.Append(timelimit);
                 sbLPro.Append(" group by om.user_id ");
-                sbLPro.Append(" order by sum(om.order_amount) desc ");//排序
-                //得到ct
 
-
+                //得到ct集合sbCT
                 StringBuilder sbCT = new StringBuilder("");
                 sbCT.Append(" select om.user_id, sum(opc.offsetamt) as ct ");
                 sbCT.Append(" from order_master om inner join order_payment_ct opc on om.order_id = opc.lidm ");
-                sbCT.Append(" where   om.order_status = 99 ");
+                sbCT.AppendFormat(@" where   om.order_status = 99 and om.user_id in ({0}) ", userIdString);
                 sbCT.Append(timelimit);
                 sbCT.Append("  group by om.user_id ");
-                sbCT.Append(" order by sum(om.order_amount) desc ");//排序
-                //得到ht
 
+                //得到ht集合sbHT
                 StringBuilder sbHT = new StringBuilder("");
                 sbHT.Append(" select om.user_id, sum(oph.redem_discount_amount) as ht");
                 sbHT.Append(" from order_master om inner join order_payment_hitrust oph on om.order_id = oph.order_id");
-
-                sbHT.Append(" where  om.order_status = 99 ");
+                sbHT.AppendFormat(@" where  om.order_status = 99 and om.user_id in ({0}) ", userIdString);
                 sbHT.Append(timelimit);
                 sbHT.Append("  group by om.user_id ");
-                sbHT.Append(" order by sum(om.order_amount) desc ");//排序
-
-                //獲取全部信息
-                //// sql.Append("select b.*,n.normal_product,l.low_product,c.ct,h.ht");
-                // sql.Append("select b.* ");
-                // sql.AppendFormat(" from  ( {0} ) b ", sbuser);
-                // //sql.AppendFormat(" left join ( {0} )  n on n.user_id = b.user_id", sbNPro);
-                // //sql.AppendFormat(" left join ( {0} )  l on l.user_id = b.user_id", sbLPro);
-                // //sql.AppendFormat(" left join ( {0} )  c on c.user_id = b.user_id", sbCT);
-                // //sql.AppendFormat(" left join  ( {0} )  h on h.user_id = b.user_id", sbHT);
-                // sql.Append("  group by b.user_id order by b.sum_amount desc");
 
 
+                #region 手動插入數據
+                ////                foreach ( var sbuserItem in sbuserList)
+                ////                {
+                ////                    foreach (var sbNProItem in sbNProList)
+                ////                    {
+                ////                        if (sbuserItem.user_id == sbNProItem.user_id)
+                ////                        {
+                ////                            sbuserItem.normal_product = sbNProItem.normal_product;
+                ////                            sbuserItem.normal_deduct_bonus = sbNProItem.normal_deduct_bonus;
+                ////                            //sbuserItem.sum_amount + = sbNProItem.normal_product;
+                ////                            //sbuserItem.sum_bonus + = sbNProItem.normal_deduct_bonus;
+                ////                        }                  
+                ////                    }
+                ////                    foreach (var sbLProItem in sbLProList)
+                ////                    {
+                ////                        if (sbuserItem.user_id == sbLProItem.user_id)
+                ////                        {
+                ////                            sbuserItem.low_product = sbLProItem.low_product;
+                ////                            sbuserItem.low_deduct_bonus = sbLProItem.low_deduct_bonus;
+                ////                            //sbuserItem.sum_amount + = sbLProItem.low_product;
+                ////                            //sbuserItem.sum_bonus + = sbLProItem.low_deduct_bonus;
+                ////                        }
+                ////                    }
+                ////                    foreach (var sbCTItem in sbCTList)
+                ////                    {
+                ////                        if (sbuserItem.user_id == sbCTItem.user_id)
+                ////                        {
+                ////                            sbuserItem.ct = sbCTItem.ct;
+                ////                        }
+                ////                    }
+                ////                    foreach (var sbHTItem in sbHTList)
+                ////                    {
+                ////                        if (sbuserItem.user_id == sbHTItem.user_id)
+                ////                        {
+                ////                            sbuserItem.ht = sbHTItem.ht;
+                ////                        }
+                ////                    }                   
+                ////                } 
+                #endregion
 
-                //得到數據總條數
-                totalCount = 0;
-                string sqlForCount = "select count(user_id) as totalCount from (" + sbuser + ") s ";
-                System.Data.DataTable _dt = _accessMySql.getDataTable(sqlForCount);
-                if (_dt != null)
-                {
-                    totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
-                }
-                sbuser.AppendFormat(" limit {0},{1}", uvlq.Start, uvlq.Limit);//分頁
-                sql.Append(" select b.*,n.normal_product,l.low_product,c.ct,h.ht,uos.order_product_subtotal ");
+                sql.Append(@" select b.*,IFNULL(n.normal_product,0) as normal_product,IFNULL(l.low_product,0) as low_product,IFNULL(c.ct,0) as ct ,IFNULL(h.ht,0) as ht,
+                                           IFNULL(n.normal_deduct_bonus,0)+IFNULL(l.low_deduct_bonus,0) as sum_bonus,
+                                           IFNULL(n.normal_product,0)+IFNULL(l.low_product,0)  as sum_amount  ");
                 sql.AppendFormat(" from  ( {0} ) b ", sbuser);
                 sql.AppendFormat(" left join ( {0} )  n on n.user_id = b.user_id", sbNPro);
                 sql.AppendFormat(" left join ( {0} )  l on l.user_id = b.user_id", sbLPro);
                 sql.AppendFormat(" left join ( {0} )  c on c.user_id = b.user_id", sbCT);
                 sql.AppendFormat(" left join  ( {0} )  h on h.user_id = b.user_id", sbHT);
-                sql.AppendFormat(" left join  user_orders_subtotal uos  on uos.user_id = b.user_id");
-                return _accessMySql.getDataTableForObj<Model.Query.UserVipListQuery>(sql.ToString());
-                //return _accessMySql.getDataTableForObj<Model.Query.UserVipListQuery>(sbuser.ToString());
+                sql.AppendFormat(" where 1=1   order by sum_amount DESC");
+                //得到數據總條數
+                totalCount = 0;
+                if (uvlq.IsPage)
+                {
+                    string sqlForCount = "select count(user_id) as totalCount from (" + sbuser + ") s ";
+                    System.Data.DataTable _dt = _accessMySql.getDataTable(sqlForCount);
+                    if (_dt != null && _dt.Rows.Count > 0)
+                    {
+                        totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
+                    }
+                    sql.AppendFormat(" limit {0},{1}", uvlq.Start, uvlq.Limit);//分頁
+                }
+                DataTable vipListDT = _accessMySql.getDataTable(sql.ToString());
+                List<Model.Query.UserVipListQuery> store = new List<UserVipListQuery>();
+
+                for (var i = 0; i < vipListDT.Rows.Count; i++)
+                {
+                    Model.Query.UserVipListQuery query = new UserVipListQuery();
+
+                    query.user_id = Convert.ToUInt32(vipListDT.Rows[i]["user_id"]);
+                    query.user_status = Convert.ToUInt32(vipListDT.Rows[i]["user_status"]);
+                    query.cou = Convert.ToInt64(vipListDT.Rows[i]["cou"]);
+                    query.user_name = Convert.ToString(vipListDT.Rows[i]["user_name"]);
+                    query.ml_code = Convert.ToString(vipListDT.Rows[i]["ml_code"]);
+                    query.user_phone = Convert.ToString(vipListDT.Rows[i]["user_phone"]);
+                    query.user_mobile = Convert.ToString(vipListDT.Rows[i]["user_mobile"]);
+                    query.user_gender = Convert.ToUInt32(vipListDT.Rows[i]["user_gender"]);
+                    query.user_birthday_year = Convert.ToUInt32(vipListDT.Rows[i]["user_birthday_year"]);
+                    query.user_birthday_month = Convert.ToUInt32(vipListDT.Rows[i]["user_birthday_month"]);
+                    query.user_birthday_day = Convert.ToUInt32(vipListDT.Rows[i]["user_birthday_day"]);
+                    query.user_type = Convert.ToInt32(vipListDT.Rows[i]["user_type"]);
+                    query.adm_note = Convert.ToString(vipListDT.Rows[i]["adm_note"]);
+                    query.send_sms_ad = Convert.ToBoolean(vipListDT.Rows[i]["send_sms_ad"]);
+                    query.paper_invoice = Convert.ToBoolean(vipListDT.Rows[i]["paper_invoice"]);
+                    query.user_password = Convert.ToString(vipListDT.Rows[i]["user_password"]);
+                    query.user_reg_date = Convert.ToUInt32(vipListDT.Rows[i]["user_reg_date"]);
+                    query.last_time = Convert.ToUInt32(vipListDT.Rows[i]["last_time"]);
+                    query.freight_low = Convert.ToDecimal(vipListDT.Rows[i]["freight_low"]);
+                    query.freight_normal = Convert.ToDecimal(vipListDT.Rows[i]["freight_normal"]);
+                    query.order_createdate = Convert.ToUInt32(vipListDT.Rows[i]["order_createdate"]);
+                    query.happygo = Convert.ToDouble(vipListDT.Rows[i]["happygo"]);
+                    query.normal_product = Convert.ToDecimal(vipListDT.Rows[i]["normal_product"]);
+                    query.low_product = Convert.ToDecimal(vipListDT.Rows[i]["low_product"]);
+                    query.ct = Convert.ToDecimal(vipListDT.Rows[i]["ct"]);
+                    query.ht = Convert.ToDecimal(vipListDT.Rows[i]["ht"]);
+                    query.sum_bonus = Convert.ToDecimal(vipListDT.Rows[i]["sum_bonus"]);
+                    query.sum_amount = Convert.ToDecimal(vipListDT.Rows[i]["sum_amount"]);
+                    store.Add(query);
+                }
+                return store;
+                                              
             }
             catch (Exception ex)
             {
@@ -510,93 +792,103 @@ namespace BLL.gigade.Dao
         }
 
 
-        public List<Model.Query.UserVipListQuery> ExportVipListCsv(UserVipListQuery query)
-        {
-            StringBuilder sql = new StringBuilder();
-            try
-            {
-                query.Replace4MySQL();
-                string timelimit = string.Empty;
-                //添加搜索條件
-                if (query.create_dateOne != 0)
-                {
-                    timelimit += string.Format(" and om.order_createdate >='{0}' ", query.create_dateOne);
-                }
-                if (query.create_dateTwo != 0)
-                {
-                    timelimit += string.Format(" and om.order_createdate <='{0}' ", query.create_dateTwo);
-                }
-                //count(*) as cou,
-                StringBuilder sbuser = new StringBuilder();
-                sbuser.Append(" select  u.user_id,u.user_status,u.ml_code,u.user_name ,u.user_gender,u.user_id 'VIP',u.user_birthday_year ,u.user_birthday_month,  ");
-                sbuser.Append(" u.user_reg_date,max( om.order_createdate ) as order_createdate,");
-                sbuser.Append("u.last_time,");
-                sbuser.Append(" sum(om.order_amount) as sum_amount ,count(om.order_id) as cou,");
-                sbuser.Append(" sum(deduct_bonus) as sum_bonus,sum(om.order_freight_normal) as freight_normal,");
-                sbuser.Append(" sum(om.order_freight_low) as freight_low ,  ");
-                sbuser.Append(" round(sum(om.deduct_happygo_convert * om.deduct_happygo)) as happygo ");
-                sbuser.Append(" from order_master om inner join users u on u.user_id = om.user_id ");
-                sbuser.Append(" where om.order_status = 99  ");
-                sbuser.Append(timelimit);
-                sbuser.Append("  group by om.user_id order by sum(om.order_amount) desc ");
+//        public List<Model.Query.UserVipListQuery> ExportVipListCsv(UserVipListQuery query,string userIdString)
+//        {
+//            StringBuilder sql = new StringBuilder();
+//            try
+//            {
+//                query.Replace4MySQL();
+//                string timelimit = string.Empty;
+//                //添加搜索條件
+//                if (query.create_dateOne != 0)
+//                {
+//                    timelimit += string.Format(" and om.order_createdate >='{0}' ", query.create_dateOne);
+//                }
+//                if (query.create_dateTwo != 0)
+//                {
+//                    timelimit += string.Format(" and om.order_createdate <='{0}' ", query.create_dateTwo);
+//                }
+//                //count(*) as cou,
+//                StringBuilder sbuser = new StringBuilder();
+//                sbuser.Append(" select  ");
+//                sbuser.Append(" u.user_id,count(om.order_id) as cou,u.user_status,u.user_name ,u.ml_code, ");
+//                sbuser.Append(" u.user_phone,u.user_mobile,u.user_gender,u.user_birthday_year,u.user_birthday_month,");
+//                sbuser.Append(" u.last_time,");
+//                sbuser.Append(" u.user_birthday_day,u.user_type,u.adm_note,u.send_sms_ad,u.paper_invoice, u.user_password,u.user_reg_date,");
+//                sbuser.Append(" sum(om.order_freight_low) as freight_low ,sum(om.order_freight_normal) as freight_normal, ");
+//                sbuser.Append(" max( om.order_createdate ) as order_createdate,");
+//                sbuser.Append(" round(sum(om.deduct_happygo_convert * om.deduct_happygo)) as happygo ");
+//                sbuser.Append(" from order_master om inner join users u on u.user_id = om.user_id ");
+//                sbuser.Append(" where om.order_status = 99 ");
+//                sbuser.AppendFormat(" and om.user_id in ({0}) ", userIdString);
+//                sbuser.Append(timelimit);
+//                sbuser.Append("  group by om.user_id ");
 
-                ////order_status=99表示訂單已歸檔
-                //得到常溫商品總額
-                StringBuilder sbNPro = new StringBuilder("");
-                sbNPro.Append(" select om.user_id,sum(single_money * buy_num) as normal_product ");
-                sbNPro.Append(" from order_master om  ");
-                sbNPro.Append(" left join order_slave os on os.order_id = om.order_id");
-                sbNPro.Append(" left join order_detail od on od.slave_id = os.slave_id");
-                sbNPro.Append(" where od.product_freight_set in (1,3) and od.detail_status = 4  and om.order_status = 99 ");
-                sbNPro.Append(timelimit);
-                sbNPro.Append("  group by om.user_id order by sum(om.order_amount) desc ");
-                //得到低溫商品總額
-                StringBuilder sbLPro = new StringBuilder("");
-                sbLPro.Append(" select om.user_id,sum(single_money * buy_num) as low_product ");
-                sbLPro.Append(" from order_master om ");
-                sbLPro.Append(" left join order_slave os on os.order_id = om.order_id");
-                sbLPro.Append(" left join order_detail od on od.slave_id = os.slave_id");
-                sbLPro.Append(" where od.product_freight_set in (2,4,5,6) and od.detail_status = 4  and om.order_status = 99 ");
-                sbLPro.Append(timelimit);
-                sbLPro.Append(" group by om.user_id ");
-                sbLPro.Append(" order by sum(om.order_amount) desc ");//排序
-                //得到ct
+                
+//                ////order_status=99表示訂單已歸檔
+//                //得到常溫商品總額
+//                StringBuilder sbNPro = new StringBuilder("");
+//                sbNPro.Append(@" select om.user_id,sum(single_money * (case  when od.item_mode=0  then od.buy_num 
+//                              when od.item_mode=2 then od.parent_num end)) as normal_product ,sum(od.deduct_bonus) as normal_deduct_bonus");
+//                sbNPro.Append(" from order_master om  ");
+//                sbNPro.Append(" left join order_slave os on os.order_id = om.order_id");
+//                sbNPro.Append(" left join order_detail od on od.slave_id = os.slave_id");
+//                sbNPro.AppendFormat(@" where od.product_freight_set in (1,3) and od.detail_status = 4  and om.order_status = 99 
+//                                    and od.item_mode in (0,2) and om.user_id in ({0}) ", userIdString);
+//                sbNPro.Append(timelimit);
+//                sbNPro.Append("  group by om.user_id ");              
 
 
-                StringBuilder sbCT = new StringBuilder("");
-                sbCT.Append(" select om.user_id, sum(opc.offsetamt) as ct ");
-                sbCT.Append(" from order_master om inner join order_payment_ct opc on om.order_id = opc.lidm ");
-                sbCT.Append(" where   om.order_status = 99 ");
-                sbCT.Append(timelimit);
-                sbCT.Append("  group by om.user_id ");
-                sbCT.Append(" order by sum(om.order_amount) desc ");//排序
-                //得到ht
+//                //得到低溫商品總額
+//                StringBuilder sbLPro = new StringBuilder("");
+//                sbLPro.Append(@" select om.user_id,sum(single_money * (case  when od.item_mode=0  then od.buy_num 
+//                              when od.item_mode=2 then od.parent_num end)) as low_product,sum(od.deduct_bonus) as low_deduct_bonus ");
+//                sbLPro.Append(" from order_master om ");
+//                sbLPro.Append(" left join order_slave os on os.order_id = om.order_id");
+//                sbLPro.Append(" left join order_detail od on od.slave_id = os.slave_id");
+//                sbLPro.AppendFormat(@" where od.product_freight_set in (2,4,5,6) and od.detail_status = 4  and om.order_status = 99 
+//                                    and od.item_mode in (0,2) and om.user_id in ({0}) ", userIdString);
+//                sbLPro.Append(timelimit);
+//                sbLPro.Append(" group by om.user_id ");
 
-                StringBuilder sbHT = new StringBuilder("");
-                sbHT.Append(" select om.user_id, sum(oph.redem_discount_amount) as ht");
-                sbHT.Append(" from order_master om inner join order_payment_hitrust oph on om.order_id = oph.order_id");
+                
+//                //得到ct
+//                StringBuilder sbCT = new StringBuilder("");
+//                sbCT.Append(" select om.user_id, sum(opc.offsetamt) as ct ");
+//                sbCT.Append(" from order_master om inner join order_payment_ct opc on om.order_id = opc.lidm ");
+//                sbCT.AppendFormat(@" where   om.order_status = 99 and om.user_id in ({0}) ", userIdString);
+//                sbCT.Append(timelimit);
+//                sbCT.Append("  group by om.user_id ");                
 
-                sbHT.Append(" where  om.order_status = 99 ");
-                sbHT.Append(timelimit);
-                sbHT.Append("  group by om.user_id ");
-                sbHT.Append(" order by sum(om.order_amount) desc ");//排序
 
-                //獲取全部信息
-                sql.Append("select b.*,uos.order_product_subtotal,n.normal_product,l.low_product,c.ct,h.ht");
-                sql.AppendFormat(" from  ( {0} ) b ", sbuser);
-                sql.AppendFormat(" left join ( {0} )  n on n.user_id = b.user_id", sbNPro);
-                sql.AppendFormat(" left join ( {0} )  l on l.user_id = b.user_id", sbLPro);
-                sql.AppendFormat(" left join ( {0} )  c on c.user_id = b.user_id", sbCT);
-                sql.AppendFormat(" left join  ( {0} )  h on h.user_id = b.user_id", sbHT);
-                sql.AppendFormat(" left join  user_orders_subtotal  uos on uos.user_id = b.user_id");
-                sql.Append("  group by b.user_id order by b.sum_amount desc");
-                return _accessMySql.getDataTableForObj<UserVipListQuery>(sql.ToString());
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("UsersDao-->ExportVipListCsv-->" + ex.Message + sql, ex);
-            }
-        }
+//                //得到ht集合sbHT
+//                StringBuilder sbHT = new StringBuilder("");               
+//                sbHT.Append(" select om.user_id, sum(oph.redem_discount_amount) as ht");
+//                sbHT.Append(" from order_master om inner join order_payment_hitrust oph on om.order_id = oph.order_id");
+//                sbHT.AppendFormat(@" where  om.order_status = 99 and om.user_id in ({0}) ", userIdString);
+//                sbHT.Append(timelimit);
+//                sbHT.Append("  group by om.user_id ");
+
+                
+
+//                //獲取全部信息
+//                sql.Append(@" select b.*,n.normal_product,l.low_product,c.ct,h.ht,
+//                                           IFNULL(n.normal_deduct_bonus,0)+IFNULL(l.low_deduct_bonus,0) as sum_bonus,
+//                                           IFNULL(n.normal_product,0)+IFNULL(l.low_product,0)  as sum_amount  ");
+//                sql.AppendFormat(" from  ( {0} ) b ", sbuser);
+//                sql.AppendFormat(" left join ( {0} )  n on n.user_id = b.user_id", sbNPro);
+//                sql.AppendFormat(" left join ( {0} )  l on l.user_id = b.user_id", sbLPro);
+//                sql.AppendFormat(" left join ( {0} )  c on c.user_id = b.user_id", sbCT);
+//                sql.AppendFormat(" left join  ( {0} )  h on h.user_id = b.user_id", sbHT);
+//                sql.AppendFormat(" where 1=1   order by sum_amount DESC");
+             
+//                return _accessMySql.getDataTableForObj<UserVipListQuery>(sql.ToString());
+//            }
+//            catch (Exception ex)
+//            {
+//                throw new Exception("UsersDao-->ExportVipListCsv-->" + ex.Message + sql, ex);
+//            }
+//        }
 
         public List<UserQuery> Query(Model.Custom.Users query)
         {

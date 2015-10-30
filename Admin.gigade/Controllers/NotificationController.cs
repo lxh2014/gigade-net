@@ -16,6 +16,7 @@ using System.Xml;
 using gigadeExcel.Comment;
 using System.Data;
 using BLL.gigade.Common;
+using System.Net;
 
 namespace Admin.gigade.Controllers
 {
@@ -44,6 +45,11 @@ namespace Admin.gigade.Controllers
         private ISiteConfigImplMgr _siteConfigMgr;
         private IProductRemoveReasonImplMgr _proRemoveMgr;
 
+        private IRecommendedExcleImplMgr _recommendedExcleMgr;
+        private IParametersrcImplMgr _iParametersrcImplMgr;
+        string ftpuser = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.ftpuser);//ftp用戶名
+        string ftppwd = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.ftppwd);//ftp密碼
+        string RecommendExcleLocalPath = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.local);//ftp地址
         public ActionResult Index()
         {
             return View();
@@ -941,7 +947,7 @@ namespace Admin.gigade.Controllers
         }
 
 
-        #region 設定有關商品自動下架等功能  product_status 7 表示缺货系统下架   
+        #region 設定有關商品自動下架等功能  product_status 7 表示缺货系统下架
         public string SetProductRmoveDown()
         {
 
@@ -1111,7 +1117,7 @@ namespace Admin.gigade.Controllers
                 log.Error(logMessage);
                 endRunInfo = DateTime.Now.ToString() + "SetProductRmoveDown: " + ex.Message;
                 WriterInfo("SetProductRmoveDown", startRunInfo, endRunInfo);
-                return "{success:false,data:'',msg:"+ex.Message+"}";
+                return "{success:false,data:'',msg:" + ex.Message + "}";
             }
         }
         #endregion
@@ -1161,5 +1167,191 @@ namespace Admin.gigade.Controllers
                 log.Error(logMessage);
             }
         }
+        #region 吉甲地推薦系統匯出
+        // 吉甲地推薦系統匯出 guodong1130w 2015/10/9
+        public string OutExcleForRecommended()
+        {
+            try
+            {
+                //獲取傳參并封裝到對象
+                RecommendedOutPra rop = new RecommendedOutPra();
+                string outType = Request.Params["outType"].ToString();
+                string outTime = Request.Params["outTime"].ToString();
+                if (!string.IsNullOrEmpty(outType))
+                {
+                    rop.outType = outType;
+                    DateTime dtnow = DateTime.Now;
+                    rop.nowMonth = dtnow.Month.ToString();
+                    rop.nowYear = dtnow.Year.ToString();
+                }
+                if (!string.IsNullOrEmpty(outTime))
+                {
+                    rop.outTime = outTime;
+                }
+                //導出方法
+                _recommendedExcleMgr = new RecommendedExcleMgr(connectionString);
+                //獲取XML裏面的Sheetname
+                string strXml = "../XML/ParameterSrc.xml";
+                _iParametersrcImplMgr = new ParameterMgr(Server.MapPath(strXml), ParaSourceType.XML);
+                List<Parametersrc> liparsrc = _iParametersrcImplMgr.QueryUsed(new Parametersrc { ParameterType = "RecommendedExcleSheetName" }).ToList();
+                //導出文件名稱
+                List<string> strPath = new List<string>();
+                List<string> strNewPath = new List<string>();
+                DateTime nowtime = DateTime.Now;
+                //導出EXCLE  分別導出6種
+                List<MemoryStream> msVipUser = _recommendedExcleMgr.GetVipUserInfo(rop, liparsrc[0].parameterName);
+                OutExcleForRecommendedByMs(msVipUser, liparsrc[0].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
+                List<MemoryStream> msProduct = _recommendedExcleMgr.GetProductInfo(rop, liparsrc[1].parameterName);
+                OutExcleForRecommendedByMs(msProduct, liparsrc[1].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
+                List<MemoryStream> msOrder = _recommendedExcleMgr.GetOrderInfo(rop, liparsrc[2].parameterName);
+                OutExcleForRecommendedByMs(msOrder, liparsrc[2].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
+                List<MemoryStream> msOrderDetail = _recommendedExcleMgr.GetOrderDetailInfo(rop, liparsrc[3].parameterName);
+                OutExcleForRecommendedByMs(msOrderDetail, liparsrc[3].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
+                List<MemoryStream> msCategory = _recommendedExcleMgr.GetCategoryInfo(rop, liparsrc[4].parameterName);
+                OutExcleForRecommendedByMs(msCategory, liparsrc[4].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
+                List<MemoryStream> msBrand = _recommendedExcleMgr.GetBrandInfo(rop, liparsrc[5].parameterName);
+                OutExcleForRecommendedByMs(msBrand, liparsrc[5].parameterName, out strNewPath, nowtime);
+                strPath = AddstrPath(strPath, strNewPath);
+                #region
+                //打包壓縮文件
+                string zipfifilename = "吉甲地推薦系統匯出.zip";
+                string strZipPath = Server.MapPath("../ImportUserIOExcel/" + zipfifilename + "");
+                string strZipTopDirectoryPath = Server.MapPath("../ImportUserIOExcel/");
+                int intZipLevel = 6;
+                string strPassword = "";
+                SharpZipLibHelp szlh = new SharpZipLibHelp();
+                szlh.Zip(strZipPath, strZipTopDirectoryPath, intZipLevel, strPassword, strPath);
+                //下載
+                downLoad(strZipPath, zipfifilename);
+                //下載完後刪除本次的緩存文件
+                DeleteFileByPath(strPath);
+                #endregion
+                return "{success:true}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                return "{success:false,data:'',msg:" + ex.Message + "}";
+            }
+        }
+        //導出Exlce
+        public void OutExcleForRecommendedByMs(List<MemoryStream> ms, string exclename, out  List<string> strPath, DateTime dtnow)
+        {
+            strPath = new List<string>();
+            for (int i = 0; i < ms.Count; i++)
+            {
+                string fileName = "吉甲地推薦系統" + exclename + "匯出" + dtnow.ToString("yyyyMMddHHmmss") + ".xls";
+                string serverPath = Server.MapPath("../ImportUserIOExcel/" + fileName);
+                FileStream fs = new FileStream(serverPath, FileMode.OpenOrCreate);
+                BinaryWriter w = new BinaryWriter(fs);
+                w.Write(ms[i].ToArray());
+                fs.Close();
+                ms[i].Close();
+                //上傳FTP
+                //UploadFTP(RecommendExcleLocalPath, serverPath, ftpuser, ftppwd);
+                //記錄本次導出文件
+                strPath.Add(serverPath);
+            }
+        }
+        //新增導出地址
+        public List<string> AddstrPath(List<string> strPath, List<string> strNewPath)
+        {
+            for (int i = 0; i < strNewPath.Count; i++)
+            {
+                strPath.Add(strNewPath[i]);
+            }
+            return strPath;
+        }
+        /// <summary>
+        /// 上傳FTP方法
+        /// </summary>
+        /// <param name="ftpServerIP">服务器ip</param>
+        /// <param name="filename">为本地文件的绝对路径</param>
+        /// <param name="ftpUserID">用戶名</param>
+        /// <param name="ftpPassword">密碼</param>
+        private void UploadFTP(string ftpServerIP, string filename, string ftpUserID, string ftpPassword)
+        {
+            FileInfo fileInf = new FileInfo(filename);
+            string uri = string.Format("{0}/{1}", ftpServerIP, fileInf.Name);
+            FtpWebRequest reqFTP;
+            // 根据uri创建FtpWebRequest对象 
+            reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(uri));
+            // ftp用户名和密码
+            reqFTP.Credentials = new NetworkCredential(ftpUserID, ftpPassword);
+            // 默认为true，连接不会被关闭
+            // 在一个命令之后被执行
+            reqFTP.KeepAlive = false;
+            // 指定执行什么命令
+            reqFTP.Method = WebRequestMethods.Ftp.UploadFile;
+            // 指定数据传输类型
+            reqFTP.UseBinary = true;
+            // 上传文件时通知服务器文件的大小
+            reqFTP.ContentLength = fileInf.Length;
+            // 缓冲大小设置为2kb
+            int buffLength = 2048;
+            byte[] buff = new byte[buffLength];
+            int contentLen;
+            // 打开一个文件流 (System.IO.FileStream) 去读上传的文件
+            FileStream fs = fileInf.OpenRead();
+            try
+            {
+                // 把上传的文件写入流
+                Stream strm = reqFTP.GetRequestStream();
+                // 每次读文件流的2kb
+                contentLen = fs.Read(buff, 0, buffLength);
+                // 流内容没有结束
+                while (contentLen != 0)
+                {
+                    // 把内容从file stream 写入 upload stream
+                    strm.Write(buff, 0, contentLen);
+                    contentLen = fs.Read(buff, 0, buffLength);
+                }
+                // 关闭两个流
+                strm.Close();
+                fs.Close();
+            }
+            catch (Exception ex)
+            {
+                // MessageBox.Show(ex.Message, "Upload Error");
+                Response.Write("Upload Error：" + ex.Message);
+            }
+        }
+        //文件下載方法
+        private void downLoad(string path, string filename)
+        {
+            FileInfo fi = new FileInfo(path);
+            if (fi.Exists)
+            {
+                Response.Clear();
+                Response.AddHeader("Content-Disposition", "attachment;filename=" + Server.UrlEncode(filename));
+                Response.AddHeader("Content-Length", fi.Length.ToString());
+                Response.ContentType = "application/octet-stream;charset=gb2321";
+                Response.WriteFile(fi.FullName);
+                Response.Flush();
+                Response.Close();
+            }
+        }
+        //刪除指定文件
+        public void DeleteFileByPath(List<string> strPath) 
+        {
+            foreach (string path in strPath)
+            {
+                FileInfo file = new FileInfo(path);//指定文件路径
+                if (file.Exists)//判断文件是否存在
+                {
+                    file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
+                    file.Delete();//删除文件
+                }
+            }
+        }
+        #endregion
     }
 }

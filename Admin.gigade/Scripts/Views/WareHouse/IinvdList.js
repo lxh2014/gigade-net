@@ -114,7 +114,17 @@ Ext.onReady(function () {
                             forceSelection: false,
                             value: 2
                         },
-                        { xtype: 'textfield', allowBlank: true, id: 'searchcontent', name: 'searchcontent' },
+                        {
+                            xtype: 'textfield', allowBlank: true, id: 'searchcontent', name: 'searchcontent',
+                            listeners: {
+                                specialkey: function (field, e) {
+                                    if (e.getKey() == e.ENTER) {
+                                        Query();
+                                    }
+                                }
+                            }
+                      
+                        },
                         { xtype: 'label', margin: '2 0 0 10', text: '創建時間:' },
                         {
                             xtype: "datefield",
@@ -392,6 +402,8 @@ function UpdateActive(id) {
                 handler: function () {
                     var form = this.up('form').getForm();
                     if (form.isValid()) {
+                        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: 'Loading...' });
+                        myMask.show();
                         form.submit({
                             params: {
                                 lock_id: Ext.htmlEncode(Ext.getCmp('lock_id').getValue()),
@@ -401,9 +413,11 @@ function UpdateActive(id) {
                                 "remarks": Ext.htmlEncode(Ext.getCmp('remarks').getValue())
                             },
                             success: function (form, action) {
+                                myMask.hide();
                                 var result = Ext.decode(action.response.responseText);
                                 Ext.Msg.alert(INFORMATION, SUCCESS);
                                 if (result.success) {
+                                  
                                     IinvdStore.load();
                                     whylock.close();
                                 } else {
@@ -411,6 +425,7 @@ function UpdateActive(id) {
                                 }
                             },
                             failure: function () {
+                                myMask.hide();
                                 Ext.Msg.alert(INFORMATION, FAILURE);
                             }
                         });
@@ -553,7 +568,7 @@ function UpdateActive(id) {
 
                         }
                         else {
-                            return false;
+                            Ext.Msg.alert("提示", "驗證碼輸入錯誤!");
                         }
                     }
                 }
@@ -561,7 +576,7 @@ function UpdateActive(id) {
         });
         var codeWin = Ext.create('Ext.window.Window', {
             iconCls: 'icon-user-edit',
-            id: 'codeWin',
+            id: 'codeWinF',
             width: 300,
             // height:300,
             y: 100,
@@ -572,11 +587,26 @@ function UpdateActive(id) {
             modal: true,
             resizable: false,
             bodyStyle: 'padding:5px 5px 5px 5px',
-            closable: false
+            closable: false,
+            tools: [
+            {
+                type: 'close',
+                qtip: CLOSEFORM,
+                handler: function (event, toolEl, panel) {
+                    Ext.MessageBox.confirm(CONFIRM, IS_CLOSEFORM, function (btn) {
+                        if (btn == "yes") {
+                            Ext.getCmp('codeWinF').destroy();
+                        }
+                        else {
+                            return false;
+                        }
+                    });
+                }
+            }]
 
 
-        });
-        codeWin.show();
+        }).show();
+       // codeWin.show();
      
     }
 }

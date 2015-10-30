@@ -174,6 +174,7 @@ namespace BLL.gigade.Model
         public uint expend_day { get; set; }
         public string months { get; set; }
         public int combotype { get; set; }
+        public int outofstock_days_stopselling { get; set; }
         public Product()
         {
             Product_Id = 0;
@@ -266,6 +267,7 @@ namespace BLL.gigade.Model
             expend_day = 0;
             months = string.Empty;
             combotype = 0;
+            outofstock_days_stopselling = 15;
         }
 
         /// <summary>

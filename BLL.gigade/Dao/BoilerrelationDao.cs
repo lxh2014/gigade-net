@@ -46,7 +46,7 @@ namespace BLL.gigade.Dao
                 mySqlCmd.Connection = mySqlConn;
                 mySqlCmd.Transaction = mySqlConn.BeginTransaction();
                 mySqlCmd.CommandType = System.Data.CommandType.Text;
-                sb.Append("delete from boiler_relation where 1>0 ; ");//在執行插入之前先進行刪除操作
+                sb.Append("SET sql_safe_updates = 0;delete from boiler_relation where 1>0 ; ");//在執行插入之前先進行刪除操作
                 for (int i = 1; i < dr.Length; i++)
                 {
                    string strstring = string.Empty;

@@ -154,6 +154,7 @@ namespace BLL.gigade.Dao
             sql.AppendFormat(@",bank_number,bank_account,freight_normal_money,freight_normal_limit,");
             sql.AppendFormat(@"freight_return_normal_money,freight_low_money,freight_low_limit,");
             sql.AppendFormat(@"freight_return_low_money,product_manage,user_username,");
+            sql.AppendFormat(@"assist,");
             sql.AppendFormat(@"contact_name_1,contact_phone_1_1,contact_mobile_1,contact_email_1,");
             sql.AppendFormat(@"contact_type_2,contact_name_2,contact_phone_1_2,contact_mobile_2,contact_email_2,");
             sql.AppendFormat(@"contact_type_3,contact_name_3,contact_phone_1_3,contact_mobile_3,contact_email_3,");
@@ -233,7 +234,7 @@ namespace BLL.gigade.Dao
 
         #region 獲取所有供應商（用作下拉列表框）+List<Vendor> VendorQueryAll(Vendor query)
         /// <summary>
-        /// 獲取所有未失格的供應商（用作下拉列表框）
+        /// 獲取所有有效的供應商（用作下拉列表框）
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -251,7 +252,7 @@ namespace BLL.gigade.Dao
                 cost_percent,creditcard_1_percent,creditcard_3_percent,sales_limit,bonus_percent,agreement_createdate,agreement_start,agreement_end,checkout_type,
                 checkout_other,bank_code,bank_name,bank_number,bank_account,freight_low_limit,freight_low_money,freight_normal_limit,freight_normal_money,
                 freight_return_low_money,freight_return_normal_money,vendor_note,vendor_confirm_code,vendor_login_attempts,assist,dispatch,product_mode,
-                product_manage,gigade_bunus_percent,gigade_bunus_threshold,procurement_days,self_send_days,stuff_ware_days,dispatch_days,vendor_type,kuser,kdate FROM vendor WHERE vendor_status!=3 ");
+                product_manage,gigade_bunus_percent,gigade_bunus_threshold,procurement_days,self_send_days,stuff_ware_days,dispatch_days,vendor_type,kuser,kdate FROM vendor WHERE vendor_status = 1 ");
                 if (query.assist != 0)
                 {
                     sbSql.AppendFormat(" AND assist = 1 ");
@@ -273,7 +274,7 @@ namespace BLL.gigade.Dao
             StringBuilder sbSql = new StringBuilder();
             try
             {
-                sbSql.Append(@" SELECT vendor_id,vendor_name_full,vendor_name_simple FROM vendor WHERE vendor_status!=3 ");
+                sbSql.Append(@" SELECT vendor_id,vendor_name_full,vendor_name_simple FROM vendor WHERE vendor_status = 1 ");
                 if (query.assist != 0)
                 {
                     sbSql.AppendFormat(" AND assist = 1 ");
@@ -795,131 +796,7 @@ where p.off_grade<> 1 or p.product_status not in(6,99);", vendorId);
             }
         }
 
-        #region 供應商銀行信息
-        public List<VendorBank> QueryBank(VendorBank query, ref int totalCount)
-        {
-            query.Replace4MySQL();
-            StringBuilder sql = new StringBuilder("");
-            StringBuilder sqlCon = new StringBuilder("");
-            try
-            {
-                sql.Append(@" select id,bank_code,bank_name,muser,mdate,status,u.user_username as muser_name from vendor_bank");
-                sql.Append(" left join manage_user u on u.user_id =vendor_bank.muser");
-                sqlCon.Append(" where 1=1 ");
-                if (!string.IsNullOrEmpty(query.bank_code) || !string.IsNullOrEmpty(query.bank_name))
-                {
-                    sqlCon.AppendFormat(" and (bank_code like N'%{0}%' or bank_name like N'%{1}%') ", query.bank_code, query.bank_name);
-                }
-                sqlCon.Append(" order by id desc");
-                totalCount = 0;
-                if (query.IsPage)
-                {
-                    System.Data.DataTable _dt = _dbAccess.getDataTable(" select count(id) as totalCount from vendor_bank  " + sqlCon.ToString());
-                    if (_dt != null && _dt.Rows.Count > 0)
-                    {
-                        totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
-                    }
-                    sqlCon.AppendFormat(" limit {0},{1}", query.Start, query.Limit);
-                }
-                sql.Append(sqlCon.ToString());
-                return _dbAccess.getDataTableForObj<VendorBank>(sql.ToString());
-            }
-            catch (MySqlException ex)
-            {
-                throw new Exception(ex.Number.ToString() + ":VendorDao-->QueryBank" + ex.Message, ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(" VendorDao-->QueryBank-->" + ex.Message + sql.ToString(), ex);
-            }
-        }
 
-        public string SaveBank(VendorBank model)
-        {
-            model.Replace4MySQL();
-            StringBuilder sql = new StringBuilder();
-            try
-            {
-                sql.Append("insert into vendor_bank(bank_code,bank_name,kuser,kdate,muser,mdate,status) values (");
-                sql.AppendFormat("'{0}','{1}','{2}','{3}'", model.bank_code, model.bank_name, model.kuser, CommonFunction.DateTimeToString(model.kdate));
-                sql.AppendFormat(",'{0}','{1}','{2}');", model.muser, CommonFunction.DateTimeToString(model.mdate), model.status);
-                return sql.ToString();
-            }
-            catch (MySqlException ex)
-            {
-                throw new Exception(ex.Number.ToString() + ":VendorDao-->SaveBank" + ex.Message, ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(" VendorDao-->SaveBank-->" + ex.Message + sql.ToString(), ex);
-            }
-        }
-        public List<VendorBank> GetVendorBank(VendorBank model)
-        {
-            model.Replace4MySQL();
-            StringBuilder sql = new StringBuilder();
-            try
-            {
-                sql.Append("select bank_code,bank_name from vendor_bank where 1=1 ");
-                if (!string.IsNullOrEmpty(model.bank_code) && !string.IsNullOrEmpty(model.bank_name))
-                {
-                    sql.AppendFormat(" and (bank_code='{0}' or  bank_name='{1}')", model.bank_code, model.bank_name);
-                }
-                else if (!string.IsNullOrEmpty(model.bank_code))
-                {
-                    sql.AppendFormat(" and bank_code='{0}'", model.bank_code);
-                }
-
-
-                return _dbAccess.getDataTableForObj<VendorBank>(sql.ToString());
-            }
-            catch (MySqlException ex)
-            {
-                throw new Exception(ex.Number.ToString() + ":VendorDao-->QueryBank" + ex.Message, ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(" VendorDao-->QueryBank-->" + ex.Message + sql.ToString(), ex);
-            }
-        }
-        public int UpdateBank(VendorBank model)
-        {
-            model.Replace4MySQL();
-            StringBuilder sql = new StringBuilder();
-            try
-            {
-                sql.AppendFormat("update vendor_bank set  bank_code='{0}',bank_name='{1}',muser='{2}',mdate='{3}' where id='{4}';", model.bank_code, model.bank_name, model.muser, CommonFunction.DateTimeToString(model.mdate), model.id);
-                return _dbAccess.execCommand(sql.ToString());
-            }
-            catch (MySqlException ex)
-            {
-                throw new Exception(ex.Number.ToString() + ":VendorDao-->UpdateBank" + ex.Message, ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(" VendorDao-->UpdateBank-->" + ex.Message + sql.ToString(), ex);
-            }
-        }
-
-        public int UpdateActiveBank(VendorBank model)
-        {
-            model.Replace4MySQL();
-            StringBuilder sql = new StringBuilder();
-            try
-            {
-                sql.AppendFormat("update vendor_bank set  muser='{0}',mdate='{1}',status='{2}' where id='{3}';", model.muser, CommonFunction.DateTimeToString(model.mdate), model.status, model.id);
-                return _dbAccess.execCommand(sql.ToString());
-            }
-            catch (MySqlException ex)
-            {
-                throw new Exception(ex.Number.ToString() + ":VendorDao-->UpdateActiveBank" + ex.Message, ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(" VendorDao-->UpdateActiveBank-->" + ex.Message + sql.ToString(), ex);
-            }
-        }
-        #endregion
 
     }
 }

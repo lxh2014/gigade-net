@@ -30,13 +30,14 @@ namespace BLL.gigade.Dao
             StringBuilder sb = new StringBuilder();
             try
             {
+                //edit by zhuoqin0830w  2015/10/21  判斷規格是否為空  CONCAT(IF(ps1.spec_name IS NULL,'',ps1.spec_name),'  ',IF(ps2.spec_name IS NULL,'',ps2.spec_name)) AS spec_name
                 sb.Append(@"SELECT p.product_id,p.brand_id,p.product_name,p.prod_sz,pit.item_id,pe.pend_del,pe.cde_dt_shp,pe.pwy_dte_ctl,pe.cde_dt_incr,
-            pe.cde_dt_var,pe.hzd_ind,pe.cse_wid,pe.cse_wgt,pe.cse_unit,pe.cse_len,pe.cse_hgt,pe.unit_ship_cse,pe.inner_pack_wid,pe.inner_pack_wgt,
-            pe.inner_pack_unit,pe.inner_pack_len,pe.inner_pack_hgt,CONCAT(ps1.spec_name ,'  ',ps2.spec_name) AS spec_name FROM product p 
-            INNER JOIN product_item pit ON p.product_id =pit.product_id 
-			LEFT JOIN product_spec ps1 ON ps1.spec_id = pit.spec_id_1 
-			LEFT JOIN product_spec ps2 ON ps2.spec_id = pit.spec_id_2 
-            LEFT JOIN product_ext pe ON pe.item_id=pit.item_id WHERE 1=1"); //add by wwei0216w 添加規格1和規格2查詢
+                           pe.cde_dt_var,pe.hzd_ind,pe.cse_wid,pe.cse_wgt,pe.cse_unit,pe.cse_len,pe.cse_hgt,pe.unit_ship_cse,pe.inner_pack_wid,pe.inner_pack_wgt,
+                           pe.inner_pack_unit,pe.inner_pack_len,pe.inner_pack_hgt,CONCAT(IF(ps1.spec_name IS NULL,'',ps1.spec_name),'  ',IF(ps2.spec_name IS NULL,'',ps2.spec_name)) AS spec_name FROM product p 
+                           INNER JOIN product_item pit ON p.product_id =pit.product_id 
+                           LEFT JOIN product_spec ps1 ON ps1.spec_id = pit.spec_id_1 
+                           LEFT JOIN product_spec ps2 ON ps2.spec_id = pit.spec_id_2 
+                           LEFT JOIN product_ext pe ON pe.item_id=pit.item_id WHERE 1=1"); //add by wwei0216w 添加規格1和規格2查詢  
                 switch (condition)
                 {
                     case ProductExtCustom.Condition.ProductId:
@@ -105,7 +106,7 @@ namespace BLL.gigade.Dao
             catch (Exception ex)
             {
                 throw new Exception("ProductExtDao.DeleteProductExtByCondition-->" + ex.Message, ex);
-            } 
+            }
         }
 
         /// <summary>
@@ -124,7 +125,7 @@ namespace BLL.gigade.Dao
             catch (Exception ex)
             {
                 throw new Exception("ProductExtDao.UpdatePendDel-->" + ex.Message, ex);
-            } 
+            }
         }
 
         /// <summary>
@@ -155,7 +156,7 @@ namespace BLL.gigade.Dao
             }
         }
 
-        public List<ProductExtCustom> QueryHistoryInfo(DateTime Update_start, DateTime Update_end,int Brand_id = 0, string Item_ids = null, string Product_ids = null)
+        public List<ProductExtCustom> QueryHistoryInfo(DateTime Update_start, DateTime Update_end, int Brand_id = 0, string Item_ids = null, string Product_ids = null)
         {
             StringBuilder sb = new StringBuilder();
             try
@@ -170,7 +171,7 @@ namespace BLL.gigade.Dao
 	                            MAX(IF(thi.col_name = 'cde_dt_incr',thi.old_value,0)) AS 'incr_old'
                             FROM product p");
                 sb.Append(" INNER JOIN product_item pi ON pi.product_id = p.product_id ");
-                if(Item_ids!= "")
+                if (Item_ids != "")
                 {
                     sb.AppendFormat(" AND pi.item_id IN ('{0}') ", Item_ids);
                 }
@@ -183,16 +184,16 @@ namespace BLL.gigade.Dao
                 sb.Append(" INNER JOIN t_table_historyitem thi ON thi.tableHistoryId = th.rowid AND col_name IN ('cde_dt_shp','cde_dt_var','cde_dt_incr') ");
                 sb.AppendFormat(" INNER JOIN t_history_batch tb ON tb.batchno = th.batchno AND tb.kdate BETWEEN '{0}' AND '{1}' ", Update_start.ToString("yyyy-MM-dd HH:MM:ss"), Update_end.ToString("yyyy-MM-dd HH:MM:ss"));
                 sb.Append(" INNER JOIN mail_user u ON u.row_id = p.user_id ");
-                if(Product_ids!="")
+                if (Product_ids != "")
                 {
-                    sb.AppendFormat(" WHERE p.product_id IN ('{0}')  ",Product_ids);
+                    sb.AppendFormat(" WHERE p.product_id IN ('{0}')  ", Product_ids);
                 }
                 sb.Append(" GROUP BY th.batchno");
                 return _dbAccess.getDataTableForObj<ProductExtCustom>(sb.ToString());
             }
             catch (Exception ex)
             {
-                throw new Exception("ProductExtDao-->QueryHistoryInfo" + ex.Message,ex);
+                throw new Exception("ProductExtDao-->QueryHistoryInfo" + ex.Message, ex);
             }
         }
     }

@@ -44,10 +44,7 @@ namespace BLL.gigade.Mgr.Impl
         int GetOffGradeCount(string vendorId);
         int UnGrade(string vendorId, string active, List<TableChangeLog> list);
         List<Vendor> GetArrayDaysInfo(uint brand_id);
-        List<VendorBank> QueryBank(VendorBank query, ref int totalCount);
         string ImportVendorBank(DataTable dt);
-        int SaveVendorBank(VendorBank model);
-        int UpdateActiveBank(VendorBank model);
-        List<VendorBank> GetVendorBank(VendorBank model);
+        string GetVendorBank(string code);
     }
 }

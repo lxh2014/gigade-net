@@ -396,6 +396,42 @@ namespace BLL.gigade.Dao
             }
         }
 
+        public string GetBrand_idByBrand_name(VendorBrandQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                query.Replace4MySQL();
+                sql.AppendFormat(@"SELECT brand_id,brand_name from vendor_brand WHERE brand_name LIKE N'%{0}%'",query);
+                return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("VendorBrandDao-->GetBrand_idByBrand_name-->" + ex.Message + "sql:" + sql.ToString(), ex);
+            }
+        }
 
+        public List<VendorBrand> GetBrandListByIds(string ids,int id)
+        {           
+            StringBuilder strSql = new StringBuilder();
+            try
+            {
+                strSql.AppendFormat(@"SELECT brand_id,brand_name,brand_status,brand_story_text,story_created,story_createdate,story_update,story_updatedate FROM vendor_brand ");
+                if (ids != string.Empty)
+                {
+                    strSql.AppendFormat(" where brand_id in ({0})", ids);
+                }
+                if (id != 0)
+                {
+                    strSql.AppendFormat(" where brand_id = {0}", id);
+                }
+                return _dbAccess.getDataTableForObj<VendorBrand>(strSql.ToString());
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("VendorBrandDao-->GetBrandList-->" + ex.Message + "sql:" + strSql.ToString(), ex);
+            }
+        }
     }
 }

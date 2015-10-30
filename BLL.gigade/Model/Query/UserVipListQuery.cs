@@ -20,6 +20,8 @@ namespace BLL.gigade.Model.Query
         public int aver_amount { get; set; }//平均購買金額
         public uint om_user_id { get; set; }
         public decimal normal_product { get; set; }
+        public decimal normal_deduct_bonus { get; set; }
+        public decimal low_deduct_bonus { get; set; }
         public decimal low_product { get; set; }
         public decimal ct { get; set; }
         public decimal ht { get; set; }
@@ -46,6 +48,8 @@ namespace BLL.gigade.Model.Query
             aver_amount = 0;
             om_user_id = 0;
             normal_product = 0;
+            normal_deduct_bonus = 0;
+            low_deduct_bonus = 0;
             low_product = 0;
             ct = 0;
             ht = 0;
