@@ -600,7 +600,7 @@ namespace Admin.gigade.Controllers
                     template_data = Request.Params["template_data"];
                 }
                 _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
-                DataTable _dt = _edmContentNewMgr.GetPraraData();
+                DataTable _dt = _edmContentNewMgr.GetPraraData(1);
                 if (_dt != null && _dt.Rows.Count > 0)
                 {
                     replaceStr = _dt.Rows[0][0].ToString();

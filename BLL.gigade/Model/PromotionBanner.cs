@@ -8,7 +8,6 @@ namespace BLL.gigade.Model
     public class PromotionBanner:PageBase
     {
         public int pb_id { get; set; }
-        public string brand_id { get; set; }
         public string pb_image { get; set; }
         public string pb_image_link { get; set; }
         public DateTime pb_startdate { get; set; }
@@ -20,8 +19,7 @@ namespace BLL.gigade.Model
         public int pb_muser { get; set; }
         public PromotionBanner()
         {
-            pb_id = 0;
-            brand_id = string.Empty;
+            pb_id = 0;          
             pb_image = string.Empty;
             pb_image_link = string.Empty;
             pb_startdate = DateTime.MinValue;

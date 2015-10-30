@@ -949,7 +949,7 @@ namespace Admin.gigade.Controllers
                 //添加兩列用於存儲"平均平均量"與"建議採購量"
                 dtExcel.Columns.Add("商品編號", typeof(String));
                 dtExcel.Columns.Add("商品名稱", typeof(String));
-                dtExcel.Columns.Add("料位編號", typeof(String));
+                dtExcel.Columns.Add("主料位編號", typeof(String));
                 dtExcel.Columns.Add("商品細項編號", typeof(String));
 
                 dtExcel.Columns.Add("組合Y/N", typeof(String));
