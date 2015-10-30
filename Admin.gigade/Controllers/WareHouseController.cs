@@ -10576,13 +10576,24 @@ namespace Admin.gigade.Controllers
                     {
                         ipodStore[i].spec = GetProductSpec(ipodStore[i].prod_id.ToString());//--------取值出錯了item_id-----------
                         IupcQuery upc = new IupcQuery();
-                        upc.item_id = uint.Parse(ipodStore[i].prod_id);//--------取值出錯了item_id-----------
-                        List<IupcQuery> upcStore = new List<IupcQuery>();
                         _IiupcMgr = new IupcMgr(mySqlConnectionString);
-                        upcStore = _IiupcMgr.GetIupcByItemID(upc);
-                        if (upcStore.Count > 0)
+
+                        upc.item_id = uint.Parse(ipodStore[i].prod_id);//--------取值出錯了item_id-----------
+                        //獲取國際條碼
+                        List<IupcQuery> upcInternationalStore = new List<IupcQuery>();
+                        upc.upc_type_flg = "1";
+                        upcInternationalStore = _IiupcMgr.GetIupcByType(upc);
+                        //獲取店內條碼
+                        List<IupcQuery> upcShopStore = new List<IupcQuery>();
+                        upc.upc_type_flg = "3";
+                        upcShopStore = _IiupcMgr.GetIupcByType(upc);
+                        if (upcInternationalStore.Count > 0)
                         {
-                            ipodStore[i].upc_id = upcStore[0].upc_id;
+                            ipodStore[i].upc_id_international = upcInternationalStore[0].upc_id;
+                        }
+                        if (upcShopStore.Count > 0)
+                        {
+                            ipodStore[i].upc_id_shop = upcShopStore[0].upc_id;
                         }
                         int freiset = ipodStore[i].product_freight_set;
                         if (!product_freight_set_mapping.Keys.Contains(freiset))
@@ -11330,7 +11341,7 @@ namespace Admin.gigade.Controllers
                         //cell.DisableBorderSide(2);
                         cell.Rowspan = 3;
                         ptable.AddCell(cell);
-                        cell = new PdfPCell(new Phrase("條碼", font));
+                        cell = new PdfPCell(new Phrase("國際條碼", font));
                         cell.DisableBorderSide(2);
                         ptable.AddCell(cell);
                         cell = new PdfPCell(new Phrase("品號", font));
@@ -11351,7 +11362,7 @@ namespace Admin.gigade.Controllers
 
 
 
-                        cell = new PdfPCell(new Phrase("", font));
+                        cell = new PdfPCell(new Phrase("供應商店內碼", font));
                         cell.DisableBorderSide(1);
                         cell.DisableBorderSide(2);
                         ptable.AddCell(cell);
@@ -11412,14 +11423,14 @@ namespace Admin.gigade.Controllers
                         #region 循環讀取數據填入表格
                         DataTable Ipod_dt = new DataTable();
                         Ipod_dt.Columns.Add("序號", typeof(string));
-                        Ipod_dt.Columns.Add("條碼", typeof(string));
+                        Ipod_dt.Columns.Add("國際條碼", typeof(string));
                         Ipod_dt.Columns.Add("品號", typeof(string));
                         Ipod_dt.Columns.Add("採購數量", typeof(string));
                         Ipod_dt.Columns.Add("允收天數", typeof(string));
                         Ipod_dt.Columns.Add("製造日期", typeof(string));
                         Ipod_dt.Columns.Add("備註", typeof(string));
                         Ipod_dt.Columns.Add("Empty_1", typeof(string));
-                        Ipod_dt.Columns.Add("Empty_2", typeof(string));
+                        Ipod_dt.Columns.Add("供應商店內碼", typeof(string));
                         Ipod_dt.Columns.Add("品名", typeof(string));
                         Ipod_dt.Columns.Add("允收數量", typeof(string));
                         Ipod_dt.Columns.Add("允出天數", typeof(string));
@@ -11436,14 +11447,14 @@ namespace Admin.gigade.Controllers
                         for (int i = 0; i < Ipodleibie.Count; i++)
                         {
                             DataRow newRow = Ipod_dt.NewRow();
-                            newRow["條碼"] = Ipodleibie[i].upc_id;
+                            newRow["國際條碼"] = Ipodleibie[i].upc_id_international;
                             newRow["品號"] = Ipodleibie[i].Erp_Id.ToString();
                             newRow["採購數量"] = Ipodleibie[i].qty_ord.ToString();
                             newRow["允收天數"] = Ipodleibie[i].cde_dt_var.ToString();
                             newRow["製造日期"] = "";
                             newRow["備註"] = "";
                             newRow["Empty_1"] = (i + 1).ToString(); //序號
-                            newRow["Empty_2"] = "";
+                            newRow["供應商店內碼"] = Ipodleibie[i].upc_id_shop;
                             newRow["品名"] = Ipodleibie[i].product_name;
                             newRow["允收數量"] = Ipodleibie[i].qty_claimed.ToString();
                             newRow["允出天數"] = Ipodleibie[i].cde_dt_shp.ToString();

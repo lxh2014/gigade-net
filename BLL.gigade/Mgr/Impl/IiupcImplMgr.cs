@@ -22,5 +22,6 @@ namespace BLL.gigade.Mgr.Impl
         int upc_num(int m);
         string Getupc(string item_id, string type);
         List<IupcQuery> GetIupcByItemID(IupcQuery query);
+        List<IupcQuery> GetIupcByType(IupcQuery query);
     }
 }
