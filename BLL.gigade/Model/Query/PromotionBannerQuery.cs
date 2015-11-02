@@ -14,7 +14,7 @@ namespace BLL.gigade.Model.Query
         public int dateCon { get; set; }
         public string brand_name { get; set; }
         public int showStatus { get; set; }
-        public int singleBrand_id { get; set; }
+        public uint singleBrand_id { get; set; }
         public int multi { get; set; }
         public int changeMode { get; set; }       
         public string brandIDS { get; set; }
