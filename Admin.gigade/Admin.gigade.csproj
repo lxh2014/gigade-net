@@ -297,10 +297,13 @@
     <Content Include="Config.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Content\css\dataview.css" />
     <Content Include="Content\css\icon.css" />
     <Content Include="Content\css\login\axurerp_pagespecificstyles.css" />
     <Content Include="Content\css\login\axure_rp_page.css" />
     <Content Include="Content\img\bg_top.jpg" />
+    <Content Include="Content\img\click_up.jpg" />
+    <Content Include="Content\img\click_up_img.jpg" />
     <Content Include="Content\img\icons\door_out.png" />
     <Content Include="Content\css\login\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
     <Content Include="Content\css\login\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" />
@@ -395,8 +398,6 @@
     <Content Include="Content\img\nopic_50.jpg" />
     <Content Include="Content\img\x.png" />
     <Content Include="Content\img\youtube_url_link_step.jpg" />
-    <Content Include="Content\img\點擊上傳.jpg" />
-    <Content Include="Content\img\點擊上傳圖片.jpg" />
     <Content Include="Content\kendo\2014.2.716\Black\editor.png" />
     <Content Include="Content\kendo\2014.2.716\Black\imagebrowser.png" />
     <Content Include="Content\kendo\2014.2.716\Black\indeterminate.gif" />
@@ -1981,6 +1982,7 @@
     <Content Include="Scripts\Views\VipUserGroup\edit.js" />
     <Content Include="Scripts\Views\VipUserGroup\GCCInfo.js" />
     <Content Include="Scripts\Views\VipUserGroup\list.js" />
+    <Content Include="Scripts\Views\WareHouse\Aseld.js" />
     <Content Include="Scripts\Views\WareHouse\Check.js" />
     <Content Include="Scripts\Views\WareHouse\Idiff_count_book.js" />
     <Content Include="Scripts\Views\WareHouse\IialgList.js" />
@@ -2006,6 +2008,7 @@
     <Content Include="Scripts\Views\Website\BannerNewsEdit.js" />
     <Content Include="Scripts\Views\Website\BannerNewsList.js" />
     <Content Include="Scripts\Views\Website\BannernewssiteList.js" />
+    <Content Include="Scripts\Views\XMLManage\Index.js" />
     <Content Include="Template\ProductDetail\product_detail_safe.txt" />
     <Content Include="XML\Exceptional.xml" />
     <Content Include="XML\ItemPrice.xml" />
@@ -4411,7 +4414,6 @@
     <Content Include="Views\WareHouse\Check.cshtml" />
     <Content Include="Views\Super\Index.cshtml" />
     <Content Include="Views\Product\InventoryQuery.cshtml" />
-    <Content Include="Template\SiteStatistics\站臺訪問量統計匯入範本.xlsx" />
     <Content Include="Views\OrderManage\OrderDetailManage.cshtml" />
     <Content Include="Template\SiteAnalytics\SiteAnalytics.xlsx" />
     <Content Include="Views\WareHouse\IpodList.cshtml" />
@@ -4434,8 +4436,13 @@
     <Content Include="Template\OrderImport\t_orders.xlsx" />
     <Content Include="Views\EdmNew\EdmContentNewReport.cshtml" />
     <Content Include="Views\EdmNew\EdmSendListCountView.cshtml" />
+    <Content Include="Views\WareHouse\Aseld.cshtml" />
+    <Content Include="Template\SiteStatistics\SiteStatistics.xlsx" />
     <Content Include="Views\ProductPurchase\StatusLowerShelf.cshtml" />
     <Content Include="Views\BrandLogoSort\Index.cshtml" />
+    <Content Include="Views\XMLManage\Index.cshtml" />
+    <Content Include="Views\XMLManage\test.cshtml" />
+    <Content Include="Views\XMLManage\xmlFile.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4650,7 +4657,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>2224</DevelopmentServerPort>
+          <DevelopmentServerPort>11529</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

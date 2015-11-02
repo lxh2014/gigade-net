@@ -111,8 +111,7 @@ Ext.onReady(function () {
     var frm = Ext.create('Ext.form.Panel', {
         id: 'frm',
         layout: 'anchor',
-        height: 120,
-        flex: 2,
+        height: 140,
         border: 0,
         bodyPadding: 10,
         width: document.documentElement.clientWidth,

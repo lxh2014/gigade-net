@@ -1,4 +1,13 @@
-﻿
+﻿/*
+*
+* 文件摘要：排程管理前台.js
+* 監    製：YellowBaby520
+* 創建日期：2015.02.12
+* 版權所有：GigadeTeam-WH
+*
+*/
+
+
 var PRODUCT_ID, OLD_PRODUCT_ID = '';
 var messages = '';
 var messagesrep = '';
@@ -834,7 +843,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
                         Ext.getCmp('mst').setText(messagestime);
                     } else {
                         Ext.getCmp('ce_time').setDisabled(false);
-                        if (Ext.getCmp('cs_time').getValue() == null) {
+                        if (Ext.getCmp('cs_time').getValue() == null || Ext.getCmp('ce_time').getValue() == null) {
                             return;
                         }
                         messagestime = EXECUTE_TIME_ON + '：' + Ext.Date.format(Ext.getCmp('cs_time').getValue(), 'Y/m/d') + ' ~ ' + Ext.Date.format(Ext.getCmp('ce_time').getValue(), 'Y/m/d') + '。';

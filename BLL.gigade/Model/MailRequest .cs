@@ -35,6 +35,8 @@ namespace BLL.gigade.Model
         public int group_id { get; set; }
         public int content_id { get; set; }
 
+        public string bodyData { get; set; }
+
         public MailRequest()
         {
             request_id = 0;
@@ -62,6 +64,7 @@ namespace BLL.gigade.Model
             extra_send = string.Empty;
             extra_no_send = string.Empty;
             is_outer = true;
+            bodyData = string.Empty;
         }
 
     }
