@@ -836,6 +836,11 @@ function function_uadd(i, j, z) {
                                         //Ext.Msg.alert(INFORMATION, "操作成功!");
                                         //setTimeout('Loadthis()', 4000);
                                         KucunTiaozhengStore.load();
+                                    } else
+                                    {
+                                        myMask.hide();
+                                        Ext.Msg.alert(INFORMATION, "庫調記錄失敗!");
+                                        KucunTiaozhengStore.load();
                                     }
                                 }
                             });
