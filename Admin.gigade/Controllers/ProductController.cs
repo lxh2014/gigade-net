@@ -1860,7 +1860,6 @@ namespace Admin.gigade.Controllers
                     else
                     {
                         product.Product_Image = imgServerPath + "/product/nopic_150.jpg";
-                        //product.Product_Image = imgServerPath + "/Content/img/點擊上傳.jpg";
                     }
                     if (!string.IsNullOrEmpty(product.Mobile_Image)) //edit by wwei0216w 2015/3/18 添加關於手機說明圖的操作
                     {
@@ -1870,7 +1869,7 @@ namespace Admin.gigade.Controllers
                     else
                     {
                         product.Mobile_Image = imgServerPath + "/product/nopic_150.jpg";
-                        //product.Mobile_Image = imgServerPath + "/Content/img/點擊上傳圖片.jpg";
+                        //product.Mobile_Image = imgServerPath + "/Content/img/click_up_img.jpg";
                     }
                     #region 庫存是否可編輯
                     //edit by xiangwang 0413w 2014/10/09
