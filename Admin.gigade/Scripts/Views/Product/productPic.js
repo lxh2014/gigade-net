@@ -199,7 +199,6 @@ Ext.onReady(function () {
         width: 150,
         height: 150,
         floating: false,
-        //src:"/Content/img/點擊上傳.jpg",
         style: {
             margin: '10px 15px 0px 0px',//修改商品說明圖和手機說明圖之間的間距   edit by zhuoqin0830w 2015/03/19
             border: 'solid 1px #EEE',
@@ -216,14 +215,14 @@ Ext.onReady(function () {
                 ///productPicEvent的二個參數
                 ///參數一:要刪除img控件的樣式(刪去圖片根據該控件的樣式來查找控件)
                 ///參數二:用來替換用戶圖片的統一圖片路徑(通常為默認圖片)
-                $('.picClick').parent().append("<img id='clearPic_1' onclick='productPicEvent(\"picClick\",\"/Content/img/點擊上傳.jpg\",1)' src='/Content/img/x.png' style='width:15px;height:15px;display:none;position:relative;z-index:0;cursor:pointer;top:12px;left:133px' />");
+                $('.picClick').parent().append("<img id='clearPic_1' onclick='productPicEvent(\"picClick\",\"/Content/img/click_up.jpg\",1)' src='/Content/img/x.png' style='width:15px;height:15px;display:none;position:relative;z-index:0;cursor:pointer;top:12px;left:133px' />");
                 $('.picClick').attr("Id", "Pic_1");
-                SetClearPic("picClick", "Pic_1", "clearPic_1", "/Content/img/點擊上傳.jpg");
+                SetClearPic("picClick", "Pic_1", "clearPic_1", "/Content/img/click_up.jpg");
                 ///通過樣式尋找到img控件中可以正確執行mousemove事件的父div
                 //$('.picClick').parent().parent().parent().parent().mousemove(function (e) {
                 //    var target = e.target;
                 //    //如果觸發對象為為IMG元素並且,它的id == "Pic_1"或者是clearPic_1 並且該圖片不是默認圖片,就顯示X小圖標
-                //    if (target.tagName == 'IMG' && ($(target).attr("Id") == "Pic_1" || $(target).attr("Id") == "clearPic_1") && $(target).attr("src") != "/Content/img/點擊上傳.jpg") {
+                //    if (target.tagName == 'IMG' && ($(target).attr("Id") == "Pic_1" || $(target).attr("Id") == "clearPic_1") && $(target).attr("src") != "/Content/img/click_up.jpg") {
                 //        $("#clearPic_1").show();
                 //    } else {
                 //        $("#clearPic_1").hide();
@@ -237,7 +236,7 @@ Ext.onReady(function () {
     Pic2 = Ext.create('Ext.Img', {
         width: 150,
         height: 150,
-        //src: "/Content/img/點擊上傳圖片.jpg",
+        //src: "/Content/img/click_up_img.jpg",
         style: {
             margin: '10px 0px 0px 0px',
             border: 'solid 1px #EEE',
@@ -249,9 +248,9 @@ Ext.onReady(function () {
                 $('.picClick2').click(function () {//通過picClick2找到該控件的點擊事件
                     addPic("mobile", 0, 4);//進行圖片上傳的操作 4：手機說明圖
                 });
-                $('.picClick2').parent().append("<img id='clearPic_2' onclick='productPicEvent(\"picClick2\",\"/Content/img/點擊上傳圖片.jpg\",2)' src='/Content/img/x.png' style='width:15px;height:15px;display:none;position:relative;z-index:0;cursor:pointer;top:12px;left:298px' />");
+                $('.picClick2').parent().append("<img id='clearPic_2' onclick='productPicEvent(\"picClick2\",\"/Content/img/click_up_img.jpg\",2)' src='/Content/img/x.png' style='width:15px;height:15px;display:none;position:relative;z-index:0;cursor:pointer;top:12px;left:298px' />");
                 $('.picClick2').attr("Id", "Pic_2");
-                SetClearPic("picClick2", "Pic_2", "clearPic_2", "/Content/img/點擊上傳圖片.jpg");
+                SetClearPic("picClick2", "Pic_2", "clearPic_2", "/Content/img/click_up_img.jpg");
             }
         }
     });
@@ -800,14 +799,14 @@ Ext.onReady(function () {
                     Pic.setSrc(resText.data.Product_Image); //設置圖片路徑
                     Ext.getCmp("fileName").setValue(filename); //將圖片路徑保存到fileName中
                 } else {
-                    //Pic.setSrc("/Content/img/點擊上傳.jpg");//如果說明圖名稱等於"nopic_150.jpg",將圖片換成預設圖片
-                    $('.picClick').attr("src", "/Content/img/點擊上傳.jpg");
+                    //如果說明圖名稱等於"nopic_150.jpg",將圖片換成預設圖片
+                    $('.picClick').attr("src", "/Content/img/click_up.jpg");
                 }
                 if (mobileFilename != "nopic_150.jpg") {   //如果手機說明圖名稱不等於"nopic_150.jpg",證明存在圖片
                     Pic2.setSrc(resText.data.Mobile_Image);//設置圖片路徑
                     Ext.getCmp("fileNameMobile").setValue(mobileFilename);//將圖片路徑保存到fileNameMobile中
                 } else {
-                    Pic2.setSrc("/Content/img/點擊上傳圖片.jpg");//如果說明圖名稱等於"nopic_150.jpg",將圖片換成預設圖片
+                    Pic2.setSrc("/Content/img/click_up_img.jpg");//如果說明圖名稱等於"nopic_150.jpg",將圖片換成預設圖片
                 }
 
                 //edit by zhuoqin0830w  2014/04/14
