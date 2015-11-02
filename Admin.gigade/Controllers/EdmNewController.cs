@@ -30,7 +30,7 @@ namespace Admin.gigade.Controllers
         public EdmTemplateMgr edmtemplatemgr;        //
         public EmailBlockListMgr _emailBlockListMgr;
         private EmailGroupMgr _emailGroupMgr;
-
+        private static DataTable _newDt = new DataTable();
         // GET: /EdmNew/
 
         #region view
@@ -66,6 +66,8 @@ namespace Admin.gigade.Controllers
         {
             int content_id = Convert.ToInt32(Request.Params["content_id"]);
             ViewBag.contentId = content_id;
+            int log_id = Convert.ToInt32(Request.Params["log_id"]);
+            ViewBag.log_id = log_id;
             return View();
         }
 
@@ -73,6 +75,8 @@ namespace Admin.gigade.Controllers
         {
             int content_id = Convert.ToInt32(Request.Params["content_id"]);
             ViewBag.contentId = content_id;
+            int log_id = Convert.ToInt32(Request.Params["log_id"]);
+            ViewBag.log_id = log_id;
             return View();
         }
 
@@ -576,6 +580,7 @@ namespace Admin.gigade.Controllers
             string json = string.Empty;
             string template_data = string.Empty;
             string contentJson = string.Empty;
+            string replaceStr = string.Empty;
             try
             {
                 if (!string.IsNullOrEmpty(Request.Params["content_url"]))
@@ -583,7 +588,7 @@ namespace Admin.gigade.Controllers
                     #region 獲取網頁內容方法
                     string url = Request.Params["content_url"].ToString();
                     HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
-                    httpRequest.Timeout = 5000;
+                    httpRequest.Timeout = 9000;
                     httpRequest.Method = "GET";
                     HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
                     StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
@@ -594,7 +599,18 @@ namespace Admin.gigade.Controllers
                 {
                     template_data = Request.Params["template_data"];
                 }
-                json = contentJson + " " + template_data;
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                DataTable _dt = _edmContentNewMgr.GetPraraData(1);
+                if (_dt != null && _dt.Rows.Count > 0)
+                {
+                    replaceStr = _dt.Rows[0][0].ToString();
+                }
+                else
+                {
+                    replaceStr = "&nbsp;&nbsp;";
+                }
+                contentJson=contentJson.Replace(replaceStr,template_data);
+                json = contentJson;
             }
             catch (Exception ex)
             {
@@ -958,7 +974,7 @@ namespace Admin.gigade.Controllers
         public HttpResponseBase ImportExcel()
         {
             string json = string.Empty;
-            string excelPath = "../Template/EmailGroup/";
+            string excelPath = "../ImportUserIOExcel/";
             try
             {
                 if (Request.Files.Count > 0)
@@ -969,17 +985,22 @@ namespace Admin.gigade.Controllers
                     string newExcelName = Server.MapPath(excelPath) + "email_group" + fileManagement.NewFileName(excelFile.FileName);
                     excelFile.SaveAs(newExcelName);
                     NPOI4ExcelHelper helper = new NPOI4ExcelHelper(newExcelName);
-                    DataTable _dt = helper.ExcelToTableForXLSX();
-
+                    DataTable _dt = helper.SheetData();
                     _emailGroupMgr = new EmailGroupMgr(mySqlConnectionString);
-                    if (_emailGroupMgr.ImportEmailList(_dt, group_id))
+                    _newDt.Clear();
+                    int totalCount = 0;
+                    _newDt = _emailGroupMgr.ImportEmailList(_dt, group_id, out totalCount);//匯入失敗的數據
+                    if (_newDt.Rows.Count > 0 && _newDt != null)
                     {
-                        json = "{success:true}";
+                        int totalCountData = totalCount;
+                        int wrongCount = _newDt.Rows.Count;
+                        json = "{success:true,totalCount:'" + totalCountData + "',wrongCount:'" + wrongCount + "'}";
                     }
                     else
                     {
-                        json = "{success:false}";
+                        json = "{success:true,wrongCount:'" + 0 + "'}";
                     }
+                  
                 }
             }
             catch (Exception ex)
@@ -994,6 +1015,26 @@ namespace Admin.gigade.Controllers
             this.Response.Write(json);
             this.Response.End();
             return this.Response;
+        }
+
+        public void DownWrongList()
+        {
+            string json = string.Empty;
+            try
+            {
+                string fileName = "信箱名單匯入錯誤列表" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                MemoryStream ms = ExcelHelperXhf.ExportDT( _newDt, "");
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                Response.BinaryWrite(ms.ToArray());
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,data:" + "" + "}";
+            }
         }
         #endregion
 
@@ -1091,6 +1132,48 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
+        #region 刪除
+        public HttpResponseBase DelEmailGroupList()
+        {
+            string json = string.Empty;
+            EmailGroup query = new EmailGroup();
+            List<EmailGroup> list = new List<EmailGroup>();
+            try
+            {
+                 _emailGroupMgr =  new EmailGroupMgr(mySqlConnectionString);
+                if (!string.IsNullOrEmpty(Request.Form["rowID"]))
+                {
+                    string rowIDs = Request.Form["rowID"];
+                    if (rowIDs.IndexOf("∑") != -1)
+                    {
+                        foreach (string id in rowIDs.Split('∑'))
+                        {
+                            if (!string.IsNullOrEmpty(id))
+                            {
+                                query = new EmailGroup();
+                                query.group_id =Convert.ToInt32(id);
+                                list.Add(query);
+                            }
+                        }
+                    }
+                }
+                json = _emailGroupMgr.DelEmailGroupList(list);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+
 
         #endregion
 
@@ -1102,55 +1185,62 @@ namespace Admin.gigade.Controllers
             string json = string.Empty;
             if (!string.IsNullOrEmpty(Request.Params["content_id"]))
             {
-                string openAveragePrecent = "0";
-                string openAverageCount = "0";
-                int content_id = Convert.ToInt32(Request.Params["content_id"]);
-                List<EdmContentNew> store = new List<BLL.gigade.Model.EdmContentNew>();
-                EdmContentNew query = new BLL.gigade.Model.EdmContentNew();
-                EdmContentNew newQuery = new BLL.gigade.Model.EdmContentNew();
-                query.content_id = content_id;
-                int count = 0;
-                int successCount = 0;
-                int failCount = 0;
-                int totalPersonCount = 0;
-                int totalCount = 0;
-                //電子報主旨和發送時間
-                newQuery = _edmContentNewMgr.GetECNList(query, out count).FirstOrDefault();
-                string date = newQuery.date.ToString("yyyy-MM-dd HH:mm:ss");
-                DateTime now = DateTime.Now;
-
-                string subject = newQuery.subject;
-                //發信成功人數
-                if (now > Convert.ToDateTime(date))
+                if (!string.IsNullOrEmpty(Request.Params["log_id"]))
                 {
-                    successCount = _edmContentNewMgr.GetSendMailSCount(content_id);
-                    //發信失敗人數
-                    failCount = _edmContentNewMgr.GetSendMailFCount(content_id);
-                    //總開信人數
-                    totalPersonCount = _edmContentNewMgr.GetSendMailCount(content_id);
-                    //開總信次數
-                    totalCount = _edmContentNewMgr.GetSendCount(content_id);
-                    //開信率
-                    if (successCount == 0)
-                    {
-                        openAveragePrecent = "0";
-                    }
-                    else
-                    {
-                        openAveragePrecent = Math.Round((double)totalPersonCount / successCount * 100, 2) + "%";
-                    }
-                    //平均開信次數
-                    if (totalPersonCount == 0)
-                    {
-                        openAverageCount = "0";
-                    }
-                    else
-                    {
-                        openAverageCount = Math.Round((double)totalCount / totalPersonCount, 2).ToString();
-                    }
+                    int log_id = Convert.ToInt32(Request.Params["log_id"]);
+                    string openAveragePrecent = "0";
+                    string openAverageCount = "0";
+                    int content_id = Convert.ToInt32(Request.Params["content_id"]);
+                    List<EdmContentNew> store = new List<BLL.gigade.Model.EdmContentNew>();
+                    EdmContentNew query = new BLL.gigade.Model.EdmContentNew();
+                    EdmContentNew newQuery = new BLL.gigade.Model.EdmContentNew();
+                    _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                    query.content_id = content_id;
+                    int count = 0;
+                    int successCount = 0;
+                    int failCount = 0;
+                    int totalPersonCount = 0;
+                    int totalCount = 0;
+                    //電子報主旨和發送時間
+                    newQuery = _edmContentNewMgr.GetECNList(query, out count).FirstOrDefault();
+                    string subject = newQuery.subject;
+                     string date=string.Empty;
+                  DataTable _dt=_edmContentNewMgr.GetScheduleDate(content_id, log_id);
+                  if (_dt != null && _dt.Rows.Count > 0)
+                  {
+                      date = Convert.ToDateTime(_dt.Rows[0][0].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
+                      //發信成功人數
+                      if (DateTime.Now > Convert.ToDateTime(date))
+                      {
+                          successCount = _edmContentNewMgr.GetSendMailSCount(content_id, log_id);
+                          //發信失敗人數
+                          failCount = _edmContentNewMgr.GetSendMailFCount(content_id, log_id);
+                          //總開信人數
+                          totalPersonCount = _edmContentNewMgr.GetSendMailCount(content_id, log_id);
+                          //開總信次數
+                          totalCount = _edmContentNewMgr.GetSendCount(content_id, log_id);
+                          //開信率
+                          if (successCount == 0)
+                          {
+                              openAveragePrecent = "0";
+                          }
+                          else
+                          {
+                              openAveragePrecent = Math.Round((double)totalPersonCount / successCount * 100, 2) + "%";
+                          }
+                          //平均開信次數
+                          if (totalPersonCount == 0)
+                          {
+                              openAverageCount = "0";
+                          }
+                          else
+                          {
+                              openAverageCount = Math.Round((double)totalCount / totalPersonCount, 2).ToString();
+                          }
+                      }
+                  }
+                    json = "{success:true,successCount:'" + successCount + "',failCount:'" + failCount + "',totalPersonCount:'" + totalPersonCount + "',totalCount:'" + totalCount + "',openAveragePrecent:'" + openAveragePrecent + "',openAverageCount:'" + openAverageCount + "',subject:'" + subject + "',date:'" + date + "'}";
                 }
-
-                json = "{success:true,successCount:'" + successCount + "',failCount:'" + failCount + "',totalPersonCount:'" + totalPersonCount + "',totalCount:'" + totalCount + "',openAveragePrecent:'" + openAveragePrecent + "',openAverageCount:'" + openAverageCount + "',subject:'" + subject + "',date:'" + date + "'}";
             }
             this.Response.Clear();
             this.Response.Write(json);
@@ -1166,8 +1256,11 @@ namespace Admin.gigade.Controllers
             {
                 if (!string.IsNullOrEmpty(Request.Params["content_id"]))
                 {
+                    if (!string.IsNullOrEmpty(Request.Params["log_id"]))
+                    {
+                        int log_id = Convert.ToInt32(Request.Params["log_id"]);
                     _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
-                    DataTable _dt = _edmContentNewMgr.KXMD(Convert.ToInt32(Request.Params["content_id"]));
+                    DataTable _dt = _edmContentNewMgr.KXMD(Convert.ToInt32(Request.Params["content_id"]), log_id);
                     DataTable _newDt = new DataTable();
                     _newDt.Columns.Add("發信狀態", typeof(string));
                     _newDt.Columns.Add("姓名", typeof(string));
@@ -1208,16 +1301,16 @@ namespace Admin.gigade.Controllers
                         {
                             newRow[4] = Convert.ToInt32(_dt.Rows[i]["count"]);
                         }
-                        if (_dt.Rows[i]["request_createdate"] == "")
+                        if (_dt.Rows[i]["send_date"] == "")
                         {
                             newRow[5] = "";
                         }
                         else
                         {
                             DateTime request_createdate;
-                            if (DateTime.TryParse(_dt.Rows[i]["request_createdate"].ToString(), out request_createdate))
+                            if (DateTime.TryParse(_dt.Rows[i]["send_date"].ToString(), out request_createdate))
                             {
-                                newRow[5] = Convert.ToDateTime(_dt.Rows[i]["request_createdate"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
+                                newRow[5] = Convert.ToDateTime(_dt.Rows[i]["send_date"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
                             }
                             else
                             {
@@ -1269,6 +1362,7 @@ namespace Admin.gigade.Controllers
                     Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
                     Response.BinaryWrite(ms.ToArray());
                 }
+                }
             }
             catch (Exception ex)
             {
@@ -1287,108 +1381,76 @@ namespace Admin.gigade.Controllers
             {
                 if (!string.IsNullOrEmpty(Request.Params["content_id"]))
                 {
-                    _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
-                    DataTable _newDt = new DataTable();
-                    DataTable _dt = _edmContentNewMgr.WKXMD(Convert.ToInt32(Request.Params["content_id"]));
-                    _newDt.Columns.Add("發信狀態", typeof(string));
-                    _newDt.Columns.Add("姓名", typeof(string));
-                    _newDt.Columns.Add("信箱", typeof(string));
-                    _newDt.Columns.Add("信箱編號", typeof(string));
-                    _newDt.Columns.Add("開信次數", typeof(string));
-                    _newDt.Columns.Add("寄信時間", typeof(string));
-                    _newDt.Columns.Add("首次開信時間", typeof(string));
-                    _newDt.Columns.Add("最近開信時間", typeof(string));
-                    for (int i = 0; i < _dt.Rows.Count; i++)
+                    if (!string.IsNullOrEmpty(Request.Params["log_id"]))
                     {
-                        #region 轉換dt
-                        DataRow newRow = _newDt.NewRow();
-                        newRow[0] = "success";
-                        if (_dt.Rows[i]["name"] == "")
-                        {
-                            newRow[1] = "";
-                        }
-                        else
-                        {
-                            newRow[1] = _dt.Rows[i]["name"].ToString().Substring(0, 1) + "**";
-                        }
+                        int log_id = Convert.ToInt32(Request.Params["log_id"]);
+                        _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                        DataTable _newDt = new DataTable();
+                        DataTable _dt = _edmContentNewMgr.WKXMD(Convert.ToInt32(Request.Params["content_id"]), log_id);
+                        _newDt.Columns.Add("發信狀態", typeof(string));
+                        _newDt.Columns.Add("姓名", typeof(string));
+                        _newDt.Columns.Add("信箱", typeof(string));
+                        _newDt.Columns.Add("信箱編號", typeof(string));
+                        _newDt.Columns.Add("開信次數", typeof(string));
+                        _newDt.Columns.Add("寄信時間", typeof(string));
 
-                        if (_dt.Rows[i]["email"] == "")
+                        for (int i = 0; i < _dt.Rows.Count; i++)
                         {
-                            newRow[2] = "";
-                        }
-                        else
-                        {
-                            newRow[2] = _dt.Rows[i]["email"].ToString().Split('@')[0] + "@***";
-                        }
-                        newRow[3] = (_dt.Rows[i]["email_id"]).ToString();
-                        if (_dt.Rows[i]["count"] == "")
-                        {
-                            newRow[4] = "0";
-                        }
-                        else
-                        {
-                            newRow[4] = Convert.ToInt32(_dt.Rows[i]["count"]);
-                        }
-                        if (_dt.Rows[i]["request_createdate"] == "")
-                        {
-                            newRow[5] = "";
-                        }
-                        else
-                        {
-                            DateTime request_createdate;
-                            if (DateTime.TryParse(_dt.Rows[i]["request_createdate"].ToString(), out request_createdate))
+                            #region 轉換dt
+                            DataRow newRow = _newDt.NewRow();
+                            newRow[0] = "success";
+                            if (_dt.Rows[i]["name"] == "")
                             {
-                                newRow[5] = Convert.ToDateTime(_dt.Rows[i]["request_createdate"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
+                                newRow[1] = "";
                             }
                             else
+                            {
+                                newRow[1] = _dt.Rows[i]["name"].ToString().Substring(0, 1) + "**";
+                            }
+
+                            if (_dt.Rows[i]["email"] == "")
+                            {
+                                newRow[2] = "";
+                            }
+                            else
+                            {
+                                newRow[2] = _dt.Rows[i]["email"].ToString().Split('@')[0] + "@***";
+                            }
+                            newRow[3] = (_dt.Rows[i]["email_id"]).ToString();
+                            if (_dt.Rows[i]["count"] == "")
+                            {
+                                newRow[4] = "0";
+                            }
+                            else
+                            {
+                                newRow[4] = Convert.ToInt32(_dt.Rows[i]["count"]);
+                            }
+                            if (_dt.Rows[i]["send_date"] == "")
                             {
                                 newRow[5] = "";
                             }
-
-                        }
-                        if (_dt.Rows[i]["first_traceback"] == "")
-                        {
-                            newRow[6] = "";
-                        }
-                        else
-                        {
-                            DateTime first_traceabck;
-                            if (DateTime.TryParse(_dt.Rows[i]["first_traceback"].ToString(), out first_traceabck))
-                            {
-                                newRow[6] = Convert.ToDateTime(_dt.Rows[i]["first_traceback"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
-                            }
                             else
                             {
-                                newRow[6] = "";
+                                DateTime request_createdate;
+                                if (DateTime.TryParse(_dt.Rows[i]["send_date"].ToString(), out request_createdate))
+                                {
+                                    newRow[5] = Convert.ToDateTime(_dt.Rows[i]["send_date"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
+                                }
+                                else
+                                {
+                                    newRow[5] = "";
+                                }
+
                             }
 
-
+                            _newDt.Rows.Add(newRow);
+                            #endregion
                         }
-                        if (_dt.Rows[i]["last_traceback"] == "")
-                        {
-                            newRow[7] = "";
-                        }
-                        else
-                        {
-                            DateTime first_traceabck;
-                            if (DateTime.TryParse(_dt.Rows[i]["last_traceback"].ToString(), out first_traceabck))
-                            {
-                                newRow[7] = Convert.ToDateTime(_dt.Rows[i]["last_traceback"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
-                            }
-                            else
-                            {
-                                newRow[7] = "";
-                            }
-
-
-                        }
-                        _newDt.Rows.Add(newRow);
-                        #endregion
+                        string fileName = "未開信名單" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                        MemoryStream ms = ExcelHelperXhf.ExportDT(_newDt, "");
+                        Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                        Response.BinaryWrite(ms.ToArray());
                     }
-                    string fileName = "未開信名單" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
-                    MemoryStream ms = ExcelHelperXhf.ExportDT(_newDt, "");
-                    Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
-                    Response.BinaryWrite(ms.ToArray());
                 }
             }
             catch (Exception ex)
@@ -1411,6 +1473,10 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["content_id"]))
                 {
                     query.content_id = Convert.ToInt32(Request.Params["content_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["log_id"]))
+                {
+                    query.log_id = Convert.ToInt32(Request.Params["log_id"]);
                 }
                 query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
@@ -1458,6 +1524,10 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["content_id"]))
                 {
                     query.content_id = Convert.ToInt32(Request.Params["content_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["log_id"]))
+                {
+                    query.log_id = Convert.ToInt32(Request.Params["log_id"]);
                 }
                 query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
@@ -1512,6 +1582,37 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
+
+        public HttpResponseBase CreatedateAndLogId()
+        {
+            string json = string.Empty;
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["content_id"]))
+                {
+                    int content_id = Convert.ToInt32(Request.Params["content_id"]);
+                    DataTable _dt = _edmContentNewMgr.CreatedateAndLogId(content_id);
+                    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                    timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                    json = "{success:true,data:" + JsonConvert.SerializeObject(_dt, Formatting.Indented, timeConverter)
+
++ "}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,data:[]}";
+            }
+
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
         #endregion
     }
 }

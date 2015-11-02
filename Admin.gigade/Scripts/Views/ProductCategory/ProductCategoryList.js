@@ -26,6 +26,7 @@ Ext.define('gigade.ProductCategoryModel', {
         { name: "category_updatedate", type: "string" },
         { name: "category_ipfrom", type: "string" },
          { name: "category_father_name", type: "string" },
+        { name: "short_description", type: "string" },
          { name: "status", type: "int" }
     ]
 });
@@ -259,7 +260,7 @@ onBack = function () {
                 Ext.getCmp("productCategoryGift").store.loadPage(1, {
                     params: {
                         father_id: fatherid,
-                       // search: Ext.getCmp("search").getValue()
+                        // search: Ext.getCmp("search").getValue()
                     }
                 });
             },

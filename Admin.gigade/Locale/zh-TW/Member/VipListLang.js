@@ -2,7 +2,7 @@
 NOW_DISPLAY_RECORD = "當前顯示記錄";
 NOTHING_DISPLAY = "沒有記錄可以顯示";
 //grid
-USERID = "編號";
+USERID = "會員編號";
 USERNAME = "姓名";
 USERGENDER = "性別";
 MAN = "先生";

@@ -7,6 +7,7 @@ Ext.define('gigade.EdmContentNew', {
     { name: "subject", type: "string" },
     { name: "template_id", type: "int" },
     { name: "template_data", type: "string" },
+      { name: "template_data_send", type: "string" },
     { name: "importance", type: "int" },
     { name: "sender_id", type: "int" },
     { name: "content_createdate", type: "string" },
@@ -201,7 +202,7 @@ onGoSendClick = function () {
                     Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
                 }
                 else {
-                    row[0].data.template_data = data.responseText;
+                    row[0].data.template_data_send = data.responseText;
                     sendFunction(row[0], EdmContentNewStore);
                 }
             },

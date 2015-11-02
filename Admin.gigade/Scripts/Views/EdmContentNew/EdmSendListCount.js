@@ -5,18 +5,17 @@
         fields: [
         { name: "success", type: "int" },
         { name: "name", type: "string" },
-        { name: "pic", type: "string" },
         { name: "first_traceback", type: "string" },
         { name: "last_traceback", type: "string" },
         { name: "count", type: "int" },
-       { name: "request_createdate", type: "stirng" },
+       { name: "send_date", type: "stirng" },
          { name: "email", type: "stirng" },
 
 
         ]
     });
     EdmSendListCountStore = Ext.create('Ext.data.Store', {
-        autoDestroy: true,
+        autoLoad: true,
         pageSize: 25,
         model: 'gigade.EdmSendListCount',
         proxy: {
@@ -29,11 +28,37 @@
             }
         }
     });
+    Ext.define('gigade.CreatedateAndLogId02', {
+        extend: 'Ext.data.Model',
+        fields: [
+        { name: "log_id", type: "int" },
+        { name: "createdate", type: "string" },
+        ]
+    });
+    CreatedateAndLogIdStore02 = Ext.create('Ext.data.Store', {
+        model: 'gigade.CreatedateAndLogId02',
+        autoLoad: true,
+        proxy: {
+            type: 'ajax',
+            url: '/EdmNew/CreatedateAndLogId',
+            reader: {
+                type: 'json',
+                root: 'data',
+            }
+        }
+    });
 
+    CreatedateAndLogIdStore02.on('beforeload', function () {
+        Ext.apply(CreatedateAndLogIdStore02.proxy.extraParams,
+        {
+            content_id: document.getElementById('content_id').value,
+        });
+    });
     EdmSendListCountStore.on('beforeload', function () {
         Ext.apply(EdmSendListCountStore.proxy.extraParams,
         {
-            content_id: document.getElementById('content_id').value
+            content_id: document.getElementById('content_id').value,
+            log_id: Ext.getCmp('log_id').getValue(),
         });
     });
 
@@ -45,6 +70,24 @@
         bodyPadding: 10,
         width: document.documentElement.clientWidth,
         items: [
+                        {
+                            xtype: 'combobox',
+                            store: CreatedateAndLogIdStore02,
+                            displayField: 'createdate',
+                            valueField: 'log_id',
+                            id: 'log_id',
+                            fieldLabel: '電子報統計報表',
+                            lastQuery: '',
+                            editable: false,
+                            listeners: {
+                                select: function () {
+                                    var log_id = Ext.getCmp('log_id').getValue();
+                                    EdmSendListCountStore.load();
+                                    load();
+
+                                }
+                            }
+                        },
                 {
                     xtype: 'displayfield',
                     value: '<span style="color:white;color:green;font-size:20px;margin-left: 200px">開　信　狀　況　統　計　摘　要</span>'
@@ -200,22 +243,31 @@
                    {
                        header: "信箱", dataIndex: 'email', width: 260, align: 'center'
                    },
-
-                {
-                    header: " 圖表", dataIndex: 'pic', width: 80, align: 'center'
-                },
                  {
                      header: "開信次數", dataIndex: 'count', width: 80, align: 'center'
                  },
                   {
-                      header: "寄送時間", dataIndex: 'request_createdate', width: 150, align: 'center'
+                      header: "寄送時間", dataIndex: 'send_date', width: 150, align: 'center'
                   },
 
                 {
-                    header: "首次開信時間", dataIndex: 'first_traceback', width: 150, align: 'center'
+                    header: "首次開信時間", dataIndex: 'first_traceback', width: 150, align: 'center', renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                        if(record.data.count==0){
+                            return "-";
+                        }
+                        else {
+                            return value;
+                        }
+                    }
                 },
                 {
-                    header: "最近開信時間", dataIndex: 'last_traceback', width: 150, align: 'center'
+                    header: "最近開信時間", dataIndex: 'last_traceback', width: 150, align: 'center', renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                        if (record.data.count == 0) {
+                            return "-";
+                        } else {
+                            return value;
+                        }
+                    }
                 },
 
         ],
@@ -264,6 +316,7 @@
         autoScroll: true,
         listeners: {
             resize: function () {
+                Ext.getCmp('log_id').setValue(document.getElementById('log_id').value)
                 EdmSendListCountGrid.width = document.documentElement.clientWidth;
                 Ext.getCmp('edm_send').setDisabled(true);
                 Ext.getCmp('edm_list').setDisabled(false);
@@ -272,6 +325,7 @@
             }
         }
     });
+    EdmSendListCountStore.load();
     //QueryAuthorityByUrl('/EdmNew/EdmContentNewReport');
 });
 
@@ -281,6 +335,7 @@ function load() {
         url: '/EdmNew/Load',
         params: {
             content_id: content_id,
+            log_id:Ext.getCmp('log_id').getValue(),
         },
         success: function (form, action) {
             var result = Ext.decode(form.responseText);
@@ -313,17 +368,20 @@ function load() {
 
 function onOpen_downloadClick() {
     var content_id = document.getElementById('content_id').value;
-    window.open("/EdmNew/ImportKXMD?content_id=" + content_id);
+    var log_id = Ext.getCmp('log_id').getValue();
+    window.open("/EdmNew/ImportKXMD?content_id=" + content_id+"&log_id="+log_id);
 }
 
 function onClose_downloadClick() {
+    var log_id = Ext.getCmp('log_id').getValue();
     var content_id = document.getElementById('content_id').value;
-    window.open("/EdmNew/ImportWKXMD?content_id=" + content_id);
+    window.open("/EdmNew/ImportWKXMD?content_id=" + content_id + "&log_id=" + log_id);
 }
 
 function onEdm_listClick() {
     var content_id = document.getElementById("content_id").value;
-    var urlTran = '/EdmNew/EdmContentNewReport?content_id=' + content_id;
+    var log_id = Ext.getCmp('log_id').getValue();
+    var urlTran = '/EdmNew/EdmContentNewReport?content_id=' + content_id + "&log_id=" + log_id;
     var panel = window.parent.parent.Ext.getCmp('ContentPanel');
     var copy = panel.down('#EdmListGrid');
     if (copy) {
@@ -341,6 +399,7 @@ function onEdm_listClick() {
 
 function onEdm_sendClick() {
     var content_id = document.getElementById("content_id").value;
+   
     var urlTran = '/EdmNew/EdmSendListCountView?content_id=' + content_id;
     var panel = window.parent.parent.Ext.getCmp('ContentPanel');
     var copy = panel.down('#EdmSendListCount');

@@ -18,7 +18,7 @@ Ext.define('GIGADE.VendorList', {
         { name: "vendor_name_simple", type: "string" },
         { name: "checkout_type", type: "string" },
         { name: "agr_date", type: "string" },
-        { name: "agr_start", type: "string" }, 
+        { name: "agr_start", type: "string" },
         { name: "agr_end", type: "string" },
         { name: "freight_normal_limit", type: "decimal" },
         { name: "freight_normal_money", type: "decimal" },
@@ -35,6 +35,7 @@ Ext.define('GIGADE.VendorList', {
         { name: "vendor_confirm_code", type: "string" },
         { name: "vendor_note", type: "string" },
         { name: "vendor_login_attempts", type: "int" },
+        { name: "assist", type: "int" },
         { name: "product_manage", type: "int" },
         { name: "gigade_bunus_percent", type: "int" },
         { name: "gigade_bunus_threshold", type: "int" },
@@ -314,7 +315,7 @@ Ext.onReady(function () {
                           name: 'dateOne',
                           format: 'Y-m-d',
                           submitValue: true,
-                          editable:false,
+                          editable: false,
                           listeners: {
                               select: function (a, b, c) {
                                   var start = Ext.getCmp("dateOne");

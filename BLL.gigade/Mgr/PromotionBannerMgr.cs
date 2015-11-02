@@ -13,13 +13,15 @@ namespace BLL.gigade.Mgr
 {
     public class PromotionBannerMgr
     {
-        private PromotionBannerDao _promotionBannerDao;       
+        private PromotionBannerDao _promotionBannerDao;
+        private PromotionBannerRelationDao _promotionBannerRelationDao;
         private MySqlDao _mysqlDao;
         private VendorBrandDao _vendorBrandDao;
         private IDBAccess _accessMySql;
         public PromotionBannerMgr(string connectionStr)
-        {            
-            _promotionBannerDao = new PromotionBannerDao(connectionStr);           
+        {
+            _promotionBannerDao = new PromotionBannerDao(connectionStr);
+            _promotionBannerRelationDao = new PromotionBannerRelationDao(connectionStr);
             _mysqlDao = new MySqlDao(connectionStr);
             _vendorBrandDao = new VendorBrandDao(connectionStr);
             _accessMySql = DBFactory.getDBAccess(DBType.MySql, connectionStr);
@@ -32,26 +34,24 @@ namespace BLL.gigade.Mgr
                 strSql.AppendFormat(@" ");
                 if (query.brand_name != string.Empty)
                 {
-                    string sql_getID = _vendorBrandDao.GetBrand_idByBrand_name(query.brand_name);
+                    VendorBrandQuery vb_query = new VendorBrandQuery();
+                    vb_query.Brand_Name = query.brand_name;
+                    string sql_getID = _vendorBrandDao.GetBrand_idByBrand_name(vb_query);
                     DataTable dt = _accessMySql.getDataTable(sql_getID);
+                    string id = string.Empty;
                     if (dt.Rows.Count > 0 && dt != null)
                     {
                         for (int i = 0; i < dt.Rows.Count; i++)
                         {
-                            string id = dt.Rows[i][0].ToString();
-                            if (i == 0)
-                            {
-                                strSql.AppendFormat(" AND ((brand_id LIKE N'{0},%' or brand_id LIKE N'%,{0},%'or brand_id LIKE N'%,{0}'  or brand_id ='{0}')", id);
-                            }
-                            else
-                            {
-                                strSql.AppendFormat(" OR (brand_id LIKE N'{0},%' or brand_id LIKE N'%,{0},%'or brand_id LIKE N'%,{0}'  or brand_id ='{0}')", id);
-                            }
+                            id += dt.Rows[i][0].ToString() + ",";
+
                         }
-                        strSql.AppendFormat(")");
+                        id = id.Substring(0, id.LastIndexOf(','));
+                        strSql.AppendFormat(" AND pbr.brand_id in({0})", id);
                     }
-                    else {
-                        strSql.AppendFormat(" AND ((brand_id LIKE N'{0},%' or brand_id LIKE N'%,{0},%'or brand_id LIKE N'%,{0}'  or brand_id ='{0}')", -1);
+                    else
+                    {
+                        strSql.AppendFormat(" AND pbr.brand_id in({0})", -1);
                     }
                 }
                 return _promotionBannerDao.GetPromotionBannerList(query, strSql.ToString(), out totalCount);
@@ -63,23 +63,48 @@ namespace BLL.gigade.Mgr
         }
 
         #region 更改促銷圖片信息
-        public int UpdateImageInfo(PromotionBannerQuery query, out int brand_id)
+        public bool UpdateImageInfo(PromotionBannerQuery query, out uint brand_id)
         {
             brand_id = 0;
+            ArrayList arr = new ArrayList();
+            string[] bids = null;
             try
             {
+                if (query.brandIDS != string.Empty)
+                {
+                    bids = query.brandIDS.Split(',');
+                }
                 if (query.multi == 0)//不允許一個品牌多個促銷圖的話要檢查，否則不檢查
                 {
-                    string[] bids = query.brand_id.Split(',');
-                    query.date_start = query.pb_startdate;
-                    query.date_end = query.pb_enddate;
-                    AllowShowOrNot(query, bids, out brand_id);
-                    if (brand_id != 0)
+                    if (bids != null)
                     {
-                        return -1;//品牌编号在該促銷圖片顯示期間已有其他促銷圖片 且已啟用
+                        query.date_start = query.pb_startdate;
+                        query.date_end = query.pb_enddate;
+                        AllowShowOrNot(query, bids, out brand_id);
+                        if (brand_id != 0)
+                        {
+                            return false;//品牌编号在該促銷圖片顯示期間已有其他促銷圖片 且已啟用
+                        }
+                    }
+
+                }
+                PromotionBannerRelationQuery pbr_query = new PromotionBannerRelationQuery();
+                pbr_query.pb_id = query.pb_id;
+                arr.Add(_promotionBannerRelationDao.DeleteBrand(pbr_query));
+                if (bids != null)
+                {
+                    for (int i = 0; i < bids.Length; i++)
+                    {
+                        if (bids[i] != string.Empty)
+                        {
+                            pbr_query.brand_id = Convert.ToUInt32(bids[i]);
+                            arr.Add(_promotionBannerRelationDao.AddBrand(pbr_query));
+                        }
                     }
                 }
-                return _promotionBannerDao.UpdateImageInfo(query);
+
+                arr.Add(_promotionBannerDao.UpdateImageInfo(query));
+                return _mysqlDao.ExcuteSqls(arr);
             }
             catch (Exception ex)
             {
@@ -89,23 +114,53 @@ namespace BLL.gigade.Mgr
         #endregion
 
         #region 新增促銷圖片
-        public int AddImageInfo(PromotionBannerQuery query,out int brand_id)
+        public bool AddImageInfo(PromotionBannerQuery query, out uint brand_id)
         {
             brand_id = 0;
+            ArrayList arr = new ArrayList();
+            string[] bids = null;
             try
             {
+                if (query.brandIDS != string.Empty)
+                {
+                    bids = query.brandIDS.Split(',');
+                }
                 if (query.multi == 0)//不允許一個品牌多個促銷圖的話要檢查，否則不檢查
                 {
-                    string[] bids = query.brand_id.Split(',');
-                    query.date_start = query.pb_startdate;
-                    query.date_end = query.pb_enddate;
-                    AllowShowOrNot(query, bids, out brand_id);
-                    if (brand_id != 0)
+                    if (bids != null)
                     {
-                        return -1;//品牌编号在該促銷圖片顯示期間已有其他促銷圖片 且已啟用
+                        query.date_start = query.pb_startdate;
+                        query.date_end = query.pb_enddate;
+                        AllowShowOrNot(query, bids, out brand_id);
+                        if (brand_id != 0)
+                        {
+                            return false;//品牌编号在該促銷圖片顯示期間已有其他促銷圖片 且已啟用
+                        }
                     }
                 }
-                return _promotionBannerDao.AddImageInfo(query);
+                int result = _promotionBannerDao.AddImageInfo(query);
+                if (result > 0)
+                {
+                    PromotionBannerQuery model = _promotionBannerDao.GetNewPb_id();
+                    PromotionBannerRelationQuery pbr_query = new PromotionBannerRelationQuery();
+                    pbr_query.pb_id = model.pb_id;
+                    if (bids != null)
+                    {
+                        for (int i = 0; i < bids.Length; i++)
+                        {
+                            if (bids[i] != string.Empty)
+                            {
+                                pbr_query.brand_id = Convert.ToUInt32(bids[i]);
+                                arr.Add(_promotionBannerRelationDao.AddBrand(pbr_query));
+                            }
+                        }
+                    }
+                    return _mysqlDao.ExcuteSqls(arr);
+                }
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -115,7 +170,7 @@ namespace BLL.gigade.Mgr
         #endregion
 
         #region 更改促銷圖片狀態
-        public int UpdateStatus(PromotionBannerQuery query, out int brand_id)
+        public int UpdateStatus(PromotionBannerQuery query, out uint brand_id)
         {
             try
             {
@@ -127,13 +182,19 @@ namespace BLL.gigade.Mgr
                     {
                         if (query.pb_status == 1)
                         {
-                            PromotionBannerQuery model = _promotionBannerDao.GetModelById(query.pb_id);
+                            List<PromotionBannerQuery> model = _promotionBannerDao.GetModelById(query.pb_id);
                             DataTable dt = new DataTable();
-                            query.date_start = model.pb_startdate;
-                            query.date_end = model.pb_enddate;
-                            if (model != null && model.brand_id != string.Empty)
+                            query.date_start = model[0].pb_startdate;
+                            query.date_end = model[0].pb_enddate;
+                            string brandIDS = string.Empty;
+                            for (int i = 0; i < model.Count; i++)
                             {
-                                string[] bids = model.brand_id.Split(',');
+                                brandIDS += model[i].singleBrand_id + ",";
+                            }
+                            brandIDS = brandIDS.Substring(0, brandIDS.LastIndexOf(','));
+                            if (model != null && brandIDS != string.Empty)
+                            {
+                                string[] bids = brandIDS.Split(',');
                                 AllowShowOrNot(query, bids, out brand_id);
                                 if (brand_id != 0)
                                 {
@@ -177,15 +238,20 @@ namespace BLL.gigade.Mgr
 
                 throw new Exception("PromotionBannerMgr-->CanModify-->" + ex.Message, ex);
             }
-        } 
+        }
         #endregion
 
         #region 刪除促銷圖片
-        public int DeleteImage(PromotionBannerQuery query)
+        public bool DeleteImage(PromotionBannerQuery query)
         {
             try
             {
-                return _accessMySql.execCommand(_promotionBannerDao.DeleteImage(query));               
+                ArrayList arr = new ArrayList();
+                PromotionBannerRelationQuery pbr_query = new PromotionBannerRelationQuery();
+                pbr_query.pb_id = query.pb_id;
+                arr.Add(_promotionBannerRelationDao.DeleteBrand(pbr_query));
+                arr.Add(_promotionBannerDao.DeleteImage(query));
+                return _mysqlDao.ExcuteSqls(arr);
             }
             catch (Exception ex)
             {
@@ -200,11 +266,17 @@ namespace BLL.gigade.Mgr
         {
             try
             {
-                PromotionBannerQuery model = _promotionBannerDao.GetModelById(query.pb_id);
-                if (model != null && model.brand_id != string.Empty)
+                List<PromotionBannerQuery> model = _promotionBannerDao.GetModelById(query.pb_id);
+                string brandIDS = string.Empty;
+                for (int i = 0; i < model.Count; i++)
                 {
-                    int id = 0;
-                    List<VendorBrand> vb_store = _vendorBrandDao.GetBrandListByIds(model.brand_id, id);
+                    brandIDS += model[i].singleBrand_id + ",";
+                }
+                brandIDS = brandIDS.Substring(0, brandIDS.LastIndexOf(','));
+                if (model != null && brandIDS != string.Empty)
+                {
+                    uint id = 0;
+                    List<VendorBrand> vb_store = _vendorBrandDao.GetBrandListByIds(brandIDS, id);
                     return vb_store;
                 }
                 else
@@ -221,7 +293,7 @@ namespace BLL.gigade.Mgr
         #endregion
 
         #region 獲取單個對象
-        public PromotionBannerQuery GetModelById(int id)
+        public List<PromotionBannerQuery> GetModelById(int id)
         {
             try
             {
@@ -236,49 +308,36 @@ namespace BLL.gigade.Mgr
         #endregion
 
         #region 檢查品牌編號是否已有促銷圖片且已啟用，有的話返回品牌編號
-        public void AllowShowOrNot(PromotionBannerQuery query, string[] bids, out int brand_id)
+        public void AllowShowOrNot(PromotionBannerQuery query, string[] bids, out uint brand_id)
         {
             brand_id = 0;
             try
             {
-                if (query.pb_enddate != DateTime.MinValue && query.pb_enddate < DateTime.Now)
+                string pb_ids = string.Empty;
+                DataTable dt = _promotionBannerDao.GetUsingImageInTimeArea(query);
+                if (dt != null && dt.Rows.Count > 0)
                 {
-                    return;
-                }
-                DataTable dt = new DataTable();
-                for (int i = 0; i < bids.Length; i++)
-                {
-                    if (bids[i] != string.Empty)
+                    for (int i = 0; i < dt.Rows.Count; i++)
                     {
-                        query.singleBrand_id = Convert.ToInt32(bids[i]);
-                        dt = _promotionBannerDao.GetUsingImage(query);
-                        if (query.changeMode == 0)
-                        {
-                            if (dt != null && dt.Rows.Count > 0)
-                            {
-                                brand_id = query.singleBrand_id;
-                                return;//品牌编号在該促銷圖片顯示期間已有其他促銷圖片 且已啟用
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                        }
-                        else {
-                            if (dt != null && dt.Rows.Count >1)
-                            {
-                                brand_id = query.singleBrand_id;
-                                return;//品牌编号在該促銷圖片顯示期間已有其他促銷圖片 且已啟用
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                        }
+                        pb_ids += dt.Rows[i]["pb_id"] + ",";
                     }
-                    else
+                    pb_ids = pb_ids.Substring(0, pb_ids.LastIndexOf(","));
+                    List<PromotionBannerRelationQuery> pbr_store = _promotionBannerRelationDao.GetBrandIds(pb_ids, string.Empty);
+                    for (int a = 0; a < bids.Length; a++)
                     {
-                        return;
+                        if (bids[a] != string.Empty)
+                        {
+                            query.singleBrand_id = Convert.ToUInt32(bids[a]);
+                        }
+                        for (int b = 0; b < pbr_store.Count; b++)
+                        {
+                            if (query.singleBrand_id == pbr_store[b].brand_id)
+                            {
+                                brand_id = (uint)query.singleBrand_id;
+                                return;
+                                //品牌编号在該促銷圖片顯示期間已有其他促銷圖片 且已啟用
+                            }
+                        }
                     }
                 }
             }
@@ -286,7 +345,7 @@ namespace BLL.gigade.Mgr
             {
                 throw new Exception("PromotionBannerMgr-->AllowShowOrNot-->" + ex.Message, ex);
             }
-        } 
+        }
         #endregion
 
         #region 查詢品牌名稱
@@ -297,7 +356,7 @@ namespace BLL.gigade.Mgr
                 VendorBrandQuery vb_query = new VendorBrandQuery();
                 vb_query.Brand_Id = (uint)query.singleBrand_id;
                 List<VendorBrand> exits = _vendorBrandDao.GetVendorBrand(vb_query);//查詢是否有這個品牌編號
-                int brand_id = 0;
+                uint brand_id = 0;
                 string brand_name = string.Empty;
                 if (exits.Count != 0)
                 {
@@ -327,45 +386,87 @@ namespace BLL.gigade.Mgr
             {
                 throw new Exception("PromotionBannerRelationMgr-->GetBrandName-->" + ex.Message, ex);
             }
-        } 
+        }
         #endregion
 
         #region 是否允許一個品牌有多張促銷圖片
-        public int AllowMultiOrNot(PromotionBannerQuery query,out int id)
+        public int AllowMultiOrNot(PromotionBannerQuery query, out uint id)
         {
             int result = 0;
             id = 0;
             try
             {
-                List<PromotionBannerQuery> store = _promotionBannerDao.ShowUsingImage();
-                StringBuilder bids = new StringBuilder();
-                DataTable dt = new DataTable();
-                foreach (var item in store)
+                DataTable Using_Image = _promotionBannerDao.ShowUsingImage();
+                if (Using_Image==null||Using_Image.Rows.Count==0)
                 {
-                    bids.AppendFormat("{0},", item.brand_id);
+                    return 0;
                 }
-                string s = bids.ToString().Substring(0, bids.ToString().LastIndexOf(','));
-                string[] brand_ids = s.Split(',');
-                for (int i = 0; i < brand_ids.Length; i++)
+                StringBuilder bids = new StringBuilder();
+                string pb_ids = string.Empty;
+                for (int a = 0; a < Using_Image.Rows.Count; a++)
                 {
-                    dt = _promotionBannerDao.SearchImages(brand_ids[i]);
-                    if (dt.Rows.Count > 1)
+                    if (!string.IsNullOrEmpty(Using_Image.Rows[a]["pb_startdate"].ToString()))
                     {
-                        for (int j = 0; j < dt.Rows.Count; j++)
+                        query.date_start = Convert.ToDateTime(Using_Image.Rows[a]["pb_startdate"].ToString());
+                    }
+                    if (!string.IsNullOrEmpty(Using_Image.Rows[a]["pb_enddate"].ToString()))
+                    {
+                        query.date_end = Convert.ToDateTime(Using_Image.Rows[a]["pb_enddate"].ToString());
+                    }
+
+                    for (int b = Using_Image.Rows.Count - 1; b > a; b--)
+                    {
+                        DateTime pb_startdate = Convert.ToDateTime(Using_Image.Rows[b]["pb_startdate"].ToString());
+                        DateTime pb_enddate = Convert.ToDateTime(Using_Image.Rows[b]["pb_enddate"].ToString());
+                        if (pb_startdate <= query.date_start && pb_enddate >= query.date_end ||
+                            pb_startdate <= query.date_start && pb_enddate >= query.date_start ||
+                            pb_startdate >= query.date_start && pb_enddate <= query.date_end ||
+                            pb_startdate >= query.date_start && pb_startdate <= query.date_end && pb_enddate >= query.date_end)
                         {
-                            if (!string.IsNullOrEmpty(dt.Rows[j]["pb_startdate"].ToString()))
+                            if (pb_ids == string.Empty)
                             {
-                                query.date_start = Convert.ToDateTime(dt.Rows[j]["pb_startdate"]);
+                                pb_ids = Using_Image.Rows[b]["pb_id"].ToString();
                             }
-                            if (!string.IsNullOrEmpty(dt.Rows[j]["pb_enddate"].ToString()))
+                            else
                             {
-                                query.date_end = Convert.ToDateTime(dt.Rows[j]["pb_enddate"]);
+                                pb_ids += "," + Convert.ToInt32(Using_Image.Rows[b]["pb_id"].ToString());
                             }
-                            string[] single_bid = brand_ids[i].ToString().Split(',');
-                            AllowShowOrNot(query, single_bid, out id);
-                            if (id != 0)
+                        }
+                    }
+                }
+                if (pb_ids != string.Empty)
+                {
+                    List<PromotionBannerRelationQuery> pbr_store = _promotionBannerRelationDao.GetBrandIds(pb_ids, string.Empty);
+                    if (pbr_store.Count > 0)
+                    {
+                        for (int i = 0; i < pbr_store.Count; i++)
+                        {
+                            List<PromotionBannerRelationQuery> pbr_store_two = _promotionBannerRelationDao.GetBrandIds(pb_ids, pbr_store[i].brand_id.ToString());
+                            bool condition = false;
+                            if (!string.IsNullOrEmpty(pbr_store[i].brand_id.ToString()))
                             {
-                                return result = 1; //品牌编号在該促銷圖片顯示期間已有其他促銷圖片 且已啟用
+                                condition = pbr_store_two.Count > 0 ? true : false;
+                            }
+                            else
+                            {
+                                condition = pbr_store_two.Count > 1 ? true : false;
+                            }
+                            if (condition)
+                            {
+                                query.singleBrand_id = pbr_store[i].brand_id;
+                                List<PromotionBannerQuery> model = _promotionBannerDao.GetModelById(pbr_store[i].pb_id);
+                                if (model != null)
+                                {
+                                    query.date_start = model[0].pb_startdate;
+                                    query.date_end = model[0].pb_enddate;
+                                    query.pb_id = pbr_store[i].pb_id;
+                                    DataTable repet_dt = _promotionBannerDao.GetUsingImageInTimeArea(query);
+                                    if (repet_dt.Rows.Count > 0)
+                                    {
+                                        id = pbr_store[i].brand_id;
+                                        return result = 1; //品牌编号在該促銷圖片顯示期間已有其他促銷圖片 且已啟用
+                                    }
+                                }
                             }
                         }
                     }
@@ -376,7 +477,7 @@ namespace BLL.gigade.Mgr
             {
                 throw new Exception("PromotionBannerRelationMgr-->AllowMultiOrNot-->" + ex.Message, ex);
             }
-        } 
+        }
         #endregion
 
     }

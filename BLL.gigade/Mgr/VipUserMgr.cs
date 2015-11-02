@@ -44,16 +44,34 @@ namespace BLL.gigade.Mgr
             {
                 query.updatedate = Convert.ToUInt32(Common.CommonFunction.GetPHPTime(DateTime.Now.ToString()));
                 sql = _vipUserDao.UpdateState(query);
-                UserLifeDao _userLifeDao = new UserLifeDao(conn);
-                if (query.status == 1)//z狀態改為鎖定時記錄會員取消電子報的時間和操作人
+                if (query.user_id == 0)
                 {
-                    //將取消電子報的時間和人員加入會員生活信息表（user_life）edit by shuangshuang0420j 20150814 11:00
-                  
-                    sql = sql + _userLifeDao.UpdateEdmTime(query.user_id, query.updatedate, (int)query.update_id);
+                    VipUser vimodel = new VipUser();
+                    vimodel = _dbAccess.getSinggleObj<VipUser>(_vipUserDao.GetSingleByID(Convert.ToInt32(query.v_id)));
+                    if (vimodel != null)
+                    {
+                        query.user_id = vimodel.user_id;
+                    }
                 }
-                else if (query.user_status == 0)//狀態改為解鎖時清空會員取消電子報的信息
+                if (query.user_id != 0)
                 {
-                    sql = sql + _userLifeDao.UpdateEdmTime(query.user_id, 0, (int)query.update_id);
+                    UserLifeDao _userLifeDao = new UserLifeDao(conn);
+
+                    if (query.status == 1)//z狀態改為鎖定時記錄會員取消電子報的時間和操作人
+                    {
+                        //將取消電子報的時間和人員加入會員生活信息表（user_life）edit by shuangshuang0420j 20150814 11:00
+                        UserLife modelUF = new UserLife();
+                        modelUF = _userLifeDao.GetSingle(query.user_id, "cancel_edm_time");
+                        if (modelUF != null)
+                        {
+                            sql = sql + _userLifeDao.UpdateEdmTime(query.user_id, 0, (int)query.update_id);
+                        }
+                        sql = sql + _userLifeDao.UpdateEdmTime(query.user_id, query.updatedate, (int)query.update_id);
+                    }
+                    else if (query.user_status == 0)//狀態改為解鎖時清空會員取消電子報的信息
+                    {
+                        sql = sql + _userLifeDao.UpdateEdmTime(query.user_id, 0, (int)query.update_id);
+                    }
                 }
                 result = _dbAccess.execCommand(sql);
                 return result;
@@ -109,7 +127,7 @@ namespace BLL.gigade.Mgr
                         sqlUpdate = _vipUserDao.UpdateBlackList(query);
                         //將取消電子報的時間和人員加入會員生活信息表（user_life）edit by shuangshuang0420j 20150814 11:00
                         UserLifeDao _userLifeDao = new UserLifeDao(conn);
-                      
+
                         sqlUpdate = sqlUpdate + _userLifeDao.UpdateEdmTime(userID, phpTime, (int)update_id);
 
                         return _dbAccess.execCommand(sqlUpdate);

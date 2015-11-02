@@ -114,8 +114,8 @@
 
                               {
                                   xtype: 'displayfield',
-                                  id: 'template_data',
-                                  name: 'template_data',
+                                  id: 'template_data_send',
+                                  name: 'template_data_send',
                                   fieldLabel: 'template_data',
                                   hidden: true,
                               },
@@ -137,7 +137,7 @@
                                     sender_email: Ext.getCmp('sender_email').getValue(),
                                     sender_name: Ext.getCmp('sender_name').getValue(),
                                     subject: Ext.getCmp('subject').getValue(),
-                                    body: Ext.getCmp('template_data').getValue(),
+                                    body: Ext.getCmp('template_data_send').getValue(),
 
                                 },
                                 success: function (form, action) {
@@ -341,7 +341,7 @@
                                                   sender_email: Ext.getCmp('sender_email').getValue(),
                                                   sender_name: Ext.getCmp('sender_name').getValue(),
                                                   subject: Ext.getCmp('subject').getValue(),
-                                                  body: Ext.getCmp('template_data').getValue(),
+                                                  body: Ext.getCmp('template_data_send').getValue(),
                                                   schedule_date: Ext.getCmp('schedule_date').getValue(),
                                                   expire_date: Ext.getCmp('expire_date').getValue(),
                                                   elcm_id: Ext.getCmp('elcm').getValue(),
@@ -415,7 +415,7 @@
                 Ext.getCmp('sender_name').setValue(row.data.sender_name);
                 Ext.getCmp('group_id').setValue(row.data.group_id);
                 Ext.getCmp('subject').setValue(row.data.subject);
-                Ext.getCmp('template_data').setValue(row.data.template_data);
+                Ext.getCmp('template_data_send').setValue(row.data.template_data_send);
             }
         }
     });

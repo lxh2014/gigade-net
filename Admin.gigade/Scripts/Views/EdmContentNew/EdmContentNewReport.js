@@ -25,10 +25,43 @@
         }
     });
 
+
+    Ext.define('gigade.CreatedateAndLogId', {
+        extend: 'Ext.data.Model',
+        fields: [
+        { name: "log_id", type: "int" },
+        { name: "createdate", type: "string" },
+         ]
+    });
+    CreatedateAndLogIdStore = Ext.create('Ext.data.Store', {
+        model: 'gigade.CreatedateAndLogId',
+        autoLoad:true,
+        proxy: {
+            type: 'ajax',
+            url: '/EdmNew/CreatedateAndLogId',
+            reader: {
+                type: 'json',
+                root: 'data',
+            }
+        }
+    });
+
+
+
+
+
+    CreatedateAndLogIdStore.on('beforeload', function () {
+        Ext.apply(CreatedateAndLogIdStore.proxy.extraParams,
+        {
+            content_id: document.getElementById('content_id').value,
+        });
+    });
+
     EdmContentNewReportStore.on('beforeload', function () {
         Ext.apply(EdmContentNewReportStore.proxy.extraParams,
         {
             content_id: document.getElementById('content_id').value,
+            log_id: Ext.getCmp('log_id').getValue(),
         });
     });
 
@@ -39,6 +72,24 @@
         bodyPadding: 10,
         width: document.documentElement.clientWidth,
         items: [
+               {
+                   xtype: 'combobox',
+                   store: CreatedateAndLogIdStore,
+                   displayField: 'createdate',
+                   valueField: 'log_id',
+                   id:'log_id',
+                   fieldLabel: '電子報統計報表',
+                   lastQuery:'',
+                   editable: false,
+                   listeners: {
+                       select: function () {
+                           var log_id = Ext.getCmp('log_id').getValue();
+                           load();
+                           EdmContentNewReportStore.load();
+
+                       }
+                   }
+               },
                 {
                     xtype: 'displayfield',
                     value: '<span style="color:white;color:green;font-size:20px;margin-left: 200px">開　信　狀　況　統　計　摘　要</span>'
@@ -221,6 +272,16 @@
         listeners: {
             resize: function () {
                 EdmListGrid.width = document.documentElement.clientWidth;
+                var log_id = document.getElementById('log_id').value;
+                if (log_id != "" && log_id != 0) {
+                    Ext.getCmp('log_id').setValue(log_id)
+                } else {
+                    CreatedateAndLogIdStore.on('load', function () {
+                        Ext.getCmp('log_id').select(CreatedateAndLogIdStore.getAt(0));
+                        load();
+                        EdmContentNewReportStore.load();
+                    });
+                }
                 load();
                 this.doLayout();
             }
@@ -235,6 +296,7 @@ function load() {
         url: '/EdmNew/Load',
         params: {
             content_id: content_id,
+            log_id: Ext.getCmp('log_id').getValue(),
         },
         success: function (form, action) {
             var result = Ext.decode(form.responseText);
@@ -267,16 +329,21 @@ function load() {
 
 function onOpen_downloadClick() {
     var content_id = document.getElementById('content_id').value;
-    window.open("/EdmNew/ImportKXMD?content_id=" + content_id);
+    var log_id = Ext.getCmp('log_id').getValue();
+    window.open("/EdmNew/ImportKXMD?content_id=" + content_id + "&log_id=" + log_id);
 }
 
 function onClose_downloadClick() {
+    var log_id = Ext.getCmp('log_id').getValue();
     var content_id = document.getElementById('content_id').value;
-    window.open("/EdmNew/ImportWKXMD?content_id=" + content_id);
+    window.open("/EdmNew/ImportWKXMD?content_id=" + content_id + "&log_id=" + log_id);
 }
+
 function onEdm_sendClick() {
     var content_id = document.getElementById("content_id").value;
-    var urlTran = '/EdmNew/EdmSendListCountView?content_id=' + content_id;
+    var log_id = Ext.getCmp('log_id').getValue();
+  
+    var urlTran = '/EdmNew/EdmSendListCountView?content_id=' + content_id + "&log_id=" + log_id;;
     var panel = window.parent.parent.Ext.getCmp('ContentPanel');
     var copy = panel.down('#EdmSendListCount');
     if (copy) {

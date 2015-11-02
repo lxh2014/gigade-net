@@ -278,7 +278,11 @@ namespace Admin.gigade.Controllers
                     if (!string.IsNullOrEmpty(Request.Params["enddate"]))
                     {
                         cq.banner_show_end = Convert.ToUInt32(CommonFunction.GetPHPTime(Request.Params["enddate"].ToString()));
-                    }
+                    } 
+                    if (!string.IsNullOrEmpty(Request.Params["short_description"]))
+                    {
+                        cq.short_description = Request.Params["short_description"].ToString();
+                    }                   
                     cq.category_ipfrom = CommonFunction.GetClientIP();
                     cq.category_createdate = Convert.ToUInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
                     cq.category_updatedate = Convert.ToUInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
@@ -466,8 +470,7 @@ namespace Admin.gigade.Controllers
                     }
 
                     cq.banner_link_url = Request.Params["banner_link_url"].ToString();
-
-
+                    cq.short_description = Request.Params["short_description"].ToString();
                     cq.banner_show_start = Convert.ToUInt32(CommonFunction.GetPHPTime(Request.Params["startdate"].ToString()));
 
                     cq.banner_show_end = Convert.ToUInt32(CommonFunction.GetPHPTime(Request.Params["enddate"].ToString()));
@@ -489,7 +492,7 @@ namespace Admin.gigade.Controllers
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
-                json = "{success:true,data:[]}";
+                json = "{success:false,data:[]}";
             }
             this.Response.Clear();
             this.Response.Write(json);

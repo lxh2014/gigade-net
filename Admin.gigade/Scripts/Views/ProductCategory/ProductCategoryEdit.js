@@ -232,7 +232,15 @@ editFunction = function (row, store, fatherid, fathername) {
                     }
                 }
             }
-        }
+        },
+            {
+                xtype: 'textareafield',
+                fieldLabel: '短文字說明 (300字內)',
+                id: 'short_description',
+                name: 'short_description',
+                width: 300,
+                maxLength: 300
+            }
         ],
         buttons: [{
             formBind: true,
@@ -255,16 +263,15 @@ editFunction = function (row, store, fatherid, fathername) {
                             banner_link_mode: Ext.htmlEncode(Ext.getCmp('banner_link_mode').getValue().banner_status),
                             banner_link_url: Ext.htmlEncode(Ext.getCmp('banner_link_url').getValue()),
                             startdate: Ext.htmlEncode(Ext.getCmp('startdate').getRawValue()),
-                            enddate: Ext.htmlEncode(Ext.getCmp('enddate').getRawValue())
+                            enddate: Ext.htmlEncode(Ext.getCmp('enddate').getRawValue()),
+                            short_description: Ext.htmlEncode(Ext.getCmp('short_description').getValue())
                         },
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
                             if (result.success) {
                                 Ext.Msg.alert(INFORMATION, SAVESUCCESS);
-
                                 ProductCategoryStore.load({ params: { father_id: Ext.getCmp('comboFrontCage_hide').getValue() == '' ? '' : Ext.htmlEncode(Ext.getCmp('comboFrontCage_hide').getValue()) } });
                                 editWin.close();
-
                             }
                             else {
                                 Ext.Msg.alert(INFORMATION, SAVEFILURE);

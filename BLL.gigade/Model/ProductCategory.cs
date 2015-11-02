@@ -27,6 +27,7 @@ namespace BLL.gigade.Model
         public uint category_updatedate { get; set; }
         public string category_ipfrom { get; set; }
         public int status { get; set; }
+        public string short_description { get; set; }
         public ProductCategory()
         {
             category_id = 0;
@@ -48,6 +49,7 @@ namespace BLL.gigade.Model
             category_createdate = 0;
             category_updatedate = 0;
             category_ipfrom = string.Empty;
+            short_description = string.Empty;
             status = 0;
         }
     }
