@@ -7564,7 +7564,6 @@ namespace Admin.gigade.Controllers
                 Caller call = new Caller();
                 call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
                 int k = 0;
-                if (iarc_id == "NE")//庫存調整-不改動前台庫存
                 if (iarc_id == "NE" || iarc_id == "RF")//庫存調整-不改動前台庫存
                 {
                     k = 1;
