@@ -354,7 +354,9 @@
                                             cde_dt_var: Ext.htmlEncode(Ext.getCmp('cde_dt_var').getValue()),
                                             cde_dt_incr: cde_dt_incr,
                                             iarc_id: '',//不存值
-                                            doc_num:'',//庫調單號
+                                            doc_num: '',//庫調單號
+                                            Po_num: '',//前置單號
+                                            remark: '',//備註
                                             vendor_id: vendor_id
                                         },
                                         success: function (form, action) {

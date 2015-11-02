@@ -116,6 +116,22 @@
                 value: Ext.getCmp('doc_no').getValue(),
                 hidden:true
             },
+             {
+                 xtype: 'textfield',
+                 fieldLabel: "前置單號",
+                 name: 'Po_num',
+                 id: 'Po_num',
+                 value: Ext.getCmp('po_id').getValue(),
+                 hidden: true
+             },
+              {
+                  xtype: 'textfield',
+                  fieldLabel: "備註",
+                  name: 'remark',
+                  id: 'remark',
+                  value: Ext.getCmp('remarks').getValue(),
+                  hidden: true
+              },
             {
                 xtype: 'fieldcontainer',
                 fieldLabel: "製造日期",
@@ -351,7 +367,9 @@
                                              loc_id: Ext.getCmp('loc_id').getValue(),//主料位
                                              cde_dt_var: Ext.htmlEncode(Ext.getCmp('cde_dt_var').getValue()),
                                              cde_dt_incr: cde_dt_incr,
-                                             doc_num:Ext.getCmp('doc_num').getValue(),//庫調單號
+                                             doc_num: Ext.getCmp('doc_num').getValue(),//庫調單號
+                                             Po_num: Ext.getCmp('Po_num').getValue(),//前置單號
+                                             remark: Ext.getCmp('remark').getValue(),//備註
                                              iarc_id: Ext.getCmp('iarc_id').getValue(),
                                              vendor_id: vendor_id
                                          },

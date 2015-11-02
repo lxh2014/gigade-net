@@ -2648,6 +2648,7 @@ namespace Admin.gigade.Controllers
                 Iupc iu = new Iupc();
                 ProductItem proitem = new ProductItem();
                 Caller call = new Caller();
+                IstockChangeQuery stock = new IstockChangeQuery();
                 call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
                 string path = "";
                 _iinvd = new IinvdMgr(mySqlConnectionString);
@@ -2722,6 +2723,7 @@ namespace Admin.gigade.Controllers
                 #region 獲取數據添加打iialg
                 ia.loc_id = m.plas_loc_id.ToString().ToUpper();
                 ia.item_id = m.item_id;
+                stock.sc_trans_type = 0;
                 int type = 0;//庫存調整
                 if (!string.IsNullOrEmpty(Request.Params["iarc_id"].ToString()))
                 {
@@ -2730,7 +2732,8 @@ namespace Admin.gigade.Controllers
                 else
                 {
                     ia.iarc_id = "PC";
-                    type = 1;//收貨上架
+                    type = 1;
+                    stock.sc_trans_type = 1;//收貨上架
                 }
                 //if (ia.iarc_id == "DR" || ia.iarc_id == "KR")
                 //{
@@ -2743,7 +2746,18 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["doc_num"]))
                 {
                     ia.doc_no = Request.Params["doc_num"];
+                    stock.sc_trans_id = ia.doc_no;//交易單號
                 }
+                if (!string.IsNullOrEmpty(Request.Params["Po_num"]))
+                {
+                    ia.po_id = Request.Params["Po_num"];
+                    stock.sc_cd_id = ia.po_id;//前置單號
+                }
+                if (!string.IsNullOrEmpty(Request.Params["remark"]))
+                {
+                    ia.remarks = Request.Params["remark"];
+                    stock.sc_note = ia.remarks;//備註 
+                }               
                 ia.made_dt = m.made_date;
                 ia.cde_dt = m.cde_dt;
                 #endregion
@@ -2774,7 +2788,7 @@ namespace Admin.gigade.Controllers
                 proitem.Item_Stock = item_stock;
                 proitem.Item_Id = m.item_id;
                 #endregion
-                if (_iinvd.IsUpd(m, type) > 0)
+                if (_iinvd.IsUpd(m, stock) > 0)
                 {//編輯             
                     ia.qty_o = _iinvd.Selnum(m);
                     ia.adj_qty = m.prod_qty;
@@ -7550,8 +7564,8 @@ namespace Admin.gigade.Controllers
                 Caller call = new Caller();
                 call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
                 int k =0;
-               
-                if (iarc_id == "NE")//庫存調整-不改動前台庫存
+
+                if (iarc_id == "NE" || iarc_id == "RF")//庫存調整-不改動前台庫存
                 {
                     k = 1;
                 }else
