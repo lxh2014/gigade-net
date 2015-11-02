@@ -142,7 +142,8 @@ Ext.onReady(function () {
                                 }
                                 else if (Ext.getCmp('iarc_id').getValue() == 'RF')
                                 {
-                                   Ext.getCmp("KucunTiaozhengGrid").down('#add_new_message').setDisabled(true);
+                                    Ext.getCmp("KucunTiaozhengGrid").down('#add_new_message').setDisabled(true);
+                                    Ext.getCmp('po_id').show();
                                 }
                                 else {
                                     Ext.getCmp('po_id').setValue("");
