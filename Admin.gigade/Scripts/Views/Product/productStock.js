@@ -4,6 +4,7 @@
  * 摘    要：單一商品修改和新增 庫存頁面
  * 
  */
+
 var OLD_PRODUCTID = window.parent.GetCopyProductId();
 var defaultArriveDays = 0;
 var isEditStock = false;  //add by Jiajun 2014.09.26 判斷庫存是否可以修改
@@ -66,25 +67,25 @@ Ext.onReady(function () {
             defaultType: 'checkboxfield',
             items: [
                 {
-                boxLabel: IGNORE_STOCK,
-                id: 'ignore_stock',
-                hidden: true,
-                colName: 'ignore_stock',
-                inputValue: '1'
+                    boxLabel: IGNORE_STOCK,
+                    id: 'ignore_stock',
+                    hidden: true,
+                    colName: 'ignore_stock',
+                    inputValue: '1'
                 },
             {
-                    xtype: 'numberfield',
-                    fieldLabel: STOCK_DAYS,
-                    name: 'outofstock_days_stopselling',
-                    id: 'outofstock_days_stopselling',
-                    emptyText: INPUT_DAY,
-                    submitValue: true,
-                    labelWidth: 90,
-                    width: 170,
-                    maxValue: 9999,
-                    minValue: 1,
-                    value: 15
-                }, {
+                xtype: 'numberfield',
+                fieldLabel: STOCK_DAYS,
+                name: 'outofstock_days_stopselling',
+                id: 'outofstock_days_stopselling',
+                emptyText: INPUT_DAY,
+                submitValue: true,
+                labelWidth: 90,
+                width: 170,
+                maxValue: 9999,
+                minValue: 1,
+                value: 15
+            }, {
                 boxLabel: SHORTAGE,
                 id: 'shortage',
                 hidden: true,
@@ -263,7 +264,7 @@ Ext.onReady(function () {
                     id: 'remark',
                     allowBlank: false
                 }
-            }, {// edit  2015/10/12  拆分運達天數
+            }, {// edit  JJ  2015/10/12  拆分運達天數
                 header: TRANSPORT_ARRIVE_DAY,
                 colName: 'arrive_days',
                 //hidden:true,

@@ -99,7 +99,7 @@ Ext.onReady(function () {
                 width: 180,
                 labelWidth: 60,
                 margin: '5 10 0 5',
-                regex: /^([0-9]*)$/,
+                regex: /^([0-9]{1,9})$/,
                 listeners: {
                     specialkey: function (field, e) {
                         if (e.getKey() == e.ENTER) {
@@ -295,7 +295,7 @@ Ext.onReady(function () {
         { header: "異動時間", dataIndex: 'pb_mdate', flex: 2, align: 'center' },
         { header: "異動人員", dataIndex: 'updateusername', flex: 1, align: 'center' },
         {
-            header: "狀態", dataIndex: 'pb_status', flex: 1, align: 'center',
+            header: "啟用狀態", dataIndex: 'pb_status', flex: 1, align: 'center',
             renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                 if (value == 1) {
                     return "<a href='javascript:void(0);' onclick='UpdateStatus(" + record.data.pb_id + ")'><img hidValue='0' id='img" + record.data.pb_id + "' src='../../../Content/img/icons/accept.gif'/></a>";

@@ -134,8 +134,15 @@ Ext.onReady(function () {
                         value: 'DR',
                         listeners: {
                             select: function () {
+                                Ext.getCmp("KucunTiaozhengGrid").down('#add_new_message').setDisabled(false);
+                                
                                 if (Ext.getCmp('iarc_id').getValue() == 'DR' || Ext.getCmp('iarc_id').getValue() == 'KR') {
+
                                     Ext.getCmp('po_id').show();
+                                }
+                                else if (Ext.getCmp('iarc_id').getValue() == 'RF')
+                                {
+                                   Ext.getCmp("KucunTiaozhengGrid").down('#add_new_message').setDisabled(true);
                                 }
                                 else {
                                     Ext.getCmp('po_id').setValue("");
@@ -696,6 +703,11 @@ PrintKT = function ()
 //加
 function function_add(i, j, z, th) {
 
+    if (Ext.getCmp('iarc_id').getValue() == 'RF')
+    {
+        Ext.Msg.alert(INFORMATION, "RF狀態不能新增");
+        return;
+    }
             if (Ext.getCmp('iarc_id').getValue() == 'DR' || Ext.getCmp('iarc_id').getValue() == 'KR') {
                 if (Ext.getCmp('po_id').getValue().trim() == "") {
                     Ext.Msg.alert(INFORMATION, "前置單號不能為空");

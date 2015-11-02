@@ -48,7 +48,7 @@ RelationFunction = function (row) {
             width: 180,
             labelWidth: 60,
             margin: '5 5 0 0',
-            regex: /^([0-9]*)$/,
+            regex: /^([0-9]{1,9})$/,
             listeners: {
                 specialkey: function (field, e) {
                     if (e.getKey() == e.ENTER) {
