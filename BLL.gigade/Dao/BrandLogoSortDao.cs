@@ -39,16 +39,11 @@ namespace BLL.gigade.Dao
               {
                   sqlWhere.AppendFormat("and pc.category_id='{0}' ",query.category_id);
               }
-              if (query.brand_id != 0)
-              {
-                  sqlWhere.AppendFormat("and blo.brand_id='{0}' ", query.brand_id);
-              }
               DataTable _dt = _access.getDataTable(sqlCount.ToString() + sqlFrom.ToString());
               if (_dt != null && _dt.Rows.Count > 0)
               {
                   totalCount = Convert.ToInt32(_dt.Rows[0][0]);
               }
-              sqlWhere.AppendFormat(" order by  blo.blo_id desc limit {0},{1}; ",query.Start,query.Limit);
               return _access.getDataTableForObj<BrandLogoSort>(sql.ToString() + sqlFrom.ToString() + sqlWhere.ToString());
           }
           catch (Exception ex)
@@ -138,7 +133,7 @@ namespace BLL.gigade.Dao
       /// </summary>
       /// <param name="category_id"></param>
       /// <returns></returns>
-      public DataTable CategoryStore(uint category_id)
+      public DataTable CategoryStore(int category_id)
       {
           StringBuilder sql = new StringBuilder();
           try
@@ -175,7 +170,7 @@ namespace BLL.gigade.Dao
       /// </summary>
       /// <param name="category_id"></param>
       /// <returns></returns>
-      public DataTable GetCountByCat(uint category_id)
+      public DataTable GetCountByCat(int category_id)
       {
           StringBuilder sql = new StringBuilder();
           try
@@ -194,7 +189,7 @@ namespace BLL.gigade.Dao
       /// </summary>
       /// <param name="category_id"></param>
       /// <returns></returns>
-      public DataTable MaxSort(uint category_id)
+      public DataTable MaxSort(int category_id)
       {
           StringBuilder sql = new StringBuilder();
           try
@@ -260,37 +255,6 @@ namespace BLL.gigade.Dao
               throw new Exception("BrandLogoSortDao-->GetCountByCat-->" + sql.ToString(), ex);
           }
 
-      }
-
-      public int MaxLimit()
-      {
-          StringBuilder sql = new StringBuilder();
-          try
-          {
-              int n=10;
-               sql.Append("select  parameterCode from t_parametersrc where parameterType='brand_logo' and parameterName='limit';");
-               DataTable _dt = _access.getDataTable(sql.ToString());
-              if(_dt.Rows.Count>0&&_dt!=null)
-              {
-                  if (int.TryParse(_dt.Rows[0][0].ToString(), out n))
-                  {
-                      return Convert.ToInt32(_dt.Rows[0][0]);
-                  }
-                  else
-                  {
-                      return n;
-                  }
-              }
-              else
-              {
-                  return n;
-              }
-           
-          }
-          catch (Exception ex)
-          {
-              throw new Exception("BrandLogoSortDao-->MaxLimit-->" + sql.ToString(), ex);
-          }
       }
 
     }

@@ -27,8 +27,6 @@ namespace BLL.gigade.Model.Query
         public uint creator { get; set; }
         public uint vendorstatus { get; set; }
 
-        public string brand_logo { get; set; }
-
         public VendorBrandSetQuery()
         {
             image_sort = 0;
@@ -39,7 +37,6 @@ namespace BLL.gigade.Model.Query
             eventendtime = DateTime.MinValue;
             creator = 0;
             vendorstatus = 0;
-            brand_logo = string.Empty;
         }
     }
 }
