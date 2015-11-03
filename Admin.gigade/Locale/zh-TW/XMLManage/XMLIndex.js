@@ -25,3 +25,4 @@ DONTDOFORPROOT = "根節點不允操作,請新增其子節點后再進行操作"
 DONTNAMEINNUMSTART = '節點名稱不能以數字開頭、不能含有空格以及特殊字符';
 ROOTNAMEDONTBLACK = "節點名稱不能為空"
 ROOTORNODEEXCEPTION = "名稱不能以數字開頭、不能含有空格以及特殊字符"
+
