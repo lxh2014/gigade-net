@@ -83,7 +83,8 @@ NON_DATA_HAVE_EDIT = "沒有數據被修改";
 DELETE_UNUSUAL = "刪除異常";
 PARALLELISM_INFORMATION_CONFIG = "對應信息設定";
 VALUE = "值";
-
+INFO = "信息";
+MESSAGEPROMPT = "請完整填寫名稱,對應表,key值以及value值";
 PLEASEVERIFYDATAOFREPEAT = "請保證名稱不重複"
 EMPTYDATA = "數據不能為空!"
 

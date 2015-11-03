@@ -402,7 +402,7 @@ namespace BLL.gigade.Dao
             try
             {
                 query.Replace4MySQL();
-                sql.AppendFormat(@"SELECT brand_id,brand_name from vendor_brand WHERE brand_name LIKE N'%{0}%'",query);
+                sql.AppendFormat(@"SELECT brand_id,brand_name from vendor_brand WHERE brand_name LIKE N'%{0}%'",query.Brand_Name);
                 return sql.ToString();
             }
             catch (Exception ex)

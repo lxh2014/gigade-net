@@ -199,12 +199,12 @@ namespace Working
             int index = ((int)dt.DayOfWeek - 1) * 24 + dt.Hour;
             while (!flag)
             {
-                dt = dt.AddHours(1);
+                dt = dt.AddMinutes(1);
                 if (dt > DateTime.Now)
                 {
                     return dt;
                 }
-                if (index==168)
+                if (index==168*60)
                 {
                     flag = true;
                 }

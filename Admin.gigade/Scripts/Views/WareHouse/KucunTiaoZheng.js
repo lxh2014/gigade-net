@@ -142,7 +142,8 @@ Ext.onReady(function () {
                                 }
                                 else if (Ext.getCmp('iarc_id').getValue() == 'RF')
                                 {
-                                   Ext.getCmp("KucunTiaozhengGrid").down('#add_new_message').setDisabled(true);
+                                    Ext.getCmp("KucunTiaozhengGrid").down('#add_new_message').setDisabled(true);
+                                    Ext.getCmp('po_id').show();
                                 }
                                 else {
                                     Ext.getCmp('po_id').setValue("");
@@ -835,6 +836,11 @@ function function_uadd(i, j, z) {
                                         myMask.hide();
                                         //Ext.Msg.alert(INFORMATION, "操作成功!");
                                         //setTimeout('Loadthis()', 4000);
+                                        KucunTiaozhengStore.load();
+                                    } else
+                                    {
+                                        myMask.hide();
+                                        Ext.Msg.alert(INFORMATION, "庫調記錄失敗!");
                                         KucunTiaozhengStore.load();
                                     }
                                 }
