@@ -33,8 +33,59 @@ BrandLogoSortStore = Ext.create('Ext.data.Store', {
 BrandLogoSortStore.on('beforeload', function () {
     Ext.apply(BrandLogoSortStore.proxy.extraParams,
     {
-        category_id_ser: Ext.getCmp('category_id_ser').getValue(),
+        category_id: Ext.getCmp('category_id_ser').getValue(),
+        brand_id: Ext.getCmp('brand_id_ser').getValue(),
+
     });
+});
+
+
+
+var comType = false;
+Ext.define('gigade.CategoryStore2', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: 'category_id', type: 'int' },
+        { name: 'category_name', type: 'string' }
+    ]
+});
+var CategoryStore2 = Ext.create("Ext.data.Store", {
+    autoLoad: true,
+    model: 'gigade.CategoryStore2',
+    proxy: {
+        type: 'ajax',
+        url: '/BrandLogoSort/GetCategoryStore',
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
+
+Ext.define('gigade.BrandStore2', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: 'brand_id', type: 'int' },
+        { name: 'brand_name', type: 'string' }
+    ]
+});
+var BrandStore2 = Ext.create("Ext.data.Store", {
+    model: 'gigade.BrandStore2',
+    proxy: {
+        type: 'ajax',
+        url: '/BrandLogoSort/GetBrandStore',
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
+
+BrandStore2.on('beforeload', function () {
+    Ext.apply(BrandStore2.proxy.extraParams,
+        {
+            category_id: Ext.getCmp('category_id_ser').getValue(),
+        });
 });
 
 var sm = Ext.create('Ext.selection.CheckboxModel', {
@@ -58,7 +109,14 @@ Ext.onReady(function () {
         columns: [
         { header: "編號", dataIndex: 'blo_id', width: 60, align: 'center' },
         { header: "品牌名稱", dataIndex: 'brand_name', width: 150, align: 'center' },
-        { header: "品牌LOGO", dataIndex: 'brand_logo', width: 60, align: 'center' },
+                        {
+                            header: "品牌logo",
+                            dataIndex: 'brand_logo',
+                            width: 80,
+                            align: 'center',
+                            xtype: 'templatecolumn',
+                            tpl: '<a target="_blank" href="{brand_logo}" ><img width=50 name="tplImg" height=50 src="{brand_logo}" /></a>'
+                        },
         { header: "排序", dataIndex: 'blo_sort', width: 150, align: 'center' },
         { header: "分類名稱", dataIndex: 'category_name', width: 150, align: 'center' },
         { header: "異動人員", dataIndex: 'user_username', width: 150, align: 'center' },
@@ -71,21 +129,61 @@ Ext.onReady(function () {
 
          '->',
          {
-             xtype: 'textfield', fieldLabel: '分類編號', id: 'category_id_ser', LabelWidth: 65,
+             xtype: 'combobox',
+             fieldLabel: '分類名稱',
+             id: 'category_id_ser',
+             displayField: 'category_name',
+             valueField: 'category_id',
+             labelWidth:70,
+             editable: false,
+             emptyText:"請選擇...",
+             store: CategoryStore2,
              listeners: {
-                 specialkey: function (field, e) {
-                     if (e.getKey() == e.ENTER) {
-                         Search();
-                     }
+                 select: function (combo, record) {
+                     var m = Ext.getCmp("brand_id_ser");
+                     m.clearValue();
+                     BrandStore2.removeAll();
+                     BrandStore2.load({
+                         params: {
+                             category_id: Ext.getCmp('category_id_ser').getValue(),
+                         }
+                     });
+                     comType = true;
                  }
-             }
+             },
          },
+          {
+              xtype: 'combobox', fieldLabel: '品牌名稱', id: 'brand_id_ser',
+              store: BrandStore2,
+              labelWidth: 70,
+              width:245,
+              margin:'0 0 0 15',
+              emptyText: "請選擇...",
+              displayField: 'brand_name',
+              valueField: 'brand_id',
+              queryMode: 'local',
+              typeAhead: true,
+              listeners: {
+                  beforequery: function (qe) {
+                      if (comType) {
+                          delete qe.combo.lastQuery;
+                          BrandStore2.load({
+                              params: {
+                                  category_id: Ext.getCmp('category_id_ser').getValue(),
+                              }
+                          });
+                          comType = false;
+                      }
+                  }
+              }
+          },
          {
              xtype: 'button', text: '查詢', handler: Search
          },
          {
              xtype: 'button', text: '重置', handler: function () {
                  Ext.getCmp('category_id_ser').setValue();
+                 Ext.getCmp('brand_id_ser').setValue();
              }
          },
         ],
@@ -188,7 +286,8 @@ function Search() {
 
     Ext.getCmp("BrandLogoSort").store.loadPage(1, {
         params: {
-            category_id_ser: Ext.getCmp('category_id_ser').getValue(),
+            category_id: Ext.getCmp('category_id_ser').getValue(),
+            brand_id: Ext.getCmp('brand_id_ser').getValue(),
         }
     });
 }

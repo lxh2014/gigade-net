@@ -85,7 +85,8 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                             resumeimagelink: Ext.htmlEncode(Ext.getCmp('Resume_Image_Link').getValue()),
                             promotionbannerimage: Ext.htmlEncode(Ext.getCmp('Promotion_Banner_Image').getValue()),
                             promotionbannerimagelink: Ext.htmlEncode(Ext.getCmp('Promotion_Banner_Image_Link').getValue()),
-                            mediareportlinkurl: Ext.htmlEncode(Ext.getCmp('Media_Report_Link_Url').getValue())
+                            mediareportlinkurl: Ext.htmlEncode(Ext.getCmp('Media_Report_Link_Url').getValue()),
+                            brand_logo: Ext.htmlEncode(Ext.getCmp('brand_logo').getValue()),
                         },
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
@@ -376,7 +377,19 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                     vtype: 'url',
                     hidden: false,
                     anchor: '90%'
-                }
+                },
+                   {
+                       xtype: 'filefield',
+                       fieldLabel: '促銷圖片',
+                       id: 'brand_logo',
+                       name: 'brand_logo',
+                       msgTarget: 'side',
+                       submitValue: true,
+                       allowBlank: true,
+                       anchor: '90%',
+                       buttonText: '選擇...',
+                       fileUpload: true
+                   },
                 ]
             },
             {//媒體報道
