@@ -61,6 +61,7 @@ namespace Admin.gigade.Controllers
         public ProductItemMgr productitemMgr;
         private IVendorImplMgr _vendorMgr;
         IProductItemImplMgr _proditemMgr;
+        IParametersrcImplMgr _IparasrcMgr;
         #region Views
         /// <summary>
         /// 
@@ -1209,13 +1210,23 @@ namespace Admin.gigade.Controllers
 
                 DTIupcExcel.Columns.Add("商品細項編號", typeof(String));
                 DTIupcExcel.Columns.Add("條碼編號", typeof(String));
+                DTIupcExcel.Columns.Add("條碼類型", typeof(String));
                 DTIupcExcel.Columns.Add("不能匯入的原因", typeof(String));
+                DTIupcExcel.Columns.Add("匯入失敗數據的行號", typeof(String));
+
+                DataTable DTIupcImportSucceed = new DataTable();
+                DTIupcImportSucceed.Columns.Add("商品細項編號", typeof(String));
+                DTIupcImportSucceed.Columns.Add("條碼編號", typeof(String));
+                DTIupcImportSucceed.Columns.Add("條碼類型", typeof(String));
+                DTIupcImportSucceed.Columns.Add("行號", typeof(String));
+
                 int result = 0;
                 int count = 0;//總匯入數
-                int errorcount = 0;
+                int errorCount = 0;//異常數據數量
                 int create_user = (Session["caller"] as Caller).user_id;
-                int bucunzaicount = 0;//商品細項編號不存在
-                int chongfucount = 0;//商品條碼重複數量
+                int itemIdNotExistCount = 0;//商品細項編號不存在數量
+                //int iupcTypeNotExistCount = 0;//條碼類型不存在數量
+                int repeatCount = 0;//商品條碼重複數量
                 StringBuilder strsql = new StringBuilder();
                 if (Request.Files["ImportExcelFile"] != null && Request.Files["ImportExcelFile"].ContentLength > 0)
                 {
@@ -1230,74 +1241,149 @@ namespace Admin.gigade.Controllers
                     if (dt.Rows.Count > 0)
                     {
                         _IiupcMgr = new IupcMgr(mySqlConnectionString);
+                        _IparasrcMgr = new ParameterMgr(mySqlConnectionString);
                         #region 循環Excel的數據
-
-
+   
+                        List<BLL.gigade.Model.Parametersrc> codeTypeList = _IparasrcMgr.GetElementType("iupc_type");
+                                              
                         int i = 0;
-                        foreach (DataRow dr in dt.Rows)
+                        for (int k = 0; k < dt.Rows.Count; k++)
                         {
                             i++;
                             try
                             {
-                                if (!string.IsNullOrEmpty(dr[1].ToString()) && dr[1].ToString().Length >= 8 && dr[1].ToString().Length <= 25)
+                                if (!string.IsNullOrEmpty(dt.Rows[k][1].ToString()) && dt.Rows[k][1].ToString().Length >= 8 && dt.Rows[k][1].ToString().Length <= 25)
                                 {
-                                    int a = Convert.ToInt32(dr[0]);//商品細項編號
-                                    string b = dr[1].ToString();//條碼編號
+
+                                    int a = Convert.ToInt32(dt.Rows[k][0]);//商品細項編號
+                                    string b = dt.Rows[k][1].ToString().Trim();//條碼編號
+                                    int c = Convert.ToInt32(dt.Rows[k][2]);//條碼類型
                                     int flag = _IiupcMgr.Yesornoexist(a, b);
+
                                     if (flag == 1)//等於1表示商品細項表里面沒有此商品細項編號
                                     {
                                         DataRow drtwo = DTIupcExcel.NewRow();
-                                        drtwo[0] = dr[0].ToString();
-                                        drtwo[1] = dr[1].ToString();
-                                        drtwo[2] = "商品表不存在此商品細項編號";
+                                        drtwo[0] = dt.Rows[k][0].ToString();
+                                        drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                        drtwo[2] = dt.Rows[k][2].ToString();
+                                        drtwo[3] = "在數據庫商品表中，不存在此商品細項編號";
+                                        drtwo[4] = k + 2;//匯入失敗數據的行號,Excel表行號
                                         DTIupcExcel.Rows.Add(drtwo);
-                                        bucunzaicount++;
+                                        itemIdNotExistCount++;
                                         continue;
                                     }
+
                                     if (flag == 2)//等於2表示條碼表裡面已存在此條碼
                                     {
                                         DataRow drtwo = DTIupcExcel.NewRow();
-                                        drtwo[0] = dr[0].ToString();
-                                        drtwo[1] = dr[1].ToString();
-                                        drtwo[2] = "該條碼已經存在";
+                                        drtwo[0] = dt.Rows[k][0].ToString();
+                                        drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                        drtwo[2] = dt.Rows[k][2].ToString();
+                                        drtwo[3] = "在數據庫中，該條碼已經存在";
+                                        drtwo[4] = k + 2;
                                         DTIupcExcel.Rows.Add(drtwo);
-                                        chongfucount++;
+                                        repeatCount++;
                                         continue;
-
                                     }
+
                                     if (flag == 0)//當存在此商品細項編號並且該條碼不存在時進行添加數據
                                     {
+
                                         bool xunhuan = true;
                                         for (int j = 0; j < i - 1; j++)
                                         {
-                                            if (dt.Rows[j][1].ToString() == dr[1].ToString())//如果匯入的Excel條碼重複
+                                            if (dt.Rows[j][1].ToString() == dt.Rows[k][1].ToString())//如果匯入的Excel條碼重複
                                             {
                                                 xunhuan = false;
                                                 DataRow drtwo = DTIupcExcel.NewRow();
-                                                drtwo[0] = dr[0].ToString();
-                                                drtwo[1] = dr[1].ToString();
-                                                drtwo[2] = "該商品條碼與在此表中與商品細項編號:" + dt.Rows[j][0].ToString() + "條碼重複";
+                                                drtwo[0] = dt.Rows[k][0].ToString();
+                                                drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                                drtwo[2] = dt.Rows[k][2].ToString();
+                                                drtwo[3] = "該商品條碼與此表中(行號： " + (j + 2) + " )的商品細項編號:" + dt.Rows[j][0].ToString() + "的條碼重複";
+                                                drtwo[4] = k + 2;
                                                 DTIupcExcel.Rows.Add(drtwo);
-                                                chongfucount++;
+                                                repeatCount++;
                                                 break;
                                             }
                                         }
                                         if (xunhuan)
                                         {
-                                            if (_IiupcMgr.upc_num(Convert.ToInt32(dr[0])) > 0)
+                                            string codeTypeStr = string.Empty;
+                                            StringBuilder codeType = new StringBuilder();
+                                            bool haveCodeType = false;
+                                            foreach (var codeTypeModel in codeTypeList)
+                                            {
+                                                if (Convert.ToString(dt.Rows[k][2]).Trim() == codeTypeModel.ParameterCode)
+                                                {
+                                                    haveCodeType = true;
+                                                }
+                                                codeType.AppendFormat("{0}:{1}, ", codeTypeModel.ParameterCode, codeTypeModel.parameterName);
+                                            }
+                                            codeTypeStr = codeType.ToString().Substring(0, codeType.Length - 2);
+                                            if (!haveCodeType)//此條碼類型是否在參數表t_parameterSrc(parameterType="iupc_type")中存在
                                             {
                                                 DataRow drtwo = DTIupcExcel.NewRow();
-                                                drtwo[0] = dr[0].ToString();
-                                                drtwo[1] = dr[1].ToString();
-                                                drtwo[2] = "該商品已經存在國際條碼";
+                                                drtwo[0] = dt.Rows[k][0].ToString();
+                                                drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                                drtwo[2] = dt.Rows[k][2].ToString();
+                                                drtwo[3] = "在數據庫參數表中，此條碼類型不存在(" + codeTypeStr + ")";
+                                                drtwo[4] = k + 2;
                                                 DTIupcExcel.Rows.Add(drtwo);
-                                                chongfucount++;
-                                                break;
+                                                errorCount++;
+                                                continue;
                                             }
+                                            //如果條碼類為 1 時，判斷該商品是否在Iupc表中已經存在國際條碼
+                                            if (_IiupcMgr.upc_num(Convert.ToInt32(dt.Rows[k][0])) > 0 && dt.Rows[k][2].ToString() == "1")
+                                            {
+                                                DataRow drtwo = DTIupcExcel.NewRow();
+                                                drtwo[0] = dt.Rows[k][0].ToString();
+                                                drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                                drtwo[2] = dt.Rows[k][2].ToString();
+                                                drtwo[3] = "在數據庫中，該商品已經存在國際條碼";
+                                                drtwo[4] = k + 2;
+                                                DTIupcExcel.Rows.Add(drtwo);
+                                                repeatCount++;
+                                                continue;                                             
+                                            }                         
                                             else
                                             {
+                                                bool skip = false;
+                                                for (int index = 0; index < DTIupcImportSucceed.Rows.Count; index++)
+                                                {
+                                                    bool m1 = dt.Rows[k][0].ToString().Trim() == DTIupcImportSucceed.Rows[index][0].ToString().Trim();
+                                                    bool m2 = dt.Rows[k][2].ToString().Trim() == "1";
+                                                    bool m3 = DTIupcImportSucceed.Rows[index][2].ToString().Trim() == "1";
+
+                                                    if (m1 && m2 && m3)//在已經成功匯入的數據中，判斷該商品是否存在國際條碼 
+                                                    {
+                                                        skip = true;
+                                                        DataRow drtwo1 = DTIupcExcel.NewRow();
+                                                        drtwo1[0] = dt.Rows[k][0].ToString();
+                                                        drtwo1[1] = " " + dt.Rows[k][1].ToString();
+                                                        drtwo1[2] = dt.Rows[k][2].ToString();
+                                                        drtwo1[3] = "在已經成功匯入的數據中(行號： " + DTIupcImportSucceed.Rows[index][3].ToString() + "),該商品已經存在國際條碼";
+                                                        drtwo1[4] = k + 2;
+                                                        DTIupcExcel.Rows.Add(drtwo1);
+                                                        repeatCount++;
+                                                        break;
+                                                    }
+                                                }
+                                                if (skip)
+                                                {
+                                                    continue;
+                                                }
+                                                DataRow drtwo = DTIupcImportSucceed.NewRow();
+                                                drtwo[0] = dt.Rows[k][0].ToString();
+                                                drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                                drtwo[2] = dt.Rows[k][2].ToString();
+                                                drtwo[3] = k + 2;
+                                                DTIupcImportSucceed.Rows.Add(drtwo);
+                                                
+
                                                 count++;
-                                                strsql.AppendFormat(@"insert into iupc(upc_id,item_id,create_dtim,create_user,upc_type_flg)values('{0}','{1}','{2}','{3}','1');", b, a, CommonFunction.DateTimeToString(DateTime.Now), create_user);//默認匯入 的是國際條碼
+                                                string dataTimeNow = CommonFunction.DateTimeToString(DateTime.Now);
+                                                strsql.AppendFormat(@"insert into iupc(upc_id,item_id,suppr_upc,lst_ship_dte,lst_rct_dte,create_dtim,create_user,upc_type_flg)
+                    values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}');", b, a,"", dataTimeNow, dataTimeNow, dataTimeNow, create_user, c);
                                                 continue;
                                             }
                                         }
@@ -1306,32 +1392,165 @@ namespace Admin.gigade.Controllers
                                 else
                                 {
                                     DataRow drtwo = DTIupcExcel.NewRow();
-                                    drtwo[0] = dr[0].ToString();
-                                    drtwo[1] = dr[1].ToString();
-                                    drtwo[2] = "條碼不符合格式";
+                                    drtwo[0] = dt.Rows[k][0].ToString();
+                                    drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                    drtwo[2] = dt.Rows[k][2].ToString();
+                                    drtwo[3] = "條碼不符合格式(8-25位)";
+                                    drtwo[4] = k + 2;
                                     DTIupcExcel.Rows.Add(drtwo);
-                                    errorcount++;
+                                    errorCount++;
                                     continue;
                                 }
                             }
                             catch
                             {
                                 DataRow drtwo = DTIupcExcel.NewRow();
-                                drtwo[0] = dr[0].ToString();
-                                drtwo[1] = dr[1].ToString();
-                                drtwo[2] = "數據異常";
+                                drtwo[0] = dt.Rows[k][0].ToString();
+                                drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                drtwo[2] = dt.Rows[k][2].ToString();
+                                drtwo[3] = "數據異常，程序報錯";
+                                drtwo[4] = k + 2;
                                 DTIupcExcel.Rows.Add(drtwo);
-                                errorcount++;
+                                errorCount++;
                                 continue;
                             }
                         }
+                        #region 註釋的代碼foreach
+                        //                        foreach (DataRow dr in dt.Rows)
+                        //                        {
+                        //                            i++;
+                        //                            try
+                        //                            {
+                        //                                if (!string.IsNullOrEmpty(dr[1].ToString()) && dr[1].ToString().Length >= 8 && dr[1].ToString().Length <= 25)
+                        //                                {
+
+                        //                                    int a = Convert.ToInt32(dr[0]);//商品細項編號
+                        //                                    string b = dr[1].ToString();//條碼編號
+                        //                                    int c = Convert.ToInt32(dr[2]);//條碼類型
+                        //                                    int flag = _IiupcMgr.Yesornoexist(a, b);
+
+                        //                                    if (flag == 1)//等於1表示商品細項表里面沒有此商品細項編號
+                        //                                    {
+                        //                                        DataRow drtwo = DTIupcExcel.NewRow();
+                        //                                        drtwo[0] = dr[0].ToString();
+                        //                                        drtwo[1] = " " + dr[1].ToString();
+                        //                                        drtwo[2] = dr[2].ToString();
+                        //                                        drtwo[3] = "商品表不存在此商品細項編號";
+                        //                                        DTIupcExcel.Rows.Add(drtwo);
+                        //                                        bucunzaicount++;
+                        //                                        continue;
+                        //                                    }
+
+                        //                                    if (flag == 2)//等於2表示條碼表裡面已存在此條碼
+                        //                                    {
+                        //                                        DataRow drtwo = DTIupcExcel.NewRow();
+                        //                                        drtwo[0] = dr[0].ToString();
+                        //                                        drtwo[1] = " " + dr[1].ToString();
+                        //                                        drtwo[2] = dr[2].ToString();
+                        //                                        drtwo[3] = "該條碼已經存在";
+                        //                                        DTIupcExcel.Rows.Add(drtwo);
+                        //                                        chongfucount++;
+                        //                                        continue;
+                        //                                    }
+
+                        //                                    if (flag == 0)//當存在此商品細項編號並且該條碼不存在時進行添加數據
+                        //                                    {
+
+                        //                                        bool xunhuan = true;
+                        //                                        for (int j = 0; j < i - 1; j++)
+                        //                                        {
+                        //                                            if (dt.Rows[j][1].ToString() == dr[1].ToString())//如果匯入的Excel條碼重複
+                        //                                            {
+                        //                                                xunhuan = false;
+                        //                                                DataRow drtwo = DTIupcExcel.NewRow();
+                        //                                                drtwo[0] = dr[0].ToString();
+                        //                                                drtwo[1] = " " + dr[1].ToString();
+                        //                                                drtwo[2] = dr[2].ToString();
+                        //                                                drtwo[3] = "該商品條碼與在此表中的商品細項編號:" + dt.Rows[j][0].ToString() + "條碼重複";
+                        //                                                DTIupcExcel.Rows.Add(drtwo);
+                        //                                                chongfucount++;
+                        //                                                break;
+                        //                                            }
+                        //                                        }
+                        //                                        if (xunhuan)
+                        //                                        {
+                        //                                            string codeTypeStr = string.Empty;
+                        //                                            StringBuilder codeType = new StringBuilder();
+                        //                                            bool haveCodeType = false;
+                        //                                            foreach (var codeTypeModel in codeTypeList)
+                        //                                            {
+                        //                                                if (Convert.ToString(dr[2]) == codeTypeModel.ParameterCode)
+                        //                                                {
+                        //                                                    haveCodeType = true;                                                  
+                        //                                                }
+                        //                                                codeType.AppendFormat("{0}:{1}, ", codeTypeModel.ParameterCode, codeTypeModel.parameterName);
+                        //                                            }
+                        //                                            codeTypeStr = codeType.ToString().Substring(0, codeType.Length - 2);
+                        //                                            if (!haveCodeType)
+                        //                                            {
+                        //                                                DataRow drtwo = DTIupcExcel.NewRow();
+                        //                                                drtwo[0] = dr[0].ToString();
+                        //                                                drtwo[1] = " " + dr[1].ToString();
+                        //                                                drtwo[2] = dr[2].ToString();
+                        //                                                drtwo[3] = "此條碼類型不存在(" + codeTypeStr + ")";
+                        //                                                DTIupcExcel.Rows.Add(drtwo);
+                        //                                                errorcount++;
+                        //                                                continue;
+                        //                                            }
+
+                        //                                            if (_IiupcMgr.upc_num(Convert.ToInt32(dr[0])) > 0)
+                        //                                            {
+                        //                                                DataRow drtwo = DTIupcExcel.NewRow();
+                        //                                                drtwo[0] = dr[0].ToString();
+                        //                                                drtwo[1] = " " + dr[1].ToString();
+                        //                                                drtwo[2] = dr[2].ToString();
+                        //                                                drtwo[3] = "該商品已經存在國際條碼";
+                        //                                                DTIupcExcel.Rows.Add(drtwo);
+                        //                                                chongfucount++;
+                        //                                                break;
+                        //                                            }
+                        //                                            else
+                        //                                            {
+                        //                                                count++;
+                        //                                                strsql.AppendFormat(@"insert into iupc(upc_id,item_id,create_dtim,create_user,upc_type_flg)
+                        //                    values('{0}','{1}','{2}','{3}','{4}');", b, a, CommonFunction.DateTimeToString(DateTime.Now), create_user,c);//默認匯入 的是國際條碼
+                        //                                                continue;
+                        //                                            }
+                        //                                        }
+                        //                                    }
+                        //                                }
+                        //                                else
+                        //                                {
+                        //                                    DataRow drtwo = DTIupcExcel.NewRow();
+                        //                                    drtwo[0] = dr[0].ToString();
+                        //                                    drtwo[1] = " " + dr[1].ToString();
+                        //                                    drtwo[2] = dr[2].ToString();
+                        //                                    drtwo[3] = "條碼不符合格式";
+                        //                                    DTIupcExcel.Rows.Add(drtwo);
+                        //                                    errorcount++;
+                        //                                    continue;
+                        //                                }
+                        //                            }
+                        //                            catch
+                        //                            {
+                        //                                DataRow drtwo = DTIupcExcel.NewRow();
+                        //                                drtwo[0] = dr[0].ToString();
+                        //                                drtwo[1] = " " + dr[1].ToString();
+                        //                                drtwo[2] = dr[2].ToString();
+                        //                                drtwo[3] = "數據異常";
+                        //                                DTIupcExcel.Rows.Add(drtwo);
+                        //                                errorcount++;
+                        //                                continue;
+                        //                            }
+                        // 
+                        #endregion                        }
                         #endregion
                         if (strsql.ToString().Trim() != "")
                         {
                             result = _IiupcMgr.ExcelImportIupc(strsql.ToString());
                             if (result > 0)
                             {
-                                json = "{success:true,total:" + count + ",error:" + errorcount + ",repeat:" + chongfucount + ",NoItem:" + bucunzaicount + "}";
+                                json = "{success:true,total:" + count + ",error:" + errorCount + ",repeat:" + repeatCount + ",NoItem:" + itemIdNotExistCount + "}";
                             }
                             else
                             {
@@ -1340,12 +1559,12 @@ namespace Admin.gigade.Controllers
                         }
                         else
                         {
-                            json = "{success:true,total:" + 0 + ",error:" + errorcount + ",repeat:" + chongfucount + ",NoItem:" + bucunzaicount + "}";
+                            json = "{success:true,total:" + 0 + ",error:" + errorCount + ",repeat:" + repeatCount + ",NoItem:" + itemIdNotExistCount + "}";
                         }
                     }
                     else
                     {
-                        json = "{success:true,total:" + 0 + ",error:" + 0 + ",repeat:" + 0 + ",NoItem:" + 0 + "}";
+                        json = "{success:true,total:" + 0 + ",error:" + 0 + ",repeat:" + 0 + ",NoItem:" + 0 + ",NoType:" + 0 + "}";
                     }
                 }
             }
@@ -1355,7 +1574,7 @@ namespace Admin.gigade.Controllers
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
-                json = "{success:false,data:" + "" + "}";
+                json = "{success:false }";
             }
             this.Response.Clear();
             this.Response.Write(json);
@@ -1370,7 +1589,7 @@ namespace Admin.gigade.Controllers
             string json = string.Empty;
             try
             {
-                string fileName = "條碼維護匯入不符合的數據_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                string fileName = "IupcImportErrorMsg" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
                 MemoryStream ms = ExcelHelperXhf.ExportDT(DTIupcExcel, "");
                 Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
                 Response.BinaryWrite(ms.ToArray());
@@ -1399,9 +1618,10 @@ namespace Admin.gigade.Controllers
             {
                 dtTemplateExcel.Columns.Add("商品細項編號", typeof(String));
                 dtTemplateExcel.Columns.Add("條碼編號", typeof(String));
+                dtTemplateExcel.Columns.Add("條碼類型(數字)", typeof(String));
                 DataRow newRow = dtTemplateExcel.NewRow();
                 dtTemplateExcel.Rows.Add(newRow);
-                string fileName = "條碼維護匯入模板_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                string fileName = "BarCodeVindicateImportModel_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";//條碼維護匯入模板
                 MemoryStream ms = ExcelHelperXhf.ExportDT(dtTemplateExcel, "");//"條碼維護匯入模板_" + DateTime.Now.ToString("yyyyMMddHHmmss")
                 Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
                 Response.BinaryWrite(ms.ToArray());
@@ -1480,24 +1700,24 @@ namespace Admin.gigade.Controllers
                     store[i].product_name += GetProductSpec(store[i].item_id.ToString());
                     newRow[1] = store[i].product_name.ToString();
                     newRow[2] = " " + store[i].upc_id.ToString();
-                    if (!string.IsNullOrEmpty(store[i].upc_type_flg))
-                    {
-                        string upc_type = store[i].upc_type_flg;
-                        if (upc_type.Equals("1"))
-                        {
-                            newRow[3] = "國際條碼";
-                        }
-                        if (upc_type.Equals("2"))
-                        {
-                            newRow[3] = "吉甲地店內碼";
-                        }
-                        if (upc_type.Equals("3"))
-                        {
-                            newRow[3] = "供應商店內碼";
-                        }
-                    }
-                    else { newRow[3] = ""; }
-
+                    //if (!string.IsNullOrEmpty(store[i].upc_type_flg))
+                    //{
+                    //    string upc_type = store[i].upc_type_flg;
+                    //    if (upc_type.Equals("1"))
+                    //    {
+                    //        newRow[3] = "國際條碼";
+                    //    }
+                    //    if (upc_type.Equals("2"))
+                    //    {
+                    //        newRow[3] = "吉甲地店內碼";
+                    //    }
+                    //    if (upc_type.Equals("3"))
+                    //    {
+                    //        newRow[3] = "供應商店內碼";
+                    //    }
+                    //}
+                    //else { newRow[3] = ""; }
+                    newRow[3] = store[i].parametername.ToString();
                     newRow[4] = store[i].create_users.ToString();
                     newRow[5] = store[i].create_dtim.ToString();
                     dtExcel.Rows.Add(newRow);
