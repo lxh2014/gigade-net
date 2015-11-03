@@ -21,7 +21,6 @@ namespace Admin.gigade.Controllers
 {
     public class EdmNewController : Controller
     {
-
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly string mySqlConnectionString = System.Configuration.ConfigurationManager.AppSettings["MySqlConnectionString"].ToString();
         private static EdmContentNewMgr _edmContentNewMgr;
@@ -37,7 +36,7 @@ namespace Admin.gigade.Controllers
         //電子報類型
         public ActionResult Index()
         {
-            return View();
+            return View();            
         }
         //電子報範本
         public ActionResult EdmTemplate()
@@ -79,7 +78,14 @@ namespace Admin.gigade.Controllers
             ViewBag.log_id = log_id;
             return View();
         }
-
+        public ActionResult Editkendo()
+        {
+            return PartialView("~/Views/EdmNew/Editkendo.cshtml");
+        }
+        public ActionResult Editkendo2()
+        {
+            return PartialView("~/Views/EdmNew/Editkendo2.cshtml");
+        }
         #endregion
 
         #region 電子報類型
