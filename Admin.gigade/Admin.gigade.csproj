@@ -4416,7 +4416,6 @@
     <Content Include="Views\WareHouse\Check.cshtml" />
     <Content Include="Views\Super\Index.cshtml" />
     <Content Include="Views\Product\InventoryQuery.cshtml" />
-    <Content Include="Template\SiteStatistics\站臺訪問量統計匯入範本.xlsx" />
     <Content Include="Views\OrderManage\OrderDetailManage.cshtml" />
     <Content Include="Template\SiteAnalytics\SiteAnalytics.xlsx" />
     <Content Include="Views\WareHouse\IpodList.cshtml" />
@@ -4444,6 +4443,8 @@
     <Content Include="Views\XMLManage\Index.cshtml" />
     <Content Include="Views\XMLManage\test.cshtml" />
     <Content Include="Views\XMLManage\xmlFile.cshtml" />
+    <Content Include="Template\SiteStatistics\SiteStatistics.xlsx" />
+    <Content Include="Views\WareHouse\Aseld.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
