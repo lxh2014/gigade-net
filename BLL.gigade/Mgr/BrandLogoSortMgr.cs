@@ -49,8 +49,8 @@ namespace BLL.gigade.Mgr
                if (query.blo_id == 0)//add
                {
                    //當前品牌館下有多少筆數據了
-                   DataTable _dataCount = _brandLogoSort.GetCountByCat(Convert.ToInt32(query.category_id));
-                   if (_dataCount.Rows.Count < 10)
+                   DataTable _dataCount = _brandLogoSort.GetCountByCat(query.category_id);
+                   if (_dataCount.Rows.Count < _brandLogoSort.MaxLimit())
                    {
                        //數據不能重複
                        DataTable _existData = _brandLogoSort.NoExistData(query);
@@ -171,7 +171,7 @@ namespace BLL.gigade.Mgr
                DataTable _dt = _brandLogoSort.CategoryId();
                if (_dt != null && _dt.Rows.Count > 0)
                {
-                   _categoryDt = _brandLogoSort.CategoryStore(Convert.ToInt32( _dt.Rows[0][0]));
+                   _categoryDt = _brandLogoSort.CategoryStore( Convert.ToUInt32( _dt.Rows[0][0]));
                }
                return _categoryDt;
            }
@@ -198,7 +198,7 @@ namespace BLL.gigade.Mgr
            int sort = 0;
            try
            {
-               DataTable _dt = _brandLogoSort.MaxSort(Convert.ToInt32(query.category_id));
+               DataTable _dt = _brandLogoSort.MaxSort(query.category_id);
                int n=0;
                if (int.TryParse(_dt.Rows[0][0].ToString(), out n))
                {
