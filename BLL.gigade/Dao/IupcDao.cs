@@ -401,12 +401,15 @@ where 1=1 ");//LEFT JOIN (select parametercode,parameterName from t_parametersrc
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.Append(@"select mu.user_username as create_users,i.row_id,i.upc_id,i.item_id,CONCAT(vb.brand_name,'-',p.product_name) as product_name,i.create_dtim,i.upc_type_flg from iupc i");
+                sql.Append(@" select mu.user_username as create_users,i.row_id,i.upc_id,i.item_id,
+                        CONCAT(vb.brand_name,'-',p.product_name) as product_name,i.create_dtim,i.upc_type_flg,tp.parameterName ");
+                sql.Append(@" from iupc i ");
                 sql.Append(@" left JOIN manage_user mu on mu.user_id=i.create_user ");
                 sql.Append(@" left JOIN product_item pi on i.item_id=pi.item_id 
-inner join product p on p.product_id=pi.product_id 
-left join vendor_brand vb on p.brand_id=vb.brand_id
-where 1=1 ");
+                        inner join product p on p.product_id=pi.product_id 
+                        left join vendor_brand vb on p.brand_id=vb.brand_id
+                      left join (select * from t_parametersrc where parameterType='iupc_type') tp on tp.parameterCode=i.upc_type_flg
+                        where 1=1 ");
                 if (!string.IsNullOrEmpty(iupc.searchcontent))
                 {
                     //sql.AppendFormat(" and (i.item_id like '%{0}%'  or i.upc_id like '%{0}%' )", iupc.searchcontent );
