@@ -7564,15 +7564,14 @@ namespace Admin.gigade.Controllers
                 Caller call = new Caller();
                 call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
                 int k = 0;
-                if (iarc_id == "NE")//庫存調整-不改動前台庫存
-                    if (iarc_id == "NE" || iarc_id == "RF")//庫存調整-不改動前台庫存
-                    {
-                        k = 1;
-                    }
-                    else
-                    {
-                        k = _proditemMgr.UpdateItemStock(Proitems, path, call);
-                    }
+                if (iarc_id == "NE" || iarc_id == "RF")//庫存調整-不改動前台庫存
+                {
+                    k = 1;
+                }
+                else
+                {
+                    k = _proditemMgr.UpdateItemStock(Proitems, path, call);
+                }
                 int newsumcount = _iinvd.GetProqtyByItemid(Convert.ToInt32(Icg.item_id));//總庫存
 
                 Icg.sc_num_chg = newsumcount - oldsumcount;
