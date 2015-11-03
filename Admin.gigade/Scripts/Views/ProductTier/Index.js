@@ -572,6 +572,12 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                         item.data.type = item.data.tabType;
                         item.data.key1 = item.data.keyStr;
                         item.data.value1 = item.data.valueStr;
+                        if (item.data.item_name == "" || item.data.tabType == "" || item.data.keyStr == "" || item.data.valueStr == "") {
+                            Ext.Msg.alert(INFO, MESSAGEPROMPT);
+                            myMask.hide();
+                            return;
+                        }
+
                         //upDataStore[upDataStore.length] = item;
                     } else {
                         oldList.push(item.data.item_name);
@@ -600,6 +606,11 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                     }
                     if (!isNaN(item.data.valueStr)) {
                         item.data.value1 = item.data.valueStr;
+                    }
+                    if (item.data.item_name == "" || item.data.tabType == "" || item.data.keyStr == "" || item.data.valueStr == "") {
+                        Ext.Msg.alert(INFO, MESSAGEPROMPT);
+                        myMask.hide();
+                        return;
                     }
 
                     for (var i = 0; i < relevantStore.data.length; i++) {
