@@ -411,7 +411,7 @@ namespace BLL.gigade.Dao
             }
         }
 
-        public List<VendorBrand> GetBrandListByIds(string ids,int id)
+        public List<VendorBrand> GetBrandListByIds(string ids,uint id)
         {           
             StringBuilder strSql = new StringBuilder();
             try

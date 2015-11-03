@@ -321,5 +321,27 @@ namespace BLL.gigade.Mgr
                 throw new Exception("AseldMgr-->Getfreight-->" + ex.Message, ex);
             }
         }
+        public DataTable GetAseldTable(AseldQuery ase, out int total)
+        {
+            try
+            {
+                return _aseldDao.GetAseldTable(ase, out total);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldMgr-->GetAseldTable-->" + ex.Message, ex);
+            }
+        } 
+        public DataTable GetAseldTablePDF(AseldQuery aseld)
+        {
+            try
+            {
+                return _aseldDao.GetAseldTablePDF(aseld);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldMgr-->GetAseldTablePDF-->" + ex.Message, ex);
+            }
+        }
     } 
 }

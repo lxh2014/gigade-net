@@ -608,7 +608,9 @@ where pext.pwy_dte_ctl='Y' ");
                 DataTable qtdt = _access.getDataTable(sbstr.ToString());
                 sbstr2.AppendFormat("select row_id from iinvd where plas_loc_id='{0}';", qtdt.Rows[0][0]);
                 DataTable qtdt2 = _access.getDataTable(sbstr2.ToString());
+                sb.Append("set sql_safe_updates = 0;");
                 sb.AppendFormat("delete from iinvd where row_id='{0}';", invd.row_id);
+                sb.Append("set sql_safe_updates = 1;");
                 if (qtdt2.Rows.Count < 2)
                 {
                     sb.AppendFormat("set sql_safe_updates = 0;");
