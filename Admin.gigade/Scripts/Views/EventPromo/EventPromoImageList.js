@@ -384,7 +384,7 @@ Ext.onReady(function () {
 //查询
 Query = function () {
     EventPromoImageListStore.removeAll();
-    if (!Ext.getCmp('id').regex.test(Ext.getCmp('id').getValue())) {
+    if (Ext.getCmp('id').getValue()!=""&&!Ext.getCmp('id').regex.test(Ext.getCmp('id').getValue())) {
         Ext.Msg.alert(INFORMATION, "請輸入有效字符串");
         return;
     }
