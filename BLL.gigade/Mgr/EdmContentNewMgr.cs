@@ -532,10 +532,20 @@ namespace BLL.gigade.Mgr
                             arrList.Add(_edmContentNewDao.InsertEdmTrace(et));
                             MRquery.success_action = "update edm_trace set success=1,send_date=NOW()  where log_id=" + log_id + " and  content_id=" + eslQuery.content_id + " and email_id=" + email_id + ";";
                             MRquery.fail_action = "update edm_trace set success=0,send_date=NOW()  where log_id=" + log_id + " and  content_id=" + eslQuery.content_id + " and email_id=" + email_id + ";";
-                            string url = "<img src='http://www.gigade100.com/edm.php?c=" + eslQuery.content_id + "&e=" + email_id + "&l="+log_id+"'/>";
-                            MRquery.body = MRquery.body + url;
+                            DataTable _dtUrl = _edmContentNewDao.GetPraraData(2);
+                            string url = string.Empty;
+                            if (_dtUrl != null && _dtUrl.Rows.Count > 0)
+                            {
+                             url=   "<img src='" + _dtUrl.Rows[0][0].ToString() + "?c=" + eslQuery.content_id + "&e=" + email_id + "&l=" + log_id + "'/>";
+                            }
+                            else
+                            {
+                                url = "<img src='http://www.gigade100.com/edm.php?c=" + eslQuery.content_id + "&e=" + email_id + "&l=" + log_id + "'/>";
+                            }
                           
+                            MRquery.bodyData = MRquery.body + url;
                             arrList.Add(_edmContentNewDao.InsertEmailRequest(MRquery));
+                            MRquery.bodyData = string.Empty;
 
                         }
                     }
@@ -710,6 +720,18 @@ namespace BLL.gigade.Mgr
             catch (Exception ex)
             {
            throw new Exception("EdmContentNewMgr-->FXMD-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetPraraData(int paraCode)
+        {
+            try
+            {
+                return _edmContentNewDao.GetPraraData(paraCode);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetPraraData-->" + ex.Message, ex);
             }
         }
 

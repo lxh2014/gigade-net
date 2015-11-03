@@ -396,12 +396,13 @@ namespace BLL.gigade.Dao
             }
         }
 
-        public string GetBrand_idByBrand_name(string name)
+        public string GetBrand_idByBrand_name(VendorBrandQuery query)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT brand_id,brand_name from vendor_brand WHERE brand_name LIKE N'%{0}%'",name);
+                query.Replace4MySQL();
+                sql.AppendFormat(@"SELECT brand_id,brand_name from vendor_brand WHERE brand_name LIKE N'%{0}%'",query);
                 return sql.ToString();
             }
             catch (Exception ex)
@@ -410,7 +411,7 @@ namespace BLL.gigade.Dao
             }
         }
 
-        public List<VendorBrand> GetBrandListByIds(string ids,int id)
+        public List<VendorBrand> GetBrandListByIds(string ids,uint id)
         {           
             StringBuilder strSql = new StringBuilder();
             try

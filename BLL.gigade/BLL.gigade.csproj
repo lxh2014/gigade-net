@@ -273,6 +273,7 @@
     <Compile Include="Dao\PromoShareConditionTypeDao.cs" />
     <Compile Include="Dao\PromoShareMasterDao.cs" />
     <Compile Include="Dao\PromotionBannerDao.cs" />
+    <Compile Include="Dao\PromotionBannerRelationDao.cs" />
     <Compile Include="Dao\RecommendedExcleDao.cs" />
     <Compile Include="Dao\RecommendedProductAttributeDao.cs" />
     <Compile Include="Dao\ScheduleDao.cs" />
@@ -746,6 +747,7 @@
     <Compile Include="Mgr\EventpromoUserConditionMgr.cs" />
     <Compile Include="Mgr\FunctionHistoryMgr.cs" />
     <Compile Include="Mgr\GroupCommitteContactMgr.cs" />
+    <Compile Include="Mgr\HandleXmlMgr.cs" />
     <Compile Include="Mgr\IdiffcountbookMgr.cs" />
     <Compile Include="Mgr\IlocChangeDetailMgr.cs" />
     <Compile Include="Mgr\Impl\IAppcategoryImplMgr.cs" />
@@ -769,6 +771,7 @@
     <Compile Include="Mgr\Impl\IEventpromoUserConditionImplMgr.cs" />
     <Compile Include="Mgr\Impl\IFunctionHistoryImplMgr.cs" />
     <Compile Include="Mgr\EmsDepRelationMgr.cs" />
+    <Compile Include="Mgr\Impl\IHandleXmlImplMgr.cs" />
     <Compile Include="Mgr\Impl\IInvoiceMasterRecordImplMgr.cs" />
     <Compile Include="Mgr\Impl\IIpodImplMgr.cs" />
     <Compile Include="Mgr\Impl\IIpoImplMgr.cs" />
@@ -815,6 +818,7 @@
     <Compile Include="Mgr\PromoShareConditionTypeMgr.cs" />
     <Compile Include="Mgr\PromoShareMasterMgr.cs" />
     <Compile Include="Mgr\PromotionBannerMgr.cs" />
+    <Compile Include="Mgr\PromotionBannerRelationMgr.cs" />
     <Compile Include="Mgr\RecommendedExcleMgr.cs" />
     <Compile Include="Mgr\RecommendedProductAttributeMgr.cs" />
     <Compile Include="Mgr\ScheduleItemMgr.cs" />
@@ -1377,6 +1381,7 @@
     <Compile Include="Model\PromoShareConditionType.cs" />
     <Compile Include="Model\PromoShareMaster.cs" />
     <Compile Include="Model\PromotionBanner.cs" />
+    <Compile Include="Model\PromotionBannerRelation.cs" />
     <Compile Include="Model\Query\BannerNewsContentQuery.cs" />
     <Compile Include="Model\Query\AppcategoryQuery.cs" />
     <Compile Include="Model\Query\AppmessageQuery.cs" />
@@ -1440,6 +1445,7 @@
     <Compile Include="Model\Query\PromoShareConditionTypeQuery.cs" />
     <Compile Include="Model\Query\PromoShareMasterQuery.cs" />
     <Compile Include="Model\Query\PromotionBannerQuery.cs" />
+    <Compile Include="Model\Query\PromotionBannerRelationQuery.cs" />
     <Compile Include="Model\Query\ScheduleConfigQuery.cs" />
     <Compile Include="Model\Query\ScheduleQuery.cs" />
     <Compile Include="Model\OrderAccumAmount.cs" />
@@ -1847,6 +1853,7 @@
     <Compile Include="Model\WebContentType7.cs" />
     <Compile Include="Model\WebContentType8.cs" />
     <Compile Include="Model\WebContentTypeSetup.cs" />
+    <Compile Include="Model\XmlModelCustom.cs" />
     <Compile Include="Model\Zip.cs" />
     <Compile Include="Model\OrderMasterStatus.cs" />
     <Compile Include="Dao\ParametersrcXmlDao.cs" />
