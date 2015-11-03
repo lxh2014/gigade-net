@@ -179,7 +179,7 @@
                                 myMask.hide();
                                 if (result.success) {
                                     if (result.maxCount) {
-                                        Ext.Msg.alert("提示信息", "該品牌分類下已有10筆數據");
+                                        Ext.Msg.alert("提示信息", "該品牌分類下已達最大數據限制！");
 
                                     }
                                     if (result.repeatSort) {
