@@ -65,7 +65,7 @@
             }, {
                 xtype: 'combobox',
                 fieldLabel: '品牌館分類',
-                store:CategoryStore,
+                store: CategoryStore,
                 id: 'category_id',
                 name: 'category_id',
                 queryMode: 'local',
@@ -73,7 +73,7 @@
                 valueField: 'category_id',
                 typeAhead: true,
                 //allowBlank: false,
-                editable:false,
+                editable: false,
                 listeners: {
                     select: function (combo, record) {
                         var m = Ext.getCmp("brand_id");
@@ -91,11 +91,11 @@
             {
                 xtype: 'combobox',
                 fieldLabel: '品牌名稱',
-                store:BrandStore,
+                store: BrandStore,
                 id: 'brand_id',
                 name: 'brand_id',
                 displayField: 'brand_name',
-                valueField:'brand_id',
+                valueField: 'brand_id',
                 queryMode: 'local',
                 typeAhead: true,
                 //allowBlank: false,
@@ -134,19 +134,19 @@
                 xtype: 'displayfield',
                 id: 'old_brand_id',
                 name: 'old_brand_id',
-                hidden:'true',
+                hidden: 'true',
             },
               {
-                xtype: 'numberfield',
-                fieldLabel: '排序',
-                id: 'blo_sort',
-                name: 'blo_sort',
-                minValue: 1,
-                  value:1,
-                maxValue:99999999,
-                allowDecimals:false,
-                allowBlank: false
-            },  
+                  xtype: 'numberfield',
+                  fieldLabel: '排序',
+                  id: 'blo_sort',
+                  name: 'blo_sort',
+                  minValue: 1,
+                  value: 1,
+                  maxValue: 99999999,
+                  allowDecimals: false,
+                  allowBlank: false
+              },
         ],
         buttons: [
             {
@@ -180,22 +180,22 @@
                                 if (result.success) {
                                     if (result.maxCount) {
                                         Ext.Msg.alert("提示信息", "該品牌分類下已有10筆數據");
-                                      
+
                                     }
                                     if (result.repeatSort) {
                                         Ext.Msg.alert("提示信息", "排序重複");
-                                       
+
                                     }
                                     if (result.repeatData) {
                                         Ext.Msg.alert("提示信息", "數據重複");
-                                      
+
                                     }
                                     if (result.re) {
                                         Ext.Msg.alert("提示信息", "保存成功! ");
                                         store.load();
                                         editWin.close();
                                     }
-                                  
+
                                 }
                                 else {
                                     Ext.Msg.alert("提示信息", "保存失敗! ");
@@ -247,13 +247,13 @@
             'show': function () {
                 if (row) {
                     editFrm.getForm().loadRecord(row);
-                    Ext.getCmp('brand_id').allowBlank =true;
+                    Ext.getCmp('brand_id').allowBlank = true;
                     Ext.getCmp('category_id').allowBlank = true;
                     Ext.getCmp('category_id').setValue(row.data.category_id);
                     BrandStore.load();
                     Ext.getCmp('category_id').setDisabled(true);
                     Ext.getCmp('old_brand_id').setValue(row.data.brand_id);
-                
+
                 }
                 else {
                     editFrm.getForm().reset();
