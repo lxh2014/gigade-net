@@ -44,7 +44,8 @@ Ext.define('gigade.Fares', {
         { name: "vendor_name_simple", type: "string" }, //供應商名稱
         { name: "Event", type: "string" },
         { name: "vendorstatus", type: "int" },
-        { name: "short_description", type: "string" }
+        { name: "short_description", type: "string" },
+           { name: "brand_logo", type: "string" },
     ]
 });
 //品牌列表數據
@@ -193,6 +194,15 @@ Ext.onReady(function () {
                  tpl: '<a target="_blank" href="{Promotion_Banner_Image}" ><img width=50 name="tplImg" height=50 src="{Promotion_Banner_Image}" /></a>'
 
              },
+              {
+                  header: "品牌logo",
+                  dataIndex: 'brand_logo',
+                  width: 80,
+                  align: 'center',
+                  xtype: 'templatecolumn',
+                  tpl: '<a target="_blank" href="{brand_logo}" ><img width=50 name="tplImg" height=50 src="{brand_logo}" /></a>'
+
+              },
 
             {
                 header: "狀態", dataIndex: 'Brand_Status', width: 100, align: 'center',
