@@ -1992,6 +1992,7 @@
     <Content Include="Scripts\Views\VipUserGroup\edit.js" />
     <Content Include="Scripts\Views\VipUserGroup\GCCInfo.js" />
     <Content Include="Scripts\Views\VipUserGroup\list.js" />
+    <Content Include="Scripts\Views\WareHouse\Aseld.js" />
     <Content Include="Scripts\Views\WareHouse\Check.js" />
     <Content Include="Scripts\Views\WareHouse\Idiff_count_book.js" />
     <Content Include="Scripts\Views\WareHouse\IialgList.js" />
@@ -4669,7 +4670,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>11529</DevelopmentServerPort>
+          <DevelopmentServerPort>16565</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
