@@ -82,7 +82,7 @@ Ext.onReady(function () {
         frame: true,
         flex: 9.4,
         columns: [
-            new Ext.grid.RowNumberer(),//自動顯示行號
+            //new Ext.grid.RowNumberer(),//自動顯示行號
          { header: "編號", dataIndex: "rowid", width: 80, align: 'center' },
         { header: "排程名稱", dataIndex: "schedule_code", width: 120, align: 'center' },
         { header: "創建人", dataIndex: "create_username", width: 100, align: 'center' },
