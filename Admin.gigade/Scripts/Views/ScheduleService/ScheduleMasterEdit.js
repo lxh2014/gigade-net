@@ -131,7 +131,7 @@ editFunction_master = function (row, store) {
     //点击关闭按钮后  提示信息
     //一个指定的打算作为一个应用程序窗口的面板。
     var editWin = Ext.create('Ext.window.Window', {
-        title: "新增排程",
+        title: "排程服務",
         id: 'editWin',
         iconCls: "icon-user-add",
         width: 460,
@@ -176,7 +176,6 @@ editFunction_master = function (row, store) {
                     Ext.getCmp('schedule_code_master').setValue(row.data.schedule_code);
                 }
                 else {
-
                     editFrm.getForm().reset();
 
                 }
