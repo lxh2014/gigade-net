@@ -118,7 +118,7 @@ Ext.onReady(function () {
                             tpl: '<a target="_blank" href="{brand_logo}" ><img width=50 name="tplImg" height=50 src="{brand_logo}" /></a>'
                         },
         { header: "排序", dataIndex: 'blo_sort', width: 150, align: 'center' },
-        { header: "分類名稱", dataIndex: 'category_name', width: 150, align: 'center' },
+        { header: "品牌館分類", dataIndex: 'category_name', width: 150, align: 'center' },
         { header: "異動人員", dataIndex: 'user_username', width: 150, align: 'center' },
           { header: "異動時間", dataIndex: 'blo_mdate', width: 150, align: 'center' },
         ],
@@ -130,7 +130,7 @@ Ext.onReady(function () {
          '->',
          {
              xtype: 'combobox',
-             fieldLabel: '分類名稱',
+             fieldLabel: '品牌館分類',
              id: 'category_id_ser',
              displayField: 'category_name',
              valueField: 'category_id',
@@ -280,13 +280,27 @@ onDeleteClick = function () {
 
 
 function Search() {
-    BrandLogoSortStore.removeAll();
 
-    Ext.getCmp("BrandLogoSort").store.loadPage(1, {
-        params: {
-            category_id: Ext.getCmp('category_id_ser').getValue(),
-            brand_id: Ext.getCmp('brand_id_ser').getValue(),
-        }
-    });
+    BrandLogoSortStore.removeAll();
+    var category_id = Ext.getCmp('category_id_ser').getValue();
+    var brand_id = Ext.getCmp('brand_id_ser').getValue();
+    if (category_id == null && brand_id == null) {
+        Ext.Msg.alert("提示信息", "請選擇查詢條件");
+        return;
+    }
+    else if (category_id == null) {
+        Ext.Msg.alert("提示信息", "請先選擇品牌館分類");
+        //Ext.getCmp('brand_id_ser').setValue();
+        return;
+    }
+    else {
+        Ext.getCmp("BrandLogoSort").store.loadPage(1, {
+            params: {
+                category_id: Ext.getCmp('category_id_ser').getValue(),
+                brand_id: Ext.getCmp('brand_id_ser').getValue(),
+            }
+        });
+    }
 }
+
 
