@@ -1202,15 +1202,25 @@ namespace Admin.gigade.Controllers
             string newName = string.Empty;
             string json = string.Empty;
             List<IupcQuery> store = new List<IupcQuery>();
+            _IparasrcMgr = new ParameterMgr(mySqlConnectionString);
+            StringBuilder codeType1 = new StringBuilder();
+            string codeTypeStr1 = string.Empty;
             try
             {
+
+                List<BLL.gigade.Model.Parametersrc> codeTypeList = _IparasrcMgr.GetElementType("iupc_type");
+                foreach (var codeTypeModel in codeTypeList)
+                {
+                    codeType1.AppendFormat("{0}:{1}, ", codeTypeModel.ParameterCode, codeTypeModel.parameterName);
+                }
+                codeTypeStr1 = codeType1.ToString().Substring(0, codeType1.Length - 2);
 
                 DTIupcExcel.Clear();
                 DTIupcExcel.Columns.Clear();
 
                 DTIupcExcel.Columns.Add("商品細項編號", typeof(String));
                 DTIupcExcel.Columns.Add("條碼編號", typeof(String));
-                DTIupcExcel.Columns.Add("條碼類型", typeof(String));
+                DTIupcExcel.Columns.Add("條碼類型（" + codeTypeStr1 + "）", typeof(String));
                 DTIupcExcel.Columns.Add("不能匯入的原因", typeof(String));
                 DTIupcExcel.Columns.Add("匯入失敗數據的行號", typeof(String));
 
@@ -1241,10 +1251,10 @@ namespace Admin.gigade.Controllers
                     if (dt.Rows.Count > 0)
                     {
                         _IiupcMgr = new IupcMgr(mySqlConnectionString);
-                        _IparasrcMgr = new ParameterMgr(mySqlConnectionString);
+                        //_IparasrcMgr = new ParameterMgr(mySqlConnectionString);
                         #region 循環Excel的數據
    
-                        List<BLL.gigade.Model.Parametersrc> codeTypeList = _IparasrcMgr.GetElementType("iupc_type");
+                        //List<BLL.gigade.Model.Parametersrc> codeTypeList = _IparasrcMgr.GetElementType("iupc_type");
                                               
                         int i = 0;                     
                         for (int k = 0; k < dt.Rows.Count; k++)
