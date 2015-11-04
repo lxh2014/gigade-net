@@ -35,15 +35,15 @@ namespace BLL.gigade.Dao
                 sql.Append(" select blo.blo_id,blo.brand_id,vb.brand_name, vb.brand_logo,  blo.blo_sort, pc.category_id, pc.category_name,mu.user_username,blo.blo_mdate  ");
                 sqlFrom.Append(" from brand_logo_sort blo LEFT JOIN vendor_brand vb on blo.brand_id=vb.brand_id LEFT JOIN product_category pc on blo.category_id=pc.category_id LEFT JOIN manage_user mu on blo.blo_muser=mu.user_id  ");
                 sqlWhere.AppendFormat(" where 1=1   ");
-                if (query.category_id != 0)
+                if (query.category_id != 0 && query.brand_id != 0)
                 {
-                    sqlWhere.AppendFormat("and pc.category_id='{0}' ", query.category_id);
+                    sqlWhere.AppendFormat("and pc.category_id='{0}' and blo.brand_id='{1}'", query.category_id, query.brand_id);
                 }
-                if (query.brand_id != 0)
+                else if (query.category_id != 0 && query.brand_id == 0)
                 {
-                    sqlWhere.AppendFormat("and blo.brand_id='{0}' ", query.brand_id);
+                    sqlWhere.AppendFormat("and pc.category_id='{0}'  ", query.category_id);
                 }
-                DataTable _dt = _access.getDataTable(sqlCount.ToString() + sqlFrom.ToString());
+                DataTable _dt = _access.getDataTable(sqlCount.ToString() + sqlFrom.ToString()+sqlWhere.ToString());
                 if (_dt != null && _dt.Rows.Count > 0)
                 {
                     totalCount = Convert.ToInt32(_dt.Rows[0][0]);

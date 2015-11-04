@@ -1865,6 +1865,11 @@
     <Content Include="Scripts\Views\EdmContentNew\EdmContentNewReport.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmSend.js" />
     <Content Include="Scripts\Views\EdmContentNew\EdmSendListCount.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmContentNewEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmContentNewList.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmContentNewReport.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmSend.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmSendListCount.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateEdit.js" />

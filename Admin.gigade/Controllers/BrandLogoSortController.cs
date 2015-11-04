@@ -55,7 +55,7 @@ namespace Admin.gigade.Controllers
                     }
                     else
                     {
-                        query.brand_id = n;
+                        query.brand_id = 99999999;
                     }
                 }
                 query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");

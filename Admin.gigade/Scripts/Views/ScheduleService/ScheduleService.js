@@ -220,7 +220,7 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
      { xtype: 'button', text: "刪除", id: 'delete_master', iconCls: 'icon-user-remove', hidden: true, disabled: true, handler: ondelete_master },
      { xtype: 'button', text: "立即執行", id: 'runonce_master', iconCls: 'icon-user-edit', hidden: true, disabled: true, handler: onrunonce_master },
      '->',
-     { xtype: 'button', text: "查詢", id: 'grid_btn_search', iconCls: 'ui-icon ui-icon-search', width: 65, handler: Search },
+     { xtype: 'button', text: "刷新", id: 'grid_btn_search', iconCls: 'ui-icon ui-icon-search', width: 65, handler: Search },
     ],
     bbar: Ext.create('Ext.PagingToolbar', {
         store: ScheduleStore,
@@ -373,7 +373,7 @@ Ext.onReady(function () {
             xtype: 'panel',
             autoScroll: true,
             frame: false,
-            width: 400,
+            width: 500,
             margins: '5 4 5 5',
             id: 'west-region-container',
             layout: 'anchor',
