@@ -71,6 +71,7 @@ namespace BLL.gigade.Model.Query
 
         public string estimated_arrival_period_str { get; set; }
         public string delivery_date_str { get; set; }
+        public int order_day { set; get; }//add by chaojie1124j 2015/11/3 05:21PM,距離預計到貨日，實現訂單細項查詢中，預計到貨日-今天<=order_day的未到貨的出貨單show出來
         public DeliverMasterQuery()
         {
             vendor_id = 0;
