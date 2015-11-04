@@ -74,9 +74,10 @@
         frame: true,
         plain: true,
         constrain: true,
-        //autoScroll: true,
+        autoScroll: true,
         layout: 'anchor',
         labelWidth: 45,
+       // height:1000,
         url: '/EdmNew/SaveEdmContentNew',
         defaults: { anchor: "95%", msgTarget: "side" },
         //////編輯器
@@ -196,13 +197,13 @@
         },
         /////編輯器
         items: [
-              {
-                  xtype: 'displayfield',
-                  fieldLabel: '編號',
-                  id: 'content_id',
-                  name: 'content_id',
-                  hidden: true
-              },
+            {
+                xtype: 'displayfield',
+                fieldLabel: '編號',
+                id: 'content_id',
+                name: 'content_id',
+                hidden: true
+            },
             {
                 xtype: 'combobox',
                 store: MailSenderStore,
@@ -229,8 +230,7 @@
                 id: 'group_id',
                 name: 'group_id',
                 editable: false,
-                lastQuery: '',
-
+                lastQuery: ''
             },
             {
                 xtype: 'combobox',
@@ -242,7 +242,7 @@
                 name: 'importance',
                 value: 1,
                 editable: false,
-                lastQuery: '',
+                lastQuery: ''
             },
             {
                 xtype: 'textfield',
@@ -294,6 +294,12 @@
                 id: 'kendoEditor',
                 name: 'kendoEditor',
             },
+            {
+                xtype: 'textarea',
+                html: '<div id="template_area"></div>',
+                frame: true,
+                border: false
+            }
         ],
         buttons: [
             {
@@ -403,5 +409,15 @@
     editWin.show();
     function initRow(row) {
         $('textarea[name=kendoEditor]').data("kendoEditor").value(row.data.template_data);
+    }
+    function Query() {
+        $.ajax({
+            async: false,
+            url: '/EdmNew/Editkendo2'
+        }).success(function (partialView) {
+            $('#template_area').empty().append(partialView);
+            // 呼叫 API 取得 edm_content.template_data
+            $(".content_editor").kendoEditor();
+        });
     }
 }
