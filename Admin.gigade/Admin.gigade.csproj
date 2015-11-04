@@ -1843,6 +1843,9 @@
     <Content Include="Scripts\Ext4.0\ux\DataView\DragSelector.js" />
     <Content Include="Scripts\Ext4.0\ux\DataView\LabelEditor.js" />
     <Content Include="Scripts\jquery-2.1.4.min.js" />
+    <Content Include="Content\kendo.common.min.css" />
+    <Content Include="Content\kendo.default.min.css" />
+    <Content Include="Scripts\kendo.ui.core.min.js" />
     <Content Include="Scripts\kendo\2014.2.716\angular.min.js" />
     <Content Include="Scripts\kendo\2014.2.716\jquery-1.9.1.js" />
     <Content Include="Scripts\kendo\2014.2.716\jquery.min.js" />
@@ -1857,11 +1860,11 @@
     <Content Include="Scripts\Views\DispatchingSystem\DesignRequestList.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsEdit.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsList.js" />
-    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />
-    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
-    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewReport.js" />
-    <Content Include="Scripts\Views\EdmContentNew\EdmSend.js" />
-    <Content Include="Scripts\Views\EdmContentNew\EdmSendListCount.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmContentNewEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmContentNewList.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmContentNewReport.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmSend.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmSendListCount.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateEdit.js" />
@@ -4416,7 +4419,6 @@
     <Content Include="Views\WareHouse\Check.cshtml" />
     <Content Include="Views\Super\Index.cshtml" />
     <Content Include="Views\Product\InventoryQuery.cshtml" />
-    <Content Include="Template\SiteStatistics\站臺訪問量統計匯入範本.xlsx" />
     <Content Include="Views\OrderManage\OrderDetailManage.cshtml" />
     <Content Include="Template\SiteAnalytics\SiteAnalytics.xlsx" />
     <Content Include="Views\WareHouse\IpodList.cshtml" />
@@ -4444,6 +4446,10 @@
     <Content Include="Views\XMLManage\Index.cshtml" />
     <Content Include="Views\XMLManage\test.cshtml" />
     <Content Include="Views\XMLManage\xmlFile.cshtml" />
+    <Content Include="Views\EdmNew\Editkendo.cshtml" />
+    <Content Include="Views\EdmNew\Editkendo2.cshtml" />
+    <Content Include="Template\SiteStatistics\SiteStatistics.xlsx" />
+    <Content Include="Views\WareHouse\Aseld.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -243,10 +243,11 @@ onDeleteClick = function () {
         Ext.Msg.alert("提示信息", "沒有選擇一行！");
     }
     else {
-        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
-        myMask.show();
+    
         Ext.Msg.confirm("確認信息", Ext.String.format("刪除選中 {0} 條數據？", row.length), function (btn) {
             if (btn == 'yes') {
+                var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                myMask.show();
                 var rowIDs = '';
                 for (var i = 0; i < row.length; i++) {
                     rowIDs += row[i].data.blo_id + "∑";
@@ -272,9 +273,6 @@ onDeleteClick = function () {
                         BrandLogoSortStore.load();
                     }
                 });
-            }
-            else {
-                myMask.hide();
             }
         });
     }

@@ -43,7 +43,7 @@ namespace BLL.gigade.Dao
                 {
                     sqlWhere.AppendFormat("and blo.brand_id='{0}' ", query.brand_id);
                 }
-                DataTable _dt = _access.getDataTable(sqlCount.ToString() + sqlFrom.ToString());
+                DataTable _dt = _access.getDataTable(sqlCount.ToString() + sqlFrom.ToString()+sqlWhere.ToString());
                 if (_dt != null && _dt.Rows.Count > 0)
                 {
                     totalCount = Convert.ToInt32(_dt.Rows[0][0]);
