@@ -1925,6 +1925,7 @@
     <Content Include="Scripts\Views\OrderManage\OrderReturn.js" />
     <Content Include="Scripts\Views\OrderManage\OrderReturnList.js" />
     <Content Include="Scripts\Views\OrderManage\ReturnAllOrder.js" />
+    <Content Include="Scripts\Views\Order\OrderCategortSum.js" />
     <Content Include="Scripts\Views\Order\OrderStatusModify.js" />
     <Content Include="Scripts\Views\PageErrorLog\list.js" />
     <Content Include="Scripts\Views\ProductCategory\CateBrandEdit.js" />
@@ -4436,6 +4437,7 @@
     <Content Include="Views\EdmNew\EdmSendListCountView.cshtml" />
     <Content Include="Views\ProductPurchase\StatusLowerShelf.cshtml" />
     <Content Include="Views\BrandLogoSort\Index.cshtml" />
+    <Content Include="Views\Order\OrderCategorySum.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4650,7 +4652,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>11529</DevelopmentServerPort>
+          <DevelopmentServerPort>11531</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
