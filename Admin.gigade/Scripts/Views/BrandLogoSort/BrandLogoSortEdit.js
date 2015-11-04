@@ -198,13 +198,13 @@
 
                                 }
                                 else {
-                                    Ext.Msg.alert("提示信息", "保存失敗! ");
+                                    Ext.Msg.alert("提示信息", "操作失敗,請稍後再試,或聯繫開發人員! ");
                                     editWin.close();
                                 }
                             },
                             failure: function () {
                                 myMask.hide();
-                                Ext.Msg.alert("提示信息", "出現異常! ");
+                                Ext.Msg.alert("提示信息", "操作失敗,請稍後再試,或聯繫開發人員! ");
                                 editWin.close();
                             }
                         });
