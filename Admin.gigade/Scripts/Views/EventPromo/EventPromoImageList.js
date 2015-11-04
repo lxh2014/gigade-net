@@ -593,17 +593,17 @@ AllowMultiOrNot = function () {
             var result = Ext.decode(form.responseText);
             if (result.msg == '0') {
                 //0是禁止多圖狀態，此時應該顯示可以多圖的按鈕
-                Ext.getCmp('forbidMulti').hide();
-                Ext.getCmp('allowMulti').show();
+                //Ext.getCmp('forbidMulti').hide();
+                //Ext.getCmp('allowMulti').show();
             }
             else {
-                Ext.getCmp('forbidMulti').show();
-                Ext.getCmp('allowMulti').hide();
-                multi = 1;
+                //Ext.getCmp('forbidMulti').show();
+                //Ext.getCmp('allowMulti').hide();
+                //multi = 1;
             }
         },
         failure: function () {
-            Ext.Msg.alert(INFORMATION, FAILURE);
+           // Ext.Msg.alert(INFORMATION, FAILURE);
         }
     });
 }
