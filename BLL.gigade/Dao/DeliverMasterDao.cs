@@ -739,7 +739,7 @@ on ld.deliver_id=dm.deliver_id  where 1=1 ");
                 }
                 if (deliver.order_day != 0)
                 {
-                    strcondition.AppendFormat(" and dm.deliver_org_days<='{0}' and ld.logisticsTypes<>6 ", Common.CommonFunction.GetPHPTime(DateTime.Now.AddDays(deliver.order_day).ToString("yyyy-MM-dd 23:59:59")));//預計到貨日期且未到貨
+                    strcondition.AppendFormat(" and dm.deliver_org_days<='{0}' ", Common.CommonFunction.GetPHPTime(DateTime.Now.AddDays(deliver.order_day).ToString("yyyy-MM-dd 23:59:59")));//預計到貨日期且未到貨
                 }
                 if (deliver.i_slave_status != -1)
                 {
@@ -865,7 +865,7 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1  "
                 }
                 if (deliver.order_day != 0)
                 {
-                    strcondition.AppendFormat(" and dm.deliver_org_days<='{0}' and ld.logisticsTypes<>6 ", Common.CommonFunction.GetPHPTime(DateTime.Now.AddDays(deliver.order_day).ToString("yyyy-MM-dd 23:59:59")));//預計到貨日期且未到貨
+                    strcondition.AppendFormat(" and dm.deliver_org_days<='{0}'  ", Common.CommonFunction.GetPHPTime(DateTime.Now.AddDays(deliver.order_day).ToString("yyyy-MM-dd 23:59:59")));//預計到貨日期且未到貨
                 }
                 if (deliver.i_slave_status != -1)
                 {
