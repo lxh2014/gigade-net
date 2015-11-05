@@ -263,6 +263,10 @@
                                                 Ext.getCmp("bank_branch").show();
                                                 Ext.getCmp("bank_account").show();
                                                 Ext.getCmp("account_name").show();
+                                                Ext.getCmp("bank_name").setValue(result.bank_name);
+                                                Ext.getCmp("bank_branch").setValue(result.bank_branch);
+                                                Ext.getCmp("bank_account").setValue(result.bank_account);
+                                                Ext.getCmp("account_name").setValue(result.account_name);
                                             }
                                             transport.getForm().reset();
                                             Ext.getCmp('transportBtn').setDisabled(true);
@@ -434,6 +438,10 @@
                                             Ext.getCmp("bank_branch").show();
                                             Ext.getCmp("bank_account").show();
                                             Ext.getCmp("account_name").show();
+                                            Ext.getCmp("bank_name").setValue(result.bank_name);
+                                            Ext.getCmp("bank_branch").setValue(result.bank_branch);
+                                            Ext.getCmp("bank_account").setValue(result.bank_account);
+                                            Ext.getCmp("account_name").setValue(result.account_name);
                                         }
                                         transport.getForm().reset();
                                         Ext.getCmp('transportBtn').setDisabled(true);
