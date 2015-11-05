@@ -333,20 +333,20 @@ Ext.onReady(function () {
         }, '->',
         {
             xtype: 'button',
-            text: '允許多圖',
-            id: 'allowMulti',
+            //text: '多圖',
+            id: 'multi',
             iconCls: 'icon-user-edit',
             hidden: true,
-            handler: onAllowMultiClick
-        },
-        {
-            xtype: 'button',
-            text: '禁止多圖',
-            id: 'forbidMulti',
-            iconCls: 'icon-user-edit',
-            hidden: true,
-            handler: onForbidMultiClick
+            handler: onChangeMultiClick
         }
+        //{
+        //    xtype: 'button',
+        //    text: '禁止多圖',
+        //    id: 'forbidMulti',
+        //    iconCls: 'icon-user-edit',
+        //    hidden: true,
+        //    handler: onForbidMultiClick
+        //}
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: EventPromoImageListStore,
@@ -412,7 +412,8 @@ Query = function () {
 }
 function UpdateStatus(id) {
     var activeValue = $("#img" + id).attr("hidValue");
-    if (Ext.getCmp("allowMulti").hidden) {
+    if(Ext.getCmp('multi').text == "禁止多圖"){
+    //if (Ext.getCmp("allowMulti").hidden) {
         multi = 1;
     }
     else {
@@ -561,21 +562,41 @@ setNextMonth = function (source, n) {
     }
     return s;
 }
-onAllowMultiClick = function () {
-    multi = 1;
-    Ext.Msg.alert(INFORMATION, '您將允許一個品牌添加多張促銷圖片');
-    Ext.getCmp('allowMulti').hide();
-    Ext.getCmp('forbidMulti').show();
-}
-onForbidMultiClick = function () {
-    ChangeImageMode();
-    if (multi == 1) {
-        if (changeError == 0) {
-            multi = 0;
-            Ext.Msg.alert(INFORMATION, '您將禁止一個品牌添加多張促銷圖片');
-            Ext.getCmp('forbidMulti').hide();
-            Ext.getCmp('allowMulti').show();
+//onMultiClick = function () {
+//    multi = 1;
+//    Ext.Msg.alert(INFORMATION, '您將允許一個品牌添加多張促銷圖片');
+//    Ext.getCmp('allowMulti').hide();
+//    Ext.getCmp('forbidMulti').show();
+//}
+//onForbidMultiClick = function () {
+//    ChangeImageMode();
+//    if (multi == 1) {
+//        if (changeError == 0) {
+//            multi = 0;
+//            Ext.Msg.alert(INFORMATION, '您將禁止一個品牌添加多張促銷圖片');
+//            Ext.getCmp('forbidMulti').hide();
+//            Ext.getCmp('allowMulti').show();
+//        }
+//    }
+//}
+onChangeMultiClick = function ()
+{
+    if (Ext.getCmp('multi').text == "允許多圖") {
+        multi = 1;
+        Ext.Msg.alert(INFORMATION, '您將允許一個品牌添加多張促銷圖片');
+        Ext.getCmp('multi').setText('禁止多圖');
+        return;
+    }
+    else {
+        ChangeImageMode();
+        if (multi == 1) {
+            if (changeError == 0) {
+                multi = 0;
+                Ext.Msg.alert(INFORMATION, '您將禁止一個品牌添加多張促銷圖片');
+                Ext.getCmp('multi').setText('允許多圖');
+            }
         }
+        return;
     }
 }
 AllowMultiOrNot = function () {
@@ -591,19 +612,21 @@ AllowMultiOrNot = function () {
         },
         success: function (form, action) {
             var result = Ext.decode(form.responseText);
-            if (result.msg == '0') {
+            if (result.msg == '0') {                
                 //0是禁止多圖狀態，此時應該顯示可以多圖的按鈕
-                //Ext.getCmp('forbidMulti').hide();
-                //Ext.getCmp('allowMulti').show();
+                Ext.getCmp('multi').setText('允許多圖');
+                return;
             }
             else {
+                Ext.getCmp('multi').setText('禁止多圖');
                 //Ext.getCmp('forbidMulti').show();
                 //Ext.getCmp('allowMulti').hide();
                 //multi = 1;
+                return;
             }
         },
         failure: function () {
-           // Ext.Msg.alert(INFORMATION, FAILURE);
+            Ext.Msg.alert(INFORMATION, FAILURE);
         }
     });
 }
@@ -619,17 +642,15 @@ ChangeImageMode = function () {
         },
         success: function (form, action) {
             var result = Ext.decode(form.responseText);
-            if (result.success) {
-                multi = 0;
-                Ext.getCmp('forbidMulti').hide();
-                Ext.getCmp('allowMulti').show();
+            if (result.success) {              
+                Ext.getCmp('multi').setText('允許多圖');
+                return;
             }
             else if (result.id != '0') {
                 Ext.Msg.alert(INFORMATION, '品牌編號: ' + result.id + ',在指定的時段內正在使用其他促銷圖片, 請確認');
                 multi = 1;
                 changeError = 1;
-                Ext.getCmp('forbidMulti').show();
-                Ext.getCmp('allowMulti').hide();
+                Ext.getCmp('multi').setText('禁止多圖');
             }
         },
         failure: function () {
