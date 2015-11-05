@@ -1931,6 +1931,7 @@
     <Content Include="Scripts\Views\OrderManage\OrderReturn.js" />
     <Content Include="Scripts\Views\OrderManage\OrderReturnList.js" />
     <Content Include="Scripts\Views\OrderManage\ReturnAllOrder.js" />
+    <Content Include="Scripts\Views\Order\OrderCategortSum.js" />
     <Content Include="Scripts\Views\Order\OrderStatusModify.js" />
     <Content Include="Scripts\Views\PageErrorLog\list.js" />
     <Content Include="Scripts\Views\ProductCategory\CateBrandEdit.js" />
@@ -1987,6 +1988,7 @@
     <Content Include="Scripts\Views\VipUserGroup\edit.js" />
     <Content Include="Scripts\Views\VipUserGroup\GCCInfo.js" />
     <Content Include="Scripts\Views\VipUserGroup\list.js" />
+    <Content Include="Scripts\Views\WareHouse\Aseld.js" />
     <Content Include="Scripts\Views\WareHouse\Check.js" />
     <Content Include="Scripts\Views\WareHouse\Idiff_count_book.js" />
     <Content Include="Scripts\Views\WareHouse\IialgList.js" />
@@ -4443,6 +4445,7 @@
     <Content Include="Views\EdmNew\EdmSendListCountView.cshtml" />
     <Content Include="Views\ProductPurchase\StatusLowerShelf.cshtml" />
     <Content Include="Views\BrandLogoSort\Index.cshtml" />
+    <Content Include="Views\Order\OrderCategorySum.cshtml" />
     <Content Include="Views\XMLManage\Index.cshtml" />
     <Content Include="Views\XMLManage\test.cshtml" />
     <Content Include="Views\XMLManage\xmlFile.cshtml" />
@@ -4664,7 +4667,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>11529</DevelopmentServerPort>
+          <DevelopmentServerPort>16565</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6088/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

@@ -90,7 +90,7 @@ editFunction = function (row, store) {
             submitValue: true,
             allowBlank: false,
             maxLength: 25,
-            minLength: 8,
+            //minLength: 8,
             //regex: /^[a-zA-Z0-9]+$/,
             fieldLabel: UPCID
         },

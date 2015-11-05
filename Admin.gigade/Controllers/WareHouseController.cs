@@ -1202,15 +1202,25 @@ namespace Admin.gigade.Controllers
             string newName = string.Empty;
             string json = string.Empty;
             List<IupcQuery> store = new List<IupcQuery>();
+            _IparasrcMgr = new ParameterMgr(mySqlConnectionString);
+            StringBuilder codeType1 = new StringBuilder();
+            string codeTypeStr1 = string.Empty;
             try
             {
+
+                List<BLL.gigade.Model.Parametersrc> codeTypeList = _IparasrcMgr.GetElementType("iupc_type");
+                foreach (var codeTypeModel in codeTypeList)
+                {
+                    codeType1.AppendFormat("{0}:{1}, ", codeTypeModel.ParameterCode, codeTypeModel.parameterName);
+                }
+                codeTypeStr1 = codeType1.ToString().Substring(0, codeType1.Length - 2);
 
                 DTIupcExcel.Clear();
                 DTIupcExcel.Columns.Clear();
 
                 DTIupcExcel.Columns.Add("商品細項編號", typeof(String));
                 DTIupcExcel.Columns.Add("條碼編號", typeof(String));
-                DTIupcExcel.Columns.Add("條碼類型", typeof(String));
+                DTIupcExcel.Columns.Add("條碼類型（" + codeTypeStr1 + "）", typeof(String));
                 DTIupcExcel.Columns.Add("不能匯入的原因", typeof(String));
                 DTIupcExcel.Columns.Add("匯入失敗數據的行號", typeof(String));
 
@@ -1241,18 +1251,34 @@ namespace Admin.gigade.Controllers
                     if (dt.Rows.Count > 0)
                     {
                         _IiupcMgr = new IupcMgr(mySqlConnectionString);
-                        _IparasrcMgr = new ParameterMgr(mySqlConnectionString);
+                        //_IparasrcMgr = new ParameterMgr(mySqlConnectionString);
                         #region 循環Excel的數據
    
-                        List<BLL.gigade.Model.Parametersrc> codeTypeList = _IparasrcMgr.GetElementType("iupc_type");
+                        //List<BLL.gigade.Model.Parametersrc> codeTypeList = _IparasrcMgr.GetElementType("iupc_type");
                                               
-                        int i = 0;
+                        int i = 0;                     
                         for (int k = 0; k < dt.Rows.Count; k++)
                         {
                             i++;
                             try
                             {
-                                if (!string.IsNullOrEmpty(dt.Rows[k][1].ToString()) && dt.Rows[k][1].ToString().Length >= 8 && dt.Rows[k][1].ToString().Length <= 25)
+                                bool b0 = string.IsNullOrEmpty(dt.Rows[k][0].ToString().Trim());
+                                bool b1 = string.IsNullOrEmpty(dt.Rows[k][1].ToString().Trim());
+                                bool b2 = string.IsNullOrEmpty(dt.Rows[k][2].ToString().Trim());
+
+                                if (b0 || b1 || b2)//如果數據有一個欄位為空
+                                {
+                                    DataRow drtwo = DTIupcExcel.NewRow();
+                                    drtwo[0] = dt.Rows[k][0].ToString();
+                                    drtwo[1] = " " + dt.Rows[k][1].ToString().Trim();
+                                    drtwo[2] = dt.Rows[k][2].ToString();
+                                    drtwo[3] = "這條數據有欄位為空，請確認";
+                                    drtwo[4] = k + 2;//匯入失敗數據的行號,Excel表行號
+                                    DTIupcExcel.Rows.Add(drtwo);
+                                    errorCount++;
+                                    continue;
+                                }
+                                if ( dt.Rows[k][1].ToString().Trim().Length <= 25)
                                 {
 
                                     int a = Convert.ToInt32(dt.Rows[k][0]);//商品細項編號
@@ -1264,7 +1290,7 @@ namespace Admin.gigade.Controllers
                                     {
                                         DataRow drtwo = DTIupcExcel.NewRow();
                                         drtwo[0] = dt.Rows[k][0].ToString();
-                                        drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                        drtwo[1] = " " + dt.Rows[k][1].ToString().Trim();
                                         drtwo[2] = dt.Rows[k][2].ToString();
                                         drtwo[3] = "在數據庫商品表中，不存在此商品細項編號";
                                         drtwo[4] = k + 2;//匯入失敗數據的行號,Excel表行號
@@ -1277,7 +1303,7 @@ namespace Admin.gigade.Controllers
                                     {
                                         DataRow drtwo = DTIupcExcel.NewRow();
                                         drtwo[0] = dt.Rows[k][0].ToString();
-                                        drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                        drtwo[1] = " " + dt.Rows[k][1].ToString().Trim();
                                         drtwo[2] = dt.Rows[k][2].ToString();
                                         drtwo[3] = "在數據庫中，該條碼已經存在";
                                         drtwo[4] = k + 2;
@@ -1297,7 +1323,7 @@ namespace Admin.gigade.Controllers
                                                 xunhuan = false;
                                                 DataRow drtwo = DTIupcExcel.NewRow();
                                                 drtwo[0] = dt.Rows[k][0].ToString();
-                                                drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                                drtwo[1] = " " + dt.Rows[k][1].ToString().Trim();
                                                 drtwo[2] = dt.Rows[k][2].ToString();
                                                 drtwo[3] = "該商品條碼與此表中(行號： " + (j + 2) + " )的商品細項編號:" + dt.Rows[j][0].ToString() + "的條碼重複";
                                                 drtwo[4] = k + 2;
@@ -1324,7 +1350,7 @@ namespace Admin.gigade.Controllers
                                             {
                                                 DataRow drtwo = DTIupcExcel.NewRow();
                                                 drtwo[0] = dt.Rows[k][0].ToString();
-                                                drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                                drtwo[1] = " " + dt.Rows[k][1].ToString().Trim();
                                                 drtwo[2] = dt.Rows[k][2].ToString();
                                                 drtwo[3] = "在數據庫參數表中，此條碼類型不存在(" + codeTypeStr + ")";
                                                 drtwo[4] = k + 2;
@@ -1337,7 +1363,7 @@ namespace Admin.gigade.Controllers
                                             {
                                                 DataRow drtwo = DTIupcExcel.NewRow();
                                                 drtwo[0] = dt.Rows[k][0].ToString();
-                                                drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                                drtwo[1] = " " + dt.Rows[k][1].ToString().Trim();
                                                 drtwo[2] = dt.Rows[k][2].ToString();
                                                 drtwo[3] = "在數據庫中，該商品已經存在國際條碼";
                                                 drtwo[4] = k + 2;
@@ -1359,7 +1385,7 @@ namespace Admin.gigade.Controllers
                                                         skip = true;
                                                         DataRow drtwo1 = DTIupcExcel.NewRow();
                                                         drtwo1[0] = dt.Rows[k][0].ToString();
-                                                        drtwo1[1] = " " + dt.Rows[k][1].ToString();
+                                                        drtwo1[1] = " " + dt.Rows[k][1].ToString().Trim();
                                                         drtwo1[2] = dt.Rows[k][2].ToString();
                                                         drtwo1[3] = "在已經成功匯入的數據中(行號： " + DTIupcImportSucceed.Rows[index][3].ToString() + "),該商品已經存在國際條碼";
                                                         drtwo1[4] = k + 2;
@@ -1374,7 +1400,7 @@ namespace Admin.gigade.Controllers
                                                 }
                                                 DataRow drtwo = DTIupcImportSucceed.NewRow();
                                                 drtwo[0] = dt.Rows[k][0].ToString();
-                                                drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                                drtwo[1] = " " + dt.Rows[k][1].ToString().Trim();
                                                 drtwo[2] = dt.Rows[k][2].ToString();
                                                 drtwo[3] = k + 2;
                                                 DTIupcImportSucceed.Rows.Add(drtwo);
@@ -1393,9 +1419,9 @@ namespace Admin.gigade.Controllers
                                 {
                                     DataRow drtwo = DTIupcExcel.NewRow();
                                     drtwo[0] = dt.Rows[k][0].ToString();
-                                    drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                    drtwo[1] = " " + dt.Rows[k][1].ToString().Trim();
                                     drtwo[2] = dt.Rows[k][2].ToString();
-                                    drtwo[3] = "條碼不符合格式(8-25位)";
+                                    drtwo[3] = "條碼不符合格式(0-25位)";
                                     drtwo[4] = k + 2;
                                     DTIupcExcel.Rows.Add(drtwo);
                                     errorCount++;
@@ -1406,9 +1432,9 @@ namespace Admin.gigade.Controllers
                             {
                                 DataRow drtwo = DTIupcExcel.NewRow();
                                 drtwo[0] = dt.Rows[k][0].ToString();
-                                drtwo[1] = " " + dt.Rows[k][1].ToString();
+                                drtwo[1] = " " + dt.Rows[k][1].ToString().Trim();
                                 drtwo[2] = dt.Rows[k][2].ToString();
-                                drtwo[3] = "數據異常，程序報錯";
+                                drtwo[3] = "數據異常";
                                 drtwo[4] = k + 2;
                                 DTIupcExcel.Rows.Add(drtwo);
                                 errorCount++;
@@ -1614,11 +1640,21 @@ namespace Admin.gigade.Controllers
         {
             string json = string.Empty;
             DataTable dtTemplateExcel = new DataTable();
+            _IparasrcMgr = new ParameterMgr(mySqlConnectionString);
+            StringBuilder codeType = new StringBuilder();
+            string codeTypeStr = string.Empty;
             try
             {
-                dtTemplateExcel.Columns.Add("商品細項編號", typeof(String));
+                List<BLL.gigade.Model.Parametersrc> codeTypeList = _IparasrcMgr.GetElementType("iupc_type");
+                foreach (var codeTypeModel in codeTypeList)
+                {                  
+                    codeType.AppendFormat("{0}:{1}, ", codeTypeModel.ParameterCode, codeTypeModel.parameterName);
+                }
+                codeTypeStr = codeType.ToString().Substring(0, codeType.Length - 2);
+
+                dtTemplateExcel.Columns.Add("商品細項編號", typeof(String));           
                 dtTemplateExcel.Columns.Add("條碼編號", typeof(String));
-                dtTemplateExcel.Columns.Add("條碼類型(數字)", typeof(String));
+                dtTemplateExcel.Columns.Add("條碼類型(" + codeTypeStr + ")", typeof(String));
                 DataRow newRow = dtTemplateExcel.NewRow();
                 dtTemplateExcel.Rows.Add(newRow);
                 string fileName = "BarCodeVindicateImportModel_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";//條碼維護匯入模板

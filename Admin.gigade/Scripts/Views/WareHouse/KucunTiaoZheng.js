@@ -75,7 +75,7 @@ KucunTiaozhengStore.on('beforeload', function () {
     })
 });
 
-Ext.onReady(function () {
+Ext.onReady(function ()  {
     var frm = Ext.create('Ext.form.Panel', {
         id: 'frm',
         layout: 'anchor',
@@ -706,7 +706,7 @@ function function_add(i, j, z, th) {
 
     if (Ext.getCmp('iarc_id').getValue() == 'RF')
     {
-        Ext.Msg.alert(INFORMATION, "RF狀態不能新增");
+        Ext.Msg.alert(INFORMATION, "RF理貨調整庫存時不能增加庫存量");
         return;
     }
             if (Ext.getCmp('iarc_id').getValue() == 'DR' || Ext.getCmp('iarc_id').getValue() == 'KR') {
