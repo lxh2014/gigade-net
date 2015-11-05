@@ -364,13 +364,24 @@ function onAddClick() {
     pcFrm.getForm().reset();
     Ext.getCmp('gxGrid').hide();
     Ext.getCmp('mst').setText("");
+    Ext.getCmp("cs_time").setMaxValue('9999/12/31');
+    Ext.getCmp("ce_time").setMinValue('0001/01/01');
     Ext.getCmp('irrms').setText("");
     Ext.getCmp('ms').setText("");
     Ext.getCmp('btnSave').show();
 }
 
 function onEditClick() {
+    var startTime = Ext.getCmp("cs_time").getValue();
+    var endTime = Ext.getCmp("ce_time").getValue();
     Ext.getCmp('gxGrid').hide();
+    if (startTime != "" && endTime != "") {
+        Ext.getCmp("cs_time").setMaxValue(endTime);
+        Ext.getCmp("ce_time").setMinValue(startTime);
+    } else {
+        Ext.getCmp("cs_time").setMaxValue('9999/12/31');
+        Ext.getCmp("ce_time").setMinValue('0001/01/01');
+    }
     var row = Ext.getCmp("tierGrid").getSelectionModel().getSelection();
     if (row.length == 0) {
         Ext.Msg.alert(INFORMATION, NO_SELECTION);

@@ -239,7 +239,34 @@ namespace BLL.gigade.Dao
             }
         }
 
-         
-  
+        public DataTable GetProductCategoryStore()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT category_id, CONCAT(category_id,'-',category_name) as category_name  FROM  product_category  WHERE  banner_status = 1;");
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductCategoryDao-->GetProductCategoryStore-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetCagegoryIdsByIdAndFatherId(ProductCategory query)
+        {
+            StringBuilder sql = new StringBuilder();
+            DataTable dt = new DataTable();
+            try
+            {
+                sql.AppendFormat(@"SELECT	category_id,category_name FROM product_category 
+												WHERE category_display = 1 and (category_id={0} or  category_father_id={0})", query.category_id);               
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductCategoryDao-->GetCagegoryIdsByIdAndFatherId-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
     }
 }

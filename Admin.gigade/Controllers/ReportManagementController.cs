@@ -265,7 +265,7 @@ namespace Admin.gigade.Controllers
             try
             {
                 string newExcelName = string.Empty;
-                dtHZ.Columns.Add("距離壓單日", typeof(String));
+                dtHZ.Columns.Add("訂單成立天數", typeof(String));
                 dtHZ.Columns.Add("付款單成立日期", typeof(String));
                 dtHZ.Columns.Add("訂單編號", typeof(String));
                 dtHZ.Columns.Add("出貨商簡稱", typeof(String));
