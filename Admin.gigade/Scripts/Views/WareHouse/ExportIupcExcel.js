@@ -37,7 +37,7 @@
             },
              
              {
-                 html: '<font color=red>注意事項：<br/>1.匯入數據時要逐條檢查，會比較耗時.<br/>2.當匯出不合格的數據時，會比較耗時,請耐心等待.<br/>3.在匯入Excel檔案前，請檢查：<br/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp第一列是否為商品細項編號，<br/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp第二列是否為條碼編號，<br/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp第三列是否為條碼類型.<br/>4.當數據量超過500條時，建議分割匯入.</font>' + "<br/><a href='#' onclick='updownmuban()'>點擊下載模板</a>"
+                 html: '<font color=red>注意事項：<br/>1.匯入數據時要逐條檢查，會比較耗時.<br/>2.當匯出不合格的數據時，會比較耗時,請耐心等待.<br/>3.在匯入Excel檔案前，請檢查：<br/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp第一列是否為商品細項編號，<br/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp第二列是否為條碼編號，<br/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp第三列是否為條碼類型.<br/>4.匯入的數據中不要插入空行，否則匯入“失敗數據的行號”將不準確（重要）.<br/>5.當數據量超過500條時，建議分割匯入.</font>' + "<br/><a href='#' onclick='updownmuban()'>點擊下載模板</a>"
                  // bodyStyle: "padding:5px;background:#7DC64C",
                  ,
                  height: 60,
@@ -116,7 +116,7 @@
         iconCls: 'icon-user-edit',
         id: 'ExportWin',
         width: 400,
-        height: 280,
+        height: 320,
         y: 100,
         layout: 'fit',
         items: [ExportFrm],

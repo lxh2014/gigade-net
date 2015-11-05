@@ -57,6 +57,7 @@ function Query() {
     }
     if (falg == 0) {
         Ext.Msg.alert("提示", "請輸入查詢條件");
+        AseldStore.removeAll();
         return false;
     }
     var form = Ext.getCmp('frm').getForm();

@@ -212,6 +212,10 @@ namespace Admin.gigade.Controllers
                 {
                     dmQuery.serch_where = Request.Params["serch_where"].Trim();
                 }
+                if (!string.IsNullOrEmpty(Request.Params["order_day"]))
+                {
+                    dmQuery.order_day = int.Parse(Request.Params["order_day"]);
+                }
                 if (!string.IsNullOrEmpty(Request.Params["t_days"]))
                 {
                     dmQuery.t_days = Convert.ToInt32(Request.Params["t_days"]);
@@ -261,7 +265,7 @@ namespace Admin.gigade.Controllers
             try
             {
                 string newExcelName = string.Empty;
-                dtHZ.Columns.Add("距離壓單日", typeof(String));
+                dtHZ.Columns.Add("訂單成立天數", typeof(String));
                 dtHZ.Columns.Add("付款單成立日期", typeof(String));
                 dtHZ.Columns.Add("訂單編號", typeof(String));
                 dtHZ.Columns.Add("出貨商簡稱", typeof(String));
@@ -286,8 +290,8 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("可出貨日期", typeof(String));
 
                 dtHZ.Columns.Add("預計到貨時段", typeof(String));
-                dtHZ.Columns.Add("最近出貨時間", typeof(String));
-                dtHZ.Columns.Add("貨物運達時間", typeof(String));
+                dtHZ.Columns.Add("預計出貨時間", typeof(String));//最近出貨時間預計出貨時間
+                dtHZ.Columns.Add("預計到貨時間", typeof(String));//貨物運達時間預計到貨時間
                 dtHZ.Columns.Add("出貨時間", typeof(String));
                 dtHZ.Columns.Add("到貨時間", typeof(String));
               
@@ -321,6 +325,10 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["serch_where"].Trim()))
                 {
                     dmQuery.serch_where = Request.Params["serch_where"].Trim();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["order_day"]) && Request.Params["order_day"] != "null")
+                {
+                    dmQuery.order_day = int.Parse(Request.Params["order_day"]);
                 }
                 if (!string.IsNullOrEmpty(Request.Params["t_days"]) && Request.Params["t_days"] != "null")
                 {
