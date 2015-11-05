@@ -22,7 +22,7 @@ Ext.define('gigade.gridlistStatus', {
         { name: "product_name", type: "string" },//商品細項編號
         { name: "loc_id", type: "string" },//料位編號
         { name: "item_id", type: "string" },//商品細項編號
-        { name: "combination", type: "int" },//組合Y/N
+        { name: "spec_title_1", type: "string" },//規格
         { name: "item_stock", type: "int" },//前台庫存量
         { name: "iinvd_stock", type: "string" },//後台庫存量
         { name: "prepaid", type: "int" },//買斷
@@ -273,23 +273,9 @@ Ext.onReady(function () {
              // new Ext.grid.RowNumberer(),//自動顯示行號
              { header: "商品編號", dataIndex: 'product_id', width: 100, align: 'center' },
             { header: "商品名稱", dataIndex: 'product_name', width: 170, align: 'center' },
+            { header: "規格", dataIndex: 'spec_title_1', width: 80, align: 'center' },
             { header: "主料位編號", dataIndex: 'loc_id', width: 100, align: 'center' },
             { header: "商品細項編號", dataIndex: 'item_id', width: 120, align: 'center' },
-            {
-                header: "組合Y/N", dataIndex: 'combination', width: 80, align: 'center',
-                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    switch (value) {
-                        case 1:
-                            return "N";
-                        case 2:
-                        case 3:
-                        case 4:
-                            return "Y";
-                        default:
-                            return value;
-                    }
-                }
-            },
             { header: "前台庫存量", dataIndex: 'item_stock', width: 80, align: 'center' },
             { header: "後台庫存量", dataIndex: 'iinvd_stock', width: 80, align: 'center' },
             {

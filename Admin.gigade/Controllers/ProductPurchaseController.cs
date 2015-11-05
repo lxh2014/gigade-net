@@ -949,10 +949,11 @@ namespace Admin.gigade.Controllers
                 //添加兩列用於存儲"平均平均量"與"建議採購量"
                 dtExcel.Columns.Add("商品編號", typeof(String));
                 dtExcel.Columns.Add("商品名稱", typeof(String));
+                dtExcel.Columns.Add("規格", typeof(String));
                 dtExcel.Columns.Add("主料位編號", typeof(String));
                 dtExcel.Columns.Add("商品細項編號", typeof(String));
 
-                dtExcel.Columns.Add("組合Y/N", typeof(String));
+                
 
                 dtExcel.Columns.Add("前台庫存量", typeof(String));
                 dtExcel.Columns.Add("後台庫存量", typeof(String));
@@ -968,28 +969,11 @@ namespace Admin.gigade.Controllers
                     DataRow newRow = dtExcel.NewRow();
                     newRow[0] = dt.Rows[i]["product_id"];
                     newRow[1] = dt.Rows[i]["product_name"];
-                    newRow[2] = dt.Rows[i]["loc_id"];
-                    newRow[3] = dt.Rows[i]["item_id"];
+                    newRow[2] = dt.Rows[i]["spec_title_1"];
+                    newRow[3] = dt.Rows[i]["loc_id"];
+                    newRow[4] = dt.Rows[i]["item_id"];
 
-                    if (!string.IsNullOrEmpty(dt.Rows[i]["combination"].ToString()))
-                    {
-                        int combination = Convert.ToInt32(dt.Rows[i]["combination"]);
-                        switch (combination)
-                        {
-
-                            case 1:
-                                newRow[4] = "N";
-                                break;
-                            case 2:
-                            case 3:
-                            case 4:
-                                newRow[4] = "Y";
-                                break;
-                            default:
-                                newRow[4] = combination;
-                                break;
-                        }
-                    }
+                   
                     newRow[5] = dt.Rows[i]["item_stock"];
                     newRow[6] = dt.Rows[i]["iinvd_stock"];
 

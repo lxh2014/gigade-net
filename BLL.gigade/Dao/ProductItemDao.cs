@@ -803,8 +803,8 @@ namespace BLL.gigade.Dao
             TotalCount = 0;
             try
             {
-                sqlClumn.Append(" select p.product_id,p.product_name,ip.loc_id,pi.item_id,p.combination ,dfsm.delivery_freight_set as product_freight,p.product_status,pi.item_stock,subTtotal.iinvd_stock as iinvd_stock, ");
-                sqlClumn.Append(" p.prepaid,p.shortage,'' as product_status_string ");
+                sqlClumn.Append(" select p.product_id,p.product_name,ip.loc_id,pi.item_id ,dfsm.delivery_freight_set as product_freight,p.product_status,pi.item_stock,subTtotal.iinvd_stock as iinvd_stock, ");
+                sqlClumn.Append(" p.prepaid,p.shortage,'' as product_status_string ,p.spec_title_1,p.spec_title_2,pi.spec_id_1,pi.spec_id_2");
                 //  sqlClumn.Append(" select p.product_id,p.product_name,ip.loc_id)
                 sqlCondi.Append(" from product_item pi ");
                 sqlCondi.Append(" left join iplas ip on ip.item_id=pi.item_id  ");
@@ -859,6 +859,7 @@ namespace BLL.gigade.Dao
                 }
                 DataTable dtResult = _dbAccess.getDataTable(sqlClumn.ToString() + sqlCondi.ToString() + sbSqlCondition.ToString());
                 IParametersrcImplDao _parameterDao = new ParametersrcDao(connStr);
+                IProductSpecImplDao _specDao = new ProductSpecDao(connStr);
                 List<Parametersrc> parameterStatus = _parameterDao.QueryParametersrcByTypes("product_status");
 
                 foreach (DataRow dr in dtResult.Rows)
@@ -868,6 +869,18 @@ namespace BLL.gigade.Dao
                     {
                         dr["product_status_string"] = slist.parameterName;
                     }
+
+                    ProductSpec spec1 = _specDao.query(Convert.ToInt32(dr["spec_id_1"].ToString()));
+                    ProductSpec spec2 = _specDao.query(Convert.ToInt32(dr["spec_id_2"].ToString()));
+                    if (spec1 != null)
+                    {
+                        dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString()) ? "" : dr["spec_title_1"] + ":" + spec1.spec_name;
+                    }
+                    if (spec2 != null)
+                    {
+                        dr["spec_title_2"] = string.IsNullOrEmpty(dr["spec_title_2"].ToString()) ? "" : dr["spec_title_2"] + ":" + spec2.spec_name;
+                    }
+                    dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString()) ? "" : dr["spec_title_1"].ToString() + "  " + dr["spec_title_2"];
                 }
                 return dtResult;
             }
