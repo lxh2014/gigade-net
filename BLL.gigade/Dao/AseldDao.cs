@@ -702,11 +702,14 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
             StringBuilder strWhr = new StringBuilder();
             StringBuilder strLimit=new StringBuilder();
             StringBuilder strJoin=new StringBuilder();
-            strAll.Append("SELECT p.product_id,p.product_name,pi.item_id,CONCAT(ps.spec_name,'-',ps2.spec_name)AS spec,SUM(out_qty)out_qty,SUM(act_pick_qty)act_pick_qty,SUM(a.ord_qty)ord_qty, a.create_dtim   FROM aseld  a");
+            strAll.Append("SELECT a.assg_id,p.product_id,p.product_name,pi.item_id,CONCAT(ps.spec_name,'-',ps2.spec_name)AS spec,SUM(out_qty)out_qty,SUM(act_pick_qty)act_pick_qty,SUM(a.ord_qty)ord_qty, a.create_dtim,i.loc_id,temp.parameterName,ic.lcat_id   FROM aseld  a");
             strJoin.Append(" LEFT JOIN product_item pi ON a.item_id=pi.item_id");
             strJoin.Append(" LEFT JOIN product p ON p.product_id=pi.product_id");
+            strJoin.Append(" LEFT JOIN iplas i ON pi.item_id=i.item_id");
+            strJoin.Append(" LEFT JOIN iloc ic ON ic.loc_id=i.loc_id");
             strJoin.Append(" LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id ");
             strJoin.Append(" LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id");
+            strJoin.Append(" LEFT JOIN (select parameterCode,parameterName from t_parametersrc where parameterType ='product_mode') temp ON p.product_mode=temp.parameterCode");
 
             strWhr.Append(" WHERE a.wust_id<>'COM'");
             if (!string.IsNullOrEmpty(ase.assg_id))

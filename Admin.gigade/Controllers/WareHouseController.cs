@@ -1253,10 +1253,10 @@ namespace Admin.gigade.Controllers
                         _IiupcMgr = new IupcMgr(mySqlConnectionString);
                         //_IparasrcMgr = new ParameterMgr(mySqlConnectionString);
                         #region 循環Excel的數據
-   
+
                         //List<BLL.gigade.Model.Parametersrc> codeTypeList = _IparasrcMgr.GetElementType("iupc_type");
-                                              
-                        int i = 0;                     
+
+                        int i = 0;
                         for (int k = 0; k < dt.Rows.Count; k++)
                         {
                             i++;
@@ -1278,7 +1278,7 @@ namespace Admin.gigade.Controllers
                                     errorCount++;
                                     continue;
                                 }
-                                if ( dt.Rows[k][1].ToString().Trim().Length <= 25)
+                                if (dt.Rows[k][1].ToString().Trim().Length <= 25)
                                 {
 
                                     int a = Convert.ToInt32(dt.Rows[k][0]);//商品細項編號
@@ -1369,8 +1369,8 @@ namespace Admin.gigade.Controllers
                                                 drtwo[4] = k + 2;
                                                 DTIupcExcel.Rows.Add(drtwo);
                                                 repeatCount++;
-                                                continue;                                             
-                                            }                         
+                                                continue;
+                                            }
                                             else
                                             {
                                                 bool skip = false;
@@ -1404,12 +1404,12 @@ namespace Admin.gigade.Controllers
                                                 drtwo[2] = dt.Rows[k][2].ToString();
                                                 drtwo[3] = k + 2;
                                                 DTIupcImportSucceed.Rows.Add(drtwo);
-                                                
+
 
                                                 count++;
                                                 string dataTimeNow = CommonFunction.DateTimeToString(DateTime.Now);
                                                 strsql.AppendFormat(@"insert into iupc(upc_id,item_id,suppr_upc,lst_ship_dte,lst_rct_dte,create_dtim,create_user,upc_type_flg)
-                    values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}');", b, a,"", dataTimeNow, dataTimeNow, dataTimeNow, create_user, c);
+                    values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}');", b, a, "", dataTimeNow, dataTimeNow, dataTimeNow, create_user, c);
                                                 continue;
                                             }
                                         }
@@ -1647,12 +1647,12 @@ namespace Admin.gigade.Controllers
             {
                 List<BLL.gigade.Model.Parametersrc> codeTypeList = _IparasrcMgr.GetElementType("iupc_type");
                 foreach (var codeTypeModel in codeTypeList)
-                {                  
+                {
                     codeType.AppendFormat("{0}:{1}, ", codeTypeModel.ParameterCode, codeTypeModel.parameterName);
                 }
                 codeTypeStr = codeType.ToString().Substring(0, codeType.Length - 2);
 
-                dtTemplateExcel.Columns.Add("商品細項編號", typeof(String));           
+                dtTemplateExcel.Columns.Add("商品細項編號", typeof(String));
                 dtTemplateExcel.Columns.Add("條碼編號", typeof(String));
                 dtTemplateExcel.Columns.Add("條碼類型(" + codeTypeStr + ")", typeof(String));
                 DataRow newRow = dtTemplateExcel.NewRow();
@@ -12263,6 +12263,22 @@ namespace Admin.gigade.Controllers
                 }
             }
             DataTable table = aseldMgr.GetAseldTable(query, out totalcount);
+            for (int i = 0; i < table.Rows.Count; i++)
+            {
+                string lcat_id = table.Rows[i]["lcat_id"].ToString();
+                if (lcat_id != "S")
+                {
+                    string parameterName = table.Rows[i]["parameterName"].ToString();
+                    if (parameterName == "寄倉")
+                    {
+                        table.Rows[i]["loc_id"] = "YY999999";
+                    }
+                    else if (parameterName == "調度")
+                    {
+                        table.Rows[i]["loc_id"] = "ZZ999999";
+                    }
+                }
+            }
             IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
             timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(table, Formatting.Indented, timeConverter) + "}";
@@ -12271,35 +12287,35 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return Response;
         }
-        public static DataTable AseldPDF(DataTable aseldTable)
-        {
-            DataTable table = new DataTable();
-            table.Columns.Add("商品編號", typeof(string));
-            table.Columns.Add("商品名稱", typeof(string));
-            table.Columns.Add("細項編號", typeof(string));
-            table.Columns.Add("規格", typeof(string));
-            table.Columns.Add("待檢貨量", typeof(string));
-            table.Columns.Add("已檢貨量", typeof(string));
-            table.Columns.Add("創建時間", typeof(string));
-            for (int i = 0; i < aseldTable.Rows.Count; i++)
-            {
-                DataRow row = table.NewRow();
-                row["商品編號"] = aseldTable.Rows[i]["product_id"];
-                row["商品名稱"] = aseldTable.Rows[i]["product_name"];
-                row["細項編號"] = aseldTable.Rows[i]["item_id"];
-                row["規格"] = aseldTable.Rows[i]["spec"];
-                row["待檢貨量"] = aseldTable.Rows[i]["out_qty"];
-                row["已檢貨量"] = aseldTable.Rows[i]["act_pick_qty"];
-                row["創建時間"] = aseldTable.Rows[i]["create_dtim"];
-                table.Rows.Add(row);
-            }
-            return table;
-        }
+        //public static DataTable AseldPDF(DataTable aseldTable)
+        //{
+        //    DataTable table = new DataTable();
+        //    table.Columns.Add("商品編號", typeof(string));
+        //    table.Columns.Add("商品名稱", typeof(string));
+        //    table.Columns.Add("細項編號", typeof(string));
+        //    table.Columns.Add("規格", typeof(string));
+        //    table.Columns.Add("待檢貨量", typeof(string));
+        //    table.Columns.Add("已檢貨量", typeof(string));
+        //    table.Columns.Add("創建時間", typeof(string));
+        //    for (int i = 0; i < aseldTable.Rows.Count; i++)
+        //    {
+        //        DataRow row = table.NewRow();
+        //        row["商品編號"] = aseldTable.Rows[i]["product_id"];
+        //        row["商品名稱"] = aseldTable.Rows[i]["product_name"];
+        //        row["細項編號"] = aseldTable.Rows[i]["item_id"];
+        //        row["規格"] = aseldTable.Rows[i]["spec"];
+        //        row["待檢貨量"] = aseldTable.Rows[i]["out_qty"];
+        //        row["已檢貨量"] = aseldTable.Rows[i]["act_pick_qty"];
+        //        row["創建時間"] = aseldTable.Rows[i]["create_dtim"];
+        //        table.Rows.Add(row);
+        //    }
+        //    return table;
+        //}
         public string MakePDF(DataTable aseldTable, string assg_id, string user_username, string newPDFName, int index)
         {
             string dateNow = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             PdfHelper pdf = new PdfHelper();
-            float[] arrColWidth = new float[] { 40, 150, 35, 60, 30, 35, 35, 45, 60 };
+            float[] arrColWidth = new float[] { 150, 60, 30, 35, 35, 45, 45, 60 };
             Document document = new Document(PageSize.A4);
             BaseFont bf = BaseFont.CreateFont("C:\\WINDOWS\\Fonts\\simsun.ttc,1", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
             iTextSharp.text.Font fontChinese = new iTextSharp.text.Font(bf, 8, iTextSharp.text.Font.UNDERLINE, iTextSharp.text.BaseColor.RED);
@@ -12309,7 +12325,7 @@ namespace Admin.gigade.Controllers
             PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(newPDFName + index, FileMode.Create));
             document.Open();
 
-            PdfPTable ptable = new PdfPTable(9);
+            PdfPTable ptable = new PdfPTable(8);
             ptable.WidthPercentage = 100;//表格寬度
             font = new iTextSharp.text.Font(bf, 10, iTextSharp.text.Font.NORMAL, new iTextSharp.text.BaseColor(0, 0, 0));//黑  
             ptable.SetTotalWidth(arrColWidth);
@@ -12331,7 +12347,7 @@ namespace Admin.gigade.Controllers
                 #region 表頭
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 9;
+                cell.Colspan = 8;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12340,7 +12356,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 3;
+                cell.Colspan = 2;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12367,7 +12383,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 9;
+                cell.Colspan = 8;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12384,7 +12400,7 @@ namespace Admin.gigade.Controllers
                 ptable.AddCell(cell);
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 4;
+                cell.Colspan = 3;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12402,7 +12418,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 1)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 9;
+                cell.Colspan = 8;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12412,24 +12428,24 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("                                       工作代號:" + assg_id, new iTextSharp.text.Font(bf, 10)));
                 cell.VerticalAlignment = Element.ALIGN_CENTER;
-                cell.Colspan = 9;
+                cell.Colspan = 8;
                 cell.DisableBorderSide(2);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("商品編號", new iTextSharp.text.Font(bf, 8)));
-                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.DisableBorderSide(8);
-                ptable.AddCell(cell);
+                //cell = new PdfPCell(new Phrase("商品編號", new iTextSharp.text.Font(bf, 8)));
+                //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                //cell.DisableBorderSide(8);
+                //ptable.AddCell(cell);
 
                 cell = new PdfPCell(new Phrase("商品名稱", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 8)));
-                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.DisableBorderSide(8);
-                ptable.AddCell(cell);
+                //cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 8)));
+                //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                //cell.DisableBorderSide(8);
+                //ptable.AddCell(cell);
 
                 cell = new PdfPCell(new Phrase("規格", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
@@ -12456,91 +12472,122 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
+                cell = new PdfPCell(new Phrase("料位編號", new iTextSharp.text.Font(bf, 8)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+
                 cell = new PdfPCell(new Phrase("創建時間", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 ptable.AddCell(cell);
 
-                int k = 0;
-                if (aseldTable.Rows.Count > 35)
+                if (0 < aseldTable.Rows.Count)
                 {
-                    k = (j+1) * 35;
-                    if (j!=0)
+                    int k = 0;
+                    if (aseldTable.Rows.Count > 35)
                     {
-                        if ((aseldTable.Rows.Count - j * 35) < 35)
+                        k = (j + 1) * 35;
+                        if (j != 0)
                         {
-                            k = aseldTable.Rows.Count;
+                            if ((aseldTable.Rows.Count - j * 35) < 35)
+                            {
+                                k = aseldTable.Rows.Count;
+                            }
+                            else
+                            {
+                                k = (j + 1) * 35;
+                            }
                         }
-                        else {
-                            k = (j + 1) * 35;
+                    }
+                    else if (0 < aseldTable.Rows.Count)
+                    {
+                        k = aseldTable.Rows.Count;
+                    }
+                    for (int i = j * 35; i < k; i++)
+                    {
+                        //cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["product_id"].ToString(), new iTextSharp.text.Font(bf, 8)));
+                        //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                        //cell.DisableBorderSide(8);
+                        //ptable.AddCell(cell);
+
+                        cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["product_name"].ToString(), new iTextSharp.text.Font(bf, 8)));
+                        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                        cell.DisableBorderSide(8);
+                        ptable.AddCell(cell);
+
+                        //cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["item_id"].ToString(), new iTextSharp.text.Font(bf, 8)));
+                        //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                        //cell.DisableBorderSide(8);
+                        //ptable.AddCell(cell);
+
+                        cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["spec"].ToString(), new iTextSharp.text.Font(bf, 8)));
+                        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                        cell.DisableBorderSide(8);
+                        ptable.AddCell(cell);
+
+                        cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["ord_qty"].ToString(), new iTextSharp.text.Font(bf, 8)));
+                        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                        cell.DisableBorderSide(8);
+                        ptable.AddCell(cell);
+
+                        cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["act_pick_qty"].ToString(), new iTextSharp.text.Font(bf, 8)));
+                        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                        cell.DisableBorderSide(8);
+                        ptable.AddCell(cell);
+
+                        cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["out_qty"].ToString(), new iTextSharp.text.Font(bf, 8)));
+                        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                        cell.DisableBorderSide(8);
+                        ptable.AddCell(cell);
+
+                        cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 8)));
+                        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                        cell.DisableBorderSide(8);
+                        ptable.AddCell(cell);
+
+                        string loc_id = aseldTable.Rows[i]["loc_id"].ToString();
+                        string lcat_id = aseldTable.Rows[i]["lcat_id"].ToString();
+                        if (lcat_id != "S")
+                        {
+                            string parameterName = aseldTable.Rows[i]["parameterName"].ToString();
+                            if (parameterName == "寄倉")
+                            {
+                                loc_id = "YY999999";
+                            }
+                            else if (parameterName == "調度")
+                            {
+                                loc_id = "ZZ999999";
+                            }
                         }
+                        cell = new PdfPCell(new Phrase(loc_id, new iTextSharp.text.Font(bf, 8)));
+                        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                        cell.DisableBorderSide(8);
+                        ptable.AddCell(cell);
+
+                        string dateStr = string.Empty;
+                        DateTime dateCreate = DateTime.MinValue;
+                        if (DateTime.TryParse(aseldTable.Rows[i]["create_dtim"].ToString(), out dateCreate))
+                        {
+                            dateStr = dateCreate.ToString("yyyy-MM-dd HH:mm:ss");
+                        }
+                        cell = new PdfPCell(new Phrase(dateStr, new iTextSharp.text.Font(bf, 8)));
+                        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                        //cell.DisableBorderSide(8);
+                        ptable.AddCell(cell);
                     }
                 }
                 else
                 {
-                    k = aseldTable.Rows.Count;
-                }
-
-                for (int i = j * 35; i < k; i++)
-                {
-                    cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["product_id"].ToString(), new iTextSharp.text.Font(bf, 8)));
+                    cell = new PdfPCell(new Phrase("此工作代號無數據", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                    cell.Colspan = 8;
+                    cell.DisableBorderSide(1);
+                    cell.DisableBorderSide(2);
+                    cell.DisableBorderSide(4);
                     cell.DisableBorderSide(8);
-                    ptable.AddCell(cell);
-
-                    cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["product_name"].ToString(), new iTextSharp.text.Font(bf, 8)));
-                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.DisableBorderSide(8);
-                    ptable.AddCell(cell);
-
-                    cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["item_id"].ToString(), new iTextSharp.text.Font(bf, 8)));
-                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.DisableBorderSide(8);
-                    ptable.AddCell(cell);
-
-                    cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["spec"].ToString(), new iTextSharp.text.Font(bf, 8)));
-                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.DisableBorderSide(8);
-                    ptable.AddCell(cell);
-
-                    cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["ord_qty"].ToString(), new iTextSharp.text.Font(bf, 8)));
-                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.DisableBorderSide(8);
-                    ptable.AddCell(cell);
-
-                    cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["act_pick_qty"].ToString(), new iTextSharp.text.Font(bf, 8)));
-                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.DisableBorderSide(8);
-                    ptable.AddCell(cell);
-
-                    cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["out_qty"].ToString(), new iTextSharp.text.Font(bf, 8)));
-                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.DisableBorderSide(8);
-                    ptable.AddCell(cell);
-
-                    cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 8)));
-                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.DisableBorderSide(8);
-                    ptable.AddCell(cell);
-
-
-                    string dateStr = string.Empty;
-                    DateTime dateCreate = DateTime.MinValue;
-                    if (DateTime.TryParse(aseldTable.Rows[i]["create_dtim"].ToString(), out dateCreate))
-                    {
-                        dateStr = dateCreate.ToString("yyyy-MM-dd HH:mm:ss");
-                    }
-                    cell = new PdfPCell(new Phrase(dateStr, new iTextSharp.text.Font(bf, 8)));
-                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    //cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
                 }
-
             }
-
-
-
-
-
             newfilename = newPDFName + "_part" + index + "." + "pdf";
             // pdf.ExportDataTableToPDF(aseldTable, false, newfilename, arrColWidth, ptable, comTable, "", "", 7, uint.Parse(table.Rows.Count.ToString()));/*第一7是列，第二個是行*/
             pdf.ExportDataTableToPDF(newfilename, ptable, "", "");
