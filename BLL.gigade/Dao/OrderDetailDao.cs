@@ -956,5 +956,40 @@ od.single_cost,od.event_cost,od.single_price,od.single_money,od.deduct_bonus,od.
             }
 
         }
+
+        public DataTable GetCategorySummary(OrderDetailQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder count = new StringBuilder();
+            DataTable dt = new DataTable();         
+            try
+            {
+                sql.AppendFormat(@" select pcs.category_id, sum(od.single_money * buy_num) as amount
+        from order_detail od 
+        inner join product_item pit using(item_id)
+        INNER JOIN order_slave os USING (slave_id)
+        INNER JOIN order_master om USING (order_id)
+        inner join product p using (product_id)
+        inner join product_category_set pcs using(product_id)		
+where 1=1  and  pcs.category_id={0} ", query.category_id);
+                sql.AppendFormat(" AND od.detail_status <> 90");
+                if (query.category_status != 0)
+                {
+                    sql.AppendFormat(" AND om.money_collect_date > 0");           
+                }
+                if(query.date_stauts!=0)
+                {
+                    if (query.date_start != DateTime.MinValue && query.date_end != DateTime.MinValue)
+                    {
+                        sql.AppendFormat(" AND om.order_createdate>='{0}' and  om.order_createdate<='{1}'", CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_start)), CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_end)));
+                    }
+                }                                     
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderDetailDao.GetCategorySummaryList -->" + ex.Message + sql.ToString(), ex);
+            }
+        }
     }
 }
