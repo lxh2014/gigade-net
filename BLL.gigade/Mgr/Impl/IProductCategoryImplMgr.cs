@@ -5,6 +5,7 @@ using System.Text;
 using BLL.gigade.Model.Custom;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
+using System.Data;
 namespace BLL.gigade.Mgr.Impl
 {
     public interface IProductCategoryImplMgr
@@ -35,5 +36,6 @@ namespace BLL.gigade.Mgr.Impl
         List<ProdPromoQuery> GetList(ProdPromo store, out int totalCount);
         int UpStatus(ProdPromoQuery store);
         int UpdateUrl(ProdPromo store);
+        DataTable GetProductCategoryStore();
     }
 }
