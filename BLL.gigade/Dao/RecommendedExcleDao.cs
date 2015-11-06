@@ -6,6 +6,7 @@ using System.Text;
 using BLL.gigade.Dao.Impl;
 using BLL.gigade.Model;
 using DBAccess;
+using BLL.gigade.Model.Custom;
 
 namespace BLL.gigade.Dao
 {
@@ -278,7 +279,6 @@ on p.brand_id=vb.brand_id  ");
         //獲得訂單信息最小年份
         public DataTable GetOrderInfoByMinYear()
         {
-            {
                 StringBuilder sql = new StringBuilder();
                 StringBuilder sqlwhere = new StringBuilder();
                 try
@@ -295,6 +295,79 @@ year(FROM_UNIXTIME(max(order_createdate)))  as maxyear from order_master  ");
                 {
                     throw new Exception("RecommendedExcleDao-->GetBrandInfo" + ex.Message + sql.ToString(), ex);
                 }
+        }
+
+
+        public DataTable GetThisProductInfo()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT pt.product_id,pii.item_id,pt.cate_id,FROM_UNIXTIME(pt.product_start)as crate_time,pt.product_status,pt.product_name,pt.product_alt,pt.page_content_1,pt.product_image,price,event_price,pm.cost,pm.event_cost,FROM_UNIXTIME(pm.event_start)as event_starts,FROM_UNIXTIME(pm.event_end)as event_ends,pt.prod_classify
+FROM product_item pii LEFT JOIN product pt 
+on pt.product_id=pii.product_id  INNER JOIN price_master pm on pm.product_id=pii.product_id ");
+                DataTable dt = _access.getDataTable(sql.ToString());
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("RecommendedExcleDao-->GetThisProductInfo" + ex.Message + sql.ToString(), ex);
+            }
+        }
+
+        public List<CategoryItem> GetVendorCategoryMsg(CategoryItem pcb,List<CategoryItem> lscm)
+        {
+            StringBuilder sql = new StringBuilder();   
+            try
+            {
+                sql.AppendFormat(@"SELECT category_id, category_name, depth FROM product_category_brand 
+WHERE category_father_id='{0}' GROUP BY category_id, category_name, depth;",pcb.Id);
+                DataTable dtVendorMsg = _access.getDataTable(sql.ToString());
+                if (dtVendorMsg.Rows.Count > 0)//再次調用自己
+                {
+                    for (int i = 0; i < dtVendorMsg.Rows.Count; i++)
+                    {
+                        CategoryItem cm = new CategoryItem();
+                        cm.Id = dtVendorMsg.Rows[i]["category_id"].ToString();
+                        cm.Name = dtVendorMsg.Rows[i]["category_name"].ToString();
+                        cm.Depth = Convert.ToInt32(dtVendorMsg.Rows[i]["depth"]) - 1;
+                        lscm.Add(cm);
+                        GetVendorCategoryMsg(cm,lscm);
+                    }
+                }
+                else
+                {
+                   DataTable _dttwo= GetVendorBrandMsg(pcb);
+                   for (int j = 0; j < _dttwo.Rows.Count; j++)
+                   {
+                       CategoryItem cmtwo = new CategoryItem();
+                       cmtwo.Id = String.Format("{0}-{1}", new Object[] { pcb.Id, Int32.Parse(_dttwo.Rows[j]["brand_id"].ToString()) });
+                       cmtwo.Name = _dttwo.Rows[j]["brand_name"].ToString();
+                       cmtwo.Depth = pcb.Depth + 1;
+                       lscm.Add(cmtwo);
+                   }
+                }
+                return lscm;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("RecommendedExcleDao-->GetVendorCategoryMsg" + ex.Message + sql.ToString(), ex);
+            }
+        }
+        public DataTable GetVendorBrandMsg(CategoryItem pcb)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT v.brand_id, v.brand_name FROM vendor_brand AS v 
+                                   INNER JOIN product_category_brand AS p ON v.brand_id = p.brand_id 
+                                   WHERE p.category_id = '{0}' AND p.banner_cate_id = 754;", pcb.Id);
+                DataTable dt = _access.getDataTable(sql.ToString());
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("RecommendedExcleDao-->GetVendorBrandMsg" + ex.Message + sql.ToString(), ex);
             }
         }
     }

@@ -112,6 +112,70 @@ namespace BLL.gigade.Dao
             }
         }
         #endregion
+        #region 根據產品條碼獲取數據
+        /// <summary>
+        /// 根據產品條碼獲取庫存數據
+        /// </summary>
+        /// <param name="ivd">上架料位對象</param>
+        /// <param name="totalCount">返回的數據總條數</param>
+        /// <returns>上架料位列表</returns>
+        public List<IinvdQuery> GetIinvdListByItemid(Model.Query.IinvdQuery ivd, out int totalCount)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
+            StringBuilder sbwhere = new StringBuilder();
+            totalCount = 0;
+            try
+            {
+                sb.Append("select count(ii.row_id) as totalcounts from iinvd ii  left join iupc iu on iu.item_id=ii.item_id where 1=1 ");
+                sql.Append(@"select Tp_table.parameterName as qity_name,ii.row_id,lic_plt_id,ii.dc_id,ii.whse_id,ii.made_date,po_id,prod_qty,rcpt_id,lot_no,hgt_used,ii.create_user,ii.create_dtim,ii.change_user,ii.change_dtim,cde_dt,ista_id,receipt_dtim,stor_ti,stor_hi,inv_pos_cat,qity_id,plas_loc_id,ii.item_id,plas_prdd_id,CONCAT(vb.brand_name,'-',p.product_name) as product_name,ip.loc_id,pe.cde_dt_var,pe.cde_dt_shp,pe.pwy_dte_ctl,pe.cde_dt_incr,us.user_username as user_name,vb.vendor_id from iinvd ii");
+                sql.Append(" left join iplas ip on ii.item_id=ip.item_id ");
+                //sql.Append(" left join iupc iu on iu.item_id=ii.item_id ");
+                sql.Append(" left join product_item pi on ii.item_id=pi.item_id ");
+                sql.Append(" left JOIN product_ext pe ON ii.item_id=pe.item_id ");
+                sql.Append(" LEFT JOIN (SELECT parameterCode,parameterName from t_parametersrc where parameterType='loc_lock_msg') as Tp_table on ii.qity_id=Tp_table.parameterCode ");
+                sql.Append(" left join product p on p.product_id=pi.product_id  ");
+                sql.Append(" LEFT JOIN  manage_user us on ii.create_user=us.user_id  ");
+                sql.Append(" left join vendor_brand vb on p.brand_id=vb.brand_id where 1=1 ");
+                if (ivd.item_id!=0)
+                {
+                    sbwhere.AppendFormat(" and ii.item_id='{0}' ", ivd.item_id);
+                }
+                
+                DateTime dt = DateTime.Parse("1970-01-02 08:00:00");
+                if (!string.IsNullOrEmpty(ivd.starttime.ToString()) && dt < ivd.starttime)
+                {
+                    sbwhere.AppendFormat(" and ii.create_dtim>'{0}' ", CommonFunction.DateTimeToString(ivd.starttime));
+                }
+                if (!string.IsNullOrEmpty(ivd.endtime.ToString()) && dt < ivd.endtime)
+                {
+                    sbwhere.AppendFormat(" and ii.create_dtim<'{0}' ", CommonFunction.DateTimeToString(ivd.endtime));
+                }
+
+                if (ivd.IsPage)
+                {
+                    DataTable _dt = _access.getDataTable(sb.ToString() + sbwhere.ToString());
+                    if (_dt != null && _dt.Rows.Count > 0)
+                    {
+                        totalCount = Convert.ToInt32(_dt.Rows[0]["totalcounts"]);
+                    }
+                    if (!string.IsNullOrEmpty(ivd.ista_id))
+                    {//理貨員工作用到庫存
+                        sbwhere.AppendFormat(" and ii.ista_id='{0}'  order by ii.cde_dt ;", ivd.ista_id);
+                    }
+                    else
+                    {//收貨上架列表頁
+                        sbwhere.AppendFormat(" group by ii.row_id order by ii.row_id limit {0},{1};", ivd.Start, ivd.Limit);
+                    }
+                }
+                return _access.getDataTableForObj<IinvdQuery>(sql.ToString() + sbwhere.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IupcDao-->GetIinvdListByItemid-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+        #endregion
 
         #region 新增
         public int Insert(Iinvd ivd)
@@ -608,7 +672,9 @@ where pext.pwy_dte_ctl='Y' ");
                 DataTable qtdt = _access.getDataTable(sbstr.ToString());
                 sbstr2.AppendFormat("select row_id from iinvd where plas_loc_id='{0}';", qtdt.Rows[0][0]);
                 DataTable qtdt2 = _access.getDataTable(sbstr2.ToString());
+                sb.Append("set sql_safe_updates = 0;");
                 sb.AppendFormat("delete from iinvd where row_id='{0}';", invd.row_id);
+                sb.Append("set sql_safe_updates = 1;");
                 if (qtdt2.Rows.Count < 2)
                 {
                     sb.AppendFormat("set sql_safe_updates = 0;");

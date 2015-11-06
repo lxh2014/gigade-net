@@ -982,7 +982,9 @@ namespace BLL.gigade.Dao
                 {
                     StringBuilder url = new StringBuilder();
                     #region 判斷是正式線還是測試線
-                    sb.Append(" select parameterCode from t_parametersrc where parameterType ='CancelUrl';");//判斷是正式線還是測試線
+                    //sb.Append(" select parameterCode from t_parametersrc where parameterType ='CancelUrl';");
+                    sb.Append(" select parameterCode from t_parametersrc where parameterType ='hg_config' AND parameterName ='CancelUrl';");//判斷是正式線還是測試線
+
                     DataTable _dtDEV = _accessMySql.getDataTable(sb.ToString());
                     sb.Clear();
                       string DEV = "false";

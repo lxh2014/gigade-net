@@ -1030,7 +1030,7 @@ namespace BLL.gigade.Common
                 writer.PageEvent = new HeaderAndFooterEvent();
                 HeaderAndFooterEvent.basefont = basefont;
                 HeaderAndFooterEvent.header = header;
-                HeaderAndFooterEvent.isPdfTable = true;
+                HeaderAndFooterEvent.isPdfTable = false;
                 HeaderAndFooterEvent.pdftable = pdftable;
                 HeaderAndFooterEvent.PAGE_NUMBER = true;
                 HeaderAndFooterEvent.tpl = writer.DirectContent.CreateTemplate(100, 100);

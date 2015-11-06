@@ -747,6 +747,7 @@
     <Compile Include="Mgr\EventpromoUserConditionMgr.cs" />
     <Compile Include="Mgr\FunctionHistoryMgr.cs" />
     <Compile Include="Mgr\GroupCommitteContactMgr.cs" />
+    <Compile Include="Mgr\HandleXmlMgr.cs" />
     <Compile Include="Mgr\IdiffcountbookMgr.cs" />
     <Compile Include="Mgr\IlocChangeDetailMgr.cs" />
     <Compile Include="Mgr\Impl\IAppcategoryImplMgr.cs" />
@@ -770,6 +771,7 @@
     <Compile Include="Mgr\Impl\IEventpromoUserConditionImplMgr.cs" />
     <Compile Include="Mgr\Impl\IFunctionHistoryImplMgr.cs" />
     <Compile Include="Mgr\EmsDepRelationMgr.cs" />
+    <Compile Include="Mgr\Impl\IHandleXmlImplMgr.cs" />
     <Compile Include="Mgr\Impl\IInvoiceMasterRecordImplMgr.cs" />
     <Compile Include="Mgr\Impl\IIpodImplMgr.cs" />
     <Compile Include="Mgr\Impl\IIpoImplMgr.cs" />
@@ -1281,6 +1283,7 @@
     <Compile Include="Model\CoursePicture.cs" />
     <Compile Include="Model\CourseProduct.cs" />
     <Compile Include="Model\CourseTicket.cs" />
+    <Compile Include="Model\Custom\CategoryItem.cs" />
     <Compile Include="Model\Custom\CourseDetailCustom.cs" />
     <Compile Include="Model\Custom\CourseDetailItemCustom.cs" />
     <Compile Include="Model\Custom\CourseTicketCustom.cs" />
@@ -1851,6 +1854,7 @@
     <Compile Include="Model\WebContentType7.cs" />
     <Compile Include="Model\WebContentType8.cs" />
     <Compile Include="Model\WebContentTypeSetup.cs" />
+    <Compile Include="Model\XmlModelCustom.cs" />
     <Compile Include="Model\Zip.cs" />
     <Compile Include="Model\OrderMasterStatus.cs" />
     <Compile Include="Dao\ParametersrcXmlDao.cs" />

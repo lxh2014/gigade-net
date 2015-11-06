@@ -125,7 +125,7 @@ function editFunction(row, store,multi) {
                     id: 'b_id',
                     width: 200,
                     labelWidth: 60,
-                    regex: /^([0-9]+)$/,
+                    regex: /^([0-9]{1,9})$/,
                     listeners: {
                         specialkey: function (field, e) {
                             if (e.getKey() == e.ENTER) {

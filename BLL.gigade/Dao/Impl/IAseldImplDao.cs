@@ -22,6 +22,7 @@ namespace BLL.gigade.Dao.Impl
         DataTable GetOrderProductInformation(AseldQuery ase);
         string UpdTicker(string id);
         List<AseldQuery> GetAseldList(Aseld ase);
+        List<AseldQuery> GetAseldListByItemid(Aseld ase);
         string UpdAseld(Aseld a);
         int SelCom(Aseld a);
         int SelComA(Aseld a);
@@ -41,5 +42,7 @@ namespace BLL.gigade.Dao.Impl
         int Updwust(Aseld a);
         void ConsoleAseldBeforeInsert(int detail_id);
         string Getfreight(string ord_id);
+        DataTable GetAseldTable(AseldQuery ase, out int total);
+        DataTable GetAseldTablePDF(AseldQuery aseld);
     }
 }

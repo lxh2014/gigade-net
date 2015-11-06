@@ -21,7 +21,6 @@ namespace Admin.gigade.Controllers
 {
     public class EdmNewController : Controller
     {
-
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly string mySqlConnectionString = System.Configuration.ConfigurationManager.AppSettings["MySqlConnectionString"].ToString();
         private static EdmContentNewMgr _edmContentNewMgr;
@@ -37,7 +36,7 @@ namespace Admin.gigade.Controllers
         //電子報類型
         public ActionResult Index()
         {
-            return View();
+            return View();            
         }
         //電子報範本
         public ActionResult EdmTemplate()
@@ -47,6 +46,16 @@ namespace Admin.gigade.Controllers
         //電子報
         public ActionResult EdmContentNew()
         {
+            _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+            DataTable _dt = _edmContentNewMgr.GetPraraData(3);
+            if (_dt != null && _dt.Rows.Count > 0)
+            {
+                ViewBag.split_str = _dt.Rows[0][0].ToString();
+            }
+            else
+            {
+                ViewBag.split_str = "&nbsp;&nbsp;";
+            }
             ViewBag.path = ConfigurationManager.AppSettings["webDavImage"];
             ViewBag.BaseAddress = ConfigurationManager.AppSettings["webDavBaseAddress"];
             return View();
@@ -54,6 +63,7 @@ namespace Admin.gigade.Controllers
         //擋信名單
         public ActionResult EmailBlockList()
         {
+            
             return View();
         }
 
@@ -79,7 +89,14 @@ namespace Admin.gigade.Controllers
             ViewBag.log_id = log_id;
             return View();
         }
-
+        public ActionResult Editkendo()
+        {
+            return PartialView("~/Views/EdmNew/Editkendo.cshtml");
+        }
+        public ActionResult Editkendo2()
+        {
+            return PartialView("~/Views/EdmNew/Editkendo2.cshtml");
+        }
         #endregion
 
         #region 電子報類型
@@ -438,6 +455,19 @@ namespace Admin.gigade.Controllers
                 {
                     query.template_data = Request.Params["template_data"];
                 }
+                if (!string.IsNullOrEmpty(Request.Params["editor1"]))
+                {
+                    query.editor1 = Request.Params["editor1"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["editor2"]))
+                {
+                    query.editor2 = Request.Params["editor2"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["split_str"]))
+                {
+                    query.split_str = Request.Params["split_str"];
+                }
+                query.template_data = query.editor1 + query.split_str + query.editor2;
                 query.content_create_userid = (Session["caller"] as Caller).user_id;
                 query.content_update_userid = (Session["caller"] as Caller).user_id;
                 json = _edmContentNewMgr.SaveEdmContentNew(query);
@@ -539,7 +569,7 @@ namespace Admin.gigade.Controllers
         #region edit_url
         public HttpResponseBase GetEditUrlData()
         {
-            string json = string.Empty;
+            string data = string.Empty;
             try
             {
                 #region 獲取edit_url
@@ -552,7 +582,7 @@ namespace Admin.gigade.Controllers
                     httpRequest.Method = "GET";
                     HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
                     StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
-                    json = sr.ReadToEnd();
+                    data = sr.ReadToEnd();
                     #endregion
                 }
                 #endregion
@@ -564,10 +594,10 @@ namespace Admin.gigade.Controllers
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
-                json = "獲取網頁出現異常！";
+                data = "獲取網頁出現異常！}";
             }
             this.Response.Clear();
-            this.Response.Write(json);
+            this.Response.Write(data);
             this.Response.End();
             return this.Response;
         }
@@ -581,8 +611,10 @@ namespace Admin.gigade.Controllers
             string template_data = string.Empty;
             string contentJson = string.Empty;
             string replaceStr = string.Empty;
+            string editStr = string.Empty;
             try
             {
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
                 if (!string.IsNullOrEmpty(Request.Params["content_url"]))
                 {
                     #region 獲取網頁內容方法
@@ -599,7 +631,7 @@ namespace Admin.gigade.Controllers
                 {
                     template_data = Request.Params["template_data"];
                 }
-                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+             
                 DataTable _dt = _edmContentNewMgr.GetPraraData(1);
                 if (_dt != null && _dt.Rows.Count > 0)
                 {
@@ -609,6 +641,16 @@ namespace Admin.gigade.Controllers
                 {
                     replaceStr = "&nbsp;&nbsp;";
                 }
+                DataTable _dtEdit = _edmContentNewMgr.GetPraraData(3);
+                if (_dtEdit != null && _dtEdit.Rows.Count > 0)
+                {
+                    editStr = _dtEdit.Rows[0][0].ToString();
+                }
+                else
+                {
+                    editStr = "&nbsp;&nbsp;";
+                }
+                template_data = template_data.Replace(editStr,"");
                 contentJson=contentJson.Replace(replaceStr,template_data);
                 json = contentJson;
             }
@@ -685,7 +727,7 @@ namespace Admin.gigade.Controllers
 
                         #endregion
                         MailHelper mail = new MailHelper();
-                        mail.SendMailAction((Session["caller"] as Caller).user_email, mQuery.subject, mQuery.body + "   ");
+                        mail.SendMailAction("shiwei0620j@gimg.tw", mQuery.subject, mQuery.body + "   ");
                         {
                             json = _edmContentNewMgr.MailAndRequest(eslQuery, mQuery);
                         }

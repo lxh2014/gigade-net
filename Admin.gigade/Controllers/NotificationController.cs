@@ -896,6 +896,7 @@ namespace Admin.gigade.Controllers
 
                     xmldoc.Load(path);
                     XmlNode root = xmldoc.SelectSingleNode("InformationRecord");//查找<InformationRecord>
+
                     XmlElement xe1 = xmldoc.CreateElement(functionName);//创建一个傳值進來的方法名稱节点
                     xe1.SetAttribute("date", timeStr);//设置该节点genre属性
                     XmlElement xesub1 = xmldoc.CreateElement("info");
@@ -1340,7 +1341,7 @@ namespace Admin.gigade.Controllers
             }
         }
         //刪除指定文件
-        public void DeleteFileByPath(List<string> strPath) 
+        public void DeleteFileByPath(List<string> strPath)
         {
             foreach (string path in strPath)
             {
@@ -1350,6 +1351,64 @@ namespace Admin.gigade.Controllers
                     file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
                     file.Delete();//删除文件
                 }
+            }
+        }
+        #endregion
+
+        #region 匯出xml信息
+        public string OutXmlForProduct()
+        {
+            try
+            {
+                //導出方法
+                _recommendedExcleMgr = new RecommendedExcleMgr(connectionString);
+                DateTime nowtime = DateTime.Now;
+                //導出XML
+                StringWriter sw = _recommendedExcleMgr.GetThisProductInfo();
+                string filename = "128_MYFONE_item_" + nowtime.ToString("yyyyMMdd-HHmm") + ".xml";
+
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
+                Response.ContentType = "application/octet-stream";
+                Response.ContentEncoding = Encoding.UTF8;
+                Response.Write(sw);
+                Response.End();
+                return "{success:true}";
+
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                return "{success:false,data:'',msg:" + ex.Message + "}";
+            }
+        }
+        #endregion
+
+        #region 匯出廠商的類別txt信息
+        public string OutExportVendorCategoryMsg()
+        {
+            try
+            {
+                _recommendedExcleMgr = new RecommendedExcleMgr(connectionString);
+                DateTime nowtime = DateTime.Now;
+                string filename = "食用品館類別樹-含品牌" + nowtime.ToString("yyyyMMdd-HHmm") + ".txt";
+                StringWriter sw = _recommendedExcleMgr.GetVendorCategoryMsg();
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
+                Response.ContentType = "application/octet-stream";
+                Response.ContentEncoding = Encoding.UTF8;
+                Response.Write(sw);
+                Response.End();
+                return "{success:true}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                return "{success:false,data:'',msg:" + ex.Message + "}";
             }
         }
         #endregion

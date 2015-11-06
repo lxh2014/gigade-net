@@ -48,7 +48,7 @@ RelationFunction = function (row) {
             width: 180,
             labelWidth: 60,
             margin: '5 5 0 0',
-            regex: /^([0-9]*)$/,
+            regex: /^([0-9]{1,9})$/,
             listeners: {
                 specialkey: function (field, e) {
                     if (e.getKey() == e.ENTER) {
@@ -109,7 +109,7 @@ ListQuery = function () {
     pbr_Store.removeAll();
     var id = Ext.getCmp("br_id").getValue();
     var name = Ext.getCmp("br_name").getValue();
-    if (!Ext.getCmp('br_id').regex.test(id)) {
+    if (Ext.getCmp('id').getValue() != "" && !Ext.getCmp('br_id').regex.test(id)) {
         Ext.Msg.alert(INFORMATION, "請輸入有效字符串");
         return;
     }

@@ -37,5 +37,7 @@ namespace BLL.gigade.Dao.Impl
         List<ProdPromoQuery> GetList(ProdPromo store, out int totalCount);
         int UpStatus(ProdPromoQuery store);
         int UpdateUrl(ProdPromo store);
+        DataTable GetProductCategoryStore();
+        DataTable GetCagegoryIdsByIdAndFatherId(ProductCategory query);
     }
 }

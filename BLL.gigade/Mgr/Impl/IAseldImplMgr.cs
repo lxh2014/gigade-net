@@ -20,6 +20,7 @@ namespace BLL.gigade.Mgr.Impl
         DataTable GetOrderProductInformation(AseldQuery ase);
 
         List<AseldQuery> GetAseldList(Aseld ase);
+        List<AseldQuery> GetAseldListByItemid(Aseld ase);
         string UpdTicker(string m);
         string UpdAseld(Aseld a);
         int SelCom(Aseld a);
@@ -38,5 +39,7 @@ namespace BLL.gigade.Mgr.Impl
         DataTable getTime(AseldQuery a);
         void ConsoleAseldBeforeInsert(int detail_id);
         string Getfreight(string ord_id);
+        DataTable GetAseldTable(AseldQuery ase, out int total);
+        DataTable GetAseldTablePDF(AseldQuery aseld);
     }
 }

@@ -1185,7 +1185,7 @@ namespace Admin.gigade.Controllers
             _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
             try
             {
-                int id = 0;               
+                uint id = 0;               
                 if (!string.IsNullOrEmpty(Request.Params["change"]))
                 {
                     if (Request.Params["change"] == "true")
@@ -1264,7 +1264,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["brand_id"]))
                 {
-                    query.singleBrand_id = Convert.ToInt32(Request.Params["brand_id"]);
+                    query.singleBrand_id = Convert.ToUInt32(Request.Params["brand_id"]);
                 }
                 _promotionBannerMgr = new PromotionBannerMgr(mySqlConnectionString);
                 store = _promotionBannerMgr.GetPromotionBannerList(query, out totalCount);
@@ -1308,7 +1308,7 @@ namespace Admin.gigade.Controllers
         public JsonResult UpdateStatus()
         {
             string json = string.Empty;
-            int brand_id;
+            uint brand_id;
             PromotionBannerQuery query = new PromotionBannerQuery();
             try
             {
@@ -1357,7 +1357,7 @@ namespace Admin.gigade.Controllers
         {
             string json = string.Empty;
             string errorInfo = string.Empty;
-            int brand_id = 0;
+            uint brand_id = 0;
             bool result = false;
             try
             {
@@ -1532,7 +1532,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["id"]))
                 {
-                    query.brand_id = Convert.ToInt32(Request.Params["id"]);
+                    query.brand_id = Convert.ToUInt32(Request.Params["id"]);
                 }
                 if (!string.IsNullOrEmpty(Request.Params["name"]))
                 {
@@ -1654,7 +1654,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["brand_id"]))
                 {
-                    query.singleBrand_id = Convert.ToInt32(Request.Params["brand_id"]);
+                    query.singleBrand_id = Convert.ToUInt32(Request.Params["brand_id"]);
                 }
                 if (!string.IsNullOrEmpty(Request.Params["startdate"]))
                 {

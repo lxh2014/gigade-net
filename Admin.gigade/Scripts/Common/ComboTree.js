@@ -20,7 +20,7 @@
             floating: true,
             focusOnToFront: true,
             shadow: true,
-            ownerCt: this.ownerCt,
+            //ownerCt: this.ownerCt,
             useArrows: true,
             store: store,
             rootVisible: false,

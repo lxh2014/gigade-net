@@ -44,6 +44,7 @@ function editFunction(rowID) {
         Ext.getCmp("Image_Name").setRawValue(row.data.Image_Name);
         Ext.getCmp("Resume_Image").setRawValue(row.data.Resume_Image);
         Ext.getCmp("Promotion_Banner_Image").setRawValue(row.data.Promotion_Banner_Image);
+        Ext.getCmp("brand_logo").setRawValue(row.data.brand_logo);
         var shopclassid = row.data.classIds;
         var shopclassids = shopclassid.split(",");
         myCheckboxGroup = Ext.getCmp("shopclass").items;
@@ -84,6 +85,8 @@ function editFunction(rowID) {
 
                 if (form.isValid()) {
                     var sss = "";
+                    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                    myMask.show();
                     myCheckboxGroup = Ext.getCmp("shopclass").getChecked();
                     for (var i = 0; i < myCheckboxGroup.length; i++) {
                         if (myCheckboxGroup[i].checked) {
@@ -112,9 +115,11 @@ function editFunction(rowID) {
                             resumeimagelink: Ext.htmlEncode(Ext.getCmp('Resume_Image_Link').getValue()),
                             promotionbannerimage: Ext.htmlEncode(Ext.getCmp('Promotion_Banner_Image').getValue()),
                             promotionbannerimagelink: Ext.htmlEncode(Ext.getCmp('Promotion_Banner_Image_Link').getValue()),
-                            mediareportlinkurl: Ext.htmlEncode(Ext.getCmp('Media_Report_Link_Url').getValue())
+                            mediareportlinkurl: Ext.htmlEncode(Ext.getCmp('Media_Report_Link_Url').getValue()),
+                            brand_logo: Ext.htmlEncode(Ext.getCmp('brand_logo').getValue()),
                         },
                         success: function (form, action) {
+                            myMask.hide();
                             var result = Ext.decode(action.response.responseText);
                             if (result.success) {
                                 if (result.msg != "undefined") {
@@ -130,6 +135,7 @@ function editFunction(rowID) {
                             }
                         },
                         failure: function (form, action) {
+                            myMask.hide();
                             Ext.Msg.alert("提示", "操作失败,請稍后再試,或聯繫開發人員!");
                         }
                     });
@@ -444,7 +450,28 @@ function editFunction(rowID) {
                         allowBlank: true,
                         hidden: false,
                         anchor: '90%'
-                    }
+                    },
+                                                             {
+                                                                 xtype: 'fieldcontainer',
+                                                                 combineErrors: true,
+                                                                 layout: 'hbox',
+                                                                 anchor: '90%',
+                                                                 items: [
+                                                            {
+                                                                xtype: 'filefield',
+                                                                fieldLabel: '品牌logo',
+                                                                id: 'brand_logo',
+                                                                name: 'brand_logo',
+                                                                msgTarget: 'side',
+                                                                allowBlank: true,
+                                                                flex: 1,
+                                                                buttonText: '選擇...',
+                                                                fileUpload: true
+                                                            },
+                                                            {
+                                                                xtype: 'button', id: 'delBrandLogo', margin: '0 0 0 3', iconCls: 'icon-cross', handler: onDelProPicClick
+                                                            }]
+                                                             },
                 ]
             },
             {//媒體報道
@@ -602,6 +629,10 @@ function editFunction(rowID) {
             case "delPromo":
                 type = "promotion_banner_image";
                 targetID = "Promotion_Banner_Image";
+                break;
+            case "delBrandLogo":
+                type = "brand_logo";
+                targetID = "brand_logo";
                 break;
             default:
                 break;

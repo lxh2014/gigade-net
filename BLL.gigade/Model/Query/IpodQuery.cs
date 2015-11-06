@@ -19,6 +19,8 @@ namespace BLL.gigade.Model.Query
         public uint product_id { get; set; }
         public string product_name { set; get; }
         public string upc_id { set; get; }
+        public string upc_id_international { set; get; } //國際條碼
+        public string upc_id_shop { set; get; } //店內條碼
         public string user_username { set; get; }
         public string parameterName { set; get; }
         public string ParameterCode { set; get; }
@@ -46,6 +48,8 @@ namespace BLL.gigade.Model.Query
             product_name = string.Empty;
             item_id = 0;
             upc_id = string.Empty;
+            upc_id_international = string.Empty;
+            upc_id_shop = string.Empty;
             user_username = string.Empty;
             ParameterCode=string.Empty;
             Erp_Id = string.Empty;

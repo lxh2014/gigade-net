@@ -22,5 +22,6 @@ namespace BLL.gigade.Dao.Impl
         int upc_num(int m);//查詢這個商品是否有國際碼
         string Getupc(string item_id, string type);
         List<IupcQuery> GetIupcByItemID(IupcQuery query);
+        List<IupcQuery> GetIupcByType(IupcQuery query);
     }
 }

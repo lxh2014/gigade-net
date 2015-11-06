@@ -128,21 +128,50 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IinvdMgr-->GetIinvdList-->" + ex.Message, ex);
             }
         }
-        public int IsUpd(Iinvd i,int type=0)/*chaojie1124j添加，區分是庫存調整，還是收貨上架*/
+        public List<IinvdQuery> GetIinvdListByItemid(IinvdQuery ivd, out int totalCount)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(ivd.serchcontent))
+                {
+                    switch (ivd.serch_type)
+                    {
+                        case 1:
+                            ivd.serchcontent = _iplasdao.Getlocid(ivd.serchcontent.ToString());
+                            break;
+                        case 2:
+                            ivd.serchcontent = _iplasdao.Getprodbyupc(ivd.serchcontent.ToString()).Rows[0]["item_id"].ToString();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                return _ivddao.GetIinvdListByItemid(ivd, out totalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->GetIinvdListByItemid-->" + ex.Message, ex);
+            }
+        }
+
+        public int IsUpd(Iinvd i,IstockChangeQuery stock=null)/*chaojie1124j添加，區分是庫存調整，還是收貨上架*/
         {
             try
             {
                 IstockChange m = new IstockChange();
                 m.item_id = i.item_id;
-                if (type == 1)//收貨上架
+                if (stock.sc_trans_type == 1)//收貨上架
                 {
                     m.sc_trans_type = 1;//1.收貨上架,2表示庫調
                     m.sc_istock_why = 3;//3.收貨上架，2.庫調，1.庫鎖
                 }
-                if (type == 0)//庫存調整
+                if (stock.sc_trans_type == 0)//庫存調整
                 {
                     m.sc_trans_type = 2;
                     m.sc_istock_why = 2;//2表示庫調
+                    m.sc_trans_id = stock.sc_trans_id;
+                    m.sc_cd_id = stock.sc_cd_id;
+                    m.sc_note = stock.sc_note;
                 }
                 m.sc_num_old = GetProqtyByItemid(int.Parse(i.item_id.ToString()));
                 m.sc_num_chg = i.prod_qty;

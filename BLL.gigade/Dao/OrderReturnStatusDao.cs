@@ -177,7 +177,7 @@ namespace BLL.gigade.Dao
             try
             {
                 totalCount = 0;
-                sql.Append("select orm.order_id,od.item_id,od.product_name,para.parameterName as 'product_mode',od.product_spec_name,od.buy_num,od.single_money ,om.order_payment  ");
+                sql.Append("select orm.order_id,od.item_id,od.product_name,para.parameterName as 'product_mode',od.product_spec_name,od.buy_num,od.single_money ,om.order_payment,orm.bank_name,orm.bank_branch,orm.bank_account,orm.account_name  ");
                 sqlFrom.Append(" from order_return_master  orm  LEFT JOIN order_return_detail ord on orm.return_id=ord.return_id ");
                 sqlFrom.Append("LEFT JOIN order_detail  od on ord.detail_id=od.detail_id ");
                 sqlFrom.Append(" LEFT JOIN (select parameterCode,parameterName,remark from t_parametersrc where parametertype='product_mode') para on od.product_mode=para.parameterCode  ");
