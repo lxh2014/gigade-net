@@ -10,6 +10,7 @@ using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.IO;
 
 namespace Admin.gigade.Controllers
 {
@@ -924,6 +925,7 @@ namespace Admin.gigade.Controllers
             }
             try
             {
+                #region
                 string schedule_code = Request.Params["schedule_code"].ToString();
                 MailModel mailModel = new MailModel();
                 mailModel.MysqlConnectionString = mySqlConnectionString;
@@ -1025,6 +1027,7 @@ namespace Admin.gigade.Controllers
                 query_log.create_user = 9;
                 query_log.ipfrom = BLL.gigade.Common.CommonFunction.GetIP4Address(Request.UserHostAddress.ToString());
                 _secheduleServiceMgr.AddScheduleLog(query_log);
+                #endregion
             }
             catch (Exception ex)
             {
@@ -1036,7 +1039,125 @@ namespace Admin.gigade.Controllers
             }
             return true;
         }
+
+        //檢測文件夾下是否有內容,如果有內容則發送email  add by yachao1120j 2015-11-04  
+        public bool setconfigxml()
+        {
+            string json = string.Empty;
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+
+                    //存在 ,發送郵件
+                    #region
+                    string schedule_code = Request.Params["schedule_code"].ToString();
+                    MailModel mailModel = new MailModel();
+                    mailModel.MysqlConnectionString = mySqlConnectionString;
+                    string GroupCode = string.Empty;
+                    string MailTitle = string.Empty;
+                    string filepath = string.Empty;
+                    List<MailRequest> MR = new List<MailRequest>();
+                    MailRequest model = new MailRequest();
+                    List<ScheduleConfigQuery> store_config = new List<ScheduleConfigQuery>();
+                    ScheduleConfigQuery query_config = new ScheduleConfigQuery();
+                    if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+                    {
+                        return false;
+                    }
+                    query_config.schedule_code = schedule_code;
+                    _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+                    store_config = _secheduleServiceMgr.GetScheduleConfig(query_config);
+                    foreach (ScheduleConfigQuery item in store_config)
+                    {
+                        if (item.parameterCode.Equals("MailFromAddress"))
+                        {
+                            mailModel.MailFromAddress = item.value;
+                        }
+                        else if (item.parameterCode.Equals("MailHost"))
+                        {
+                            mailModel.MailHost = item.value;
+                        }
+                        else if (item.parameterCode.Equals("MailPort"))
+                        {
+                            mailModel.MailPort = item.value;
+                        }
+                        else if (item.parameterCode.Equals("MailFromUser"))
+                        {
+                            mailModel.MailFromUser = item.value;
+                        }
+                        else if (item.parameterCode.Equals("EmailPassWord"))
+                        {
+                            mailModel.MailFormPwd = item.value;
+                        }
+                        else if (item.parameterCode.Equals("GroupCode"))
+                        {
+                            GroupCode = item.value;
+                        }
+                        else if (item.parameterCode.Equals("MailTitle"))
+                        {
+                            MailTitle = item.value;
+                        }
+                        else if (item.parameterCode.Equals("filepath"))
+                        {
+                            filepath = item.value;
+                        }
+                    }
+                    #region  判斷文件夾是否為空
+                    string[] filepaths = filepath.Split(',');
+                    for (int i = 0; i < filepaths.Length; i++)
+                    {
+                        if (!System.IO.Directory.Exists(@filepaths[i]))
+                        {
+                            return false;
+                        }
+                        if (Directory.GetFiles(filepaths[i]).Length == 0)
+                        {
+                             MailHelper mail = new MailHelper(mailModel);
+                            mail.SendToGroup(GroupCode, MailTitle, filepaths[i]+"   "+"     此路徑下目錄為空    ", false, false);
+                        }
+                        if (Directory.GetFiles(filepaths[i]).Length > 0)//判斷路徑下是否有文件
+                        {
+                            string[] fn = Directory.GetFiles(filepaths[i]);
+                            string ss = string.Empty;
+                            for (int ii = 0; ii < fn.Length; ii++)
+                            {
+                                string[] fn_name = fn[ii].Split(new char [2]{'\\','/'});
+                                ss = ss + fn_name[fn_name.Length-1] +";"+ "  "+Environment.NewLine;
+                            }
+                            MailHelper mail = new MailHelper(mailModel);
+                            //
+                            string mailBody=string.Empty;
+                            mailBody=filepaths[i]+"      此路徑下"+ "\r\n"+"包含的文件的个数為:     "+ fn.Length +Environment.NewLine +"     包含的文件分別為      "+ ss + Environment.NewLine;
+                    #endregion
+                            mail.SendToGroup(GroupCode, MailTitle, mailBody, false, false);//發送郵件
+                        }
+                        //_secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+                        //_secheduleServiceMgr.SendEMail(mail);
+                        //添加排程執行日誌
+                        ScheduleLogQuery query_log = new ScheduleLogQuery();
+                        query_log.schedule_code = schedule_code;
+                        query_log.create_user = 9;
+                        query_log.ipfrom = BLL.gigade.Common.CommonFunction.GetIP4Address(Request.UserHostAddress.ToString());
+                        _secheduleServiceMgr.AddScheduleLog(query_log);
+
+                    }               
+                    #endregion
+                          
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            return true;
+        }
+
+        
     }
-    
-    
 }

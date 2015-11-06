@@ -1,0 +1,202 @@
+﻿@{
+    ViewBag.Title = "MarketTallyWD";
+}
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes " />
+
+<script src="../../Scripts/jquery-2.1.4.min.js"></script>
+<link href="../../Scripts/Bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="../../Scripts/Bootstrap/css/bootstrap-table.min.css" rel="stylesheet" />
+<script src="../../Scripts/Bootstrap/bootstrap.min.js"></script>
+<script src="../../Scripts/Bootstrap/bootstrap-table.min.js"></script>
+
+    <title></title>
+</head>
+
+
+<div class="container">
+    <h1>提示：請輸入產品條碼!</h1>
+    <br />
+    <h3>工作代號： <span class="label label-info">@ViewBag.number</span></h3>
+    <br />
+<div class="row">
+    <div class="col-lg-8">
+        <div class="alert alert-danger" id="alert" hidden="hidden" role="alert">
+            <h4 class="glyphicon glyphicon-exclamation-sign" id="MessageContentId">提示</h4>
+        </div>
+    </div>
+    <!-- /.col-lg-8 -->
+  <div class="col-lg-8">
+    <div class="input-group ">
+      <span class="input-group-btn">
+        <button class="btn btn-default btn-lg "  type="button">產品條碼</button>
+      </span>
+      <input type="text" class="form-control input-lg" id="upc" onKeypress= "javascript:if(event.keyCode==13) onUpcButtonClick();"  placeholder="請輸入產品條碼...">
+      
+      <span class="input-group-btn">
+      <button class="btn btn-default btn-lg " id="upcbutton" onClick="onUpcButtonClick()" type="button">確定</button>
+      </span>
+      @*<span class="glyphicon " id="inputGroupStatus_productitem" aria-hidden="true"></span>*@
+
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-8 -->
+</div><!-- /.row --> 
+</div>
+
+<div class="modal fade MarketTally-modal-alert" role="dialog" aria-labelledby="gridSystemModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 class="modal-title" >提示</h3>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">         
+          <h4 id="MessageContentId2" class="text-center">錯誤提示</h4>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="modal-dialog-close" data-dismiss="modal">確定</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        {
+            $("#upc").focus();
+        }
+        onUpcButtonClick = function ()
+        {
+            var upc = document.getElementById("upc").value.trim();
+            var number = '@ViewBag.number';
+            
+            //獲取upc對應的itemid 
+            $.get('/MarketTally/GetItemidByUpcid', { upc_id: upc }, function (data)
+            {
+                var result = eval("(" + data + ")");
+                if (result.success)
+                {
+                    if (result.itemid != "")
+                    {
+                        var itemid = result.itemid;
+                        $.get('/MarketTally/GetAseldListByItemid', { assg_id: number, item_id: itemid }, function (data)
+                        {
+                            var result = eval("(" + data + ")");
+                            if (result.success)
+                            {
+                                if (result.totalCount > 0)
+                                {
+                                    document.location.href = "/MarketTally/MarketTallyWDProduct?number=" + number + "&itemid=" + itemid;
+                                }
+                                else
+                                {
+                                    $('#MessageContentId').text("當前工作代號中沒有該產品條碼(" + upc + ")或者其不需要分貨，請重新掃描!");
+                                    $('#alert').show();
+                                    $("#upc").focus()
+                                }
+                            }
+
+                        }).error(function ()
+                        {
+                            $('#MessageContentId').text("查詢失敗!");
+                            $('#alert').show();
+                            $("#upc").focus()
+                        })
+                    }
+                }
+                else
+                {
+                    if (result.msg == 0)
+                    {
+                        $('#MessageContentId').text("產品條碼(" + upc + ")不存在，請重新掃描!");
+                        $('#alert').show();
+                        $("#upc").focus()
+                    }
+                    else if (result.msg == 2)
+                    {
+                        $('#MessageContentId').text("產品條碼(" + upc + ")存在多個，請重新掃描!");
+                        $('#alert').show();
+                        $("#upc").focus()
+                    }
+                }
+            }).error(function ()
+            {
+                $('#MessageContentId').text("查詢失敗!");
+                $('#alert').show();
+                $("#upc").focus()
+            })
+
+        }
+
+
+        //$('#productitem').on('input', function (e)
+        //{
+        //    //alert(document.getElementById("productitem").value.trim());
+        //    if (document.getElementById("productitem").value == "")
+        //    {
+        //        $('#product').attr("hidden", "hidden");
+
+        //        $('#productitem_group').attr("class", "input-group "); 
+        //        $('#inputGroupStatus_productitem').attr("class", "glyphicon");
+                
+        //        $('#stock_table').bootstrapTable('destroy');
+
+        //        return false;
+        //    }
+        //    else if (document.getElementById("productitem").value.trim() == "123")
+        //    {
+        //        $('#product').removeAttr("hidden");
+
+        //        $('#productitem_group').attr("class", "input-group has-success ");
+        //        $('#inputGroupStatus_productitem').attr("class", "glyphicon glyphicon-ok form-control-feedback");
+                                
+        //        $('#stock_table').attr("data-url", "/MarketTally/GetStockByProductId?loc_id=AA099A88");
+        //        $('#stock_table').bootstrapTable();
+                
+        //    }
+        //    else
+        //    {
+        //        $('#product').attr("hidden", "hidden");
+
+        //        $('#productitem_group').attr("class", "input-group has-error ");
+        //        $('#inputGroupStatus_productitem').attr("class", "glyphicon glyphicon-remove form-control-feedback");
+
+        //        $('#stock_table').bootstrapTable('destroy');
+                
+        //    }
+        //})
+
+        //$('#delivercode').on('input', function (e)
+        //{
+        //    if (document.getElementById("delivercode").value == "")
+        //    {
+        //        $('#delivercode_group').attr("class", "input-group "); 
+        //        $('#inputGroupStatus_delivercode').attr("class", "glyphicon");
+
+        //        $('#amsure').attr("class", "btn btn-default btn-lg disabled");
+        //        return false;
+        //    }
+        //    else if (document.getElementById("delivercode").value.trim() == "123")
+        //    {
+        //        $('#delivercode_group').attr("class", "input-group has-success ");
+        //        $('#inputGroupStatus_delivercode').attr("class", "glyphicon glyphicon-ok form-control-feedback");
+
+        //        $('#amsure').attr("class", "btn btn-success btn-lg ");
+                
+        //    }
+        //    else
+        //    {
+        //        $('#delivercode_group').attr("class", "input-group has-error ");
+        //        $('#inputGroupStatus_delivercode').attr("class", "glyphicon glyphicon-remove form-control-feedback");
+
+        //        $('#amsure').attr("class", "btn btn-default btn-lg disabled");
+        //    }
+        //})
+
+    });
+</script>

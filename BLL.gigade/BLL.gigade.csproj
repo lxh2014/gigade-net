@@ -1283,6 +1283,7 @@
     <Compile Include="Model\CoursePicture.cs" />
     <Compile Include="Model\CourseProduct.cs" />
     <Compile Include="Model\CourseTicket.cs" />
+    <Compile Include="Model\Custom\CategoryItem.cs" />
     <Compile Include="Model\Custom\CourseDetailCustom.cs" />
     <Compile Include="Model\Custom\CourseDetailItemCustom.cs" />
     <Compile Include="Model\Custom\CourseTicketCustom.cs" />

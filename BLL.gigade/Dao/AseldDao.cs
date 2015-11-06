@@ -266,6 +266,40 @@ LEFT JOIN order_master o ON a.ord_id=o.order_id
         }
         #endregion
 
+        #region 根據工作代號、產品條碼查找數據
+        public List<AseldQuery> GetAseldListByItemid(Aseld a)
+        {
+            StringBuilder sb = new StringBuilder();//left join iloc ic on i.plas_loc_id=ic.loc_id 
+            sb.AppendFormat(@"SELECT seld_id,assg_id,case when ip.loc_id is null then 'YY999999' else ip.loc_id end as sel_loc,CONCAT('(',a.item_id,')',v.brand_name,'-',p.product_name) as description,concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz,ord_qty,out_qty,ord_id,a.item_id,ordd_id,upc_id,i.cde_dt,pe.cde_dt_shp,deliver_id,deliver_code,o.note_order,ic.hash_loc_id 
+FROM aseld a LEFT JOIN iinvd i ON a.item_id=i.item_id 
+
+LEFT JOIN product_ext pe ON i.item_id = pe.item_id 
+LEFT JOIN iplas ip on a.item_id=ip.item_id 
+left join iloc ic on ip.loc_id=ic.loc_id  
+LEFT JOIN product_item pi ON a.item_id = pi.item_id 
+LEFT JOIN product_spec ps1 ON pi.spec_id_1 = ps1.spec_id
+LEFT JOIN product_spec ps2 ON pi.spec_id_2 = ps2.spec_id
+LEFT JOIN product p ON pi.product_id=p.product_id 
+LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id
+LEFT JOIN order_master o ON a.ord_id=o.order_id
+            WHERE assg_id='{0}' AND wust_id<>'COM' AND commodity_type='2' and scaned='0' ", a.assg_id);
+            if (a.item_id != 0)
+            {
+                sb.AppendFormat(" and a.item_id='{0}' ",a.item_id);
+            }
+            sb.AppendFormat(" ORDER BY sel_loc,seld_id LIMIT 1;");
+            
+            try
+            {
+                return _access.getDataTableForObj<AseldQuery>(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldDao.GetAseldListByItemid-->" + ex.Message + sb.ToString(), ex);
+            }
+        }
+        #endregion
+
         /// <summary>
         /// 調度頁面數據
         /// </summary>
@@ -485,7 +519,7 @@ LEFT JOIN order_detail od ON os.slave_id=od.slave_id AND a.item_id=od.item_id
             {
                 if (!string.IsNullOrEmpty(a.assg_id))
                 {
-                    sb.AppendFormat(" set sql_safe_updates = 0;UPDATE aseld SET scaned='0' where assg_id ='{0}'; set sql_safe_updates = 1; ", a.assg_id);
+                    sb.AppendFormat(" set sql_safe_updates = 0;UPDATE aseld SET scaned='0' where assg_id ='{0}' and wust_id !='COM'; set sql_safe_updates = 1; ", a.assg_id);
                 }
                 return _access.execCommand(sb.ToString());
             }
@@ -702,11 +736,14 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
             StringBuilder strWhr = new StringBuilder();
             StringBuilder strLimit=new StringBuilder();
             StringBuilder strJoin=new StringBuilder();
-            strAll.Append("SELECT p.product_id,p.product_name,pi.item_id,CONCAT(ps.spec_name,'-',ps2.spec_name)AS spec,SUM(out_qty)out_qty,SUM(act_pick_qty)act_pick_qty,SUM(a.ord_qty)ord_qty, a.create_dtim   FROM aseld  a");
+            strAll.Append("SELECT a.assg_id,p.product_id,p.product_name,pi.item_id,CONCAT(ps.spec_name,'-',ps2.spec_name)AS spec,SUM(out_qty)out_qty,SUM(act_pick_qty)act_pick_qty,SUM(a.ord_qty)ord_qty, a.create_dtim,i.loc_id,temp.parameterName,ic.lcat_id   FROM aseld  a");
             strJoin.Append(" LEFT JOIN product_item pi ON a.item_id=pi.item_id");
             strJoin.Append(" LEFT JOIN product p ON p.product_id=pi.product_id");
+            strJoin.Append(" LEFT JOIN iplas i ON pi.item_id=i.item_id");
+            strJoin.Append(" LEFT JOIN iloc ic ON ic.loc_id=i.loc_id");
             strJoin.Append(" LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id ");
             strJoin.Append(" LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id");
+            strJoin.Append(" LEFT JOIN (select parameterCode,parameterName from t_parametersrc where parameterType ='product_mode') temp ON p.product_mode=temp.parameterCode");
 
             strWhr.Append(" WHERE a.wust_id<>'COM'");
             if (!string.IsNullOrEmpty(ase.assg_id))

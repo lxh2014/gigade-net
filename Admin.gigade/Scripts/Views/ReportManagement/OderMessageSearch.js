@@ -547,7 +547,7 @@ Ext.onReady(function () {
                            xtype: 'numberfield',
                            labelWidth: 135,
                            margin: '0 20px',
-                           fieldLabel: '距離壓單日(大於等於)',
+                           fieldLabel: '訂單成立天數(大於等於)',
                            minValue: 0,
                            value: 0,
                            allowDecimals: false,
@@ -789,7 +789,7 @@ Ext.onReady(function () {
         frame: true,
         columns: [
             {
-                header: '距離壓單日', dataIndex: 'overdue_day', width: 65, align: 'center',
+                header: '訂單成立天數', dataIndex: 'overdue_day', width: 85, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (record.data.order_status == 99) {
                         return "<div style='color:#AAAAEE;'> " + value + "</div>";
@@ -951,7 +951,7 @@ Ext.onReady(function () {
 //    s += d.getFullYear() + "/";                     // 获取年份。
 //    s += (d.getMonth() + 1) + "/";              // 获取月份。
 //    s += d.getDate() + days;                          // 获取日。
-//    return (new Date(s));                                 // 返回日期。
+//    return (new Date(s));                                 // 返回日期。  
 //}
 setNextMonth = function (source, n) {
     var s = new Date(source);
