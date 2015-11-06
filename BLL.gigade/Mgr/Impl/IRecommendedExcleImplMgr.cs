@@ -27,5 +27,9 @@ namespace BLL.gigade.Mgr.Impl
         List<MemoryStream> BuildRecommendedExcleOutBigInfo(DataTable dt, string NameListStr);
         //構造Excle
         List<MemoryStream> BuildRecommendedExcleOut(DataTable dt, string NameListStr);
+        //導出product信息
+        StringWriter GetThisProductInfo();
+
+        StringWriter GetVendorCategoryMsg();
     }
 }
