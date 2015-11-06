@@ -282,10 +282,10 @@ Ext.onReady(function () {
                           Ext.Msg.alert(INFORMATION, DATA_TIP);
                           end.setValue(setNextMonth(start.getValue(), 1));
                       }
-                      else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                          // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                          end.setValue(setNextMonth(start.getValue(), 1));
-                      }
+                      //else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
+                      //    // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                      //    end.setValue(setNextMonth(start.getValue(), 1));
+                      //}
                   }
               }
           }, '~', {
@@ -306,10 +306,10 @@ Ext.onReady(function () {
                               Ext.Msg.alert(INFORMATION, DATA_TIP);
                               start.setValue(setNextMonth(end.getValue(), -1));
                           }
-                          else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                              // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                              start.setValue(setNextMonth(end.getValue(), -1));
-                          }
+                          //else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
+                          //    // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                          //    start.setValue(setNextMonth(end.getValue(), -1));
+                          //}
                       }
                       else {
                           start.setValue(setNextMonth(end.getValue(), -1));
