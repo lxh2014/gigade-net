@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using BLL.gigade.Model;
+using BLL.gigade.Model.Custom;
 
 namespace BLL.gigade.Dao.Impl
 {
@@ -23,5 +24,11 @@ namespace BLL.gigade.Dao.Impl
         DataTable GetBrandInfo(RecommendedOutPra rop);
         //獲得訂單信息最小年份
         DataTable GetOrderInfoByMinYear();
+        //獲取商品信息
+        DataTable GetThisProductInfo();
+
+        List<CategoryItem> GetVendorCategoryMsg(CategoryItem pcb,List<CategoryItem> lscm);
+
+        DataTable GetVendorBrandMsg(CategoryItem pcb);
     }
 }
