@@ -8,9 +8,9 @@
 
 <script src="../../Scripts/jquery-2.1.4.min.js"></script>
 <link href="../../Scripts/Bootstrap/css/bootstrap.min.css" rel="stylesheet" />
-<link href="../../Scripts/Bootstrap/css/bootstrap-table.min.css" rel="stylesheet" />
 <script src="../../Scripts/Bootstrap/bootstrap.min.js"></script>
 <script src="../../Scripts/Bootstrap/bootstrap-table.min.js"></script>
+<link href="../../Scripts/Bootstrap/css/bootstrap-table.min.css" rel="stylesheet" />
     <title></title>
 </head>
 
@@ -83,7 +83,7 @@
         </table>
        
         <br />
-        <button class="btn btn-default btn-lg" disabled="disabled" id="amsure" type="button">確認分貨</button>
+        <button class="btn btn-default btn-lg" disabled="disabled" data-loading-text="提交中..."  id="amsure" type="button">確認分貨</button>
     </div>
 </div>
 
@@ -475,7 +475,14 @@
     
             
         }
-
+        $('button[data-loading-text]').click(function ()
+        {
+            var btn = $(this).button('loading');
+            setTimeout(function ()
+            {
+                btn.button('reset');
+            }, 3000);
+        });
         $('#delivercode').on('input', function (e)
         {
             
