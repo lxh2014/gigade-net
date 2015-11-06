@@ -12263,6 +12263,10 @@ namespace Admin.gigade.Controllers
                 }
             }
             DataTable table = aseldMgr.GetAseldTable(query, out totalcount);
+            _IiupcMgr = new IupcMgr(mySqlConnectionString);
+            IupcQuery queryIupc = new IupcQuery();
+            string upc_id = string.Empty;
+            List<IupcQuery> list = new List<IupcQuery>();
             for (int i = 0; i < table.Rows.Count; i++)
             {
                 string lcat_id = table.Rows[i]["lcat_id"].ToString();
@@ -12277,6 +12281,40 @@ namespace Admin.gigade.Controllers
                     {
                         table.Rows[i]["loc_id"] = "ZZ999999";
                     }
+                }
+                uint item_id = uint.Parse(table.Rows[i]["item_id"].ToString());
+                queryIupc.item_id = item_id;
+                queryIupc.upc_type_flg = "1";
+                list = _IiupcMgr.GetIupcByType(queryIupc);
+                int j = 0;
+                if (list.Count > 0)
+                {
+                    table.Rows[i]["upc_id"] = list[0].upc_id;
+                    j++;
+                }
+                else
+                {
+                    queryIupc.upc_type_flg = "3";
+                    list = _IiupcMgr.GetIupcByType(queryIupc);
+                    if (list.Count > 0)
+                    {
+                        table.Rows[i]["upc_id"] = list[0].upc_id;
+                        j++;
+                    }
+                    else
+                    {
+                        queryIupc.upc_type_flg = "2";
+                        list = _IiupcMgr.GetIupcByType(queryIupc);
+                        if (list.Count > 0)
+                        {
+                            table.Rows[i]["upc_id"] = list[0].upc_id;
+                            j++;
+                        }
+                    }
+                }
+                if(j==0)
+                {
+                    table.Rows[i]["upc_id"] ="";
                 }
             }
             IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
@@ -12313,9 +12351,10 @@ namespace Admin.gigade.Controllers
         //}
         public string MakePDF(DataTable aseldTable, string assg_id, string user_username, string newPDFName, int index)
         {
+            int columnNum = 10;
             string dateNow = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             PdfHelper pdf = new PdfHelper();
-            float[] arrColWidth = new float[] { 150, 60, 30, 35, 35, 45, 45, 60 };
+            float[] arrColWidth = new float[] { 150, 60, 60, 30, 35, 35, 45, 45, 60,35 };
             Document document = new Document(PageSize.A4);
             BaseFont bf = BaseFont.CreateFont("C:\\WINDOWS\\Fonts\\simsun.ttc,1", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
             iTextSharp.text.Font fontChinese = new iTextSharp.text.Font(bf, 8, iTextSharp.text.Font.UNDERLINE, iTextSharp.text.BaseColor.RED);
@@ -12325,7 +12364,7 @@ namespace Admin.gigade.Controllers
             PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(newPDFName + index, FileMode.Create));
             document.Open();
 
-            PdfPTable ptable = new PdfPTable(8);
+            PdfPTable ptable = new PdfPTable(columnNum);
             ptable.WidthPercentage = 100;//表格寬度
             font = new iTextSharp.text.Font(bf, 10, iTextSharp.text.Font.NORMAL, new iTextSharp.text.BaseColor(0, 0, 0));//黑  
             ptable.SetTotalWidth(arrColWidth);
@@ -12347,7 +12386,7 @@ namespace Admin.gigade.Controllers
                 #region 表頭
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 8;
+                cell.Colspan = columnNum;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12365,7 +12404,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("待撿貨商品報表", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;
-                cell.Colspan = 3;
+                cell.Colspan = 4;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12383,7 +12422,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 8;
+                cell.Colspan = columnNum;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12400,7 +12439,7 @@ namespace Admin.gigade.Controllers
                 ptable.AddCell(cell);
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 3;
+                cell.Colspan = 5;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12418,7 +12457,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 1)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 8;
+                cell.Colspan = columnNum;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12428,7 +12467,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("                                       工作代號:" + assg_id, new iTextSharp.text.Font(bf, 10)));
                 cell.VerticalAlignment = Element.ALIGN_CENTER;
-                cell.Colspan = 8;
+                cell.Colspan = columnNum;
                 cell.DisableBorderSide(2);
                 ptable.AddCell(cell);
 
@@ -12442,10 +12481,10 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                //cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 8)));
-                //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                //cell.DisableBorderSide(8);
-                //ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 8)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
 
                 cell = new PdfPCell(new Phrase("規格", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
@@ -12481,6 +12520,10 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 ptable.AddCell(cell);
 
+                cell = new PdfPCell(new Phrase("備註", new iTextSharp.text.Font(bf, 8)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                ptable.AddCell(cell);
+
                 if (0 < aseldTable.Rows.Count)
                 {
                     int k = 0;
@@ -12503,6 +12546,8 @@ namespace Admin.gigade.Controllers
                     {
                         k = aseldTable.Rows.Count;
                     }
+                    _IiupcMgr = new IupcMgr(mySqlConnectionString);
+                    IupcQuery query = new IupcQuery();
                     for (int i = j * 35; i < k; i++)
                     {
                         //cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["product_id"].ToString(), new iTextSharp.text.Font(bf, 8)));
@@ -12515,10 +12560,35 @@ namespace Admin.gigade.Controllers
                         cell.DisableBorderSide(8);
                         ptable.AddCell(cell);
 
-                        //cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["item_id"].ToString(), new iTextSharp.text.Font(bf, 8)));
-                        //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                        //cell.DisableBorderSide(8);
-                        //ptable.AddCell(cell);
+                        string upc_id = string.Empty;
+                        List<IupcQuery> list=new List<IupcQuery>();
+                        uint item_id = uint.Parse(aseldTable.Rows[i]["item_id"].ToString());
+                        query.item_id = item_id;
+                        query.upc_type_flg="1";
+                        list=_IiupcMgr.GetIupcByType(query);
+                        if (list.Count > 0)
+                        {
+                            upc_id = list[0].upc_id;
+                        }
+                        else {
+                            query.upc_type_flg = "3";
+                            list = _IiupcMgr.GetIupcByType(query);
+                            if (list.Count > 0)
+                            {
+                                upc_id = list[0].upc_id;
+                            }
+                            else {
+                                query.upc_type_flg = "2";
+                                list = _IiupcMgr.GetIupcByType(query);
+                                if(list.Count>0){
+                                    upc_id = list[0].upc_id;
+                                }
+                            }
+                        }
+                        cell = new PdfPCell(new Phrase(upc_id, new iTextSharp.text.Font(bf, 8)));
+                        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                        cell.DisableBorderSide(8);
+                        ptable.AddCell(cell);
 
                         cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["spec"].ToString(), new iTextSharp.text.Font(bf, 8)));
                         cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
@@ -12574,13 +12644,17 @@ namespace Admin.gigade.Controllers
                         cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                         //cell.DisableBorderSide(8);
                         ptable.AddCell(cell);
+
+                        cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 8)));
+                        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                        ptable.AddCell(cell);
                     }
                 }
                 else
                 {
                     cell = new PdfPCell(new Phrase("此工作代號無數據", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.Colspan = 8;
+                    cell.Colspan = columnNum;
                     cell.DisableBorderSide(1);
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);

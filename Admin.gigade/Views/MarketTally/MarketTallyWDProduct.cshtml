@@ -8,9 +8,9 @@
 
 <script src="../../Scripts/jquery-2.1.4.min.js"></script>
 <link href="../../Scripts/Bootstrap/css/bootstrap.min.css" rel="stylesheet" />
-<link href="../../Scripts/Bootstrap/css/bootstrap-table.min.css" rel="stylesheet" />
 <script src="../../Scripts/Bootstrap/bootstrap.min.js"></script>
 <script src="../../Scripts/Bootstrap/bootstrap-table.min.js"></script>
+<link href="../../Scripts/Bootstrap/css/bootstrap-table.min.css" rel="stylesheet" />
     <title></title>
 </head>
 
@@ -83,7 +83,7 @@
         </table>
        
         <br />
-        <button class="btn btn-default btn-lg" disabled="disabled" id="amsure" type="button">確認分貨</button>
+        <button class="btn btn-default btn-lg" disabled="disabled" data-loading-text="提交中..."  id="amsure" type="button">確認分貨</button>
     </div>
 </div>
 
@@ -110,7 +110,7 @@
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        @*<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>*@
         <h3 class="modal-title" >提示</h3>
       </div>
       <div class="modal-body">
@@ -127,6 +127,8 @@
 </div><!-- /.modal -->
 
 <script>
+    var index2;
+    var result2;
     function nameFormatter(value, row, index)
     {
         return '<input type="number"  min="0" class="form-control" id="pick_num' + index + '"  onkeydown="return check(event);">';
@@ -169,6 +171,8 @@
         {
             
             var result = eval("(" + JSON.stringify($('#stock_table').bootstrapTable('getData')) + ")");
+            index2 = index;
+            result2 = result;
             var count = sum(result.length); 
             if (count == -1)
             {
@@ -219,7 +223,8 @@
             }
             if (parseInt(result[index].prod_qty) < parseInt($('#pick_num' + index).val()))
             {
-                
+                //alert('pick_num')
+
                 if ($('#hidden_loc_id').text() == "YY999999")
                 {
                     $('#MessageContentId').text("該商品沒有主料位,不能庫調!");
@@ -237,164 +242,93 @@
                         $('#amsure').attr("disabled", "disabled");
                         $('#pick_num' + index).focus();
                     })
+
                 }
                 else
                 {
                     var pnum = parseInt($('#pick_num' + index).val());
-
                     $('#ConfirmContentId').text("該商品庫存不夠，確認直接進行商品數量庫調？");
-                    $('.MarketTally-modal-confirm').modal('toggle')
+                    $('.MarketTally-modal-confirm').modal({
+                        backdrop: 'static'
+                    })
                     $('.MarketTally-modal-confirm').on('shown.bs.modal', function (event)
                     {
                         $('#modal-dialog-no').focus();
-                        $('#modal-dialog-yes').on('click', function ()
+
+                    })
+                    $('.MarketTally-modal-confirm').on('hidden.bs.modal', function (event)
+                    {
+
+                    })
+                }
+
+            }
+            else
+            {
+                var message = "";
+                if ($('#pick_num' + index).val() != "" && $('#pick_num' + index).val() != "0")
+                {   //請遵守先進先出原則！
+                    for (var i = 0; i < index; i++)
+                    {
+                        var pick_num = 0;
+                        if ($('#pick_num' + i).val() != "")
                         {
-                            //alert($('#pick_num' + index).val())
-                            //調整庫存；
-                            var item_id = '@ViewBag.itemid';
-                            var order_id = $("#ord_id").text();
-                            var loc_id = $("#hidden_loc_id").text();
-                            var prod_qty = result[index].prod_qty;
-                            var made_date = result[index].made_date;
-                            //var pnum = parseInt($('#pick_num' + index).val()); 
+                            pick_num = parseInt($('#pick_num' + i).val());
+                        }
+                        if (parseInt(result[i].prod_qty) > pick_num)
+                        {
+                            message = "請遵守先進先出原則！";
+                            break;
+                        }
 
-                            $.get('/MarketTally/RFKT', { item_id: item_id, order_id: order_id, loc_id: loc_id, prod_qty: prod_qty, made_date: made_date, pnum: pnum }, function (data)
+                    }
+                }
+                if (true)
+                {   /*檢查日期是否過期開始*/
+                    var dtstring = 2
+                    var item_id = '@ViewBag.itemid'
+                    var startTime = result[index].cde_dt
+                    $.get('/MarketTally/JudgeDate', { dtstring: dtstring, item_id: item_id, startTime: startTime }, function (data)
+                    {
+                        var result = eval("(" + data + ")");
+                        if (result.success)
+                        {
+                            //var message=""
+                            if (result.msg == "3")
                             {
-                                var result = eval("(" + data + ")");
-                                if (result.success)
-                                {
-                                    if (result.msg == "100")
-                                    {
-                                    }
-                                    if (result.msg == "2")
-                                    {
-                                        $('#MessageContentId').text("今日的庫存已鎖，不能庫調");
-                                        $('.MarketTally-modal-alert').modal('toggle')
-                                        $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
-                                        {
-                                            $('#modal-dialog-close').focus();
-                                        })
-                                    }
-                                }
-                                else
-                                {
-                                    $('#MessageContentId').text("系統故障,內部庫調失敗!");
-                                    $('.MarketTally-modal-alert').modal('toggle')
-                                    $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
-                                    {
-                                        $('#modal-dialog-close').focus();
-                                    })
-                                }
+                                message += "超過允出天數!";
+                            }
+                            else if (result.msg == "4")
+                            {
+                                message += "有效期為" + result.dte + "的商品已超過有效日期!!";
+                            }
 
-                            }).error(function ()
+                        }
+                        if (message != "")
+                        {
+                            $('#MessageContentId').text(message);
+                            $('.MarketTally-modal-alert').modal('toggle')
+                            $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
                             {
-                                $('#MessageContentId').text("系統故障,內部庫調失敗!");
-                                $('.MarketTally-modal-alert').modal('toggle')
-                                $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
-                                {
-                                    $('#modal-dialog-close').focus();
-                                })
-                            }).complete(function ()
+                                $('#modal-dialog-close').focus();
+                            })
+                            $('.MarketTally-modal-alert').on('hidden.bs.modal', function (event)
                             {
-                                $('#stock_table').bootstrapTable('refresh');
-                                $('#act_pick_qty').text('  ');
-                                $('#act_pick_qty').attr("class", "label label-danger");
-                                $('#amsure').attr("class", "btn btn-default btn-lg");
-                                $('#amsure').attr("disabled", "disabled");
                                 $('#pick_num' + index).focus();
                             })
-                            
-                        })
-                        $('#modal-dialog-no').on('click', function ()
-                        {
-                            $('#pick_num' + index).val('');
-                            var count = sum(result.length);
-                            if (count == -1 || count > parseInt($('#out_qty').text()))
-                            {
-                                $('#act_pick_qty').attr("class", "label label-danger");
-                                $('#amsure').attr("class", "btn btn-default btn-lg");
-                                $('#amsure').attr("disabled", "disabled");
-                            }
-                            else
-                            {
-                                $('#act_pick_qty').attr("class", "label label-success");
-                                if ($("#delivercode").val().trim() == $("#hidden_deliver_code").text().trim())
-                                {
-                                    $('#amsure').attr("class", "btn btn-success btn-lg");
-                                    $('#amsure').removeAttr("disabled");
-                                }
-                            }
-                            $('#pick_num' + index).focus();
-                        })
-                        
-                    })
-                    
-                }
-                
-            }
-            var message = "";
-            if ($('#pick_num' + index).val() != "" && $('#pick_num' + index).val() != "0")
-            {   //請遵守先進先出原則！
-                for(var i=0;i<index;i++)
-                {
-                    var pick_num = 0; 
-                    if ($('#pick_num' + i).val() != "")
-                    {
-                        pick_num = parseInt($('#pick_num' + i).val());
-                    } 
-                    if (parseInt(result[i].prod_qty) > pick_num)
-                    {
-                        message = "請遵守先進先出原則！";
-                        break;
-                    }
+                        }
 
-                }
-            }
-            if (true)
-            {   /*檢查日期是否過期開始*/
-                var dtstring = 2
-                var item_id = '@ViewBag.itemid'
-                var startTime = result[index].cde_dt
-                $.get('/MarketTally/JudgeDate', { dtstring: dtstring, item_id: item_id,startTime:startTime }, function (data)
-                {
-                    var result = eval("(" + data + ")");
-                    if (result.success)
+                    }).error(function ()
                     {
-                        //var message=""
-                        if (result.msg == "3")
-                        {
-                            message += "超過允出天數!";
-                        }
-                        else if (result.msg == "4")
-                        {
-                            message += "有效期為" + result.dte + "的商品已超過有效日期!!";
-                        }
-                        
-                    }
-                    if (message != "")
-                    {
-                        $('#MessageContentId').text(message);
+                        $('#MessageContentId').text("該商品日期驗證出問題！請聯繫管理員~");
                         $('.MarketTally-modal-alert').modal('toggle')
                         $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
                         {
                             $('#modal-dialog-close').focus();
                         })
-                        $('.MarketTally-modal-alert').on('hidden.bs.modal', function (event)
-                        {
-                            $('#pick_num' + index).focus();
-                        })
-                    }
+                    });
 
-                }).error(function ()
-                {
-                    $('#MessageContentId').text("該商品日期驗證出問題！請聯繫管理員~");
-                    $('.MarketTally-modal-alert').modal('toggle')
-                    $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
-                    {
-                        $('#modal-dialog-close').focus();
-                    })
-                });
-
+                }
             }
 
         }
@@ -541,7 +475,14 @@
     
             
         }
-
+        $('button[data-loading-text]').click(function ()
+        {
+            var btn = $(this).button('loading');
+            setTimeout(function ()
+            {
+                btn.button('reset');
+            }, 3000);
+        });
         $('#delivercode').on('input', function (e)
         {
             
@@ -696,5 +637,86 @@
             });
 
         });
+        //
+        {
+            $('#modal-dialog-yes').on('click', function ()
+            {
+                //調整庫存；
+                var item_id = '@ViewBag.itemid';
+                var order_id = $("#ord_id").text();
+                var loc_id = $("#hidden_loc_id").text();
+                var prod_qty = result2[index2].prod_qty;
+                var made_date = result2[index2].made_date;
+                var pnum = parseInt($('#pick_num' + index2).val()); 
+                $.get('/MarketTally/RFKT', { item_id: item_id, order_id: order_id, loc_id: loc_id, prod_qty: prod_qty, made_date: made_date, pnum: pnum }, function (data)
+                {
+                    var result = eval("(" + data + ")");
+                    if (result.success)
+                    {
+                        if (result.msg == "100")
+                        {
+                        }
+                        if (result.msg == "2")
+                        {
+                            $('#MessageContentId').text("今日的庫存已鎖，不能庫調");
+                            $('.MarketTally-modal-alert').modal('toggle')
+                            $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
+                            {
+                                $('#modal-dialog-close').focus();
+                            })
+                        }
+                    }
+                    else
+                    {
+                        $('#MessageContentId').text("系統故障,內部庫調失敗!");
+                        $('.MarketTally-modal-alert').modal('toggle')
+                        $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
+                        {
+                            $('#modal-dialog-close').focus();
+                        })
+                    }
+
+                }).error(function ()
+                {
+                    $('#MessageContentId').text("系統故障,內部庫調失敗!");
+                    $('.MarketTally-modal-alert').modal('toggle')
+                    $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
+                    {
+                        $('#modal-dialog-close').focus();
+                    })
+                }).complete(function ()
+                {
+                    $('#stock_table').bootstrapTable('refresh');
+                    $('#act_pick_qty').text('  ');
+                    $('#act_pick_qty').attr("class", "label label-danger");
+                    $('#amsure').attr("class", "btn btn-default btn-lg");
+                    $('#amsure').attr("disabled", "disabled");
+                    $('#pick_num' + index2).focus();
+                })
+
+            })
+            $('#modal-dialog-no').on('click', function ()
+            {
+                $('#pick_num' + index2).val('');
+                var count = sum(result2.length);
+                if (count == -1 || count > parseInt($('#out_qty').text()))
+                {
+                    $('#act_pick_qty').attr("class", "label label-danger");
+                    $('#amsure').attr("class", "btn btn-default btn-lg");
+                    $('#amsure').attr("disabled", "disabled");
+                }
+                else
+                {
+                    $('#act_pick_qty').attr("class", "label label-success");
+                    if ($("#delivercode").val().trim() == $("#hidden_deliver_code").text().trim())
+                    {
+                        $('#amsure').attr("class", "btn btn-success btn-lg");
+                        $('#amsure').removeAttr("disabled");
+                    }
+                }
+                $('#pick_num' + index2).focus();
+            })
+        }
+        //
     });
 </script>
