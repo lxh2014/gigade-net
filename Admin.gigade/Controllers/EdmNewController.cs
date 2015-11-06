@@ -455,19 +455,6 @@ namespace Admin.gigade.Controllers
                 {
                     query.template_data = Request.Params["template_data"];
                 }
-                if (!string.IsNullOrEmpty(Request.Params["editor1"]))
-                {
-                    query.editor1 = Request.Params["editor1"];
-                }
-                if (!string.IsNullOrEmpty(Request.Params["editor2"]))
-                {
-                    query.editor2 = Request.Params["editor2"];
-                }
-                if (!string.IsNullOrEmpty(Request.Params["split_str"]))
-                {
-                    query.split_str = Request.Params["split_str"];
-                }
-                query.template_data = query.editor1 + query.split_str + query.editor2;
                 query.content_create_userid = (Session["caller"] as Caller).user_id;
                 query.content_update_userid = (Session["caller"] as Caller).user_id;
                 json = _edmContentNewMgr.SaveEdmContentNew(query);
