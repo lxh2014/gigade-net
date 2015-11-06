@@ -16,8 +16,9 @@
                 id: 'group_id',
                 name: 'group_id',
                 fieldLabel: '群組編號',
-                hidden:true,
+                hidden: true,
             },
+
             {
                 xtype: 'filefield',
                 margin: '10 0 10 0',
@@ -42,15 +43,17 @@
                         }
                     }
             },
-
+              {
+                  xtype: 'displayfield',
+                  value: "<a href='#' onclick=DownTemplate() style='font-size:large' >點擊下載模板</>",
+                  margin: '0 0 0 78',
+              }
+              ,
              {
-                    html: '<ol><li>CSV檔案，一行一筆資料，首行略過不處理；若資料有異常，系統主動略過不處理。</li><li><li>欄位一：電子信箱位址。</li><li>欄位二：是否訂閱電子報，0（不訂閱），1（訂閱）。若不為 0、1、未指定或有錯誤時，預設皆為訂閱。</li><li>欄位三：信箱姓名，即收信人姓名，或無指定，預設以電子信箱帳號代替。</li><li>其它欄位：皆略過不處理。</li></li><li>若此郵件群組中已有相同信箱時，系統不重覆匯入，但欄位二、欄位三資訊，會以匯入檔案資訊取代。</li></ol>'
-                 // bodyStyle: "padding:5px;background:#7DC64C",
-                 ,
-                 height:80,
-                 border: 0
+                 xtype: 'displayfield',
+                 value: "1.  匯入CSV檔案，必需為逗點分割欄位 <br/> 2.  CSV檔案，一列一筆資料，若資料有異常，系統主動略過不處理<br/>3.  CSV檔案，包含三個欄位，如下：<br/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp①欄位一：電子信箱地址。<br/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp②欄位二：是否訂閱電子報，0（不訂閱），1（訂閱）。若不為 0、1、未指定或有錯誤時，預設皆為訂閱。<br/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp③欄位三：信箱姓名，即收信人姓名，或無指定，預設以電子信箱帳號代替。<br/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp④其他欄位：皆略過不處理<br/>4.  若此郵件群組中已有相同信箱時，系統不重覆匯入，但欄位二、欄位三資訊，會以匯入檔案資訊取代。<br/>5.  匯入CSV檔案大小預設 2MB，若超出系統限制時，請自行分割檔案後，再重新匯入。<br/>6.  匯入處理速度，每秒約 100 筆資料，若名單過大，請自行切割檔案後分批匯入，以減少錯誤及影響系統效能。",
+             },
 
-             }
         ],
         buttons: [{
             text: '確定匯入',
@@ -70,9 +73,9 @@
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
                             if (result.success) {
-                                    Ext.Msg.alert("提示", "匯入完成!");
-                                    ExportWin.close();
-                                    store.load();
+                                Ext.Msg.alert("提示", "匯入完成!");
+                                ExportWin.close();
+                                store.load();
                             }
                             else {
                                 Ext.Msg.alert("提示", "匯入過程中出錯!");
@@ -91,7 +94,7 @@
         iconCls: 'icon-user-edit',
         id: 'ExportWin',
         width: 400,
-        height:320,
+        height: 420,
         y: 100,
         layout: 'fit',
         items: [ExportFrm],
@@ -123,7 +126,7 @@
             'show': function () {
                 if (row) {
                     Ext.getCmp('group_id').setValue(row.data.group_id);
-                    editFrm.getForm().loadRecord(row);
+                    //editFrm.getForm().loadRecord(row);
                     //Ext.getCmp('group_id').show(true);
                     //Ext.getCmp('s_group_createdate').show(true);
                     //Ext.getCmp('s_group_updatedate').show(true);
@@ -133,6 +136,6 @@
     });
     ExportWin.show();
 }
-function updownmuban() {
-    window.open("/InspectionReport/UpdownTemplate");
+function DownTemplate() {
+    window.open("/Edm/DownTemplate");
 }

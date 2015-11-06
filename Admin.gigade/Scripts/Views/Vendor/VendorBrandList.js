@@ -42,7 +42,10 @@ Ext.define('gigade.Fares', {
         { name: "class_name", type: "string" },
         { name: "classIds", type: "string" },
         { name: "vendor_name_simple", type: "string" }, //供應商名稱
-        { name: "Event", type: "string" }
+        { name: "Event", type: "string" },
+        { name: "vendorstatus", type: "int" },
+        { name: "short_description", type: "string" },
+           { name: "brand_logo", type: "string" },
     ]
 });
 //品牌列表數據
@@ -191,6 +194,15 @@ Ext.onReady(function () {
                  tpl: '<a target="_blank" href="{Promotion_Banner_Image}" ><img width=50 name="tplImg" height=50 src="{Promotion_Banner_Image}" /></a>'
 
              },
+              {
+                  header: "品牌logo",
+                  dataIndex: 'brand_logo',
+                  width: 80,
+                  align: 'center',
+                  xtype: 'templatecolumn',
+                  tpl: '<a target="_blank" href="{brand_logo}" ><img width=50 name="tplImg" height=50 src="{brand_logo}" /></a>'
+
+              },
 
             {
                 header: "狀態", dataIndex: 'Brand_Status', width: 100, align: 'center',
@@ -294,43 +306,33 @@ function SecretLogin(rid) {//secretcopy
 
 /********************************新增**********************************/
 onAddClick = function () {
-    VendorStore.load();
-
     addFunction(null, VendorBrandStore);
 }
 
 /*******************************編輯***********************************/
 onEditClick = function () {
-
     var row = Ext.getCmp("gdFgroup").getSelectionModel().getSelection();
     if (row.length == 0) {
         Ext.Msg.alert(INFORMATION, NO_SELECTION);
     } else if (row.length > 1) {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
-        VendorStore.load({
-            callback: function () {
-                if (VendorStore.findExact("vendor_id", row[0].data.Vendor_Id, 0) > -1) {
-                    var secret_type = "7";//參數表中的"供應商查詢列表"
-                    var url = "/Vendor/VendorBrandList/Edit";
-                    var ralated_id = row[0].data.Brand_Id;
-                    boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
-                    if (boolPassword != "-1") {
-                        if (boolPassword) {//驗證
-                            SecretLoginFun(secret_type, ralated_id, true, false, true, url, null, null, null);//先彈出驗證框，關閉時在彈出顯示框
-                        } else {
-                            editFunction(ralated_id);
-                        }
-                    }
-                }
-                else {
-                    Ext.Msg.alert(INFORMATION, "失格或停用供應商下的品牌不可編輯！");
+        if (row[0].data.vendorstatus == 1) {
+            var secret_type = "7";//參數表中的"供應商查詢列表"
+            var url = "/Vendor/VendorBrandList/Edit";
+            var ralated_id = row[0].data.Brand_Id;
+            boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+            if (boolPassword != "-1") {
+                if (boolPassword) {//驗證
+                    SecretLoginFun(secret_type, ralated_id, true, false, true, url, null, null, null);//先彈出驗證框，關閉時在彈出顯示框
+                } else {
+                    editFunction(ralated_id);
                 }
             }
-        });
-
+        } else {
+            Ext.Msg.alert(INFORMATION, "失格或停用供應商下的品牌不可編輯！");
+        }
     }
-
 }
 
 //訂單編號跳轉

@@ -55,7 +55,7 @@
                 vertical: true,
                 items: [
                    { boxLabel: '訂閱', id: 'rdo1', name: 'email_status', inputValue: '1',checked:true },
-                   { boxLabel: '取消', id: 'rdo2', name: 'email_status', inputValue: '2' }
+                   { boxLabel: '取消', id: 'rdo2', name: 'email_status', inputValue: '0' }
                 ]
             },
             {
@@ -153,7 +153,7 @@
                     var email_status = row.data.email_status.toString();
                     if (email_status == 1) {
                         Ext.getCmp('rdo1').setValue(true);
-                    } else if (email_status == 2) {
+                    } else{
                         Ext.getCmp('rdo2').setValue(true);
                     }
                 }

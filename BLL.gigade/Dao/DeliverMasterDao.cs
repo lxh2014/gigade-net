@@ -737,6 +737,10 @@ on ld.deliver_id=dm.deliver_id  where 1=1 ");
                 {
                     strcondition.AppendFormat(" and om.order_status='{0}' ", deliver.i_order_status);
                 }
+                if (deliver.order_day != 0)
+                {
+                    strcondition.AppendFormat(" and dm.deliver_org_days<='{0}' ", Common.CommonFunction.GetPHPTime(DateTime.Now.AddDays(deliver.order_day).ToString("yyyy-MM-dd 23:59:59")));//預計到貨日期且未到貨
+                }
                 if (deliver.i_slave_status != -1)
                 {
                     strcondition.AppendFormat(" and os.slave_status='{0}' ", deliver.i_slave_status);
@@ -771,13 +775,13 @@ on ld.deliver_id=dm.deliver_id  where 1=1 ");
                     strcondition.AppendFormat(" where overdue_day>='{0}' ", deliver.t_days);
                 }
                 str.AppendFormat(@"SELECT delivery_code,deliver_id,created,delivery_date,order_id,order_date,order_status,order_payment,delivery_store,
-logisticsTypes,delivery_status,dvendor_name_simple,vendor_name_simple,freight_set,delivery_freight_cost,
+logisticsTypes,delivery_status,dvendor_name_simple,vendor_name_simple,freight_set,delivery_freight_cost,delivery_date_str,
 overdue_day,
 arrival_date,estimated_delivery_date 
 ,estimated_arrival_date,estimated_arrival_period,delivery_name,product_name,note_order,note_admin,
 buy_num,item_id,product_mode,deliver_master_date,slave_status,detail_status,product_id,detail_id 
 FROM (
-SELECT dm.delivery_code,dm.deliver_id,dm.created,om.order_id,DATE(FROM_UNIXTIME(om.order_createdate)) as order_date,dd.detail_id,pt.product_id,om.order_status,om.order_payment,dm.delivery_store,
+SELECT dm.delivery_code, case dm.deliver_org_days when 0 then '-' else FROM_UNIXTIME(dm.deliver_org_days) end as delivery_date_str,dm.deliver_id,dm.created,om.order_id,DATE(FROM_UNIXTIME(om.order_createdate)) as order_date,dd.detail_id,pt.product_id,om.order_status,om.order_payment,dm.delivery_store,
 ld.logisticsTypes,dm.delivery_status,vds.vendor_name_simple as dvendor_name_simple,vd.vendor_name_simple,dm.freight_set,dm.delivery_freight_cost,
 case ISNULL(dm.delivery_date) when TRUE then DATEDIFF(NOW(),DATE(FROM_UNIXTIME(om.order_date_pay)))  ELSE datediff(dm.delivery_date,DATE(FROM_UNIXTIME(om.order_date_pay))) end as overdue_day,
 dm.arrival_date,dm.estimated_delivery_date 
@@ -859,6 +863,10 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1  "
                 {
                     strcondition.AppendFormat(" and om.order_status='{0}' ", deliver.i_order_status);
                 }
+                if (deliver.order_day != 0)
+                {
+                    strcondition.AppendFormat(" and dm.deliver_org_days<='{0}'  ", Common.CommonFunction.GetPHPTime(DateTime.Now.AddDays(deliver.order_day).ToString("yyyy-MM-dd 23:59:59")));//預計到貨日期且未到貨
+                }
                 if (deliver.i_slave_status != -1)
                 {
                     strcondition.AppendFormat(" and os.slave_status='{0}' ", deliver.i_slave_status);
@@ -893,13 +901,13 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1  "
                     strcondition.AppendFormat(" where overdue_day>='{0}' ", deliver.t_days);
                 }
                 str.AppendFormat(@"SELECT delivery_code,deliver_id,delivery_date,created,order_id,order_date,order_status,order_payment,delivery_store,
-logisticsTypes,delivery_status,dvendor_name_simple,vendor_name_simple,freight_set,delivery_freight_cost,
+logisticsTypes,delivery_status,dvendor_name_simple,vendor_name_simple,freight_set,delivery_freight_cost,delivery_date_str,
 overdue_day,
 arrival_date,estimated_delivery_date 
 ,estimated_arrival_date,estimated_arrival_period,delivery_name,product_name,note_order,note_admin,
 buy_num,item_id,product_mode,deliver_master_date,slave_status,detail_status,product_id,detail_id 
 FROM (
-SELECT dm.delivery_code,dm.deliver_id,dm.created,om.order_id,DATE(FROM_UNIXTIME(om.order_createdate)) as order_date,dd.detail_id ,pt.product_id,om.order_status,om.order_payment,dm.delivery_store,
+SELECT dm.delivery_code,case dm.deliver_org_days when 0 then '-' else FROM_UNIXTIME(dm.deliver_org_days) end as delivery_date_str,dm.deliver_id,dm.created,om.order_id,DATE(FROM_UNIXTIME(om.order_createdate)) as order_date,dd.detail_id ,pt.product_id,om.order_status,om.order_payment,dm.delivery_store,
 ld.logisticsTypes,dm.delivery_status,vds.vendor_name_simple as dvendor_name_simple,vd.vendor_name_simple,dm.freight_set,dm.delivery_freight_cost,
 case ISNULL(dm.delivery_date) when TRUE then DATEDIFF(NOW(),DATE(FROM_UNIXTIME(om.order_date_pay)))  ELSE datediff(dm.delivery_date,DATE(FROM_UNIXTIME(om.order_date_pay))) end as overdue_day,
 dm.arrival_date,dm.estimated_delivery_date 
@@ -946,6 +954,17 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1 ")
             sbStr.AppendFormat("WHERE dm.delivery_status IN(2,3) AND dm.export_id={0} AND  dm.delivery_store={1} AND dm.delivery_date BETWEEN  '{2}' AND '{3}';", query.export_id, query.delivery_store, Common.CommonFunction.DateTimeToString(query.time_start), Common.CommonFunction.DateTimeToString(query.time_end));
             return int.Parse(_access.getDataTable(sbStr.ToString()).Rows[0][0].ToString());
         }
-
+        /// <summary>
+        /// 根據時間間隔查取相應的物流單號  add by yafeng0715j 20151019AM 
+        /// </summary>
+        /// <returns></returns>
+        public DataTable GetDeliverMaster(string hourNum)
+        {
+            int hoursNum = int.Parse(hourNum);
+            DateTime date = DateTime.Now.AddHours(hoursNum);
+            string sql = string.Format(@"SELECT  dm.deliver_id,delivery_code from deliver_master dm WHERE not EXISTS (SELECT deliver_id from deliver_status ds where ds.deliver_id=dm.deliver_id and ds.state=99)and  dm.delivery_store=1 and dm.deliver_org_days <>0 and dm.delivery_code<>''and created between '{0}' and '{1}'", Common.CommonFunction.DateTimeToString(date), Common.CommonFunction.DateTimeToString(DateTime.Now));
+            DataTable table = _access.getDataTable(sql);
+            return table;
+        }
     }
 }

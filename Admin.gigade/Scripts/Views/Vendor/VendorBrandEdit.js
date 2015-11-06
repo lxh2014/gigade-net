@@ -1,5 +1,26 @@
 ﻿
 function editFunction(rowID) {
+    //供應商Model
+    Ext.define("gigade.Vendor", {
+        extend: 'Ext.data.Model',
+        fields: [
+            { name: "vendor_id", type: "string" },
+            { name: "vendor_name_simple", type: "string" }]
+    });
+    //供應商Store
+    var VendorStore = Ext.create('Ext.data.Store', {
+        model: 'gigade.Vendor',
+        autoLoad: false,
+        proxy: {
+            type: 'ajax',
+            url: "/Vendor/GetVendor",
+            actionMethods: 'post',
+            reader: {
+                type: 'json',
+                root: 'data'
+            }
+        }
+    });
     var row = null;
     var mycount = ShopClassStore.getCount();
     var Shopclass = [];
@@ -23,6 +44,7 @@ function editFunction(rowID) {
         Ext.getCmp("Image_Name").setRawValue(row.data.Image_Name);
         Ext.getCmp("Resume_Image").setRawValue(row.data.Resume_Image);
         Ext.getCmp("Promotion_Banner_Image").setRawValue(row.data.Promotion_Banner_Image);
+        Ext.getCmp("brand_logo").setRawValue(row.data.brand_logo);
         var shopclassid = row.data.classIds;
         var shopclassids = shopclassid.split(",");
         myCheckboxGroup = Ext.getCmp("shopclass").items;
@@ -63,6 +85,8 @@ function editFunction(rowID) {
 
                 if (form.isValid()) {
                     var sss = "";
+                    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                    myMask.show();
                     myCheckboxGroup = Ext.getCmp("shopclass").getChecked();
                     for (var i = 0; i < myCheckboxGroup.length; i++) {
                         if (myCheckboxGroup[i].checked) {
@@ -82,6 +106,7 @@ function editFunction(rowID) {
                             begin_time: Ext.htmlEncode(Ext.getCmp('begin_time').getValue()),
                             end_time: Ext.htmlEncode(Ext.getCmp('end_time').getValue()),
                             cucumberbrand: Ext.htmlEncode(Ext.getCmp("Cucumber_Brand").getValue().Brand),
+                            short_description: Ext.htmlEncode(Ext.getCmp('short_description').getValue()),
                             imagestatus: Ext.htmlEncode(Ext.getCmp("Image_Status").getValue().Hidden),
                             imagelinkmode: Ext.htmlEncode(Ext.getCmp("Image_Link_Mode").getValue().Mode),
                             imagelinkurl: Ext.htmlEncode(Ext.getCmp('Image_Link_Url').getValue()),
@@ -90,9 +115,11 @@ function editFunction(rowID) {
                             resumeimagelink: Ext.htmlEncode(Ext.getCmp('Resume_Image_Link').getValue()),
                             promotionbannerimage: Ext.htmlEncode(Ext.getCmp('Promotion_Banner_Image').getValue()),
                             promotionbannerimagelink: Ext.htmlEncode(Ext.getCmp('Promotion_Banner_Image_Link').getValue()),
-                            mediareportlinkurl: Ext.htmlEncode(Ext.getCmp('Media_Report_Link_Url').getValue())
+                            mediareportlinkurl: Ext.htmlEncode(Ext.getCmp('Media_Report_Link_Url').getValue()),
+                            brand_logo: Ext.htmlEncode(Ext.getCmp('brand_logo').getValue()),
                         },
                         success: function (form, action) {
+                            myMask.hide();
                             var result = Ext.decode(action.response.responseText);
                             if (result.success) {
                                 if (result.msg != "undefined") {
@@ -108,6 +135,7 @@ function editFunction(rowID) {
                             }
                         },
                         failure: function (form, action) {
+                            myMask.hide();
                             Ext.Msg.alert("提示", "操作失败,請稍后再試,或聯繫開發人員!");
                         }
                     });
@@ -150,7 +178,8 @@ function editFunction(rowID) {
                     xtype: 'combobox',
                     fieldLabel: '供應商簡稱<font color="red">*</font>',
                     allowBlank: false,
-                    editable: false,
+                    editable: true,
+                    queryMode: 'local',
                     hidden: false,
                     id: 'Vendor_Id',
                     name: 'Vendor_Id',
@@ -269,7 +298,15 @@ function editFunction(rowID) {
                     { boxLabel: '大陸區品牌', id: 'cb2', inputValue: '2' },
                     { boxLabel: '小農品牌 ', id: 'cb3', inputValue: '3' }
                     ]
-                }
+                },
+                 {
+                     xtype: 'textareafield',
+                     fieldLabel: '短文字說明 (300字內)',
+                     id: 'short_description',
+                     name: 'short_description',
+                     anchor: '90%',
+                     maxLength: 300
+                 }
                 ]
             },
             {//形象圖管理
@@ -413,7 +450,28 @@ function editFunction(rowID) {
                         allowBlank: true,
                         hidden: false,
                         anchor: '90%'
-                    }
+                    },
+                                                             {
+                                                                 xtype: 'fieldcontainer',
+                                                                 combineErrors: true,
+                                                                 layout: 'hbox',
+                                                                 anchor: '90%',
+                                                                 items: [
+                                                            {
+                                                                xtype: 'filefield',
+                                                                fieldLabel: '品牌logo',
+                                                                id: 'brand_logo',
+                                                                name: 'brand_logo',
+                                                                msgTarget: 'side',
+                                                                allowBlank: true,
+                                                                flex: 1,
+                                                                buttonText: '選擇...',
+                                                                fileUpload: true
+                                                            },
+                                                            {
+                                                                xtype: 'button', id: 'delBrandLogo', margin: '0 0 0 3', iconCls: 'icon-cross', handler: onDelProPicClick
+                                                            }]
+                                                             },
                 ]
             },
             {//媒體報道
@@ -538,12 +596,15 @@ function editFunction(rowID) {
     //editWins.show();
 
     if (rowID !== null) {
-
         edit_VendorBrandStore.load({
             params: { relation_id: rowID },
             callback: function () {
                 row = edit_VendorBrandStore.getAt(0);
-                editWins.show();
+                VendorStore.load({
+                    callback: function () {
+                        editWins.show();
+                    }
+                })
             }
         });
 
@@ -568,6 +629,10 @@ function editFunction(rowID) {
             case "delPromo":
                 type = "promotion_banner_image";
                 targetID = "Promotion_Banner_Image";
+                break;
+            case "delBrandLogo":
+                type = "brand_logo";
+                targetID = "brand_logo";
                 break;
             default:
                 break;

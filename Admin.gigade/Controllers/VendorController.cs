@@ -947,14 +947,14 @@ namespace Admin.gigade.Controllers
                     {
                         venQuery.freight_return_normal_money = 0;
                     }
-                    //if (!string.IsNullOrEmpty(Request.Params["assist"].ToString()))
-                    //{
-                    //    venQuery.assist = Convert.ToUInt32(Request.Params["assist"].ToString());
-                    //}
-                    //else
-                    //{
-                    //    venQuery.assist = 0;
-                    //}
+                    if (!string.IsNullOrEmpty(Request.Params["assist"].ToString()))
+                    {
+                        venQuery.assist = Convert.ToUInt32(Request.Params["assist"].ToString());
+                    }
+                    else
+                    {
+                        venQuery.assist = 0;
+                    }
                     //if (!string.IsNullOrEmpty(Request.Params["dispatch"].ToString()))
                     //{
                     //    venQuery.dispatch = Convert.ToUInt32(Request.Params["dispatch"].ToString());
@@ -1623,14 +1623,14 @@ namespace Admin.gigade.Controllers
                     {
                         venQuery.freight_return_normal_money = 0;
                     }
-                    //if (uint.TryParse(Request.Params["assist"].ToString(), out isUint))
-                    //{
-                    //    venQuery.assist = Convert.ToUInt32(Request.Params["assist"].ToString());
-                    //}
-                    //else
-                    //{
-                    //    venQuery.assist = 0;
-                    //}
+                    if (uint.TryParse(Request.Params["assist"].ToString(), out isUint))
+                    {
+                        venQuery.assist = Convert.ToUInt32(Request.Params["assist"].ToString());
+                    }
+                    else
+                    {
+                        venQuery.assist = venQuery.assist;
+                    }
                     //if (uint.TryParse(Request.Params["dispatch"].ToString(), out isUint))
                     //{
                     //    venQuery.dispatch = Convert.ToUInt32(Request.Params["dispatch"].ToString());
@@ -2806,6 +2806,16 @@ namespace Admin.gigade.Controllers
                         {
                             item.Promotion_Banner_Image = defaultImg;
                         }
+                        if (!string.IsNullOrEmpty(item.brand_logo))
+                        {
+                            string folder5 = item.brand_logo.Substring(0, 2) + "/"; //圖片名前兩碼
+                            string folder6 = item.brand_logo.Substring(2, 2) + "/"; //圖片名第三四碼
+                            item.brand_logo = imgServerPath + brandPath + folder5 + folder6 + item.brand_logo;
+                        }
+                        else
+                        {
+                            item.brand_logo = defaultImg;
+                        }
                     }
                 }
                 #endregion
@@ -2975,6 +2985,9 @@ namespace Admin.gigade.Controllers
                             case 2:
                                 query.Promotion_Banner_Image = fileName;
                                 break;
+                            case 3:
+                                query.brand_logo = fileName;
+                                break;
                             default:
                                 break;
                         }
@@ -3047,6 +3060,10 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["cucumberbrand"]))
                 {
                     query.Cucumber_Brand = uint.Parse(Request.Params["cucumberbrand"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["short_description"]))
+                {
+                    query.short_description = Request.Params["short_description"].ToString();
                 }
                 if (!string.IsNullOrEmpty(Request.Params["promotionbannerimagelink"]))
                 {
@@ -4231,9 +4248,18 @@ namespace Admin.gigade.Controllers
                 {
                     query.Promotion_Banner_Image_Link = oldquery.Promotion_Banner_Image_Link;
                 }
+                try
+                {
+                    query.short_description = Request.Params["short_description"].ToString();
+                }
+                catch (Exception)
+                {
+                    query.short_description = oldquery.short_description;
+                }
                 query.Image_Name = oldquery.Image_Name;
                 query.Resume_Image = oldquery.Resume_Image;
                 query.Promotion_Banner_Image = oldquery.Promotion_Banner_Image;
+                query.brand_logo = oldquery.brand_logo;
                 #endregion
                 #region 上傳圖片
                 string path = Server.MapPath(xmlPath);
@@ -4300,6 +4326,9 @@ namespace Admin.gigade.Controllers
                             case 2:
                                 query.Promotion_Banner_Image = fileName;
                                 break;
+                            case 3:
+                                query.brand_logo = fileName;
+                                break;
                             default:
                                 break;
                         }
@@ -4317,6 +4346,9 @@ namespace Admin.gigade.Controllers
                                     break;
                                 case 2:
                                     oldFileName = oldquery.Promotion_Banner_Image;
+                                    break;
+                                case 3:
+                                    oldFileName = oldquery.brand_logo;
                                     break;
                                 default:
                                     break;
@@ -4337,6 +4369,9 @@ namespace Admin.gigade.Controllers
                                 break;
                             case 2:
                                 query.Promotion_Banner_Image = oldquery.Promotion_Banner_Image;//促銷圖片
+                                break;
+                            case 3:
+                                query.brand_logo = oldquery.brand_logo;//品牌logo
                                 break;
                             default:
                                 break;

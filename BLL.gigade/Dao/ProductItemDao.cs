@@ -738,9 +738,6 @@ namespace BLL.gigade.Dao
 
         }
 
-
-
-
         public List<ProductItemQuery> GetWaitLiaoWeiList(ProductItemQuery query, out int totalCount)// by yachao1120j 2015-10-20 等待料位報表
         {
             StringBuilder str = new StringBuilder();
@@ -751,15 +748,17 @@ namespace BLL.gigade.Dao
             try
             {
                 sqlCount.AppendFormat("SELECT count(pi.item_id) as totalCount ");
-                str.AppendFormat("select pi.item_id,p.product_createdate,p.product_name,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1,CONCAT(p.spec_title_2,'',ps2.spec_name) as Spec_Name_2 ,p.combination,p.product_status,p.product_mode,dfsm.delivery_freight_set,p.product_start,tp2.parameterName as product_fenlei_dalei,tp1.parameterName as  product_fenlei_xiaolei  ");
+                str.AppendFormat("select pi.item_id,p.product_createdate,p.product_name,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1,CONCAT(p.spec_title_2,'',ps2.spec_name) as Spec_Name_2 ,p.combination,p.product_status,p.product_mode,dfsm.delivery_freight_set,p.product_start,tp2.parameterName as product_fenlei_dalei,tp1.parameterName as  product_fenlei_xiaolei,i.po_id  ");
                 strcont.AppendFormat(" from  product_item pi ");
-                strcont.AppendFormat(" left join product p on p.product_id =pi.product_id ");
-                strcont.AppendFormat(" left join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set ");
+                strcont.AppendFormat(" inner join product p on p.product_id =pi.product_id ");
+                strcont.AppendFormat(" inner join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set ");
+                strcont.AppendFormat(" LEFT JOIN ipod i on i.prod_id=pi.item_id ");
+                strcont.AppendFormat(" INNER JOIN v_product_item_noloc v on v.item_id=pi.item_id ");
                 strcont.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
                 strcont.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
-                strcont.AppendFormat(" inner JOIN (SELECT parameterName,parameterCode,topValue from t_parametersrc where parameterType='product_cate')  tp1 on tp1.parameterCode=p.cate_id   ");
-                strcont.AppendFormat(" inner JOIN (SELECT parameterName,parameterCode,topValue from t_parametersrc where parameterType='product_cate')  tp2 on tp2.parameterCode=tp1.topValue ");
-                strcont.AppendFormat(" where item_id NOT in (select item_id from iplas)  and p.product_id>10000  ");
+                strcont.AppendFormat(" inner JOIN t_parametersrc  tp1 on tp1.parameterCode=p.cate_id  and tp1.parameterType='product_cate'  ");
+                strcont.AppendFormat(" inner JOIN  t_parametersrc  tp2 on tp2.parameterCode=tp1.topValue  and tp2.parameterType='product_cate' ");
+                strcont.AppendFormat(" where 1=1  and p.product_id>10000  ");
 
                 if (query.product_mode != 100)//  出貨方式  100 代表全部
                 {
@@ -769,18 +768,9 @@ namespace BLL.gigade.Dao
                 {
                     strcont.AppendFormat(" and dfsm.delivery_freight_set = '{0}' ", query.product_freight_set);
                 }
-                //if (query.product_status != 100)//商品狀態  100 代表全部
-                //{
-                //    strcont.AppendFormat(" and p.product_status ='{0}' ", query.product_status);
-                //}
-                //else 
-                //{
                 strcont.AppendFormat("and p.product_status in (0,1,2,5) ");
-                //}
-                //開始日期 結束時間 都不為空的條件下
                 strcont.AppendFormat("  and p.product_createdate >='{0}' and p.product_createdate  <='{1}'  ", (query.start_time), (query.end_time));
                 str.Append(strcont);
-
                 if (query.IsPage)
                 {
                     DataTable _dt = _access.getDataTable(sqlCount.ToString() + strcont.ToString());
@@ -798,6 +788,93 @@ namespace BLL.gigade.Dao
                 throw new Exception("ProductItemDao-->GetWaitLiaoWeiList-->" + ex.Message);
             }
 
+        }
+        /// <summary>
+        /// chaojie1124j add by 2015/10/26 實現下架狀態明細表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="TotalCount"></param>
+        /// <returns></returns>
+        public DataTable GetStatusListLowerShelf(ProductQuery query, out int TotalCount)
+        {
+            StringBuilder sqlClumn = new StringBuilder();
+            StringBuilder sqlCondi = new StringBuilder();
+            StringBuilder sbSqlCondition = new StringBuilder();
+            TotalCount = 0;
+            try
+            {
+                sqlClumn.Append(" select p.product_id,p.product_name,ip.loc_id,pi.item_id,p.combination ,dfsm.delivery_freight_set as product_freight,p.product_status,pi.item_stock,subTtotal.iinvd_stock as iinvd_stock, ");
+                sqlClumn.Append(" p.prepaid,p.shortage,'' as product_status_string ");
+                //  sqlClumn.Append(" select p.product_id,p.product_name,ip.loc_id)
+                sqlCondi.Append(" from product_item pi ");
+                sqlCondi.Append(" left join iplas ip on ip.item_id=pi.item_id  ");
+                sqlCondi.Append(" inner join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=pi.item_id ");
+                sqlCondi.Append(" inner join product p on pi.product_id=p.product_id ");
+                sqlCondi.Append(" inner join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set  ");
+                sqlCondi.Append(" left join v_product_item_stopsale on pi.item_id=v_product_item_stopsale.item_id ");
+                sbSqlCondition.Append(" where 1=1 ");
+                sbSqlCondition.Append(" and p.product_id>10000  ");
+                if (query.Shortage != 0)
+                {
+                    sbSqlCondition.AppendFormat(" and ((pi.item_id=v_product_item_stopsale.item_id)or p.shortage='{0}' ) ", query.Shortage);
+                   
+                }
+                else 
+                {
+                    sbSqlCondition.AppendFormat(" and pi.item_id=v_product_item_stopsale.item_id ");
+                }
+                if (query.Product_Id != 0)
+                {
+                    sbSqlCondition.AppendFormat(" and (p.product_id='{0}' or p.product_name like '%{0}%' ) ", query.Product_Id);
+                }
+                if (query.item_id != 0)
+                {
+                    sbSqlCondition.AppendFormat(" and (pi.item_id='{0}' or p.product_name like '%{0}%' ) ", query.item_id);
+                }
+                if (!string.IsNullOrEmpty(query.Product_Name))
+                {
+                    sbSqlCondition.AppendFormat(" and  p.product_name like '%{0}%' ", query.Product_Name);
+                }
+                if (query.product_freight != 0)
+                {
+                    sbSqlCondition.AppendFormat(" and  dfsm.delivery_freight_set='{0}' ", query.product_freight);
+                }
+                if (!string.IsNullOrEmpty(query.loc_id))
+                {
+                    sbSqlCondition.AppendFormat(" and ip.loc_id>='{0}' ", query.loc_id);
+                }
+                if (!string.IsNullOrEmpty(query.loc_id2))
+                {
+                    sbSqlCondition.AppendFormat(" and ip.loc_id<='{0}' ", query.loc_id2);
+                }
+                if (query.IsPage)
+                {
+                    DataTable dt = _dbAccess.getDataTable("select count(pi.item_id) as totalCount " + sqlCondi.ToString() + sbSqlCondition.ToString());
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        TotalCount = Convert.ToInt32(dt.Rows[0]["totalCount"]);
+                    }
+
+                    sbSqlCondition.AppendFormat(" limit {0},{1} ", query.Start, query.Limit);
+                }
+                DataTable dtResult = _dbAccess.getDataTable(sqlClumn.ToString() + sqlCondi.ToString() + sbSqlCondition.ToString());
+                IParametersrcImplDao _parameterDao = new ParametersrcDao(connStr);
+                List<Parametersrc> parameterStatus = _parameterDao.QueryParametersrcByTypes("product_status");
+
+                foreach (DataRow dr in dtResult.Rows)
+                {
+                    var slist = parameterStatus.Find(m => m.ParameterType == "product_status" && m.ParameterCode == dr["Product_Status"].ToString());// dr["product_status"].ToString()
+                    if (slist != null)
+                    {
+                        dr["product_status_string"] = slist.parameterName;
+                    }
+                }
+                return dtResult;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->GetStatusListLowerShelf-->" + ex.Message + "", ex);
+            }
         }
 
 

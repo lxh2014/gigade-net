@@ -415,7 +415,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               {
                   sql1.AppendFormat("SELECT request_id,priority,user_id,sender_address,sender_name,receiver_address,receiver_name,`subject`,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,request_createdate,request_updatedate from mail_request where valid_until_date<'{0}'  ;", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                   MR = _access.getDataTableForObj<MailRequest>(sql1.ToString());
-                  sql.Append(InsertLog(MR, "mail expired", 0));
+                  sql.Append(InsertLog(MR, "3"));
                   if (sql.Length > 0)
                   {
                       return _access.execCommand(sql.ToString());
@@ -437,7 +437,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               {
                   sql1.AppendFormat("SELECT request_id,priority,user_id,sender_address,sender_name,receiver_address,receiver_name,`subject`,importance,schedule_date,valid_until_date,retry_count,last_sent,sent_log,request_createdate,request_updatedate from mail_request where retry_count<>0 and retry_count >= max_retry;");
                   MR = _access.getDataTableForObj<MailRequest>(sql1.ToString());
-                  sql.Append(InsertLog(MR, "retry count exceeded", 0));
+                  sql.Append(InsertLog(MR, "2"));
                   if (sql.Length > 0)
                   {
                       return _access.execCommand(sql.ToString());
@@ -475,7 +475,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                           if (item.receiver_address.ToString() == dt.Rows[i][0].ToString())
                           {
                               //刪除擋信名單的數據
-                              sql.Append(InsertLog(item, "blocked email", 0));
+                              sql.Append(InsertLog(item, "4"));
                               black = false;
                               if (sql.Length > 0)
                               {
@@ -490,13 +490,14 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                           {
                               if (mail.SendMailAction(item.receiver_address.ToString(), item.subject.ToString(), item.body.ToString(), item.sender_address, item.sender_name))
                               {
-                                  //sql.Append(item.success_action + ";");
+                                  sql.Append(item.success_action);
                                   //發送成功刪除原數據新增log
-                                  sql.Append(InsertLog(item, "success", 1));
+                                  sql.Append(InsertLog(item, "1"));
                               }
                               else
                               {
                                   //發送失敗更新數據
+                                  sql.Append(item.fail_action);
                                   sql.AppendFormat("update mail_request set retry_count ='{1}',next_send='{2}',sent_log='{3}' where request_id='{0}' ;", item.request_id, item.retry_count + 1, DateTime.Now.AddMinutes(next_time), "not errow massage");
                                   //sql.Append(item.fail_action + ";");
                               }
@@ -510,6 +511,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                           {
                               item.sent_log = ex.ToString();
                               item.Replace4MySQL();
+                              sql.Append(item.fail_action);
                               //發送失敗更新數據
                               sql.AppendFormat("update mail_request set retry_count ='{1}',next_send='{2}',sent_log='{3}' where request_id='{0}' ;", item.request_id, item.retry_count + 1, DateTime.Now.AddMinutes(next_time).ToString("yyyy-MM-dd HH:mm:ss"), item.sent_log);
                               _access.execCommand(sql.ToString());
@@ -524,7 +526,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               }
           }
           #region 刪除mailrequest 新增log
-          public string InsertLog(List<MailRequest> q, string mail_result, int send)
+          public string InsertLog(List<MailRequest> q, string mail_result)
           {
               StringBuilder sb = new StringBuilder();
              
@@ -554,7 +556,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               }       
           }
 
-          public string InsertLog(MailRequest m, string mail_result, int send)
+          public string InsertLog(MailRequest m, string mail_result)
           {
               StringBuilder sb = new StringBuilder();
               try

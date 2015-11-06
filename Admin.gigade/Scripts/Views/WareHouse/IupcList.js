@@ -137,7 +137,7 @@ Ext.onReady(function () {
                 margin: '0 0 0 10',
                 id: 'start_time',
                 format: 'Y-m-d',
-                fieldLabel: "時間範圍",
+                fieldLabel: "創建時間",
                 labelWidth: 70,
                 editable: false,
                 listeners: {

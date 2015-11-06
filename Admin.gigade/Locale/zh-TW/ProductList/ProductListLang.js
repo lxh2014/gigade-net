@@ -272,5 +272,7 @@ PRODUCT_DETAILS_PRICE_OUT = "商品細項價格匯出";
 PURCHASE_IN_ADVANCE_LABLE = "預購商品"
 PURCHASE_IN_ADVANCE_DATA_OUT = "預購商品匯出"
 
-// add by dongya 2015/10/19
+// add by dongya 2015/10/19~2015/10/22
 STOCK_DAYS = "缺貨下架天數";
+STOCK_RESON = "缺貨系統下架";
+INPUT_DAY = "請輸入天數";

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using BLL.gigade.Common;
 using System.Data;
+using System.Text.RegularExpressions;
 
 namespace BLL.gigade.Mgr
 {
@@ -17,13 +18,13 @@ namespace BLL.gigade.Mgr
       private EdmGroupDao _edmGroup;
       private ISerialImplDao _ISerialImpl;
       private IEdmGroupEmailImpIDao _IEdmGroupEmailMgr;
-      private InspectionReportDao _inspectionReport;
+      private MySqlDao _mysql;
       public EdmGroupMgr(string connectionString)
       {
           _edmGroup = new EdmGroupDao(connectionString);
           _ISerialImpl = new SerialDao(connectionString);
           _IEdmGroupEmailMgr = new EdmGroupEmailDao(connectionString);
-          _inspectionReport = new InspectionReportDao(connectionString);
+          _mysql = new MySqlDao(connectionString);
       }
 
       public List<EdmGroup> GetEdmGroupList(EdmGroup query, out int totalCount)
@@ -145,8 +146,9 @@ namespace BLL.gigade.Mgr
           Serial serial = new Serial();
           EdmEmailQuery emailQuery = new EdmEmailQuery();
           EdmGroupQuery query = new EdmGroupQuery();
-          List<EdmEmail> emailStore =new List<EdmEmail>();
-          List<EdmGroupEmailQuery> groupMailStore =new List<EdmGroupEmailQuery>();
+          List<EdmEmail> emailStore = new List<EdmEmail>();
+          List<EdmGroupEmailQuery> groupMailStore = new List<EdmGroupEmailQuery>();
+          string regex = @"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$";
           try
           {
               query.group_id = groupMailQuery.group_id;
@@ -154,13 +156,33 @@ namespace BLL.gigade.Mgr
               {
                   if (_dt.Rows[i][0] != "")
                   {
+                     if( Regex.IsMatch(_dt.Rows[i][0].ToString(), regex))
+                     {
                       emailQuery.email_address = _dt.Rows[i][0].ToString();
                       //若不為 0、1、未指定或有錯誤時，預設皆為訂閱。
+
+                      #region 有2列
                       int n = 1;
-                      if (int.TryParse(_dt.Rows[i][1].ToString(), out n))
+                      if (_dt.Columns.Count >= 2)
                       {
-                          groupMailQuery.email_status = Convert.ToUInt32(_dt.Rows[i][1].ToString());
-                          if (groupMailQuery.email_status != 1 && groupMailQuery.email_status != 0)
+                          if (_dt.Rows[i][1] != "")
+                          {
+                              #region MyRegion
+                              if (int.TryParse(_dt.Rows[i][1].ToString(), out n))
+                              {
+                                  groupMailQuery.email_status = Convert.ToUInt32(_dt.Rows[i][1].ToString());
+                                  if (groupMailQuery.email_status != 1 && groupMailQuery.email_status != 0)
+                                  {
+                                      groupMailQuery.email_status = 1;
+                                  }
+                              }
+                              else
+                              {
+                                  groupMailQuery.email_status = 1;
+                              }
+                              #endregion
+                          }
+                          else
                           {
                               groupMailQuery.email_status = 1;
                           }
@@ -169,23 +191,36 @@ namespace BLL.gigade.Mgr
                       {
                           groupMailQuery.email_status = 1;
                       }
-                      if (_dt.Rows[i][2] == "")//或無指定，預設以電子信箱帳號代替。
+                      #endregion
+                      #region 有3列
+                      if (_dt.Columns.Count == 3)
                       {
-                          emailQuery.email_name = _dt.Rows[i][0].ToString().Substring(0, _dt.Rows[i][0].ToString().LastIndexOf("@"));
+                          if (_dt.Rows[i][2] == "")//或無指定，預設以電子信箱帳號代替。
+                          {
+                              emailQuery.email_name = _dt.Rows[i][0].ToString().Substring(0, _dt.Rows[i][0].ToString().LastIndexOf("@"));
+                          }
+                          else
+                          {
+                              emailQuery.email_name = _dt.Rows[i][2].ToString();
+                          }
                       }
                       else
                       {
-                          emailQuery.email_name = _dt.Rows[i][2].ToString();
+                          emailQuery.email_name = _dt.Rows[i][0].ToString().Substring(0, _dt.Rows[i][0].ToString().LastIndexOf("@"));
                       }
+                      #endregion
+
                       groupMailQuery.email_name = emailQuery.email_name;
                       //查看edm_mail中郵箱是否存在，如果重複則更新
                       emailStore = _IEdmGroupEmailMgr.getList(emailQuery);
+                      #region 存在,更新
+                      
                       if (emailStore.Count > 0)//存在,更新
                       {
                           emailQuery.email_id = emailStore[0].email_id;
                           emailQuery.email_updatedate = Convert.ToInt32(CommonFunction.GetPHPTime());
                           arrList.Add(_IEdmGroupEmailMgr.UpdateEdmEmailStr(emailQuery));//更新edm_mail表
-                       
+
                           groupMailQuery.email_id = emailQuery.email_id;
                           // 查看 edm_group_email表中數據是否存在
                           if (_IEdmGroupEmailMgr.Check(groupMailQuery).Count > 0)//存在
@@ -200,6 +235,9 @@ namespace BLL.gigade.Mgr
                               arrList.Add(_edmGroup.insertEGEInfo(groupMailQuery));
                           }
                       }
+                      #endregion
+                      #region 不存在新增
+   
                       else//不存在新增
                       {
                           //1 新增edm_email表
@@ -218,13 +256,15 @@ namespace BLL.gigade.Mgr
                           groupMailQuery.email_id = emailQuery.email_id;
                           arrList.Add(_edmGroup.insertEGEInfo(groupMailQuery));
                       }
+                      #endregion
+                     }
                   }
               }
               if (arrList.Count > 0)
               {
-                  if (_inspectionReport.ExecSql(arrList))
+                  if (_mysql.ExcuteSqlsThrowException(arrList))
                   {
-                
+
                       json = "{success:'true'}";
                   }
                   else
@@ -232,13 +272,13 @@ namespace BLL.gigade.Mgr
                       json = "{success:'false'}";
                   }
               }
-            DataTable _dtCount =   _IEdmGroupEmailMgr.getCount(Convert.ToInt32(query.group_id));
-            if (_dtCount.Rows.Count > 0)
-            {
-                query.group_total_email = Convert.ToUInt32(_dtCount.Rows[0][0]);
-                _IEdmGroupEmailMgr.updateEdmGroupCount(query);
-            }
-             
+              DataTable _dtCount = _IEdmGroupEmailMgr.getCount(Convert.ToInt32(query.group_id));
+              if (_dtCount.Rows.Count > 0)
+              {
+                  query.group_total_email = Convert.ToUInt32(_dtCount.Rows[0][0]);
+                  _IEdmGroupEmailMgr.updateEdmGroupCount(query);
+              }
+
               return json;
           }
           catch (Exception ex)

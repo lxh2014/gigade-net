@@ -154,7 +154,7 @@ function comboStockDetails(combination, product_id) {
                 }
             }
         });
-        stockStore.load({ params: { product_id: product_id, pile_id: 0} });
+        stockStore.load({ params: { product_id: product_id, pile_id: 0 } });
         var stockficxed = Ext.create("Ext.grid.Panel", {
             id: 'stockComcoFixed',
             store: stockStore,
@@ -192,7 +192,7 @@ function comboStockDetails(combination, product_id) {
                             }
                         }
                     });
-                    stockName.load({ params: { product_id: product_id, pile_id: resText[i - 1].Pile_Id} });
+                    stockName.load({ params: { product_id: product_id, pile_id: resText[i - 1].Pile_Id } });
                     var title = GROUP + i
                     /*****************Grid***************************/
                     var stockPileGrid = Ext.create("Ext.grid.Panel", {
@@ -230,7 +230,8 @@ function singleStockDetails(combination, product_id) {
                 { name: "barcode", type: "string" },
                 { name: "remark", type: "string" }, //add by zhuoqin0830w 2015/04/07 增加備註
                 { name: "arrive_days", type: "int" },// add by zhuoqin0830w 2015/04/07 增加運達天數
-            ]
+                { name: 'default_arrive_days', type: 'int' } //運達天數拆分
+        ]
     });
 
     var sinStockStore = Ext.create("Ext.data.Store", {
@@ -249,10 +250,10 @@ function singleStockDetails(combination, product_id) {
             }
         }
     });
-    sinStockStore.load({ params: { 'product_id': product_id} });
+    sinStockStore.load({ params: { 'product_id': product_id } });
 
     chekPanel = Ext.create("Ext.form.Panel", {
-        height: 50,
+        height: 90,
         width: 800,
         border: false,
         items: [{
@@ -265,7 +266,16 @@ function singleStockDetails(combination, product_id) {
                 hidden: true,
                 colName: 'ignore_stock',
                 inputValue: '1'
-            }, {
+            },
+            {
+                xtype: 'displayfield',
+                fieldLabel: STOCK_DAYS,
+                name: 't_outofstock_days_stopselling',//爲了解決重複問題
+                id: 't_outofstock_days_stopselling',
+                readOnly: true,
+                value: 0
+            },
+            {
                 boxLabel: SHORTAGE,
                 id: 'shortage',
                 readOnly: true,
@@ -285,10 +295,13 @@ function singleStockDetails(combination, product_id) {
                     success: function (response) {
                         var reStr = eval("(" + response.responseText + ")");
                         if (reStr && reStr.data) {
-                            if (reStr.data.Ignore_Stock == 1) Ext.getCmp("ignore_stock").setValue(true); else Ext.getCmp("ignore_stock").setValue(false); 
+                            if (reStr.data.Ignore_Stock == 1) Ext.getCmp("ignore_stock").setValue(true); else Ext.getCmp("ignore_stock").setValue(false);
                             if (reStr.data.Shortage == 1) Ext.getCmp("shortage").setValue(true); else Ext.getCmp("shortage").setValue(false);
+                            if (reStr.data.outofstock_days_stopselling > 0) {
+                                Ext.getCmp("t_outofstock_days_stopselling").setValue(reStr.data.outofstock_days_stopselling);
+                            }
                         }
-                    }   
+                    }
                 });
             }
         }
@@ -351,8 +364,7 @@ function singleStockDetails(combination, product_id) {
             hidden: true,
             colName: 'item_alarm',
             id: 'item_alarm'
-        },
-        {//add by xiangwang0413w 2014/06/26 增加 ERP廠商編號（erp_id)
+        }, {//add by xiangwang0413w 2014/06/26 增加 ERP廠商編號（erp_id)
             header: ERP_ID,
             sortable: false,
             menuDisabled: true,
@@ -361,7 +373,7 @@ function singleStockDetails(combination, product_id) {
             hidden: false,
             colName: 'erp_id',
             id: 'erp_id'
-        },{// add by zhuoqin0830w 2014/04/07 增加備註
+        }, {// add by zhuoqin0830w 2014/04/07 增加備註
             header: REMARK,
             dataIndex: 'remark',
             colName: 'remark',
@@ -370,18 +382,47 @@ function singleStockDetails(combination, product_id) {
             width: 150,
             hidden: false,
             id: 'remark'
-        },
-        {// add by zhuoqin0830w 2014/04/07 增加運達天數
+        }, {// edit  JJ  2015/10/27  拆分運達天數
             header: TRANSPORT_ARRIVE_DAY,
-            dataIndex: 'arrive_days',
             colName: 'arrive_days',
+            //hidden:true,
             sortable: false,
             menuDisabled: true,
-            width: 60,
-            hidden: false,
-            id: 'arrive_days'
-        },
-        {
+            columns: [{
+                text: '供應商運達天數',
+                id: 'default_arrive_days',
+                dataIndex: 'default_arrive_days',
+                width: 95,
+                sortable: false,
+                align: 'center',
+                menuDisabled: true
+            }, {
+                text: '+',
+                dataIndex: 'symbol',
+                width: 20,
+                sortable: false,
+                align: 'center',
+                menuDisabled: true,
+                renderer: function (val) {
+                    return '+';
+                }
+            }, {
+                text: '商品運達天數',
+                dataIndex: 'arrive_days',
+                align: 'center',
+                sortable: false,
+                menuDisabled: true,
+                width: 85,
+                editor: {
+                    xtype: 'numberfield',
+                    id: 'arrive_days',
+                    decimalPrecision: 0,
+                    minValue: 0,
+                    maxValue: 99,
+                    allowBlank: false
+                }
+            }]
+        }, {
             header: BARCODE,
             sortable: false,
             menuDisabled: true,

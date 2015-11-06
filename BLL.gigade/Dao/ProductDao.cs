@@ -136,7 +136,7 @@ namespace BLL.gigade.Dao
                 strSql.AppendFormat(",cate_id='{0}',fortune_quota={1},fortune_freight={2},shortage={3},price_type={4}", product.Cate_Id, product.Fortune_Quota, product.Fortune_Freight, product.Shortage, product.Price_type);
                 strSql.AppendFormat(",show_listprice={0},expect_msg='{1}',process_type={2},show_in_deliver={3},prepaid={4},product_type={5},prod_name='{6}', prod_sz='{7}',prod_classify={8} ",
                     product.show_listprice, product.expect_msg, product.Process_Type, product.Show_In_Deliver, product.Prepaid, product.Product_Type, product.Prod_Name, product.Prod_Sz, product.Prod_Classify);//新增Process_Type ，Show_In_Deliver，Prepaid，Product_Type四個欄位 edit by xiangwang0413w 2014/09/26
-                strSql.AppendFormat(",deliver_days={0},min_purchase_amount={1},safe_stock_amount={2},extra_days={3},product_alt='{4}',purchase_in_advance={5},purchase_in_advance_start = {6},purchase_in_advance_end={7},outofstock_days_stopselling={8}", product.Deliver_Days, product.Min_Purchase_Amount, product.Safe_Stock_Amount, product.Extra_Days, product.Product_alt, product.purchase_in_advance, product.purchase_in_advance_start, product.purchase_in_advance_end,product.outofstock_days_stopselling);// add by zhuoqin0830w 新增5個修改欄位  2015/03/17
+                strSql.AppendFormat(",deliver_days={0},min_purchase_amount={1},safe_stock_amount={2},extra_days={3},product_alt='{4}',purchase_in_advance={5},purchase_in_advance_start = {6},purchase_in_advance_end={7},outofstock_days_stopselling={8}", product.Deliver_Days, product.Min_Purchase_Amount, product.Safe_Stock_Amount, product.Extra_Days, product.Product_alt, product.purchase_in_advance, product.purchase_in_advance_start, product.purchase_in_advance_end, product.outofstock_days_stopselling);// add by zhuoqin0830w 新增5個修改欄位  2015/03/17
                 strSql.AppendFormat(" where product_id={0};SET sql_safe_updates = 1;", product.Product_Id);
                 ///add by wwei0216w 2015/7/30 添加預購3欄位
                 //strSql.Append(pmDao.UpdateProductName(product.Prod_Sz,product.Product_Id.ToString()));
@@ -694,7 +694,7 @@ namespace BLL.gigade.Dao
                 //add by guodong1130w 2015/09/17 預購商品
                 if (query.purchase_in_advance != 0)
                 {
-                        strCondition.AppendFormat(" and a.purchase_in_advance={0}  ", query.purchase_in_advance);
+                    strCondition.AppendFormat(" and a.purchase_in_advance={0}  ", query.purchase_in_advance);
                 }
                 if (query.category_id != 0)
                 {
@@ -753,7 +753,7 @@ namespace BLL.gigade.Dao
                 StringBuilder strCols = new StringBuilder("select  a.product_id,b.brand_name,a.product_image,a.prod_sz,a.combination AS combination_id,a.product_spec AS product_spec_id,");
                 strCols.Append("a.product_price_list,a.sale_status AS sale_status_id,v.vendor_name_full,v.vendor_name_simple,v.erp_id,a.product_status as product_status_id,a.user_id, a.create_channel,a.prepaid,a.bag_check_money,a.off_grade ");//添加 失格欄位 a.off_grade  add by zhuoqin0830w  2015/06/30
                 //add by wangwei 2014/9/29 添加a.create_channel字段
-                strCols.Append(",a.purchase_in_advance_start,a.purchase_in_advance_end,a.expect_time,a.outofstock_days_stopselling ");//添加預購商品開始時間 ,結束時間 guodong1130w 2015/9/16
+                strCols.Append(",a.purchase_in_advance_start,a.purchase_in_advance_end,a.expect_time,a.outofstock_days_stopselling,prr.create_time as 'outofstock_create_time' ");//添加預購商品開始時間 ,結束時間 guodong1130w 2015/9/16
                 StringBuilder strTbls = new StringBuilder("from product a left join vendor_brand b on a.brand_id=b.brand_id ");
                 //strTbls.Append("left join (select parametercode,parametername from t_parametersrc where parametertype='combo_type') c on a.combination=c.parametercode ");
                 //strTbls.Append("left join (select parametercode,parametername from t_parametersrc where parametertype='product_spec') d on a.product_spec=d.parametercode ");
@@ -761,6 +761,7 @@ namespace BLL.gigade.Dao
                 //strTbls.Append(" LEFT JOIN (SELECT parametercode,parametername FROM t_parametersrc WHERE parametertype='sale_status') sa ON a.sale_status = sa.parametercode "); //add by wwei0216w 2015/02/05
                 //add by wwei 0216w 2015/5/18 
                 strTbls.Append(" LEFT JOIN vendor v ON v.vendor_id = b.vendor_id "); //add by wwei0216w 2015/02/06
+                strTbls.Append(" LEFT JOIN product_remove_reason prr ON a.product_id = prr.product_id "); //add by wwei0216w 2015/02/06
                 StringBuilder strCondition = new StringBuilder("where 1=1 ");
                 if (query.brand_id != 0)
                 {
@@ -800,7 +801,14 @@ namespace BLL.gigade.Dao
                 }
                 if (query.combination != 0)
                 {
-                    strCondition.AppendFormat(" and a.combination={0}", query.combination);
+                    if (query.combination == 1&&query.outofstock_days_stopselling > 0)// add by dongya 2015/10/22
+                    {
+                            strCondition.AppendFormat(" and a.combination={0} and a.outofstock_days_stopselling >= '{1}' ", query.combination,query.outofstock_days_stopselling);
+                    }
+                    else
+                    {
+                        strCondition.AppendFormat(" and a.combination={0}", query.combination);
+                    }
                 }
                 if (query.product_status != -1)
                 {
@@ -892,7 +900,7 @@ namespace BLL.gigade.Dao
 
                     if (!query.IsPage)//匯出時不匯出大於10000的商品
                     {
-//商品匯出添加商品上下架備註欄位 add by mingwei0727w 2015/09/25
+                        //商品匯出添加商品上下架備註欄位 add by mingwei0727w 2015/09/25
                         strCols.Append(" ,psh.remark ");
                         //strTbls.AppendFormat(" LEFT JOIN (select product_id,remark from (select product_id,remark from product_status_history where type =1 order by create_time desc) as kp group by product_id) as psh on a.product_id = psh.product_id ");
                         strTbls.AppendFormat(" LEFT JOIN (select product_id,remark from product_status_history as pshman inner join ( select max(id) as mid from product_status_history where type = 1 and remark <> '' group by product_id ) as pshson on pshman.id=pshson.mid)as psh on a.product_id = psh.product_id ");
@@ -1011,7 +1019,7 @@ namespace BLL.gigade.Dao
                 strTbls.Append(@"LEFT JOIN (select ordetail.item_id,ordetail.buy_num,ordetail.detail_id from order_detail as ordetail
 INNER JOIN  deliver_detail as ddetail on ordetail.detail_id=ddetail.detail_id  
 and  ddetail.delivery_status in (0,1,2,3)
-and detail_status=2 
+and detail_status=2 and item_mode<>1
 LEFT JOIN order_slave AS oslave on  ordetail.slave_id=oslave.slave_id
 INNER JOIN order_master AS omaster on  omaster.order_id=oslave.order_id
 WHERE   ((order_payment=8 and money_collect_date=0) or money_collect_date<>0)) as odetail on  odetail.item_id = pi.item_id ");

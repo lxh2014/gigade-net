@@ -14,6 +14,7 @@ namespace BLL.gigade.Model.Query
         public string searchcontent { get; set; }
         public string searchcontentstring { get; set; }//當不是純數字時使用
         public int parametercode { set; get; }
+        public string parametername { set; get; }
         public string upc_type_flg_string { get; set; }
         public string create_time_start { set; get; }
         public string create_time_end { set; get; }
@@ -23,6 +24,7 @@ namespace BLL.gigade.Model.Query
             searchcontent = string.Empty;
             searchcontentstring = string.Empty;
             parametercode = 0;
+            parametername = string.Empty;
             upc_type_flg_string = string.Empty;
             create_time_start = string.Empty;
             create_time_end = string.Empty;

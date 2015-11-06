@@ -364,13 +364,24 @@ function onAddClick() {
     pcFrm.getForm().reset();
     Ext.getCmp('gxGrid').hide();
     Ext.getCmp('mst').setText("");
+    Ext.getCmp("cs_time").setMaxValue('9999/12/31');
+    Ext.getCmp("ce_time").setMinValue('0001/01/01');
     Ext.getCmp('irrms').setText("");
     Ext.getCmp('ms').setText("");
     Ext.getCmp('btnSave').show();
 }
 
 function onEditClick() {
+    var startTime = Ext.getCmp("cs_time").getValue();
+    var endTime = Ext.getCmp("ce_time").getValue();
     Ext.getCmp('gxGrid').hide();
+    if (startTime != "" && endTime != "") {
+        Ext.getCmp("cs_time").setMaxValue(endTime);
+        Ext.getCmp("ce_time").setMinValue(startTime);
+    } else {
+        Ext.getCmp("cs_time").setMaxValue('9999/12/31');
+        Ext.getCmp("ce_time").setMinValue('0001/01/01');
+    }
     var row = Ext.getCmp("tierGrid").getSelectionModel().getSelection();
     if (row.length == 0) {
         Ext.Msg.alert(INFORMATION, NO_SELECTION);
@@ -572,6 +583,12 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                         item.data.type = item.data.tabType;
                         item.data.key1 = item.data.keyStr;
                         item.data.value1 = item.data.valueStr;
+                        if (item.data.item_name == "" || item.data.tabType == "" || item.data.keyStr == "" || item.data.valueStr == "") {
+                            Ext.Msg.alert(INFO, MESSAGEPROMPT);
+                            myMask.hide();
+                            return;
+                        }
+
                         //upDataStore[upDataStore.length] = item;
                     } else {
                         oldList.push(item.data.item_name);
@@ -600,6 +617,11 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                     }
                     if (!isNaN(item.data.valueStr)) {
                         item.data.value1 = item.data.valueStr;
+                    }
+                    if (item.data.item_name == "" || item.data.tabType == "" || item.data.keyStr == "" || item.data.valueStr == "") {
+                        Ext.Msg.alert(INFO, MESSAGEPROMPT);
+                        myMask.hide();
+                        return;
                     }
 
                     for (var i = 0; i < relevantStore.data.length; i++) {

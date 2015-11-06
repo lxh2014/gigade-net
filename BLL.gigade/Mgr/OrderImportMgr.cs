@@ -101,7 +101,7 @@ namespace BLL.gigade.Mgr
         /// <param name="template"></param>
         /// <param name="model_in"></param>
         /// <returns></returns>
-        public List<T> ReadExcelWatch<T>(string filePath, string template, string model_in)
+        public List<T> ReadExcelMatch<T>(string filePath, string template, string model_in)
         {
             List<T> orders = new List<T>();
             try
@@ -1411,7 +1411,11 @@ namespace BLL.gigade.Mgr
             newDetail.Product_Name = buyName;
             newDetail.Product_Spec_Name = proItem.GetSpecName();
             newDetail.Single_Cost = Convert.ToUInt32(price.cost); //price.same_price == 1 ? Convert.ToUInt32(price.cost) : proItem.Item_Cost;//售價  成本
-            newDetail.Event_Cost = Convert.ToUInt32(price.event_cost);
+
+            //判斷特價活動成本是否過期，如果過期就 賦值 為 0 如果沒有則使用 特價 活動成本  eidt by zhuoqin0830w  2015/10/15  通過溝通 ahon 決定更改 因為前台代碼有判斷 成本取值是活動成本還是原成本
+            if (price.event_end < uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString())) { newDetail.Event_Cost = 0; }
+            else { newDetail.Event_Cost = Convert.ToUInt32(price.event_cost); }
+
             newDetail.Single_Price = Convert.ToUInt32(price.price);
             newDetail.Single_Money = buyCount != 0 ? sumPrice / buyCount : 0;
             newDetail.Channel_Detail_Id = channel_Detail_Id;

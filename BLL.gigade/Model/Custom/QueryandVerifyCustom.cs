@@ -129,12 +129,14 @@ namespace BLL.gigade.Model.Custom
         //未出貨數量 add by guodong1130w 2015/09/16 
         public Int64 bnum { get; set; }
         //排成設定 add by guodong1130w 2015/09/16 
-        public string  schedule_name { get; set; }
+        public string schedule_name { get; set; }
         /// <summary>
         /// 活動時間
         /// </summary>
-        public string event_time {
-            get {
+        public string event_time
+        {
+            get
+            {
                 DateTime start = CommonFunction.GetNetTime(event_start);
                 DateTime end = CommonFunction.GetNetTime(event_end);
                 string startTime = start.ToString("yyyy-MM-dd HH:mm:ss"); ;
@@ -195,10 +197,11 @@ namespace BLL.gigade.Model.Custom
         /// 上架時間 
         /// </summary>
         public uint product_start { get; set; }
-        public string product_start_time {
-            get 
+        public string product_start_time
+        {
+            get
             {
-                DateTime dt=CommonFunction.GetNetTime(product_start);
+                DateTime dt = CommonFunction.GetNetTime(product_start);
                 if (dt.Year == 1970)
                     return "";
                 else
@@ -226,7 +229,7 @@ namespace BLL.gigade.Model.Custom
         {
             get
             {
-                return user_id.ToString() ==(System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString() ? "0" : "1";
+                return user_id.ToString() == (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString() ? "0" : "1";
             }
         }
         private string cando = null;//edit by xiangwang 2014/09/11
@@ -238,9 +241,10 @@ namespace BLL.gigade.Model.Custom
                 {
                     cando = user_id.ToString() != (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString() ? "0" : "1";
                 }
-                return cando ;
+                return cando;
             }
-            set{
+            set
+            {
                 cando = value;
             }
         }
@@ -265,21 +269,22 @@ namespace BLL.gigade.Model.Custom
         public string itemIds { get; set; }/// add by wwei0216w2015/8/12
         public string remark { get; set; }//添加商品上下架備註欄位 add by mingwei0727w 2015/09/25
         public int outofstock_days_stopselling { get; set; }// add by dongya 2015/10/16
+        public int outofstock_create_time { get; set; }
         public QueryandVerifyCustom()
         {
-             //_imgsrc =string.Empty;
-             //_productid= 0;
-             //_brandname =string.Empty;
-             //_productname =string.Empty;
-             //_combination =string.Empty;
-             //_combination_id = 0;
-             //_pricetype = string.Empty;
-             //_pricetype_id = 0;
-             //_productstate = string.Empty;
-             //_price = 0;
-             //_cost = 0;
-             //_activeprice = 0;
-             //_activecost = 0;
+            //_imgsrc =string.Empty;
+            //_productid= 0;
+            //_brandname =string.Empty;
+            //_productname =string.Empty;
+            //_combination =string.Empty;
+            //_combination_id = 0;
+            //_pricetype = string.Empty;
+            //_pricetype_id = 0;
+            //_productstate = string.Empty;
+            //_price = 0;
+            //_cost = 0;
+            //_activeprice = 0;
+            //_activecost = 0;
 
             product_image = string.Empty;
             product_id = 0;
@@ -341,9 +346,10 @@ namespace BLL.gigade.Model.Custom
             off_grade = 0;
             itemIds = "Empty data!";
             Item_Stock = 0;
-             bnum =0;
-             schedule_name = string.Empty;
-             outofstock_days_stopselling = 0;
+            bnum = 0;
+            schedule_name = string.Empty;
+            outofstock_days_stopselling = 0;
+            outofstock_create_time = 0;
         }
     }
 }

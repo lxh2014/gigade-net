@@ -7,6 +7,7 @@ Ext.define('gigade.EdmContentNew', {
     { name: "subject", type: "string" },
     { name: "template_id", type: "int" },
     { name: "template_data", type: "string" },
+    { name: "template_data_send", type: "string" },
     { name: "importance", type: "int" },
     { name: "sender_id", type: "int" },
     { name: "content_createdate", type: "string" },
@@ -58,7 +59,7 @@ var EdmGroupNewStore2 = Ext.create("Ext.data.Store", {
 EdmContentNewStore.on('beforeload', function () {
     Ext.apply(EdmContentNewStore.proxy.extraParams,
     {
-       group_id:Ext.getCmp('search_group_name').getValue(),
+        group_id: Ext.getCmp('search_group_name').getValue(),
     });
 });
 
@@ -69,7 +70,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
             //Ext.getCmp("EdmContentNew").down('#report').setDisabled(selections.length == 0);
             Ext.getCmp("EdmContentNew").down('#goSend').setDisabled(selections.length == 0);
 
-            
+
         }
     }
 });
@@ -82,11 +83,10 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
 //)
 
 Ext.onReady(function () {
-   
     var EdmContentNew = Ext.create('Ext.grid.Panel', {
         id: 'EdmContentNew',
         store: EdmContentNewStore,
-        flex:'8.9',
+        flex: '8.9',
         width: document.documentElement.clientWidth,
         columnLines: true,
         frame: true,
@@ -94,6 +94,12 @@ Ext.onReady(function () {
         { header: "編號", dataIndex: 'content_id', width: 60, align: 'center' },
         { header: "正式發送", dataIndex: 'count', width: 150, align: 'center' },
         { header: "郵件主旨", dataIndex: 'subject', width: 200, align: 'center' },
+                {
+                    header: "報表", width: 100, align: 'center', hidden: false, id: 'reportEdmContentNew',
+                    renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                        return "<a href='javascript:void(0)' onclick='ContentNewReportList(" + record.data.content_id + ")'><img src='../../../Content/img/icon_report.gif' /></a>"
+                    }
+                },
         {
             header: "發送時間", dataIndex: 'date', width: 150, align: 'center'
             , renderer: function (value) {
@@ -107,17 +113,17 @@ Ext.onReady(function () {
         },
         ],
         tbar: [
-        { xtype: 'button', text:'新增', id: 'add', hidden: false, iconCls: 'icon-user-add',   handler: onAddClick },
+        { xtype: 'button', text: '新增', id: 'add', hidden: false, iconCls: 'icon-user-add', handler: onAddClick },
         { xtype: 'button', text: '編輯', id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
-        { xtype: 'button', text: "前往發送", id: 'goSend', hidden: false,disabled: true,handler: onGoSendClick  },
+        { xtype: 'button', text: "前往發送", id: 'goSend', hidden: false, disabled: true, handler: onGoSendClick },
        // { xtype: 'button', text: "報表", id: 'report', hidden: false, disabled: true, },
          '->',
          {
              xtype: 'combobox', fieldLabel: '電子報類型', id: 'search_group_name', store: EdmGroupNewStore2, displayField: 'group_name',
-             valueField: 'group_id',editable:false,value:0,lastQuery:'',emptyText:'全部',
+             valueField: 'group_id', editable: false, value: 0, lastQuery: '', emptyText: '全部',
          },
          {
-             xtype:'button',text:'查詢',handler:Search
+             xtype: 'button', text: '查詢', handler: Search
          },
          {
              xtype: 'button', text: '重置', handler: function () {
@@ -195,7 +201,7 @@ onGoSendClick = function () {
                     Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
                 }
                 else {
-                    row[0].data.template_data = data.responseText;
+                    row[0].data.template_data_send = data.responseText;
                     sendFunction(row[0], EdmContentNewStore);
                 }
             },
@@ -204,7 +210,7 @@ onGoSendClick = function () {
                 Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
             }
         });
-       
+
     }
 }
 onStatusClick = function () {
@@ -248,14 +254,28 @@ onRemoveClick = function () {
 function Search() {
     EdmContentNewStore.removeAll();
     var group_id = Ext.getCmp('search_group_name').getValue();
-        Ext.getCmp("EdmContentNew").store.loadPage(1, {
-            params: {
-                group_id: Ext.getCmp('search_group_name').getValue(),
-            }
-        });
+    Ext.getCmp("EdmContentNew").store.loadPage(1, {
+        params: {
+            group_id: Ext.getCmp('search_group_name').getValue(),
+        }
+    });
 }
 
-
-
+function ContentNewReportList(content_id) {
+    var urlTran = '/EdmNew/EdmContentNewReport?content_id=' + content_id;
+    var panel = window.parent.parent.Ext.getCmp('ContentPanel');
+    var copy = panel.down('#EdmContentNew');
+    if (copy) {
+        copy.close();
+    }
+    copy = panel.add({
+        id: 'EdmContentNew',
+        title: '電子報統計報表',
+        html: window.top.rtnFrame(urlTran),
+        closable: true
+    });
+    panel.setActiveTab(copy);
+    panel.doLayout();
+}
 
 

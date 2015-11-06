@@ -896,6 +896,7 @@ namespace Admin.gigade.Controllers
 
                     xmldoc.Load(path);
                     XmlNode root = xmldoc.SelectSingleNode("InformationRecord");//查找<InformationRecord>
+                    
                     XmlElement xe1 = xmldoc.CreateElement(functionName);//创建一个傳值進來的方法名稱节点
                     xe1.SetAttribute("date", timeStr);//设置该节点genre属性
                     XmlElement xesub1 = xmldoc.CreateElement("info");

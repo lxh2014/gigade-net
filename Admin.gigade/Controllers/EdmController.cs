@@ -208,7 +208,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["tstart"]))
                 {
-                    query.s_content_start = Convert.ToDateTime(Request.Params["tstart"]);                   
+                    query.s_content_start = Convert.ToDateTime(Request.Params["tstart"]);
                 }
                 if (!string.IsNullOrEmpty(Request.Params["tend"]))
                 {
@@ -482,10 +482,10 @@ namespace Admin.gigade.Controllers
                 DataTable _emaildt = _edmContentMgr.GetTestEmailById(query.content_id);
                 if (_emaildt.Rows.Count > 0)
                 {
-                    EmailFrom =_emaildt.Rows[0]["content_from_email"].ToString();
-                    FromName =_emaildt.Rows[0]["content_from_name"].ToString();
-					
-                    EmailTile =_emaildt.Rows[0]["content_title"].ToString();
+                    EmailFrom = _emaildt.Rows[0]["content_from_email"].ToString();
+                    FromName = _emaildt.Rows[0]["content_from_name"].ToString();
+
+                    EmailTile = _emaildt.Rows[0]["content_title"].ToString();
                     strTemp = _emaildt.Rows[0]["content_body"].ToString();
                 }
                 if (query.content_status == 1)
@@ -497,8 +497,8 @@ namespace Admin.gigade.Controllers
                         userEmail = _dt.Rows[index]["email_address"].ToString();
                         userName = _dt.Rows[index]["test_username"].ToString();
 
-                        bool result=sendmail(EmailFrom, FromName, userEmail, userName, EmailTile, strTemp, "", SmtpHost, Convert.ToInt32(SmtpPort), EmailUserName, EmailPassWord);
-                        if(result)
+                        bool result = sendmail(EmailFrom, FromName, userEmail, userName, EmailTile, strTemp, "", SmtpHost, Convert.ToInt32(SmtpPort), EmailUserName, EmailPassWord);
+                        if (result)
                             json = "{success:true}";
 
                     }
@@ -512,7 +512,7 @@ namespace Admin.gigade.Controllers
                         json = "{success:true}";
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -527,7 +527,7 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
-        public HttpResponseBase LoadEpaperContent() 
+        public HttpResponseBase LoadEpaperContent()
         {
             string json = string.Empty;
             EpaperContentQuery query = new EpaperContentQuery();
@@ -761,7 +761,7 @@ namespace Admin.gigade.Controllers
                 string mail = string.Empty;
                 if (!string.IsNullOrEmpty(Request.Params["mail"]))
                 {
-                    mail = Request.Params["mail"].ToString();
+                    mail = Request.Params["mail"].ToString().Trim();
                 }
                 _IEdmContentMgr = new EdmContentMgr(mySqlConnectionString);
                 update_id = Convert.ToUInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString());
@@ -839,7 +839,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["date_start"]))
                 {
-                   query.date_start = (uint)CommonFunction.GetPHPTime(Request.Params["date_start"].ToString());
+                    query.date_start = (uint)CommonFunction.GetPHPTime(Request.Params["date_start"].ToString());
                 }
                 if (!string.IsNullOrEmpty(Request.Params["date_end"]))
                 {
@@ -849,7 +849,7 @@ namespace Admin.gigade.Controllers
                 {
                     query.test_status = Convert.ToInt32(Request.Params["activeStatus"].ToString());
                 }
-                
+
                 if (!string.IsNullOrEmpty(Request.Params["email_id"]))
                 {
                     query.email_id = Convert.ToUInt32(Request.Params["email_id"]);
@@ -916,7 +916,7 @@ namespace Admin.gigade.Controllers
                     }
                     query.test_createdate = Convert.ToInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString()));
                     query.test_updatedate = Convert.ToInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString()));
-                    i = _etestMgr.AddEdmTest(query,out msg);
+                    i = _etestMgr.AddEdmTest(query, out msg);
                     if (i)
                     {
                         json = "{success:true}";
@@ -946,7 +946,7 @@ namespace Admin.gigade.Controllers
                         oldQuery.test_status = Convert.ToInt32(Request.Params["test_status"]);
                     }
                     oldQuery.test_updatedate = Convert.ToInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString()));
-                    i = _etestMgr.EditEdmTest(oldQuery,out msg);
+                    i = _etestMgr.EditEdmTest(oldQuery, out msg);
                     if (i)
                     {
                         json = "{success:true}";
@@ -1025,7 +1025,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["search_text"]))
                 {
-                    query.serchtype = Request.Params["search_text"].ToString().Replace("\\", "\\\\");
+                    query.serchtype = Request.Params["search_text"].ToString().Replace("\\", "\\\\").Trim();
                 }
                 if (!string.IsNullOrEmpty(Request.Params["start_date"]))
                 {
@@ -1085,7 +1085,11 @@ namespace Admin.gigade.Controllers
                 activeValue = Convert.ToUInt32(Request.Params["active"]);
             }
             query.v_id = id;
-            query.user_id = Convert.ToUInt32(Request.Params["uid"]);
+
+            if (!string.IsNullOrEmpty(Request.Params["uid"]))
+            {
+                query.user_id = Convert.ToUInt32(Request.Params["uid"]);
+            }
             query.status = activeValue;
             query.update_id = Convert.ToUInt32((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString());
             if (_vipuserMgr.UpdateState(query) > 0)
@@ -1253,7 +1257,7 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(Request.Params["dateType"]))
             {
-                query.dateCondition =Convert.ToInt32( Request.Params["dateType"].ToString());
+                query.dateCondition = Convert.ToInt32(Request.Params["dateType"].ToString());
             }
             if (!string.IsNullOrEmpty(Request.Params["timestart"]))
             {
@@ -1369,33 +1373,34 @@ namespace Admin.gigade.Controllers
                 _edmGroup = new EdmGroupMgr(mySqlConnectionString);
                 DataTable _dt = _edmGroup.Export(query);
                 string fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "." + "csv";
-                string newFileName = Server.MapPath(excelPath_export + fileName);
-                string[] colName = { "電子信箱", "訂閱狀態", "姓名" };
-                         
                 DataTable _newdt = new DataTable();
                 DataRow dr;
-                _newdt.Columns.Add("email_address", typeof(string));
-                _newdt.Columns.Add("email_status", typeof(string));
-                _newdt.Columns.Add("email_name", typeof(string));
+                _newdt.Columns.Add("電子信箱", typeof(string));
+                _newdt.Columns.Add("訂閱狀態", typeof(string));
+                _newdt.Columns.Add("姓名", typeof(string));
                 for (int i = 0; i < _dt.Rows.Count; i++)
                 {
                     dr = _newdt.NewRow();
                     _newdt.Rows.Add(dr);
-                    _newdt.Rows[i]["email_address"] = _dt.Rows[i]["email_address"];
-                    _newdt.Rows[i]["email_name"] = _dt.Rows[i]["email_name"];
+                    _newdt.Rows[i]["電子信箱"] = _dt.Rows[i]["email_address"];
+                    _newdt.Rows[i]["姓名"] = _dt.Rows[i]["email_name"];
                     uint email_status = Convert.ToUInt32(_dt.Rows[i]["email_status"].ToString());
                     if (email_status == 1)
                     {
-                        _newdt.Rows[i]["email_status"] = "已訂閱";
+                        _newdt.Rows[i]["訂閱狀態"] = "已訂閱";
                     }
                     else
                     {
-                        _newdt.Rows[i]["email_status"] = "未訂閱";
+                        _newdt.Rows[i]["訂閱狀態"] = "未訂閱";
                     }
                 }
-
-                CsvHelper.ExportDataTableToCsv(_newdt, newFileName, colName, true);
-                json = "{success:true,fileName:\'" + fileName + "\'}";
+                StringWriter sw = ExcelHelperXhf.SetCsvFromData(_newdt, fileName);
+                Response.Clear();
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                Response.ContentType = "application/ms-excel";
+                Response.ContentEncoding = Encoding.Default;
+                Response.Write(sw);
+                Response.End();
             }
             catch (Exception ex)
             {
@@ -1429,6 +1434,45 @@ namespace Admin.gigade.Controllers
                     _edmGroup = new EdmGroupMgr(mySqlConnectionString);
                     json = _edmGroup.Import(_dt, query);
                 }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        public HttpResponseBase DownTemplate()
+        {
+            string json = string.Empty;
+            try
+            {
+                string fileName = "名單管理匯入模板" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "." + "csv";
+
+                DataTable _newdt = new DataTable();
+                _newdt.Columns.Add("電子信箱", typeof(string));
+                _newdt.Columns.Add("訂閱狀態", typeof(string));
+                _newdt.Columns.Add("姓名", typeof(string));
+                DataRow dr = _newdt.NewRow();
+                dr["電子信箱"] = "example@gimg.tw";
+                dr["訂閱狀態"] = "1";
+                dr["姓名"] = "example";
+                _newdt.Rows.Add(dr);
+
+                StringWriter sw = ExcelHelperXhf.SetCsvFromData(_newdt, fileName);
+                Response.Clear();
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                Response.ContentType = "application/ms-excel";
+                Response.ContentEncoding = Encoding.Default;
+                Response.Write(sw);
+                Response.End();
             }
             catch (Exception ex)
             {
@@ -1492,7 +1536,7 @@ namespace Admin.gigade.Controllers
                         if (!string.IsNullOrEmpty(egeq.email_address))
                         {
                             egeq.email_address = egeq.email_address.Split('@')[0] + "@***";
-                        }                     
+                        }
                     }
                     egeq.email_createdate_tostring = CommonFunction.GetNetTime(egeq.email_createdate);
                     egeq.email_updatedate_tostring = CommonFunction.GetNetTime(egeq.email_updatedate);
@@ -1682,7 +1726,7 @@ namespace Admin.gigade.Controllers
                 foreach (var items in store)
                 {
                     items.email_name = items.email_name.ToString().Substring(0, 1) + "**";
-                }               
+                }
                 //計算圖表width
                 int max_open = _edmSendMgr.GetMaxOpen(query);
                 double nTemp_Image_Rate = 1;
@@ -2125,7 +2169,7 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        
+
         #region C#发送邮件函数
         /// <summary>
         /// C#发送邮件函数
@@ -2165,7 +2209,7 @@ namespace Admin.gigade.Controllers
             oMail.IsBodyHtml = true;
             ////邮件采用的编码
             oMail.BodyEncoding = System.Text.Encoding.UTF8;
-             
+
             ////设置邮件的优先级为高
             oMail.Priority = MailPriority.Normal;
             ////发送邮件

@@ -723,7 +723,84 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
             {
                 throw new Exception("AseldDao.ConsoleAseldBeforeInsert-->" + ex.Message + sbSql.ToString(), ex);
             }
-        
+
         }
+
+        #region  待撿貨商品報表 add by yafeng0715j 201510260937
+
+        public DataTable GetAseldTable(AseldQuery ase,out int total)
+        {
+            total = 0;
+            string sql = "";
+            StringBuilder strAll = new StringBuilder();
+            StringBuilder strWhr = new StringBuilder();
+            StringBuilder strLimit=new StringBuilder();
+            StringBuilder strJoin=new StringBuilder();
+            strAll.Append("SELECT a.assg_id,p.product_id,p.product_name,pi.item_id,CONCAT(ps.spec_name,'-',ps2.spec_name)AS spec,SUM(out_qty)out_qty,SUM(act_pick_qty)act_pick_qty,SUM(a.ord_qty)ord_qty, a.create_dtim,i.loc_id,temp.parameterName,ic.lcat_id   FROM aseld  a");
+            strJoin.Append(" LEFT JOIN product_item pi ON a.item_id=pi.item_id");
+            strJoin.Append(" LEFT JOIN product p ON p.product_id=pi.product_id");
+            strJoin.Append(" LEFT JOIN iplas i ON pi.item_id=i.item_id");
+            strJoin.Append(" LEFT JOIN iloc ic ON ic.loc_id=i.loc_id");
+            strJoin.Append(" LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id ");
+            strJoin.Append(" LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id");
+            strJoin.Append(" LEFT JOIN (select parameterCode,parameterName from t_parametersrc where parameterType ='product_mode') temp ON p.product_mode=temp.parameterCode");
+
+            strWhr.Append(" WHERE a.wust_id<>'COM'");
+            if (!string.IsNullOrEmpty(ase.assg_id))
+            {
+                strWhr.AppendFormat(" and a.assg_id='{0}' ", ase.assg_id);
+            }
+            if (ase.start_dtim!=DateTime.MinValue)
+            {
+                strWhr.AppendFormat(" and a.create_dtim between '{0}' and  '{1}'", CommonFunction.DateTimeToString(ase.start_dtim), CommonFunction.DateTimeToString(ase.change_dtim));
+            }
+            strWhr.Append(" GROUP BY a.item_id ORDER BY a.create_dtim");
+            if(ase.IsPage)
+            {
+                total = Convert.ToInt32(_access.getDataTable("SELECT count(item_id) FROM(SELECT a.item_id FROM aseld a " + strJoin.ToString()+strWhr.ToString() + ") temp").Rows[0][0]);
+                strLimit.AppendFormat(" LIMIT {0},{1};",ase.Start,ase.Limit);
+            }
+            try
+            {
+
+                sql = strAll.ToString()+strJoin.ToString()+strWhr.ToString() + strLimit.ToString();
+                DataTable _dt = _access.getDataTable(sql);
+                return _dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldDao.GetAseldTable-->" + ex.Message + sql, ex);
+            }
+        }
+
+        public DataTable GetAseldTablePDF(AseldQuery aseld)
+        { 
+            StringBuilder sbStr = new StringBuilder();
+            try
+            {
+                sbStr.AppendFormat("SELECT a.assg_id FROM aseld a WHERE a.wust_id<>'COM'");
+                if (aseld.start_dtim != DateTime.MinValue)
+                {
+                    sbStr.AppendFormat(" AND a.create_dtim between '{0}' and  '{1}'", CommonFunction.DateTimeToString(aseld.start_dtim), CommonFunction.DateTimeToString(aseld.change_dtim));
+                }
+                if (aseld.assg_id != string.Empty)
+                {
+                    sbStr.AppendFormat(" and a.assg_id='{0}'", aseld.assg_id);
+                }
+                sbStr.Append("  GROUP BY a.assg_id;");
+                return _access.getDataTable(sbStr.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldDao.GetAseldTablePDF-->" + ex.Message + sbStr.ToString(), ex);
+            }           
+        }
+
+        //public DataTable GetAseldTableByAssg_id(string assg_id)
+        //{
+        //    StringBuilder sbStr = new StringBuilder();
+        //    sbStr.AppendFormat(
+        //}
+        #endregion
     }
 }

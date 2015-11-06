@@ -45,6 +45,8 @@ namespace Admin.gigade.Controllers
         private IOrderMasterImplMgr _OrderMasterMgr;
         private IBonusMasterImplMgr _bonusMasterMgr;
         private ZipMgr zMgr;
+        private IProductCategoryImplMgr _productCategoryMgr;
+        private IOrderDetailImplMgr _orderDetialMgr;
         [CustomHandleError]
         public ActionResult Index()
         {
@@ -91,6 +93,10 @@ namespace Admin.gigade.Controllers
             return View();
         }
 
+        public ActionResult OrderCategorySum()
+        {
+            return View();
+        }
         #region Gigade商品查詢
         #region 獲取組合商品下的子商品
         [HttpPost]
@@ -3355,6 +3361,98 @@ namespace Admin.gigade.Controllers
                 json = "{success:false,totalCount:0,data:[]}";
             }
         }
+        #endregion
+
+        #region 類別營業額  訂單查詢
+        #region 類別選擇store
+        public HttpResponseBase GetProductCategoryStore()
+        {
+            string json = string.Empty;
+            try
+            {
+                _productCategoryMgr = new ProductCategoryMgr(connectionString);
+                DataTable store = _productCategoryMgr.GetProductCategoryStore();
+                if (store != null)
+                {
+                    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                    timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                    json = "{success:true" + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+
+
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }  
+        #endregion
+        #region 列表頁store
+        public HttpResponseBase GetCategorySummaryList()
+        {
+            string json = string.Empty;
+            int sumAmount = 0;
+            int totalCount = 0;
+            try
+            {
+                _orderDetialMgr = new OrderDetailMgr(connectionString);
+                OrderDetailQuery query = new OrderDetailQuery();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
+                if (!string.IsNullOrEmpty(Request.Params["chooseCategory"]))
+                {
+                    query.category_id = Convert.ToUInt32(Request.Params["chooseCategory"]);                
+                }
+                if (!string.IsNullOrEmpty(Request.Params["receiptStatus"]))
+                {
+                    query.category_status = Convert.ToInt32(Request.Params["receiptStatus"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["dateCon"]))
+                {
+                    query.date_stauts = Convert.ToInt32(Request.Params["dateCon"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_start"]))
+                {
+                    query.date_start = Convert.ToDateTime(Request.Params["date_start"]);
+                    query.date_start = Convert.ToDateTime(query.date_start.ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_end"]))
+                {
+                    query.date_end = Convert.ToDateTime(Request.Params["date_end"]);
+                    query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
+                }
+                List<OrderDetailQuery> store = _orderDetialMgr.GetCategorySummaryList(query,out totalCount, out sumAmount);
+                if (store != null && store.Count > 0)
+                {
+                    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                    timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                    json = "{success:true,totalCount:" + totalCount + ",sumAmount:" + sumAmount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+
+
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
         #endregion
 
     }

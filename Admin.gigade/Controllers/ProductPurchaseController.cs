@@ -45,6 +45,10 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+        public ActionResult StatusLowerShelf()
+        {
+            return View();
+        }
         #endregion
 
         #region 根據條件獲取需要建議採購的商品信息
@@ -812,5 +816,234 @@ namespace Admin.gigade.Controllers
             }
         }
         #endregion
+
+        public HttpResponseBase GetStatusListLowerShelf()
+        {
+            string json = string.Empty;
+
+            DataTable dt = new DataTable();
+            ProductQuery query = new ProductQuery();
+            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+            int totalCount = 0;
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["Short"]))
+                {
+                    query.Shortage = int.Parse(Request.Params["Short"]);
+                }
+                int p = 0;
+                if (!string.IsNullOrEmpty(Request.Params["searchcon"].Trim()))
+                {
+                    if (int.TryParse(Request.Params["searchcon"].Trim(), out p))
+                    {
+                        if (Request.Params["searchcon"].Trim().Length == 5)
+                        {
+                            query.Product_Id = uint.Parse(Request.Params["searchcon"].Trim());
+                        }
+                        else if (Request.Params["searchcon"].Trim().Length == 6)
+                        {
+                            query.item_id = uint.Parse(Request.Params["searchcon"].Trim());
+                        }
+                        else
+                        {
+                            query.Product_Name = Request.Params["searchcon"].Trim();
+                        }
+
+                    }
+                    else
+                    {
+                        query.Product_Name = Request.Params["searchcon"].Trim();
+                    }
+                }
+                if (!string.IsNullOrEmpty(Request.Params["startIloc"].Trim()))
+                {
+                    query.loc_id = Request.Params["startIloc"].Trim();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["endIloc"].Trim()))
+                {
+                    query.loc_id2 = Request.Params["endIloc"].Trim()+"Z";
+                }
+                if (!string.IsNullOrEmpty(Request.Params["fright_set"]))
+                {
+                    query.product_freight = int.Parse(Request.Params["fright_set"]);
+                }
+                DataTable _td = productItemMgr.GetStatusListLowerShelf(query, out totalCount);
+
+
+
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(_td, Formatting.Indented, timeConverter) + "}";//返回json數據
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+
+        }
+
+        public void GetStatusListLowerShelfExcel()
+        {
+            ProductQuery query = new ProductQuery();
+            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+
+            DataTable dt = new DataTable();
+            query.IsPage = false;
+            DataTable dtExcel = new DataTable();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["Short"]))
+                {
+                    query.Shortage = int.Parse(Request.Params["Short"]);
+                }
+                int p = 0;
+                if (!string.IsNullOrEmpty(Request.Params["searchcon"].Trim()))
+                {
+                    if (int.TryParse(Request.Params["searchcon"].Trim(), out p))
+                    {
+                        if (Request.Params["searchcon"].Trim().Length == 5)
+                        {
+                            query.Product_Id = uint.Parse(Request.Params["searchcon"].Trim());
+                        }
+                        else if (Request.Params["searchcon"].Trim().Length == 6)
+                        {
+                            query.item_id = uint.Parse(Request.Params["searchcon"].Trim());
+                        }
+                        else
+                        {
+                            query.Product_Name = Request.Params["searchcon"].Trim();
+                        }
+
+                    }
+                    else
+                    {
+                        query.Product_Name = Request.Params["searchcon"].Trim();
+                    }
+                }
+                if (!string.IsNullOrEmpty(Request.Params["startIloc"].Trim()))
+                {
+                    query.loc_id = Request.Params["startIloc"].Trim();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["endIloc"].Trim()))
+                {
+                    query.loc_id2 = Request.Params["endIloc"].Trim() + "Z";
+                }
+                if (!string.IsNullOrEmpty(Request.Params["fright_set"]))
+                {
+                    query.product_freight = int.Parse(Request.Params["fright_set"]);
+                }
+
+                int totalCount = 0;
+                dt = productItemMgr.GetStatusListLowerShelf(query, out totalCount);
+
+                //添加兩列用於存儲"平均平均量"與"建議採購量"
+                dtExcel.Columns.Add("商品編號", typeof(String));
+                dtExcel.Columns.Add("商品名稱", typeof(String));
+                dtExcel.Columns.Add("主料位編號", typeof(String));
+                dtExcel.Columns.Add("商品細項編號", typeof(String));
+
+                dtExcel.Columns.Add("組合Y/N", typeof(String));
+
+                dtExcel.Columns.Add("前台庫存量", typeof(String));
+                dtExcel.Columns.Add("後台庫存量", typeof(String));
+
+                dtExcel.Columns.Add("溫層", typeof(String));
+                dtExcel.Columns.Add("是否買斷", typeof(String));
+                dtExcel.Columns.Add("商品狀態", typeof(String));
+                dtExcel.Columns.Add("有庫存掛補", typeof(String));
+
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    DataRow newRow = dtExcel.NewRow();
+                    newRow[0] = dt.Rows[i]["product_id"];
+                    newRow[1] = dt.Rows[i]["product_name"];
+                    newRow[2] = dt.Rows[i]["loc_id"];
+                    newRow[3] = dt.Rows[i]["item_id"];
+
+                    if (!string.IsNullOrEmpty(dt.Rows[i]["combination"].ToString()))
+                    {
+                        int combination = Convert.ToInt32(dt.Rows[i]["combination"]);
+                        switch (combination)
+                        {
+
+                            case 1:
+                                newRow[4] = "N";
+                                break;
+                            case 2:
+                            case 3:
+                            case 4:
+                                newRow[4] = "Y";
+                                break;
+                            default:
+                                newRow[4] = combination;
+                                break;
+                        }
+                    }
+                    newRow[5] = dt.Rows[i]["item_stock"];
+                    newRow[6] = dt.Rows[i]["iinvd_stock"];
+
+
+                    if (!string.IsNullOrEmpty(dt.Rows[i]["product_freight"].ToString()))
+                    {
+                        int product_freight = Convert.ToInt32(dt.Rows[i]["product_freight"]);
+                        if (product_freight == 1)
+                            newRow[7] = "常溫";
+                        if (product_freight == 2)
+                            newRow[7] = "冷凍";
+                    }
+                    if (!string.IsNullOrEmpty(dt.Rows[i]["prepaid"].ToString()))
+                    {
+                        int prepaid = Convert.ToInt32(dt.Rows[i]["prepaid"]);
+                        if (prepaid == 0)
+                            newRow[8] = "否";
+                        if (prepaid == 1)
+                            newRow[8] = "是";
+                    }
+
+                    newRow[9] = dt.Rows[i]["product_status_string"];
+
+                    if (!string.IsNullOrEmpty(dt.Rows[i]["shortage"].ToString()))
+                    {
+                        int shortage = Convert.ToInt32(dt.Rows[i]["shortage"]);
+                        if (shortage == 0)
+                            newRow[10] = "否";
+                        if (shortage == 1)
+                            newRow[10] = "是";
+                    }
+
+
+                    dtExcel.Rows.Add(newRow);
+                }
+                if (dtExcel.Rows.Count > 0)
+                {
+                    string fileName = "下架狀態明細表_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                    MemoryStream ms = ExcelHelperXhf.ExportDT(dtExcel, "");
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                    Response.BinaryWrite(ms.ToArray());
+                }
+                else
+                {
+                    Response.Write("匯出數據不存在");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+        }
     }
 }

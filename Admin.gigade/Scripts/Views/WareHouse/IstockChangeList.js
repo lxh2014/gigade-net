@@ -213,7 +213,8 @@ Ext.onReady(function () {
             Ext.Msg.alert("提示", "請輸入商品細項編號/條碼");
             return false;
         }
-        var url = "oid=" + Ext.getCmp('oid').getValue() + "&start_time=" + Ext.getCmp('start_time').getValue() + "&end_time=" + Ext.getCmp('end_time').getValue();
+
+        var url = "oid=" + Ext.getCmp('oid').getValue() + "&start_time=" +  Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d') + "&end_time=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d') ;
         window.open("/WareHouse/IstockChangeExcelList?" + url);
     }
     function Query() {

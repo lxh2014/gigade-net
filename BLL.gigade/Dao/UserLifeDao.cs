@@ -117,5 +117,24 @@ namespace BLL.gigade.Dao
             }
             return sql.ToString();
         }
+        public Model.UserLife GetSingle(uint user_id, string info_type)
+        {
+            StringBuilder sql = new StringBuilder();
+
+            try
+            {
+                sql.Append(@"select row_id, user_id,info_type, info_code,info_name,remark,kdate,kuser");
+                sql.AppendFormat(" from user_life where user_id='{0}' and info_type='{1}';", user_id, info_type);
+                return _access.getSinggleObj<Model.UserLife>(sql.ToString());
+            }
+            catch (MySqlException ex)
+            {
+                throw new Exception(ex.Number.ToString() + ":UserLifeDao-->GetSingle" + ex.Message, ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("UserLifeDao-->GetSingle-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
     }
 }

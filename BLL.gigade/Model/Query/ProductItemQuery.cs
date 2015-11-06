@@ -54,7 +54,13 @@ namespace BLL.gigade.Model.Query
         public int product_mode { get; set; }
         public string product_fenlei_xiaolei { get; set; }
         public string product_fenlei_dalei { get; set; }
-
+        public uint spec_id_1 { get; set; }
+        public uint spec_id_2 { get; set; }
+        public string cate_id { get; set; }
+        public string spec_title_1 { get; set; }
+        public string spec_title_2 { get; set; }
+        public string plas_id_string { get; set; }
+        public string po_id { get; set; }
         public ProductItemQuery()
         {
             stockScope = 0;
@@ -98,6 +104,13 @@ namespace BLL.gigade.Model.Query
             product_mode = 0;
             product_fenlei_xiaolei = string.Empty;
             product_fenlei_dalei = string.Empty;
+            spec_id_1 = 0;
+            spec_id_2 = 0;
+            cate_id = string.Empty ;
+            spec_title_1 = string.Empty;
+            spec_title_2 = string.Empty;
+            plas_id_string = string.Empty ;
+            po_id = string.Empty;
 
         }
     }

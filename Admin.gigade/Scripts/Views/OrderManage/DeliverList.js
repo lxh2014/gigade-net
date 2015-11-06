@@ -367,9 +367,9 @@ Ext.onReady(function () {
         columns: [
             {
                 header: "付款單號", dataIndex: 'order_id', width: 120, align: 'center',
-                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    return '<a href=javascript:TransToOrder(' + record.data.order_id + ') >' + record.data.order_id + '</a>';
-                }
+                //renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                //    return '<a href=javascript:TransToOrder(' + record.data.order_id + ') >' + record.data.order_id + '</a>';
+                //}
             },
             { header: "廠商出貨單號", dataIndex: 'slave_id', width: 100, align: 'center' },
             { header: "供應商", dataIndex: 'vendor_name_simple', width: 120, align: 'center' },

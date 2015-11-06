@@ -19,47 +19,6 @@ namespace BLL.gigade.Dao
             _accessMySql = DBFactory.getDBAccess(DBType.MySql, connectionString);
             connStr = connectionString;
         }
-        public List<OrderReturnUserQuery> GetOrderTempReturnList(OrderReturnUserQuery store, out int totalCount)
-        {
-            StringBuilder sql = new StringBuilder();
-            StringBuilder sqlcount = new StringBuilder();
-            StringBuilder sqlwhere = new StringBuilder();
-            List<OrderReturnUserQuery> list = new List<OrderReturnUserQuery>();
-            try
-            {
-                sql.Append(@"  SELECT ORU.user_return_id,ORU.detail_id,ORU.return_reason,ORU.gift,ORU.temp_status,ORU.user_note,ORU.return_zip,ORU.return_address,ORU.bank_name,ORU.bank_branch,ORU.bank_account,ORU.account_name,ORU.user_return_createdate,ORU.user_return_updatedate,ORU.user_return_ipfrom,OS.order_id,OS.slave_status,OD.item_vendor_id FROM order_return_user ORU  INNER JOIN order_detail OD  ON ORU.detail_id=OD.detail_id INNER JOIN order_slave OS ON OD.slave_id=OS.slave_id where 1=1 ");
-                sqlcount.AppendFormat(@" SELECT count(*) as search_total FROM order_return_user WHERE 1=1 ");
-                if(store.selecttype == "1")
-                {
-                    sqlwhere.AppendFormat(" and order_return_user.detail_id like '%{0}%' ", store.searchcon);
-                }
-                if(store.seldate =="1")
-                {
-                    sqlwhere.AppendFormat(" and user_return_createdate>='{0}' and user_return_createdate<='{1}' ", store.timestart, store.timeend);
-                }
-                if (store.temp_status != 3)
-                {
-                    sqlwhere.AppendFormat(" and temp_status='{0}' ", store.temp_status);
-                }
-                sql.Append(sqlwhere.ToString());
-                totalCount = 0;
-                if (store.IsPage)
-                {
-                    System.Data.DataTable _dt = _accessMySql.getDataTable(sqlcount.ToString()+sqlwhere.ToString());
-                    if (_dt != null && _dt.Rows.Count > 0)
-                    {
-                        totalCount = Convert.ToInt32(_dt.Rows[0]["search_total"]);
-                    }
-                    sql.AppendFormat(" limit {0},{1}", store.Start, store.Limit);
-                }
-                list = _accessMySql.getDataTableForObj<OrderReturnUserQuery>(sql.ToString());
-            }
-            catch(Exception ex)
-            {
-                throw new Exception("ReturnMasterDao-->GetOrderTempReturnList-->" + ex.Message + "sql:" + sql.ToString() + sqlwhere.ToString(), ex);
-            }
-            return list;
-        }
         #region send
         public DataTable GetOrderReturnCount(OrderReturnUserQuery store)
         { 
@@ -164,20 +123,7 @@ namespace BLL.gigade.Dao
                 throw new Exception("OrderTempReturnListDao.UpdateOrderDetailStatus-->" + sql.ToString() + ex.Message, ex);
             }
         }
-        public int UpdateTempStatus(OrderReturnUserQuery store)
-        {
-            StringBuilder sql = new StringBuilder();
-            try
-            {
-                sql.AppendFormat(" UPDATE order_return_user  SET temp_status='{0}' ,user_return_updatedate='{1}' WHERE user_return_id='{2}'", store.temp_status, store.user_return_updatedate, store.user_return_id);
-                return _accessMySql.execCommand(sql.ToString());
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("OrderTempReturnListDao.UpdateTempStatus-->" + sql.ToString() + ex.Message, ex);
-            }
-           
-        }
+
         #endregion
 
         #region secend send
@@ -367,6 +313,62 @@ namespace BLL.gigade.Dao
             
         }
         #endregion
+        #region 暫存退貨單棄用
+        //public List<OrderReturnUserQuery> GetOrderTempReturnList(OrderReturnUserQuery store, out int totalCount)
+        //{
+        //    StringBuilder sql = new StringBuilder();
+        //    StringBuilder sqlcount = new StringBuilder();
+        //    StringBuilder sqlwhere = new StringBuilder();
+        //    List<OrderReturnUserQuery> list = new List<OrderReturnUserQuery>();
+        //    try
+        //    {
+        //        sql.Append(@"  SELECT ORU.user_return_id,ORU.detail_id,ORU.return_reason,ORU.gift,ORU.temp_status,ORU.user_note,ORU.return_zip,ORU.return_address,ORU.bank_name,ORU.bank_branch,ORU.bank_account,ORU.account_name,ORU.user_return_createdate,ORU.user_return_updatedate,ORU.user_return_ipfrom,OS.order_id,OS.slave_status,OD.item_vendor_id FROM order_return_user ORU  INNER JOIN order_detail OD  ON ORU.detail_id=OD.detail_id INNER JOIN order_slave OS ON OD.slave_id=OS.slave_id where 1=1 ");
+        //        sqlcount.AppendFormat(@" SELECT count(*) as search_total FROM order_return_user WHERE 1=1 ");
+        //        if (store.selecttype == "1")
+        //        {
+        //            sqlwhere.AppendFormat(" and order_return_user.detail_id like '%{0}%' ", store.searchcon);
+        //        }
+        //        if (store.seldate == "1")
+        //        {
+        //            sqlwhere.AppendFormat(" and user_return_createdate>='{0}' and user_return_createdate<='{1}' ", store.timestart, store.timeend);
+        //        }
+        //        if (store.temp_status != 3)
+        //        {
+        //            sqlwhere.AppendFormat(" and temp_status='{0}' ", store.temp_status);
+        //        }
+        //        sql.Append(sqlwhere.ToString());
+        //        totalCount = 0;
+        //        if (store.IsPage)
+        //        {
+        //            System.Data.DataTable _dt = _accessMySql.getDataTable(sqlcount.ToString() + sqlwhere.ToString());
+        //            if (_dt != null && _dt.Rows.Count > 0)
+        //            {
+        //                totalCount = Convert.ToInt32(_dt.Rows[0]["search_total"]);
+        //            }
+        //            sql.AppendFormat(" limit {0},{1}", store.Start, store.Limit);
+        //        }
+        //        list = _accessMySql.getDataTableForObj<OrderReturnUserQuery>(sql.ToString());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("ReturnMasterDao-->GetOrderTempReturnList-->" + ex.Message + "sql:" + sql.ToString() + sqlwhere.ToString(), ex);
+        //    }
+        //    return list;
+        //}
+        //public int UpdateTempStatus(OrderReturnUserQuery store)
+        //{
+        //    StringBuilder sql = new StringBuilder();
+        //    try
+        //    {
+        //        sql.AppendFormat(" UPDATE order_return_user  SET temp_status='{0}' ,user_return_updatedate='{1}' WHERE user_return_id='{2}'", store.temp_status, store.user_return_updatedate, store.user_return_id);
+        //        return _accessMySql.execCommand(sql.ToString());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("OrderTempReturnListDao.UpdateTempStatus-->" + sql.ToString() + ex.Message, ex);
+        //    }
 
+        //}
+        #endregion
     }
 }
