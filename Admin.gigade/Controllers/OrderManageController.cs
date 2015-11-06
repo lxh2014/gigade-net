@@ -2124,7 +2124,7 @@ namespace Admin.gigade.Controllers
                 //dt.Columns.Add("電子信箱", typeof(String));
                 dt.Columns.Add("宅配代碼", typeof(String));
                 dt.Columns.Add("宅配時間", typeof(String));
-                dt.Columns.Add("商品編號", typeof(String));
+                dt.Columns.Add("商品細項編號", typeof(String));
                 dt.Columns.Add("假日可出貨", typeof(String));
                 #endregion
                 foreach (DataRow dr in dta.Rows)

@@ -404,7 +404,7 @@ Ext.onReady(function () {
                     }
                 }
             },
-            { header: CREATEDATE, dataIndex: 'order_createdates', width: 120, align: 'center' },
+            { header: "訂單日期", dataIndex: 'order_createdates', width: 120, align: 'center' },
             {
                 header: PAYDATE, dataIndex: 'order_date_pays', width: 120, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
