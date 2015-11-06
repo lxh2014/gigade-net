@@ -267,7 +267,7 @@ namespace BLL.gigade.Dao
             VendorBrandSetQuery m = new VendorBrandSetQuery();
             try
             {
-                sql.Append("SELECT brand_id,vendor_id,brand_name,brand_sort,brand_status,image_name,image_status,image_link_mode,image_link_url,media_report_link_url,brand_msg,brand_msg_start_time,brand_msg_end_time,brand_createdate,brand_updatedate,brand_ipfrom,cucumber_brand,`event`,promotion_banner_image,resume_image,promotion_banner_image_link,resume_image_link,short_description ");
+                sql.Append("SELECT brand_id,vendor_id,brand_name,brand_sort,brand_status,image_name,image_status,image_link_mode,image_link_url,media_report_link_url,brand_msg,brand_msg_start_time,brand_msg_end_time,brand_createdate,brand_updatedate,brand_ipfrom,cucumber_brand,`event`,promotion_banner_image,resume_image,promotion_banner_image_link,resume_image_link,short_description,brand_logo ");
                 sql.Append(" FROM vendor_brand ");
                 sql.AppendFormat("  where 1=1 and brand_id={0}", id);
                 m = _dbAccess.getSinggleObj<VendorBrandSetQuery>(sql.ToString());

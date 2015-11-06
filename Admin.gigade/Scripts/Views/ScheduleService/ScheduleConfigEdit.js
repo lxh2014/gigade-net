@@ -123,7 +123,7 @@ editFunction_config = function (row, store)
     //点击关闭按钮后  提示信息
     //一个指定的打算作为一个应用程序窗口的面板。
     var editWin = Ext.create('Ext.window.Window', {
-        title: "新增參數",
+        title: "排程參數",
         id: 'editWin',
         iconCls: "icon-user-add",
         width: 460,

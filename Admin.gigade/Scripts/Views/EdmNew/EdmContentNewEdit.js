@@ -1,5 +1,25 @@
-﻿editFunction = function (row, store) {
-
+﻿function selectionChange() {
+    var lis = $('.k-selectable').children();
+    for (var i = 0; i < lis.length; i++) {
+        var current = $(lis[i]);
+        var selected = current.attr("aria-selected");
+        if (selected == "true") {
+            var dType = current.attr("data-type");
+            if (dType == "d") {
+                url.val('http://');
+                return;
+            }
+            else if (dType == "f") {
+                url.val(decodeURIComponent(url.val()));
+                break;
+            }
+        }
+    }
+}
+editFunction = function (row, store) {
+    var split_str = document.getElementById('split_str').value;
+    var template_data = "";
+    var template = true;
     Ext.define('gigade.edm_group_new', {
         extend: 'Ext.data.Model',
         fields: [
@@ -80,122 +100,6 @@
        // height:1000,
         url: '/EdmNew/SaveEdmContentNew',
         defaults: { anchor: "95%", msgTarget: "side" },
-        //////編輯器
-        listeners: {
-            'afterrender': function () {
-                jQuery(function () {
-                    jQuery('textarea[name=kendoEditor]').kendoEditor({
-                        "tools": [
-                            { "name": "bold" },
-                            { "name": "italic" },
-                            { "name": "underline" },
-                            { "name": "strikethrough" },
-                            { "name": "justifyLeft" },
-                            { "name": "justifyCenter" },
-                            { "name": "justifyRight" },
-                            { "name": "justifyFull" },
-                            { "name": "insertUnorderedList" },
-                            { "name": "insertOrderedList" },
-                            { "name": "outdent" },
-                            { "name": "indent" },
-                            {
-                                "name": "cLink",
-                                "tooltip": "插入鏈接",
-                                "exec":
-                                    function (e) {
-                                        var editor = $(this).data("kendoEditor");
-                                        editor.exec("createLink");
-                                        $('.k-overlay').css('z-index', 19012);//设置遮罩zindex
-                                        $('.k-window').css('z-index', 19013);//设置文件选择框zindex,比上面遮罩大1即可
-                                    }
-
-                            },
-                            { "name": "unlink" },
-                            {
-                                "name": "iFile",
-                                "tooltip": "插入文件",
-                                "exec":
-                                   function (e) {
-                                       var editor = $(this).data("kendoEditor");
-                                       editor.exec("insertFile");
-                                       $('.k-overlay').css('z-index', 19012);//设置遮罩zindex
-                                       $('.k-window').css('z-index', 19013);//设置文件选择框zindex,比上面遮罩大1即可
-                                   }
-                            },
-                            {
-                                "name": "iImage",
-                                "tooltip": "插入圖片",
-                                "exec":
-                                    function (e) {
-                                        var editor = $(this).data("kendoEditor");
-                                        editor.exec("insertImage");
-                                        url = $('#k-editor-image-url');
-                                        $('.k-selectable').attr("onclick", "selectionChange()");
-                                        $('.k-overlay').css('z-index', 19012);//设置遮罩zindex
-                                        $('.k-window').css('z-index', 19013);//设置文件选择框zindex,比上面遮罩大1即可
-                                    }
-                            },
-                             {
-                                 "name": "preview",
-                                 "tooltip": "預覽",
-                                 "exec":
-                                    function (e) {
-                                        var editor = $(this).data("kendoEditor");
-                                        var htmlsrc = $('textarea[name=kendoEditor]').data("kendoEditor");// Ext.getCmp('kendoEditor').getValue();
-                                        var A = 1000;
-                                        var B = 700;
-                                        var C = (document.body.clientWidth - A) / 2;
-                                        var D = window.open('', null, 'toolbar=yes,location=no,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=' + A + ',height=' + B + ',left=' + C);
-                                        var E = "<html><head><title>預覽</title></head><style>body{line-height:200%;padding:50px;}</style><body><div >" + htmlsrc.body.innerHTML + "</div></body></html>";
-                                        D.document.write(E);
-                                        D.document.close();
-                                    }
-                             },
-                            { "name": "subscript" },
-                            { "name": "superscript" },
-                            { "name": "createTable" },
-                            { "name": "addColumnLeft" },
-                            { "name": "addColumnRight" },
-                            { "name": "addRowAbove" },
-                            { "name": "addRowBelow" },
-                            { "name": "deleteRow" },
-                            { "name": "deleteColumn" },
-                            {
-                                "name": "vHtml",
-                                "tooltip": "查看HTML",
-                                "exec":
-                               function (e) {
-                                   var editor = $(this).data("kendoEditor");
-                                   editor.exec("viewHtml");
-                                   $('.k-editor-textarea').attr("onchange", "HtmlChange()");
-                                   $('.k-overlay').css('z-index', 19012);//设置遮罩zindex
-                                   $('.k-window').css('z-index', 19013);//设置文件选择框zindex,比上面遮罩大1即可
-                               }
-                            },
-                            { "name": "formatting" },
-                            { "name": "fontName" },
-                            { "name": "fontSize" },
-                            { "name": "foreColor" },
-                            { "name": "backColor" }
-                        ],
-                        "imageBrowser": {
-                            "transport": {
-                                "read": { "url": "/ImageBrowser/Read" },
-                                "type": "imagebrowser-aspnetmvc",
-                                "thumbnailUrl": "/ImageBrowser/Thumbnail",
-                                "uploadUrl": "/ImageBrowser/Upload",
-                                "destroy": { "url": "/ImageBrowser/Destroy" },
-                                "create": { "url": "/ImageBrowser/Create" },
-                                //  "imageUrl": "http://192.168.16.118/uploads/{0}"
-                                "imageUrl": document.getElementById('BaseAddress').value + "/" + "" + document.getElementById('path').value + "" + "/" + "{0}"
-                            }
-                        }
-                    });
-                });
-            }
-
-        },
-        /////編輯器
         items: [
             {
                 xtype: 'displayfield',
@@ -240,7 +144,7 @@
                 valueField: 'value',
                 id: 'importance',
                 name: 'importance',
-                value: 1,
+                value: 0,
                 editable: false,
                 lastQuery: ''
             },
@@ -273,11 +177,24 @@
                             },
                             success: function (data) {
                                 myMask.hide();
-                                if (data.responseText == "獲取網頁出現異常！") {
+                                var result = data.responseText;
+                                if (result == "獲取網頁出現異常！") {
                                     Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
-                                }
+                                    }
                                 else {
-                                    $('textarea[name=kendoEditor]').data("kendoEditor").value(Ext.util.Format.htmlDecode(data.responseText));
+                                    var index = result.indexOf(split_str);
+                                    if(index > 0) {
+                                        Query(2);
+                                        var editData1 = result.substr(0, index);
+                                        var editData2 = result.substr(index + split_str.length, result.length - (index + split_str.length));
+                                        $("#editor").data("kendoEditor").value(editData1);
+                                        $("#editor2").data("kendoEditor").value(editData2);
+                                    }
+                                    else {
+                                        Query(1);
+                                        $("#editor3").data("kendoEditor").value(result);
+                                    }
+                                  
                                 }
                             },
                             failure: function () {
@@ -288,12 +205,7 @@
                     }
                 }
             },
-            {
-                xtype: 'textarea',
-                fieldLabel: '郵件內容',
-                id: 'kendoEditor',
-                name: 'kendoEditor',
-            },
+ 
             {
                 xtype: 'textarea',
                 html: '<div id="template_area"></div>',
@@ -307,14 +219,23 @@
                 disabled: true,
                 text: '保存',
                 handler: function () {
-                    if (Ext.htmlEncode(Ext.getCmp('kendoEditor').getValue()) == "") {
-                        Ext.Msg.alert("提示信息", '郵件內容為空！');
-                        return;
-                    }
-                    else {
                         var form = this.up('form').getForm();
                         var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
                         myMask.show();
+                    try {
+                        var editor1 = document.getElementById('editor').value;
+                        var editor2 = document.getElementById('editor2').value;
+                        template_data = editor1 + split_str + editor2;
+                    } catch (e) {
+                        template = false;
+                    }
+                    if (!template) {
+                        try {
+                            template_data = document.getElementById('editor3').value;
+                        } catch (e) {
+                            template_data = "";
+                        }
+                    }
                         if (form.isValid()) {
                             this.disable();
                             form.submit({
@@ -325,7 +246,7 @@
                                     importance: Ext.htmlEncode(Ext.getCmp('importance').getValue()),
                                     subject: Ext.htmlEncode(Ext.getCmp('subject').getValue()),
                                     template_id: Ext.htmlEncode(Ext.getCmp('template_id').getValue()),
-                                    template_data: Ext.htmlEncode(Ext.getCmp('kendoEditor').getValue()),
+                                    template_data: template_data,
                                 },
                                 success: function (form, action) {
                                     myMask.hide();
@@ -349,7 +270,6 @@
                                 }
                             });
                         }
-                    }
 
                 }
             }
@@ -360,8 +280,8 @@
         title: '電子報新增/編輯',
         iconCls: 'icon-user-edit',
         id: 'editWin',
-        height: 550,
-        width: 750,
+        height: 520,
+        width: 740,
         y: 100,
         layout: 'fit',
         items: [editFrm],
@@ -398,6 +318,7 @@
                     initRow(row);
                 }
                 else {
+                    Query(1);
                     Ext.getCmp('sender_id').allowBlank = false;
                     Ext.getCmp('group_id').allowBlank = false;
                     Ext.getCmp('template_id').allowBlank = false;
@@ -408,16 +329,143 @@
     });
     editWin.show();
     function initRow(row) {
-        $('textarea[name=kendoEditor]').data("kendoEditor").value(row.data.template_data);
+       
+        var result = row.data.template_data;
+        var index = result.indexOf(split_str);
+        if (index > 0) {
+            Query(2);
+            var editData1 = result.substr(0, index);
+            var editData2 = result.substr(index + split_str.length, result.length - (index + split_str.length));
+            $("#editor").data("kendoEditor").value(editData1);
+            $("#editor2").data("kendoEditor").value(editData2);
+        }
+        else {
+            Query(1);
+            $("#editor3").data("kendoEditor").value(result);
+        }
     }
-    function Query() {
+    function Query(x) {
+        var url ;
+        if (x == 1) {
+            url = "/EdmNew/Editkendo";
+        }
+        else {
+            url = "/EdmNew/Editkendo2";
+        }
         $.ajax({
             async: false,
-            url: '/EdmNew/Editkendo2'
+            url:url,
         }).success(function (partialView) {
             $('#template_area').empty().append(partialView);
             // 呼叫 API 取得 edm_content.template_data
-            $(".content_editor").kendoEditor();
+            $('.content_editor').kendoEditor({
+                "tools": [
+                    { "name": "bold" },
+                    { "name": "italic" },
+                    { "name": "underline" },
+                    { "name": "strikethrough" },
+                    { "name": "justifyLeft" },
+                    { "name": "justifyCenter" },
+                    { "name": "justifyRight" },
+                    { "name": "justifyFull" },
+                    { "name": "insertUnorderedList" },
+                    { "name": "insertOrderedList" },
+                    { "name": "outdent" },
+                    { "name": "indent" },
+                    {
+                        "name": "cLink",
+                        "tooltip": "插入鏈接",
+                        "exec":
+                            function (e) {
+                                var editor = $(this).data("kendoEditor");
+                                editor.exec("createLink");
+                                $('.k-overlay').css('z-index', 19012);//设置遮罩zindex
+                                $('.k-window').css('z-index', 19013);//设置文件选择框zindex,比上面遮罩大1即可
+                            }
+
+                    },
+                    { "name": "unlink" },
+                    {
+                        "name": "iFile",
+                        "tooltip": "插入文件",
+                        "exec":
+                           function (e) {
+                               var editor = $(this).data("kendoEditor");
+                               editor.exec("insertFile");
+                               $('.k-overlay').css('z-index', 19012);//设置遮罩zindex
+                               $('.k-window').css('z-index', 19013);//设置文件选择框zindex,比上面遮罩大1即可
+                           }
+                    },
+                    {
+                        "name": "iImage",
+                        "tooltip": "插入圖片",
+                        "exec":
+                            function (e) {
+                                var editor = $(this).data("kendoEditor");
+                                editor.exec("insertImage");
+                                url = $('#k-editor-image-url');
+                                $('.k-selectable').attr("onclick", "selectionChange()");
+                                $('.k-overlay').css('z-index', 19012);//设置遮罩zindex
+                                $('.k-window').css('z-index', 19013);//设置文件选择框zindex,比上面遮罩大1即可
+                            }
+                    },
+                     //{
+                     //    "name": "preview",
+                     //    "tooltip": "預覽",
+                     //    "exec":
+                     //       function (e) {
+                     //           var editor = $(this).data("kendoEditor");
+                     //           var htmlsrc = $('.content_editor]').data("kendoEditor");// Ext.getCmp('kendoEditor').getValue();
+                     //           var A = 1000;
+                     //           var B = 700;
+                     //           var C = (document.body.clientWidth - A) / 2;
+                     //           var D = window.open('', null, 'toolbar=yes,location=no,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=' + A + ',height=' + B + ',left=' + C);
+                     //           var E = "<html><head><title>預覽</title></head><style>body{line-height:200%;padding:50px;}</style><body><div >" + htmlsrc.body.innerHTML + "</div></body></html>";
+                     //           D.document.write(E);
+                     //           D.document.close();
+                     //       }
+                     //},
+                    { "name": "subscript" },
+                    { "name": "superscript" },
+                    { "name": "createTable" },
+                    { "name": "addColumnLeft" },
+                    { "name": "addColumnRight" },
+                    { "name": "addRowAbove" },
+                    { "name": "addRowBelow" },
+                    { "name": "deleteRow" },
+                    { "name": "deleteColumn" },
+                    {
+                        "name": "vHtml",
+                        "tooltip": "查看HTML",
+                        "exec":
+                       function (e) {
+                           var editor = $(this).data("kendoEditor");
+                           editor.exec("viewHtml");
+                           $('.k-editor-textarea').attr("onchange", "HtmlChange()");
+                           $('.k-overlay').css('z-index', 19012);//设置遮罩zindex
+                           $('.k-window').css('z-index', 19013);//设置文件选择框zindex,比上面遮罩大1即可
+                       }
+                    },
+                    { "name": "formatting" },
+                    { "name": "fontName" },
+                    { "name": "fontSize" },
+                    { "name": "foreColor" },
+                    { "name": "backColor" }
+                ],
+                "imageBrowser": {
+                    "transport": {
+                        "read": { "url": "/ImageBrowser/Read" },
+                        "type": "imagebrowser-aspnetmvc",
+                        "thumbnailUrl": "/ImageBrowser/Thumbnail",
+                        "uploadUrl": "/ImageBrowser/Upload",
+                        "destroy": { "url": "/ImageBrowser/Destroy" },
+                        "create": { "url": "/ImageBrowser/Create" },
+                        //  "imageUrl": "http://192.168.16.118/uploads/{0}"
+                        "imageUrl": document.getElementById('BaseAddress').value + "/" + "" + document.getElementById('path').value + "" + "/" + "{0}"
+                    }
+                }
+
+            });
         });
     }
 }
