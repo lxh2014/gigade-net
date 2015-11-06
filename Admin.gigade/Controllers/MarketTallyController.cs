@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using Admin.gigade.CustomError;
@@ -19,9 +21,11 @@ namespace Admin.gigade.Controllers
         //
         // GET: /MarketTally/
         IinvdImplMgr _iinvd;
+        IiupcImplMgr _IiupcMgr;
         IAseldImplMgr _iasdMgr;
         IAseldMasterImplMgr _aseldmasterMgr;
         IIialgImplMgr _iagMgr;
+        IProductItemImplMgr _iproductitemMgr;
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly string mySqlConnectionString = System.Configuration.ConfigurationManager.AppSettings["MySqlConnectionString"].ToString();
 
@@ -42,7 +46,7 @@ namespace Admin.gigade.Controllers
         public ActionResult MarketTallyWDProduct()
         {
             ViewBag.number = Request.Params["number"];
-            ViewBag.upc = Request.Params["upc"];
+            ViewBag.itemid = Request.Params["itemid"];
             return View();
         }
 
@@ -88,8 +92,78 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
 
-        //根據工作代號、產品條碼 獲取商品數據
-        public HttpResponseBase GetAseldByUpc()
+        //根據upcid獲取item_id
+        public HttpResponseBase GetItemidByUpcid()
+        {
+            string json = string.Empty;
+            _IiupcMgr = new IupcMgr(mySqlConnectionString);
+            _iproductitemMgr = new ProductItemMgr(mySqlConnectionString);
+            Iupc m = new Iupc();
+            DataTable dt = new DataTable();
+            bool isUpc = true;
+            try
+            {
+                //獲取條碼
+                if (!string.IsNullOrEmpty(Request.Params["upc_id"]))
+                {
+                    m.upc_id = Request.Params["upc_id"].ToString().Trim();
+                    //6位整數時先判斷輸入的是否為item_id
+                    Regex reg = new Regex("^\\d{6}$");
+                    if (reg.IsMatch(m.upc_id))
+                    {
+                        ProductItemQuery query = new ProductItemQuery();
+                        query.Item_Id = Convert.ToUInt32(m.upc_id);
+                        List<ProductItemQuery> store = _iproductitemMgr.GetProductItemByID(query);
+                        if (store.Count == 0)
+                        {
+                            isUpc = true;
+                        }
+                        else if (store.Count > 1)
+                        {
+                            isUpc = true;
+                        }
+                        else
+                        {
+                            json = "{success:true,msg:1,itemid:" + query.Item_Id + "}";
+                            isUpc = false;
+                        }
+                    }
+                    if (isUpc)
+                    {
+                        dt = _IiupcMgr.upcid(m);
+                        if (dt.Rows.Count == 0)
+                        {
+                            json = "{success:false,msg:0}";
+                        }
+                        else if (dt.Rows.Count > 1)
+                        {
+                            json = "{success:false,msg:2}";
+                        }
+                        else
+                        {
+                            json = "{success:true,msg:1,itemid:" + dt.Rows[0]["item_id"].ToString() + "}";
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+
+        //根據工作代號、細項編號 獲取商品數據
+        public HttpResponseBase GetAseldListByItemid()
         {//判斷寄倉或者調度
             string json = String.Empty;
             
@@ -98,10 +172,12 @@ namespace Admin.gigade.Controllers
             _iasdMgr = new AseldMgr(mySqlConnectionString);
             try
             {
-
                 m.assg_id = Request.Params["assg_id"].ToString().Trim();
-                m.upc_id = Request.Params["upc_id"].ToString().Trim();
-                list = _iasdMgr.GetAseldListByUpc(m);
+                if (!string.IsNullOrEmpty(Request.Params["item_id"]))
+                {
+                    m.item_id = Convert.ToUInt32(Request.Params["item_id"].ToString().Trim());
+                }
+                list = _iasdMgr.GetAseldListByItemid(m);
                 foreach (var item in list)
                 {
                     m.seld_id = item.seld_id;
@@ -126,7 +202,7 @@ namespace Admin.gigade.Controllers
         }
 
         //理货员工作--寄仓--庫存信息
-        public HttpResponseBase GetStockByUpc()
+        public HttpResponseBase GetStockByItemid()
         {
             string json = string.Empty;
             int totalCount = 0;
@@ -138,10 +214,10 @@ namespace Admin.gigade.Controllers
             };
             try
             {
-                if (!string.IsNullOrEmpty(Request.Params["upc_id"].ToString().Trim()))
+                if (!string.IsNullOrEmpty(Request.Params["item_id"].ToString().Trim()))
                 {
-
-                    List<IinvdQuery> listIinvdQuery = _iinvd.GetIinvdListByUpc(query, Request.Params["upc_id"].ToString().Trim(), out totalCount);
+                    query.item_id = Convert.ToUInt32(Request.Params["item_id"].ToString().Trim());
+                    List<IinvdQuery> listIinvdQuery = _iinvd.GetIinvdListByItemid(query, out totalCount);
                     IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                     //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
                     //timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -162,7 +238,7 @@ namespace Admin.gigade.Controllers
                         m.made_date = DateTime.Now;
                         m.cde_dt = DateTime.Now;
                         listIinvdQuery.Add(m);
-                        json = "{success:true,islock:'" + islock + "',totalCount:" + listIinvdQuery.Count + ",data:" + JsonConvert.SerializeObject(listIinvdQuery, Formatting.Indented, timeConverter) + "}";//返回json數據
+                        json = JsonConvert.SerializeObject(listIinvdQuery, Formatting.Indented, timeConverter);//返回json數據
                     }
                 }
             }
@@ -322,11 +398,14 @@ namespace Admin.gigade.Controllers
                         _iasdMgr.InsertSql(sb.ToString());//執行SQL語句裡面有事物處理
                     }
                     int ord = 1;
-                    int can = 0;
+                    int cancel = 0;
+                    int ord_id = 0;
                     #region  判斷項目狀態
                     if (_iasdMgr.SelCom(m) == 0)
                     {
-                        ord = 0;//訂單揀貨完成，可以封箱
+                        ord = 0;
+                        ord_id = m.ord_id;
+                        //訂單揀貨完成，可以封箱
                     }
                     if (_iasdMgr.SelComA(m) == 0)
                     {
@@ -336,11 +415,11 @@ namespace Admin.gigade.Controllers
                     {//有沒有臨時取消的商品
                         if (_iasdMgr.SelComC(m) > 0)
                         {
-                            can = 1;
+                            cancel = 1; ord_id = m.ord_id;
                         }
                     }
                     #endregion
-                    json = "{success:true,qty:'" + m.out_qty + "',flag:'" + flag + "',ord:'" + ord + "',can:'" + can + "'}";//返回json數據  
+                    json = "{success:true,qty:'" + m.out_qty + "',flag:'" + flag + "',ord:'" + ord + "',can:'" + cancel + "',ord_id:'" + ord_id + "'}";//返回json數據  
                     //qty 該物品是否缺貨，如果為零揀貨完成，否則彈框提示缺貨數量。
                     //over：0表示該訂單已經揀貨完畢，如果qty為零則提示該訂單可以封箱，qty不為零則提示該訂單還缺物品的數量。不為零則不提示任何信息。
                     #endregion
@@ -410,6 +489,110 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
+
+        //獲取製造日期，有效日期判斷是否日期控管
+        public HttpResponseBase JudgeDate()
+        {
+            string jsonStr = "{success:false}";
+            DateTime dt = new DateTime();
+            DataTable data = new DataTable();
+            _iinvd = new IinvdMgr(mySqlConnectionString);
+            int day = 0;
+            try
+            {
+                string dtstring = Request.Params["dtstring"].ToString();
+                if (DateTime.TryParse(Request.Params["startTime"].ToString(), out dt))
+                {
+                    #region 編號獲取數據
+                    if (!int.TryParse(Request.Params["item_id"].ToString(), out day))
+                    {//獲取條碼
+                        data = _iinvd.Getprodubybar(Request.Params["item_id"].ToString());
+                    }
+                    else
+                    {//獲取商品編號
+                        data = _iinvd.Getprodu(int.Parse(Request.Params["item_id"].ToString()));
+                    }
+                    #endregion
+                    DateTime dts = DateTime.Parse(Request.Params["startTime"].ToString());
+
+                    if (data.Rows.Count > 0)
+                    {//該商品有數據才往下進行
+                        if (data.Rows[0]["pwy_dte_ctl"].ToString() == "Y")
+                        {//需要日期控管才進行操作]
+                            DateTime dte = dts, dtss, dtee;
+                            dt = DateTime.Now;
+                            if (dtstring == "1" || dtstring == "2")
+                            {
+                                if (dtstring == "1")
+                                {//根據製造日期求出有效期
+                                    dte = dts.AddDays(int.Parse(data.Rows[0]["cde_dt_incr"].ToString()));//製造日期+保質期=有效期
+                                }
+                                if (dtstring == "2")
+                                {//根據有效日期求出製造日期
+                                    dts = dte.AddDays(-int.Parse(data.Rows[0]["cde_dt_incr"].ToString()));
+                                }
+                                //
+                                if (dts > dt)
+                                {
+                                    jsonStr = "{success:true,msg:'1'}";
+                                }
+                                else
+                                {
+                                    dtss = dts.AddDays(int.Parse(data.Rows[0]["cde_dt_var"].ToString()));//製造時間+允出天數
+                                    dtee = dt.AddDays(int.Parse(data.Rows[0]["cde_dt_shp"].ToString()));//今天+允出天數
+                                    if (dt > dtss)
+                                    {
+                                        jsonStr = "{success:true,msg:'2'}";
+                                        if (dtee > dte)
+                                        {
+                                            jsonStr = "{success:true,msg:'3'}";
+                                            if (dte < dt)
+                                            {
+                                                jsonStr = "{success:true,msg:'4',dte:'" + dte.ToShortDateString() + "'}";
+                                            }
+                                        }
+                                    }
+                                    else
+                                    { //有效期匯出                                       
+                                        jsonStr = "{success:true,msg:'5',dts:'" + dts.ToString("yyyy-MM-dd") + "',dte:'" + dte.ToString("yyyy-MM-dd") + "'}";
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                jsonStr = "{success:false}";
+                            }
+                        }
+                        else
+                        {
+                            if (dts > DateTime.Now)
+                            {
+                                jsonStr = "{success:true,msg:'1'}";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (dts > DateTime.Now)
+                        {
+                            jsonStr = "{success:true,msg:'1'}";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                jsonStr = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(jsonStr.ToString());
+            this.Response.End();
+            return this.Response;
+        }
 
     }
 }

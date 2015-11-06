@@ -267,7 +267,7 @@ LEFT JOIN order_master o ON a.ord_id=o.order_id
         #endregion
 
         #region 根據工作代號、產品條碼查找數據
-        public List<AseldQuery> GetAseldListByUpc(Aseld a)
+        public List<AseldQuery> GetAseldListByItemid(Aseld a)
         {
             StringBuilder sb = new StringBuilder();//left join iloc ic on i.plas_loc_id=ic.loc_id 
             sb.AppendFormat(@"SELECT seld_id,assg_id,case when ip.loc_id is null then 'YY999999' else ip.loc_id end as sel_loc,CONCAT('(',a.item_id,')',v.brand_name,'-',p.product_name) as description,concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz,ord_qty,out_qty,ord_id,a.item_id,ordd_id,upc_id,i.cde_dt,pe.cde_dt_shp,deliver_id,deliver_code,o.note_order,ic.hash_loc_id 
@@ -282,14 +282,20 @@ LEFT JOIN product_spec ps2 ON pi.spec_id_2 = ps2.spec_id
 LEFT JOIN product p ON pi.product_id=p.product_id 
 LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id
 LEFT JOIN order_master o ON a.ord_id=o.order_id
-            WHERE assg_id='{0}' and upc_id='{1}'  AND wust_id<>'COM' AND commodity_type='2' and scaned='0' ORDER BY sel_loc,seld_id LIMIT 1;", a.assg_id,a.upc_id);
+            WHERE assg_id='{0}' AND wust_id<>'COM' AND commodity_type='2' and scaned='0' ", a.assg_id);
+            if (a.item_id != 0)
+            {
+                sb.AppendFormat(" and a.item_id='{0}' ",a.item_id);
+            }
+            sb.AppendFormat(" ORDER BY sel_loc,seld_id LIMIT 1;");
+            
             try
             {
                 return _access.getDataTableForObj<AseldQuery>(sb.ToString());
             }
             catch (Exception ex)
             {
-                throw new Exception("AseldDao.GetAseldListByUpc-->" + ex.Message + sb.ToString(), ex);
+                throw new Exception("AseldDao.GetAseldListByItemid-->" + ex.Message + sb.ToString(), ex);
             }
         }
         #endregion
@@ -513,7 +519,7 @@ LEFT JOIN order_detail od ON os.slave_id=od.slave_id AND a.item_id=od.item_id
             {
                 if (!string.IsNullOrEmpty(a.assg_id))
                 {
-                    sb.AppendFormat(" set sql_safe_updates = 0;UPDATE aseld SET scaned='0' where assg_id ='{0}'; set sql_safe_updates = 1; ", a.assg_id);
+                    sb.AppendFormat(" set sql_safe_updates = 0;UPDATE aseld SET scaned='0' where assg_id ='{0}' and wust_id !='COM'; set sql_safe_updates = 1; ", a.assg_id);
                 }
                 return _access.execCommand(sb.ToString());
             }

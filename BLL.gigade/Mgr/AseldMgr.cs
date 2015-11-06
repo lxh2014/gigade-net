@@ -101,15 +101,15 @@ namespace BLL.gigade.Mgr
         }
         #endregion
         #region
-        public List<AseldQuery> GetAseldListByUpc(Aseld ase)
+        public List<AseldQuery> GetAseldListByItemid(Aseld ase)
         {
             try
             {
-                return _aseldDao.GetAseldListByUpc(ase);
+                return _aseldDao.GetAseldListByItemid(ase);
             }
             catch (Exception ex)
             {
-                throw new Exception("AseldMgr-->GetAseldListByUpc-->" + ex.Message, ex);
+                throw new Exception("AseldMgr-->GetAseldListByItemid-->" + ex.Message, ex);
             }
         }
         #endregion

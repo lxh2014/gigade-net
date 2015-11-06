@@ -20,9 +20,9 @@
         <option value="1">冷凍</option>
     </select>
     <p></p>*@
-    <div class="row">
+    <div class="row hidden" >
       <div class="col-xs-2">
-        <select class="form-control input-lg" >
+        <select class="form-control input-lg" id="freight_set">
             <option value="2">冷凍</option>
             <option value="1">常溫</option>
         </select>
@@ -38,7 +38,7 @@
     <div class="alert alert-danger" id="alert" hidden="hidden" role="alert">
     <h4 class="glyphicon glyphicon-exclamation-sign"  id="MessageContentId">提示</h4>
   </div>
-  </div><!-- /.col-lg-6 -->
+  </div><!-- /.col-lg-8 -->
   <div class="col-lg-8">
     <div class="input-group">
       <span class="input-group-btn">
@@ -50,7 +50,7 @@
         @*<button class="close" id="numberbutton" data-dismiss="alert" type="button">確定</button>*@
       </span>
     </div><!-- /input-group -->
-  </div><!-- /.col-lg-6 -->
+  </div><!-- /.col-lg-8 -->
     
 </div><!-- /.row -->
 </div>
@@ -90,7 +90,7 @@
               //$('#alert').
               $('#MessageContentId').text(number+"格式錯誤，"+"請輸入正確的工作代號!");
               $('#alert').show();
-              $("#number").focus()
+              $("#number").focus();
 
               //$('#MessageContentId').text("請輸入正確的工作代號!");
               //$('.MarketTally-modal-alert').modal('toggle')
@@ -109,7 +109,7 @@
                   }
                   else
                   {
-                      $('#MessageContentId').text("工作代號("+number+")中沒有寄倉商品!");
+                      $('#MessageContentId').text("工作代號("+number+")中沒有需要分貨的寄倉商品!");
                       $('#alert').show();
                       $("#number").focus()
                   }

@@ -119,7 +119,7 @@ namespace BLL.gigade.Dao
         /// <param name="ivd">上架料位對象</param>
         /// <param name="totalCount">返回的數據總條數</param>
         /// <returns>上架料位列表</returns>
-        public List<IinvdQuery> GetIinvdListByUpc(Model.Query.IinvdQuery ivd, string upc_id, out int totalCount)
+        public List<IinvdQuery> GetIinvdListByItemid(Model.Query.IinvdQuery ivd, out int totalCount)
         {
             StringBuilder sql = new StringBuilder();
             StringBuilder sb = new StringBuilder();
@@ -130,16 +130,16 @@ namespace BLL.gigade.Dao
                 sb.Append("select count(ii.row_id) as totalcounts from iinvd ii  left join iupc iu on iu.item_id=ii.item_id where 1=1 ");
                 sql.Append(@"select Tp_table.parameterName as qity_name,ii.row_id,lic_plt_id,ii.dc_id,ii.whse_id,ii.made_date,po_id,prod_qty,rcpt_id,lot_no,hgt_used,ii.create_user,ii.create_dtim,ii.change_user,ii.change_dtim,cde_dt,ista_id,receipt_dtim,stor_ti,stor_hi,inv_pos_cat,qity_id,plas_loc_id,ii.item_id,plas_prdd_id,CONCAT(vb.brand_name,'-',p.product_name) as product_name,ip.loc_id,pe.cde_dt_var,pe.cde_dt_shp,pe.pwy_dte_ctl,pe.cde_dt_incr,us.user_username as user_name,vb.vendor_id from iinvd ii");
                 sql.Append(" left join iplas ip on ii.item_id=ip.item_id ");
-                sql.Append(" left join iupc iu on iu.item_id=ii.item_id ");
+                //sql.Append(" left join iupc iu on iu.item_id=ii.item_id ");
                 sql.Append(" left join product_item pi on ii.item_id=pi.item_id ");
                 sql.Append(" left JOIN product_ext pe ON ii.item_id=pe.item_id ");
                 sql.Append(" LEFT JOIN (SELECT parameterCode,parameterName from t_parametersrc where parameterType='loc_lock_msg') as Tp_table on ii.qity_id=Tp_table.parameterCode ");
                 sql.Append(" left join product p on p.product_id=pi.product_id  ");
                 sql.Append(" LEFT JOIN  manage_user us on ii.create_user=us.user_id  ");
                 sql.Append(" left join vendor_brand vb on p.brand_id=vb.brand_id where 1=1 ");
-                if (!string.IsNullOrEmpty(upc_id))
+                if (ivd.item_id!=0)
                 {
-                    sbwhere.AppendFormat(" and iu.upc_id='{0}' ", upc_id);
+                    sbwhere.AppendFormat(" and ii.item_id='{0}' ", ivd.item_id);
                 }
                 
                 DateTime dt = DateTime.Parse("1970-01-02 08:00:00");
@@ -172,7 +172,7 @@ namespace BLL.gigade.Dao
             }
             catch (Exception ex)
             {
-                throw new Exception("IupcDao-->GetIinvdListByUpc-->" + ex.Message + sql.ToString(), ex);
+                throw new Exception("IupcDao-->GetIinvdListByItemid-->" + ex.Message + sql.ToString(), ex);
             }
         }
         #endregion

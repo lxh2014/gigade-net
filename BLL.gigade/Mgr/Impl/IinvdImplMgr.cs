@@ -16,7 +16,7 @@ namespace BLL.gigade.Mgr.Impl
         DataTable Getprodubybar(string id);
         int Islocid(string id, string zid, string prod_id);
         List<Model.Query.IinvdQuery> GetIinvdList(Model.Query.IinvdQuery ivd, out int totalCount);
-        List<Model.Query.IinvdQuery> GetIinvdListByUpc(Model.Query.IinvdQuery ivd, string upc_id, out int totalCount);
+        List<Model.Query.IinvdQuery> GetIinvdListByItemid(Model.Query.IinvdQuery ivd, out int totalCount);
         int IsUpd(Iinvd m,int type=0);/*chaojie1124j 2015/10/8添加type用來判斷庫存調整和收貨上架*/
         int Selnum(Iinvd m);
         int UpdateIinvdLock(Iinvd nvd,IialgQuery q);

@@ -21,6 +21,12 @@
     <h3>工作代號： <span class="label label-info">@ViewBag.number</span></h3>
     <br />
 <div class="row">
+    <div class="col-lg-8">
+        <div class="alert alert-danger" id="alert" hidden="hidden" role="alert">
+            <h4 class="glyphicon glyphicon-exclamation-sign" id="MessageContentId">提示</h4>
+        </div>
+    </div>
+    <!-- /.col-lg-8 -->
   <div class="col-lg-8">
     <div class="input-group ">
       <span class="input-group-btn">
@@ -47,11 +53,11 @@
       </div>
       <div class="modal-body">
         <div class="container-fluid">         
-          <h4 id="MessageContentId" class="text-center">錯誤提示</h4>
+          <h4 id="MessageContentId2" class="text-center">錯誤提示</h4>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" id="modal-dialog-close" data-dismiss="modal">關閉</button>
+        <button type="button" class="btn btn-default" id="modal-dialog-close" data-dismiss="modal">確定</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -67,31 +73,64 @@
         onUpcButtonClick = function ()
         {
             var upc = document.getElementById("upc").value.trim();
-            var number='@ViewBag.number'
-            $.get('/MarketTally/GetAseldByUpc', { assg_id:number , upc_id: upc }, function (data)
+            var number = '@ViewBag.number';
+            
+            //獲取upc對應的itemid 
+            $.get('/MarketTally/GetItemidByUpcid', { upc_id: upc }, function (data)
             {
                 var result = eval("(" + data + ")");
                 if (result.success)
                 {
-                    if (result.totalCount > 0)
+                    if (result.itemid != "")
                     {
-                        //alert("result.success == true")
-                        document.location.href = "/MarketTally/MarketTallyWDProduct?number=" + number + "&upc=" + upc;
-                    }
-                    else
-                    {
-                        $('#MessageContentId').text("當前工作代號中沒有該產品條碼!");
-                        $('.MarketTally-modal-alert').modal('toggle')
-                        $('#modal - dialog - close').focus();
+                        var itemid = result.itemid;
+                        $.get('/MarketTally/GetAseldListByItemid', { assg_id: number, item_id: itemid }, function (data)
+                        {
+                            var result = eval("(" + data + ")");
+                            if (result.success)
+                            {
+                                if (result.totalCount > 0)
+                                {
+                                    document.location.href = "/MarketTally/MarketTallyWDProduct?number=" + number + "&itemid=" + itemid;
+                                }
+                                else
+                                {
+                                    $('#MessageContentId').text("當前工作代號中沒有該產品條碼(" + upc + ")或者其不需要分貨，請重新掃描!");
+                                    $('#alert').show();
+                                    $("#upc").focus()
+                                }
+                            }
+
+                        }).error(function ()
+                        {
+                            $('#MessageContentId').text("查詢失敗!");
+                            $('#alert').show();
+                            $("#upc").focus()
+                        })
                     }
                 }
-
+                else
+                {
+                    if (result.msg == 0)
+                    {
+                        $('#MessageContentId').text("產品條碼(" + upc + ")不存在，請重新掃描!");
+                        $('#alert').show();
+                        $("#upc").focus()
+                    }
+                    else if (result.msg == 2)
+                    {
+                        $('#MessageContentId').text("產品條碼(" + upc + ")存在多個，請重新掃描!");
+                        $('#alert').show();
+                        $("#upc").focus()
+                    }
+                }
             }).error(function ()
             {
                 $('#MessageContentId').text("查詢失敗!");
-                $('.MarketTally-modal-alert').modal('toggle')
-                $('#modal - dialog - close').focus();
+                $('#alert').show();
+                $("#upc").focus()
             })
+
         }
 
 
