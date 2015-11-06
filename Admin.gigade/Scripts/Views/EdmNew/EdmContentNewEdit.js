@@ -18,6 +18,8 @@
 }
 editFunction = function (row, store) {
     var split_str = document.getElementById('split_str').value;
+    var template_data = "";
+    var template = true;
     Ext.define('gigade.edm_group_new', {
         extend: 'Ext.data.Model',
         fields: [
@@ -142,7 +144,7 @@ editFunction = function (row, store) {
                 valueField: 'value',
                 id: 'importance',
                 name: 'importance',
-                value: 1,
+                value: 0,
                 editable: false,
                 lastQuery: ''
             },
@@ -220,6 +222,20 @@ editFunction = function (row, store) {
                         var form = this.up('form').getForm();
                         var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
                         myMask.show();
+                    try {
+                        var editor1 = document.getElementById('editor').value;
+                        var editor2 = document.getElementById('editor2').value;
+                        template_data = editor1 + split_str + editor2;
+                    } catch (e) {
+                        template = false;
+                    }
+                    if (!template) {
+                        try {
+                            template_data = document.getElementById('editor3').value;
+                        } catch (e) {
+                            template_data = "";
+                        }
+                    }
                         if (form.isValid()) {
                             this.disable();
                             form.submit({
@@ -230,10 +246,7 @@ editFunction = function (row, store) {
                                     importance: Ext.htmlEncode(Ext.getCmp('importance').getValue()),
                                     subject: Ext.htmlEncode(Ext.getCmp('subject').getValue()),
                                     template_id: Ext.htmlEncode(Ext.getCmp('template_id').getValue()),
-                                  
-                                    editor1: document.getElementById('editor').value,
-                                    editor2: document.getElementById('editor2').value,
-                                    split_str: split_str,
+                                    template_data: template_data,
                                 },
                                 success: function (form, action) {
                                     myMask.hide();
@@ -267,8 +280,8 @@ editFunction = function (row, store) {
         title: '電子報新增/編輯',
         iconCls: 'icon-user-edit',
         id: 'editWin',
-        height: 550,
-        width: 750,
+        height: 520,
+        width: 740,
         y: 100,
         layout: 'fit',
         items: [editFrm],
@@ -305,6 +318,7 @@ editFunction = function (row, store) {
                     initRow(row);
                 }
                 else {
+                    Query(1);
                     Ext.getCmp('sender_id').allowBlank = false;
                     Ext.getCmp('group_id').allowBlank = false;
                     Ext.getCmp('template_id').allowBlank = false;
