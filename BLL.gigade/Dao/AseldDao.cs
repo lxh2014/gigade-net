@@ -730,13 +730,14 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
 
         public DataTable GetAseldTable(AseldQuery ase,out int total)
         {
+            ase.Replace4MySQL();
             total = 0;
             string sql = "";
             StringBuilder strAll = new StringBuilder();
             StringBuilder strWhr = new StringBuilder();
             StringBuilder strLimit=new StringBuilder();
             StringBuilder strJoin=new StringBuilder();
-            strAll.Append("SELECT a.assg_id,p.product_id,p.product_name,pi.item_id,CONCAT(ps.spec_name,'-',ps2.spec_name)AS spec,SUM(out_qty)out_qty,SUM(act_pick_qty)act_pick_qty,SUM(a.ord_qty)ord_qty, a.create_dtim,i.loc_id,temp.parameterName,ic.lcat_id   FROM aseld  a");
+            strAll.Append("SELECT a.assg_id,p.product_id,p.product_name,pi.item_id,CONCAT(ps.spec_name,'-',ps2.spec_name)AS spec,SUM(out_qty)out_qty,SUM(act_pick_qty)act_pick_qty,SUM(a.ord_qty)ord_qty, a.create_dtim,i.loc_id,temp.parameterName,ic.lcat_id,ic.lcat_id as upc_id   FROM aseld  a");
             strJoin.Append(" LEFT JOIN product_item pi ON a.item_id=pi.item_id");
             strJoin.Append(" LEFT JOIN product p ON p.product_id=pi.product_id");
             strJoin.Append(" LEFT JOIN iplas i ON pi.item_id=i.item_id");
@@ -774,7 +775,8 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
         }
 
         public DataTable GetAseldTablePDF(AseldQuery aseld)
-        { 
+        {
+            aseld.Replace4MySQL();
             StringBuilder sbStr = new StringBuilder();
             try
             {

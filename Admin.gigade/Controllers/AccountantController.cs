@@ -3120,7 +3120,7 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("總毛利率(毛利/總售價)");
                 for (int i = 0; i < _dt.Rows.Count; i++)
                 {
-                    if (Convert.ToInt32(_dt.Rows[i]["m_product_money"]) != 0)
+                    if (Convert.ToInt32(_dt.Rows[i]["m_product_cost"]) != 0)
                     {
                         DataRow dr = dtHZ.NewRow();
                         dr[0] = _dt.Rows[i]["vendor_id"];
@@ -3208,7 +3208,14 @@ namespace Admin.gigade.Controllers
                             dr[25] = "";
                         }
                         dr[26] = Convert.ToInt32(_dt.Rows[i]["m_product_money"]) - Convert.ToInt32(_dt.Rows[i]["m_product_cost"]);
-                        dr[27] = (Convert.ToInt32(_dt.Rows[i]["m_product_money"]) - Convert.ToInt32(_dt.Rows[i]["m_product_cost"])) / Convert.ToDecimal(_dt.Rows[i]["m_product_money"]);
+                        if (Convert.ToDecimal(_dt.Rows[i]["m_product_money"]) != 0)
+                        {
+                            dr[27] = (Convert.ToInt32(_dt.Rows[i]["m_product_money"]) - Convert.ToInt32(_dt.Rows[i]["m_product_cost"])) / Convert.ToDecimal(_dt.Rows[i]["m_product_money"]);
+                        }
+                        else
+                        {
+                            dr[27] = "";
+                        }
                         dtHZ.Rows.Add(dr);
                     }
 
@@ -5759,13 +5766,23 @@ namespace Admin.gigade.Controllers
                 }
                 dre[13] = account_amount;
                 dtHZ.Rows.Add(dre);
+                DataRow drJiC = dtHZ.NewRow();
+                drJiC[12] = "寄倉費";
+                drJiC[13] = "-" + Convert.ToInt32(tempTemp.Rows[0]["m_bag_check_money"].ToString());
+                if (drJiC[13].ToString() != "-0")
+                {
+                    dtHZ.Rows.Add(drJiC);
+                }
                 DataRow drFre = dtHZ.NewRow();
                 drFre[12] = "運費";
-                fritotal = tempFreightDelivery_Low + tempFreightDelivery_Normal - (Convert.ToInt32(tempTemp.Rows[0]["m_bag_check_money"].ToString())) + 0;
-                drFre[13] = fritotal;
+                drFre[13] = tempFreightDelivery_Low + tempFreightDelivery_Normal;
                 if (drFre[13].ToString() != "0")
                 {
                     dtHZ.Rows.Add(drFre);
+                }
+                fritotal = tempFreightDelivery_Low + tempFreightDelivery_Normal - (Convert.ToInt32(tempTemp.Rows[0]["m_bag_check_money"].ToString())) + 0;
+                if (drJiC[13].ToString() != "-0" || drFre[13].ToString() != "0")
+                {
                     DataRow drFreTotal = dtHZ.NewRow();
                     drFreTotal[13] = account_amount + fritotal;
                     dtHZ.Rows.Add(drFreTotal);
@@ -5776,7 +5793,7 @@ namespace Admin.gigade.Controllers
                 int month = Convert.ToInt32(Request.Params["dateTwo"].ToString());
                 DateTime dtime = new DateTime(year, month, 1);
 
-                drT1[0] = "※" + Request.Params["dateTwo"].ToString() + "月對帳表出貨日期(+10天)：" + dtime.AddDays(-10).ToShortDateString() + "～" + dtime.AddMonths(1).AddDays(-11).ToShortDateString() + "(到店取貨(+15天):" + dtime.AddDays(-15).ToShortDateString() + "～" + dtime.AddMonths(1).AddDays(-16).ToShortDateString() + ")";
+                drT1[0] = "※" + Request.Params["dateTwo"].ToString() + "月對帳表出貨日期：" + dtime.AddDays(-11).ToShortDateString() + "～" + dtime.AddMonths(1).AddDays(-12).ToShortDateString() + "(到店取貨:" + dtime.AddDays(-16).ToShortDateString() + "～" + dtime.AddMonths(1).AddDays(-17).ToShortDateString() + ")";
                 dtHZ.Rows.Add(drT1);
                 DataRow drT2 = dtHZ.NewRow();
                 drT2[0] = "※發票抬頭：吉甲地好市集股份有限公司，統編：25137186。";
@@ -5805,6 +5822,11 @@ namespace Admin.gigade.Controllers
                 dtHZ.Rows.Add(drShuiBei);
                 DataRow DrXS = dtHZ.NewRow();
                 DrXS[13] = "銷售額";
+                if (yingTotal < 0)
+                {
+                    mianx = mianx + yingTotal;
+                    yingTotal = 0;
+                }
                 DrXS[14] = mianx;
                 DrXS[15] = Math.Round(yingTotal / 1.05);
                 DrXS[16] = "/";
