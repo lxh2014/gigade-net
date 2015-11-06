@@ -17,8 +17,10 @@ namespace Admin.gigade.Controllers
         // GET: /BrandLogoSort/
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly string mySqlConnectionString = System.Configuration.ConfigurationManager.AppSettings["MySqlConnectionString"].ToString();
-
-        private  BrandLogoSortMgr _BrandLSMgr;
+        string imgServerPath = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server);//"http://192.168.71.159:8080"
+        string defaultImg = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server) + "/product/nopic_50.jpg";
+        private BrandLogoSortMgr _BrandLSMgr;
+        string brandPath = "/brand_master/a/";
         public ActionResult Index()
         {
             return View();
@@ -31,15 +33,50 @@ namespace Admin.gigade.Controllers
             {
                 BrandLogoSort query = new BrandLogoSort();
                 List<BrandLogoSort> store = new List<BrandLogoSort>();
-                if (!string.IsNullOrEmpty(Request.Params["category_id_ser"]))
+                if (!string.IsNullOrEmpty(Request.Params["category_id"]))
                 {
-                    query.category_id = Convert.ToUInt32(Request.Params["category_id_ser"].ToString().Trim());
+                    uint n = 99999999;
+
+                    if (uint.TryParse(Request.Params["category_id"].ToString().Trim(), out n))
+                    {
+                        query.category_id = Convert.ToUInt32(Request.Params["category_id"].ToString().Trim());
+                    }
+                    else
+                    {
+                        query.category_id = 99999999;
+                    }
+                }
+                if (!string.IsNullOrEmpty(Request.Params["brand_id"]))
+                {
+                    uint n = 99999999;
+                    if (uint.TryParse(Request.Params["brand_id"].ToString().Trim(), out n))
+                    {
+                        query.brand_id = Convert.ToUInt32(Request.Params["brand_id"].ToString().Trim());
+                    }
+                    else
+                    {
+                        query.brand_id = 99999999;
+                    }
                 }
                 query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
                 int totalCount = 0;
-                _BrandLSMgr =  new BrandLogoSortMgr(mySqlConnectionString);
+                _BrandLSMgr = new BrandLogoSortMgr(mySqlConnectionString);
                 store = _BrandLSMgr.GetBLSList(query, out totalCount);
+                foreach (var item in store)
+                {
+                    if (!string.IsNullOrEmpty(item.brand_logo))
+                    {
+                        string folder1 = item.brand_logo.Substring(0, 2) + "/"; //圖片名前兩碼
+                        string folder2 = item.brand_logo.Substring(2, 2) + "/"; //圖片名第三四碼
+                        item.brand_logo = imgServerPath + brandPath + folder1 + folder2 + item.brand_logo;
+                    }
+                    else
+                    {
+                        item.brand_logo = defaultImg;
+                    }
+
+                }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
@@ -65,7 +102,7 @@ namespace Admin.gigade.Controllers
             BrandLogoSort query = new BrandLogoSort();
             try
             {
-                _BrandLSMgr=new BrandLogoSortMgr (mySqlConnectionString);
+                _BrandLSMgr = new BrandLogoSortMgr(mySqlConnectionString);
 
                 if (!string.IsNullOrEmpty(Request.Params["blo_id"]))
                 {
@@ -77,7 +114,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["brand_id"]))
                 {
-                    query.brand_id = Convert.ToInt32(Request.Params["brand_id"]);
+                    query.brand_id = Convert.ToUInt32(Request.Params["brand_id"]);
                 }
                 if (!string.IsNullOrEmpty(Request.Params["old_brand_id"]))
                 {
@@ -87,7 +124,7 @@ namespace Admin.gigade.Controllers
                 {
                     query.blo_sort = Convert.ToInt32(Request.Params["blo_sort"]);
                 }
-                query.blo_kuser = (Session["caller"] as Caller).user_id;
+                query.blo_kuser = Convert.ToUInt32((Session["caller"] as Caller).user_id);
                 query.blo_muser = query.blo_kuser;
                 json = _BrandLSMgr.SaveBLS(query);
             }
@@ -208,8 +245,8 @@ namespace Admin.gigade.Controllers
                 {
                     query.category_id = Convert.ToUInt32(Request.Params["category_id"]);
                     _BrandLSMgr = new BrandLogoSortMgr(mySqlConnectionString);
-                    int sort= _BrandLSMgr.MaxSort(query);
-                    json = "{success:true,data:" +sort+ "}";
+                    int sort = _BrandLSMgr.MaxSort(query);
+                    json = "{success:true,data:" + sort + "}";
                 }
             }
             catch (Exception ex)

@@ -7,7 +7,7 @@ Ext.define('gigade.EdmContentNew', {
     { name: "subject", type: "string" },
     { name: "template_id", type: "int" },
     { name: "template_data", type: "string" },
-      { name: "template_data_send", type: "string" },
+    { name: "template_data_send", type: "string" },
     { name: "importance", type: "int" },
     { name: "sender_id", type: "int" },
     { name: "content_createdate", type: "string" },
@@ -83,7 +83,6 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
 //)
 
 Ext.onReady(function () {
-
     var EdmContentNew = Ext.create('Ext.grid.Panel', {
         id: 'EdmContentNew',
         store: EdmContentNewStore,
@@ -278,8 +277,5 @@ function ContentNewReportList(content_id) {
     panel.setActiveTab(copy);
     panel.doLayout();
 }
-
-
-
 
 

@@ -42,14 +42,10 @@ namespace BLL.gigade.Mgr
                 {
                     if (Convert.ToInt32(_dt.Rows[0][0]) == 2 || Convert.ToInt32(_dt.Rows[0][0]) == 3 || Convert.ToInt32(_dt.Rows[0][0]) == 4)
                     {
-                        return json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "',order_payment:'" + store[0].order_payment + "'}";
+                        return json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "',order_payment:'" + store[0].order_payment + "',bank_name:'" + store[0].bank_name + "',bank_branch:'" + store[0].bank_branch + "',bank_account:'" + store[0].bank_account + "',account_name:'" + store[0].account_name + "' }";
                     }
 
-                    if (_tranDt==null)
-                    {
-                        json = "{success:true,status:'0.5'}";
-                    }
-                    else if (  _tranDt.Rows[0][0].ToString() == "")
+                    if (_tranDt==null ||  _tranDt.Rows[0][0].ToString() == "")
                     {
                         json = "{success:true,status:'0.5'}";
                     }

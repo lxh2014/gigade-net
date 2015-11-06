@@ -18,17 +18,7 @@ namespace BLL.gigade.Mgr
         {
             _iordertempreturnlistdao = new ReturnMasterDao(connectionString);
         }
-        public List<OrderReturnUserQuery> GetOrderTempReturnList(OrderReturnUserQuery store, out int totalCount)
-        {
-            try
-            {
-                return _iordertempreturnlistdao.GetOrderTempReturnList(store, out totalCount);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(" ReturnMasterMgr-->GetOrderTempReturnList-->" + ex.Message, ex);
-            }
-        }
+
         #region send
         public DataTable GetOrderReturnCount(OrderReturnUserQuery store)
         {
@@ -40,7 +30,6 @@ namespace BLL.gigade.Mgr
             {
                 throw new Exception(" ReturnMasterMgr-->GetOrderReturnCount-->" + ex.Message, ex);
             }
-            
         }
         public int InsertOrderReturnMaster(OrderReturnUserQuery store)
         {
@@ -113,19 +102,6 @@ namespace BLL.gigade.Mgr
             {
                 throw new Exception(" ReturnMasterMgr-->UpdateOrderDetailStatus-->" + ex.Message, ex);
             }
-           
-        }
-        public int UpdateTempStatus(OrderReturnUserQuery store)
-        {
-            try
-            {
-                return _iordertempreturnlistdao.UpdateTempStatus(store);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(" ReturnMasterMgr-->UpdateTempStatus-->" + ex.Message, ex);
-            }
-           
            
         }
         #endregion
@@ -284,8 +260,30 @@ namespace BLL.gigade.Mgr
             {
                 throw new Exception(" ReturnMasterMgr-->UpdMaster-->" + ex.Message, ex);
             }
-           
-            
         }
+        #region 暫存退貨單棄用
+        //public int UpdateTempStatus(OrderReturnUserQuery store)
+        //{
+        //    try
+        //    {
+        //        return _iordertempreturnlistdao.UpdateTempStatus(store);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(" ReturnMasterMgr-->UpdateTempStatus-->" + ex.Message, ex);
+        //    }    
+        //}
+        //public List<OrderReturnUserQuery> GetOrderTempReturnList(OrderReturnUserQuery store, out int totalCount)
+        //{
+        //    try
+        //    {
+        //        return _iordertempreturnlistdao.GetOrderTempReturnList(store, out totalCount);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(" ReturnMasterMgr-->GetOrderTempReturnList-->" + ex.Message, ex);
+        //    }
+        //}
+        #endregion
     }
 }

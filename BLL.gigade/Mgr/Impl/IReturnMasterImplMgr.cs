@@ -9,7 +9,7 @@ namespace BLL.gigade.Mgr.Impl
 {
     public interface IReturnMasterImplMgr
     {
-        List<OrderReturnUserQuery> GetOrderTempReturnList(OrderReturnUserQuery store, out int totalCount);
+        //List<OrderReturnUserQuery> GetOrderTempReturnList(OrderReturnUserQuery store, out int totalCount);
         DataTable GetOrderReturnCount(OrderReturnUserQuery store);
         int InsertOrderReturnMaster(OrderReturnUserQuery store);
         int InsertOrderReturnDetail(OrderReturnUserQuery store);
@@ -17,7 +17,7 @@ namespace BLL.gigade.Mgr.Impl
         List<OrderReturnUserQuery> OrderMasterQuery(OrderReturnUserQuery store);
         int UpdateOrderMaster(OrderReturnUserQuery store);
         int UpdateOrderDetailStatus(OrderReturnUserQuery store);
-        int UpdateTempStatus(OrderReturnUserQuery store);
+        //int UpdateTempStatus(OrderReturnUserQuery store);
 
         DataTable SelOrderMaster(OrderReturnUserQuery store);
         DataTable Seltime(OrderReturnUserQuery store);
