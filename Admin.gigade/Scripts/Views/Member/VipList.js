@@ -95,10 +95,10 @@ var VipListStore = Ext.create('Ext.data.Store', {
 
 //加載前先獲取ddl的值
 VipListStore.on('beforeload', function () {
-    if (Ext.getCmp('dateOne').getValue() == null && Ext.getCmp('userID').getValue()=='') {
-        Ext.Msg.alert('提示信息', '請輸入查詢條件');
-        return false;
-    }
+    //if (Ext.getCmp('dateOne').getValue() == null && Ext.getCmp('userID').getValue()=='') {
+    //    Ext.Msg.alert('提示信息', '請輸入查詢條件');
+    //    return false;
+    //}
     Ext.apply(VipListStore.proxy.extraParams, {
         dateOne: Ext.getCmp('dateOne').getValue(),
         dateTwo: Ext.getCmp('dateTwo').getValue(),
