@@ -320,6 +320,7 @@ namespace Admin.gigade.Controllers
                 dtExcel.Columns.Add("出貨方式", typeof(String));
                 dtExcel.Columns.Add("是否買斷", typeof(String));
                 dtExcel.Columns.Add("庫存量", typeof(String));
+                dtExcel.Columns.Add("後台庫存量", typeof(String));
                 dtExcel.Columns.Add("安全存量", typeof(String));
                 dtExcel.Columns.Add("購買總數", typeof(String));
                 dtExcel.Columns.Add("週期平均量", typeof(String));
@@ -331,6 +332,7 @@ namespace Admin.gigade.Controllers
                 dtExcel.Columns.Add("成本(單價)", typeof(String));
                 dtExcel.Columns.Add("商品狀態", typeof(String));
                 dtExcel.Columns.Add("販售狀態", typeof(String));
+                dtExcel.Columns.Add("下單採購時間", typeof(String));
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -354,13 +356,14 @@ namespace Admin.gigade.Controllers
                             newRow[8] = "是";
                     }
                     newRow[9] = dt.Rows[i]["item_stock"];
-                    newRow[10] = dt.Rows[i]["item_alarm"];
-                    newRow[11] = dt.Rows[i]["sum_total"];
+                    newRow[10] = dt.Rows[i]["iinvd_stock"];
+                    newRow[11] = dt.Rows[i]["item_alarm"];
+                    newRow[12] = dt.Rows[i]["sum_total"];
 
                     if (string.IsNullOrEmpty(dt.Rows[i]["sum_total"].ToString()))
                     {
-                        newRow[12] = 0;
                         newRow[13] = 0;
+                        newRow[14] = 0;
                     }
                     else
                     {
@@ -395,11 +398,11 @@ namespace Admin.gigade.Controllers
                         string averageCount = (sum_total / query.sumDays * query.periodDays).ToString();
                         if (averageCount.Contains('.') && averageCount.Substring(averageCount.IndexOf('.'), averageCount.Length - averageCount.IndexOf('.')).Length > 5)
                         {
-                            newRow[12] = averageCount.Substring(0, averageCount.IndexOf('.') + 5);
+                            newRow[13] = averageCount.Substring(0, averageCount.IndexOf('.') + 5);
                         }
                         else
                         {
-                            newRow[12] = averageCount;
+                            newRow[13] = averageCount;
                         }
 
                         //當前庫存量-供應商的採購天數*平均銷售數量(最小值為1))<=安全存量時,就需要採購
@@ -410,38 +413,39 @@ namespace Admin.gigade.Controllers
                             double suggestPurchaseTemp = (procurement_days + safe_stock_amount) * (sum_total / query.sumDays) * query.periodDays + ((item_alarm - item_stock) > 0 ? (item_alarm - item_stock) : 0);
                             //if (suggestPurchaseTemp <= 1)   //最小值為1
                             //{
-                            //    newRow[12] = 1;
+                            //    newRow[13] = 1;
                             //}
                             if (suggestPurchaseTemp <= int.Parse(dt.Rows[i]["min_purchase_amount"].ToString()))   //最小值為1
                             {
-                                 newRow[13] = dt.Rows[i]["min_purchase_amount"];
+                                 newRow[14] = dt.Rows[i]["min_purchase_amount"];
                             }
                             else
                             {
                                 int suggestPurchase = Convert.ToInt32(suggestPurchaseTemp);
                                 if (suggestPurchase < suggestPurchaseTemp)
                                 {
-                                    newRow[13] = Convert.ToInt32(suggestPurchaseTemp) + 1;
+                                    newRow[14] = Convert.ToInt32(suggestPurchaseTemp) + 1;
                                 }
                                 else
                                 {
-                                    newRow[13] = Convert.ToInt32(suggestPurchaseTemp);
+                                    newRow[14] = Convert.ToInt32(suggestPurchaseTemp);
                                 }
                             }
                         }
                         else
                         {
-                            newRow[13] = "暫不需採購";
+                            newRow[14] = "暫不需採購";
                         }
                     }
 
-                    newRow[14] = dt.Rows[i]["min_purchase_amount"];
-                    newRow[15] = dt.Rows[i]["procurement_days"];
-                    newRow[16] = dt.Rows[i]["NoticeGoods"];
-                    newRow[17] = dt.Rows[i]["item_money"];
-                    newRow[18] = dt.Rows[i]["item_cost"];
-                    newRow[19] = dt.Rows[i]["product_status_string"];
-                    newRow[20] = dt.Rows[i]["sale_name"];
+                    newRow[15] = dt.Rows[i]["min_purchase_amount"];
+                    newRow[16] = dt.Rows[i]["procurement_days"];
+                    newRow[17] = dt.Rows[i]["NoticeGoods"];
+                    newRow[18] = dt.Rows[i]["item_money"];
+                    newRow[19] = dt.Rows[i]["item_cost"];
+                    newRow[20] = dt.Rows[i]["product_status_string"];
+                    newRow[21] = dt.Rows[i]["sale_name"];
+                    newRow[22] = dt.Rows[i]["create_datetime"];
                     dtExcel.Rows.Add(newRow);
                 }
                 if (dtExcel.Rows.Count > 0)
@@ -947,12 +951,16 @@ namespace Admin.gigade.Controllers
                 dt = productItemMgr.GetStatusListLowerShelf(query, out totalCount);
 
                 //添加兩列用於存儲"平均平均量"與"建議採購量"
-                dtExcel.Columns.Add("商品編號", typeof(String));
-                dtExcel.Columns.Add("商品名稱", typeof(String));
-                dtExcel.Columns.Add("主料位編號", typeof(String));
+                dtExcel.Columns.Add("商品編號", typeof(String)); 
                 dtExcel.Columns.Add("商品細項編號", typeof(String));
-
-                dtExcel.Columns.Add("組合Y/N", typeof(String));
+                dtExcel.Columns.Add("商品名稱", typeof(String));
+                dtExcel.Columns.Add("規格", typeof(String));
+                dtExcel.Columns.Add("主料位編號", typeof(String)); 
+                dtExcel.Columns.Add("所在料位", typeof(String));
+                //dtExcel.Columns.Add("商品細項編號", typeof(String));
+                dtExcel.Columns.Add("製造日期", typeof(String));
+                dtExcel.Columns.Add("有效日期", typeof(String));
+                
 
                 dtExcel.Columns.Add("前台庫存量", typeof(String));
                 dtExcel.Columns.Add("後台庫存量", typeof(String));
@@ -967,59 +975,45 @@ namespace Admin.gigade.Controllers
                 {
                     DataRow newRow = dtExcel.NewRow();
                     newRow[0] = dt.Rows[i]["product_id"];
-                    newRow[1] = dt.Rows[i]["product_name"];
-                    newRow[2] = dt.Rows[i]["loc_id"];
-                    newRow[3] = dt.Rows[i]["item_id"];
+                    newRow[1] = dt.Rows[i]["item_id"];
+                    newRow[2] = dt.Rows[i]["product_name"];
+                    newRow[3] = dt.Rows[i]["spec_title_1"];
+                    
+                    newRow[4] = dt.Rows[i]["loc_id"];
+                    newRow[5] = dt.Rows[i]["plas_loc_id"];
 
-                    if (!string.IsNullOrEmpty(dt.Rows[i]["combination"].ToString()))
-                    {
-                        int combination = Convert.ToInt32(dt.Rows[i]["combination"]);
-                        switch (combination)
-                        {
-
-                            case 1:
-                                newRow[4] = "N";
-                                break;
-                            case 2:
-                            case 3:
-                            case 4:
-                                newRow[4] = "Y";
-                                break;
-                            default:
-                                newRow[4] = combination;
-                                break;
-                        }
-                    }
-                    newRow[5] = dt.Rows[i]["item_stock"];
-                    newRow[6] = dt.Rows[i]["iinvd_stock"];
+                    newRow[6] = dt.Rows[i]["made_date"];
+                    newRow[7] = dt.Rows[i]["cde_dt"];
+                    newRow[8] = dt.Rows[i]["item_stock"];
+                    newRow[9] = dt.Rows[i]["prod_qty"];
 
 
                     if (!string.IsNullOrEmpty(dt.Rows[i]["product_freight"].ToString()))
                     {
                         int product_freight = Convert.ToInt32(dt.Rows[i]["product_freight"]);
                         if (product_freight == 1)
-                            newRow[7] = "常溫";
+                            newRow[10] = "常溫";
                         if (product_freight == 2)
-                            newRow[7] = "冷凍";
+                            newRow[10] = "冷凍";
                     }
                     if (!string.IsNullOrEmpty(dt.Rows[i]["prepaid"].ToString()))
                     {
                         int prepaid = Convert.ToInt32(dt.Rows[i]["prepaid"]);
                         if (prepaid == 0)
-                            newRow[8] = "否";
+                            newRow[11] = "否";
                         if (prepaid == 1)
-                            newRow[8] = "是";
+                            newRow[11] = "是";
                     }
 
-                    newRow[9] = dt.Rows[i]["product_status_string"];
+                    newRow[12] = dt.Rows[i]["product_status_string"];
 
                     if (!string.IsNullOrEmpty(dt.Rows[i]["shortage"].ToString()))
                     {
                         int shortage = Convert.ToInt32(dt.Rows[i]["shortage"]);
                         if (shortage == 0)
-                            newRow[10] = "否";
+                            newRow[13] = "否";
                         if (shortage == 1)
-                            newRow[10] = "是";
+                            newRow[13] = "是";
                     }
 
 
@@ -1028,7 +1022,7 @@ namespace Admin.gigade.Controllers
                 if (dtExcel.Rows.Count > 0)
                 {
                     string fileName = "下架狀態明細表_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
-                    MemoryStream ms = ExcelHelperXhf.ExportDT(dtExcel, "");
+                    MemoryStream ms = ExcelHelperXhf.ExportDT(dtExcel, "下架狀態明細表_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
                     Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
                     Response.BinaryWrite(ms.ToArray());
                 }

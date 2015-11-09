@@ -367,18 +367,27 @@ namespace BLL.gigade.Dao
             _dbAccess.execCommand(sb.ToString());
 
             sbSqlColumn.Append("select v.vendor_id,p.spec_title_2,p.spec_title_1,p.product_id,p.product_name,(select max(create_time) from item_ipo_create_log where item_id=pi.item_id ) as create_datetime, p.sale_status ,'' as sale_name,p.product_mode ,'' as product_mode_name, p.prepaid,pi.erp_id,pi.item_id,pi.item_stock, pi.item_alarm,p.safe_stock_amount,  ");
-            sbSqlColumn.Append("pm.price as item_money,pm.cost as item_cost,sum_biao.sum_total,  p.min_purchase_amount,v.vendor_name_simple, v.procurement_days,p.product_status,'' as product_status_string, ");
+            sbSqlColumn.Append("pm.price as item_money,pm.cost as item_cost,sum_biao.sum_total, subTtotal.iinvd_stock, p.min_purchase_amount,v.vendor_name_simple, v.procurement_days,p.product_status,'' as product_status_string, ");
             sbSqlColumn.Append("  pi.product_id,pi.spec_id_1 ,pi.spec_id_2,''as NoticeGoods ");
             sbSqlTable.Append(" from (SELECT  od.item_id,sum( case item_mode when 0 then od.buy_num when  2 then od.buy_num*od.parent_num end ) as sum_total from order_master om INNER JOIN order_slave os USING(order_id)INNER JOIN order_detail od USING(slave_id)  ");
             sbSqlTable.AppendFormat(" where FROM_UNIXTIME( om.order_createdate)>='{0}' and od.item_mode in (0,2) GROUP BY od.item_id) sum_biao ", sumdate);
             sbSqlTable.Append(" INNER join  product_item pi on sum_biao.item_id=pi.item_id");
+            sbSqlTable.Append(" inner join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=pi.item_id ");
             sbSqlTable.Append(" INNER join product p on p.product_id=pi.product_id ");
             sbSqlTable.Append(" INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id");
             sbSqlTable.Append(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id ");
             sbSqlTable.Append(" LEFT JOIN item_ipo_create_log iicl on iicl.item_id=pi.item_id ");
             sbSqlTable.Append(" INNER join price_master pm on pm.product_id=p.product_id and pm.site_id=1 ");
-            sbSqlCondition.Append(" WHERE  p.product_status =5  ");  //現在只要上架的
-            sbSqlCondition.Append(" and ((p.prepaid=1) or (p.prepaid=0 and p.product_mode=2)) ");  //如果商品為買斷商品（product.prepaid=1）,則全部顯示.如果商品為非買斷商品（product.prepaid=0）,則只要寄倉的
+            sbSqlTable.Append(" INNER join (SELECT pi.item_id,p.product_id from product_item pi INNER JOIN product p on p.product_id=pi.product_id ");
+            sbSqlTable.Append(" where p.product_id>10000 and ((p.prepaid=1) or (p.prepaid=0 and p.product_mode=2))and( ");
+            sbSqlTable.Append(" p.product_status=5 or( p.product_status <>5 and p.product_id in ");
+            sbSqlTable.Append(" (SELECT pc.product_id from product pc INNER JOIN product_combo pcm on pcm.child_id=pc.product_id ");
+            sbSqlTable.Append(" INNER JOIN product pm on pm.product_id=pcm.parent_id where pm.product_status =5)))) t_tb on t_tb.item_id=sum_biao.item_id ");
+            sbSqlTable.Append(" where 1=1 ");
+
+            //sbSqlCondition.Append(" WHERE  p.product_status =5  ");  //現在只要上架的
+            //sbSqlCondition.Append(" and ((p.prepaid=1) or (p.prepaid=0 and p.product_mode=2)) ");  //如果商品為買斷商品（product.prepaid=1）,則全部顯示.如果商品為非買斷商品（product.prepaid=0）,則只要寄倉的
+
             if (query.prepaid != -1)
             {
                 sbSqlCondition.AppendFormat(" and p.prepaid='{0}' ", query.prepaid);
@@ -803,15 +812,15 @@ namespace BLL.gigade.Dao
             TotalCount = 0;
             try
             {
-                sqlClumn.Append(" select p.product_id,p.product_name,ip.loc_id,pi.item_id,p.combination ,dfsm.delivery_freight_set as product_freight,p.product_status,pi.item_stock,subTtotal.iinvd_stock as iinvd_stock, ");
-                sqlClumn.Append(" p.prepaid,p.shortage,'' as product_status_string ");
-                //  sqlClumn.Append(" select p.product_id,p.product_name,ip.loc_id)
+                sqlClumn.Append(" select p.product_id,p.product_name,ip.loc_id,ii.item_id ,dfsm.delivery_freight_set as product_freight,p.product_status,pi.item_stock,ii.plas_loc_id,ii.made_date,ii.cde_dt,ii.prod_qty, ");
+                sqlClumn.Append(" p.prepaid,p.shortage,'' as product_status_string ,p.spec_title_1,p.spec_title_2,pi.spec_id_1,pi.spec_id_2");               
                 sqlCondi.Append(" from product_item pi ");
                 sqlCondi.Append(" left join iplas ip on ip.item_id=pi.item_id  ");
                 sqlCondi.Append(" inner join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=pi.item_id ");
                 sqlCondi.Append(" inner join product p on pi.product_id=p.product_id ");
                 sqlCondi.Append(" inner join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set  ");
                 sqlCondi.Append(" left join v_product_item_stopsale on pi.item_id=v_product_item_stopsale.item_id ");
+                sqlCondi.Append(" left join iinvd ii on ii.item_id=pi.item_id and ii.ista_id='A' ");
                 sbSqlCondition.Append(" where 1=1 ");
                 sbSqlCondition.Append(" and p.product_id>10000  ");
                 if (query.Shortage != 0)
@@ -847,9 +856,10 @@ namespace BLL.gigade.Dao
                 {
                     sbSqlCondition.AppendFormat(" and ip.loc_id<='{0}' ", query.loc_id2);
                 }
+                sbSqlCondition.Append(" order by ii.item_id desc ");
                 if (query.IsPage)
                 {
-                    DataTable dt = _dbAccess.getDataTable("select count(pi.item_id) as totalCount " + sqlCondi.ToString() + sbSqlCondition.ToString());
+                    DataTable dt = _dbAccess.getDataTable("select count(ii.row_id) as totalCount " + sqlCondi.ToString() + sbSqlCondition.ToString());
                     if (dt != null && dt.Rows.Count > 0)
                     {
                         TotalCount = Convert.ToInt32(dt.Rows[0]["totalCount"]);
@@ -859,6 +869,7 @@ namespace BLL.gigade.Dao
                 }
                 DataTable dtResult = _dbAccess.getDataTable(sqlClumn.ToString() + sqlCondi.ToString() + sbSqlCondition.ToString());
                 IParametersrcImplDao _parameterDao = new ParametersrcDao(connStr);
+                IProductSpecImplDao _specDao = new ProductSpecDao(connStr);
                 List<Parametersrc> parameterStatus = _parameterDao.QueryParametersrcByTypes("product_status");
 
                 foreach (DataRow dr in dtResult.Rows)
@@ -868,6 +879,18 @@ namespace BLL.gigade.Dao
                     {
                         dr["product_status_string"] = slist.parameterName;
                     }
+
+                    ProductSpec spec1 = _specDao.query(Convert.ToInt32(dr["spec_id_1"].ToString()));
+                    ProductSpec spec2 = _specDao.query(Convert.ToInt32(dr["spec_id_2"].ToString()));
+                    if (spec1 != null)
+                    {
+                        dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString()) ? "" : dr["spec_title_1"] + ":" + spec1.spec_name;
+                    }
+                    if (spec2 != null)
+                    {
+                        dr["spec_title_2"] = string.IsNullOrEmpty(dr["spec_title_2"].ToString()) ? "" : dr["spec_title_2"] + ":" + spec2.spec_name;
+                    }
+                    dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString()) ? "" : dr["spec_title_1"].ToString() + "  " + dr["spec_title_2"];
                 }
                 return dtResult;
             }
