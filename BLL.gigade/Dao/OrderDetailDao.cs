@@ -971,7 +971,7 @@ od.single_cost,od.event_cost,od.single_price,od.single_money,od.deduct_bonus,od.
         INNER JOIN order_master om USING (order_id)
         inner join product p using (product_id)
         inner join product_category_set pcs using(product_id)		
-where 1=1  and  pcs.category_id={0} ", query.category_id);
+where 1=1 AND item_mode in(0,1)  and  pcs.category_id={0} ", query.category_id);
                 sql.AppendFormat(" AND od.detail_status <> 90");
                 if (query.category_status != 0)
                 {
