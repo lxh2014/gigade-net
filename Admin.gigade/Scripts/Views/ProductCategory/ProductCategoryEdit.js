@@ -290,7 +290,7 @@ editFunction = function (row, store, fatherid, fathername) {
             handler: function () {
                 var form = this.up('form').getForm();
                 if (form.isValid()) {
-                    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "loading..." });
+                    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "loding..." });
                     myMask.show();
                     form.submit({
                         params: {
