@@ -15,7 +15,7 @@ namespace BLL.gigade.Model.Query
         public int prepaid { set; get; }/*是否買斷*/
         public int Is_pod { set; get; }/*是否已下單採購*/
         public string vendor_name { set; get; }/*供應商名稱*/
-
+        public int iinvd_stock { set; get; }/*商品後台庫存*/
         public string category_ID_IN { set; get; }
         public string product_name { set; get; }/*chaojie1124j添加商品庫存查詢*/
         public uint vendor_id { set; get; }/*chaojie1124j添加商品庫存查詢*/
@@ -111,7 +111,7 @@ namespace BLL.gigade.Model.Query
             spec_title_2 = string.Empty;
             plas_id_string = string.Empty ;
             po_id = string.Empty;
-
+            iinvd_stock = 0;
         }
     }
 }

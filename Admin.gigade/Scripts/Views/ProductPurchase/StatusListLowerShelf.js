@@ -21,10 +21,13 @@ Ext.define('gigade.gridlistStatus', {
         { name: "product_id", type: "string" },//料位編號
         { name: "product_name", type: "string" },//商品細項編號
         { name: "loc_id", type: "string" },//料位編號
+        { name: "plas_loc_id", type: "string" },//所在料位料位編號
+        { name: "made_date", type: "string" },//創造日期
+        { name: "cde_dt", type: "string" },//有效日期
         { name: "item_id", type: "string" },//商品細項編號
         { name: "spec_title_1", type: "string" },//規格
         { name: "item_stock", type: "int" },//前台庫存量
-        { name: "iinvd_stock", type: "string" },//後台庫存量
+        { name: "prod_qty", type: "string" },//後台庫存量
         { name: "prepaid", type: "int" },//買斷
         { name: "product_freight", type: "int" },//溫層Shortage
         { name: "product_status_string", type: "string" },//商品狀態
@@ -145,7 +148,7 @@ Ext.onReady(function () {
               },
              {
                  xtype: 'fieldcontainer',
-                 fieldLabel: "料位區間",
+                 fieldLabel: "主料位區間",
                  width: 350,
                  labelWidth: 60,
                 // combineErrors: true,
@@ -271,13 +274,16 @@ Ext.onReady(function () {
         frame: true,
         columns: [
              // new Ext.grid.RowNumberer(),//自動顯示行號
-             { header: "商品編號", dataIndex: 'product_id', width: 100, align: 'center' },
+            { header: "商品編號", dataIndex: 'product_id', width: 100, align: 'center' },
+            { header: "商品細項編號", dataIndex: 'item_id', width: 120, align: 'center' },
             { header: "商品名稱", dataIndex: 'product_name', width: 170, align: 'center' },
             { header: "規格", dataIndex: 'spec_title_1', width: 210, align: 'center' },
             { header: "主料位編號", dataIndex: 'loc_id', width: 100, align: 'center' },
-            { header: "商品細項編號", dataIndex: 'item_id', width: 120, align: 'center' },
+            { header: "所在料位", dataIndex: 'plas_loc_id', width: 100, align: 'center' },
+            { header: "製造日期", dataIndex: 'made_date', width: 100, align: 'center' },
+            { header: "有效日期", dataIndex: 'cde_dt', width: 100, align: 'center' },
             { header: "前台庫存量", dataIndex: 'item_stock', width: 80, align: 'center' },
-            { header: "後台庫存量", dataIndex: 'iinvd_stock', width: 80, align: 'center' },
+            { header: "後台庫存量", dataIndex: 'prod_qty', width: 80, align: 'center' },
             {
                 header: "溫層", dataIndex: 'product_freight', width: 100, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
