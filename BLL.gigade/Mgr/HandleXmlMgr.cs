@@ -193,7 +193,7 @@ namespace BLL.gigade.Mgr
                 }
 
                 ///設置內容
-                newNode.InnerText = xmc.code;
+                //newNode.InnerText = xmc.code;
 
                 if (type == 0)
                 {
@@ -333,18 +333,20 @@ namespace BLL.gigade.Mgr
             {
                 foreach (XmlNode xn in xmlList)
                 {
-                    if (xn.InnerText == "version=\"1.0\" encoding=\"gb2312\"")
+                    if (xn.InnerText.IndexOf("version=\"1.0\"") >= 0 || xn.Name == "#text"||xn.Name=="#comment")
                     {
                         continue;
                     }
                     XmlModelCustom xTemp = new XmlModelCustom();
                     if (xn.HasChildNodes)
-                {
+                    {
                         XmlNodeList xList = xn.ChildNodes;
                         xTemp.children = ToSort(xList, xTemp.children);
                     }
-
-                    xTemp = GetAttributes((XmlElement)xn, xTemp);///設置和屬性相關內容
+                    if (xn.Attributes != null)
+                    {
+                        xTemp = GetAttributes((XmlElement)xn, xTemp);///設置和屬性相關內容
+                    }
                     xTemp.isTopNode = xn.ParentNode.Name == "#document" ? true : false;///設置是否是根節點
                     xTemp.fileName = this.fileName;
                     xTemp.name = xn.Name;///設置Node節點的名稱
