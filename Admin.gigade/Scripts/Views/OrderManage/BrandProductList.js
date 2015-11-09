@@ -108,7 +108,7 @@ var DateTypeStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
         { "txt": ALLDATE, "value": "0" },
-        { "txt": CREATEDATE, "value": "1" },
+        { "txt": '訂單日期', "value": "1" },
         { "txt": PAYDATE, "value": "2" }
     ]
 });

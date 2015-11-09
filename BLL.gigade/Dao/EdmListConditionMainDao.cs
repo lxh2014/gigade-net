@@ -144,11 +144,11 @@ namespace BLL.gigade.Dao
                 if (q.ChkCancel)
                 {//取消次數
                     buywhere.Clear();
-                    if (q.buyTimeMin >= dtime)
+                    if (q.cancelTimeMin >= dtime)
                     {//時間限制
                         buywhere.AppendFormat(" AND FROM_UNIXTIME(order_createdate) >= '{0}' ", q.buyTimeMin.ToString("yyyy/MM/dd 00:00:00"));
                     }
-                    if (q.buyTimeMax >= q.buyTimeMin && q.buyTimeMax != DateTime.MinValue)
+                    if (q.cancelTimeMax >= q.cancelTimeMin && q.cancelTimeMax != DateTime.MinValue)
                     {
                         buywhere.AppendFormat(" AND FROM_UNIXTIME(order_createdate) <= '{0}' ", q.buyTimeMax.ToString("yyyy/MM/dd 23:59:59"));
                     }
@@ -158,7 +158,7 @@ namespace BLL.gigade.Dao
                     }
                     else
                     {
-                        where.AppendFormat(" AND qx.qxcs {0} {1} ", q.buyCondition == 0 ? ">" : "<", q.buyTimes);
+                        where.AppendFormat(" AND qx.qxcs {0} {1} ", q.cancelCondition == 0 ? ">" : "<", q.cancelTimes);
                         join.AppendFormat(" LEFT JOIN (select user_id,count(om.order_id) as 'qxcs' FROM order_master om WHERE order_status IN (90) {0} GROUP BY user_id) qx ON u.user_id=qx.user_id ", buywhere);
                     }
                     //where.AppendFormat(" AND qx.qxcs {0} {1} ", q.cancelCondition == 0 ? ">" : "<", q.cancelTimes);
