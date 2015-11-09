@@ -25,7 +25,7 @@ var dateStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
     { 'txt': '所有日期', 'value': '0' },
-    { 'txt': '購買日期', 'value': '1' }
+    { 'txt': '訂單日期', 'value': '1' }
     ]
 });
 
