@@ -108,7 +108,7 @@ var DateTypeStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
         { "txt": ALLDATE, "value": "0" },
-        { "txt": CREATEDATE, "value": "1" },
+        { "txt": '訂單日期', "value": "1" },
         { "txt": PAYDATE, "value": "2" }
     ]
 });
@@ -345,11 +345,12 @@ Ext.onReady(function () {
         frame: true,
         columns: [
             {
-                header: ORDERID, dataIndex: 'order_id', width: 100, align: 'center', renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    if (value != null) {
-                        return '<a href=javascript:TransToOrder(' + record.data.order_id + ') >' + record.data.order_id + '</a>';
-                    }
-                }
+                header: ORDERID, dataIndex: 'order_id', width: 100, align: 'center',
+                //renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                //    if (value != null) {
+                //        return '<a href=javascript:TransToOrder(' + record.data.order_id + ') >' + record.data.order_id + '</a>';
+                //    }
+                //}
             },
             { header: BRANDNAME, dataIndex: 'brand_name', width: 100, align: 'center' },
             { header: PRODUCTNAMES, dataIndex: 'product_name', width: 150, align: 'center' },
@@ -403,7 +404,7 @@ Ext.onReady(function () {
                     }
                 }
             },
-            { header: CREATEDATE, dataIndex: 'order_createdates', width: 120, align: 'center' },
+            { header: "訂單日期", dataIndex: 'order_createdates', width: 120, align: 'center' },
             {
                 header: PAYDATE, dataIndex: 'order_date_pays', width: 120, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {

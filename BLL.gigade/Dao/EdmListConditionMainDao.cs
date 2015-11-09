@@ -119,7 +119,6 @@ namespace BLL.gigade.Dao
                 }
                 if (q.ChkBuy)
                 {//購買次數
-                    where.AppendFormat(" AND gm.gmcs {0} {1} ", q.buyCondition == 0 ? ">" : "<", q.buyTimes);
                     if (q.buyTimeMin >= dtime)
                     {//時間限制
                         buywhere.AppendFormat(" AND FROM_UNIXTIME(order_createdate) >= '{0}' ", q.buyTimeMin.ToString("yyyy/MM/dd 00:00:00"));
@@ -128,7 +127,15 @@ namespace BLL.gigade.Dao
                     {
                         buywhere.AppendFormat(" AND FROM_UNIXTIME(order_createdate) <= '{0}' ", q.buyTimeMax.ToString("yyyy/MM/dd 23:59:59"));
                     }
-                    join.AppendFormat(" LEFT JOIN (select user_id,count(om.order_id) as 'gmcs' FROM order_master om WHERE order_status NOT IN(90,91) {0} GROUP BY user_id) gm ON u.user_id=gm.user_id ", buywhere);
+                    if (q.buyCondition != 0 && q.buyTimes <= 1)
+                    {
+                        where.AppendFormat(" AND u.user_id NOT IN (select user_id FROM order_master om WHERE order_status NOT IN(90,91) {0} GROUP BY user_id)", buywhere);
+                    }
+                    else
+                    {
+                        where.AppendFormat(" AND gm.gmcs {0} {1} ", q.buyCondition == 0 ? ">" : "<", q.buyTimes);
+                        join.AppendFormat(" LEFT JOIN (select user_id,count(om.order_id) as 'gmcs' FROM order_master om WHERE order_status NOT IN(90,91) {0} GROUP BY user_id) gm ON u.user_id=gm.user_id ", buywhere);
+                    }
                 }
                 if (q.ChkAge)
                 {//年齡
@@ -137,16 +144,33 @@ namespace BLL.gigade.Dao
                 if (q.ChkCancel)
                 {//取消次數
                     buywhere.Clear();
-                    where.AppendFormat(" AND qx.qxcs {0} {1} ", q.cancelCondition == 0 ? ">" : "<", q.cancelTimes);
                     if (q.cancelTimeMin >= dtime)
                     {//時間限制
-                        buywhere.AppendFormat(" AND FROM_UNIXTIME(cancel_createdate) >= '{0}' ", q.cancelTimeMin.ToString("yyyy/MM/dd 00:00:00"));
+                        buywhere.AppendFormat(" AND FROM_UNIXTIME(order_createdate) >= '{0}' ", q.buyTimeMin.ToString("yyyy/MM/dd 00:00:00"));
                     }
                     if (q.cancelTimeMax >= q.cancelTimeMin && q.cancelTimeMax != DateTime.MinValue)
                     {
-                        buywhere.AppendFormat(" AND FROM_UNIXTIME(cancel_createdate) <= '{0}' ", q.cancelTimeMax.ToString("yyyy/MM/dd 23:59:59"));
+                        buywhere.AppendFormat(" AND FROM_UNIXTIME(order_createdate) <= '{0}' ", q.buyTimeMax.ToString("yyyy/MM/dd 23:59:59"));
                     }
-                    join.AppendFormat(" LEFT JOIN (select om.user_id,Count(ocm.cancel_id) as 'qxcs' FROM order_cancel_master ocm LEFT JOIN order_master om on ocm.order_id=om.order_id WHERE cancel_status=1 {0} GROUP BY om.user_id) qx ON u.user_id=qx.user_id ", buywhere);
+                    if (q.cancelCondition != 0 && q.cancelTimes <= 1)
+                    {
+                        where.AppendFormat(" AND u.user_id NOT IN (select user_id FROM order_master om WHERE order_status IN(90) {0} GROUP BY user_id)", buywhere);
+                    }
+                    else
+                    {
+                        where.AppendFormat(" AND qx.qxcs {0} {1} ", q.cancelCondition == 0 ? ">" : "<", q.cancelTimes);
+                        join.AppendFormat(" LEFT JOIN (select user_id,count(om.order_id) as 'qxcs' FROM order_master om WHERE order_status IN (90) {0} GROUP BY user_id) qx ON u.user_id=qx.user_id ", buywhere);
+                    }
+                    //where.AppendFormat(" AND qx.qxcs {0} {1} ", q.cancelCondition == 0 ? ">" : "<", q.cancelTimes);
+                    //if (q.cancelTimeMin >= dtime)
+                    //{//時間限制
+                    //    buywhere.AppendFormat(" AND FROM_UNIXTIME(cancel_createdate) >= '{0}' ", q.cancelTimeMin.ToString("yyyy/MM/dd 00:00:00"));
+                    //}
+                    //if (q.cancelTimeMax >= q.cancelTimeMin && q.cancelTimeMax != DateTime.MinValue)
+                    //{
+                    //    buywhere.AppendFormat(" AND FROM_UNIXTIME(cancel_createdate) <= '{0}' ", q.cancelTimeMax.ToString("yyyy/MM/dd 23:59:59"));
+                    //}
+                    //join.AppendFormat(" LEFT JOIN (select om.user_id,Count(ocm.cancel_id) as 'qxcs' FROM order_cancel_master ocm LEFT JOIN order_master om on ocm.order_id=om.order_id WHERE cancel_status=1 {0} GROUP BY om.user_id) qx ON u.user_id=qx.user_id ", buywhere);
                 }
                 if (q.ChkRegisterTime)
                 {//註冊時間
@@ -162,7 +186,6 @@ namespace BLL.gigade.Dao
                 if (q.ChkReturn)
                 {//退貨次數
                     buywhere.Clear();
-                    where.AppendFormat(" AND th.thcs {0} {1} ", q.returnCondition == 0 ? ">" : "<", q.returnTimes);
                     if (q.returnTimeMin >= dtime)
                     {//時間限制
                         buywhere.AppendFormat(" AND FROM_UNIXTIME(return_createdate) >= '{0}' ", q.returnTimeMin.ToString("yyyy/MM/dd 00:00:00"));
@@ -171,7 +194,15 @@ namespace BLL.gigade.Dao
                     {
                         buywhere.AppendFormat(" AND FROM_UNIXTIME(return_createdate) <= '{0}' ", q.returnTimeMax.ToString("yyyy/MM/dd 23:59:59"));
                     }
-                    join.AppendFormat(" LEFT JOIN (select om.user_id,Count(orm.return_id) as thcs FROM order_return_master orm LEFT JOIN order_master om on orm.order_id=om.order_id WHERE return_status=1 {0} GROUP BY om.user_id) th ON u.user_id=th.user_id ", buywhere);
+                    if (q.returnCondition != 0 && q.returnTimes <= 1)
+                    {
+                        where.AppendFormat("AND u.user_id not in (select DISTINCT om.user_id FROM order_return_master orm LEFT JOIN order_master om on orm.order_id=om.order_id WHERE return_status=1 {0})", buywhere);
+                    }
+                    else
+                    {
+                        where.AppendFormat(" AND th.thcs {0} {1} ", q.returnCondition == 0 ? ">" : "<", q.returnTimes);
+                        join.AppendFormat(" LEFT JOIN (select om.user_id,Count(orm.return_id) as thcs FROM order_return_master orm LEFT JOIN order_master om on orm.order_id=om.order_id WHERE return_status=1 {0} GROUP BY om.user_id) th ON u.user_id=th.user_id ", buywhere);
+                    }
                 }
                 if (q.ChkLastOrder)
                 {//最後訂單

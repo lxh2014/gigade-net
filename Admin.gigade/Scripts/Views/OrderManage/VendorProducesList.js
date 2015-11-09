@@ -123,7 +123,7 @@ var searchStatusrStore = Ext.create('Ext.data.Store', {
         { "txt": USERID, "value": "2" },
         { "txt": VENDORNAME, "value": "3" },
         { "txt": PRODUCTID, "value": "4" },
-        { "txt": '訂單編號', "value": "5" }
+        { "txt": '付款單號', "value": "5" }
     ]
 });
 var dateStore = Ext.create('Ext.data.Store', {
@@ -437,11 +437,12 @@ Ext.onReady(function () {
         flex: 8.1,
         columns: [
             {
-                header: ORDERID, dataIndex: 'order_id', width: 70, align: 'center', renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    if (value != null) {
-                        return '<a href=javascript:TransToOrder(' + record.data.order_id + ') >' + record.data.order_id + '</a>';
-                    }
-                }
+                header: ORDERID, dataIndex: 'order_id', width: 70, align: 'center',
+                //renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                //    if (value != null) {
+                //        return '<a href=javascript:TransToOrder(' + record.data.order_id + ') >' + record.data.order_id + '</a>';
+                //    }
+                //}
             },
             { header: VENDOR, dataIndex: 'vendor_name_simple', width: 60, align: 'center' },
             {

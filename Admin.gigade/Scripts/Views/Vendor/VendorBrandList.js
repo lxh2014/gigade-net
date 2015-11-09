@@ -125,7 +125,8 @@ var DDLStore = Ext.create('Ext.data.Store', {
         { "txt": "請選擇", "value": "0" },
         { "txt": "供應商簡稱", "value": "1" },
         { "txt": "統一編號", "value": "2" },
-        { "txt": "品牌名稱", "value": "3" }
+        { "txt": "品牌名稱", "value": "3" },
+        { "txt": "品牌編號", "value": "4" }
     ]
 });
 function Query(x) {
