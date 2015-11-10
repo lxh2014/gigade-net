@@ -1,6 +1,9 @@
 ﻿
 
 editFunction = function (row, store) {
+
+    
+
     var conditionID = "";
     if (row != null) {
         conditionID = row.data["condition_id"];
@@ -244,49 +247,22 @@ editFunction = function (row, store) {
                  submitValue: true,
                  value: Tomorrow(),
                  time: { hour: 00, min: 00, sec: 00 },//開始時間00：00：00
-                 listeners: {
-                     select: function (a, b, c) {
-                         var start = Ext.getCmp("startbegin");
-                         var end = Ext.getCmp("end");
-                         if (end.getValue() == null) {
-                             end.setValue(setNextMonth(start.getValue(), 1));
-                         }
-                         else if (end.getValue() < start.getValue()) {
-                             Ext.Msg.alert(INFORMATION, DATA_TIP);
-                             start.setValue(setNextMonth(end.getValue(), -1));
-                         }
-                     }
-                 }
+                 
              },
-                      {
-                          xtype: "datetimefield",
-                          fieldLabel: ENDTIME,
-                          editable: false,
-                          id: 'end',
-                          anchor: '95%',
-                          name: 'end',
-                          format: 'Y-m-d H:i:s',
-                          width: 150,
-                          allowBlank: false,
-                          submitValue: true, //
-                          value: setNextMonth(Tomorrow(), 1),
-                          listeners: {
-                              select: function (a, b, c) {
-                                  var start = Ext.getCmp("startbegin");
-                                  var end = Ext.getCmp("end");
-                                  if (start.getValue() != "" && start.getValue() != null) {
-                                      if (end.getValue() < start.getValue()) {
-                                          Ext.Msg.alert(INFORMATION, DATA_TIP);
-                                          end.setValue(setNextMonth(start.getValue(), 1));
-                                      }
-
-                                  }
-                                  else {
-                                      start.setValue(setNextMonth(end.getValue(), -1));
-                                  }
-                              }
-                          }
-                      }
+            {
+                xtype: "datetimefield",
+                fieldLabel: ENDTIME,
+                editable: false,
+                id: 'end',
+                anchor: '95%',
+                name: 'end',
+                format: 'Y-m-d H:i:s',
+                width: 150,
+                allowBlank: false,
+                submitValue: true, //
+                value: setNextMonth(Tomorrow(), 1),
+                time: { hour: 23, min: 59, sec: 59 },//開始時間00：00：00        
+            }
 
 
         ],
@@ -305,7 +281,7 @@ editFunction = function (row, store) {
                 var selEndTime = Ext.getCmp("end").getValue();
                 if (selEndTime <= selStartBegin) {
                     alert(TIMETIP);
-                    Ext.getCmp("end").setValue("");
+                    Ext.getCmp("end").setValue(setNextMonth(Tomorrow(), 1));
                     return;
                 }
                 if (form.isValid()) {
