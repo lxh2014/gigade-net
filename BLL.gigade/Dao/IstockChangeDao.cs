@@ -53,7 +53,7 @@ namespace BLL.gigade.Dao
             }
             if (query.item_upc != string.Empty)
             {
-                sbWhr.AppendFormat(" and pi.item_id in (select item_id from iupc where upc_id='{0}' or item_id='{0}' )", query.item_upc);
+                sbWhr.AppendFormat(" and (ic.item_id='{0}' or  pi.item_id in (select item_id from iupc where upc_id='{0}' or item_id='{0}' )) ", query.item_upc);
             }
             if (query.starttime != DateTime.MinValue && query.endtime != DateTime.MinValue)
             {
