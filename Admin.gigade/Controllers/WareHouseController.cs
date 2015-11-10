@@ -12569,28 +12569,38 @@ namespace Admin.gigade.Controllers
 
                         string upc_id = string.Empty;
                         List<IupcQuery> list=new List<IupcQuery>();
-                        uint item_id = uint.Parse(aseldTable.Rows[i]["item_id"].ToString());
-                        query.item_id = item_id;
-                        query.upc_type_flg="1";
-                        list=_IiupcMgr.GetIupcByType(query);
-                        if (list.Count > 0)
+                        if (!string.IsNullOrEmpty(aseldTable.Rows[i]["item_id"].ToString()))
                         {
-                            upc_id = list[0].upc_id;
-                        }
-                        else {
-                            query.upc_type_flg = "3";
+                            uint item_id = uint.Parse(aseldTable.Rows[i]["item_id"].ToString());
+                            query.item_id = item_id;
+                            query.upc_type_flg = "1";
                             list = _IiupcMgr.GetIupcByType(query);
                             if (list.Count > 0)
                             {
                                 upc_id = list[0].upc_id;
                             }
-                            else {
-                                query.upc_type_flg = "2";
+                            else
+                            {
+                                query.upc_type_flg = "3";
                                 list = _IiupcMgr.GetIupcByType(query);
-                                if(list.Count>0){
+                                if (list.Count > 0)
+                                {
                                     upc_id = list[0].upc_id;
                                 }
+                                else
+                                {
+                                    query.upc_type_flg = "2";
+                                    list = _IiupcMgr.GetIupcByType(query);
+                                    if (list.Count > 0)
+                                    {
+                                        upc_id = list[0].upc_id;
+                                    }
+                                }
                             }
+                        }
+                        else 
+                        {
+                            upc_id = " ";
                         }
                         cell = new PdfPCell(new Phrase(upc_id, new iTextSharp.text.Font(bf, 8)));
                         cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左

@@ -312,9 +312,9 @@ LEFT JOIN product_ext pe ON pi.item_id=pe.item_id where pi.item_id='{0}'  ;", id
         public DataTable Getprodubybar(string id)
         {//根據條碼獲取數據
             StringBuilder sql = new StringBuilder();
-            sql.AppendFormat(@"SELECT vb.vendor_id,i.upc_id,i.item_id,CONCAT(vb.brand_name,'-',p.product_name) as product_name,ps.spec_name,ps2.spec_name,ip.loc_id,pe.cde_dt_var,pe.cde_dt_shp,pe.pwy_dte_ctl,pe.cde_dt_var,pe.cde_dt_incr 
-from iupc i
-left JOIN product_item pi on i.item_id=pi.item_id
+            sql.AppendFormat(@"SELECT vb.vendor_id,i.upc_id,pi.item_id,CONCAT(vb.brand_name,'-',p.product_name) as product_name,ps.spec_name,ps2.spec_name,ip.loc_id,pe.cde_dt_var,pe.cde_dt_shp,pe.pwy_dte_ctl,pe.cde_dt_var,pe.cde_dt_incr 
+from product_item pi
+left JOIN iupc i on i.item_id=pi.item_id
 LEFT JOIN product p ON pi.product_id=p.product_id 
 LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id
 LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id
@@ -515,7 +515,7 @@ LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where i.upc_id='{0}' or pi.ite
             sql.Append(@"iifuliaowei.plas_loc_id as '副料位編號',");
             sql.Append(@"iifuliaowei.prod_qty as '副料位數量',");
             sql.Append(@"iplas.loc_id as '主料位編號',");
-            sql.Append(@"(SELECT IFNULL(sum(prod_qty),0) from iinvd i LEFT JOIN iplas ip on ip.loc_id=i.plas_loc_id where i.item_id  = pi.item_id and i.ista_id='A') as '主數量',");
+            sql.Append(@"(SELECT IFNULL(sum(prod_qty),0) from iinvd i right JOIN iplas ip on ip.loc_id=i.plas_loc_id where i.item_id  = pi.item_id and i.ista_id='A') as '主數量',");
             sql.Append(@"iplas.loc_stor_cse_cap AS '容量','' AS '實際補貨量',iifuliaowei.item_id AS '商品細項編號',");
             sql.Append(@"CONCAT(v.brand_name,'-',p.product_name) AS '品名',");
             sql.Append(@"concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as '規格',");
@@ -549,11 +549,11 @@ LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where i.upc_id='{0}' or pi.ite
 
             if (vd.auto == 1)
             {
-                sql.AppendFormat(" AND (SELECT IFNULL(sum(prod_qty),0) from iinvd i left join iplas ip on ip.loc_id=i.plas_loc_id where i.item_id  = pi.item_id and i.ista_id='A')< iplas.loc_stor_cse_cap");
+                sql.AppendFormat(" AND (SELECT IFNULL(sum(prod_qty),0) from iinvd i right join iplas ip on ip.loc_id=i.plas_loc_id where i.item_id  = pi.item_id and i.ista_id='A')< iplas.loc_stor_cse_cap");//LEFT JOIN iplas ip on ip.loc_id=i.plas_loc_id
             }
             else
             {
-                sql.AppendFormat(" AND (SELECT IFNULL(sum(prod_qty),0) from iinvd i LEFT JOIN  iplas ip on ip.loc_id=i.plas_loc_id where i.item_id  = pi.item_id  and i.ista_id='A')<={0}", vd.sums);
+                sql.AppendFormat(" AND (SELECT IFNULL(sum(prod_qty),0) from iinvd i right JOIN  iplas ip on ip.loc_id=i.plas_loc_id where i.item_id  = pi.item_id  and i.ista_id='A')<={0}", vd.sums);
             }
             sql.AppendFormat(" and iifuliaowei.plas_loc_id is not NULL ORDER BY iifuliaowei.cde_dt ASC ");
             return _access.getDataTable(sql.ToString());
