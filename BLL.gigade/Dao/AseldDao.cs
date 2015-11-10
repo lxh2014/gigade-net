@@ -270,7 +270,7 @@ LEFT JOIN order_master o ON a.ord_id=o.order_id
         public List<AseldQuery> GetAseldListByItemid(Aseld a)
         {
             StringBuilder sb = new StringBuilder();//left join iloc ic on i.plas_loc_id=ic.loc_id 
-            sb.AppendFormat(@"SELECT seld_id,assg_id,case when ip.loc_id is null then 'YY999999' else ip.loc_id end as sel_loc,CONCAT('(',a.item_id,')',v.brand_name,'-',p.product_name) as description,concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz,ord_qty,out_qty,ord_id,a.item_id,ordd_id,upc_id,i.cde_dt,pe.cde_dt_shp,deliver_id,deliver_code,o.note_order,ic.hash_loc_id 
+            sb.AppendFormat(@"SELECT seld_id,assg_id,case when ip.loc_id is null then 'YY999999' else ip.loc_id end as sel_loc,CONCAT('(',a.item_id,')',v.brand_name,'-',p.product_name) as description,concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz,ord_qty,out_qty,ord_id,cust_name,a.item_id,ordd_id,upc_id,i.cde_dt,pe.cde_dt_shp,deliver_id,deliver_code,o.note_order,ic.hash_loc_id 
 FROM aseld a LEFT JOIN iinvd i ON a.item_id=i.item_id 
 
 LEFT JOIN product_ext pe ON i.item_id = pe.item_id 

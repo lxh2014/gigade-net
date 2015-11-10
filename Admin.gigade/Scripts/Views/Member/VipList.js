@@ -95,10 +95,10 @@ var VipListStore = Ext.create('Ext.data.Store', {
 
 //加載前先獲取ddl的值
 VipListStore.on('beforeload', function () {
-    if (Ext.getCmp('dateOne').getValue() == null && Ext.getCmp('userID').getValue()=='') {
-        Ext.Msg.alert('提示信息', '請輸入查詢條件');
-        return false;
-    }
+    //if (Ext.getCmp('dateOne').getValue() == null && Ext.getCmp('userID').getValue()=='') {
+    //    Ext.Msg.alert('提示信息', '請輸入查詢條件');
+    //    return false;
+    //}
     Ext.apply(VipListStore.proxy.extraParams, {
         dateOne: Ext.getCmp('dateOne').getValue(),
         dateTwo: Ext.getCmp('dateTwo').getValue(),
@@ -282,10 +282,10 @@ Ext.onReady(function () {
                           Ext.Msg.alert(INFORMATION, DATA_TIP);
                           end.setValue(setNextMonth(start.getValue(), 1));
                       }
-                      else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                          // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                          end.setValue(setNextMonth(start.getValue(), 1));
-                      }
+                      //else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
+                      //    // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                      //    end.setValue(setNextMonth(start.getValue(), 1));
+                      //}
                   }
               }
           }, '~', {
@@ -306,10 +306,10 @@ Ext.onReady(function () {
                               Ext.Msg.alert(INFORMATION, DATA_TIP);
                               start.setValue(setNextMonth(end.getValue(), -1));
                           }
-                          else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                              // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                              start.setValue(setNextMonth(end.getValue(), -1));
-                          }
+                          //else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
+                          //    // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                          //    start.setValue(setNextMonth(end.getValue(), -1));
+                          //}
                       }
                       else {
                           start.setValue(setNextMonth(end.getValue(), -1));

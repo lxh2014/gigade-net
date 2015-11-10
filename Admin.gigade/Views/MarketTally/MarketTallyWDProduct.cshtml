@@ -8,9 +8,9 @@
 
 <script src="../../Scripts/jquery-2.1.4.min.js"></script>
 <link href="../../Scripts/Bootstrap/css/bootstrap.min.css" rel="stylesheet" />
-<link href="../../Scripts/Bootstrap/css/bootstrap-table.min.css" rel="stylesheet" />
 <script src="../../Scripts/Bootstrap/bootstrap.min.js"></script>
 <script src="../../Scripts/Bootstrap/bootstrap-table.min.js"></script>
+<link href="../../Scripts/Bootstrap/css/bootstrap-table.min.css" rel="stylesheet" />
     <title></title>
 </head>
 
@@ -23,6 +23,8 @@
 
     <div>
         <h3 >訂單號：&nbsp&nbsp&nbsp <span class="label label-info" id="ord_id"></span></h3>
+        <h3 >收件人：&nbsp&nbsp&nbsp <span class="label label-info" id="cust_name"></span></h3>
+        <h3 id="note_order_label" hidden="hidden">備註：&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp  <span class="label label-info" id="note_order"></span></h3>
         <h3 >品名：&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp  <span class="label label-info " id="productname"></span></h3>
         <h3 >撿貨數量： <span class="label label-info " id="out_qty"></span></h3>
         <h3 >實際撿貨量統計： <span class="label label-danger " id="act_pick_qty">&nbsp&nbsp</span></h3>
@@ -83,7 +85,7 @@
         </table>
        
         <br />
-        <button class="btn btn-default btn-lg" disabled="disabled" id="amsure" type="button">確認分貨</button>
+        <button class="btn btn-default btn-lg" disabled="disabled" data-loading-text="提交中..."  id="amsure" type="button">確認分貨</button>
     </div>
 </div>
 
@@ -434,7 +436,17 @@
                             prod = "(" + result.data[0].prod_sz + ")";
                         }
 
-                        $("#ord_id").text(result.data[0].ord_id);
+                        $("#ord_id").text(result.data[0].ord_id); 
+                        $("#cust_name").text(result.data[0].cust_name);
+                        if (result.data[0].note_order.length > 0)
+                        {
+                            $("#note_order").text(result.data[0].note_order);
+                            $("#note_order_label").show();
+                        }
+                        else
+                        {
+                            $("#note_order_label").hide();
+                        }
                         $("#productname").text(result.data[0].description + prod);
                         $("#out_qty").text(result.data[0].out_qty);
                         //$("#act_pick_qty").text(result.data[0].act_pick_qty);
@@ -475,7 +487,14 @@
     
             
         }
-
+        $('button[data-loading-text]').click(function ()
+        {
+            var btn = $(this).button('loading');
+            setTimeout(function ()
+            {
+                btn.button('reset');
+            }, 3000);
+        });
         $('#delivercode').on('input', function (e)
         {
             

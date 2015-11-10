@@ -1,7 +1,0 @@
-﻿@{
-    ViewBag.Title = "SpecIndex";
-}
-<script src="../../Scripts/Common/ToolAuthority.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
-<script src="../../Locale/@Html.Raw(Request.Cookies["lang"]==null? "zh-TW":Request.Cookies["lang"].ToString())/Product/SpecLang.js?V=@Context.Application["Version"].ToString()" type="text/javascript"></script>
-<script src="../../Scripts/Views/Product/ProductSpec.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
-@Html.Partial("Loading", 1000)

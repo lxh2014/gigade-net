@@ -1,8 +1,0 @@
-﻿@{
-    ViewBag.Title = "MarketCategoryImport";
-}
-
-<script src="../../Locale/@Html.Raw(Request.Cookies["lang"]==null? "zh-TW":Request.Cookies["lang"].ToString())/MarketCategory/Lang.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
-<script src="../../Scripts/Views/MarketCategory/MarketCategoryImport.js?v=@Context.Application["Version"].ToString()" type="text/javascript"></script>
-
-@Html.Partial("Loading")

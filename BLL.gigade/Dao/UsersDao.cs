@@ -115,6 +115,12 @@ namespace BLL.gigade.Dao
                 sbuser.Append(" where om.order_status = 99 ");
                 sbuser.Append(timelimit);
                 sbuser.Append("  group by om.user_id ");
+
+                if (uvlq.IsPage)
+                {                                       
+                    sbuser.AppendFormat(" limit {0},{1}", uvlq.Start, uvlq.Limit);//分頁
+                }
+
                 sbuserDT = _accessMySql.getDataTable(sbuser.ToString());
 
                 //如果查到的table的數據條數為零，返回空字符串
@@ -317,7 +323,7 @@ namespace BLL.gigade.Dao
                 sbuser.Append(" where om.order_status = 99 ");
                 sbuser.AppendFormat(" and om.user_id in ({0}) ", userIdString);
                 sbuser.Append(timelimit);
-                sbuser.Append("  group by om.user_id ");
+                sbuser.Append("  group by om.user_id order by om.user_id ");
                 
                         
 
@@ -332,7 +338,7 @@ namespace BLL.gigade.Dao
                 sbNPro.AppendFormat(@" where od.product_freight_set in (1,3) and od.detail_status = 4  and om.order_status = 99 
                                     and od.item_mode in (0,2) and om.user_id in ({0}) ", userIdString);
                 sbNPro.Append(timelimit);
-                sbNPro.Append("  group by om.user_id ");
+                sbNPro.Append("  group by om.user_id order by om.user_id desc");
 
                 //得到低溫商品總額集合sbLPro
                 StringBuilder sbLPro = new StringBuilder("");
@@ -344,7 +350,7 @@ namespace BLL.gigade.Dao
                 sbLPro.AppendFormat(@" where od.product_freight_set in (2,4,5,6) and od.detail_status = 4  and om.order_status = 99 
                                     and od.item_mode in (0,2) and om.user_id in ({0}) ", userIdString);
                 sbLPro.Append(timelimit);
-                sbLPro.Append(" group by om.user_id ");
+                sbLPro.Append(" group by om.user_id order by om.user_id desc");
 
                 //得到ct集合sbCT
                 StringBuilder sbCT = new StringBuilder("");
@@ -352,7 +358,7 @@ namespace BLL.gigade.Dao
                 sbCT.Append(" from order_master om inner join order_payment_ct opc on om.order_id = opc.lidm ");
                 sbCT.AppendFormat(@" where   om.order_status = 99 and om.user_id in ({0}) ", userIdString);
                 sbCT.Append(timelimit);
-                sbCT.Append("  group by om.user_id ");
+                sbCT.Append("  group by om.user_id order by om.user_id desc");
 
                 //得到ht集合sbHT
                 StringBuilder sbHT = new StringBuilder("");
@@ -360,7 +366,7 @@ namespace BLL.gigade.Dao
                 sbHT.Append(" from order_master om inner join order_payment_hitrust oph on om.order_id = oph.order_id");
                 sbHT.AppendFormat(@" where  om.order_status = 99 and om.user_id in ({0}) ", userIdString);
                 sbHT.Append(timelimit);
-                sbHT.Append("  group by om.user_id ");
+                sbHT.Append("  group by om.user_id order by om.user_id desc");
 
 
                 #region 手動插入數據
@@ -411,20 +417,21 @@ namespace BLL.gigade.Dao
                 sql.AppendFormat(" left join ( {0} )  l on l.user_id = b.user_id", sbLPro);
                 sql.AppendFormat(" left join ( {0} )  c on c.user_id = b.user_id", sbCT);
                 sql.AppendFormat(" left join  ( {0} )  h on h.user_id = b.user_id", sbHT);
-                sql.AppendFormat(" where 1=1   order by sum_amount DESC");
+                sql.AppendFormat(" where 1=1   ");//order by sum_amount DESC
                 //得到數據總條數
                 totalCount = 0;
                 if (uvlq.IsPage)
                 {
-                    string sqlForCount = "select count(user_id) as totalCount from (" + sbuser + ") s ";
+                    string sqlForCount = @"select count(s.user_id) as totalCount from (select u.user_id from order_master om inner join users u 
+                                              on u.user_id = om.user_id  where om.order_status = 99 " + timelimit + "  group by om.user_id) s ";                     
                     System.Data.DataTable _dt = _accessMySql.getDataTable(sqlForCount);
                     if (_dt != null && _dt.Rows.Count > 0)
                     {
                         totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
                     }
-                    sql.AppendFormat(" limit {0},{1}", uvlq.Start, uvlq.Limit);//分頁
+                    //sql.AppendFormat(" limit {0},{1}", uvlq.Start, uvlq.Limit);//分頁
                 }
-                DataTable vipListDT = _accessMySql.getDataTable(sql.ToString());
+                DataTable vipListDT = _accessMySql.getDataTable(sql.ToString());        
                 List<Model.Query.UserVipListQuery> store = new List<UserVipListQuery>();
 
                 for (var i = 0; i < vipListDT.Rows.Count; i++)

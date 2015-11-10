@@ -152,7 +152,7 @@ Ext.onReady(function () {
         layout: 'vbox',
         items: [EdmContentNew],
         renderTo: Ext.getBody(),
-        autoScroll: true,
+        //autoScroll: true,
         listeners: {
             resize: function () {
                 EdmContentNew.width = document.documentElement.clientWidth;
@@ -254,11 +254,17 @@ onRemoveClick = function () {
 function Search() {
     EdmContentNewStore.removeAll();
     var group_id = Ext.getCmp('search_group_name').getValue();
-    Ext.getCmp("EdmContentNew").store.loadPage(1, {
-        params: {
-            group_id: Ext.getCmp('search_group_name').getValue(),
-        }
-    });
+    if (group_id != 0 && group_id != null) {
+        Ext.getCmp("EdmContentNew").store.loadPage(1, {
+            params: {
+                group_id: group_id,
+            }
+        });
+    } else {
+        Ext.Msg.alert("提示信息","請選擇查詢條件");
+        return;
+    }
+
 }
 
 function ContentNewReportList(content_id) {
