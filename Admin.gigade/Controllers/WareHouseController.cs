@@ -6778,17 +6778,15 @@ namespace Admin.gigade.Controllers
                 ////{
                     DataTable dt = new DataTable();
                     dt = _iinvd.Getprodubybar(Request.Params["item_id"].ToString());
-                ////    if (dt.Rows.Count > 0)
-                ////    {
-                ////        m.item_id = Convert.ToUInt32(dt.Rows[0]["item_id"].ToString());
-                ////    }
+                    if (dt.Rows.Count > 0)
+                    {
+                        m.item_id = Convert.ToUInt32(dt.Rows[0]["item_id"].ToString());
+                    }
                 ////}
-                ////else
-                ////{
-                    m.item_id = Convert.ToUInt32(Request.Params["item_id"]);
-                    //int itemid = 0;
-                    //m.item_id = Convert.ToUInt32(int.TryParse(Request.Params["item_id"],out  itemid));
-               //// }
+                    else
+                    {
+                        int itemid = 0;
+                    }
 
                 //m.upc_id
             }
