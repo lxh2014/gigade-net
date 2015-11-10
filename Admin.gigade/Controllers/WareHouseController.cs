@@ -2980,7 +2980,6 @@ namespace Admin.gigade.Controllers
                 ia.loc_id = m.plas_loc_id.ToString().ToUpper();
                 ia.item_id = m.item_id;
                 stock.sc_trans_type = 0;
-                int type = 0;//庫存調整
                 if (!string.IsNullOrEmpty(Request.Params["iarc_id"].ToString()))
                 {
                     ia.iarc_id = Request.Params["iarc_id"].ToString();
@@ -2988,7 +2987,6 @@ namespace Admin.gigade.Controllers
                 else
                 {
                     ia.iarc_id = "PC";
-                    type = 1;
                     stock.sc_trans_type = 1;//收貨上架
                 }
                 //if (ia.iarc_id == "DR" || ia.iarc_id == "KR")
@@ -5878,16 +5876,17 @@ namespace Admin.gigade.Controllers
                 IstockChangeQuery query = new IstockChangeQuery();
                 if (!string.IsNullOrEmpty(Request.Params["oid"]))
                 {
-                    System.Text.RegularExpressions.Regex rex = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
-                    string id = Request.Params["oid"].ToString().Trim();
-                    if (rex.IsMatch(id))
-                    {
-                        query.item_id = uint.Parse(id);
-                    }
-                    else
-                    {
-                        query.upc_id = id;
-                    }
+                    query.item_upc = Request.Params["oid"].ToString().Trim();//料位和條碼不再通過長度來判斷了
+                    ////System.Text.RegularExpressions.Regex rex = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
+                    ////string id = Request.Params["oid"].ToString().Trim();
+                    ////if (rex.IsMatch(id))
+                    ////{
+                    ////    query.item_id = uint.Parse(id);
+                    ////}
+                    ////else
+                    ////{
+                    ////    query.upc_id = id;
+                    ////}
                 }
 
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]) && Request.Params["start_time"] != "1970-01-01")//
@@ -5967,16 +5966,17 @@ namespace Admin.gigade.Controllers
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
                 if (!string.IsNullOrEmpty(Request.Params["oid"]))
                 {
-                    System.Text.RegularExpressions.Regex rex = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
-                    string id = Request.Params["oid"].ToString().Trim();
-                    if (rex.IsMatch(id))
-                    {
-                        query.item_id = uint.Parse(id);
-                    }
-                    else
-                    {
-                        query.upc_id = id;
-                    }
+                    query.item_upc = Request.Params["oid"].ToString().Trim();//料位和條碼不再通過長度來判斷了
+                    ////System.Text.RegularExpressions.Regex rex = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
+                    ////string id = Request.Params["oid"].ToString().Trim();
+                    ////if (rex.IsMatch(id))
+                    ////{
+                    ////    query.item_id = uint.Parse(id);
+                    ////}
+                    ////else
+                    ////{
+                    ////    query.upc_id = id;
+                    ////}
                 }
                 DateTime time;
                 if (DateTime.TryParse(Request.Params["time_start"], out time))
@@ -6101,10 +6101,19 @@ namespace Admin.gigade.Controllers
                 {
                     model.auto = 1;
                 }
-                string fileName = "補貨建議報表_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
-                MemoryStream ms = ExcelHelperXhf.ExportDT(_iinvd.ExportExcel(model), "補貨建議報表(FIFO;副料位到主料位_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ")");
-                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
-                Response.BinaryWrite(ms.ToArray());
+                DataTable dtHZ=_iinvd.ExportExcel(model);
+                if(dtHZ.Rows.Count>0)
+                {
+                    string fileName = "補貨建議報表_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                    MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "補貨建議報表(FIFO;副料位到主料位_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ")");
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                    Response.BinaryWrite(ms.ToArray());
+                }
+                else
+                {
+                    Response.Clear();
+                    this.Response.Write("無數據存在<br/>");
+                }
             }
             catch (Exception ex)
             {
@@ -6763,23 +6772,21 @@ namespace Admin.gigade.Controllers
                 m.endIloc = m.endIloc.ToUpper();
             }
             _iinvd = new IinvdMgr(mySqlConnectionString);
-            if (!String.IsNullOrEmpty(Request.Params["item_id"]))
+            if (!String.IsNullOrEmpty(Request.Params["item_id"]))//料位和條碼不再通過長度來判斷了
             {
-                if (Request.Params["item_id"].ToString().Length >= 8)
-                {
+                ////if (Request.Params["item_id"].ToString().Length >= 8)
+                ////{
                     DataTable dt = new DataTable();
                     dt = _iinvd.Getprodubybar(Request.Params["item_id"].ToString());
                     if (dt.Rows.Count > 0)
                     {
                         m.item_id = Convert.ToUInt32(dt.Rows[0]["item_id"].ToString());
                     }
-                }
-                else
-                {
-                    m.item_id = Convert.ToUInt32(Request.Params["item_id"]);
-                    //int itemid = 0;
-                    //m.item_id = Convert.ToUInt32(int.TryParse(Request.Params["item_id"],out  itemid));
-                }
+                ////}
+                    else
+                    {
+                        int itemid = 0;
+                    }
 
                 //m.upc_id
             }
@@ -12562,28 +12569,38 @@ namespace Admin.gigade.Controllers
 
                         string upc_id = string.Empty;
                         List<IupcQuery> list=new List<IupcQuery>();
-                        uint item_id = uint.Parse(aseldTable.Rows[i]["item_id"].ToString());
-                        query.item_id = item_id;
-                        query.upc_type_flg="1";
-                        list=_IiupcMgr.GetIupcByType(query);
-                        if (list.Count > 0)
+                        if (!string.IsNullOrEmpty(aseldTable.Rows[i]["item_id"].ToString()))
                         {
-                            upc_id = list[0].upc_id;
-                        }
-                        else {
-                            query.upc_type_flg = "3";
+                            uint item_id = uint.Parse(aseldTable.Rows[i]["item_id"].ToString());
+                            query.item_id = item_id;
+                            query.upc_type_flg = "1";
                             list = _IiupcMgr.GetIupcByType(query);
                             if (list.Count > 0)
                             {
                                 upc_id = list[0].upc_id;
                             }
-                            else {
-                                query.upc_type_flg = "2";
+                            else
+                            {
+                                query.upc_type_flg = "3";
                                 list = _IiupcMgr.GetIupcByType(query);
-                                if(list.Count>0){
+                                if (list.Count > 0)
+                                {
                                     upc_id = list[0].upc_id;
                                 }
+                                else
+                                {
+                                    query.upc_type_flg = "2";
+                                    list = _IiupcMgr.GetIupcByType(query);
+                                    if (list.Count > 0)
+                                    {
+                                        upc_id = list[0].upc_id;
+                                    }
+                                }
                             }
+                        }
+                        else 
+                        {
+                            upc_id = " ";
                         }
                         cell = new PdfPCell(new Phrase(upc_id, new iTextSharp.text.Font(bf, 8)));
                         cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
