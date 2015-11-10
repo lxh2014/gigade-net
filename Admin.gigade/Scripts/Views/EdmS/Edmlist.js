@@ -165,6 +165,7 @@ Ext.onReady(function () {
                 xtype: 'datefield',
                 id: 'DfBuyTime1',
                 width: 100,
+                editable: false,
                 minValue: '2010-01-01',
                 listeners: {
                     select: function () {
@@ -187,6 +188,7 @@ Ext.onReady(function () {
                 xtype: 'datefield',
                 id: 'DfBuyTime2',
                 width: 100,
+                editable: false,
                 minValue: '2010-01-01',
                 listeners: {
                     select: function () {
@@ -276,6 +278,7 @@ Ext.onReady(function () {
                 xtype: 'datefield',
                 id: 'DfCancel1',
                 width: 100,
+                editable: false,
                 minValue: '2010-01-01',
                 listeners: {
                     select: function () {
@@ -298,6 +301,7 @@ Ext.onReady(function () {
                 xtype: 'datefield',
                 id: 'DfCancel2',
                 width: 100,
+                editable: false,
                 minValue: '2010-01-01',
                 listeners: {
                     select: function () {
@@ -327,6 +331,7 @@ Ext.onReady(function () {
                 id: 'DFRegisterTimeMin',
                 fieldLabel: '註冊時間',
                 labelWidth: 80,
+                editable: false,
                 width: 180,
                 minValue: '2010-01-01',
                 listeners: {
@@ -350,6 +355,7 @@ Ext.onReady(function () {
                 xtype: 'datefield',
                 id: 'DFRegisterTimeMax',
                 width: 95,
+                editable: false,
                 minValue: '2010-01-01',
                 listeners: {
                     select: function () {
@@ -399,6 +405,7 @@ Ext.onReady(function () {
                 xtype: 'datefield',
                 id: 'DfReturn1',
                 width: 100,
+                editable: false,
                 minValue: '2010-01-01',
                 listeners: {
                     select: function () {
@@ -421,6 +428,7 @@ Ext.onReady(function () {
                 xtype: 'datefield',
                 id: 'DfReturn2',
                 width: 100,
+                editable: false,
                 minValue: '2010-01-01',
                 listeners: {
                     select: function () {
@@ -451,6 +459,7 @@ Ext.onReady(function () {
                 fieldLabel: '最後訂單',
                 labelWidth: 80,
                 width: 180,
+                editable: false,
                 minValue: '2010-01-01',
                 listeners: {
                     select: function () {
@@ -473,6 +482,7 @@ Ext.onReady(function () {
                 xtype: 'datefield',
                 id: 'DFLastOrderMax',
                 width: 95,
+                editable: false,
                 minValue: '2010-01-01',
                 listeners: {
                     select: function () {
@@ -535,6 +545,7 @@ Ext.onReady(function () {
                 fieldLabel: '最後登入',
                 labelWidth: 80,
                 width: 180,
+                editable: false,
                 minValue: '2010-01-01',
                 listeners: {
                     select: function () {
@@ -557,6 +568,7 @@ Ext.onReady(function () {
                 xtype: 'datefield',
                 id: 'DFLastLoginMax',
                 width: 95,
+                editable: false,
                 minValue: '2010-01-01',
                 listeners: {
                     select: function () {
@@ -620,7 +632,7 @@ Ext.onReady(function () {
                                 Ext.getCmp("ChkBlackList").setValue(true);
                             }
                         });
-                    }                 
+                    }
                 }
             },
             {
@@ -832,22 +844,22 @@ loadListInfo = function () {
                     if (store[i].ChkTotalConsumption == true) {
                         Ext.getCmp("ChkTotalConsumption").setValue(true);
                         if (store[i].totalConsumptionMin != 0) {
-                        Ext.getCmp("NumTotalConsumption1").setValue(store[i].totalConsumptionMin);
+                            Ext.getCmp("NumTotalConsumption1").setValue(store[i].totalConsumptionMin);
                         }
                         if (store[i].totalConsumptionMax != 0) {
-                        Ext.getCmp("NumTotalConsumption2").setValue(store[i].totalConsumptionMax);
-                    }
+                            Ext.getCmp("NumTotalConsumption2").setValue(store[i].totalConsumptionMax);
+                        }
                     }
                     if (store[i].ChkBlackList != true) {
                         Ext.getCmp("ChkBlackList").setValue(false);
                     }
-                    zr = false;                 
+                    zr = false;
                 }
             },
             failure: function (form, action) {
                 Ext.Msg.alert(INFORMATION, "載入失敗");
             }
-        });    
+        });
     }
     else {
         Ext.Msg.alert(INFORMATION, "請選擇篩選條件");
@@ -869,13 +881,17 @@ deleteListInfo = function () {
             success: function (form, action) {
                 var result = Ext.decode(form.responseText);
                 if (result.success) {
-                    Ext.getCmp("conditionName").reset();
-                    Ext.Msg.alert(INFORMATION, "刪除成功!");
-                    Ext.getCmp("FrmCondition").getForm().reset();
-
+                    if (result.msg = '1') {
+                        Ext.Msg.alert(INFORMATION, "默認條件不能刪除!");
+                    }
+                    else {
+                        Ext.getCmp("conditionName").reset();
+                        Ext.Msg.alert(INFORMATION, "刪除成功!");
+                        Ext.getCmp("FrmCondition").getForm().reset();
+                    }
                 }
                 else {
-                    Ext.Msg.alert(INFORMATION, "操作失敗!");
+                    Ext.Msg.alert(INFORMATION, "刪除失敗!");
                 }
             },
             failure: function () {
@@ -944,14 +960,14 @@ saveConditions = function () {
     }
     var ChkBlackList = Ext.getCmp("ChkBlackList").getValue();
     var conditionName = Ext.getCmp("conditionName").getValue();
-    if (conditionName == "" || conditionName == undefined || conditionName == null) {       
+    if (conditionName == "" || conditionName == undefined || conditionName == null) {
         SaveNameFunction(ConditionNameStore);
     }
     else {
         if (chkGender || ChkBuy || ChkAge || ChkCancel || ChkRegisterTime || ChkReturn || ChkLastOrder || ChkNotice || ChkLastLogin || ChkTotalConsumption || ChkBlackList) {
             Ext.Ajax.request({
                 url: '/EdmS/SaveListInfo',
-                method: 'post',                
+                method: 'post',
                 params: {
                     elcm_name: conditionName,
                     chkGender: chkGender,
@@ -1366,7 +1382,7 @@ SaveNameFunction = function (store) {
             formBind: true,
             disabled: true,
             text: '保存',
-            id:'btn_saveName',
+            id: 'btn_saveName',
             margin: '0 10 0 0',
             handler: function () {
                 var numRegex = /^[-+]?[\d]+$/;
@@ -1559,4 +1575,3 @@ SaveNameFunction = function (store) {
     });
     editWin.show();
 };
-
