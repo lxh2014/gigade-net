@@ -65,6 +65,7 @@ editFunction = function (row, store) {
         extend: 'Ext.data.Model',
         fields: [
             { name: 'template_id', type: 'int' },
+            { name: 'template_name', type: 'string' },
             { name: 'edit_url', type: 'string' }
         ]
     });
@@ -79,6 +80,14 @@ editFunction = function (row, store) {
                 root: 'data'
             }
         }
+    });
+
+
+    EdmTemplateStore.on('beforeload', function () {
+        Ext.apply(EdmTemplateStore.proxy.extraParams,
+        {
+            template_id: Ext.getCmp('template_id').getValue(),
+        });
     });
 
     var importanceStore = Ext.create('Ext.data.Store', {
@@ -159,7 +168,7 @@ editFunction = function (row, store) {
                 xtype: 'combobox',
                 store: EdmTemplateStore,
                 valueField: 'template_id',
-                displayField: 'edit_url',
+                displayField: 'template_name',
                 fieldLabel: '郵件範本',
                 id: 'template_id',
                 name: 'template_id',
@@ -173,7 +182,7 @@ editFunction = function (row, store) {
                         Ext.Ajax.request({
                             url: '/EdmNew/GetEditUrlData',
                             params: {
-                                edit_url: Ext.getCmp('template_id').getRawValue(),
+                                template_id: Ext.getCmp('template_id').getValue(),
                             },
                             success: function (data) {
                                 myMask.hide();
@@ -318,6 +327,9 @@ editFunction = function (row, store) {
                     initRow(row);
                 }
                 else {
+                    EdmTemplateStore.on('load', function () {
+                        Ext.getCmp('template_id').select(EdmTemplateStore.getAt(0));
+                    });
                     Query(1);
                     Ext.getCmp('sender_id').allowBlank = false;
                     Ext.getCmp('group_id').allowBlank = false;
