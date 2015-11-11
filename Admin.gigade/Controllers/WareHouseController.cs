@@ -13372,6 +13372,8 @@ namespace Admin.gigade.Controllers
                                     row["備註"] = " ";
                                     _dtBody.Rows.Add(row);
                                     P_num -= Store[i].prod_qty;
+                                    if (P_num == 0)
+                                        break;
                                 }
 
                             }
@@ -13683,6 +13685,8 @@ namespace Admin.gigade.Controllers
                                         row["備註"] = " ";
                                         _dtBody.Rows.Add(row);
                                         P_num -= Store[i].prod_qty;
+                                        if (P_num == 0)
+                                            break;
                                     }
 
                                 }
