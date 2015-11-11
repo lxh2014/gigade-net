@@ -13099,6 +13099,7 @@ namespace Admin.gigade.Controllers
             #region 數據行
             if (ase_query.assg_id != string.Empty)
             {
+                _dtBody.Rows.Clear();
                 aseldTable = aseldMgr.GetAseldTable(ase_query, out total);
                 #region 標頭
                 #region 表頭
@@ -13413,6 +13414,7 @@ namespace Admin.gigade.Controllers
                 {
                     ase_query.assg_id = assg_idTable.Rows[a]["assg_id"].ToString();
                     aseldTable = aseldMgr.GetAseldTable(ase_query, out total);
+                    _dtBody.Rows.Clear();
                     #region 標頭
                     #region 表頭
                     PdfPTable ptable = new PdfPTable(11);
