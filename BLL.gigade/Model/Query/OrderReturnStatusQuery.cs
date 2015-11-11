@@ -31,7 +31,7 @@ namespace BLL.gigade.Model.Query
         public string bank_branch { get; set; }
         public string bank_account { get; set; }
         public string account_name { get; set; }
-
+        public string bank_note { get; set; }
         public string product_mode { get; set; }
         public uint order_payment { get; set; }
 

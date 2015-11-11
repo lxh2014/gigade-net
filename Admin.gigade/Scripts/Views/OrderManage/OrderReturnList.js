@@ -180,6 +180,8 @@
                                             Ext.getCmp("bank_branch").hide();
                                             Ext.getCmp("bank_account").hide();
                                             Ext.getCmp("account_name").hide();
+                                            Ext.getCmp("bank_note").hide();
+                                            
                                         }
                                         else if (result.status == 0) {
                                             if (result.isZIChu == 1) {
@@ -206,6 +208,7 @@
                                             Ext.getCmp("bank_branch").hide();
                                             Ext.getCmp("bank_account").hide();
                                             Ext.getCmp("account_name").hide();
+                                            Ext.getCmp("bank_note").hide();
                                         }
                                         else if (result.status == 0.5) {
                                             orderDeliverForm.hide();
@@ -220,6 +223,7 @@
                                             Ext.getCmp("bank_branch").hide();
                                             Ext.getCmp("bank_account").hide();
                                             Ext.getCmp("account_name").hide();
+                                            Ext.getCmp("bank_note").hide();
                                         }
                                         else if (result.status == 1) {
                                             orderDeliverForm.hide();
@@ -234,6 +238,7 @@
                                             Ext.getCmp("bank_branch").hide();
                                             Ext.getCmp("bank_account").hide();
                                             Ext.getCmp("account_name").hide();
+                                            Ext.getCmp("bank_note").hide();
                                             transport.hide();
                                             CouldReturnStore.load({ params: { return_id: Ext.getCmp('return_id').getValue()}});
                                         }
@@ -251,6 +256,7 @@
                                             Ext.getCmp("bank_branch").hide();
                                             Ext.getCmp("bank_account").hide();
                                             Ext.getCmp("account_name").hide();
+                                            Ext.getCmp("bank_note").hide();
                                             CouldReturnStore.load({ params: { return_id: Ext.getCmp('return_id').getValue() } });
                                             transport.hide();
                                         }
@@ -263,10 +269,12 @@
                                                 Ext.getCmp("bank_branch").show();
                                                 Ext.getCmp("bank_account").show();
                                                 Ext.getCmp("account_name").show();
+                                                Ext.getCmp("bank_note").show();
                                                 Ext.getCmp("bank_name").setValue(result.bank_name);
                                                 Ext.getCmp("bank_branch").setValue(result.bank_branch);
                                                 Ext.getCmp("bank_account").setValue(result.bank_account);
                                                 Ext.getCmp("account_name").setValue(result.account_name);
+                                                Ext.getCmp("bank_note").setValue(result.bank_note);
                                             }
                                             transport.getForm().reset();
                                             Ext.getCmp('transportBtn').setDisabled(true);
@@ -291,6 +299,7 @@
                                             Ext.getCmp("bank_branch").hide();
                                             Ext.getCmp("bank_account").hide();
                                             Ext.getCmp("account_name").hide();
+                                            Ext.getCmp("bank_note").hide();
                                             orderDeliverForm.hide();
                                             CouldReturnGrid.hide();
                                             transport.hide();
@@ -355,6 +364,7 @@
                                         Ext.getCmp("bank_branch").hide();
                                         Ext.getCmp("bank_account").hide();
                                         Ext.getCmp("account_name").hide();
+                                        Ext.getCmp("bank_note").hide();
                                     }
                                     else if (result.status == 0) {
                                         if (result.isZIChu == 1) {
@@ -381,6 +391,7 @@
                                         Ext.getCmp("bank_branch").hide();
                                         Ext.getCmp("bank_account").hide();
                                         Ext.getCmp("account_name").hide();
+                                        Ext.getCmp("bank_note").hide();
                                     }
                                     else if (result.status == 0.5) {
                                         orderDeliverForm.hide();
@@ -395,6 +406,7 @@
                                         Ext.getCmp("bank_branch").hide();
                                         Ext.getCmp("bank_account").hide();
                                         Ext.getCmp("account_name").hide();
+                                        Ext.getCmp("bank_note").hide();
                                     }
                                     else if (result.status == 1) {
                                         orderDeliverForm.hide();
@@ -409,6 +421,7 @@
                                         Ext.getCmp("bank_branch").hide();
                                         Ext.getCmp("bank_account").hide();
                                         Ext.getCmp("account_name").hide();
+                                        Ext.getCmp("bank_note").hide();
                                         transport.hide();
                                         CouldReturnStore.load({ params: { return_id: Ext.getCmp('return_id').getValue() } });
                                     }
@@ -426,6 +439,7 @@
                                         Ext.getCmp("bank_branch").hide();
                                         Ext.getCmp("bank_account").hide();
                                         Ext.getCmp("account_name").hide();
+                                        Ext.getCmp("bank_note").hide();
                                         CouldReturnStore.load({ params: { return_id: Ext.getCmp('return_id').getValue() } });
                                         transport.hide();
                                     }
@@ -438,10 +452,12 @@
                                             Ext.getCmp("bank_branch").show();
                                             Ext.getCmp("bank_account").show();
                                             Ext.getCmp("account_name").show();
+                                            Ext.getCmp("bank_note").show();
                                             Ext.getCmp("bank_name").setValue(result.bank_name);
                                             Ext.getCmp("bank_branch").setValue(result.bank_branch);
                                             Ext.getCmp("bank_account").setValue(result.bank_account);
                                             Ext.getCmp("account_name").setValue(result.account_name);
+                                            Ext.getCmp("bank_note").setValue(result.bank_note);
                                         }
                                         transport.getForm().reset();
                                         Ext.getCmp('transportBtn').setDisabled(true);
@@ -466,6 +482,8 @@
                                         Ext.getCmp("bank_branch").hide();
                                         Ext.getCmp("bank_account").hide();
                                         Ext.getCmp("account_name").hide();
+                                        Ext.getCmp("bank_note").hide();
+                                        
                                         orderDeliverForm.hide();
                                         CouldReturnGrid.hide();
                                         transport.hide();
@@ -527,7 +545,7 @@
                                var orc_deliver_code = Ext.getCmp('orc_deliver_code').getValue();
                                var orc_deliver_date = Ext.getCmp('orc_deliver_date').getValue();
                                var orc_deliver_time = Ext.getCmp('orc_deliver_time').getValue();
-                               if (orc_deliver_code != "" && orc_deliver_date != null) {
+                               if (orc_deliver_code != "" && orc_deliver_date != null&&orc_deliver_code.length<=50) {
                                    Ext.Ajax.request({
                                        url: '/OrderManage/InsertTransport',
                                        params: {
@@ -551,7 +569,7 @@
                                }
                                else {
                                    myMask.hide();
-                                   Ext.Msg.alert("提示信息", "請填寫完成物流信息！");
+                                   Ext.Msg.alert("提示信息", "請填寫正確物流信息！");
                                  
                                }
                            }
@@ -668,6 +686,7 @@
                                            bank_branch: Ext.getCmp('bank_branch').getValue(),
                                            bank_account: Ext.getCmp('bank_account').getValue(),
                                            account_name: Ext.getCmp('account_name').getValue(),
+                                           bank_note:  Ext.getCmp('bank_note').getValue(),
                                        },
                                        success: function (form, action) {
                                            myMask.hide();
@@ -680,6 +699,7 @@
                                                Ext.getCmp('bank_branch').hide();
                                                Ext.getCmp('bank_account').hide();
                                                Ext.getCmp('account_name').hide();
+                                               Ext.getCmp('bank_note').hide();
                                                CouldReturnGrid.hide();
                                                orderReturnForm.getForm().reset();
                                            }
@@ -706,6 +726,7 @@
                                    bank_branch: Ext.getCmp('bank_branch').getValue(),
                                    bank_account: Ext.getCmp('bank_account').getValue(),
                                    account_name: Ext.getCmp('account_name').getValue(),
+                                   bank_note: Ext.getCmp('bank_note').getValue(),
                                },
                                success: function (form, action) {
                                    var result = Ext.decode(form.responseText);
@@ -718,6 +739,7 @@
                                        Ext.getCmp('bank_branch').hide();
                                        Ext.getCmp('bank_account').hide();
                                        Ext.getCmp('account_name').hide();
+                                       Ext.getCmp('bank_note').hide();
                                        orderReturnForm.getForm().reset();
                                    }
                                },
@@ -741,6 +763,7 @@
                         name: 'bank_name',
                         fieldLabel: '銀行帳戶',
                         hidden: true,
+                        maxLength:20,
                         labelWidth: 60,
                       
                     },
@@ -751,6 +774,7 @@
                         fieldLabel: '分行',
                         hidden: true,
                         labelWidth: 60,
+                        maxLength: 20,
                         margin: '0 0 0 15',
                     },
                
@@ -765,6 +789,7 @@
                              id: 'bank_account',
                              name: 'bank_account',
                              fieldLabel: '帳號',
+                             maxLength: 20,
                              hidden: true,
                              labelWidth: 60,
                          },
@@ -773,12 +798,31 @@
                         id: 'account_name',
                         name: 'account_name',
                         fieldLabel: '戶名',
+                        maxLength: 20,
                         hidden: true,
                         labelWidth: 60,
                         margin: '0 0 0 15',
                     },
                 ],
             },
+
+            {
+                xtype: 'fieldcontainer',
+                layout: 'hbox',
+                items: [
+                    {
+                        xtype: 'textareafield',
+                        id: 'bank_note',
+                        name: 'bank_note',
+                        fieldLabel: '退款資訊 (最多200字)',
+                        hidden: true,
+                        width: 360,
+                        maxLength: 200,
+               
+                    }
+                ],
+            },
+
             {
                    xtype: 'textfield',
                    fieldLabel:'是否全是自出',
@@ -810,6 +854,7 @@
                 id: 'orc_name',
                 name: 'orc_name',
                 allowBlank: false,
+                maxLength:10,
                 width: 360
             },
             {
@@ -818,6 +863,7 @@
                 id: 'orc_phone',
                 name: 'orc_phone',
                 allowBlank: false,
+                maxLength:30,
                 width: 360
             },
             {
@@ -829,6 +875,7 @@
                         fieldLabel: '收貨地址',
                         id: 'orc_zipcode',
                         name: 'orc_zipcode',
+                        editable:false,
                         store: zipStore,
                         lastQuery:'',
                         displayField: 'zipname',
@@ -841,6 +888,7 @@
                         id: 'orc_address',
                         name: 'orc_address',
                         allowBlank: false,
+                        maxLength: 200,
                         width: 200
                     },
                 ],
@@ -875,7 +923,7 @@
                 id: 'orc_remark',
                 name: 'orc_remark',
                 width: 360,
-                maxLength:200,
+                maxLength: 200,
             },
             {
                 xtype: 'textarea',
@@ -948,7 +996,7 @@
         layout: 'anchor',
         width: 600,
         url: '/OrderManage/InsertTransport',
-        margin: '0 10 0 0',
+        bodyPadding: '15',
         border: false,
         plain: true,
         id: 'transport',
@@ -960,6 +1008,7 @@
                 id: 'orc_deliver_code',
                 name: 'orc_deliver_code',
                 allowBlank: false,
+                maxLength:50,
                 width: 360
             },
             {
@@ -999,41 +1048,7 @@
                 }],            
             },
         ],
-        //buttonAlign: 'right',
-        //buttons: [{
-        //    text: '確認',
-        //    formBind: true,
-        //    disabled: true,
-        //    handler: function () {
-        //        var form = this.up('form').getForm();
-        //        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
-        //        myMask.show();
-        //        if (form.isValid) {
-        //            form.submit({
-        //                params: {
-        //                    return_id: Ext.getCmp('return_id').getValue(),
-        //                    orc_deliver_code: Ext.getCmp('orc_deliver_code').getValue(),
-        //                    orc_deliver_date: Ext.getCmp('orc_deliver_date').getValue(),
-        //                    orc_deliver_time: Ext.getCmp('orc_deliver_time').getValue(),
-        //                },
-        //                success: function (form, action) {
-        //                    myMask.hide();
-        //                    var result = Ext.decode(action.response.responseText);
-        //                    if (result.success) {
-        //                        myMask.hide();
-        //                        Ext.Msg.alert("提示信息", "物流信息新增成功！");
-        //                        orderReturnForm.getForm().reset();
-        //                        transport.hide();
-        //                    }
-        //                },
-        //                failure: function (form, action) {
-        //                    myMask.hide();
-        //                    Ext.Msg.alert("提示信息", "出現異常！");
-        //                }
-        //            })
-        //        }
-        //    }
-        //}],
+ 
     });
     //唯一的grid負責承載收到商品可退、確認入庫，確認退款單
     var CouldReturnGrid = Ext.create('Ext.grid.Panel', {
