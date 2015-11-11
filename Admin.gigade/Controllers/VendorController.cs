@@ -2806,6 +2806,16 @@ namespace Admin.gigade.Controllers
                         {
                             item.Promotion_Banner_Image = defaultImg;
                         }
+                        if (!string.IsNullOrEmpty(item.brand_logo))
+                        {
+                            string folder5 = item.brand_logo.Substring(0, 2) + "/"; //圖片名前兩碼
+                            string folder6 = item.brand_logo.Substring(2, 2) + "/"; //圖片名第三四碼
+                            item.brand_logo = imgServerPath + brandPath + folder5 + folder6 + item.brand_logo;
+                        }
+                        else
+                        {
+                            item.brand_logo = defaultImg;
+                        }
                     }
                 }
                 #endregion
@@ -2974,6 +2984,9 @@ namespace Admin.gigade.Controllers
                                 break;
                             case 2:
                                 query.Promotion_Banner_Image = fileName;
+                                break;
+                            case 3:
+                                query.brand_logo = fileName;
                                 break;
                             default:
                                 break;
@@ -4246,6 +4259,7 @@ namespace Admin.gigade.Controllers
                 query.Image_Name = oldquery.Image_Name;
                 query.Resume_Image = oldquery.Resume_Image;
                 query.Promotion_Banner_Image = oldquery.Promotion_Banner_Image;
+                query.brand_logo = oldquery.brand_logo;
                 #endregion
                 #region 上傳圖片
                 string path = Server.MapPath(xmlPath);
@@ -4312,6 +4326,9 @@ namespace Admin.gigade.Controllers
                             case 2:
                                 query.Promotion_Banner_Image = fileName;
                                 break;
+                            case 3:
+                                query.brand_logo = fileName;
+                                break;
                             default:
                                 break;
                         }
@@ -4329,6 +4346,9 @@ namespace Admin.gigade.Controllers
                                     break;
                                 case 2:
                                     oldFileName = oldquery.Promotion_Banner_Image;
+                                    break;
+                                case 3:
+                                    oldFileName = oldquery.brand_logo;
                                     break;
                                 default:
                                     break;
@@ -4349,6 +4369,9 @@ namespace Admin.gigade.Controllers
                                 break;
                             case 2:
                                 query.Promotion_Banner_Image = oldquery.Promotion_Banner_Image;//促銷圖片
+                                break;
+                            case 3:
+                                query.brand_logo = oldquery.brand_logo;//品牌logo
                                 break;
                             default:
                                 break;

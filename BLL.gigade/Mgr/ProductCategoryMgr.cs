@@ -170,7 +170,17 @@ namespace BLL.gigade.Mgr
             }
         }
 
-
+        public DataTable GetProductCategoryStore()
+        {
+            try
+            {
+                return _cateDao.GetProductCategoryStore();
+            }
+            catch (Exception ex)
+            {
+               throw new Exception("ProductCategoryMgr-->GetProductCategoryStore->" + ex.Message, ex);
+            }
+        }
       
     }
 }

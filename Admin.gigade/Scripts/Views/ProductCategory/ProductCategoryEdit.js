@@ -1,4 +1,16 @@
-﻿
+﻿var images = ['jpg', 'png', 'jpeg', 'gif'];
+Ext.apply(Ext.form.field.VTypes, {
+    imageFilter: function (val, field) {
+        var type = val.split('.')[val.split('.').length - 1].toLocaleLowerCase();
+        for (var i = 0; i < images.length; i++) {
+            if (images[i] == type) {
+                return true;
+            }
+        }
+        return false;
+    },
+    imageFilterText: '文件格式錯誤',
+});
 editFunction = function (row, store, fatherid, fathername) {
     //前台分類store
     var frontCateStore = Ext.create('Ext.data.TreeStore', {
@@ -77,7 +89,8 @@ editFunction = function (row, store, fatherid, fathername) {
             value: 0,
             allowDecimals: false,
             submitValue: true,
-            width: 300
+            width: 300,
+            maxValue:9999
         },
         {
             xtype: 'radiogroup',
@@ -141,6 +154,34 @@ editFunction = function (row, store, fatherid, fathername) {
             hidden: false,
             width: 300
         },
+          {
+              xtype: 'filefield',
+              name: 'image_in',
+              id: 'image_in',
+              fieldLabel: CATEBANNERIN,
+              msgTarget: 'side',
+              buttonText: SELECT_IMG,
+              submitValue: true,
+              allowBlank: true,
+              fileUpload: true,
+              hidden: false,
+              width: 300,
+              vtype: 'imageFilter'
+          },
+          {
+              xtype: 'filefield',
+              name: 'image_out',
+              id: 'image_out',
+              fieldLabel: CATEBANNEROUT,
+              msgTarget: 'side',
+              buttonText: SELECT_IMG,
+              submitValue: true,
+              allowBlank: true,
+              fileUpload: true,
+              hidden: false,
+              width: 300,
+              vtype: 'imageFilter'
+          },
         {
             xtype: 'radiogroup',
             hidden: false,
@@ -249,6 +290,8 @@ editFunction = function (row, store, fatherid, fathername) {
             handler: function () {
                 var form = this.up('form').getForm();
                 if (form.isValid()) {
+                    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "loading..." });
+                    myMask.show();
                     form.submit({
                         params: {
                             comboFrontCage: Ext.getCmp('comboFrontCage_hide').getValue() == '' ? '' : Ext.htmlEncode(Ext.getCmp('comboFrontCage_hide').getValue()),
@@ -264,9 +307,12 @@ editFunction = function (row, store, fatherid, fathername) {
                             banner_link_url: Ext.htmlEncode(Ext.getCmp('banner_link_url').getValue()),
                             startdate: Ext.htmlEncode(Ext.getCmp('startdate').getRawValue()),
                             enddate: Ext.htmlEncode(Ext.getCmp('enddate').getRawValue()),
-                            short_description: Ext.htmlEncode(Ext.getCmp('short_description').getValue())
+                            short_description: Ext.htmlEncode(Ext.getCmp('short_description').getValue()),
+                            image_in: Ext.htmlEncode(Ext.getCmp('image_in').getValue()),
+                            image_out: Ext.htmlEncode(Ext.getCmp('image_out').getValue())
                         },
                         success: function (form, action) {
+                            myMask.hide();
                             var result = Ext.decode(action.response.responseText);
                             if (result.success) {
                                 Ext.Msg.alert(INFORMATION, SAVESUCCESS);
@@ -280,6 +326,7 @@ editFunction = function (row, store, fatherid, fathername) {
                             }
                         },
                         failure: function (form, action) {
+                            myMask.hide();
                             var result = Ext.decode(action.response.responseText);
                             Ext.Msg.alert(INFORMATION, SAVEFILURE);
                             ProductCategoryStore.load();
@@ -332,14 +379,14 @@ editFunction = function (row, store, fatherid, fathername) {
                     if (row.data.category_link_url == "0" || row.data.category_link_url == null || row.data.category_link_url == "") {
                         Ext.getCmp("category_link_url").setValue("");
                     }
-                    switch (row.data.category_display) {
-                        case 1:
-                            Ext.getCmp("isShow").setValue(true);
-                            break;
-                        case 0:
-                            Ext.getCmp("noShow").setValue(true);
-                            break;
-                    }
+                    //switch (row.data.category_display) {
+                    //    case 1:
+                    //        Ext.getCmp("isShow").setValue(true);
+                    //        break;
+                    //    case 0:
+                    //        Ext.getCmp("noShow").setValue(true);
+                    //        break;
+                    //}
                     switch (row.data.category_display) {
                         case 1:
                             Ext.getCmp("isShow").setValue(true);
@@ -352,7 +399,7 @@ editFunction = function (row, store, fatherid, fathername) {
                         case 1:
                             Ext.getCmp("ls").setValue(true);
                             break;
-                        case 0:
+                        case 2:
                             Ext.getCmp("lm").setValue(true);
                             break;
                     };
@@ -360,7 +407,7 @@ editFunction = function (row, store, fatherid, fathername) {
                         case 1:
                             Ext.getCmp("isStatus").setValue(true);
                             break;
-                        case 0:
+                        case 2:
                             Ext.getCmp("noStatus").setValue(true);
                             break;
                     };
@@ -368,7 +415,7 @@ editFunction = function (row, store, fatherid, fathername) {
                         case 1:
                             Ext.getCmp("link_mode1").setValue(true);
                             break;
-                        case 0:
+                        case 2:
                             Ext.getCmp("link_mode12").setValue(true);
                             break;
                     };
@@ -377,6 +424,8 @@ editFunction = function (row, store, fatherid, fathername) {
                     //Ext.getCmp('comboFrontCage_hide').setValue(row.data.category_father_id);
                     Ext.getCmp('comboFrontCage').setValue(row.data.category_father_name);
                     Ext.getCmp('comboFrontCage_hide').setValue(row.data.category_father_id);
+                    Ext.getCmp('image_in').setRawValue(row.data.category_image_in);
+                    Ext.getCmp('image_out').setRawValue(row.data.category_image_out);
                 } else {
                     Ext.getCmp('comboFrontCage').setValue(fathername);
                     Ext.getCmp('comboFrontCage_hide').setValue(fatherid);

@@ -420,7 +420,7 @@ Ext.onReady(function () {
                 listeners: {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("timestart");
-                        var end = Ext.getCmp("timeend");
+                        var end = Ext.getCmp("timeend");                                          
                         if (end.getValue() == null) {
                             end.setValue(setNextMonth(start.getValue(), 1));
                         }
@@ -428,9 +428,9 @@ Ext.onReady(function () {
                             Ext.Msg.alert(INFORMATION, DATA_TIP);
                             end.setValue(setNextMonth(start.getValue(), 1));
                         }
-                        else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                            end.setValue(setNextMonth(start.getValue(), 1));
-                        }
+                        //else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
+                        //    end.setValue(setNextMonth(start.getValue(), 1));
+                        //}
                     },
                     listeners: {
                         specialkey: function (field, e) {
@@ -455,9 +455,9 @@ Ext.onReady(function () {
                                 Ext.Msg.alert(INFORMATION, DATA_TIP);
                                 start.setValue(setNextMonth(end.getValue(), -1));
                             }
-                            else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                                start.setValue(setNextMonth(end.getValue(), -1));
-                            }
+                            //else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
+                            //    start.setValue(setNextMonth(end.getValue(), -1));
+                            //}
                         }
                         else {
                             start.setValue(setNextMonth(end.getValue(), -1));

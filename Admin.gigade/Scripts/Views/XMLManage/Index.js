@@ -6,7 +6,7 @@
 * 版權所有：GigadeTeam-WH
 *
 */
-
+///document.documentElement.clientHeight <= 700 ? document.documentElement.clientHeight - 240 : document.documentElement.clientHeight - 221,
 var index_id = -1;///用來記錄當前選中點點索引序號
 var data;///用來記錄所選節點
 var oldNode = {}///定義一個對象用來記錄節點的原始值
@@ -142,7 +142,8 @@ var dataview = Ext.create('Ext.view.View', {
         '</tpl>'
     ),
     id: 'phones',
-    height: 355,
+    height: document.documentElement.clientHeight <= 700 ? document.documentElement.clientHeight - 360 : document.documentElement.clientHeight - 457,
+    //height: 355,
     itemSelector: 'div.phone',
     overItemCls: 'phone-hover',
     //scrollable: true,
@@ -167,6 +168,9 @@ var dataview = Ext.create('Ext.view.View', {
                 根據Ext的命名原理得知:Panel的內容會放在 (Panel 的 Id + "-body")的div中    */
             document.getElementById('southPanel-body').innerHTML = html;
             $("#tree-body").css("overflow", "auto");
+
+            //$("#tree-body").css("overflow-y", "auto");
+
         }
     }
 });
@@ -318,11 +322,8 @@ var XMLItemStore = Ext.create('Ext.data.Store', {
 var tree = Ext.create('Ext.tree.Panel', {
     id: 'tree',
     width: 300,
-    height: 382,
-    flex: 1.0,
+    height: document.documentElement.clientHeight <= 700 ? document.documentElement.clientHeight - 339 : document.documentElement.clientHeight - 417,
     frame: false,
-    animate: true,
-    lines: true,
     layout: 'anchor',
     rootVisible: false,
     onlyLeafCheckable: true,
@@ -338,6 +339,8 @@ var tree = Ext.create('Ext.tree.Panel', {
             ///設置添加兄弟,子節點 兩按鈕的顏色,選中為紅色,未選中為黑色
             Ext.getCmp('brother').btnInnerEl.setStyle('color', "black");
             Ext.getCmp('child').btnInnerEl.setStyle('color', "black");
+
+            $("#XMLItemGird-body").children().first().css("overflow", "auto");
             ///清空節點詳細的store
             XMLItemStore.removeAll();
             /// 保存節點資料
@@ -388,7 +391,8 @@ var XMLItemGird = Ext.create('Ext.grid.Panel', {
     store: XMLItemStore,
     id: 'XMLItemGird',
     flex: 3.0,
-    height: 382,
+    autoScroll: true,
+    height: document.documentElement.clientHeight <= 700 ? document.documentElement.clientHeight - 340 : document.documentElement.clientHeight - 420,
     columns: [{ xtype: 'rownumberer', width: 25, align: 'center' },
               {
                   text: '', menuDisabled: true, width: 35, align: 'center', xtype: 'actioncolumn',
@@ -396,12 +400,15 @@ var XMLItemGird = Ext.create('Ext.grid.Panel', {
                   handler: function (grid, rowIndex, colIndex) {
                       XMLItemStore.removeAt(rowIndex);
                   }
-              },
-              { header: CHOOSEID, dataIndex: 'rowId', width: 200, align: 'center', menuDisabled: true, sortable: false },
-              { header: PROPERTYNAME, dataIndex: 'attr_name', width: 200, align: 'center', menuDisabled: true, sortable: false, editor: { xtype: 'textfield' } },
-              { header: PROPERTYVALUE, dataIndex: 'attr_value', width: 200, align: 'center', menuDisabled: true, sortable: false, editor: { xtype: 'textfield' } }
-
-    ],
+              }, {
+                  header: CHOOSEID, dataIndex: 'rowId', width: 80, align: 'center', menuDisabled: true, sortable: false
+              }, {
+                  header: PROPERTYNAME, dataIndex: 'attr_name', width: 280, align: 'center', menuDisabled: true, sortable: false, editor: { xtype: 'textfield' }
+              }, {
+                  header: PROPERTYVALUE, dataIndex: 'attr_value', width: 280, align: 'center', menuDisabled: true, sortable: false, editor: { xtype: 'textfield' }
+              }, {
+                  header: '', width: 270, align: 'center', menuDisabled: true, sortable: false
+              }],
     tbar: [{
         xtype: 'textfield',
         id: 'name',
@@ -426,13 +433,15 @@ var XMLItemGird = Ext.create('Ext.grid.Panel', {
                     Ext.Msg.alert(INFORMATION, P_C_ROOT);
                     return;
                 }
-                XMLItemStore.add({
-                    rowId: index_id,
-                    name: data.name,
-                    code: data.code,
-                    attr_name: "",
-                    attr_value: ""
-                });
+                XMLItemStore.add(
+                    {
+                        rowId: index_id,
+                        //name: data.name,
+                        //scode: data.code,
+                        attr_name: "",
+                        attr_value: ""
+                    }
+                );
             }
         }, '-', {
             text: ADD_BROOT, id: 'brother', handler: function () {
@@ -483,15 +492,15 @@ var XMLItemGird = Ext.create('Ext.grid.Panel', {
 })
 
 
-var CenteRegio = ('Ext.container.Container', {
-    id: 'CenteRegio',
-    //autoScroll: true,
-    frame: false,
-    border: 0,
-    layout: { type: 'hbox' },
-    defaults: { margin: '3 3 0 3' },
-    items: [tree, XMLItemGird]
-})
+//var CenteRegio = ('Ext.container.Container', {
+//    id: 'CenteRegio',
+//    //autoScroll: true,
+//    frame: false,
+//    border: 0,
+//    layout: { type: 'hbox' },
+//    defaults: { margin: '3 3 0 3' },
+//    items: [tree, XMLItemGird]
+//})
 
 var westRegio = ('Ext.container.Container', {
     id: 'westRegio',
@@ -527,9 +536,10 @@ Ext.create('Ext.Viewport', {
         region: 'center',
         xtype: 'panel',
         frame: false,
-        //autoScroll: false,
-        layout: 'fit',
-        items: CenteRegio
+        //autoScroll: true,
+        layout: { type: 'hbox' },
+        //spilt:true,
+        items: [tree, XMLItemGird]
     }, {
         region: 'south',
         xtype: 'panel',
@@ -542,6 +552,8 @@ Ext.create('Ext.Viewport', {
     }],
     listeners: {
         resize: function () {
+            Ext.getCmp("xmlIndex").width = document.documentElement.clientWidth;
+            Ext.getCmp("xmlIndex").height = document.documentElement.clientHeight;
             Ext.getCmp('center-region').setAutoScroll = true;
             Ext.getCmp('west-region').setAutoScroll = true;
             this.doLayout();

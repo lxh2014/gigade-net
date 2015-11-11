@@ -58,6 +58,8 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                 }
 
                 if (form.isValid()) {
+                    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                    myMask.show();
                     var sss = "";
                     myCheckboxGroup = Ext.getCmp("shopclass").getChecked();
                     for (var i = 0; i < myCheckboxGroup.length; i++) {
@@ -85,9 +87,11 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                             resumeimagelink: Ext.htmlEncode(Ext.getCmp('Resume_Image_Link').getValue()),
                             promotionbannerimage: Ext.htmlEncode(Ext.getCmp('Promotion_Banner_Image').getValue()),
                             promotionbannerimagelink: Ext.htmlEncode(Ext.getCmp('Promotion_Banner_Image_Link').getValue()),
-                            mediareportlinkurl: Ext.htmlEncode(Ext.getCmp('Media_Report_Link_Url').getValue())
+                            mediareportlinkurl: Ext.htmlEncode(Ext.getCmp('Media_Report_Link_Url').getValue()),
+                            brand_logo: Ext.htmlEncode(Ext.getCmp('brand_logo').getValue()),
                         },
                         success: function (form, action) {
+                            myMask.hide();
                             var result = Ext.decode(action.response.responseText);
                             if (result.success) {
                                 if (result.msg != "undefined") {
@@ -104,6 +108,7 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                             }
                         },
                         failure: function (form, action) {
+                            myMask.hide();
                             Ext.Msg.alert("提示", "操作失败,請稍后再試,或聯繫開發人員!");
                         }
                     });
@@ -376,7 +381,19 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                     vtype: 'url',
                     hidden: false,
                     anchor: '90%'
-                }
+                },
+                                   {
+                                       xtype: 'filefield',
+                                       fieldLabel: '品牌logo',
+                                       id: 'brand_logo',
+                                       name: 'brand_logo',
+                                       msgTarget: 'side',
+                                       submitValue: true,
+                                       allowBlank: true,
+                                       anchor: '90%',
+                                       buttonText: '選擇...',
+                                       fileUpload: true
+                                   },
                 ]
             },
             {//媒體報道

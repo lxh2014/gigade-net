@@ -125,10 +125,138 @@ namespace Admin.gigade.Controllers
             string jsonStr = string.Empty;
             CategoryQuery cq = new CategoryQuery();
             IAreaPactetImplMgr _iareaPacketMgr = new AreaPacketMgr(mySqlConnectionString);
+            string errorInfo = string.Empty;
             try
             {
-                if (string.IsNullOrEmpty(Request.Params["category_id"]))
+                _proCategoryImplMgr = new CategoryMgr(mySqlConnectionString);
+                if (!string.IsNullOrEmpty(Request.Params["category_id"]))
                 {
+                    cq.category_id = Convert.ToUInt32(Request.Params["category_id"]);
+                }
+                CategoryQuery oldCq = _proCategoryImplMgr.GetProductCategoryById(cq);
+                if (oldCq != null)
+                {
+                    cq.banner_image = oldCq.banner_image;
+                    cq.category_image_in = oldCq.category_image_in;
+                    cq.category_image_out = oldCq.category_image_out;
+                }
+                #region 上傳圖片
+
+                try
+                {
+                    if (Request.Files.Count != 0)
+                    {
+                        string path = Server.MapPath(xmlPath);
+                        SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+                        SiteConfig extention_config = _siteConfigMgr.GetConfigByName("PIC_Extention_Format");
+                        SiteConfig minValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MinValue");
+                        SiteConfig maxValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MaxValue");
+                        SiteConfig admin_userName = _siteConfigMgr.GetConfigByName("ADMIN_USERNAME");
+                        SiteConfig admin_passwd = _siteConfigMgr.GetConfigByName("ADMIN_PASSWD");
+
+                        //擴展名、最小值、最大值
+                        string extention = extention_config.Value == "" ? extention_config.DefaultValue : extention_config.Value;
+                        string minValue = minValue_config.Value == "" ? minValue_config.DefaultValue : minValue_config.Value;
+                        string maxValue = maxValue_config.Value == "" ? maxValue_config.DefaultValue : maxValue_config.Value;
+
+                        string localPromoPath = imgLocalPath + promoPath;//圖片存儲地址                             
+
+                        for (int a = 0; a < Request.Files.Count; a++)
+                        {
+                            string fileName = string.Empty;     //當前文件名
+                            string fileExtention = string.Empty;//當前文件的擴展名
+                            HttpPostedFileBase file = Request.Files[a];
+                            fileName = Path.GetFileName(file.FileName);
+                            if (string.IsNullOrEmpty(fileName))
+                            {
+                                continue;
+                            }
+
+                            bool result = false;
+                            string NewFileName = string.Empty;
+                            string ServerPath = string.Empty;
+                            string ErrorMsg = string.Empty;
+                            string oldFileName = string.Empty;  //舊文件名
+                            //生成隨機數，用於圖片的重命名
+                            Random rand = new Random();
+                            int newRand = rand.Next(1000, 9999);
+                            fileExtention = fileName.Substring(fileName.LastIndexOf(".")).ToLower();
+                            NewFileName = newRand + fileExtention;
+
+                            //判斷目錄是否存在，不存在則創建
+                            CreateFolder(localPromoPath.Substring(0, localPromoPath.Length - promoPath.Length + 1), promoPath.Substring(1, promoPath.Length - 2).Split('/'));
+                            fileName = NewFileName;
+                            NewFileName = localPromoPath + NewFileName;//絕對路徑
+                            ServerPath = Server.MapPath(imgLocalServerPath + promoPath);
+                            FTP ftp = new FTP(localPromoPath, ftpuser, ftppwd);
+                            List<string> tem = ftp.GetFileList();
+                            try
+                            {
+                                //上傳
+                                FileManagement fileLoad = new FileManagement();
+                                result = fileLoad.UpLoadFile(file, ServerPath, NewFileName, extention, int.Parse(maxValue), int.Parse(minValue), ref ErrorMsg, ftpuser, ftppwd);
+                                if (result)//上傳成功
+                                {
+                                    switch (a)
+                                    {
+                                        case 0:
+                                            cq.banner_image = fileName;
+                                            break;
+                                        case 1:
+                                            cq.category_image_in = fileName;
+                                            break;
+                                        case 2:
+                                            cq.category_image_out = fileName;
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    //圖片上傳失敗則圖片名稱為原有圖片名稱
+                                    switch (a)
+                                    {
+                                        case 0:
+                                            cq.banner_image = fileName;
+                                            break;
+                                        case 1:
+                                            cq.category_image_in = fileName;
+                                            break;
+                                        case 2:
+                                            cq.category_image_out = fileName;
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    errorInfo += "第" + (a + 1) + "張" + ErrorMsg + "<br/>";                                
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name + "->fileLoad.UpLoadFile()", ex.Source, ex.Message);
+                                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                                log.Error(logMessage);
+                                jsonStr = "{success:false,msg:'圖片上傳失敗'}";
+                              
+                            }
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                    logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name + "->圖片上傳失敗！", ex.Source, ex.Message);
+                    logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                    log.Error(logMessage);
+                    jsonStr = "{success:false,msg:'圖片上傳失敗'}";
+                  
+                }
+
+
+                #endregion              
                     if (!string.IsNullOrEmpty(Request.Params["comboFrontCage"]))
                     {
                         cq.category_father_id = Convert.ToUInt32(Request.Params["comboFrontCage"].ToString());
@@ -155,110 +283,110 @@ namespace Admin.gigade.Controllers
                     {
                         cq.category_link_url = Request.Params["category_link_url"].ToString();
                     }
-                    if (!string.IsNullOrEmpty(Request.Params["photo"]))
-                    {
-                        #region 上傳圖片
+                    //if (!string.IsNullOrEmpty(Request.Params["photo"]))
+                    //{
+                    //    #region 上傳圖片
 
-                        try
-                        {
-                            if (Request.Files.Count != 0)
-                            {
-                                string path = Server.MapPath(xmlPath);
-                                SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
-                                SiteConfig extention_config = _siteConfigMgr.GetConfigByName("PIC_Extention_Format");
-                                SiteConfig minValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MinValue");
-                                SiteConfig maxValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MaxValue");
-                                SiteConfig admin_userName = _siteConfigMgr.GetConfigByName("ADMIN_USERNAME");
-                                SiteConfig admin_passwd = _siteConfigMgr.GetConfigByName("ADMIN_PASSWD");
+                    //    try
+                    //    {
+                    //        if (Request.Files.Count != 0)
+                    //        {
+                    //            string path = Server.MapPath(xmlPath);
+                    //            SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+                    //            SiteConfig extention_config = _siteConfigMgr.GetConfigByName("PIC_Extention_Format");
+                    //            SiteConfig minValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MinValue");
+                    //            SiteConfig maxValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MaxValue");
+                    //            SiteConfig admin_userName = _siteConfigMgr.GetConfigByName("ADMIN_USERNAME");
+                    //            SiteConfig admin_passwd = _siteConfigMgr.GetConfigByName("ADMIN_PASSWD");
 
-                                //擴展名、最小值、最大值
-                                string extention = extention_config.Value == "" ? extention_config.DefaultValue : extention_config.Value;
-                                string minValue = minValue_config.Value == "" ? minValue_config.DefaultValue : minValue_config.Value;
-                                string maxValue = maxValue_config.Value == "" ? maxValue_config.DefaultValue : maxValue_config.Value;
+                    //            //擴展名、最小值、最大值
+                    //            string extention = extention_config.Value == "" ? extention_config.DefaultValue : extention_config.Value;
+                    //            string minValue = minValue_config.Value == "" ? minValue_config.DefaultValue : minValue_config.Value;
+                    //            string maxValue = maxValue_config.Value == "" ? maxValue_config.DefaultValue : maxValue_config.Value;
 
-                                string localPromoPath = imgLocalPath + promoPath;//圖片存儲地址
-                                //生成隨機數，用於圖片的重命名
-                                Random rand = new Random();
-                                int newRand = rand.Next(1000, 9999);
-
-
-
-                                //獲取上傳的圖片
-                                HttpPostedFileBase file = Request.Files[0];
-                                string fileName = string.Empty;//當前文件名
-                                string fileExtention = string.Empty;//當前文件的擴展名
-
-                                fileName = Path.GetFileName(file.FileName);
-                                if (!string.IsNullOrEmpty(fileName))
-                                {
-                                    bool result = false;
-                                    string NewFileName = string.Empty;
-
-                                    fileExtention = fileName.Substring(fileName.LastIndexOf(".")).ToLower();
-                                    //NewFileName = pacdModel.event_id + newRand + fileExtention;//圖片重命名為event_id+4位隨機數+擴展名
-                                    NewFileName = newRand + fileExtention;
-                                    string ServerPath = string.Empty;
-                                    //判斷目錄是否存在，不存在則創建
-                                    CreateFolder(localPromoPath.Substring(0, localPromoPath.Length - promoPath.Length + 1), promoPath.Substring(1, promoPath.Length - 2).Split('/'));
-
-                                    //  returnName += promoPath + NewFileName;
-                                    fileName = NewFileName;
-                                    NewFileName = localPromoPath + NewFileName;//絕對路徑
-                                    ServerPath = Server.MapPath(imgLocalServerPath + promoPath);
-                                    string ErrorMsg = string.Empty;
-
-                                    //上傳之前刪除已有的圖片
-                                    //string oldFileName = olderpcmodel.banner_image;
-                                    FTP ftp = new FTP(localPromoPath, ftpuser, ftppwd);
-                                    List<string> tem = ftp.GetFileList();
-                                    //if (tem.Contains(oldFileName))
-                                    //{
-                                    //    //FTP ftps = new FTP(localPromoPath + oldFileName, ftpuser, ftppwd);
-                                    //    //ftps.DeleteFile(localPromoPath + oldFileName);//刪除ftp:71.159上的舊圖片
-                                    //    //DeletePicFile(ServerPath + oldFileName);//刪除本地圖片
-                                    //}
-                                    try
-                                    {
-                                        //上傳
-                                        FileManagement fileLoad = new FileManagement();
-                                        result = fileLoad.UpLoadFile(file, ServerPath, NewFileName, extention, int.Parse(maxValue), int.Parse(minValue), ref ErrorMsg, ftpuser, ftppwd);
-                                        if (result)//上傳成功
-                                        {
-                                            cq.banner_image = fileName;
-                                        }
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                                        logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name + "->fileLoad.UpLoadFile()", ex.Source, ex.Message);
-                                        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                                        log.Error(logMessage);
-                                        jsonStr = "{success:false,msg:'圖片上傳失敗'}";
-
-                                        //pacdModel.banner_image = olderpcmodel.banner_image;
-                                    }
-                                }
-                                else
-                                {
-                                    //pacdModel.banner_image = olderpcmodel.banner_image;
-                                }
-                            }
-
-                        }
-                        catch (Exception ex)
-                        {
-                            Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                            logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name + "->圖片上傳失敗！", ex.Source, ex.Message);
-                            logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                            log.Error(logMessage);
-                            jsonStr = "{success:false,msg:'圖片上傳失敗'}";
-
-                            //pacdModel.banner_image = olderpcmodel.banner_image;
-                        }
+                    //            string localPromoPath = imgLocalPath + promoPath;//圖片存儲地址
+                    //            //生成隨機數，用於圖片的重命名
+                    //            Random rand = new Random();
+                    //            int newRand = rand.Next(1000, 9999);
 
 
-                        #endregion
-                    }
+
+                    //            //獲取上傳的圖片
+                    //            HttpPostedFileBase file = Request.Files[0];
+                    //            string fileName = string.Empty;//當前文件名
+                    //            string fileExtention = string.Empty;//當前文件的擴展名
+
+                    //            fileName = Path.GetFileName(file.FileName);
+                    //            if (!string.IsNullOrEmpty(fileName))
+                    //            {
+                    //                bool result = false;
+                    //                string NewFileName = string.Empty;
+
+                    //                fileExtention = fileName.Substring(fileName.LastIndexOf(".")).ToLower();
+                    //                //NewFileName = pacdModel.event_id + newRand + fileExtention;//圖片重命名為event_id+4位隨機數+擴展名
+                    //                NewFileName = newRand + fileExtention;
+                    //                string ServerPath = string.Empty;
+                    //                //判斷目錄是否存在，不存在則創建
+                    //                CreateFolder(localPromoPath.Substring(0, localPromoPath.Length - promoPath.Length + 1), promoPath.Substring(1, promoPath.Length - 2).Split('/'));
+
+                    //                //  returnName += promoPath + NewFileName;
+                    //                fileName = NewFileName;
+                    //                NewFileName = localPromoPath + NewFileName;//絕對路徑
+                    //                ServerPath = Server.MapPath(imgLocalServerPath + promoPath);
+                    //                string ErrorMsg = string.Empty;
+
+                    //                //上傳之前刪除已有的圖片
+                    //                //string oldFileName = olderpcmodel.banner_image;
+                    //                FTP ftp = new FTP(localPromoPath, ftpuser, ftppwd);
+                    //                List<string> tem = ftp.GetFileList();
+                    //                //if (tem.Contains(oldFileName))
+                    //                //{
+                    //                //    //FTP ftps = new FTP(localPromoPath + oldFileName, ftpuser, ftppwd);
+                    //                //    //ftps.DeleteFile(localPromoPath + oldFileName);//刪除ftp:71.159上的舊圖片
+                    //                //    //DeletePicFile(ServerPath + oldFileName);//刪除本地圖片
+                    //                //}
+                    //                try
+                    //                {
+                    //                    //上傳
+                    //                    FileManagement fileLoad = new FileManagement();
+                    //                    result = fileLoad.UpLoadFile(file, ServerPath, NewFileName, extention, int.Parse(maxValue), int.Parse(minValue), ref ErrorMsg, ftpuser, ftppwd);
+                    //                    if (result)//上傳成功
+                    //                    {
+                    //                        cq.banner_image = fileName;
+                    //                    }
+                    //                }
+                    //                catch (Exception ex)
+                    //                {
+                    //                    Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                    //                    logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name + "->fileLoad.UpLoadFile()", ex.Source, ex.Message);
+                    //                    logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                    //                    log.Error(logMessage);
+                    //                    jsonStr = "{success:false,msg:'圖片上傳失敗'}";
+
+                    //                    //pacdModel.banner_image = olderpcmodel.banner_image;
+                    //                }
+                    //            }
+                    //            else
+                    //            {
+                    //                //pacdModel.banner_image = olderpcmodel.banner_image;
+                    //            }
+                    //        }
+
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                    //        logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name + "->圖片上傳失敗！", ex.Source, ex.Message);
+                    //        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                    //        log.Error(logMessage);
+                    //        jsonStr = "{success:false,msg:'圖片上傳失敗'}";
+
+                    //        //pacdModel.banner_image = olderpcmodel.banner_image;
+                    //    }
+
+
+                    //    #endregion
+                    //}
                     if (!string.IsNullOrEmpty(Request.Params["banner_status"]))
                     {
                         cq.banner_status = Convert.ToUInt32(Request.Params["banner_status"].ToString());
@@ -282,207 +410,211 @@ namespace Admin.gigade.Controllers
                     if (!string.IsNullOrEmpty(Request.Params["short_description"]))
                     {
                         cq.short_description = Request.Params["short_description"].ToString();
-                    }                   
-                    cq.category_ipfrom = CommonFunction.GetClientIP();
-                    cq.category_createdate = Convert.ToUInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
-                    cq.category_updatedate = Convert.ToUInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
-                    cq.status = 1;
-                    _proCategoryImplMgr = new CategoryMgr(mySqlConnectionString);
-
-                    int i = _proCategoryImplMgr.ProductCategorySave(cq);
-                    if (i > 0)
-                    {
-                        json = "{success:true}";
-                    }
-                }
-                else
-                {
-                    _proCategoryImplMgr = new CategoryMgr(mySqlConnectionString);
-                    cq.category_id = Convert.ToUInt32(Request.Params["category_id"]);
-                    CategoryQuery oldCq = _proCategoryImplMgr.GetProductCategoryById(cq);
-                    if (!string.IsNullOrEmpty(Request.Params["comboFrontCage"]))
-                    {
-                        cq.category_father_id = Convert.ToUInt32(Request.Params["comboFrontCage"].ToString());
-                    }
-                    else
-                    {
-                        cq.category_father_id = oldCq.category_father_id;
                     }
 
-                    if (!string.IsNullOrEmpty(Request.Params["category_name"]))
+                    if (string.IsNullOrEmpty(Request.Params["category_id"]))
                     {
-                        cq.category_name = Request.Params["category_name"].ToString();
-                    }
-                    else
-                    {
-                        cq.category_name = oldCq.category_name;
-                    }
+                        cq.category_ipfrom = CommonFunction.GetClientIP();
+                        cq.category_createdate = Convert.ToUInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
+                        cq.category_updatedate = Convert.ToUInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
+                        cq.status = 1;
+                        _proCategoryImplMgr = new CategoryMgr(mySqlConnectionString);
 
-                    if (!string.IsNullOrEmpty(Request.Params["category_sort"]))
-                    {
-                        cq.category_sort = Convert.ToUInt32(Request.Params["category_sort"].ToString());
-                    }
-                    else
-                    {
-                        cq.category_sort = oldCq.category_sort;
-                    }
-                    if (!string.IsNullOrEmpty(Request.Params["category_display"]))
-                    {
-                        cq.category_display = Convert.ToUInt32(Request.Params["category_display"]);
-                    }
-                    else
-                    {
-                        cq.category_display = oldCq.category_display;
-                    }
-                    if (!string.IsNullOrEmpty(Request.Params["categorylinkmode"]))
-                    {
-                        cq.category_link_mode = Convert.ToUInt32(Request.Params["categorylinkmode"].ToString());
-                    }
-                    else
-                    {
-                        cq.category_link_mode = oldCq.category_link_mode;
-                    }
-
-                    cq.category_link_url = Request.Params["category_link_url"].ToString();
-
-                    if (!string.IsNullOrEmpty(Request.Params["photo"]))
-                    {
-                        #region 上傳圖片
-
-                        try
+                        int i = _proCategoryImplMgr.ProductCategorySave(cq);
+                        if (i > 0)
                         {
-                            if (Request.Files.Count != 0)
-                            {
-                                string path = Server.MapPath(xmlPath);
-                                SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
-                                SiteConfig extention_config = _siteConfigMgr.GetConfigByName("PIC_Extention_Format");
-                                SiteConfig minValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MinValue");
-                                SiteConfig maxValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MaxValue");
-                                SiteConfig admin_userName = _siteConfigMgr.GetConfigByName("ADMIN_USERNAME");
-                                SiteConfig admin_passwd = _siteConfigMgr.GetConfigByName("ADMIN_PASSWD");
-
-                                //擴展名、最小值、最大值
-                                string extention = extention_config.Value == "" ? extention_config.DefaultValue : extention_config.Value;
-                                string minValue = minValue_config.Value == "" ? minValue_config.DefaultValue : minValue_config.Value;
-                                string maxValue = maxValue_config.Value == "" ? maxValue_config.DefaultValue : maxValue_config.Value;
-
-                                string localPromoPath = imgLocalPath + promoPath;//圖片存儲地址
-                                //生成隨機數，用於圖片的重命名
-                                Random rand = new Random();
-                                int newRand = rand.Next(1000, 9999);
-
-
-
-                                //獲取上傳的圖片
-                                HttpPostedFileBase file = Request.Files[0];
-                                string fileName = string.Empty;//當前文件名
-                                string fileExtention = string.Empty;//當前文件的擴展名
-
-                                fileName = Path.GetFileName(file.FileName);
-                                if (!string.IsNullOrEmpty(fileName))
-                                {
-                                    bool result = false;
-                                    string NewFileName = string.Empty;
-
-                                    fileExtention = fileName.Substring(fileName.LastIndexOf(".")).ToLower();
-                                    //NewFileName = pacdModel.event_id + newRand + fileExtention;//圖片重命名為event_id+4位隨機數+擴展名
-                                    NewFileName = newRand + fileExtention;
-                                    string ServerPath = string.Empty;
-                                    //判斷目錄是否存在，不存在則創建
-                                    CreateFolder(localPromoPath.Substring(0, localPromoPath.Length - promoPath.Length + 1), promoPath.Substring(1, promoPath.Length - 2).Split('/'));
-
-                                    //  returnName += promoPath + NewFileName;
-                                    fileName = NewFileName;
-                                    NewFileName = localPromoPath + NewFileName;//絕對路徑
-                                    ServerPath = Server.MapPath(imgLocalServerPath + promoPath);
-                                    string ErrorMsg = string.Empty;
-
-                                    //上傳之前刪除已有的圖片
-                                    string oldFileName = oldCq.banner_image;
-                                    FTP ftp = new FTP(localPromoPath, ftpuser, ftppwd);
-                                    List<string> tem = ftp.GetFileList();
-                                    if (tem.Contains(oldFileName))
-                                    {
-                                        //FTP ftps = new FTP(localPromoPath + oldFileName, ftpuser, ftppwd);
-                                        //ftps.DeleteFile(localPromoPath + oldFileName);//刪除ftp:71.159上的舊圖片
-                                        //DeletePicFile(ServerPath + oldFileName);//刪除本地圖片
-                                    }
-                                    try
-                                    {
-                                        //上傳
-                                        FileManagement fileLoad = new FileManagement();
-                                        result = fileLoad.UpLoadFile(file, ServerPath, NewFileName, extention, int.Parse(maxValue), int.Parse(minValue), ref ErrorMsg, ftpuser, ftppwd);
-                                        if (result)//上傳成功
-                                        {
-                                            cq.banner_image = fileName;
-                                        }
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                                        logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name + "->fileLoad.UpLoadFile()", ex.Source, ex.Message);
-                                        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                                        log.Error(logMessage);
-                                        jsonStr = "{success:false,msg:'圖片上傳失敗'}";
-
-                                        cq.banner_image = oldCq.banner_image;
-                                    }
-                                }
-                                else
-                                {
-                                    cq.banner_image = oldCq.banner_image;
-                                }
-                            }
+                            json = "{success:true}";
                         }
-                        catch (Exception ex)
+                    }
+
+                    else
+                    {
+                        //_proCategoryImplMgr = new CategoryMgr(mySqlConnectionString);
+                        //cq.category_id = Convert.ToUInt32(Request.Params["category_id"]);
+                        //CategoryQuery oldCq = _proCategoryImplMgr.GetProductCategoryById(cq);
+                        //if (!string.IsNullOrEmpty(Request.Params["comboFrontCage"]))
+                        //{
+                        //    cq.category_father_id = Convert.ToUInt32(Request.Params["comboFrontCage"].ToString());
+                        //}
+                        //else
+                        //{
+                        //    cq.category_father_id = oldCq.category_father_id;
+                        //}
+
+                        //if (!string.IsNullOrEmpty(Request.Params["category_name"]))
+                        //{
+                        //    cq.category_name = Request.Params["category_name"].ToString();
+                        //}
+                        //else
+                        //{
+                        //    cq.category_name = oldCq.category_name;
+                        //}
+
+                        //if (!string.IsNullOrEmpty(Request.Params["category_sort"]))
+                        //{
+                        //    cq.category_sort = Convert.ToUInt32(Request.Params["category_sort"].ToString());
+                        //}
+                        //else
+                        //{
+                        //    cq.category_sort = oldCq.category_sort;
+                        //}
+                        //if (!string.IsNullOrEmpty(Request.Params["category_display"]))
+                        //{
+                        //    cq.category_display = Convert.ToUInt32(Request.Params["category_display"]);
+                        //}
+                        //else
+                        //{
+                        //    cq.category_display = oldCq.category_display;
+                        //}
+                        //if (!string.IsNullOrEmpty(Request.Params["categorylinkmode"]))
+                        //{
+                        //    cq.category_link_mode = Convert.ToUInt32(Request.Params["categorylinkmode"].ToString());
+                        //}
+                        //else
+                        //{
+                        //    cq.category_link_mode = oldCq.category_link_mode;
+                        //}
+
+                        //cq.category_link_url = Request.Params["category_link_url"].ToString();
+
+                        //if (!string.IsNullOrEmpty(Request.Params["photo"]))
+                        //{
+                        //    #region 上傳圖片
+
+                        //    try
+                        //    {
+                        //        if (Request.Files.Count != 0)
+                        //        {
+                        //            string path = Server.MapPath(xmlPath);
+                        //            SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+                        //            SiteConfig extention_config = _siteConfigMgr.GetConfigByName("PIC_Extention_Format");
+                        //            SiteConfig minValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MinValue");
+                        //            SiteConfig maxValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MaxValue");
+                        //            SiteConfig admin_userName = _siteConfigMgr.GetConfigByName("ADMIN_USERNAME");
+                        //            SiteConfig admin_passwd = _siteConfigMgr.GetConfigByName("ADMIN_PASSWD");
+
+                        //            擴展名、最小值、最大值
+                        //            string extention = extention_config.Value == "" ? extention_config.DefaultValue : extention_config.Value;
+                        //            string minValue = minValue_config.Value == "" ? minValue_config.DefaultValue : minValue_config.Value;
+                        //            string maxValue = maxValue_config.Value == "" ? maxValue_config.DefaultValue : maxValue_config.Value;
+
+                        //            string localPromoPath = imgLocalPath + promoPath;//圖片存儲地址
+                        //            生成隨機數，用於圖片的重命名
+                        //            Random rand = new Random();
+                        //            int newRand = rand.Next(1000, 9999);
+
+
+
+                        //            獲取上傳的圖片
+                        //            HttpPostedFileBase file = Request.Files[0];
+                        //            string fileName = string.Empty;//當前文件名
+                        //            string fileExtention = string.Empty;//當前文件的擴展名
+
+                        //            fileName = Path.GetFileName(file.FileName);
+                        //            if (!string.IsNullOrEmpty(fileName))
+                        //            {
+                        //                bool result = false;
+                        //                string NewFileName = string.Empty;
+
+                        //                fileExtention = fileName.Substring(fileName.LastIndexOf(".")).ToLower();
+                        //                NewFileName = pacdModel.event_id + newRand + fileExtention;//圖片重命名為event_id+4位隨機數+擴展名
+                        //                NewFileName = newRand + fileExtention;
+                        //                string ServerPath = string.Empty;
+                        //                判斷目錄是否存在，不存在則創建
+                        //                CreateFolder(localPromoPath.Substring(0, localPromoPath.Length - promoPath.Length + 1), promoPath.Substring(1, promoPath.Length - 2).Split('/'));
+
+                        //                  returnName += promoPath + NewFileName;
+                        //                fileName = NewFileName;
+                        //                NewFileName = localPromoPath + NewFileName;//絕對路徑
+                        //                ServerPath = Server.MapPath(imgLocalServerPath + promoPath);
+                        //                string ErrorMsg = string.Empty;
+
+                        //                上傳之前刪除已有的圖片
+                        //                string oldFileName = oldCq.banner_image;
+                        //                FTP ftp = new FTP(localPromoPath, ftpuser, ftppwd);
+                        //                List<string> tem = ftp.GetFileList();
+                        //                if (tem.Contains(oldFileName))
+                        //                {
+                        //                    FTP ftps = new FTP(localPromoPath + oldFileName, ftpuser, ftppwd);
+                        //                    ftps.DeleteFile(localPromoPath + oldFileName);//刪除ftp:71.159上的舊圖片
+                        //                    DeletePicFile(ServerPath + oldFileName);//刪除本地圖片
+                        //                }
+                        //                try
+                        //                {
+                        //                    上傳
+                        //                    FileManagement fileLoad = new FileManagement();
+                        //                    result = fileLoad.UpLoadFile(file, ServerPath, NewFileName, extention, int.Parse(maxValue), int.Parse(minValue), ref ErrorMsg, ftpuser, ftppwd);
+                        //                    if (result)//上傳成功
+                        //                    {
+                        //                        cq.banner_image = fileName;
+                        //                    }
+                        //                }
+                        //                catch (Exception ex)
+                        //                {
+                        //                    Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                        //                    logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name + "->fileLoad.UpLoadFile()", ex.Source, ex.Message);
+                        //                    logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                        //                    log.Error(logMessage);
+                        //                    jsonStr = "{success:false,msg:'圖片上傳失敗'}";
+
+                        //                    cq.banner_image = oldCq.banner_image;
+                        //                }
+                        //            }
+                        //            else
+                        //            {
+                        //                cq.banner_image = oldCq.banner_image;
+                        //            }
+                        //        }
+                        //    }
+                        //    catch (Exception ex)
+                        //    {
+                        //        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                        //        logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name + "->圖片上傳失敗！", ex.Source, ex.Message);
+                        //        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                        //        log.Error(logMessage);
+                        //        jsonStr = "{success:false,msg:'圖片上傳失敗'}";
+
+                        //        cq.banner_image = oldCq.banner_image;
+                        //    }
+
+
+                        //    #endregion
+                        //}
+                        //else
+                        //{
+                        //    cq.banner_image = oldCq.banner_image;
+                        //}
+                        //if (!string.IsNullOrEmpty(Request.Params["banner_status"]))
+                        //{
+                        //    cq.banner_status = Convert.ToUInt32(Request.Params["banner_status"].ToString());
+                        //}
+                        //else
+                        //{
+                        //    cq.banner_status = oldCq.banner_status;
+                        //}
+                        //if (!string.IsNullOrEmpty(Request.Params["banner_link_mode"]))
+                        //{
+                        //    cq.banner_link_mode = Convert.ToUInt32(Request.Params["banner_link_mode"].ToString());
+                        //}
+                        //else
+                        //{
+                        //    cq.banner_link_mode = oldCq.banner_link_mode;
+                        //}
+
+                        //cq.banner_link_url = Request.Params["banner_link_url"].ToString();
+                        //cq.short_description = Request.Params["short_description"].ToString();
+                        //cq.banner_show_start = Convert.ToUInt32(CommonFunction.GetPHPTime(Request.Params["startdate"].ToString()));
+
+                        //cq.banner_show_end = Convert.ToUInt32(CommonFunction.GetPHPTime(Request.Params["enddate"].ToString()));
+
+                        cq.category_ipfrom = CommonFunction.GetClientIP();
+                        cq.category_updatedate = Convert.ToUInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
+                        int j = _proCategoryImplMgr.ProductCategorySave(cq);
+                        if (j > 0)
                         {
-                            Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                            logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name + "->圖片上傳失敗！", ex.Source, ex.Message);
-                            logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                            log.Error(logMessage);
-                            jsonStr = "{success:false,msg:'圖片上傳失敗'}";
-
-                            cq.banner_image = oldCq.banner_image;
+                            json = "{success:true}";
                         }
-
-
-                        #endregion
                     }
-                    else
-                    {
-                        cq.banner_image = oldCq.banner_image;
-                    }
-                    if (!string.IsNullOrEmpty(Request.Params["banner_status"]))
-                    {
-                        cq.banner_status = Convert.ToUInt32(Request.Params["banner_status"].ToString());
-                    }
-                    else
-                    {
-                        cq.banner_status = oldCq.banner_status;
-                    }
-                    if (!string.IsNullOrEmpty(Request.Params["banner_link_mode"]))
-                    {
-                        cq.banner_link_mode = Convert.ToUInt32(Request.Params["banner_link_mode"].ToString());
-                    }
-                    else
-                    {
-                        cq.banner_link_mode = oldCq.banner_link_mode;
-                    }
-
-                    cq.banner_link_url = Request.Params["banner_link_url"].ToString();
-                    cq.short_description = Request.Params["short_description"].ToString();
-                    cq.banner_show_start = Convert.ToUInt32(CommonFunction.GetPHPTime(Request.Params["startdate"].ToString()));
-
-                    cq.banner_show_end = Convert.ToUInt32(CommonFunction.GetPHPTime(Request.Params["enddate"].ToString()));
-
-                    cq.category_ipfrom = CommonFunction.GetClientIP();
-                    cq.category_updatedate = Convert.ToUInt32(CommonFunction.GetPHPTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
-                    int j = _proCategoryImplMgr.ProductCategorySave(cq);
-                    if (j > 0)
-                    {
-                        json = "{success:true}";
-                    }
-                }
 
 
             }
@@ -1422,5 +1554,6 @@ namespace Admin.gigade.Controllers
             }
         }
         #endregion
+
     }
 }

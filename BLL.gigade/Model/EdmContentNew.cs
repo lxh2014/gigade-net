@@ -28,6 +28,10 @@ namespace BLL.gigade.Model
 
         public string edit_url { get; set; }
         public string content_url { get; set; }
+
+        public string editor1 { get; set; }
+        public string editor2 { get; set; }
+        public string split_str { get;set;}
         public EdmContentNew()
         {
             content_id = 0;
@@ -45,6 +49,9 @@ namespace BLL.gigade.Model
             count = 0;
             sender_email = string.Empty;
             sender_name = string.Empty;
+            editor1 = string.Empty;
+            editor2 = string.Empty;
+            split_str = string.Empty;
         }
     }
 }

@@ -10,7 +10,10 @@ Ext.define('gigade.Aseld', {
      { name: "out_qty", type: "string" },
      { name: "act_pick_qty", type: "string" },
      { name: "create_dtim", type: "string" },
-     { name: "ord_qty", type: "string" }
+     { name: "ord_qty", type: "string" },
+     { name: "loc_id", type: "string" }, 
+     { name: "assg_id", type: "string" }, 
+     { name: "upc_id", type: "string" }
     ]
 });
 var AseldStore = Ext.create('Ext.data.Store', {
@@ -57,6 +60,7 @@ function Query() {
     }
     if (falg == 0) {
         Ext.Msg.alert("提示", "請輸入查詢條件");
+        AseldStore.removeAll();
         return false;
     }
     var form = Ext.getCmp('frm').getForm();
@@ -220,9 +224,13 @@ Ext.onReady(function () {
         width: document.documentElement.clientWidth,
         columnLines: true,//顯示列線條
         frame: true,//Panel是圆角框显示
-        columns: [{ header: "商品編號", dataIndex: 'product_id', width: 60, align: 'center' },
+        columns: [
+            { header: "工作代號", dataIndex: 'assg_id', width: 120, align: 'center' },
+            { header: "商品編號", dataIndex: 'product_id', width: 60, align: 'center' },
+            { header: "條碼", dataIndex: 'upc_id', width: 120, align: 'center' },
             { header: "商品名稱", dataIndex: 'product_name', width: 300, align: 'center' },
             { header: "細項編號", dataIndex: 'item_id', width: 85, align: 'center' },
+            { header: "料位編號", dataIndex: 'loc_id', width: 85, align: 'center' },
             { header: "規格", dataIndex: 'spec', width: 170, align: 'center' },
             { header: "訂货量", dataIndex: 'ord_qty', width: 60, align: 'center' },
             { header: "已撿貨量 ", dataIndex: 'act_pick_qty', width: 65, align: 'center' },

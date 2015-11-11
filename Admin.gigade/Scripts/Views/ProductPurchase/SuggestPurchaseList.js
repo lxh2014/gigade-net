@@ -29,6 +29,7 @@ Ext.define('gigade.Product', {
         { name: "product_mode_name", type: "string" },//出貨方式
         { name: "prepaid", type: "int" },//是否買斷
         { name: "item_stock", type: "string" },//庫存量
+        { name: "iinvd_stock", type: "string" },//後台庫存量
         { name: "item_alarm", type: "string" },//安全存量
         { name: "sum_total", type: "string" },//購買總數
         { name: "averageCount", type: "string" },//平均平均量
@@ -511,6 +512,7 @@ Ext.onReady(function () {
                 }
             },
             { header: "庫存量", dataIndex: 'item_stock', width: 80, align: 'center' },
+            { header: "後台庫存量", dataIndex: 'iinvd_stock', width: 80, align: 'center' },
             { header: "安全存量", dataIndex: 'item_alarm', width: 80, align: 'center' },
             { header: "購買總數", dataIndex: 'sum_total', width: 80, align: 'center' },
             { header: "週期平均量", dataIndex: 'averageCount', width: 80, align: 'center' },//平均平均量

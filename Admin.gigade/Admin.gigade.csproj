@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -694,10 +694,12 @@
     <Content Include="Locale\zh-TW\SiteManager\lang.js" />
     <Content Include="Locale\zh-TW\TrialProdCate\TrialProdCateLang.js" />
     <Content Include="Locale\zh-TW\Vote\Lang.js" />
+    <Content Include="Scripts\Bootstrap\bootstrap-table.min.js" />
+    <Content Include="Scripts\Bootstrap\css\bootstrap-table.min.css" />
+    <Content Include="Scripts\Bootstrap\css\bootstrap.css" />
     <Content Include="Locale\zh-TW\XMLManage\XMLIndex.js" />
-    <Content Include="Scripts\Bootstrap\bootstrap.css" />
     <Content Include="Scripts\Bootstrap\bootstrap.js" />
-    <Content Include="Scripts\Bootstrap\bootstrap.min.css" />
+    <Content Include="Scripts\Bootstrap\css\bootstrap.min.css" />
     <Content Include="Scripts\Bootstrap\bootstrap.min.js" />
     <Content Include="Scripts\Common\ManageButton.js" />
     <Content Include="Scripts\ext-5.1.0\.sencha\package\Boot.js" />
@@ -1843,6 +1845,9 @@
     <Content Include="Scripts\Ext4.0\ux\DataView\DragSelector.js" />
     <Content Include="Scripts\Ext4.0\ux\DataView\LabelEditor.js" />
     <Content Include="Scripts\jquery-2.1.4.min.js" />
+    <Content Include="Content\kendo.common.min.css" />
+    <Content Include="Content\kendo.default.min.css" />
+    <Content Include="Scripts\kendo.ui.core.min.js" />
     <Content Include="Scripts\kendo\2014.2.716\angular.min.js" />
     <Content Include="Scripts\kendo\2014.2.716\jquery-1.9.1.js" />
     <Content Include="Scripts\kendo\2014.2.716\jquery.min.js" />
@@ -1857,11 +1862,11 @@
     <Content Include="Scripts\Views\DispatchingSystem\DesignRequestList.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsEdit.js" />
     <Content Include="Scripts\Views\DispatchingSystem\DisabledKeyWordsList.js" />
-    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewEdit.js" />
-    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewList.js" />
-    <Content Include="Scripts\Views\EdmContentNew\EdmContentNewReport.js" />
-    <Content Include="Scripts\Views\EdmContentNew\EdmSend.js" />
-    <Content Include="Scripts\Views\EdmContentNew\EdmSendListCount.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmContentNewEdit.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmContentNewList.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmContentNewReport.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmSend.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmSendListCount.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewList.js" />
     <Content Include="Scripts\Views\EdmNew\EdmTemplateEdit.js" />
@@ -1928,6 +1933,7 @@
     <Content Include="Scripts\Views\OrderManage\OrderReturn.js" />
     <Content Include="Scripts\Views\OrderManage\OrderReturnList.js" />
     <Content Include="Scripts\Views\OrderManage\ReturnAllOrder.js" />
+    <Content Include="Scripts\Views\Order\OrderCategortSum.js" />
     <Content Include="Scripts\Views\Order\OrderStatusModify.js" />
     <Content Include="Scripts\Views\PageErrorLog\list.js" />
     <Content Include="Scripts\Views\ProductCategory\CateBrandEdit.js" />
@@ -1984,6 +1990,7 @@
     <Content Include="Scripts\Views\VipUserGroup\edit.js" />
     <Content Include="Scripts\Views\VipUserGroup\GCCInfo.js" />
     <Content Include="Scripts\Views\VipUserGroup\list.js" />
+    <Content Include="Scripts\Views\WareHouse\Aseld.js" />
     <Content Include="Scripts\Views\WareHouse\Check.js" />
     <Content Include="Scripts\Views\WareHouse\Idiff_count_book.js" />
     <Content Include="Scripts\Views\WareHouse\IialgList.js" />
@@ -2022,6 +2029,12 @@
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-rtl-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\resources\Readme.md" />
+    <None Include="Properties\PublishProfiles\gigade.pubxml" />
+    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.woff2" />
     <None Include="Properties\PublishProfiles\giagade-web.pubxml" />
     <None Include="Properties\PublishProfiles\zz125.pubxml" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all-vsdoc.js" />
@@ -4416,7 +4429,6 @@
     <Content Include="Views\WareHouse\Check.cshtml" />
     <Content Include="Views\Super\Index.cshtml" />
     <Content Include="Views\Product\InventoryQuery.cshtml" />
-    <Content Include="Template\SiteStatistics\站臺訪問量統計匯入範本.xlsx" />
     <Content Include="Views\OrderManage\OrderDetailManage.cshtml" />
     <Content Include="Template\SiteAnalytics\SiteAnalytics.xlsx" />
     <Content Include="Views\WareHouse\IpodList.cshtml" />
@@ -4434,16 +4446,24 @@
     <Content Include="Views\Vendor\VendorBankImport.cshtml" />
     <Content Include="Views\EdmNew\EmailGroup.cshtml" />
     <Content Include="Views\WareHouse\WaitLiaoWei.cshtml" />
-    <Content Include="Views\MarketTally\Index.cshtml" />
     <Content Include="Views\MarketTally\MarketTally.cshtml" />
+    <Content Include="Views\MarketTally\MarketTallyWD.cshtml" />
+    <Content Include="Views\MarketTally\MarketTallyWDProduct.cshtml">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="Template\OrderImport\t_orders.xlsx" />
     <Content Include="Views\EdmNew\EdmContentNewReport.cshtml" />
     <Content Include="Views\EdmNew\EdmSendListCountView.cshtml" />
     <Content Include="Views\ProductPurchase\StatusLowerShelf.cshtml" />
     <Content Include="Views\BrandLogoSort\Index.cshtml" />
+    <Content Include="Views\Order\OrderCategorySum.cshtml" />
     <Content Include="Views\XMLManage\Index.cshtml" />
     <Content Include="Views\XMLManage\test.cshtml" />
     <Content Include="Views\XMLManage\xmlFile.cshtml" />
+    <Content Include="Views\EdmNew\Editkendo.cshtml" />
+    <Content Include="Views\EdmNew\Editkendo2.cshtml" />
+    <Content Include="Template\SiteStatistics\SiteStatistics.xlsx" />
+    <Content Include="Views\WareHouse\Aseld.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4658,9 +4678,10 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>11529</DevelopmentServerPort>
+          <DevelopmentServerPort>1489</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:6088/</IISUrl>
+          <IISUrl>
+          </IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

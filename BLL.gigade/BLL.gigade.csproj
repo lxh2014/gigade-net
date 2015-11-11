@@ -1283,6 +1283,7 @@
     <Compile Include="Model\CoursePicture.cs" />
     <Compile Include="Model\CourseProduct.cs" />
     <Compile Include="Model\CourseTicket.cs" />
+    <Compile Include="Model\Custom\CategoryItem.cs" />
     <Compile Include="Model\Custom\CourseDetailCustom.cs" />
     <Compile Include="Model\Custom\CourseDetailItemCustom.cs" />
     <Compile Include="Model\Custom\CourseTicketCustom.cs" />
@@ -1366,6 +1367,7 @@
     <Compile Include="Model\MailRequest .cs" />
     <Compile Include="Model\MailSend.cs" />
     <Compile Include="Model\MailSender.cs" />
+    <Compile Include="Model\ManageLogin.cs" />
     <Compile Include="Model\MemberEvent.cs" />
     <Compile Include="Model\MemberLevel.cs" />
     <Compile Include="Model\OrderDetailManager.cs" />
@@ -1426,7 +1428,6 @@
     <Compile Include="Model\Query\IwmsRrecordQuery.cs" />
     <Compile Include="Model\Query\LogisticsDetailQuery.cs" />
     <Compile Include="Model\Query\MailSendQuery.cs" />
-    <Compile Include="Model\Query\ManageLogin.cs" />
     <Compile Include="Model\Query\ManageLoginQuery.cs" />
     <Compile Include="Model\Query\MarketOrderQuery.cs" />
     <Compile Include="Model\Query\MemberEventQuery.cs" />
