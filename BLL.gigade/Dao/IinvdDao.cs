@@ -311,6 +311,7 @@ LEFT JOIN product_ext pe ON pi.item_id=pe.item_id where pi.item_id='{0}'  ;", id
         public DataTable Getprodubybar(string id)
         {//根據條碼獲取數據
             StringBuilder sql = new StringBuilder();
+            StringBuilder sbStr = new StringBuilder();
             sql.AppendFormat(@"SELECT vb.vendor_id,i.upc_id,pi.item_id,CONCAT(vb.brand_name,'-',p.product_name) as product_name,ps.spec_name,ps2.spec_name,ip.loc_id,pe.cde_dt_var,pe.cde_dt_shp,pe.pwy_dte_ctl,pe.cde_dt_var,pe.cde_dt_incr 
 from product_item pi
 left JOIN iupc i on i.item_id=pi.item_id
@@ -319,7 +320,17 @@ LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id
 LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id
 left join vendor_brand vb on p.brand_id=vb.brand_id
 LEFT JOIN iplas ip ON i.item_id=ip.item_id
-LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where i.upc_id='{0}' or pi.item_id='{0}' ;", id);
+LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where 1=1 ");
+            sbStr.AppendFormat("select item_id from product_item where item_id='{0}';", id);
+            DataTable _dtresult = _access.getDataTable(sbStr.ToString());
+            if (_dtresult.Rows.Count > 0)
+            {
+                sql.AppendFormat(" and pi.item_id='{0}' ", id);
+            }
+            else
+            {
+                sql.AppendFormat(" and pi.item_id =(select item_id from iupc where upc_id='{0}'limit 1 )", id);
+            }          
             try
             {
                 return _access.getDataTable(sql.ToString());
