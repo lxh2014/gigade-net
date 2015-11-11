@@ -11,6 +11,10 @@
 <script src="../../Scripts/Bootstrap/bootstrap.min.js"></script>
 <script src="../../Scripts/Bootstrap/bootstrap-table.min.js"></script>
 <link href="../../Scripts/Bootstrap/css/bootstrap-table.min.css" rel="stylesheet" />
+<link href="../../Scripts/Bootstrap/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+<script src="../../Scripts/Bootstrap/bootstrap-datetimepicker.min.js"></script>
+<script src="../../Scripts/Bootstrap/bootstrap-datetimepicker.zh-TW.js"></script>
+
     <title></title>
 </head>
 
@@ -20,7 +24,6 @@
     <h3>工作代號： <span class="label label-info">@ViewBag.number</span></h3>
     @*<h3>產品條碼： <span class="label label-info">@ViewBag.upc</span></h3>*@
 
-
     <div>
         <h3 >訂單號：&nbsp&nbsp&nbsp <span class="label label-info" id="ord_id"></span></h3>
         <h3 >收件人：&nbsp&nbsp&nbsp <span class="label label-info" id="cust_name"></span></h3>
@@ -29,7 +32,7 @@
         <h3 >撿貨數量： <span class="label label-info " id="out_qty"></span></h3>
         <h3 >實際撿貨量統計： <span class="label label-danger " id="act_pick_qty">&nbsp&nbsp</span></h3>
         <h3 class="hidden">料位： <span class="label label-info " id="hidden_loc_id"/></h3>
-        <h3 class="hidden">細項編號： <span class="label label-info " id="hidden_item_id">@ViewBag.itemid</span>/></h3>
+        <h3 class="hidden">細項編號： <span class="label label-info " id="hidden_item_id">@ViewBag.itemid</span></h3>
         <h3 class="hidden">出貨單號： <span class="label label-info " id="hidden_deliver_code"/></h3>
         <h3 class="hidden">訂單數量： <span class="label label-info " id="hidden_ord_qty"/></h3>
         <h3 class="hidden">訂單詳情編號： <span class="label label-info " id="hidden_ordd_id"/></h3>
@@ -53,6 +56,7 @@
             <!-- /.col-lg-8 -->
         </div>
         <!-- /.row -->
+        @*data-toggle="table" data-url="/MarketTally/GetStockByItemid?item_id=@ViewBag.itemid"  *@
 
         <br />
         <table class="table table-bordered table-striped table-hover" id="stock_table" >
@@ -64,18 +68,18 @@
                     </th>
                     <th data-field="sel_loc" data-halign="center" data-align="center" data-valign="middle"  data-visible="false">sel_loc
                     </th>
-                    <th data-field="made_date" data-halign="center" data-align="center" data-valign="middle" >製造日期
+                    <th data-field="made_date" class="col-md-3" data-halign="center" data-align="center" data-valign="middle" data-formatter="made_dateFormatter" data-events="MadeDateEvents">製造日期 
                     </th>
-                    <th data-field="cde_dt" data-halign="center" data-align="center" data-valign="middle" >有效日期
+                    <th data-field="cde_dt" class="col-md-3" data-halign="center" data-align="center" data-valign="middle" data-formatter="cde_dateFormatter" data-events="CdeDateEvents">有效日期
                     </th>
                     
-                    <th data-field="prod_qty" data-halign="center" data-align="center" data-valign="middle" >庫存數量
+                    <th data-field="prod_qty" class="col-md-3" data-halign="center" data-align="center" data-valign="middle" >庫存數量
                     </th>
                     <th data-field="vendor_id" data-halign="center" data-align="center" data-valign="middle"  data-visible="false">vendor_id
                     </th>
                     <th data-field="cde_dt_shp" data-halign="center" data-align="center"  data-valign="middle" data-visible="false">cde_dt_shp
                     </th>
-                    <th data-field="pick_num" data-halign="center" data-align="center" data-valign="middle"  data-formatter="nameFormatter"  data-events="operateEvents">撿貨數量
+                    <th data-field="pick_num" class="col-md-3" data-halign="center" data-align="center" data-valign="middle"  data-formatter="nameFormatter"  data-events="operateEvents">撿貨數量
 
                     </th>
                 </tr>
@@ -137,6 +141,16 @@
         //return '<input name="username" type="text" onkeyup="value=value.replace(/\D+/g,'')">'; 
         //return '<input type="number"  min="0" class="form-control" id="pick_num' + index + '"  placeholder="0"  onkeyup="value" >';
     }
+    function made_dateFormatter(value, row, index)
+    {
+        var date = '<div class="input-group date form_date col-md-12" id="made_date' + index + '" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd"><input class="form-control"  type="text" value="' + value + '" readonly="readonly" id="made_date_label' + index + '"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span></div>'
+        return date;
+    }
+    function cde_dateFormatter(value, row, index)
+    {
+        var date = '<div class="input-group date form_date col-md-12" id="cde_date' + index + '" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd"><input class="form-control" type="text" value="' + value + '" readonly="readonly" id="cde_date_label' + index + '"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span></div>'
+        return date;
+    }
     function check(e)
     {
         var keynum
@@ -167,6 +181,106 @@
         return false
 
         
+    }
+    window.MadeDateEvents = {
+        'click .glyphicon-calendar': function (e, value, row, index)
+        {
+            var old_date, date; //made_date   
+
+            $('#made_date' + index).datetimepicker({
+                language: 'zh-TW',
+                weekStart: 1,
+                todayBtn: 1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2,
+                minView: 2,
+                forceParse: 0
+            }).on('changeDate', function(ev){
+                {
+                    row_id = row.row_id;
+                    prod_id = '@ViewBag.itemid';
+                    type_id = 1;
+                    cde_dtormade_dt = $('#made_date_label' + index).val(); 
+                    y_cde_dtormade_dt = row.made_date;
+                    prod_qtys = row.prod_qty;
+                    sloc_id = $('#hidden_loc_id').text();
+                    MadeDateChange(row_id, prod_id, type_id, cde_dtormade_dt, y_cde_dtormade_dt, prod_qtys, sloc_id);
+                }
+            });
+        }
+    }
+
+    window.CdeDateEvents = {
+        'click .glyphicon-calendar': function (e, value, row, index)
+        {
+            $('#cde_date' + index).datetimepicker({
+                language: 'zh-TW',
+                weekStart: 1,
+                todayBtn: 1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2,
+                minView: 2,
+                forceParse: 0
+            }).on('changeDate', function (ev)
+            {
+                {
+                    row_id = row.row_id;
+                    prod_id = '@ViewBag.itemid';
+                    type_id = 2;
+                    cde_dtormade_dt = $('#cde_date_label' + index).val();
+                    y_cde_dtormade_dt = row.made_date;
+                    prod_qtys = row.prod_qty;
+                    sloc_id = $('#hidden_loc_id').text();
+                    MadeDateChange(row_id, prod_id, type_id, cde_dtormade_dt, y_cde_dtormade_dt, prod_qtys, sloc_id);
+                }
+            });
+        }
+    }
+    function MadeDateChange(row_id, prod_id, type_id, cde_dtormade_dt, y_cde_dtormade_dt, prod_qtys, sloc_id)
+    {
+        //alert(row_id + ":" + prod_id + ":" + type_id + ":" + cde_dtormade_dt + ":" + y_cde_dtormade_dt + ":" + prod_qtys + ":" + sloc_id)
+        $.get('/MarketTally/selectproductexttime', { item_id: prod_id }, function (data)
+        {
+            var result = eval("(" + data + ")");
+            if (result.success)
+            {
+                datetimeday = result.msg; 
+                $.get('/MarketTally/aboutmadetime', { row_id: row_id, prod_id: prod_id, type_id: type_id, cde_dtormade_dt: cde_dtormade_dt, y_cde_dtormade_dt: y_cde_dtormade_dt, prod_qtys: prod_qtys, sloc_id: sloc_id, datetimeday: datetimeday }, function (data)
+                {
+                    
+                    var result = eval("(" + data + ")");
+                    if (result.success)
+                    {
+                        var message="";
+                        if (result.msg == 1)
+                        {
+                            message = " 製造日期不能大於當前時間!";
+                        }
+                        else if (result.msg == 3)
+                        {
+                            message = " 修改失敗!";
+                        }
+                        if (message != "")
+                        {
+                            $('#MessageContentId').text(message);
+                            $('.MarketTally-modal-alert').modal('toggle')
+                            $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
+                            {
+                                $('#modal-dialog-close').focus();
+                            })
+                        }
+                        $('#stock_table').bootstrapTable('refresh');
+                        $('#act_pick_qty').text('  ');
+                        $('#act_pick_qty').attr("class", "label label-danger");
+                        $('#amsure').attr("class", "btn btn-default btn-lg");
+                        $('#amsure').attr("disabled", "disabled");
+                    }
+
+                })
+            }
+        })
     }
     window.operateEvents = {
         'input .form-control': function (e, value, row, index)
@@ -368,15 +482,12 @@
             var result = eval("(" + data + ")");
             if (result.success)
             {
-                //alert('1')
                 if (result.totalCount > 0)
                 {
-                    //alert('2')
                     document.location.href = document.location.href = "/MarketTally/MarketTallyWDProduct?number=" + number + "&itemid=" + itemid;
                 }
                 else
                 {
-                    //alert('3')
                     $.get('/MarketTally/GetAseldListByItemid', { assg_id: number }, function (data)
                     {
                         var result = eval("(" + data + ")");
@@ -384,7 +495,6 @@
                         {
                             if (result.totalCount > 0)
                             {
-                                //alert('4')
                                 document.location.href = document.location.href = "/MarketTally/MarketTallyWD?number=" + number;
                             }
                             else
@@ -410,12 +520,12 @@
         $('#stock_table').attr("data-url", "/MarketTally/GetStockByItemid?item_id=" + '@ViewBag.itemid');
         $('#stock_table').bootstrapTable();
     }
-
+    
 </script>
 
 <script type="text/javascript">
     $(document).ready(function ()
-    {
+    {      
         //頁面加載時調用
         {
             {
@@ -484,7 +594,6 @@
             });
             $('#stock_table').attr("data-url", "/MarketTally/GetStockByItemid?item_id=" + '@ViewBag.itemid');
             $('#stock_table').bootstrapTable();
-    
             
         }
         $('button[data-loading-text]').click(function ()
@@ -497,6 +606,7 @@
         });
         $('#delivercode').on('input', function (e)
         {
+           
             
             if ($("#delivercode").val() == "")
             {
@@ -730,5 +840,6 @@
             })
         }
         //
+                
     });
 </script>

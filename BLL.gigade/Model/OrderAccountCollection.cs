@@ -16,6 +16,9 @@ namespace BLL.gigade.Model
         public int return_collection_money { get; set; }
         public int return_poundage { get; set; }
         public string remark { get; set; }
+        public DateTime invoice_date_manual { get; set; }
+        public int invoice_sale_manual { get; set; }
+        public int invoice_tax_manual { get; set; }
 
         public OrderAccountCollection()
         {
@@ -28,6 +31,9 @@ namespace BLL.gigade.Model
             return_collection_money = 0;
             return_poundage = 0;
             remark = string.Empty;
+            invoice_date_manual = DateTime.MinValue;
+            invoice_sale_manual = 0;
+            invoice_tax_manual = 0;
         }
     }
 }
