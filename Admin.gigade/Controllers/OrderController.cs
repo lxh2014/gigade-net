@@ -2541,6 +2541,8 @@ namespace Admin.gigade.Controllers
                     NPOI4ExcelHelper helper = new NPOI4ExcelHelper(newExcelName);
                     dt = helper.SheetData();
                     List<OrderAccountCollection> oacli = new List<OrderAccountCollection>();
+                    string errorStr = string.Empty;
+                    Int64[] orderArr = new Int64[dt.Rows.Count];
                     for (int j = 0; j < dt.Rows.Count; j++)
                     {
                         OrderAccountCollection model = new OrderAccountCollection();
@@ -2553,11 +2555,13 @@ namespace Admin.gigade.Controllers
                             }
                             else
                             {
+                                errorStr += (j + 2) + ",";
                                 continue;
                             }
                         }
                         else
                         {
+                            errorStr += (j + 2) + ",";
                             continue;
                         }
                         if (!string.IsNullOrEmpty(dt.Rows[j][1].ToString()))
@@ -2594,6 +2598,7 @@ namespace Admin.gigade.Controllers
                                     }
                                     else
                                     {
+                                        errorStr += (j + 2) + ",";
                                         continue;
                                     }
                                 }
@@ -2608,11 +2613,13 @@ namespace Admin.gigade.Controllers
                                 }
                                 else
                                 {
+                                    errorStr += (j + 2) + ",";
                                     continue;
                                 }
                             }
                             else
                             {
+                                errorStr += (j + 2) + ",";
                                 continue;
                             }
                             if (!string.IsNullOrEmpty(dt.Rows[j][3].ToString()))
@@ -2624,11 +2631,13 @@ namespace Admin.gigade.Controllers
                                 }
                                 else
                                 {
+                                    errorStr += (j + 2) + ",";
                                     continue;
                                 }
                             }
                             else
                             {
+                                errorStr += (j + 2) + ",";
                                 continue;
                             }
                         }
@@ -2667,6 +2676,7 @@ namespace Admin.gigade.Controllers
                                     }
                                     else
                                     {
+                                        errorStr += (j + 2) + ",";
                                         continue;
                                     }
                                 }
@@ -2680,11 +2690,13 @@ namespace Admin.gigade.Controllers
                                 }
                                 else
                                 {
+                                    errorStr += (j + 2) + ",";
                                     continue;
                                 }
                             }
                             else
                             {
+                                errorStr += (j + 2) + ",";
                                 continue;
                             }
                             if (!string.IsNullOrEmpty(dt.Rows[j][6].ToString()))
@@ -2696,22 +2708,109 @@ namespace Admin.gigade.Controllers
                                 }
                                 else
                                 {
+                                    errorStr += (j + 2) + ",";
                                     continue;
                                 }
                             }
                             else
                             {
+                                errorStr += (j + 2) + ",";
                                 continue;
                             }
                         }
-
-                        model.remark = dt.Rows[j][7].ToString();
-                        if (model != null && !(model.account_collection_time == model.return_collection_time && model.return_collection_time == DateTime.MinValue))
+                        if (!string.IsNullOrEmpty(dt.Rows[j][7].ToString()))
                         {
-                            oacli.Add(model);
+                            DateTime st;
+                            if (DateTime.TryParse(dt.Rows[j][7].ToString(), out st))
+                            {
+                                model.invoice_date_manual = st;
+                            }
+                            else
+                            {
+                                string strtime = Regex.Replace(dt.Rows[j][1].ToString().Trim(), "/(\\s+)|(，)|(-)|(,)|(.)/g", "/");
+                                if (DateTime.TryParse(strtime, out st))
+                                {
+                                    model.invoice_date_manual = st;
+                                }
+                                else
+                                {
+                                    string[] str = dt.Rows[j][7].ToString().Split('/');
+                                    int year = 0;
+                                    if (str[2].Length == 2)
+                                    {
+                                        year = Convert.ToInt32("20" + str[2]);
+                                    }
+                                    else
+                                    {
+                                        year = Convert.ToInt32(str[2]);
+                                    }
+                                    int month = Convert.ToInt32(str[0]);
+                                    int day = Convert.ToInt32(str[1]);
+                                    if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
+                                    {
+                                        model.invoice_date_manual = st;
+                                    }
+                                    else
+                                    {
+                                        errorStr += (j + 2) + ",";
+                                        continue;
+                                    }
+                                }
+                            }
+
+                            if (!string.IsNullOrEmpty(dt.Rows[j][8].ToString()))
+                            {
+                                int invoice_sale_manual = 0;
+                                if (int.TryParse(dt.Rows[j][8].ToString(), out invoice_sale_manual))
+                                {
+                                    model.invoice_sale_manual = invoice_sale_manual;
+                                }
+                                else
+                                {
+                                    errorStr += (j + 2) + ",";
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                errorStr += (j + 2) + ",";
+                                continue;
+                            }
+                            if (!string.IsNullOrEmpty(dt.Rows[j][9].ToString()))
+                            {
+                                int invoice_tax_manual = 0;
+                                if (int.TryParse(dt.Rows[j][9].ToString(), out invoice_tax_manual))
+                                {
+                                    model.invoice_tax_manual = invoice_tax_manual;
+                                }
+                                else
+                                {
+                                    errorStr += (j + 2) + ",";
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                errorStr += (j + 2) + ",";
+                                continue;
+                            }
+                        }
+                        model.remark = dt.Rows[j][10].ToString();
+                        if (model != null && !(model.account_collection_time == model.return_collection_time && model.account_collection_time == model.invoice_date_manual && model.return_collection_time == DateTime.MinValue))
+                        {
+                            if (!orderArr.Contains(model.order_id))
+                            {
+                                orderArr[j] = order_id;
+                                oacli.Add(model);
+                            }
+                            else
+                            {
+                                errorStr += (j + 2) + ",";
+                            }
                         }
                     }
                     int rowsnum = oacli.Count;
+                    errorStr = errorStr.Remove(errorStr.Length - 1);
                     if (rowsnum > 0)//判斷是否是這個表
                     {
                         _OrderMasterMgr = new OrderMasterMgr(connectionString);
@@ -2721,16 +2820,16 @@ namespace Admin.gigade.Controllers
                         {
                             if (i == 99999)
                             {
-                                json = "{success:true,msg:\"" + "無數據可匯入!" + "\"}";
+                                json = "{success:true,msg:\"" + "無數據可匯入!另文件第" + errorStr + "行數據異常\"}";
                             }
                             else
                             {
-                                json = "{success:true,msg:\"" + "匯入成功!" + "\"}";
+                                json = "{success:true,msg:\"" + "匯入成功!另文件第" + errorStr + "行數據異常\"}";
                             }
                         }
                         else
                         {
-                            json = "{success:true,msg:\"" + "操作失敗" + "\"}";
+                            json = "{success:true,msg:\"" + "操作失敗!另文件第" + errorStr + "行數據異常\"}";
                         }
                     }
                     else
@@ -2783,6 +2882,9 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("退貨入帳日期", typeof(String));
                 dtHZ.Columns.Add("退貨入帳金額", typeof(String));
                 dtHZ.Columns.Add("退貨入帳手續費", typeof(String));
+                dtHZ.Columns.Add("手開發票日期", typeof(String));
+                dtHZ.Columns.Add("手開發票銷售額", typeof(String));
+                dtHZ.Columns.Add("手開發票稅額", typeof(String));
                 dtHZ.Columns.Add("備註", typeof(String));
                 DataRow dr = dtHZ.NewRow();
                 dr[0] = "";
@@ -2793,6 +2895,9 @@ namespace Admin.gigade.Controllers
                 dr[5] = "";
                 dr[6] = "";
                 dr[7] = "";
+                dr[8] = "";
+                dr[9] = "";
+                dr[10] = "";
                 dtHZ.Rows.Add(dr);
                 string fileName = DateTime.Now.ToString("會計入帳_yyyyMMddHHmmss") + ".xls";
                 MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "");
@@ -3214,6 +3319,9 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("開立發票日期", typeof(String));
                 dtHZ.Columns.Add("發票銷售額", typeof(String));
                 dtHZ.Columns.Add("發票稅額", typeof(String));
+                dtHZ.Columns.Add("手開發票日期", typeof(String));
+                dtHZ.Columns.Add("手開發票銷售額", typeof(String));
+                dtHZ.Columns.Add("手開發票稅額", typeof(String));
                 dtHZ.Columns.Add("發票總額", typeof(String));
                 dtHZ.Columns.Add("商品取消金額", typeof(String));
                 dtHZ.Columns.Add("發票金額差異", typeof(String));
@@ -3306,6 +3414,12 @@ namespace Admin.gigade.Controllers
                         }
                         dr["發票銷售額"] = _dt.Rows[i]["free_tax"];//F
                         dr["發票稅額"] = _dt.Rows[i]["tax_amount"];//G
+                        if (!string.IsNullOrEmpty(_dt.Rows[i]["invoice_date_manual"].ToString()))
+                        {
+                            dr["手開發票日期"] = Convert.ToDateTime(_dt.Rows[i]["invoice_date_manual"]).ToString("yyyy/MM/dd");
+                        }
+                        dr["手開發票銷售額"] = _dt.Rows[i]["invoice_sale_manual"];//F
+                        dr["手開發票稅額"] = _dt.Rows[i]["invoice_tax_manual"];//G
                         dr["發票總額"] = _dt.Rows[i]["imramount"];//F+G
                         //if (!string.IsNullOrEmpty(dr["發票銷售額"].ToString()) && !string.IsNullOrEmpty(dr["發票稅額"].ToString()))
                         //{
