@@ -743,7 +743,7 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
             strJoin.Append(" inner JOIN product_item pi ON a.item_id=pi.item_id");
             strJoin.Append(" inner JOIN product p ON p.product_id=pi.product_id");
             strJoin.Append(" LEFT JOIN iplas i ON pi.item_id=i.item_id");
-            strJoin.Append(" inner JOIN iloc ic ON ic.loc_id=i.loc_id");
+            strJoin.Append(" left JOIN iloc ic ON ic.loc_id=i.loc_id");
             strJoin.Append(" LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id ");
             strJoin.Append(" LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id");
             strJoin.Append(" LEFT JOIN (select parameterCode,parameterName from t_parametersrc where parameterType ='product_mode') temp ON p.product_mode=temp.parameterCode");
