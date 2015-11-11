@@ -757,7 +757,7 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
             {
                 strWhr.AppendFormat(" and a.create_dtim between '{0}' and  '{1}'", CommonFunction.DateTimeToString(ase.start_dtim), CommonFunction.DateTimeToString(ase.change_dtim));
             }
-            strWhr.Append(" GROUP BY a.item_id ORDER BY loc_id asc ");
+            strWhr.Append(" GROUP BY a.item_id,a.assg_id  ORDER BY loc_id asc ");
             if(ase.IsPage)
             {
                 total = Convert.ToInt32(_access.getDataTable("SELECT count(item_id) FROM(SELECT a.item_id,case ic.lcat_id when 'S' then i.loc_id else IFNULL(ic.lcat_id,case p.product_mode when 2 then 'YY999999' when 3 then 'ZZ999999' else i.loc_id end ) end as loc_id FROM aseld a " + strJoin.ToString() + strWhr.ToString() + ") temp").Rows[0][0]);
