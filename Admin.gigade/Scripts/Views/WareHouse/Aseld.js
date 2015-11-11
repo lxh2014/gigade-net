@@ -291,5 +291,5 @@ outExcel = function () {
         end_time = Ext.htmlEncode(Ext.Date.format(new Date(end_time), 'Y-m-d 00:00:00'));
     }
     var params = 'assg_id=' + Ext.getCmp('assg_id').getValue() + "&start_time=" + start_time + "&end_time=" + end_time;
-    window.open('/WareHouse/AseldPDF?' + params);
+    window.open('/WareHouse/AseldPDFS?' + params);
 }

@@ -334,14 +334,9 @@ namespace BLL.gigade.Dao
             sql.AppendLine(@" LEFT JOIN product p on pi.product_id=p.product_id ");
             sql.AppendLine(@" left join vendor_brand vb on p.brand_id=vb.brand_id ");
             sql.AppendFormat(@" LEFT JOIN iplas ips on ips.item_id=pi.item_id  ");
-            if (pid.Length == 6)
-            {
-                sql.AppendFormat(@" WHERE pi.item_id='{0}'", pid);
-            }
-            else
-            {
-               sql.AppendFormat(@" LEFT JOIN  iupc i on pi.item_id=i.item_id where i.upc_id='{0}'", pid);
-            }
+            
+                sql.AppendFormat(@" LEFT JOIN  iupc i on pi.item_id=i.item_id where i.upc_id='{0}' or pi.item_id='{0}'", pid);
+          
             try
             {
                 return _access.getDataTable(sql.ToString());

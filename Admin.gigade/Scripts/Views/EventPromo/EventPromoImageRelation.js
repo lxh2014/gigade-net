@@ -109,7 +109,7 @@ ListQuery = function () {
     pbr_Store.removeAll();
     var id = Ext.getCmp("br_id").getValue();
     var name = Ext.getCmp("br_name").getValue();
-    if (Ext.getCmp('id').getValue() != "" && !Ext.getCmp('br_id').regex.test(id)) {
+    if (id != "" && !Ext.getCmp('br_id').regex.test(id)) {
         Ext.Msg.alert(INFORMATION, "請輸入有效字符串");
         return;
     }

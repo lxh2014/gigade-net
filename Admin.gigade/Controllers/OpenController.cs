@@ -76,11 +76,12 @@ namespace Admin.gigade.Controllers
             days = IsAddDayFun(dt, isAddDay, days, schedule);
             ICalendarImplMgr _cdMgr = new CalendarMgr(connectionString);
             List<Calendar> calendar_list = _cdMgr.GetCalendarInfo(new Calendar { EndDateStr = CommonFunction.GetPHPTime(dt.ToString()).ToString() }); ///獲取行事歷控件中休息時間的集合
-            return VerifyTime(dt, days, calendar_list);
+            DateTime sourceDt = dt;///定義一個時間用來保存下單時間
+            return VerifyTime(dt, days, calendar_list, dt);
         }
 
 
-        public DateTime VerifyTime(DateTime dt, int days, List<Calendar> calendar_list)
+        public DateTime VerifyTime(DateTime dt, int days, List<Calendar> calendar_list,DateTime sourceDateTime)
         {
             /// 遞歸調用計算運達天數 add by wwei0216w 2015/5/26
              long num_date = CommonFunction.GetPHPTime(dt.ToString());
@@ -88,21 +89,25 @@ namespace Admin.gigade.Controllers
             result_list = calendar_list.FindAll(m => (num_date >= Convert.ToInt64(m.StartDateStr)) && (num_date <= Convert.ToInt64(m.EndDateStr)));
             if (days != 0 && result_list.Count > 0)
             {
+                if (dt == sourceDateTime)///下單的當天,無論是否處於休息時間段,均不算在時間內,所以該種情況按照正常邏輯計算,運達天數要減一
+                {
+                    days--;
+                }
                 dt = dt.AddDays(1);
-                dt = VerifyTime(dt, days, calendar_list);
+                dt = VerifyTime(dt, days, calendar_list, sourceDateTime);
                 return dt;
             }
             else if (days != 0 && result_list.Count == 0)
             {
                 dt = dt.AddDays(1);
                 days--;
-                dt = VerifyTime(dt, days, calendar_list);
+                dt = VerifyTime(dt, days, calendar_list, sourceDateTime);
                 return dt;
             }
             else if (days == 0 && (result_list.Count > 0))
             {
                 dt = dt.AddDays(1);
-                dt = VerifyTime(dt, days, calendar_list);
+                dt = VerifyTime(dt, days, calendar_list, sourceDateTime);
                 return dt;
             }
             else

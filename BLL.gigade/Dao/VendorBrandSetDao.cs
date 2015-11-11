@@ -87,6 +87,12 @@ namespace BLL.gigade.Dao
                     strSql.AppendFormat(search.ToString());
                     strCount.AppendFormat(search.ToString());
                 }
+                if (store.SearchType == 4)
+                {
+                    search.AppendFormat(" and vb.brand_id='{0}'", store.SearchCondition);
+                    strSql.AppendFormat(search.ToString());
+                    strCount.AppendFormat(search.ToString());
+                }
                 if (store.Brand_Id != 0)
                 {
                     strSql.AppendFormat(" and vb.brand_id='{0}'", store.Brand_Id);

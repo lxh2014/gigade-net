@@ -323,9 +323,7 @@ var tree = Ext.create('Ext.tree.Panel', {
     id: 'tree',
     width: 300,
     height: document.documentElement.clientHeight <= 700 ? document.documentElement.clientHeight - 339 : document.documentElement.clientHeight - 417,
-    //height: 382,
     frame: false,
-    lines: true,
     layout: 'anchor',
     rootVisible: false,
     onlyLeafCheckable: true,
@@ -391,12 +389,10 @@ var tree = Ext.create('Ext.tree.Panel', {
 var XMLItemGird = Ext.create('Ext.grid.Panel', {
     plugins: [{ ptype: 'cellediting' }],
     store: XMLItemStore,
-    resizable: true,
     id: 'XMLItemGird',
     flex: 3.0,
     autoScroll: true,
     height: document.documentElement.clientHeight <= 700 ? document.documentElement.clientHeight - 340 : document.documentElement.clientHeight - 420,
-    //height: 200,
     columns: [{ xtype: 'rownumberer', width: 25, align: 'center' },
               {
                   text: '', menuDisabled: true, width: 35, align: 'center', xtype: 'actioncolumn',
