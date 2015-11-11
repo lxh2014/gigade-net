@@ -531,5 +531,17 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IinvdMgr-->GetSearchIinvd-->" + ex.Message, ex);
             }
         }
+        public List<IinvdQuery> GetPlasIinvd(Model.Query.IinvdQuery ivd)
+        {
+            try
+            {
+                return _ivddao.GetPlasIinvd(ivd);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->GetPlasIinvd-->" + ex.Message, ex);
+            }
+        
+        }
     }
 }

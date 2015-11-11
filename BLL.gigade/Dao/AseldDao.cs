@@ -737,11 +737,13 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
             StringBuilder strWhr = new StringBuilder();
             StringBuilder strLimit=new StringBuilder();
             StringBuilder strJoin=new StringBuilder();
-            strAll.Append("SELECT a.assg_id,p.product_id,p.product_name,pi.item_id,CONCAT(ps.spec_name,'-',ps2.spec_name)AS spec,SUM(out_qty)out_qty,SUM(act_pick_qty)act_pick_qty,SUM(a.ord_qty)ord_qty, a.create_dtim,i.loc_id,temp.parameterName,ic.lcat_id,ic.lcat_id as upc_id   FROM aseld  a");
-            strJoin.Append(" LEFT JOIN product_item pi ON a.item_id=pi.item_id");
-            strJoin.Append(" LEFT JOIN product p ON p.product_id=pi.product_id");
+            strAll.Append("SELECT a.assg_id,p.product_id,p.product_name,pi.item_id,CONCAT(ps.spec_name,'-',ps2.spec_name)AS spec,SUM(out_qty)out_qty,SUM(act_pick_qty)act_pick_qty,SUM(a.ord_qty)ord_qty, a.create_dtim,");
+            strAll.Append(" case ic.lcat_id when 'S' then i.loc_id else IFNULL(ic.lcat_id,case p.product_mode when 2 then 'YY999999' when 3 then 'ZZ999999' else i.loc_id end ) end as loc_id,i.loc_id as loc_id1, ");
+            strAll.Append(" temp.parameterName,ic.lcat_id,ic.lcat_id as upc_id   FROM aseld  a ");
+            strJoin.Append(" inner JOIN product_item pi ON a.item_id=pi.item_id");
+            strJoin.Append(" inner JOIN product p ON p.product_id=pi.product_id");
             strJoin.Append(" LEFT JOIN iplas i ON pi.item_id=i.item_id");
-            strJoin.Append(" LEFT JOIN iloc ic ON ic.loc_id=i.loc_id");
+            strJoin.Append(" inner JOIN iloc ic ON ic.loc_id=i.loc_id");
             strJoin.Append(" LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id ");
             strJoin.Append(" LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id");
             strJoin.Append(" LEFT JOIN (select parameterCode,parameterName from t_parametersrc where parameterType ='product_mode') temp ON p.product_mode=temp.parameterCode");
@@ -755,10 +757,10 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
             {
                 strWhr.AppendFormat(" and a.create_dtim between '{0}' and  '{1}'", CommonFunction.DateTimeToString(ase.start_dtim), CommonFunction.DateTimeToString(ase.change_dtim));
             }
-            strWhr.Append(" GROUP BY a.item_id ORDER BY a.create_dtim");
+            strWhr.Append(" GROUP BY a.item_id ORDER BY loc_id asc ");
             if(ase.IsPage)
             {
-                total = Convert.ToInt32(_access.getDataTable("SELECT count(item_id) FROM(SELECT a.item_id FROM aseld a " + strJoin.ToString()+strWhr.ToString() + ") temp").Rows[0][0]);
+                total = Convert.ToInt32(_access.getDataTable("SELECT count(item_id) FROM(SELECT a.item_id,case ic.lcat_id when 'S' then i.loc_id else IFNULL(ic.lcat_id,case p.product_mode when 2 then 'YY999999' when 3 then 'ZZ999999' else i.loc_id end ) end as loc_id FROM aseld a " + strJoin.ToString() + strWhr.ToString() + ") temp").Rows[0][0]);
                 strLimit.AppendFormat(" LIMIT {0},{1};",ase.Start,ase.Limit);
             }
             try

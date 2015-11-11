@@ -141,7 +141,6 @@ namespace BLL.gigade.Dao
                 {
                     sbwhere.AppendFormat(" and ii.item_id='{0}' ", ivd.item_id);
                 }
-                
                 DateTime dt = DateTime.Parse("1970-01-02 08:00:00");
                 if (!string.IsNullOrEmpty(ivd.starttime.ToString()) && dt < ivd.starttime)
                 {
@@ -467,7 +466,7 @@ LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where i.upc_id='{0}' or pi.ite
                         {//刪除收貨上架表庫存,往iwms_record表添加數據
                             sb.AppendFormat("Delete from iinvd where row_id='{0}' ;", dt.Rows[0]["row_id"], int.Parse(dt.Rows[0]["prod_qty"].ToString()) - a.act_pick_qty);
                             sb.AppendFormat("INSERT INTO iwms_record (order_id,detail_id,act_pick_qty,cde_dt,create_date,create_user_id,made_dt,cde_dt_incr,cde_dt_shp) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}');", a.ord_id, a.ordd_id, value, CommonFunction.DateTimeToString(DateTime.Parse(cde_dt)), CommonFunction.DateTimeToString(DateTime.Now), a.change_user, CommonFunction.DateTimeToString(DateTime.Parse(made_date.ToString())), cde_dt_incr, cde_dt_shp);
-                            sb.AppendFormat("insert into istock_change(sc_trans_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_istock_why,sc_note) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}');", a.ord_id, dt.Rows[0]["item_id"], "3", sum, "-" + value.ToString(), sum - value, CommonFunction.DateTimeToString(DateTime.Now), a.change_user, 4,"理貨撿貨");
+                            sb.AppendFormat("insert into istock_change(sc_trans_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_istock_why,sc_note) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}');", a.ord_id, dt.Rows[0]["item_id"], "3", sum, "-" + value.ToString(), sum - value, CommonFunction.DateTimeToString(DateTime.Now), a.change_user, 4, "理貨撿貨");
                             sum = sum - value;
                         }
                         else if (int.Parse(dt.Rows[0]["prod_qty"].ToString()) > value)
@@ -1027,12 +1026,11 @@ WHERE st_qty=0 AND ia.create_dtim> ADDDATE(NOW(),-3) AND iarc_id='OB' {0} ", sbW
                     }
                     else
                     {
-                        sql.AppendFormat(@" SELECT row_id FROM iloc WHERE loc_id='{0}' and loc_status=1 and lcat_id='R'",invd.plas_loc_id);
+                        sql.AppendFormat(@" SELECT row_id FROM iloc WHERE loc_id='{0}' and loc_status=1 and lcat_id='R'", invd.plas_loc_id);
                         DataTable _locDt = new DataTable();
                         _locDt = _access.getDataTable(sql.ToString());
                         return _locDt.Rows.Count;
                     }
-                   
                 }
             }
             catch (Exception ex)
@@ -1297,14 +1295,11 @@ us.user_username as user_name from iinvd ii ");
          */
         public List<IinvdQuery> GetSearchIinvd(Model.Query.IinvdQuery ivd)
         {
-           
             StringBuilder sql = new StringBuilder();
             StringBuilder sbwhere = new StringBuilder();
-           
             try
             {
-                sql.Append(@"select row_id from iinvd ii");
-               
+                sql.Append(@"select row_id,plas_loc_id,made_date,cde_dt,prod_qty from iinvd ii");
                 sql.Append(" where 1=1 ");
                 if (!string.IsNullOrEmpty(ivd.plas_loc_id))
                 {
@@ -1314,7 +1309,11 @@ us.user_username as user_name from iinvd ii ");
                 {
                     sbwhere.AppendFormat(" and ii.ista_id='{0}' ", ivd.ista_id);
                 }
-                if (ivd.made_date != ivd.cde_dt && ivd.made_date>DateTime.MinValue)
+                if (ivd.item_id != 0)
+                {
+                    sbwhere.AppendFormat(" and ii.item_id='{0}' ", ivd.item_id);
+                }
+                if (ivd.made_date != ivd.cde_dt && ivd.made_date > DateTime.MinValue)
                 {
                     sbwhere.AppendFormat(" and ii.made_date='{0}' ", ivd.made_date.ToString("yyyy-MM-dd"));
                 }
@@ -1324,10 +1323,9 @@ us.user_username as user_name from iinvd ii ");
                 }
                 if (ivd.made_date == ivd.cde_dt && ivd.made_date > DateTime.MinValue)
                 {
-                    sbwhere.AppendFormat(" and ii.cde_dt='{0}' and ii.made_date='{1}' ", ivd.cde_dt.ToString("yyyy-MM-dd"),ivd.made_date.ToString("yyyy-MM-dd"));
+                    sbwhere.AppendFormat(" and ii.cde_dt='{0}' and ii.made_date='{1}' ", ivd.cde_dt.ToString("yyyy-MM-dd"), ivd.made_date.ToString("yyyy-MM-dd"));
                 }
-                
-               
+
                 return _access.getDataTableForObj<IinvdQuery>(sql.ToString() + sbwhere.ToString());
             }
             catch (Exception ex)
@@ -1335,6 +1333,52 @@ us.user_username as user_name from iinvd ii ");
                 throw new Exception("IupcDao-->GetSearchIinvd-->" + ex.Message + sql.ToString(), ex);
             }
         }
+        /**
+         * chaojie1124j待檢貨商品報表中，查詢主料位的額庫存，然後分批進行檢貨的 
+         */
+        public List<IinvdQuery> GetPlasIinvd(Model.Query.IinvdQuery ivd)
+        {
 
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sbwhere = new StringBuilder();
+
+            try
+            {
+                sql.Append(@"select plas_loc_id,made_date,cde_dt,prod_qty ");
+                sql.Append(@" from iplas ip left join iinvd ii  on ip.loc_id=ii.plas_loc_id ");
+                sql.Append(" where 1=1 ");
+                if (!string.IsNullOrEmpty(ivd.plas_loc_id))
+                {
+                    sbwhere.AppendFormat(" and ii.plas_loc_id='{0}' ", ivd.plas_loc_id.ToString().ToUpper());
+                }
+                if (!string.IsNullOrEmpty(ivd.ista_id))
+                {
+                    sbwhere.AppendFormat(" and ii.ista_id='{0}' ", ivd.ista_id);
+                }
+                if (ivd.item_id != 0)
+                {
+                    sbwhere.AppendFormat(" and ip.item_id='{0}' ", ivd.item_id);
+                }
+                if (ivd.made_date != ivd.cde_dt && ivd.made_date > DateTime.MinValue)
+                {
+                    sbwhere.AppendFormat(" and ii.made_date='{0}' ", ivd.made_date.ToString("yyyy-MM-dd"));
+                }
+                if (ivd.made_date != ivd.cde_dt && ivd.cde_dt > DateTime.MinValue)
+                {
+                    sbwhere.AppendFormat(" and ii.cde_dt='{0}' ", ivd.cde_dt.ToString("yyyy-MM-dd"));
+                }
+                if (ivd.made_date == ivd.cde_dt && ivd.made_date > DateTime.MinValue)
+                {
+                    sbwhere.AppendFormat(" and ii.cde_dt='{0}' and ii.made_date='{1}' ", ivd.cde_dt.ToString("yyyy-MM-dd"), ivd.made_date.ToString("yyyy-MM-dd"));
+                }
+
+
+                return _access.getDataTableForObj<IinvdQuery>(sql.ToString() + sbwhere.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IupcDao-->GetPlasIinvd-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
     }
 }
