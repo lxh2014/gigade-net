@@ -151,7 +151,7 @@ Ext.onReady(function () {
                 id: 'NumBuyTimes',
                 allowDecimals: false,
                 width: 80,
-                minValue: 1,
+                minValue: 0,
                 value: 1,
                 allowBlank: false
             },
@@ -264,7 +264,7 @@ Ext.onReady(function () {
                 id: 'NumCanceltimes',
                 allowDecimals: false,
                 width: 80,
-                minValue: 1,
+                minValue: 0,
                 value: 1,
                 allowBlank: false
             },
@@ -391,7 +391,7 @@ Ext.onReady(function () {
                 id: 'NumReturntimes',
                 allowDecimals: false,
                 width: 80,
-                minValue: 1,
+                minValue: 0,
                 value: 1,
                 allowBlank: false
             },
@@ -518,7 +518,7 @@ Ext.onReady(function () {
                 id: 'NumNotice',
                 allowDecimals: false,
                 width: 80,
-                minValue: 1,
+                minValue: 0,
                 value: 1,
                 allowBlank: false
             },
@@ -591,7 +591,7 @@ Ext.onReady(function () {
                 id: 'NumTotalConsumption1',
                 fieldLabel: '消費累計金額',
                 allowDecimals: false,
-                minValue: 1,
+                minValue: 0,
                 labelWidth: 100,
                 width: 210,
                 allowBlank: false
