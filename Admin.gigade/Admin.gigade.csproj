@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -694,7 +694,10 @@
     <Content Include="Locale\zh-TW\SiteManager\lang.js" />
     <Content Include="Locale\zh-TW\TrialProdCate\TrialProdCateLang.js" />
     <Content Include="Locale\zh-TW\Vote\Lang.js" />
+    <Content Include="Scripts\Bootstrap\bootstrap-datetimepicker.min.js" />
+    <Content Include="Scripts\Bootstrap\bootstrap-datetimepicker.zh-TW.js" />
     <Content Include="Scripts\Bootstrap\bootstrap-table.min.js" />
+    <Content Include="Scripts\Bootstrap\css\bootstrap-datetimepicker.min.css" />
     <Content Include="Scripts\Bootstrap\css\bootstrap-table.min.css" />
     <Content Include="Scripts\Bootstrap\css\bootstrap.css" />
     <Content Include="Locale\zh-TW\XMLManage\XMLIndex.js" />
