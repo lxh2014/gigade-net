@@ -129,7 +129,7 @@ namespace BLL.gigade.Dao
                     }
                     if (q.buyCondition != 0 && q.buyTimes <= 1)
                     {
-                        where.AppendFormat(" AND u.user_id NOT IN (select user_id FROM order_master om WHERE order_status NOT IN(90,91) {0} GROUP BY user_id)", buywhere);
+                        where.AppendFormat(" AND NOT EXISTS (SELECT om.user_id FROM order_master AS om WHERE om.user_id = u.user_id AND om.order_status NOT IN(90,91) {0}  GROUP BY om.user_id) ", buywhere);
                     }
                     else
                     {
@@ -139,7 +139,7 @@ namespace BLL.gigade.Dao
                 }
                 if (q.ChkAge)
                 {//年齡
-                    where.AppendFormat(" AND {0}-u.user_birthday_year >={1} AND {0}-u.user_birthday_year <{2} ", DateTime.Now.Year, q.ageMin, q.ageMax);
+                    where.AppendFormat(" AND {0}-u.user_birthday_year BETWEEN {1} AND {2} ", DateTime.Now.Year, q.ageMin, q.ageMax);
                 }
                 if (q.ChkCancel)
                 {//取消次數
@@ -154,7 +154,7 @@ namespace BLL.gigade.Dao
                     }
                     if (q.cancelCondition != 0 && q.cancelTimes <= 1)
                     {
-                        where.AppendFormat(" AND u.user_id NOT IN (select user_id FROM order_master om WHERE order_status IN(90) {0} GROUP BY user_id)", buywhere);
+                        where.AppendFormat(" AND NOT EXISTS (select user_id FROM order_master om WHERE om.user_id = u.user_id AND order_status IN(90) {0} GROUP BY om.user_id)", buywhere);
                     }
                     else
                     {
@@ -196,7 +196,7 @@ namespace BLL.gigade.Dao
                     }
                     if (q.returnCondition != 0 && q.returnTimes <= 1)
                     {
-                        where.AppendFormat("AND u.user_id not in (select DISTINCT om.user_id FROM order_return_master orm LEFT JOIN order_master om on orm.order_id=om.order_id WHERE return_status=1 {0})", buywhere);
+                        where.AppendFormat("AND NOT EXISTS (select DISTINCT om.user_id FROM order_return_master orm LEFT JOIN order_master om on orm.order_id=om.order_id WHERE om.user_id = u.user_id AND return_status=1 {0}  GROUP BY om.user_id)", buywhere);
                     }
                     else
                     {
