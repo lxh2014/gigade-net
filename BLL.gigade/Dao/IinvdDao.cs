@@ -223,7 +223,9 @@ namespace BLL.gigade.Dao
                 }
                 else
                 {
+                    sql.Append("set sql_safe_updates = 0;");
                     sql.AppendFormat("UPDATE iloc SET Ista_id='F'  where lcat_id='R' AND plas_loc_id='{0}';", m.plas_loc_id);
+                    sql.Append("set sql_safe_updates = 1;");
                     sql.AppendFormat("Delete from iinvd where plas_loc_id='{0}' AND item_id='{1}' AND cde_dt='{2}';", m.plas_loc_id, m.item_id, CommonFunction.DateTimeToString(m.cde_dt));
                 }
             }

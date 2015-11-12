@@ -23,7 +23,7 @@ Ext.onReady(function () {
              },
                   {
                       xtype: 'fieldcontainer',
-                      fieldLabel: "品號/條碼",
+                      fieldLabel: "商品細項編號/條碼",
                       combineErrors: true,
                       margins: '0 200 0 0',
                       layout: 'hbox',

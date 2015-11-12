@@ -1966,6 +1966,8 @@
     <Content Include="Scripts\Views\ScheduleService\ScheduleService.js" />
     <Content Include="Scripts\Views\SecretInfo\SecretResetPwd.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverMasterList.js" />
+    <Content Include="Scripts\Views\SendProduct\DeliverExportArrivalList.js" />
+    <Content Include="Scripts\Views\SendProduct\DeliverExportArrivalEdit.js" />
     <Content Include="Scripts\Views\Service\OrderQuestionAdd.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaEdit.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaList.js" />
@@ -4467,6 +4469,7 @@
     <Content Include="Views\EdmNew\Editkendo2.cshtml" />
     <Content Include="Template\SiteStatistics\SiteStatistics.xlsx" />
     <Content Include="Views\WareHouse\Aseld.cshtml" />
+    <Content Include="Views\SendProduct\DeliverExpectArrival.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
