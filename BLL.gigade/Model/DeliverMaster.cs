@@ -36,6 +36,8 @@ namespace BLL.gigade.Model
        public int export_flag { get; set; }
        public int data_chg { get; set; }
        public int work_status { get; set; }
+       public DateTime expect_arrive_date { get; set; }
+       public int expect_arrive_period { get; set; }
        public DeliverMaster()
        {
            deliver_id = 0;
@@ -62,6 +64,8 @@ namespace BLL.gigade.Model
            export_flag = 0;
            data_chg = 0;
            work_status = 0;
+           expect_arrive_date = DateTime.MinValue;
+           expect_arrive_period = 0;
        }
     }
 }
