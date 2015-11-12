@@ -5876,19 +5876,19 @@ namespace Admin.gigade.Controllers
                 IstockChangeQuery query = new IstockChangeQuery();
                 if (!string.IsNullOrEmpty(Request.Params["oid"]))
                 {
-                    query.item_upc = Request.Params["oid"].ToString().Trim();//料位和條碼不再通過長度來判斷了
-                    ////System.Text.RegularExpressions.Regex rex = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
-                    ////string id = Request.Params["oid"].ToString().Trim();
-                    ////if (rex.IsMatch(id))
-                    ////{
-                    ////    query.item_id = uint.Parse(id);
-                    ////}
-                    ////else
-                    ////{
-                    ////    query.upc_id = id;
-                    ////}
-                }
+                    string id = Request.Params["oid"].ToString().Trim();
 
+                    System.Text.RegularExpressions.Regex rex = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
+
+                    if (rex.IsMatch(id))
+                    {
+                        query.item_id = uint.Parse(id);
+                    }
+                    else
+                    {
+                        query.item_upc = Request.Params["oid"].ToString().Trim();//料位和條碼不再通過長度來判斷了
+                    }
+                }
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]) && Request.Params["start_time"] != "1970-01-01")//
                 {
                     query.starttime = DateTime.Parse(DateTime.Parse(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
@@ -5966,17 +5966,18 @@ namespace Admin.gigade.Controllers
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
                 if (!string.IsNullOrEmpty(Request.Params["oid"]))
                 {
-                    query.item_upc = Request.Params["oid"].ToString().Trim();//料位和條碼不再通過長度來判斷了
-                    ////System.Text.RegularExpressions.Regex rex = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
-                    ////string id = Request.Params["oid"].ToString().Trim();
-                    ////if (rex.IsMatch(id))
-                    ////{
-                    ////    query.item_id = uint.Parse(id);
-                    ////}
-                    ////else
-                    ////{
-                    ////    query.upc_id = id;
-                    ////}
+                    string id = Request.Params["oid"].ToString().Trim();
+                   
+                    System.Text.RegularExpressions.Regex rex = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
+                    
+                    if (rex.IsMatch(id))
+                    {
+                        query.item_id = uint.Parse(id);
+                    }
+                    else
+                    {
+                        query.item_upc = Request.Params["oid"].ToString().Trim();//料位和條碼不再通過長度來判斷了
+                    }
                 }
                 DateTime time;
                 if (DateTime.TryParse(Request.Params["time_start"], out time))
@@ -12332,30 +12333,30 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return Response;
         }
-        public static DataTable AseldPDF(DataTable aseldTable)
-        {
-            DataTable table = new DataTable();
-            table.Columns.Add("商品編號", typeof(string));
-            table.Columns.Add("商品名稱", typeof(string));
-            table.Columns.Add("細項編號", typeof(string));
-            table.Columns.Add("規格", typeof(string));
-            table.Columns.Add("待檢貨量", typeof(string));
-            table.Columns.Add("已檢貨量", typeof(string));
-            table.Columns.Add("創建時間", typeof(string));
-            for (int i = 0; i < aseldTable.Rows.Count; i++)
-            {
-                DataRow row = table.NewRow();
-                row["商品編號"] = aseldTable.Rows[i]["product_id"];
-                row["商品名稱"] = aseldTable.Rows[i]["product_name"];
-                row["細項編號"] = aseldTable.Rows[i]["item_id"];
-                row["規格"] = aseldTable.Rows[i]["spec"];
-                row["待檢貨量"] = aseldTable.Rows[i]["out_qty"];
-                row["已檢貨量"] = aseldTable.Rows[i]["act_pick_qty"];
-                row["創建時間"] = aseldTable.Rows[i]["create_dtim"];
-                table.Rows.Add(row);
-            }
-            return table;
-        }
+        //public static DataTable AseldPDF(DataTable aseldTable)
+        //{
+        //    DataTable table = new DataTable();
+        //    table.Columns.Add("商品編號", typeof(string));
+        //    table.Columns.Add("商品名稱", typeof(string));
+        //    table.Columns.Add("細項編號", typeof(string));
+        //    table.Columns.Add("規格", typeof(string));
+        //    table.Columns.Add("待檢貨量", typeof(string));
+        //    table.Columns.Add("已檢貨量", typeof(string));
+        //    table.Columns.Add("創建時間", typeof(string));
+        //    for (int i = 0; i < aseldTable.Rows.Count; i++)
+        //    {
+        //        DataRow row = table.NewRow();
+        //        row["商品編號"] = aseldTable.Rows[i]["product_id"];
+        //        row["商品名稱"] = aseldTable.Rows[i]["product_name"];
+        //        row["細項編號"] = aseldTable.Rows[i]["item_id"];
+        //        row["規格"] = aseldTable.Rows[i]["spec"];
+        //        row["待檢貨量"] = aseldTable.Rows[i]["out_qty"];
+        //        row["已檢貨量"] = aseldTable.Rows[i]["act_pick_qty"];
+        //        row["創建時間"] = aseldTable.Rows[i]["create_dtim"];
+        //        table.Rows.Add(row);
+        //    }
+        //    return table;
+        //}
         //public string MakePDF(DataTable aseldTable, string assg_id, string user_username, string newPDFName, int index)
         //{
         //    int columnNum = 10;
