@@ -195,6 +195,7 @@
                 todayHighlight: 1,
                 startView: 2,
                 minView: 2,
+                pickerPosition:'top-right',
                 forceParse: 0
             }).on('changeDate', function(ev){
                 {
@@ -222,6 +223,7 @@
                 todayHighlight: 1,
                 startView: 2,
                 minView: 2,
+                pickerPosition: 'top-right',
                 forceParse: 0
             }).on('changeDate', function (ev)
             {
@@ -399,7 +401,7 @@
 
                     }
                 }
-                if (true)
+                if ($('#pick_num' + index).val() != "" && $('#pick_num' + index).val() != "0")
                 {   /*檢查日期是否過期開始*/
                     var dtstring = 2
                     var item_id = '@ViewBag.itemid'

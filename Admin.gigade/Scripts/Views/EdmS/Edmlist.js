@@ -1240,7 +1240,7 @@ Export = function () {
         Ext.Ajax.request({
             url: '/EdmS/Export',
             method: 'post',
-            timeout: 900000,
+            timeout: 1000000,
             params: {
                 chkGender: chkGender,
                 genderCondition: genderCondition,
