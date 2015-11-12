@@ -735,7 +735,7 @@ compareSToE = function (a, b) {
 compareEToS = function (a, b) {
     var little = Ext.getCmp("" + a + "").getValue();
     var big = Ext.getCmp("" + b + "").getValue();
-    if (big <= little) {
+    if (big < little) {
         Ext.Msg.alert(INFORMATION, "結束日期不能小於開始日期");
         Ext.getCmp("" + a + "").setValue(setNextMonth(big, -1));
     }
