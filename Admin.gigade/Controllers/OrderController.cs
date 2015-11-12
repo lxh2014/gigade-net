@@ -2655,19 +2655,27 @@ namespace Admin.gigade.Controllers
                                 {
                                     string[] str = dt.Rows[j][1].ToString().Split('/');
                                     int year = 0;
-                                    if (str[2].Length == 2)
+                                    if (str.Length == 3)
                                     {
-                                        year = Convert.ToInt32("20" + str[2]);
-                                    }
-                                    else
-                                    {
-                                        year = Convert.ToInt32(str[2]);
-                                    }
-                                    int month = Convert.ToInt32(str[0]);
-                                    int day = Convert.ToInt32(str[1]);
-                                    if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
-                                    {
-                                        model.account_collection_time = st;
+                                        if (str[2].Length == 2)
+                                        {
+                                            year = Convert.ToInt32("20" + str[2]);
+                                        }
+                                        else
+                                        {
+                                            year = Convert.ToInt32(str[2]);
+                                        }
+                                        int month = Convert.ToInt32(str[0]);
+                                        int day = Convert.ToInt32(str[1]);
+                                        if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
+                                        {
+                                            model.account_collection_time = st;
+                                        }
+                                        else
+                                        {
+                                            errorStr += (j + 2) + ",";
+                                            continue;
+                                        }
                                     }
                                     else
                                     {
@@ -2733,19 +2741,27 @@ namespace Admin.gigade.Controllers
                                 {
                                     string[] strR = dt.Rows[j][4].ToString().Split('/');
                                     int yearR = 0;
-                                    if (strR[2].Length == 2)
+                                    if (strR.Length == 3)
                                     {
-                                        yearR = Convert.ToInt32("20" + strR[2]);
-                                    }
-                                    else
-                                    {
-                                        yearR = Convert.ToInt32(strR[2]);
-                                    }
-                                    int monthR = Convert.ToInt32(strR[0]);
-                                    int dayR = Convert.ToInt32(strR[1]);
-                                    if (DateTime.TryParse(yearR + "/" + monthR + "/" + dayR, out streturn))
-                                    {
-                                        model.return_collection_time = streturn;
+                                        if (strR[2].Length == 2)
+                                        {
+                                            yearR = Convert.ToInt32("20" + strR[2]);
+                                        }
+                                        else
+                                        {
+                                            yearR = Convert.ToInt32(strR[2]);
+                                        }
+                                        int monthR = Convert.ToInt32(strR[0]);
+                                        int dayR = Convert.ToInt32(strR[1]);
+                                        if (DateTime.TryParse(yearR + "/" + monthR + "/" + dayR, out streturn))
+                                        {
+                                            model.return_collection_time = streturn;
+                                        }
+                                        else
+                                        {
+                                            errorStr += (j + 2) + ",";
+                                            continue;
+                                        }
                                     }
                                     else
                                     {
@@ -2809,19 +2825,27 @@ namespace Admin.gigade.Controllers
                                 {
                                     string[] str = dt.Rows[j][7].ToString().Split('/');
                                     int year = 0;
-                                    if (str[2].Length == 2)
+                                    if (str.Length == 3)
                                     {
-                                        year = Convert.ToInt32("20" + str[2]);
-                                    }
-                                    else
-                                    {
-                                        year = Convert.ToInt32(str[2]);
-                                    }
-                                    int month = Convert.ToInt32(str[0]);
-                                    int day = Convert.ToInt32(str[1]);
-                                    if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
-                                    {
-                                        model.invoice_date_manual = st;
+                                        if (str[2].Length == 2)
+                                        {
+                                            year = Convert.ToInt32("20" + str[2]);
+                                        }
+                                        else
+                                        {
+                                            year = Convert.ToInt32(str[2]);
+                                        }
+                                        int month = Convert.ToInt32(str[0]);
+                                        int day = Convert.ToInt32(str[1]);
+                                        if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
+                                        {
+                                            model.invoice_date_manual = st;
+                                        }
+                                        else
+                                        {
+                                            errorStr += (j + 2) + ",";
+                                            continue;
+                                        }
                                     }
                                     else
                                     {

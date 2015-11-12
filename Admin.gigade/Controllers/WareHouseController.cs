@@ -3227,14 +3227,14 @@ namespace Admin.gigade.Controllers
                 int id;
                 _iinvd = new IinvdMgr(mySqlConnectionString);
                 DataTable dt = new DataTable();
-                if (int.TryParse(Request.Params["id"].ToString(), out id) && Request.Params["id"].ToString().Length == 6)
-                {//獲取商品編號
-                    dt = _iinvd.Getprodu(int.Parse(Request.Params["id"].ToString()));
-                }
-                else
-                {//獲取條碼
+                //if (int.TryParse(Request.Params["id"].ToString(), out id) && Request.Params["id"].ToString().Length == 6)
+                //{//獲取商品編號
+                //    dt = _iinvd.Getprodu(int.Parse(Request.Params["id"].ToString()));
+                //}
+                //else
+                //{//獲取條碼
                     dt = _iinvd.Getprodubybar(Request.Params["id"].ToString());
-                }
+               // }
                 if (dt.Rows.Count > 0)
                 {//pwy_dte_ctl是否是有效期控管的商品，cde_dt_shp：允出天數，cde_dt_var：允收天數,cde_dt_incr 保存天數
                     string spec = string.Empty;
@@ -3254,7 +3254,7 @@ namespace Admin.gigade.Controllers
                     {
                         spec = "(" + spec + ")";
                     }
-                    jsonStr = "{success:true,msg:\"" + dt.Rows[0]["product_name"] + spec + "\",locid:'" + dt.Rows[0]["loc_id"].ToString().ToUpper() + "',day:'" + dt.Rows[0]["cde_dt_var"] + "',cde_dt_shp:'" + dt.Rows[0]["cde_dt_shp"] + "',pwy_dte_ctl:'" + dt.Rows[0]["pwy_dte_ctl"] + "',cde_dt_var:'" + dt.Rows[0]["cde_dt_var"] + "',cde_dt_incr:'" + dt.Rows[0]["cde_dt_incr"] + "',vendor_id:'" + dt.Rows[0]["vendor_id"] + "'}";//返回json數據
+                    jsonStr = "{success:true,msg:\"" + dt.Rows[0]["product_name"] + spec + "\",locid:'" + dt.Rows[0]["loc_id"].ToString().ToUpper() + "',item_id:'" + dt.Rows[0]["item_id"] + "',day:'" + dt.Rows[0]["cde_dt_var"] + "',cde_dt_shp:'" + dt.Rows[0]["cde_dt_shp"] + "',pwy_dte_ctl:'" + dt.Rows[0]["pwy_dte_ctl"] + "',cde_dt_var:'" + dt.Rows[0]["cde_dt_var"] + "',cde_dt_incr:'" + dt.Rows[0]["cde_dt_incr"] + "',vendor_id:'" + dt.Rows[0]["vendor_id"] + "'}";//返回json數據
                 }
                 else
                 {
