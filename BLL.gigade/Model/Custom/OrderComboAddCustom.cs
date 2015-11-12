@@ -15,6 +15,9 @@ namespace BLL.gigade.Model.Custom
         public uint spec2 { get; set; }
         public string spec1_show { get; set; }
         public string spec2_show { get; set; }
+        /// <summary>
+        /// 商品售價
+        /// </summary>
         public int product_cost { get; set; }
         public int stock { get; set; }
         public int buynum { get; set; }
@@ -30,6 +33,19 @@ namespace BLL.gigade.Model.Custom
         /// 商品成本
         /// </summary>
         public int cost { get; set; }
+        /// <summary>
+        /// 商品活動成本
+        /// </summary>
+        public int event_cost { get; set; }
+        /// <summary>
+        /// 活動結束時間
+        /// </summary>
+        public uint event_end { get; set; }
+        /// <summary>
+        /// 活動開始時間
+        /// </summary>
+        public uint event_start { get; set; }
+
         public OrderComboAddCustom()
         {
             product_id = 0;
@@ -45,6 +61,10 @@ namespace BLL.gigade.Model.Custom
             price_type = 0;
             buy_limit = 0;
             childCount = 0;
+            cost = 0;
+            event_cost = 0;
+            event_end = 0;
+            event_start = 0;
         }
     }
 }

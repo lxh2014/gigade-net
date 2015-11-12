@@ -560,16 +560,19 @@ namespace Admin.gigade.Controllers
             try
             {
                 #region 獲取edit_url
-                if (!string.IsNullOrEmpty(Request.Params["edit_url"]))
+                if (!string.IsNullOrEmpty(Request.Params["template_id"]))
                 {
                     #region 獲取網頁內容方法
-                    string url = Request.Params["edit_url"].ToString();
-                    HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
-                    httpRequest.Timeout = 5000;
-                    httpRequest.Method = "GET";
-                    HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
-                    StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
-                    data = sr.ReadToEnd();
+                    string url = _edmContentNewMgr.GetEditUrl(Convert.ToInt32(Request.Params["template_id"]));
+                    if (!string.IsNullOrEmpty(url))
+                    {
+                        HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
+                        httpRequest.Timeout = 9000;
+                        httpRequest.Method = "GET";
+                        HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                        StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
+                        data = sr.ReadToEnd();
+                    }
                     #endregion
                 }
                 #endregion
@@ -714,7 +717,7 @@ namespace Admin.gigade.Controllers
 
                         #endregion
                         MailHelper mail = new MailHelper();
-                        mail.SendMailAction("shiwei0620j@gimg.tw", mQuery.subject, mQuery.body + "   ");
+                        mail.SendMailAction((Session["caller"] as Caller).user_email, mQuery.subject, mQuery.body + "   ");
                         {
                             json = _edmContentNewMgr.MailAndRequest(eslQuery, mQuery);
                         }
