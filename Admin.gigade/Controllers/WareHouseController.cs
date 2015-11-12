@@ -3047,7 +3047,7 @@ namespace Admin.gigade.Controllers
                     ia.qty_o = _iinvd.Selnum(m);
                     ia.adj_qty = m.prod_qty;
 
-                    m.prod_qty = _iinvd.Selnum(m) + m.prod_qty;
+                    m.prod_qty = ia.qty_o + m.prod_qty;
                     if (m.prod_qty >= 0)
                     {
                         if (_iinvd.Upd(m) > 0)
