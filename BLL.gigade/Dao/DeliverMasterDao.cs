@@ -966,5 +966,113 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1 ")
             DataTable table = _access.getDataTable(sql);
             return table;
         }
+
+        #region 出貨單期望到貨日
+        ///add by zhaozhi0623j 20151110 pm
+        /// <summary>
+        /// 根據出貨單編號更新期望到貨日期、時段   
+        /// </summary>
+        /// <returns></returns>
+        public int UpdateExpectArrive(DeliverMasterQuery Query)
+        {
+            StringBuilder sbSql = new StringBuilder();
+            Query.Replace4MySQL();
+
+            try
+            {
+                sbSql.AppendFormat(@"update deliver_master set expect_arrive_date='{0}',expect_arrive_period='{1}' where deliver_id='{2}'",
+                                Query.expect_arrive_date.ToString("yyyy-MM-dd"), Query.expect_arrive_period, Query.deliver_id);     
+                return _access.execCommand(sbSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(" DeliverMasterDao-->UpdateExpectArrive-->" + ex.Message + sbSql.ToString(), ex);
+            }
+        }
+        /// <summary>
+        /// 獲得出貨單期望到貨日list   
+        /// </summary>
+        /// <returns></returns>
+        public List<DeliverMasterQuery> GetDeliverExpectArriveList(DeliverMasterQuery Query, out int totalCount)
+        {
+            StringBuilder finalSql = new StringBuilder();
+            StringBuilder sbSql = new StringBuilder();
+            StringBuilder fromSql = new StringBuilder();
+            StringBuilder conSql = new StringBuilder();
+            Query.Replace4MySQL();
+            try
+            {
+                sbSql.Append(@"select dm.deliver_id,dm.order_id,om.user_id,dm.type,dm.freight_set,v.vendor_name_full,dm.delivery_status,
+                                            dm.estimated_delivery_date,dm.estimated_arrival_date,dm.estimated_arrival_period,
+                                            dm.expect_arrive_date,dm.expect_arrive_period ");
+                fromSql.Append(@"from deliver_master dm inner JOIN vendor v on v.vendor_id=dm.export_id inner JOIN order_master om on om.order_id=dm.order_id
+                                    where 1=1 ");
+                if (Query.type != 0)
+                {
+                    if (Query.type == 3)
+                    {
+                        conSql.AppendFormat(" and dm.type='{0}'", 101);
+                    }
+                    else
+                    {
+                        conSql.AppendFormat(" and dm.type='{0}'", Query.type);
+                    }              
+                }
+                if (Query.freight_set != 0)
+                {
+                    conSql.AppendFormat(" and dm.freight_set='{0}'", Query.freight_set);
+                }
+                if (Query.delivery_status != 10000)
+                {
+                    conSql.AppendFormat(" and dm.delivery_status='{0}'", Query.delivery_status);
+                }
+
+
+                if (Query.deliver_id != 0)
+                {
+                    conSql.AppendFormat(" and dm.deliver_id='{0}'", Query.deliver_id);
+                }
+                if (Query.order_id != 0)
+                {
+                    conSql.AppendFormat(" and dm.order_id='{0}'", Query.order_id);
+                }
+                if (Query.time_start != DateTime.MinValue && Query.time_end != DateTime.MinValue)
+                {
+                    conSql.AppendFormat(" and dm.estimated_arrival_date between '{0}' and '{1}'", Query.time_start.ToString("yyyy-MM-dd"), Query.time_end.ToString("yyyy-MM-dd"));
+                    
+                }
+                //if (Query.time_end != DateTime.MinValue)
+                //{
+                //    conSql.AppendFormat(" and dm.estimated_arrival_date <= '{0}'", Query.time_end.ToString("yyyy-MM-dd"));
+                //    //BLL.gigade.Common.CommonFunction.DateTimeToString(Query.time_end)
+                //}
+                if (Query.vendor_id != 0)
+                {
+                    conSql.AppendFormat(" and dm.export_id='{0}'",Query.vendor_id);
+                }
+                if (!string.IsNullOrEmpty(Query.vendor_name_full))
+                {
+                    conSql.AppendFormat(" and v.vendor_name_full like '%{0}%'", Query.vendor_name_full);
+                }
+                finalSql.Append(sbSql.ToString() + fromSql.ToString() + conSql.ToString());
+
+                totalCount = 0;
+                if (Query.IsPage)
+                {
+                    DataTable _dt = _access.getDataTable(" select dm.deliver_id " + fromSql.ToString() + conSql.ToString());
+                    if (_dt.Rows.Count > 0)
+                    {
+                        totalCount = _dt.Rows.Count;
+                    }
+                    finalSql.AppendFormat(" limit {0},{1} ", Query.Start, Query.Limit);
+                }
+                return _access.getDataTableForObj<DeliverMasterQuery>(finalSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(" DeliverMasterDao-->GetDeliverExpectArriveList-->" + ex.Message + finalSql.ToString(), ex);
+            }
+        } 
+        #endregion
     }
 }
