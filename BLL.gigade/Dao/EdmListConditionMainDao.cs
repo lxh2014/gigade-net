@@ -253,7 +253,7 @@ namespace BLL.gigade.Dao
             }
             catch (Exception ex)
             {
-                throw new Exception(" EdmListConditionMainDao-->GetUserNum " + ex.Message, ex);
+                throw new Exception(" EdmListConditionMainDao-->GetUserNum " + ex.Message + "sql:" + sql.ToString() + join.ToString() + where.ToString(), ex);
             }
         }
 
