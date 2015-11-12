@@ -1509,7 +1509,7 @@ namespace Admin.gigade.Controllers
                 query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");//用於分頁的變量
                 IOrderDeliverImplMgr _IorderDeliver = new OrderDeliverMgr(mySqlConnectionString);
-                query.serchs = Request.Params["serchs"].ToString();//查詢條件
+                query.serchs = Request.Params["serchs"].ToString().Trim();//查詢條件
                 if (Request.Params["orderid"] == "" || Request.Params["orderid"] == null)//查詢內容
                 {
                     query.order_id = 0;
@@ -4983,6 +4983,10 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["account_name"]))
                 {
                     query.account_name = (Request.Params["account_name"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["bank_note"]))
+                {
+                    query.bank_note = (Request.Params["bank_note"]);
                 }
                 query.ors_status = 4;
                 query.ors_createuser = (Session["caller"] as Caller).user_id;

@@ -330,13 +330,21 @@ namespace BLL.gigade.Dao
         public DataTable GetProdInfo(string pid)
         {
             StringBuilder sql = new StringBuilder();
+            StringBuilder sbStr = new StringBuilder();
             sql.AppendLine(@"select pi.item_id,pi.product_id,vb.vendor_id,CONCAT(vb.brand_name,'-',p.product_name) as product_name,p.product_mode,ips.loc_id from product_item pi ");
             sql.AppendLine(@" LEFT JOIN product p on pi.product_id=p.product_id ");
             sql.AppendLine(@" left join vendor_brand vb on p.brand_id=vb.brand_id ");
-            sql.AppendFormat(@" LEFT JOIN iplas ips on ips.item_id=pi.item_id  ");
-            
-                sql.AppendFormat(@" LEFT JOIN  iupc i on pi.item_id=i.item_id where i.upc_id='{0}' or pi.item_id='{0}'", pid);
-          
+            sql.AppendFormat(@" LEFT JOIN iplas ips on ips.item_id=pi.item_id where 1=1 ");
+
+            sbStr.AppendFormat("select item_id from product_item where item_id='{0}';", pid);
+            DataTable _dtresult = _access.getDataTable(sbStr.ToString());
+            if (_dtresult.Rows.Count > 0)
+            {
+                sql.AppendFormat(" and pi.item_id='{0}' ", pid);
+            }else
+            {
+                sql.AppendFormat(" and pi.item_id =(select item_id from iupc where upc_id='{0}'limit 1 )", pid);
+            }          
             try
             {
                 return _access.getDataTable(sql.ToString());

@@ -26,6 +26,8 @@ namespace Admin.gigade.Controllers
         IAseldMasterImplMgr _aseldmasterMgr;
         IIialgImplMgr _iagMgr;
         IProductItemImplMgr _iproductitemMgr;
+        IPalletMoveImplMgr _ipalet;
+        IIialgImplMgr _iialgMgr;
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly string mySqlConnectionString = System.Configuration.ConfigurationManager.AppSettings["MySqlConnectionString"].ToString();
 
@@ -594,5 +596,231 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
 
+        //
+        public HttpResponseBase selectproductexttime()
+        {
+            string json = string.Empty;
+            int result = 0;
+            List<ProductExt> lsPt = new List<ProductExt>();
+            try
+            {
+                string Item_id = "";
+                if (!string.IsNullOrEmpty(Request.Params["item_id"]))//查詢商品编号
+                {
+                    Item_id = Request.Params["item_id"];
+                }
+                _ipalet = new PalletMoveMgr(mySqlConnectionString);
+                lsPt = _ipalet.selectproductexttime(Item_id);
+                foreach (var item in lsPt)
+                {
+                    result = item.Cde_dt_incr;
+                }
+                json = "{success:true,msg:\"" + result + "\"}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+       }
+
+        #region 貨物轉移時間變動
+        public HttpResponseBase aboutmadetime()
+        {
+            string jsonStr = string.Empty;
+            int result = 0;
+            DataTable dt = new DataTable();
+            try
+            {
+                int userId = (Session["caller"] as Caller).user_id;
+                DateTime nowtimes = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd"));
+                int type_id = 0;//類型
+                int days = 0;
+                int row_id = int.Parse(Request.Params["row_id"]);
+                string cde_dtormade_dt = Request.Params["cde_dtormade_dt"];
+
+                string y_cde_dtormade_dt = string.Empty;
+                if (!string.IsNullOrEmpty(Request.Params["y_cde_dtormade_dt"]))
+                {
+                    y_cde_dtormade_dt = Request.Params["y_cde_dtormade_dt"];//原來的日期
+                }
+                if (!string.IsNullOrEmpty(Request.Params["type_id"]))
+                {
+                    type_id = Convert.ToInt32(Request.Params["type_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["datetimeday"]))
+                {
+                    days = Convert.ToInt32(Request.Params["datetimeday"]);
+                }
+
+                IinvdQuery invd = new IinvdQuery();
+                IinvdQuery newinvd = new IinvdQuery();
+                IialgQuery ialg = new IialgQuery();
+                newinvd.change_user = userId;
+                newinvd.change_dtim = DateTime.Now;
+                if (!string.IsNullOrEmpty(Request.Params["sloc_id"]))
+                {
+                    invd.plas_loc_id = Convert.ToString(Request.Params["sloc_id"]).ToUpper();
+                    ialg.loc_id = invd.plas_loc_id;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["prod_id"]))
+                {
+                    invd.item_id = Convert.ToUInt32(Request.Params["prod_id"]);
+                    ialg.item_id = invd.item_id;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["prod_qtys"]))
+                {
+                    invd.prod_qty = Convert.ToInt32(Request.Params["prod_qtys"]);
+                    ialg.qty_o = invd.prod_qty;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["remarks"]))
+                {
+                    invd.remarks = Request.Params["remarks"];
+                    ialg.remarks = invd.remarks;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["po_id"]))
+                {
+                    ialg.po_id = Request.Params["po_id"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["iarc_id"]))
+                {
+                    ialg.iarc_id = Request.Params["iarc_id"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["doc_no"]))
+                {
+                    ialg.doc_no = Request.Params["doc_no"];
+                }
+                ialg.create_user = userId;
+                invd.change_user = userId;
+                ialg.create_dtim = DateTime.Now;
+                invd.change_dtim = DateTime.Now;
+                invd.row_id = row_id;
+                if (type_id == 1)//表示編輯的是製造日期
+                {
+                    invd.made_date = DateTime.Parse(cde_dtormade_dt);
+                    invd.cde_dt = invd.made_date.AddDays(days);//有效日期
+                    if (invd.made_date > nowtimes)//已經過期
+                    {
+                        jsonStr = "{success:true,msg:1}";//1表示有效日期不能小於當前日期
+                    }
+                    else
+                    {
+                        _ipalet = new PalletMoveMgr(mySqlConnectionString);
+                        _iialgMgr = new IialgMgr(mySqlConnectionString);
+                        result = _ipalet.selectcount(invd);
+                        #region 往iialg表中插入時間修改記錄
+                        ialg.made_dt = DateTime.Parse(y_cde_dtormade_dt);//原來的日期
+                        ialg.c_made_dt = DateTime.Parse(cde_dtormade_dt);//改后的日期
+                        ialg.cde_dt = DateTime.Parse(y_cde_dtormade_dt).AddDays(days);//原來的有效日期
+                        ialg.c_cde_dt = DateTime.Parse(cde_dtormade_dt).AddDays(days);//修改后的有效日期
+                        ialg.adj_qty = 0;
+                        if (string.IsNullOrEmpty(ialg.iarc_id))
+                        {
+                            ialg.iarc_id = "PC";
+                        }
+                        _iialgMgr.insertiialg(ialg);//往iialg中插入數據,用來記錄數據
+                        #endregion
+                        if (result > 0)//大於0表示裡面存在一樣子的值
+                        {
+                            dt = _ipalet.selectrow_id(invd);//獲取這個重複的row_id
+                            newinvd.row_id = Convert.ToInt32(dt.Rows[0][0]);
+                            newinvd.prod_qty = Convert.ToInt32(dt.Rows[0][1]) + invd.prod_qty;
+
+                            if (_ipalet.UpdateordeleteIinvd(invd, newinvd) > 0)
+                            {
+                                jsonStr = "{success:true,msg:2}";//修改成功
+                            }
+                            else
+                            {
+                                jsonStr = "{success:false,msg:3}";//修改失敗
+                            }
+                        }
+                        else
+                        {
+                            if (_ipalet.updatemadedate(invd) > 0)
+                            {
+                                jsonStr = "{success:true,msg:2}";//修改成功
+                            }
+                            else
+                            {
+                                jsonStr = "{success:false,msg:3}";//修改失敗
+                            }
+                        }
+                    }
+                }
+                else if (type_id == 2)//表示有效日期
+                {
+                    invd.cde_dt = DateTime.Parse(cde_dtormade_dt);
+                    invd.made_date = invd.cde_dt.AddDays(days * (-1));
+                    if (invd.made_date > nowtimes)
+                    {
+                        jsonStr = "{success:true,msg:1}";//1表示有效日期不能小於當前日期
+                    }
+                    else
+                    {
+                        _ipalet = new PalletMoveMgr(mySqlConnectionString);
+                        _iialgMgr = new IialgMgr(mySqlConnectionString);
+                        result = _ipalet.selectcount(invd);
+                        #region 往iialg表中插入時間修改記錄
+                        ialg.cde_dt = DateTime.Parse(y_cde_dtormade_dt);//原來的有效日期日期
+                        ialg.c_cde_dt = DateTime.Parse(cde_dtormade_dt);//改后的有效日期日期
+                        ialg.made_dt = DateTime.Parse(y_cde_dtormade_dt).AddDays(days * (-1));//原來的製造日期
+                        ialg.c_made_dt = DateTime.Parse(cde_dtormade_dt).AddDays(days * (-1));//修改后製造日期
+                        ialg.adj_qty = 0;
+                        if (string.IsNullOrEmpty(ialg.iarc_id))
+                        {
+                            ialg.iarc_id = "PC";
+                        }
+                        _iialgMgr.insertiialg(ialg);//往iialg中插入數據,用來記錄數據
+                        #endregion
+                        if (result > 0)//大於0表示裡面存在一樣子的值
+                        {
+                            dt = _ipalet.selectrow_id(invd);//獲取這個重複的row_id
+                            newinvd.row_id = Convert.ToInt32(dt.Rows[0][0]);
+                            newinvd.prod_qty = Convert.ToInt32(dt.Rows[0][1]) + invd.prod_qty;
+                            if (_ipalet.UpdateordeleteIinvd(invd, newinvd) > 0)
+                            {
+                                jsonStr = "{success:true,msg:2}";//修改成功
+                            }
+                            else
+                            {
+                                jsonStr = "{success:false,msg:3}";//修改失敗
+                            }
+                        }
+                        else
+                        {
+                            if (_ipalet.updatemadedate(invd) > 0)
+                            {
+                                jsonStr = "{success:true,msg:2}";//修改成功
+                            }
+                            else
+                            {
+                                jsonStr = "{success:false,msg:3}";//修改失敗
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                jsonStr = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(jsonStr.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
     }
 }

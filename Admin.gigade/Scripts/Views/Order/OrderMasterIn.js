@@ -18,6 +18,9 @@ Ext.define('gigade.OrderMasterExportList', {
     { name: "invoicedate", type: "string" },
     { name: "sales_amount", type: "int" },
     { name: "free_tax", type: "int" },
+      { name: "invoice_date_manual", type: "string" },
+    { name: "invoice_sale_manual", type: "string" },
+    { name: "invoice_tax_manual", type: "string" },
     { name: "remark", type: "string" },
     { name: "imramount", type: "int" },
     { name: "oacamount", type: "int" },
@@ -206,11 +209,11 @@ Ext.onReady(function () {
                         },
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
-                            Ext.Msg.alert("提示信息", result.msg);
+                          alert(result.msg);
                         },
                         failure: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
-                            Ext.Msg.alert("提示信息", result.msg);
+                          alert( result.msg);
                         }
                     });
                 }
@@ -498,6 +501,9 @@ Ext.onReady(function () {
         { header: '開立發票日期', dataIndex: 'invoicedate', width: 100, align: 'center' },
         { header: '發票銷售額', dataIndex: 'free_tax', hidden: true, width: 90, align: 'center' },
         { header: '發票稅額', dataIndex: 'tax_amount', hidden: true, width: 90, align: 'center' },
+       { header: '手開發票日期', dataIndex: 'invoice_date_manual', width: 100, align: 'center' },
+          { header: '手開銷售額', dataIndex: 'invoice_sale_manual', hidden: true, width: 90, align: 'center' },
+        { header: '手開稅額', dataIndex: 'invoice_tax_manual', hidden: true, width: 90, align: 'center' },
         { header: '發票總額', dataIndex: 'imramount', width: 90, align: 'center' },
         { header: '發票金額差異', dataIndex: 'invoice_diff', width: 100, align: 'center' },
         { header: '備註', dataIndex: 'remark', width: 90, align: 'center' }

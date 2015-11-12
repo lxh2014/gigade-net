@@ -110,7 +110,7 @@
         title: "新增電子報範本",
         id: 'editWin',
         iconCls: "icon-user-add",
-        width: 360,
+        width:435,
         height: 300,
         layout: 'fit',//布局样式
         items: [editFrm],

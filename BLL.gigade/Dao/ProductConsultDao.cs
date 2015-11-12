@@ -157,6 +157,7 @@ namespace BLL.gigade.Dao
             StringBuilder strSql = new StringBuilder();
             try
             {
+                query.Replace4MySQL();
                 strSql.AppendFormat("set sql_safe_updates = 0; update product_consult set answer_date='{0}',consult_answer='{1}',answer_user='{2}',answer_status='{3}',status='{4}',is_sendEmail='{5}' where consult_id='{6}'; set sql_safe_updates = 1;", query.answer_date.ToString("yyyy-MM-dd HH:mm:ss"), query.consult_answer, query.answer_user, query.answer_status, query.status,query.is_sendEmail, query.consult_id);
                 return _access.execCommand(strSql.ToString());
             }

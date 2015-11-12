@@ -105,10 +105,17 @@ namespace Admin.gigade.Controllers
                 {
                     query.elcm_name = Request.Params["elcm_name"];
                 }
-                int i = _edmlistmainMgr.DeleteListInfo(query);
-                if (i > 0)
+                if (query.elcm_name == "無")
                 {
-                    json = "{success:true}";
+                    json = "{success:true,msg:1}";
+                }
+                else
+                {
+                    int i = _edmlistmainMgr.DeleteListInfo(query);
+                    if (i > 0)
+                    {
+                        json = "{success:true}";
+                    }
                 }
             }
             catch (Exception ex)
