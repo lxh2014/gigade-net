@@ -209,11 +209,11 @@ Ext.onReady(function () {
                         },
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
-                            Ext.Msg.alert("提示信息", result.msg);
+                          alert(result.msg);
                         },
                         failure: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
-                            Ext.Msg.alert("提示信息", result.msg);
+                          alert( result.msg);
                         }
                     });
                 }
