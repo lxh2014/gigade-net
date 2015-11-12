@@ -785,6 +785,38 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
+
+        public HttpResponseBase GetHtml()
+        {
+            string htmlStr = string.Empty;
+            try
+            {
+                EdmContentNew query = new EdmContentNew();
+                if (!string.IsNullOrEmpty(Request.Params["content_id"]))
+                {
+                    query.content_id = Convert.ToInt32(Request.Params["content_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["template_id"]))
+                {
+                    query.template_id = Convert.ToInt32(Request.Params["template_id"]);
+                }
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                htmlStr=_edmContentNewMgr.GetHtml(query);
+                htmlStr = Server.HtmlDecode(Server.HtmlDecode(htmlStr));
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            this.Response.Clear();
+            this.Response.Write(htmlStr);
+            this.Response.End();
+            return this.Response;
+        }
+
         #endregion
 
         #region 擋信名單管理

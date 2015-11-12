@@ -139,7 +139,8 @@ namespace BLL.gigade.Dao
                 }
                 if (q.ChkAge)
                 {//年齡
-                    where.AppendFormat(" AND {0}-u.user_birthday_year >={1} AND {0}-u.user_birthday_year <{2} ", DateTime.Now.Year, q.ageMin, q.ageMax);
+                    where.AppendFormat(" AND u.user_birthday_year BETWEEN {1} AND {2} ", DateTime.Now.Year, DateTime.Now.Year - q.ageMin, DateTime.Now.Year - q.ageMax);
+
                 }
                 if (q.ChkCancel)
                 {//取消次數
