@@ -146,7 +146,7 @@ namespace BLL.gigade.Dao
                     buywhere.Clear();
                     if (q.cancelTimeMin >= dtime)
                     {//時間限制
-                        buywhere.AppendFormat(" AND FROM_UNIXTIME(order_createdate) >= '{0}' ", q.cancelTimeMin.ToString("yyyy/MM/dd 23:59:59"));
+                        buywhere.AppendFormat(" AND FROM_UNIXTIME(order_createdate) >= '{0}' ", q.cancelTimeMin.ToString("yyyy/MM/dd 00:00:00"));
                     }
                     if (q.cancelTimeMax >= q.cancelTimeMin && q.cancelTimeMax != DateTime.MinValue)
                     {
