@@ -14,7 +14,7 @@ namespace BLL.gigade.Model.Query
         /// <summary>
         /// 條碼
         /// </summary>
-        public string upc_id { get; set; }
+        public string item_upc { get; set; }
         public DateTime starttime { get; set; }
         public DateTime endtime { get; set; }
         public string specname { get; set; }
@@ -25,7 +25,7 @@ namespace BLL.gigade.Model.Query
             istockwhy = string.Empty;
             manager = string.Empty;
             product_name = string.Empty;
-            upc_id = string.Empty;
+            item_upc = string.Empty;
             starttime = DateTime.MinValue;
             endtime = DateTime.Now;
             specname = string.Empty;

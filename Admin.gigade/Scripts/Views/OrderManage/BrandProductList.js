@@ -108,7 +108,7 @@ var DateTypeStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
         { "txt": ALLDATE, "value": "0" },
-        { "txt": CREATEDATE, "value": "1" },
+        { "txt": '訂單日期', "value": "1" },
         { "txt": PAYDATE, "value": "2" }
     ]
 });
@@ -404,7 +404,7 @@ Ext.onReady(function () {
                     }
                 }
             },
-            { header: CREATEDATE, dataIndex: 'order_createdates', width: 120, align: 'center' },
+            { header: "訂單日期", dataIndex: 'order_createdates', width: 120, align: 'center' },
             {
                 header: PAYDATE, dataIndex: 'order_date_pays', width: 120, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {

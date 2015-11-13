@@ -566,15 +566,18 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                     msg: 'Loading...'
                 });
                 myMask.show();
-
                 var newList = [];
                 var oldList = [];
                 var updateList = [];
                 var upDataStore = relevantStore.getUpdatedRecords(); //獲得修改過的store
 
-
                 for (var i = 0; i < relevantStore.data.length; i++) { //查找新增數據
                     var item = relevantStore.data.items[i];
+                    if (item.data.item_name == "" || item.data.tabType == "" || item.data.keyStr == "" || item.data.valueStr == "") {
+                        Ext.Msg.alert(INFO, MESSAGEPROMPT);
+                        myMask.hide();
+                        return;
+                    }
                     if (item.data.id < 0) {
                         item.data.id = 0;
                     }
@@ -583,12 +586,6 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                         item.data.type = item.data.tabType;
                         item.data.key1 = item.data.keyStr;
                         item.data.value1 = item.data.valueStr;
-                        if (item.data.item_name == "" || item.data.tabType == "" || item.data.keyStr == "" || item.data.valueStr == "") {
-                            Ext.Msg.alert(INFO, MESSAGEPROMPT);
-                            myMask.hide();
-                            return;
-                        }
-
                         //upDataStore[upDataStore.length] = item;
                     } else {
                         oldList.push(item.data.item_name);
@@ -635,12 +632,6 @@ var relevantGrid = Ext.create('Ext.grid.Panel', {
                         }
                     }
                 }
-
-
-
-
-
-
 
                 if (!upDataStore.length) {
                     myMask.hide();

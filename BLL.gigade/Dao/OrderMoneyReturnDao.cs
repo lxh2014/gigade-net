@@ -34,7 +34,7 @@ namespace BLL.gigade.Dao
                 sql.AppendFormat(@"bank_branch,bank_account,account_name,money_source,");
                 sql.AppendFormat(@"money_createdate,money_updatedate,money_ipfrom)");
                 sql.AppendFormat(@" values('{0}','{1}','{2}','{3}',", om.money_id, query.order_id, om.money_type, om.money_total);
-                sql.AppendFormat(@"'{0}','{1}','{2}','{3}',", 0, "", query.bank_note, query.bank_name);
+                sql.AppendFormat(@"'{0}','{1}','{2}','{3}',", 0, "", om.bank_note, om.bank_name);
                 sql.AppendFormat(@"'{0}','{1}','{2}','{3}',",  om.bank_branch,om.bank_account,om.account_name, om.money_source);
                 sql.AppendFormat(@"'{0}','{1}','{2}');", CommonFunction.GetPHPTime(), CommonFunction.GetPHPTime(), query.return_ipfrom);
                 return sql.ToString();

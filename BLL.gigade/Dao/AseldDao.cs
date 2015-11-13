@@ -270,7 +270,7 @@ LEFT JOIN order_master o ON a.ord_id=o.order_id
         public List<AseldQuery> GetAseldListByItemid(Aseld a)
         {
             StringBuilder sb = new StringBuilder();//left join iloc ic on i.plas_loc_id=ic.loc_id 
-            sb.AppendFormat(@"SELECT seld_id,assg_id,case when ip.loc_id is null then 'YY999999' else ip.loc_id end as sel_loc,CONCAT('(',a.item_id,')',v.brand_name,'-',p.product_name) as description,concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz,ord_qty,out_qty,ord_id,a.item_id,ordd_id,upc_id,i.cde_dt,pe.cde_dt_shp,deliver_id,deliver_code,o.note_order,ic.hash_loc_id 
+            sb.AppendFormat(@"SELECT seld_id,assg_id,case when ip.loc_id is null then 'YY999999' else ip.loc_id end as sel_loc,CONCAT('(',a.item_id,')',v.brand_name,'-',p.product_name) as description,concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz,ord_qty,out_qty,ord_id,cust_name,a.item_id,ordd_id,upc_id,i.cde_dt,pe.cde_dt_shp,deliver_id,deliver_code,o.note_order,ic.hash_loc_id 
 FROM aseld a LEFT JOIN iinvd i ON a.item_id=i.item_id 
 
 LEFT JOIN product_ext pe ON i.item_id = pe.item_id 
@@ -730,17 +730,20 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
 
         public DataTable GetAseldTable(AseldQuery ase,out int total)
         {
+            ase.Replace4MySQL();
             total = 0;
             string sql = "";
             StringBuilder strAll = new StringBuilder();
             StringBuilder strWhr = new StringBuilder();
             StringBuilder strLimit=new StringBuilder();
             StringBuilder strJoin=new StringBuilder();
-            strAll.Append("SELECT a.assg_id,p.product_id,p.product_name,pi.item_id,CONCAT(ps.spec_name,'-',ps2.spec_name)AS spec,SUM(out_qty)out_qty,SUM(act_pick_qty)act_pick_qty,SUM(a.ord_qty)ord_qty, a.create_dtim,i.loc_id,temp.parameterName,ic.lcat_id   FROM aseld  a");
-            strJoin.Append(" LEFT JOIN product_item pi ON a.item_id=pi.item_id");
-            strJoin.Append(" LEFT JOIN product p ON p.product_id=pi.product_id");
+            strAll.Append("SELECT a.assg_id,p.product_id,p.product_name,pi.item_id,CONCAT(ps.spec_name,'-',ps2.spec_name)AS spec,SUM(out_qty)out_qty,SUM(act_pick_qty)act_pick_qty,SUM(a.ord_qty)ord_qty, a.create_dtim,");
+            strAll.Append(" case ic.lcat_id when 'S' then i.loc_id else IFNULL(ic.lcat_id,case p.product_mode when 2 then 'YY999999' when 3 then 'ZZ999999' else i.loc_id end ) end as loc_id,i.loc_id as loc_id1, ");
+            strAll.Append(" temp.parameterName,ic.lcat_id,ic.lcat_id as upc_id   FROM aseld  a ");
+            strJoin.Append(" inner JOIN product_item pi ON a.item_id=pi.item_id");
+            strJoin.Append(" inner JOIN product p ON p.product_id=pi.product_id");
             strJoin.Append(" LEFT JOIN iplas i ON pi.item_id=i.item_id");
-            strJoin.Append(" LEFT JOIN iloc ic ON ic.loc_id=i.loc_id");
+            strJoin.Append(" left JOIN iloc ic ON ic.loc_id=i.loc_id");
             strJoin.Append(" LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id ");
             strJoin.Append(" LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id");
             strJoin.Append(" LEFT JOIN (select parameterCode,parameterName from t_parametersrc where parameterType ='product_mode') temp ON p.product_mode=temp.parameterCode");
@@ -754,10 +757,10 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
             {
                 strWhr.AppendFormat(" and a.create_dtim between '{0}' and  '{1}'", CommonFunction.DateTimeToString(ase.start_dtim), CommonFunction.DateTimeToString(ase.change_dtim));
             }
-            strWhr.Append(" GROUP BY a.item_id ORDER BY a.create_dtim");
+            strWhr.Append(" GROUP BY a.item_id,a.assg_id  ORDER BY loc_id asc ");
             if(ase.IsPage)
             {
-                total = Convert.ToInt32(_access.getDataTable("SELECT count(item_id) FROM(SELECT a.item_id FROM aseld a " + strJoin.ToString()+strWhr.ToString() + ") temp").Rows[0][0]);
+                total = Convert.ToInt32(_access.getDataTable("SELECT count(item_id) FROM(SELECT a.item_id,case ic.lcat_id when 'S' then i.loc_id else IFNULL(ic.lcat_id,case p.product_mode when 2 then 'YY999999' when 3 then 'ZZ999999' else i.loc_id end ) end as loc_id FROM aseld a " + strJoin.ToString() + strWhr.ToString() + ") temp").Rows[0][0]);
                 strLimit.AppendFormat(" LIMIT {0},{1};",ase.Start,ase.Limit);
             }
             try
@@ -774,7 +777,8 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
         }
 
         public DataTable GetAseldTablePDF(AseldQuery aseld)
-        { 
+        {
+            aseld.Replace4MySQL();
             StringBuilder sbStr = new StringBuilder();
             try
             {

@@ -37,10 +37,10 @@ namespace BLL.gigade.Dao
                 switch (store.serchs)
                 {
                     case "1":
-                        search.AppendFormat(" and os.order_id ='{0}' ", store.search);
+                        search.AppendFormat(" and os.order_id   like   '%{0}%' ", store.search);
                         break;
                     case "2":
-                        search.AppendFormat(" and os.slave_id ='{0}' ", store.search);
+                        search.AppendFormat(" and os.slave_id  like  '%{0}%' ", store.search);
                         break;
                     case "3":
                         search.AppendFormat(" and od.deliver_code LIKE '%{0}%' ", store.search);
