@@ -65,6 +65,7 @@ editFunction = function (row, store) {
         extend: 'Ext.data.Model',
         fields: [
             { name: 'template_id', type: 'int' },
+            { name: 'template_name', type: 'string' },
             { name: 'edit_url', type: 'string' }
         ]
     });
@@ -79,6 +80,14 @@ editFunction = function (row, store) {
                 root: 'data'
             }
         }
+    });
+
+
+    EdmTemplateStore.on('beforeload', function () {
+        Ext.apply(EdmTemplateStore.proxy.extraParams,
+        {
+            template_id: Ext.getCmp('template_id').getValue(),
+        });
     });
 
     var importanceStore = Ext.create('Ext.data.Store', {
@@ -159,7 +168,7 @@ editFunction = function (row, store) {
                 xtype: 'combobox',
                 store: EdmTemplateStore,
                 valueField: 'template_id',
-                displayField: 'edit_url',
+                displayField: 'template_name',
                 fieldLabel: '郵件範本',
                 id: 'template_id',
                 name: 'template_id',
@@ -169,39 +178,51 @@ editFunction = function (row, store) {
                 listeners: {
                     'select': function () {
                         var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
-                        myMask.show();
-                        Ext.Ajax.request({
-                            url: '/EdmNew/GetEditUrlData',
-                            params: {
-                                edit_url: Ext.getCmp('template_id').getRawValue(),
-                            },
-                            success: function (data) {
-                                myMask.hide();
-                                var result = data.responseText;
-                                if (result == "獲取網頁出現異常！") {
-                                    Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
-                                    }
-                                else {
-                                    var index = result.indexOf(split_str);
-                                    if(index > 0) {
-                                        Query(2);
-                                        var editData1 = result.substr(0, index);
-                                        var editData2 = result.substr(index + split_str.length, result.length - (index + split_str.length));
-                                        $("#editor").data("kendoEditor").value(editData1);
-                                        $("#editor2").data("kendoEditor").value(editData2);
+                        var template_id_sel = Ext.getCmp('template_id').getValue();
+                        var content_id_sel = Ext.getCmp('content_id').getValue();
+                        if (content_id_sel == "") {
+                            NextAjax();
+                        }
+                        else {
+                            //數據庫中有沒有 where  contnet_id=  and template_id=
+                            //如果有就把html帶過來
+                            //如果沒有就不帶過來
+                            myMask.show();
+                            Ext.Ajax.request({
+                                url: '/EdmNew/GetHtml',
+                                params: {
+                                    content_id: Ext.getCmp('content_id').getValue(),
+                                    template_id: Ext.getCmp('template_id').getValue(),
+                                },
+                                success: function (data) {
+                                    myMask.hide();
+                                    var result = data.responseText;
+                                    if (result != "") {
+                                        myMask.hide();
+                                        var index = result.indexOf(split_str);
+                                        if (index > 0) {
+                                            Query(2);
+                                            var editData1 = result.substr(0, index);
+                                            var editData2 = result.substr(index + split_str.length, result.length - (index + split_str.length));
+                                            $("#editor").data("kendoEditor").value(editData1);
+                                            $("#editor2").data("kendoEditor").value(editData2);
+                                        }
+                                        else {
+                                            Query(1);
+                                            $("#editor3").data("kendoEditor").value(result);
+                                        }
                                     }
                                     else {
-                                        Query(1);
-                                        $("#editor3").data("kendoEditor").value(result);
+                                        NextAjax();
                                     }
-                                  
+                                },
+                                failure: function () {
+                                    myMask.hide();
+                                    Ext.Msg.alert("提示信息","出現異常");
                                 }
-                            },
-                            failure: function () {
-                                myMask.hide();
-                                Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
-                            }
-                        });
+                            });
+                        }
+                      
                     }
                 }
             },
@@ -316,8 +337,13 @@ editFunction = function (row, store) {
                     Ext.getCmp('template_id').allowBlank = true;
                     editFrm.getForm().loadRecord(row);
                     initRow(row);
+                  
+                    
                 }
                 else {
+                    EdmTemplateStore.on('load', function () {
+                        Ext.getCmp('template_id').select(EdmTemplateStore.getAt(0));
+                    });
                     Query(1);
                     Ext.getCmp('sender_id').allowBlank = false;
                     Ext.getCmp('group_id').allowBlank = false;
@@ -466,6 +492,43 @@ editFunction = function (row, store) {
                 }
 
             });
+        });
+    }
+    function NextAjax()
+    {
+        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+        myMask.show();
+        Ext.Ajax.request({
+            url: '/EdmNew/GetEditUrlData',
+            params: {
+                template_id: Ext.getCmp('template_id').getValue(),
+            },
+            success: function (data) {
+                myMask.hide();
+                var result = data.responseText;
+                if (result == "獲取網頁出現異常！") {
+                    Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
+                }
+                else {
+                    var index = result.indexOf(split_str);
+                    if (index > 0) {
+                        Query(2);
+                        var editData1 = result.substr(0, index);
+                        var editData2 = result.substr(index + split_str.length, result.length - (index + split_str.length));
+                        $("#editor").data("kendoEditor").value(editData1);
+                        $("#editor2").data("kendoEditor").value(editData2);
+                    }
+                    else {
+                        Query(1);
+                        $("#editor3").data("kendoEditor").value(result);
+                    }
+
+                }
+            },
+            failure: function () {
+                myMask.hide();
+                Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
+            }
         });
     }
 }

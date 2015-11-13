@@ -46,5 +46,6 @@ namespace BLL.gigade.Mgr.Impl
         DataTable GetIinvdCountBook(IinvdQuery m);
         int GetProqtyByItemid(int item_id);
         List<IinvdQuery> GetSearchIinvd(Model.Query.IinvdQuery ivd);
+        List<IinvdQuery> GetPlasIinvd(Model.Query.IinvdQuery ivd);
     }
 }

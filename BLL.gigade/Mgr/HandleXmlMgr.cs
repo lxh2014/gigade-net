@@ -20,7 +20,9 @@ namespace BLL.gigade.Mgr
         private string fileName = "";
 
         private string xmlStr = "";
-            
+
+        private int rowId = 1;
+
         public List<XmlModelCustom> GetXmlName(string fullPath)
         {
             try
@@ -238,10 +240,22 @@ namespace BLL.gigade.Mgr
                 if (oldNode.HasChildNodes)
                 {
                     XmlNodeList childNode = oldNode.ChildNodes;
-                    foreach (XmlNode xn in childNode)
+                    int index = 0;
+                    int count = childNode.Count;///因為child.count在後面會改變所以先記錄下來
+                    for (int i = 0; i < count; i++)
                     {
-                        newNode.AppendChild(xn);
+                        if (childNode[index] != null)
+                        {
+                            newNode.AppendChild(childNode[index]);
+                        }
                     }
+                    //newNode.AppendChild(childNode[0]);
+                    //newNode.AppendChild(childNode[0]);
+                    //foreach (XmlNode xn in childNode)
+                    //{
+                    //    XmlNode temp = xn;
+                    //    newNode.AppendChild(temp);
+                    //}
                 }
                 return newNode;
             }
@@ -331,6 +345,7 @@ namespace BLL.gigade.Mgr
         {
             try
             {
+
                 foreach (XmlNode xn in xmlList)
                 {
                     if (xn.InnerText.IndexOf("version=\"1.0\"") >= 0 || xn.Name == "#text"||xn.Name=="#comment")
@@ -338,16 +353,11 @@ namespace BLL.gigade.Mgr
                         continue;
                     }
                     XmlModelCustom xTemp = new XmlModelCustom();
-                    if (xn.HasChildNodes)
-                    {
-                        XmlNodeList xList = xn.ChildNodes;
-                        xTemp.children = ToSort(xList, xTemp.children);
-                    }
+                    xTemp.isTopNode = xn.ParentNode.Name == "#document" ? true : false;///設置是否是根節點
                     if (xn.Attributes != null)
                     {
                         xTemp = GetAttributes((XmlElement)xn, xTemp);///設置和屬性相關內容
                     }
-                    xTemp.isTopNode = xn.ParentNode.Name == "#document" ? true : false;///設置是否是根節點
                     xTemp.fileName = this.fileName;
                     xTemp.name = xn.Name;///設置Node節點的名稱
                     xTemp.text = xn.Name;
@@ -357,6 +367,11 @@ namespace BLL.gigade.Mgr
                     if (xTemp.isLastNode == true && xTemp.code != "") xTemp.text = xTemp.code;
                     if (xTemp.isTopNode == true) xTemp.xmlStr = xmlStr;
                     sortList.Add(xTemp);
+                    if (xn.HasChildNodes)
+                    {
+                        XmlNodeList xList = xn.ChildNodes;
+                        xTemp.children = ToSort(xList, xTemp.children);
+                    }
                 }
 
                 return sortList;

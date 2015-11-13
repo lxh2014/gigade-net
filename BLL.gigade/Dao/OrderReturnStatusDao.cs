@@ -159,7 +159,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("set sql_safe_updates = 0;update order_return_master set return_status=1 where return_id='{0}';set sql_safe_updates = 1;", query.return_id);
+                sql.AppendFormat("set sql_safe_updates = 0;update order_return_master set return_status=1,bank_name='{0}', bank_branch='{1}',bank_account='{2}',account_name='{3}',bank_note='{4}'  where return_id='{5}';set sql_safe_updates = 1;", query.bank_name, query.bank_branch, query.bank_account, query.account_name, query.bank_note,query.return_id);
                 return sql.ToString();
             }
             catch (Exception ex)
@@ -177,7 +177,7 @@ namespace BLL.gigade.Dao
             try
             {
                 totalCount = 0;
-                sql.Append("select orm.order_id,od.item_id,od.product_name,para.parameterName as 'product_mode',od.product_spec_name,od.buy_num,od.single_money ,om.order_payment,orm.bank_name,orm.bank_branch,orm.bank_account,orm.account_name  ");
+                sql.Append("select orm.order_id,od.item_id,od.product_name,para.parameterName as 'product_mode',od.product_spec_name,od.buy_num,od.single_money ,om.order_payment,orm.bank_name,orm.bank_branch,orm.bank_account,orm.account_name,orm.bank_note  ");
                 sqlFrom.Append(" from order_return_master  orm  LEFT JOIN order_return_detail ord on orm.return_id=ord.return_id ");
                 sqlFrom.Append("LEFT JOIN order_detail  od on ord.detail_id=od.detail_id ");
                 sqlFrom.Append(" LEFT JOIN (select parameterCode,parameterName,remark from t_parametersrc where parametertype='product_mode') para on od.product_mode=para.parameterCode  ");
@@ -213,7 +213,7 @@ namespace BLL.gigade.Dao
 
             try
             {
-                sql.Append("select parameterCode, parameterName from t_parametersrc where parameterType='orc_type';");
+                sql.Append("select parameterCode, parameterName from t_parametersrc where parameterType='orc_type' ORDER BY  sort  ;");
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
@@ -414,6 +414,7 @@ namespace BLL.gigade.Dao
                         omr.bank_branch = query.bank_branch;
                         omr.bank_account = query.bank_account;
                         omr.account_name = query.account_name;
+                        omr.bank_note = query.bank_note;
                         string insertSql = _orderMoneyReturnDao.InsertSql(omQuery, omr);
 
                         arrList.Add(insertSql);

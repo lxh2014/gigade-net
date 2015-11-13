@@ -129,7 +129,7 @@ namespace BLL.gigade.Dao
                     }
                     if (q.buyCondition != 0 && q.buyTimes <= 1)
                     {
-                        where.AppendFormat(" AND u.user_id NOT IN (select user_id FROM order_master om WHERE order_status NOT IN(90,91) {0} GROUP BY user_id)", buywhere);
+                        where.AppendFormat(" AND NOT EXISTS (SELECT om.user_id FROM order_master AS om WHERE om.user_id = u.user_id AND om.order_status NOT IN(90,91) {0}  GROUP BY om.user_id) ", buywhere);
                     }
                     else
                     {
@@ -139,38 +139,28 @@ namespace BLL.gigade.Dao
                 }
                 if (q.ChkAge)
                 {//年齡
-                    where.AppendFormat(" AND {0}-u.user_birthday_year >={1} AND {0}-u.user_birthday_year <{2} ", DateTime.Now.Year, q.ageMin, q.ageMax);
+                    where.AppendFormat(" AND u.user_birthday_year BETWEEN {0} AND {1} ", DateTime.Now.Year - q.ageMax, DateTime.Now.Year - q.ageMin);
                 }
                 if (q.ChkCancel)
                 {//取消次數
                     buywhere.Clear();
                     if (q.cancelTimeMin >= dtime)
                     {//時間限制
-                        buywhere.AppendFormat(" AND FROM_UNIXTIME(order_createdate) >= '{0}' ", q.buyTimeMin.ToString("yyyy/MM/dd 00:00:00"));
+                        buywhere.AppendFormat(" AND FROM_UNIXTIME(order_createdate) >= '{0}' ", q.cancelTimeMin.ToString("yyyy/MM/dd 23:59:59"));
                     }
                     if (q.cancelTimeMax >= q.cancelTimeMin && q.cancelTimeMax != DateTime.MinValue)
                     {
-                        buywhere.AppendFormat(" AND FROM_UNIXTIME(order_createdate) <= '{0}' ", q.buyTimeMax.ToString("yyyy/MM/dd 23:59:59"));
+                        buywhere.AppendFormat(" AND FROM_UNIXTIME(order_createdate) <= '{0}' ", q.cancelTimeMax.ToString("yyyy/MM/dd 23:59:59"));
                     }
                     if (q.cancelCondition != 0 && q.cancelTimes <= 1)
                     {
-                        where.AppendFormat(" AND u.user_id NOT IN (select user_id FROM order_master om WHERE order_status IN(90) {0} GROUP BY user_id)", buywhere);
+                        where.AppendFormat(" AND NOT EXISTS (select user_id FROM order_master om WHERE om.user_id = u.user_id AND order_status IN(90) {0} GROUP BY om.user_id)", buywhere);
                     }
                     else
                     {
                         where.AppendFormat(" AND qx.qxcs {0} {1} ", q.cancelCondition == 0 ? ">" : "<", q.cancelTimes);
                         join.AppendFormat(" LEFT JOIN (select user_id,count(om.order_id) as 'qxcs' FROM order_master om WHERE order_status IN (90) {0} GROUP BY user_id) qx ON u.user_id=qx.user_id ", buywhere);
                     }
-                    //where.AppendFormat(" AND qx.qxcs {0} {1} ", q.cancelCondition == 0 ? ">" : "<", q.cancelTimes);
-                    //if (q.cancelTimeMin >= dtime)
-                    //{//時間限制
-                    //    buywhere.AppendFormat(" AND FROM_UNIXTIME(cancel_createdate) >= '{0}' ", q.cancelTimeMin.ToString("yyyy/MM/dd 00:00:00"));
-                    //}
-                    //if (q.cancelTimeMax >= q.cancelTimeMin && q.cancelTimeMax != DateTime.MinValue)
-                    //{
-                    //    buywhere.AppendFormat(" AND FROM_UNIXTIME(cancel_createdate) <= '{0}' ", q.cancelTimeMax.ToString("yyyy/MM/dd 23:59:59"));
-                    //}
-                    //join.AppendFormat(" LEFT JOIN (select om.user_id,Count(ocm.cancel_id) as 'qxcs' FROM order_cancel_master ocm LEFT JOIN order_master om on ocm.order_id=om.order_id WHERE cancel_status=1 {0} GROUP BY om.user_id) qx ON u.user_id=qx.user_id ", buywhere);
                 }
                 if (q.ChkRegisterTime)
                 {//註冊時間
@@ -196,7 +186,7 @@ namespace BLL.gigade.Dao
                     }
                     if (q.returnCondition != 0 && q.returnTimes <= 1)
                     {
-                        where.AppendFormat("AND u.user_id not in (select DISTINCT om.user_id FROM order_return_master orm LEFT JOIN order_master om on orm.order_id=om.order_id WHERE return_status=1 {0})", buywhere);
+                        where.AppendFormat("AND NOT EXISTS (select DISTINCT om.user_id FROM order_return_master orm LEFT JOIN order_master om on orm.order_id=om.order_id WHERE om.user_id = u.user_id AND return_status=1 {0}  GROUP BY om.user_id)", buywhere);
                     }
                     else
                     {
@@ -218,8 +208,15 @@ namespace BLL.gigade.Dao
                 }
                 if (q.ChkNotice)
                 {//貨到通知
-                    join.Append(" LEFT JOIN (SELECT user_id,Count(id) as hdtz from arrival_notice GROUP BY user_id) an ON u.user_id = an.user_id ");
-                    where.AppendFormat(" AND an.hdtz {0} {1} ", q.noticeCondition == 0 ? ">" : "<", q.noticeTimes);
+                    if (q.noticeCondition != 0 && q.noticeTimes <= 1)
+                    {
+                        where.Append(" AND NOT EXISTS (SELECT a.user_id,Count(a.id) as hdtz from arrival_notice a WHERE a.user_id = u.user_id GROUP BY user_id )");
+                    }
+                    else
+                    {
+                        join.Append(" LEFT JOIN (SELECT user_id,Count(id) as hdtz from arrival_notice GROUP BY user_id) an ON u.user_id = an.user_id ");
+                        where.AppendFormat(" AND an.hdtz {0} {1} ", q.noticeCondition == 0 ? ">" : "<", q.noticeTimes);
+                    }
                 }
                 if (q.ChkLastLogin)
                 {//最後登入
@@ -253,7 +250,7 @@ namespace BLL.gigade.Dao
             }
             catch (Exception ex)
             {
-                throw new Exception(" EdmListConditionMainDao-->GetUserNum " + ex.Message, ex);
+                throw new Exception(" EdmListConditionMainDao-->GetUserNum " + ex.Message + "sql:" + sql.ToString() + join.ToString() + where.ToString(), ex);
             }
         }
 

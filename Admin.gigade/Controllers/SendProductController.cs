@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using BLL.gigade.Common;
 using System.Collections.Specialized;
+using System.Text.RegularExpressions;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.collection;
@@ -47,6 +48,7 @@ namespace Admin.gigade.Controllers
         IOrderSlaveMasterImplMgr _orderSlaveMasterMgr;
         IChannelImplMgr _channelMgr;
         IZipImplMgr _zipMgr;
+        IDeliverChangeLogImplMgr _DeliverChangeLogMgr;
         string filename = string.Empty;
         #region View
         /// <summary>
@@ -180,6 +182,14 @@ namespace Admin.gigade.Controllers
         /// </summary>
         /// <returns></returns>
         public ActionResult DeliverMasterList()
+        {
+            return View();
+        }
+        /// <summary>
+        /// 出貨單期望到貨日
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult DeliverExpectArrival()
         {
             return View();
         }
@@ -5571,6 +5581,172 @@ namespace Admin.gigade.Controllers
             }
             this.Response.Clear();
             this.Response.Write(jsonStr.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+
+        #region 出貨單期望到貨日
+        /// <summary>
+        /// 出貨單期望到貨日
+        /// </summary>
+        /// <returns></returns>
+        // by zhaozhi0623j add at 20151110
+        public HttpResponseBase GetDeliverExpectArrivalList()
+        {
+            string json = string.Empty;
+            DeliverMasterQuery dmQuery = new DeliverMasterQuery();
+            _DeliverMsterMgr = new DeliverMasterMgr(mySqlConnectionString);
+            List<DeliverMasterQuery> dmList = new List<DeliverMasterQuery>();
+            try
+            {
+                dmQuery.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                dmQuery.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");//用於分頁的變量
+
+                #region 查詢條件
+
+                if (Request.Params["productMode"] != "-1")//type為0時，表示全部
+                {
+                    dmQuery.type = Convert.ToUInt32(Request.Params["productMode"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["freightType"]))//freight_set為0時，表示全部
+                {
+                    dmQuery.freight_set = Convert.ToUInt32(Request.Params["freightType"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["deliveryStatus"]))//delivery_status為10000時，表示全部狀態
+                {
+                    dmQuery.delivery_status = Convert.ToUInt32(Request.Params["deliveryStatus"]);
+                }
+
+
+                if (!string.IsNullOrEmpty(Request.Params["deliverId"]))
+                {
+                    dmQuery.deliver_id = Convert.ToUInt32(Request.Params["deliverId"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["orderId"]))
+                {
+                    dmQuery.order_id = Convert.ToInt32(Request.Params["orderId"]);
+                }
+                string vendorId_ro_name = Request.Params["vendorId_ro_name"];
+                if (!string.IsNullOrEmpty(vendorId_ro_name))
+                {
+                    if (Regex.IsMatch(vendorId_ro_name, @"^[0-9]*$"))
+                    {
+                        dmQuery.vendor_id = Convert.ToUInt32(vendorId_ro_name);
+                    }
+                    else
+                    {
+                        dmQuery.vendor_name_full = vendorId_ro_name;
+                    }
+                }
+                if (!string.IsNullOrEmpty(Request.Params["time_start"]))
+                {             
+                    dmQuery.time_start = Convert.ToDateTime(Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy-MM-dd "));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["time_end"]))
+                {
+                    dmQuery.time_end = Convert.ToDateTime(Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy-MM-dd "));
+                } 
+                #endregion
+
+                int totalCount = 0;
+                dmList = _DeliverMsterMgr.GetDeliverExpectArriveList(dmQuery,out totalCount);
+                //foreach (var item in dmList)
+                //{
+                //    if(item.type==)
+                    
+                //}
+
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(dmList, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        public HttpResponseBase SaveDeliverExportArrivalInfo()
+        {
+            string json = string.Empty;
+            DeliverChangeLog dCL = new DeliverChangeLog();
+            DeliverMasterQuery dmQuery = new DeliverMasterQuery();
+            _DeliverChangeLogMgr = new DeliverChangeLogMgr(mySqlConnectionString);
+            _DeliverMsterMgr = new DeliverMasterMgr(mySqlConnectionString);
+            try
+            {
+                                             
+                dCL.deliver_id = Convert.ToUInt32(Request.Params["deliver_id"]);
+                dCL.dcl_create_datetime = DateTime.Now;
+                dCL.dcl_ipfrom = CommonFunction.GetIP4Address(Request.UserHostAddress.ToString());
+                dCL.dcl_create_muser = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+                dCL.dcl_create_user = 0;
+                dCL.dcl_create_type = 2;
+                dmQuery.deliver_id = Convert.ToUInt32(Request.Params["deliver_id"]); 
+    
+                if (!string.IsNullOrEmpty(Request.Params["dcl_note"]))
+                {
+                    dCL.dcl_note = Request.Params["dcl_note"]; 
+                }
+                if (!string.IsNullOrEmpty(Request.Params["expect_arrive_date"]))
+                {
+                    dCL.expect_arrive_date = Convert.ToDateTime(Request.Params["expect_arrive_date"]);
+                    dmQuery.expect_arrive_date = Convert.ToDateTime(Request.Params["expect_arrive_date"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["expect_arrive_period"]))
+                {
+                    dCL.expect_arrive_period = Convert.ToInt32(Request.Params["expect_arrive_period"]);
+                    dmQuery.expect_arrive_period = Convert.ToInt32(Request.Params["expect_arrive_period"]);
+                }
+                                               
+                //更新deliver_mater表的 期望到貨日期、時段
+                int result1 = _DeliverMsterMgr.UpdateExpectArrive(dmQuery);
+                //向deliver_change_log表插入數據
+                int result2 = _DeliverChangeLogMgr.insertDeliverChangeLog(dCL);
+
+                if (result1 > 0)
+                {
+                    if (result2 > 0)
+                    {
+                        json = "{success:true,msg:'保存成功'}";//
+                    }
+                    else
+                    {
+                        json = "{success:true,msg:'deliver_mster表數據更新成功,<br/>deliver_change_log表數據添加失敗'}";
+                    }
+                }
+                else
+                {
+                    if (result2 > 0)
+                    {
+                        json = "{success:true,msg: 'deliver_mster表數據更新失敗,<br/>deliver_change_log數據添加成功'}";
+                    }
+                    else
+                    {
+                        json = "{success:true,msg:'deliver_mster表數據更新失敗,<br/>deliver_change_log表數據添加失敗'}";
+                    }
+                }                
+            }
+            catch(Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,msg:'保存失敗'}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
             this.Response.End();
             return this.Response;
         }

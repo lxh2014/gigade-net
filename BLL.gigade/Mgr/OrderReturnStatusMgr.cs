@@ -42,7 +42,7 @@ namespace BLL.gigade.Mgr
                 {
                     if (Convert.ToInt32(_dt.Rows[0][0]) == 2 || Convert.ToInt32(_dt.Rows[0][0]) == 3 || Convert.ToInt32(_dt.Rows[0][0]) == 4)
                     {
-                        return json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "',order_payment:'" + store[0].order_payment + "',bank_name:'" + store[0].bank_name + "',bank_branch:'" + store[0].bank_branch + "',bank_account:'" + store[0].bank_account + "',account_name:'" + store[0].account_name + "' }";
+                        return json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "',order_payment:'" + store[0].order_payment + "',bank_name:'" + store[0].bank_name + "',bank_branch:'" + store[0].bank_branch + "',bank_account:'" + store[0].bank_account + "',account_name:'" + store[0].account_name + "',bank_note:'" + store[0].bank_note + "' }";
                     }
 
                     if (_tranDt==null ||  _tranDt.Rows[0][0].ToString() == "")

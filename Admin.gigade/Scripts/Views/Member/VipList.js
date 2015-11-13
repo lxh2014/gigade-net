@@ -263,7 +263,7 @@ Ext.onReady(function () {
            },
           {
               xtype: "datefield",
-              fieldLabel: "歸檔訂單創建日期",
+              fieldLabel: "最近歸檔日",
               id: 'dateOne',
               name: 'dateOne',
               format: 'Y-m-d',

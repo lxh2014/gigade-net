@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -694,7 +694,10 @@
     <Content Include="Locale\zh-TW\SiteManager\lang.js" />
     <Content Include="Locale\zh-TW\TrialProdCate\TrialProdCateLang.js" />
     <Content Include="Locale\zh-TW\Vote\Lang.js" />
+    <Content Include="Scripts\Bootstrap\bootstrap-datetimepicker.min.js" />
+    <Content Include="Scripts\Bootstrap\bootstrap-datetimepicker.zh-TW.js" />
     <Content Include="Scripts\Bootstrap\bootstrap-table.min.js" />
+    <Content Include="Scripts\Bootstrap\css\bootstrap-datetimepicker.min.css" />
     <Content Include="Scripts\Bootstrap\css\bootstrap-table.min.css" />
     <Content Include="Scripts\Bootstrap\css\bootstrap.css" />
     <Content Include="Locale\zh-TW\XMLManage\XMLIndex.js" />
@@ -1963,6 +1966,8 @@
     <Content Include="Scripts\Views\ScheduleService\ScheduleService.js" />
     <Content Include="Scripts\Views\SecretInfo\SecretResetPwd.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverMasterList.js" />
+    <Content Include="Scripts\Views\SendProduct\DeliverExportArrivalList.js" />
+    <Content Include="Scripts\Views\SendProduct\DeliverExportArrivalEdit.js" />
     <Content Include="Scripts\Views\Service\OrderQuestionAdd.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaEdit.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaList.js" />
@@ -2033,10 +2038,10 @@
     <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.woff2" />
     <None Include="Properties\PublishProfiles\giagade-web.pubxml" />
     <None Include="Properties\PublishProfiles\zz125.pubxml" />
+    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.woff2" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all-vsdoc.js" />
     <None Include="Scripts\kendo\2014.2.716\kendo.all.min.intellisense.js" />
     <Content Include="Scripts\kendo\2014.2.716\kendo.all.min.js" />
@@ -4464,6 +4469,7 @@
     <Content Include="Views\EdmNew\Editkendo2.cshtml" />
     <Content Include="Template\SiteStatistics\SiteStatistics.xlsx" />
     <Content Include="Views\WareHouse\Aseld.cshtml" />
+    <Content Include="Views\SendProduct\DeliverExpectArrival.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4678,7 +4684,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>1489</DevelopmentServerPort>
+          <DevelopmentServerPort>57707</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>
