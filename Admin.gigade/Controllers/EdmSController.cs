@@ -39,7 +39,6 @@ namespace Admin.gigade.Controllers
             _edmlistmainMgr = new EdmListConditionMainMgr(sqlConnectionString);
             try
             {
-            
                 store = _edmlistmainMgr.GetConditionList();
                 item.elcm_id = 0;
                 item.elcm_name = "無";

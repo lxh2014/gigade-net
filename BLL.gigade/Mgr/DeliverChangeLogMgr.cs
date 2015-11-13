@@ -1,4 +1,16 @@
-﻿using System;
+﻿/*
+* 文件名稱 :DeliverChangeLogDao.cs
+* 文件功能描述 :出貨管理--出貨單期望到貨日
+* 版權宣告 :
+* 開發人員 : zhaozhi0623j
+* 版本資訊 : 1.0
+* 日期 : 2015-11-12
+* 修改人員 :
+* 版本資訊 : 
+* 日期 : 
+* 修改備註 : 
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

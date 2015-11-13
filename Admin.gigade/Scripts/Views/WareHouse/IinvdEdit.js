@@ -354,7 +354,7 @@
                                         params: {
                                             //id: Ext.htmlEncode(Ext.getCmp('plas_prdd_id').getValue()),//條碼
                                             iialg: 'N',//寄倉流程 新增庫存用到
-                                            item_id: Ext.htmlEncode(Ext.getCmp('plas_prod_id').getValue()),//商品品號
+                                            item_id: Ext.htmlEncode(Ext.getCmp('Pitem_id').getValue()),//商品品號
                                             product_name: Ext.htmlEncode(Ext.getCmp('product_name').getValue()),//品名
                                             prod_qty: Ext.htmlEncode(Ext.getCmp('prod_qty').getValue()),//數量
                                             startTime: Ext.htmlEncode(Ext.getCmp('startTime').getValue()),//創建時間
