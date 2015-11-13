@@ -23,6 +23,7 @@
                 fieldLabel: '訂單',
                 id: 'order_id',
                 name: 'order_id',
+                //readOnly: true,
                 allowBlank: false,
                 regex: /^[-+]?([1-9]\d*|0)$/,
                 regexText: '請輸入數字',
@@ -74,7 +75,6 @@
             id: 'account_collection_time',
             format: 'Y-m-d',
             maxLength: 25,
-            value: new Date(),
             fieldLabel: '入賬時間',
             listeners: {
                 change: function (a, b, c) {
@@ -84,7 +84,7 @@
                         collM.allowBlank = false;
                         collP.allowBlank = false;
                         collM.setDisabled(false);
-                        collP.setDisabled(false);                     
+                        collP.setDisabled(false);
                     } else {
                         collM.setValue(0);
                         collP.setValue(0);
@@ -159,6 +159,50 @@
              disabled: true,
              fieldLabel: '退貨手續費'
          },
+             {
+                 xtype: 'datetimefield',
+                 name: 'invoice_date_manual',
+                 id: 'invoice_date_manual',
+                 format: 'Y-m-d',
+                 maxLength: 25,
+                 fieldLabel: '手開發票日期',
+                 listeners: {
+                     change: function (a, b, c) {
+                         var collMI = Ext.getCmp("invoice_sale_manual");
+                         var collPI = Ext.getCmp("invoice_tax_manual");
+                         if (Ext.getCmp("invoice_date_manual").getValue() != null) {
+                             collMI.allowBlank = false;
+                             collPI.allowBlank = false;
+                             collMI.setDisabled(false);
+                             collPI.setDisabled(false);
+                         } else {
+                             collMI.setValue(0);
+                             collPI.setValue(0);
+                             collMI.allowBlank = true;
+                             collPI.allowBlank = true;
+                             collMI.setValue("");
+                             collPI.setValue("");
+                             collMI.setDisabled(true);
+                             collPI.setDisabled(true);
+                         }
+                     }
+                 }
+             },
+        {
+            xtype: 'numberfield',
+            name: 'invoice_sale_manual',
+            id: 'invoice_sale_manual',
+            allowDecimals: false,
+            disabled: true,
+            fieldLabel: '手開發票銷售額'
+        },
+        {
+            xtype: 'numberfield',
+            name: 'invoice_tax_manual',
+            id: 'invoice_tax_manual',
+            disabled: true,
+            fieldLabel: '手開發票稅額'
+        },
         {
             xtype: 'textfield',
             name: 'remark',
@@ -172,10 +216,10 @@
             text: '保存',
             handler: function () {
                 var form = this.up('form').getForm();
-                if (Ext.getCmp("account_collection_time").getValue() == null && Ext.getCmp("return_collection_time").getValue() == null) {
-                    Ext.Msg.alert(INFORMATION, "必須寫入入賬信息或退貨入賬信息！");
-                    return;
-                }
+                //if (Ext.getCmp("account_collection_time").getValue() == null && Ext.getCmp("return_collection_time").getValue() == null) {
+                //    Ext.Msg.alert(INFORMATION, "必須寫入入賬信息或退貨入賬信息！");
+                //    return;
+                //}
                 if (row == null)//空表示新增
                 {
                     if (Ext.getCmp('order_status').getValue() == "訂單存在") {
@@ -192,6 +236,9 @@
                                     return_collection_time: Ext.htmlEncode(Ext.getCmp('return_collection_time').getValue()),
                                     return_collection_money: Ext.htmlEncode(Ext.getCmp('return_collection_money').getValue()),
                                     return_poundage: Ext.htmlEncode(Ext.getCmp('return_poundage').getValue()),
+                                    invoice_date_manual: Ext.htmlEncode(Ext.getCmp('invoice_date_manual').getValue()),
+                                    invoice_sale_manual: Ext.htmlEncode(Ext.getCmp('invoice_sale_manual').getValue()),
+                                    invoice_tax_manual: Ext.htmlEncode(Ext.getCmp('invoice_tax_manual').getValue()),
                                     remark: Ext.htmlEncode(Ext.getCmp('remark').getValue())
                                 },
                                 success: function (form, action) {
@@ -235,6 +282,9 @@
                                     return_collection_time: Ext.htmlEncode(Ext.getCmp('return_collection_time').getValue()),
                                     return_collection_money: Ext.htmlEncode(Ext.getCmp('return_collection_money').getValue()),
                                     return_poundage: Ext.htmlEncode(Ext.getCmp('return_poundage').getValue()),
+                                    invoice_date_manual: Ext.htmlEncode(Ext.getCmp('invoice_date_manual').getValue()),
+                                    invoice_sale_manual: Ext.htmlEncode(Ext.getCmp('invoice_sale_manual').getValue()),
+                                    invoice_tax_manual: Ext.htmlEncode(Ext.getCmp('invoice_tax_manual').getValue()),
                                     remark: Ext.htmlEncode(Ext.getCmp('remark').getValue())
                                 },
                                 success: function (form, action) {
@@ -275,6 +325,9 @@
                                         return_collection_time: Ext.htmlEncode(Ext.getCmp('return_collection_time').getValue()),
                                         return_collection_money: Ext.htmlEncode(Ext.getCmp('return_collection_money').getValue()),
                                         return_poundage: Ext.htmlEncode(Ext.getCmp('return_poundage').getValue()),
+                                        invoice_date_manual: Ext.htmlEncode(Ext.getCmp('invoice_date_manual').getValue()),
+                                        invoice_sale_manual: Ext.htmlEncode(Ext.getCmp('invoice_sale_manual').getValue()),
+                                        invoice_tax_manual: Ext.htmlEncode(Ext.getCmp('invoice_tax_manual').getValue()),
                                         remark: Ext.htmlEncode(Ext.getCmp('remark').getValue())
                                     },
                                     success: function (form, action) {
@@ -347,6 +400,10 @@
                     if (row.data.return_collection_time != "" && row.data.return_collection_time != null && row.data.return_collection_time != '0001/01/01') {
                         var RcollecTime = new Date(row.data.return_collection_time);
                         Ext.getCmp('return_collection_time').setValue(RcollecTime);
+                    }
+                    if (row.data.invoice_date_manual != "" && row.data.invoice_date_manual != null && row.data.invoice_date_manual != '0001/01/01') {
+                        var RcollecTimeI = new Date(row.data.invoice_date_manual);
+                        Ext.getCmp('invoice_date_manual').setValue(RcollecTimeI);
                     }
                 }
 

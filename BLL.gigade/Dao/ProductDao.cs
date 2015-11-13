@@ -1499,7 +1499,8 @@ WHERE   ((order_payment=8 and money_collect_date=0) or money_collect_date<>0)) a
 
         public Model.Custom.OrderComboAddCustom OrderQuery(Product query, uint user_level, uint user_id, uint site_id)
         {
-            StringBuilder stb = new StringBuilder("select distinct a.price_type, b.product_id,b.product_name,b.cost,b.price as product_cost,c.buy_limit,case c.g_must_buy ");
+            //edit by zhuoqin0830w  2015/11/06 添加 活動成本,活動時間 查詢欄位 b.event_cost,b.event_end,b.event_start
+            StringBuilder stb = new StringBuilder("select distinct a.price_type, b.product_id,b.product_name,b.cost,b.price as product_cost,b.event_cost,b.event_end,b.event_start,c.buy_limit,case c.g_must_buy ");
             stb.Append("when 0 then count(c.g_must_buy) else c.g_must_buy end  as g_must_buy, ");
             stb.Append("case c.g_must_buy when 0 then 2 else 3 end as child ");
             stb.Append("from product a ");

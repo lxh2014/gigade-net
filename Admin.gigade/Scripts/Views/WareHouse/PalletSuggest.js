@@ -66,7 +66,7 @@
                        
                       {
                           xtype: "textfield",
-                          fieldLabel: '商品編號/條碼',
+                          fieldLabel: '商品細項編號/條碼',
                           id: 'item_id',
                           labelWidth: 100,
                           disabled: false,

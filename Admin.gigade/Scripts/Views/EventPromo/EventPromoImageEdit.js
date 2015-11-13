@@ -274,7 +274,7 @@ function editFunction(row, store,multi) {
                     var image_link = Ext.htmlEncode(Ext.getCmp('pb_image_link').getValue());
                     var begin_time = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('pb_startdate').getValue()), 'Y-m-d H:i:s'));
                     var end_time = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('pb_enddate').getValue()), 'Y-m-d H:i:s'));
-                    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "loding..." });
+                    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "loading..." });
                     myMask.show();
                     form.submit({
                         params: {

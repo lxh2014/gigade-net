@@ -84,7 +84,8 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["poundage"]))
                 {
                     orderCollection.poundage = Convert.ToInt32(Request.Params["poundage"]);
-                } if (!string.IsNullOrEmpty(Request.Params["return_collection_time"]))
+                }
+                if (!string.IsNullOrEmpty(Request.Params["return_collection_time"]))
                 {
                     orderCollection.return_collection_time = Convert.ToDateTime(Request.Params["return_collection_time"]);
                 } if (!string.IsNullOrEmpty(Request.Params["return_collection_money"]))
@@ -96,10 +97,31 @@ namespace Admin.gigade.Controllers
                 }
                 orderCollection.remark = Request.Params["remark"];
 
-                result = _OrderAccCollectMgr.SaveOrEdit(orderCollection);
-                if (result > 0)
+                if (!string.IsNullOrEmpty(Request.Params["invoice_date_manual"]))
                 {
-                    jsonStr = "{success:true}";
+                    orderCollection.invoice_date_manual = Convert.ToDateTime(Request.Params["invoice_date_manual"]);
+                } if (!string.IsNullOrEmpty(Request.Params["invoice_sale_manual"]))
+                {
+                    orderCollection.invoice_sale_manual = Convert.ToInt32(Request.Params["invoice_sale_manual"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["invoice_tax_manual"]))
+                {
+                    orderCollection.invoice_tax_manual = Convert.ToInt32(Request.Params["invoice_tax_manual"]);
+                }
+                if (orderCollection.row_id != 0 || orderCollection.account_collection_time != DateTime.MinValue
+                    || orderCollection.return_collection_time != DateTime.MinValue
+                      || orderCollection.invoice_date_manual != DateTime.MinValue
+                    || !string.IsNullOrEmpty(orderCollection.remark))
+                {
+                    result = _OrderAccCollectMgr.SaveOrEdit(orderCollection);
+                    if (result > 0)
+                    {
+                        jsonStr = "{success:true}";
+                    }
+                    else
+                    {
+                        jsonStr = "{success:false}";
+                    }
                 }
                 else
                 {

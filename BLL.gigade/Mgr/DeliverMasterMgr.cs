@@ -942,6 +942,37 @@ namespace BLL.gigade.Mgr
                 throw new Exception("DeliverMasterMgr-->GetDeliverMaster-->" + ex.Message, ex);
             }
         }
+        #region 出貨單期望到貨日 
+        /// <summary>
+        /// 出貨單期望到貨日
+        /// </summary>
+        /// <returns></returns>
+        /// //by add zhaozhi0623j 20151111 am
+        //更新期望到貨日期、時段
+        public int UpdateExpectArrive(DeliverMasterQuery query)
+        {
+            try
+            {
+                return _ideliver.UpdateExpectArrive(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("DeliverMasterMgr-->UpdateExpectArrive-->" + ex.Message, ex);
+            }
+        }
+        //獲得出貨單期望到貨日list
+        public List<DeliverMasterQuery> GetDeliverExpectArriveList(DeliverMasterQuery query, out int totalCount)
+        {
+            try
+            {
+                return _ideliver.GetDeliverExpectArriveList(query, out totalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("DeliverMasterMgr-->GetDeliverExpectArriveList-->" + ex.Message, ex);
+            }
+        } 
+        #endregion
 
     }
 }

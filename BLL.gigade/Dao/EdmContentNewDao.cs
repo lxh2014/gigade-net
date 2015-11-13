@@ -89,7 +89,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.Append("select template_id,template_name,edit_url,content_url from edm_template where enabled=1;");
+                sql.Append("select template_id,template_name,edit_url,content_url from edm_template where enabled=1 order by  template_createdate asc;");
                 return _access.getDataTableForObj<EdmTemplate>(sql.ToString());
             }
             catch (Exception ex)
@@ -436,6 +436,35 @@ WHERE content_id='{0}'  and log_id='{1}'   AND edm_trace.count>0;", content_id, 
             catch (Exception ex)
             {
                 throw new Exception("EdmContentNewDao-->GetPraraData-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetEditUrl(int template_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("select edit_url  from edm_template where template_id='{0}';",template_id);
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetEditUrl-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+
+        public DataTable GetHtml(EdmContentNew query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("select  template_data from edm_content_new where content_id='{0}' and template_id='{1}';", query.content_id, query.template_id);
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetHtml-->" + sql.ToString() + ex.Message, ex);
             }
         }
 

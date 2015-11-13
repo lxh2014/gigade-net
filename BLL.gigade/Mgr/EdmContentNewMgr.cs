@@ -735,5 +735,41 @@ namespace BLL.gigade.Mgr
             }
         }
 
+        public string GetEditUrl(int template_id)
+        {
+            string url = string.Empty;
+            try
+            {
+                DataTable _dt = _edmContentNewDao.GetEditUrl(template_id);
+                if (_dt.Rows.Count > 0 && _dt != null)
+                {
+                    url = _dt.Rows[0][0].ToString();
+                }
+                return url;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetEditUrl-->" + ex.Message, ex);
+            }
+        }
+
+        public string GetHtml(EdmContentNew query)
+        {
+            string htmlStr = string.Empty;
+            try
+            {
+                DataTable _dt = _edmContentNewDao.GetHtml(query);
+                if (_dt != null && _dt.Rows.Count > 0)
+                {
+                    htmlStr = _dt.Rows[0][0].ToString();
+                }
+                return htmlStr;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetHtml-->" + ex.Message, ex);
+            }
+        }
+
     }
 }

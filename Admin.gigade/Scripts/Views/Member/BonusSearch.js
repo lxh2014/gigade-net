@@ -215,8 +215,14 @@ Ext.onReady(function () {
                             editable: false,
                             listeners: {
                                 select: function () {
-                                    if (Ext.getCmp("time_start_create").getValue() != null) {
-                                        Ext.getCmp("time_end_create").setMinValue(Ext.getCmp("time_start_create").getValue());
+                                    var start = Ext.getCmp("time_start_create");
+                                    var end = Ext.getCmp("time_end_create");
+                                    if (end.getValue() == null) {
+                                        end.setValue(setNextMonth(start.getValue(), 1));
+                                    }
+                                    else if (start.getValue() > end.getValue()) {
+                                        Ext.Msg.alert(INFORMATION, DATA_TIP);
+                                        end.setValue(setNextMonth(start.getValue(), 1));
                                     }
                                 }
                                   , specialkey: function (field, e) {
@@ -242,8 +248,16 @@ Ext.onReady(function () {
                             editable: false,
                             listeners: {
                                 select: function () {
-                                    if (Ext.getCmp("time_end_create").getValue() != null) {
-                                        Ext.getCmp("time_start_create").setMaxValue(Ext.getCmp("time_end_create").getValue());
+                                    var start = Ext.getCmp("time_start_create");
+                                    var end = Ext.getCmp("time_end_create");
+                                    if (start.getValue() != "" && start.getValue() != null) {
+                                        if (end.getValue() < start.getValue()) {
+                                            Ext.Msg.alert(INFORMATION, DATA_TIP);
+                                            start.setValue(setNextMonth(end.getValue(), -1));
+                                        }
+                                    }
+                                    else {
+                                        start.setValue(setNextMonth(end.getValue(), -1));
                                     }
                                 }
                                 , specialkey: function (field, e) {
@@ -605,4 +619,15 @@ function Query() {
                  }
              });
     }
+}
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

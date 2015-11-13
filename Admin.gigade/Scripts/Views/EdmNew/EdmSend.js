@@ -207,8 +207,9 @@
                    select: function () {
                        var sd = Ext.getCmp('schedule_date');//排程發送時間
                        var ed = Ext.getCmp('expire_date');//信件有效時間
-
-                       if (ed.getValue() <= sd.getValue()) {
+                       var sdTime = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('schedule_date').getValue()), 'Y-m-d H:i:s'));
+                       var edTime = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('expire_date').getValue()), 'Y-m-d 23:59:59'));
+                       if (sdTime>= edTime) {
                            var new_time = new Date(sd.getValue().getFullYear(), sd.getValue().getMonth(), sd.getValue().getDate() + 1);
                            ed.setValue(new_time);
                            Ext.Msg.alert("提示信息", "信件有效時間須大於排程發送時間！");

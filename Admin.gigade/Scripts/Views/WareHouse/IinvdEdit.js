@@ -37,6 +37,7 @@
                                     msg = result.msg;
                                     locid = result.locid;
                                     vendor_id = result.vendor_id;
+                                    P_itemid = result.item_id;
                                     Ext.getCmp("product_name").setValue(msg);                                    
                                     if (result.day == "")
                                     {
@@ -51,6 +52,7 @@
                                     } else {
                                         Ext.getCmp("loc_id").setValue("無");
                                     }
+                                    Ext.getCmp("Pitem_id").setValue(P_itemid);
                                     cde_dt_shp = result.cde_dt_shp;
                                     pwy_dte_ctl = result.pwy_dte_ctl;
                                     cde_dt = result.cde_dt;
@@ -99,6 +101,14 @@
                 id: 'product_name',
                 allowBlank: false
             },
+             {
+                 xtype: 'displayfield',
+                 fieldLabel: "細項編號",
+                 name: 'Pitem_id',
+                 id: 'Pitem_id',
+                 hidden: true
+            
+             },
             {
                 xtype: 'numberfield',
                 fieldLabel: "數量",
@@ -308,7 +318,7 @@
                     async: false,//是否異步
                     params: {
                         plas_loc_id: Ext.getCmp('plas_loc_id').getValue(),//料位
-                        prod_id: Ext.getCmp('plas_prod_id').getValue(),//商品品號
+                        prod_id: Ext.getCmp('Pitem_id').getValue(),//商品品號
                         loc_id: Ext.getCmp('loc_id').getValue()//主料位
 
                     },
@@ -325,7 +335,7 @@
                             url: "/WareHouse/GetSearchStock",
                             params: {
                                 loc_id: Ext.getCmp("plas_loc_id").getValue(),
-                                item_id: Ext.getCmp("plas_prod_id").getValue(),
+                                item_id: Ext.getCmp("Pitem_id").getValue(),
                                 cde_date: Ext.getCmp('cde_dt').getValue(),
                                 made_date: Ext.getCmp('startTime').getValue()
                             },
@@ -344,7 +354,7 @@
                                         params: {
                                             //id: Ext.htmlEncode(Ext.getCmp('plas_prdd_id').getValue()),//條碼
                                             iialg: 'N',//寄倉流程 新增庫存用到
-                                            item_id: Ext.htmlEncode(Ext.getCmp('plas_prod_id').getValue()),//商品品號
+                                            item_id: Ext.htmlEncode(Ext.getCmp('Pitem_id').getValue()),//商品品號
                                             product_name: Ext.htmlEncode(Ext.getCmp('product_name').getValue()),//品名
                                             prod_qty: Ext.htmlEncode(Ext.getCmp('prod_qty').getValue()),//數量
                                             startTime: Ext.htmlEncode(Ext.getCmp('startTime').getValue()),//創建時間

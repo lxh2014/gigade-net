@@ -123,7 +123,7 @@ var searchStatusrStore = Ext.create('Ext.data.Store', {
         { "txt": USERID, "value": "2" },
         { "txt": VENDORNAME, "value": "3" },
         { "txt": PRODUCTID, "value": "4" },
-        { "txt": '訂單編號', "value": "5" }
+        { "txt": '付款單號', "value": "5" }
     ]
 });
 var dateStore = Ext.create('Ext.data.Store', {
