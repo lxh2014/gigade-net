@@ -542,7 +542,16 @@ Ext.onReady(function () {
                         id: 'btnExcel',
                         hidden:true,
                         handler: Export
-                    }
+                    },
+                                        {
+                                            xtype: 'button',
+                                            text: '會計報表',
+                                            margin: '5 0 0 10',
+                                            iconCls: 'icon-excel',
+                                            id: 'btnExcelReport',
+                                            //hidden: true,
+                                            handler: ExportReport
+                                        }
                 ]
             }
         ]
@@ -720,6 +729,12 @@ function Export() {
    var order_pay= Ext.htmlEncode(Ext.getCmp("order_pay").getValue().Order_Pay); //付款狀態
    var invoice= Ext.htmlEncode(Ext.getCmp("invoice").getValue().Invoice);//過濾條件
     window.open("/OrderManage/OrderSerchExport?selecttype=" + selecttype + "&invoice=" + invoice + "&order_pay=" + order_pay + "&order_payment=" + order_payment + "&channel=" + channel + "&Vip_User_Group=" + Vip_User_Group + "&page_status=" + page_status + "&searchcon=" + searchcon + "&timeone=" + timeone + "&dateOne=" + Ext.Date.format(new Date(Ext.getCmp('dateOne').getValue()), 'Y-m-d') + "&dateTwo=" + Ext.Date.format(new Date(Ext.getCmp('dateTwo').getValue()), 'Y-m-d'));
+}
+
+function ExportReport() {
+    var dateOne = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('dateOne').getValue()), 'Y-m-d 00:00:00'));
+    var dateTwo = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('dateTwo').getValue()), 'Y-m-d 23:59:59'));
+    window.open("/OrderManage/ExportReport?dateOne=" + dateOne + "&dateTwo=" + dateTwo);
 }
 function Tomorrow() {
     var d;
