@@ -244,6 +244,7 @@
     <Compile Include="Dao\Impl\IScheduleRelationImplDao.cs" />
     <Compile Include="Dao\Impl\IUserForbidImplDao.cs" />
     <Compile Include="Dao\Impl\IVendorAccountMonthImplDao.cs" />
+    <Compile Include="Dao\Impl\IDeliverChangeLogImplDao.cs" />
     <Compile Include="Dao\InspectionReportDao.cs" />
     <Compile Include="Dao\InvoiceMasterRecordDao.cs" />
     <Compile Include="Dao\IpoDao.cs" />
@@ -679,6 +680,7 @@
     <Compile Include="Dao\WebContentType8Dao.cs" />
     <Compile Include="Dao\WebContentTypeSetupDao.cs" />
     <Compile Include="Dao\ZipDao.cs" />
+    <Compile Include="Dao\DeliverChangeLogDao.cs" />
     <Compile Include="Mgr\AnnounceMgr.cs" />
     <Compile Include="Mgr\AppcategoryMgr.cs" />
     <Compile Include="Mgr\AppmessageMgr.cs" />
@@ -789,6 +791,7 @@
     <Compile Include="Mgr\Impl\IScheduleRelationImplMgr.cs" />
     <Compile Include="Mgr\Impl\IUserForbidImplMgr.cs" />
     <Compile Include="Mgr\Impl\IVendorAccountMonthImplMgr.cs" />
+    <Compile Include="Mgr\Impl\IDeliverChangeLogImplMgr.cs" />
     <Compile Include="Mgr\InspectionReportMgr.cs" />
     <Compile Include="Mgr\InvoiceMasterRecordMgr.cs" />
     <Compile Include="Mgr\IpodMgr.cs" />
@@ -1251,6 +1254,7 @@
     <Compile Include="Mgr\Work\SpecialWork.cs" />
     <Compile Include="Mgr\Work\Work.cs" />
     <Compile Include="Mgr\ZipMgr.cs" />
+    <Compile Include="Mgr\DeliverChangeLogMgr.cs" />
     <Compile Include="Model\Announce.cs" />
     <Compile Include="Model\Appcategory.cs" />
     <Compile Include="Model\Appmessage.cs" />
@@ -1861,6 +1865,7 @@
     <Compile Include="Dao\ParametersrcXmlDao.cs" />
     <Compile Include="Model\SchedulePeriod.cs" />
     <Compile Include="Model\ScheduleLog.cs" />
+    <Compile Include="Model\DeliverChangeLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\TrialPicture.cs" />
     <Compile Include="Model\TrialRecord.cs" />
