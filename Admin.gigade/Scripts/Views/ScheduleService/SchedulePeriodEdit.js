@@ -119,6 +119,7 @@ editFunction_period= function (row, store) {
                                 period_nums: Ext.htmlEncode(Ext.getCmp('period_nums').getValue()),
                                 current_nums: Ext.htmlEncode(Ext.getCmp('current_nums').getValue()),
                                 limit_nums: Ext.htmlEncode(Ext.getCmp('limit_nums').getValue()),
+                                begin_datetime: Ext.getCmp('begin_datetime').getValue(),
                             },
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);
