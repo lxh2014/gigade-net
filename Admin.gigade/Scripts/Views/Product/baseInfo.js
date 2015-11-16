@@ -350,15 +350,23 @@ Ext.onReady(function () {
             id: 'purchase_inAdvance',//預售起止時間
             items: [{
                 xtype: 'datetimefield',
-                disabledMin: true,
-                disabledSec: true,
+                disabledMin: false,
+                disabledSec: false,
                 format: 'Y-m-d H:i:s',
                 id: 'purchase_in_advance_start',
                 fieldLabel: PURCHASE_IN_ADVANCE_TIME,
                 allowBlank: false,
                 disabled: true,
                 value: new Date(),
-                minValue: new Date()
+                minValue: new Date(),
+                listeners: {                    ///add by wwei0216w 添加選擇時間判斷 如果預購開始時間大於預計到貨時間,則給出提示 2015/11/16
+                    select: function (a, b, c) {
+                        if (b > Ext.getCmp("e_time").getValue()) {
+                            Ext.getCmp("purchase_in_advance_start").setValue("");
+                            Ext.Msg.alert(PROMPT, EXPECT_TIME_IS_ERRORTO);
+                        }
+                    }
+                }
             }, {
                 xtype: 'displayfield',
                 value: '~ ',
@@ -367,8 +375,8 @@ Ext.onReady(function () {
                 margin: '0 5 0 5'
             }, {
                 xtype: 'datetimefield',
-                disabledMin: true,
-                disabledSec: true,
+                disabledMin: false,
+                disabledSec: false,
                 format: 'Y-m-d H:i:s',
                 id: 'purchase_in_advance_end',//預計結束時間
                 allowBlank: false,
@@ -378,7 +386,7 @@ Ext.onReady(function () {
                 listeners: {
                     select: function (a, b, c) {
                         var e_time = Ext.getCmp("e_time");
-                        if (b > e_time.getValue() && e_time.getValue() != null) {
+                        if ((+b/1000-86400*10) > +e_time.getValue()/1000 && e_time.getValue() != null) {
                             Ext.getCmp("e_time").setValue("");
                             Ext.Msg.alert(PROMPT, EXPECT_TIME_IS_ERROR);
                         }
@@ -386,8 +394,8 @@ Ext.onReady(function () {
                 }
             }, {
                 xtype: 'datetimefield',
-                disabledMin: true,
-                disabledSec: true,
+                disabledMin: false,
+                disabledSec: false,
                 disabled: true,
                 editable: false,
                 format: 'Y-m-d H:i:s',
@@ -398,9 +406,13 @@ Ext.onReady(function () {
                 listeners: {
                     select: function (a, b, c) {
                         var purchase_in_advance_end = Ext.getCmp("purchase_in_advance_end");
-                        if (b < purchase_in_advance_end.getValue()) {
+                        if (+b/1000 < (+purchase_in_advance_end.getValue()/1000-(86400*10))) {
                             Ext.getCmp("e_time").setValue("");
                             Ext.Msg.alert(PROMPT, EXPECT_TIME_IS_ERROR);
+                        }
+                        if (b < Ext.getCmp("purchase_in_advance_start").getValue()) {
+                            Ext.getCmp("e_time").setValue("");
+                            Ext.Msg.alert(PROMPT, EXPECT_TIME_IS_ERRORTO);
                         }
                     }
                 }
