@@ -279,33 +279,56 @@ on p.brand_id=vb.brand_id  ");
         //獲得訂單信息最小年份
         public DataTable GetOrderInfoByMinYear()
         {
-                StringBuilder sql = new StringBuilder();
-                StringBuilder sqlwhere = new StringBuilder();
-                try
-                {
-                    sql.AppendFormat(@" SELECT year(FROM_UNIXTIME(min(order_createdate))) as minyear ,
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sqlwhere = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@" SELECT year(FROM_UNIXTIME(min(order_createdate))) as minyear ,
 year(FROM_UNIXTIME(max(order_createdate)))  as maxyear from order_master  ");
-                    sqlwhere.Append(" where 1=1 ");
-                    sqlwhere.Append(" and order_createdate!=0 ");
-                    sql.Append(sqlwhere);
-                    DataTable dt = _access.getDataTable(sql.ToString());
-                    return dt;
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("RecommendedExcleDao-->GetBrandInfo" + ex.Message + sql.ToString(), ex);
-                }
+                sqlwhere.Append(" where 1=1 ");
+                sqlwhere.Append(" and order_createdate!=0 ");
+                sql.Append(sqlwhere);
+                DataTable dt = _access.getDataTable(sql.ToString());
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("RecommendedExcleDao-->GetBrandInfo" + ex.Message + sql.ToString(), ex);
+            }
         }
 
 
-        public DataTable GetThisProductInfo()
+        public DataTable GetThisProductInfo(int start_product_id, int end_product_id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT pt.product_id,pii.item_id,pt.cate_id,FROM_UNIXTIME(pt.product_start)as crate_time,pt.product_status,pt.product_name,pt.product_alt,pt.page_content_1,pt.product_image,price,event_price,pm.cost,pm.event_cost,FROM_UNIXTIME(pm.event_start)as event_starts,FROM_UNIXTIME(pm.event_end)as event_ends,pt.prod_classify
-FROM product_item pii LEFT JOIN product pt 
-on pt.product_id=pii.product_id  INNER JOIN price_master pm on pm.product_id=pii.product_id ");
+               
+                if (end_product_id > start_product_id && start_product_id > 10000)
+                {
+                    sql.AppendFormat(@"SELECT pt.product_id,pcs.category_id,pii.item_id,pt.brand_id,FROM_UNIXTIME(pt.product_start)as crate_time,pt.product_status,pt.product_name,pt.product_alt,pt.page_content_1,
+                                pt.product_image,price,event_price,pm.cost,pm.event_cost,FROM_UNIXTIME(pm.event_start)as event_starts,FROM_UNIXTIME(pm.event_end)as event_ends,pt.prod_classify
+                                FROM product pt 
+                                INNER JOIN product_item pii 
+                                on pt.product_id=pii.product_id and pt.combination=1 and pt.product_id >= '{0}' and pt.product_id <= '{1}' 
+                                INNER JOIN price_master pm 
+                                on pm.product_id=pii.product_id and pm.product_id>='{0}' and pm.product_id <= '{1}'
+                                right JOIN product_category_set pcs on pii.item_id=pcs.item_id 
+                                where pii.product_id>='{0}'and pii.product_id <='{1}' ", start_product_id,end_product_id);
+                }
+                else
+                {
+                    sql.AppendFormat(@"SELECT pt.product_id,pii.item_id,pt.brand_id,FROM_UNIXTIME(pt.product_start)as crate_time,pt.product_status,pt.product_name,pt.product_alt,pt.page_content_1,
+                                pt.product_image,price,event_price,pm.cost,pm.event_cost,FROM_UNIXTIME(pm.event_start)as event_starts,FROM_UNIXTIME(pm.event_end)as event_ends,pt.prod_classify
+                                FROM product pt 
+                                INNER JOIN product_item pii 
+                                on pt.product_id=pii.product_id and pt.combination=1 and pt.product_id>=10001
+                                INNER JOIN price_master pm 
+                                on pm.product_id=pii.product_id and pm.product_id>=10001
+                                where pii.product_id>=10001 ");
+                }
+                    sql.AppendFormat(" ORDER BY pii.product_id ;");
+               
                 DataTable dt = _access.getDataTable(sql.ToString());
                 return dt;
             }
@@ -315,13 +338,13 @@ on pt.product_id=pii.product_id  INNER JOIN price_master pm on pm.product_id=pii
             }
         }
 
-        public List<CategoryItem> GetVendorCategoryMsg(CategoryItem pcb,List<CategoryItem> lscm)
+        public List<CategoryItem> GetVendorCategoryMsg(CategoryItem pcb, List<CategoryItem> lscm)
         {
-            StringBuilder sql = new StringBuilder();   
+            StringBuilder sql = new StringBuilder();
             try
             {
                 sql.AppendFormat(@"SELECT category_id, category_name, depth FROM product_category_brand 
-WHERE category_father_id='{0}' GROUP BY category_id, category_name, depth;",pcb.Id);
+WHERE category_father_id='{0}' GROUP BY category_id, category_name, depth;", pcb.Id);
                 DataTable dtVendorMsg = _access.getDataTable(sql.ToString());
                 if (dtVendorMsg.Rows.Count > 0)//再次調用自己
                 {
@@ -332,20 +355,20 @@ WHERE category_father_id='{0}' GROUP BY category_id, category_name, depth;",pcb.
                         cm.Name = dtVendorMsg.Rows[i]["category_name"].ToString();
                         cm.Depth = Convert.ToInt32(dtVendorMsg.Rows[i]["depth"]) - 1;
                         lscm.Add(cm);
-                        GetVendorCategoryMsg(cm,lscm);
+                        GetVendorCategoryMsg(cm, lscm);
                     }
                 }
                 else
                 {
-                   DataTable _dttwo= GetVendorBrandMsg(pcb);
-                   for (int j = 0; j < _dttwo.Rows.Count; j++)
-                   {
-                       CategoryItem cmtwo = new CategoryItem();
-                       cmtwo.Id = String.Format("{0}-{1}", new Object[] { pcb.Id, Int32.Parse(_dttwo.Rows[j]["brand_id"].ToString()) });
-                       cmtwo.Name = _dttwo.Rows[j]["brand_name"].ToString();
-                       cmtwo.Depth = pcb.Depth + 1;
-                       lscm.Add(cmtwo);
-                   }
+                    DataTable _dttwo = GetVendorBrandMsg(pcb);
+                    for (int j = 0; j < _dttwo.Rows.Count; j++)
+                    {
+                        CategoryItem cmtwo = new CategoryItem();
+                        cmtwo.Id = String.Format("{0}-{1}", new Object[] { pcb.Id, Int32.Parse(_dttwo.Rows[j]["brand_id"].ToString()) });
+                        cmtwo.Name = _dttwo.Rows[j]["brand_name"].ToString();
+                        cmtwo.Depth = pcb.Depth + 1;
+                        lscm.Add(cmtwo);
+                    }
                 }
                 return lscm;
             }
@@ -368,6 +391,54 @@ WHERE category_father_id='{0}' GROUP BY category_id, category_name, depth;",pcb.
             catch (Exception ex)
             {
                 throw new Exception("RecommendedExcleDao-->GetVendorBrandMsg" + ex.Message + sql.ToString(), ex);
+            }
+        }
+
+
+        public string GetCidMessage(int porduct_id, int brand_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            string str = string.Empty;
+            try
+            {
+                sql.AppendFormat(@"SELECT pcs.product_id,pcs.category_id,pcb.brand_id FROM product_category_set pcs INNER JOIN product_category_brand pcb on pcs.category_id=pcb.category_id 
+WHERE pcs.product_id='{0}' and pcb.banner_cate_id=754 and pcs.brand_id='{1}';", porduct_id, brand_id);
+                DataTable _dt = _access.getDataTable(sql.ToString());
+                for (int i = 0; i < _dt.Rows.Count; i++)
+                {
+                    if (str.Length > 0)
+                    {
+                        str = str+","+_dt.Rows[i]["category_id"] + "-" + _dt.Rows[i]["brand_id"];
+                    }
+                    else
+                    {
+                        str = _dt.Rows[i]["category_id"] + "-" + _dt.Rows[i]["brand_id"];
+                    }
+                }
+                return str;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("RecommendedExcleDao-->GetCidMessage" + ex.Message + sql.ToString(), ex);
+            }
+        }
+
+
+        public DataTable GetAllBrandByProductId()
+        {
+            
+         StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT pcs.product_id,pcs.category_id,pcb.brand_id FROM product_category_set pcs 
+INNER JOIN product_category_brand pcb on pcs.category_id=pcb.category_id 
+WHERE pcb.banner_cate_id=754 ORDER BY pcs.product_id;");
+                DataTable dt = _access.getDataTable(sql.ToString());
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("RecommendedExcleDao-->GetAllBrandByProductId" + ex.Message + sql.ToString(), ex);
             }
         }
     }
