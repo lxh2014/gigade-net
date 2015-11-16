@@ -106,5 +106,8 @@ namespace BLL.gigade.Dao.Impl
         string UpdateDM(OrderMasterQuery query);
         string InsertOrderMasterStatus(OrderShowMasterQuery store);
         DataTable VerifySession(uint user_id);
+        DataTable OrderSerchExport(OrderMasterQuery query);
+        DataTable GetPara(string type, int order_status);
+        DataTable GetParaByPayment(int payment);
     }
 }

@@ -648,7 +648,7 @@ namespace BLL.gigade.Mgr
 
         #region 生成單筆訂單的OrderSlave,OrderDetail  gigade賣場
         /// <summary>
-        /// 生成單筆訂單的OrderSlave,OrderDetail
+        /// 生成單筆訂單的OrderSlave,OrderDetail（訂單匯入  gigade）
         /// </summary>
         /// <param name="product"></param>
         /// <param name="all"></param>
@@ -734,7 +734,9 @@ namespace BLL.gigade.Mgr
                     {
                         newDetail = new OrderDetail();
                         newDetail.Item_Id = Convert.ToUInt32(prItem.Item_Id);
-                        newDetail.Item_Vendor_Id = vb.Vendor_Id;
+                        //edit by zhuoqin0830w 2015/11/02
+                        //判斷商品 是否 買斷 商品  如果是  則 供應商 為 gigade 如果不是 則表示 使用原有的供應商
+                        newDetail.Item_Vendor_Id = pr.Prepaid == 0 ? vb.Vendor_Id : Convert.ToUInt32((df.Delivery_Freight_Set == 1 ? 2 : 92));
                         newDetail.Detail_Status = 2;
                         newDetail.Buy_Num = uint.Parse(p.qty);
                         newDetail.Product_Freight_Set = pr.Product_Freight_Set;
@@ -773,7 +775,7 @@ namespace BLL.gigade.Mgr
 
         #region Gigade 後台新增訂單－生成訂單的OrderSlave,OrderDetail
         /// <summary>
-        ///Gigade 後台新增訂單－生成OrderSlave,OrderDetail
+        ///Gigade 後台新增訂單－生成OrderSlave,OrderDetail（內部訂單輸入）
         /// </summary>
         /// <param name="odc"></param>
         /// <param name="errorOrder"></param>
@@ -1087,7 +1089,7 @@ namespace BLL.gigade.Mgr
 
         #region 合作賣場 後台新增訂單－生成訂單的OrderSlave,OrderDetail
         /// <summary>
-        ///合作外站 後台新增訂單－生成OrderSlave,OrderDetail
+        ///合作外站 後台新增訂單－生成OrderSlave,OrderDetail （訂單輸入 合作）
         /// </summary>
         /// <param name="odc"></param>
         /// <param name="errorOrder"></param>
@@ -1398,12 +1400,11 @@ namespace BLL.gigade.Mgr
             #endregion
 
             #region OrderDetail
-            //edit by zhuoqin0830w 2015/08/21
-            //判斷商品 是否 買斷 商品  如果是  則 供應商 為 gigade 如果不是 則表示 使用原有的供應商  
-            vendorId = pro.Prepaid == 0 ? vb.Vendor_Id : Convert.ToUInt32((df.Delivery_Freight_Set == 1 ? 2 : 92));
             OrderDetail newDetail = new OrderDetail();
             newDetail.Item_Id = Convert.ToUInt32(proItem.Item_Id);
-            newDetail.Item_Vendor_Id = vendorId;
+            //edit by zhuoqin0830w 2015/08/21
+            //判斷商品 是否 買斷 商品  如果是  則 供應商 為 gigade 如果不是 則表示 使用原有的供應商  
+            newDetail.Item_Vendor_Id = pro.Prepaid == 0 ? vb.Vendor_Id : Convert.ToUInt32((df.Delivery_Freight_Set == 1 ? 2 : 92));
             newDetail.Detail_Status = 2;
             newDetail.Buy_Num = buyCount;
             newDetail.Product_Freight_Set = pro.Product_Freight_Set;
@@ -1413,7 +1414,9 @@ namespace BLL.gigade.Mgr
             newDetail.Single_Cost = Convert.ToUInt32(price.cost); //price.same_price == 1 ? Convert.ToUInt32(price.cost) : proItem.Item_Cost;//售價  成本
 
             //判斷特價活動成本是否過期，如果過期就 賦值 為 0 如果沒有則使用 特價 活動成本  eidt by zhuoqin0830w  2015/10/15  通過溝通 ahon 決定更改 因為前台代碼有判斷 成本取值是活動成本還是原成本
-            if (price.event_end < uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString())) { newDetail.Event_Cost = 0; }
+            uint nowTime = uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
+            if (nowTime > price.event_start && nowTime < price.event_end)
+            { newDetail.Event_Cost = 0; }
             else { newDetail.Event_Cost = Convert.ToUInt32(price.event_cost); }
 
             newDetail.Single_Price = Convert.ToUInt32(price.price);

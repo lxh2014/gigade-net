@@ -120,6 +120,7 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
+        #region 內部訂單輸入組合商品>商品ID查詢
         /// <summary>
         /// 订单输入查询Giagde站台下的組合商品
         /// </summary>
@@ -137,6 +138,7 @@ namespace Admin.gigade.Controllers
             ProductCombo pcombo = new ProductCombo();
             if (pid != 0)
             {
+                long nowTime = BLL.gigade.Common.CommonFunction.GetPHPTime();//獲取當前時間  add by zhuoqin0830w  2015/11/09
                 Product prod = _proMgr.Query(new Product { Product_Id = pid }).FirstOrDefault();
                 if (prod != null)
                 {
@@ -162,6 +164,7 @@ namespace Admin.gigade.Controllers
                                 jsonStr = "{success:true";
                                 double comboPrice = 0.0;     //組合商品的價格 ＝sum( 子商品價格 * 子商品必選數量(s_must_buy);
                                 double comboCost = 0.0;  //組合商品的成本
+                                double comboEventCost = 0.0;  //組合商品的活動成本  add by zhuoqin0830w  2015/11/09
                                 int childSum = 0;      //必選商品的必購數量之和
                                 int minStock = 0;
                                 int stockIndex = 0;
@@ -367,8 +370,10 @@ namespace Admin.gigade.Controllers
                                 jsonStr += ",child:[";
                                 double totalPrice = 0;
                                 double totalCost = 0;
+                                double totalEventCost = 0; //add by zhuoqin0830w  2015/11/09
                                 string priceScales = "";//單一商品價格所占比例
                                 string costScales = ""; //單一商品成本所占比例
+                                string eventcostScales = "";//單一商品活動成本所占比例  add by zhuoqin0830w  2015/11/09
                                 int minStock = 0;
                                 if (prod.Price_type == 1)
                                 {
@@ -391,8 +396,15 @@ namespace Admin.gigade.Controllers
                                             child_id = 0
                                         });
                                         List<ItemPriceCustom> ipList = new List<ItemPriceCustom>();
+
                                         if (pM != null)
                                         {
+                                            //add by zhuoqin0830w  2015/11/06  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動成本為 0 如果沒有過期則顯示活動成本
+                                            if (nowTime > pM.event_end)
+                                            {
+                                                pM.event_cost = 0;
+                                            }
+
                                             //遍歷此商品所有item_id,找出第一筆在item_price中的item_id返回，若無，則此組合商品不能加入訂單
                                             foreach (ProductItem items in pItemList)
                                             {
@@ -407,11 +419,13 @@ namespace Admin.gigade.Controllers
                                                     {
                                                         totalPrice += pM.price * item.S_Must_Buy;
                                                         totalCost += pM.cost * item.S_Must_Buy;
+                                                        totalEventCost += pM.event_cost * item.S_Must_Buy;//add by zhuoqin0830w  2015/11/09
                                                     }
                                                     else
                                                     {
                                                         totalPrice += ipList[0].item_money * item.S_Must_Buy;
                                                         totalCost += ipList[0].item_cost * item.S_Must_Buy;
+                                                        totalEventCost += ipList[0].event_cost * item.S_Must_Buy;//add by zhuoqin0830w  2015/11/09
                                                     }
                                                     price_data_right_list.Add(items);
                                                     findState = true;
@@ -431,6 +445,16 @@ namespace Admin.gigade.Controllers
                                     int index = 0;
                                     int comboPrice = orderAdd.product_cost;   //組合商品的定價
                                     int comboCost = orderAdd.cost;
+                                    int comboEventCost = 0;
+                                    //add by zhuoqin0830w  2015/11/06  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動成本為 0 如果沒有過期則顯示活動成本
+                                    if (orderAdd != null)
+                                    {
+                                        if (nowTime > orderAdd.event_start && nowTime < orderAdd.event_end)
+                                        {
+                                            comboEventCost = orderAdd.event_cost;
+                                        }
+                                        else { orderAdd.event_cost = 0; }
+                                    }
                                     for (int i = 0; i < prodComList.Count; i++)
                                     {
                                         index++;
@@ -488,12 +512,16 @@ namespace Admin.gigade.Controllers
                                             {
                                                 double singlePrice = 0;
                                                 double singleCost = 0;
+                                                double singleEventCost = 0;//add by zhuoqin0830w  2015/11/09
+
                                                 if (pM.same_price == 1)
                                                 {
                                                     oc.original_price = pM.price;
                                                     oc.Item_Cost = uint.Parse(pM.cost.ToString());
+                                                    oc.Event_Item_Cost = uint.Parse(pm.event_cost.ToString());//add by zhuoqin0830w  2015/11/09
                                                     singlePrice = pM.price * oc.s_must_buy;
                                                     singleCost = pM.cost * oc.s_must_buy;
+                                                    singleEventCost = pM.event_cost * oc.s_must_buy;//add by zhuoqin0830w  2015/11/09
                                                 }
                                                 else
                                                 {
@@ -506,14 +534,17 @@ namespace Admin.gigade.Controllers
                                                     {
                                                         oc.original_price = int.Parse(ipList[0].item_money.ToString());
                                                         oc.Item_Cost = ipList[0].item_cost;
+                                                        oc.Event_Item_Cost = ipList[0].event_cost;//add by zhuoqin0830w  2015/11/09
                                                         singlePrice = ipList[0].item_money * oc.s_must_buy;
                                                         singleCost = ipList[0].item_cost * oc.s_must_buy;
+                                                        singleEventCost = ipList[0].event_cost * oc.s_must_buy;//add by zhuoqin0830w  2015/11/09
                                                     }
                                                 }
                                                 if (totalPrice == 0)
                                                 {
                                                     priceScales += "0";
                                                     costScales += "0";
+                                                    eventcostScales += "0";//add by zhuoqin0830w  2015/11/09
                                                     oc.product_cost = 0;
                                                 }
                                                 else
@@ -521,19 +552,36 @@ namespace Admin.gigade.Controllers
                                                     //new logic 算比例
                                                     double priceScale = double.Parse((singlePrice / totalPrice).ToString());
                                                     double costScale = double.Parse((singleCost / totalCost).ToString());
+                                                    //add by zhuoqin0830w  2015/11/09  添加活動成本的比例
+                                                    double eventcostScale = 0;
+                                                    if (totalEventCost != 0)
+                                                    {
+                                                        eventcostScale = double.Parse((singleEventCost / totalEventCost).ToString());
+                                                    }
+                                                    else
+                                                    {
+                                                        eventcostScale = priceScale;// 如果 活動成本的比例為0 則表示沒有活動成本則按照價格的比例進行計算
+                                                    }
 
                                                     priceScales += priceScale + ",";
                                                     costScales += costScale + ",";
+                                                    eventcostScales += eventcostScale + ",";//add by zhuoqin0830w  2015/11/09
 
                                                     var afterprice = Convert.ToInt16(Math.Round(comboPrice * priceScale / oc.s_must_buy));
                                                     var aftercost = Convert.ToInt16(Math.Round(comboCost * costScale / oc.s_must_buy));
+                                                    var aftereventcost = Convert.ToInt16(Math.Round(comboEventCost * eventcostScale / oc.s_must_buy));//add by zhuoqin0830w  2015/11/09
 
                                                     comboPrice -= afterprice * oc.s_must_buy;
                                                     comboCost -= aftercost * oc.s_must_buy;
+                                                    comboEventCost -= aftereventcost * oc.s_must_buy;//add by zhuoqin0830w  2015/11/09
+
                                                     totalPrice -= singlePrice;
                                                     totalCost -= singleCost;
+                                                    totalEventCost -= singleEventCost;//add by zhuoqin0830w  2015/11/09
+
                                                     oc.product_cost = uint.Parse(afterprice.ToString());
                                                     oc.Item_Cost = uint.Parse(aftercost.ToString());
+                                                    oc.Event_Item_Cost = uint.Parse(aftereventcost.ToString());//add by zhuoqin0830w  2015/11/09
                                                 }
                                             }
                                         }
@@ -602,8 +650,8 @@ namespace Admin.gigade.Controllers
                                 jsonStr = jsonStr.Substring(0, jsonStr.Length - 1) + "]";
                                 jsonStr += ",data:[";
                                 //拼接組合商品   cost為組合商品之成本,product_cost為組合商品之售價
-                                jsonStr += "{product_id:'" + orderAdd.product_id + "',product_name:'" + orderAdd.product_name + "',Item_Cost:'" + orderAdd.cost + "',product_cost:'" + orderAdd.product_cost + "',item_id:0";
-                                jsonStr += ",s_must_buy:'" + prodComList.Count + "',child_scale:'" + priceScales + "',child_cost_scale:'" + costScales + "',stock:'" + minStock + "',g_must_buy:'" + prodComList.Count + "',child:" + orderAdd.child + ",product_status_name:'" + (upFlag ? "上架" : "未上架") + "'}";
+                                jsonStr += "{product_id:'" + orderAdd.product_id + "',product_name:'" + orderAdd.product_name + "',Item_Cost:'" + orderAdd.cost + "',product_cost:'" + orderAdd.product_cost + "',item_id:0" + ",Event_Item_Cost:" + orderAdd.event_cost;
+                                jsonStr += ",s_must_buy:'" + prodComList.Count + "',child_scale:'" + priceScales + "',child_cost_scale:'" + costScales + "',child_event_cost_scale:'" + eventcostScales + "',stock:'" + minStock + "',g_must_buy:'" + prodComList.Count + "',child:" + orderAdd.child + ",product_status_name:'" + (upFlag ? "上架" : "未上架") + "'}";
                                 jsonStr += "]}";
                             }
                             catch (Exception ex)
@@ -727,7 +775,6 @@ namespace Admin.gigade.Controllers
                                     oc.Spec_Id_2 = pItemList[0].Spec_Id_2;
                                     oc.Item_Id = pItemList[0].Item_Id;
                                     oc.Item_Stock = pItemList[0].Item_Stock;
-                                    long nowTime = BLL.gigade.Common.CommonFunction.GetPHPTime();
                                     if (ipList.Count() > 0)
                                     {
                                         //取成本
@@ -739,6 +786,14 @@ namespace Admin.gigade.Controllers
                                         {
                                             oc.Item_Cost = ipList[0].item_cost;
                                         }
+
+                                        //add by zhuoqin0830w  2015/11/06  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動成本為 0 如果沒有過期則顯示活動成本
+                                        if (nowTime > pM.event_start && nowTime < pM.event_end)
+                                        {
+                                            oc.Event_Item_Cost = uint.Parse(pM.event_cost.ToString());
+                                        }
+                                        else { oc.Event_Item_Cost = 0; }
+
                                         if (nowTime > pItemList[0].Event_Product_Start && nowTime < pItemList[0].Event_Product_End)
                                         {
                                             if (pM.same_price == 1)
@@ -817,9 +872,11 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+        #endregion
 
+        #region 內部訂單輸入單一商品>商品細項查詢
         /// <summary>
-        /// 使用商品細項查詢商品信息  add by zhuoqin0830w  2015/07/10
+        /// 使用商品細項查詢商品信息  add by zhuoqin0830w  2015/07/10 (內部訂單輸入單一商品>商品細項查詢)
         /// </summary>
         /// <returns></returns>
         public HttpResponseBase OrderInfoQueryBySoleGigade()
@@ -857,11 +914,11 @@ namespace Admin.gigade.Controllers
                                 if (pList.Count() <= 0)
                                 {
                                     jsonStr = "{success:false,msg:'" + Resources.OrderAdd.PRODUCT_NOT_EXIST + "'}";//商品不存在
-            this.Response.Clear();
-            this.Response.Write(jsonStr);
-            this.Response.End();
-            return this.Response;
-        }
+                                    this.Response.Clear();
+                                    this.Response.Write(jsonStr);
+                                    this.Response.End();
+                                    return this.Response;
+                                }
                                 //補貨中停止販售 1:是 0:否
                                 if (pList[0].Shortage == 1)
                                 {
@@ -910,6 +967,14 @@ namespace Admin.gigade.Controllers
                                         {
                                             oc.Item_Cost = ipList[0].item_cost;
                                         }
+
+                                        //add by zhuoqin0830w  2015/11/06  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動成本為 0 如果沒有過期則顯示活動成本
+                                        if (nowTime > pM.event_start && nowTime < pM.event_end)
+                                        {
+                                            oc.Event_Item_Cost = uint.Parse(pM.event_cost.ToString());
+                                        }
+                                        else { oc.Event_Item_Cost = 0; }
+
                                         if (nowTime > proItem[0].Event_Product_Start && nowTime < proItem[0].Event_Product_End)
                                         {
                                             if (pM.same_price == 1)
@@ -944,7 +1009,7 @@ namespace Admin.gigade.Controllers
                                     StringBuilder stb = new StringBuilder();
                                     stb.Append("[");
                                     stb.Append("{product_id:" + oc.Product_Id + ",price_type:" + oc.price_type + ",child:" + c_combination + ",buy_limit:" + c_buy_limit + ",item_id:" + oc.Item_Id + ",product_name:'" + oc.product_name + "',");
-                                    stb.Append("product_cost:" + oc.Item_Money + ",Item_Cost:" + oc.Item_Cost + ",Event_Item_Cost:" + pM.event_cost + ",stock:" + oc.Item_Stock + ",s_must_buy:" + oc.s_must_buy + ",Spec_Name_1:'" + proItem[0].Spec_Name_1 + "',Spec_Name_2:'" + proItem[0].Spec_Name_2 + "',spec1:" + proItem[0].Spec_Id_1 + ",spec2:" + proItem[0].Spec_Id_2 + ",price_master_id:" + oc.price_master_id + ",ignore_stock:" + pList[0].Ignore_Stock + ",product_status_name:'" + (upFlag ? "上架" : "未上架") + "'}");
+                                    stb.Append("product_cost:" + oc.Item_Money + ",Item_Cost:" + oc.Item_Cost + ",Event_Item_Cost:" + oc.Event_Item_Cost + ",stock:" + oc.Item_Stock + ",s_must_buy:" + oc.s_must_buy + ",Spec_Name_1:'" + proItem[0].Spec_Name_1 + "',Spec_Name_2:'" + proItem[0].Spec_Name_2 + "',spec1:" + proItem[0].Spec_Id_1 + ",spec2:" + proItem[0].Spec_Id_2 + ",price_master_id:" + oc.price_master_id + ",ignore_stock:" + pList[0].Ignore_Stock + ",product_status_name:'" + (upFlag ? "上架" : "未上架") + "'}");
                                     stb.Append("]");
                                     jsonStr = "{success:true,data:" + stb.ToString() + "}";
                                 }
@@ -952,7 +1017,7 @@ namespace Admin.gigade.Controllers
                                 {
                                     jsonStr = "{success:false,msg:'" + Resources.OrderAdd.PRODUCT_PRICE_NOT_EXIST + "'}";
                                 }
-        #endregion
+                                #endregion
                             }
                             else
                             {
@@ -986,6 +1051,8 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+        #endregion
+
         #endregion
 
         #region 合作外站商品查詢
@@ -2588,19 +2655,27 @@ namespace Admin.gigade.Controllers
                                 {
                                     string[] str = dt.Rows[j][1].ToString().Split('/');
                                     int year = 0;
-                                    if (str[2].Length == 2)
+                                    if (str.Length == 3)
                                     {
-                                        year = Convert.ToInt32("20" + str[2]);
-                                    }
-                                    else
-                                    {
-                                        year = Convert.ToInt32(str[2]);
-                                    }
-                                    int month = Convert.ToInt32(str[0]);
-                                    int day = Convert.ToInt32(str[1]);
-                                    if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
-                                    {
-                                        model.account_collection_time = st;
+                                        if (str[2].Length == 2)
+                                        {
+                                            year = Convert.ToInt32("20" + str[2]);
+                                        }
+                                        else
+                                        {
+                                            year = Convert.ToInt32(str[2]);
+                                        }
+                                        int month = Convert.ToInt32(str[0]);
+                                        int day = Convert.ToInt32(str[1]);
+                                        if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
+                                        {
+                                            model.account_collection_time = st;
+                                        }
+                                        else
+                                        {
+                                            errorStr += (j + 2) + ",";
+                                            continue;
+                                        }
                                     }
                                     else
                                     {
@@ -2666,19 +2741,27 @@ namespace Admin.gigade.Controllers
                                 {
                                     string[] strR = dt.Rows[j][4].ToString().Split('/');
                                     int yearR = 0;
-                                    if (strR[2].Length == 2)
+                                    if (strR.Length == 3)
                                     {
-                                        yearR = Convert.ToInt32("20" + strR[2]);
-                                    }
-                                    else
-                                    {
-                                        yearR = Convert.ToInt32(strR[2]);
-                                    }
-                                    int monthR = Convert.ToInt32(strR[0]);
-                                    int dayR = Convert.ToInt32(strR[1]);
-                                    if (DateTime.TryParse(yearR + "/" + monthR + "/" + dayR, out streturn))
-                                    {
-                                        model.return_collection_time = streturn;
+                                        if (strR[2].Length == 2)
+                                        {
+                                            yearR = Convert.ToInt32("20" + strR[2]);
+                                        }
+                                        else
+                                        {
+                                            yearR = Convert.ToInt32(strR[2]);
+                                        }
+                                        int monthR = Convert.ToInt32(strR[0]);
+                                        int dayR = Convert.ToInt32(strR[1]);
+                                        if (DateTime.TryParse(yearR + "/" + monthR + "/" + dayR, out streturn))
+                                        {
+                                            model.return_collection_time = streturn;
+                                        }
+                                        else
+                                        {
+                                            errorStr += (j + 2) + ",";
+                                            continue;
+                                        }
                                     }
                                     else
                                     {
@@ -2742,19 +2825,27 @@ namespace Admin.gigade.Controllers
                                 {
                                     string[] str = dt.Rows[j][7].ToString().Split('/');
                                     int year = 0;
-                                    if (str[2].Length == 2)
+                                    if (str.Length == 3)
                                     {
-                                        year = Convert.ToInt32("20" + str[2]);
-                                    }
-                                    else
-                                    {
-                                        year = Convert.ToInt32(str[2]);
-                                    }
-                                    int month = Convert.ToInt32(str[0]);
-                                    int day = Convert.ToInt32(str[1]);
-                                    if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
-                                    {
-                                        model.invoice_date_manual = st;
+                                        if (str[2].Length == 2)
+                                        {
+                                            year = Convert.ToInt32("20" + str[2]);
+                                        }
+                                        else
+                                        {
+                                            year = Convert.ToInt32(str[2]);
+                                        }
+                                        int month = Convert.ToInt32(str[0]);
+                                        int day = Convert.ToInt32(str[1]);
+                                        if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
+                                        {
+                                            model.invoice_date_manual = st;
+                                        }
+                                        else
+                                        {
+                                            errorStr += (j + 2) + ",";
+                                            continue;
+                                        }
                                     }
                                     else
                                     {
@@ -2816,7 +2907,10 @@ namespace Admin.gigade.Controllers
                         }
                     }
                     int rowsnum = oacli.Count;
-                    errorStr = errorStr.Remove(errorStr.Length - 1);
+                    if (!string.IsNullOrEmpty(errorStr))
+                    {
+                        errorStr = errorStr.Remove(errorStr.Length - 1);
+                    }
                     if (rowsnum > 0)//判斷是否是這個表
                     {
                         _OrderMasterMgr = new OrderMasterMgr(connectionString);
@@ -2826,16 +2920,37 @@ namespace Admin.gigade.Controllers
                         {
                             if (i == 99999)
                             {
-                                json = "{success:true,msg:\"" + "無數據可匯入!另文件第" + errorStr + "行數據異常\"}";
+                                if (!string.IsNullOrEmpty(errorStr))
+                                {
+                                    json = "{success:true,msg:\"" + "無數據可匯入!另文件第" + errorStr + "行數據異常\"}";
+                                }
+                                else
+                                {
+                                    json = "{success:true,msg:\"" + "無數據可匯入!\"}";
+                                }
                             }
                             else
                             {
-                                json = "{success:true,msg:\"" + "匯入成功!另文件第" + errorStr + "行數據異常\"}";
+                                if (!string.IsNullOrEmpty(errorStr))
+                                {
+                                    json = "{success:true,msg:\"" + "匯入成功!另文件第" + errorStr + "行數據異常\"}";
+                                }
+                                else
+                                {
+                                    json = "{success:true,msg:\"" + "匯入成功!\"}";
+                                }
                             }
                         }
                         else
                         {
-                            json = "{success:true,msg:\"" + "操作失敗!另文件第" + errorStr + "行數據異常\"}";
+                            if (!string.IsNullOrEmpty(errorStr))
+                            {
+                                json = "{success:true,msg:\"" + "操作失敗!另文件第" + errorStr + "行數據異常\"}";
+                            }
+                            else
+                            {
+                                json = "{success:true,msg:\"" + "操作失敗!\"}";
+                            }
                         }
                     }
                     else

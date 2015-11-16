@@ -3047,7 +3047,7 @@ namespace Admin.gigade.Controllers
                     ia.qty_o = _iinvd.Selnum(m);
                     ia.adj_qty = m.prod_qty;
 
-                    m.prod_qty = _iinvd.Selnum(m) + m.prod_qty;
+                    m.prod_qty = ia.qty_o + m.prod_qty;
                     if (m.prod_qty >= 0)
                     {
                         if (_iinvd.Upd(m) > 0)
@@ -3227,14 +3227,14 @@ namespace Admin.gigade.Controllers
                 int id;
                 _iinvd = new IinvdMgr(mySqlConnectionString);
                 DataTable dt = new DataTable();
-                if (int.TryParse(Request.Params["id"].ToString(), out id) && Request.Params["id"].ToString().Length == 6)
-                {//獲取商品編號
-                    dt = _iinvd.Getprodu(int.Parse(Request.Params["id"].ToString()));
-                }
-                else
-                {//獲取條碼
+                //if (int.TryParse(Request.Params["id"].ToString(), out id) && Request.Params["id"].ToString().Length == 6)
+                //{//獲取商品編號
+                //    dt = _iinvd.Getprodu(int.Parse(Request.Params["id"].ToString()));
+                //}
+                //else
+                //{//獲取條碼
                     dt = _iinvd.Getprodubybar(Request.Params["id"].ToString());
-                }
+               // }
                 if (dt.Rows.Count > 0)
                 {//pwy_dte_ctl是否是有效期控管的商品，cde_dt_shp：允出天數，cde_dt_var：允收天數,cde_dt_incr 保存天數
                     string spec = string.Empty;
@@ -3254,7 +3254,7 @@ namespace Admin.gigade.Controllers
                     {
                         spec = "(" + spec + ")";
                     }
-                    jsonStr = "{success:true,msg:\"" + dt.Rows[0]["product_name"] + spec + "\",locid:'" + dt.Rows[0]["loc_id"].ToString().ToUpper() + "',day:'" + dt.Rows[0]["cde_dt_var"] + "',cde_dt_shp:'" + dt.Rows[0]["cde_dt_shp"] + "',pwy_dte_ctl:'" + dt.Rows[0]["pwy_dte_ctl"] + "',cde_dt_var:'" + dt.Rows[0]["cde_dt_var"] + "',cde_dt_incr:'" + dt.Rows[0]["cde_dt_incr"] + "',vendor_id:'" + dt.Rows[0]["vendor_id"] + "'}";//返回json數據
+                    jsonStr = "{success:true,msg:\"" + dt.Rows[0]["product_name"] + spec + "\",locid:'" + dt.Rows[0]["loc_id"].ToString().ToUpper() + "',item_id:'" + dt.Rows[0]["item_id"] + "',day:'" + dt.Rows[0]["cde_dt_var"] + "',cde_dt_shp:'" + dt.Rows[0]["cde_dt_shp"] + "',pwy_dte_ctl:'" + dt.Rows[0]["pwy_dte_ctl"] + "',cde_dt_var:'" + dt.Rows[0]["cde_dt_var"] + "',cde_dt_incr:'" + dt.Rows[0]["cde_dt_incr"] + "',vendor_id:'" + dt.Rows[0]["vendor_id"] + "'}";//返回json數據
                 }
                 else
                 {
@@ -5876,19 +5876,19 @@ namespace Admin.gigade.Controllers
                 IstockChangeQuery query = new IstockChangeQuery();
                 if (!string.IsNullOrEmpty(Request.Params["oid"]))
                 {
-                    query.item_upc = Request.Params["oid"].ToString().Trim();//料位和條碼不再通過長度來判斷了
-                    ////System.Text.RegularExpressions.Regex rex = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
-                    ////string id = Request.Params["oid"].ToString().Trim();
-                    ////if (rex.IsMatch(id))
-                    ////{
-                    ////    query.item_id = uint.Parse(id);
-                    ////}
-                    ////else
-                    ////{
-                    ////    query.upc_id = id;
-                    ////}
-                }
+                    string id = Request.Params["oid"].ToString().Trim();
 
+                    System.Text.RegularExpressions.Regex rex = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
+
+                    if (rex.IsMatch(id))
+                    {
+                        query.item_id = uint.Parse(id);
+                    }
+                    else
+                    {
+                        query.item_upc = Request.Params["oid"].ToString().Trim();//料位和條碼不再通過長度來判斷了
+                    }
+                }
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]) && Request.Params["start_time"] != "1970-01-01")//
                 {
                     query.starttime = DateTime.Parse(DateTime.Parse(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
@@ -5966,17 +5966,18 @@ namespace Admin.gigade.Controllers
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
                 if (!string.IsNullOrEmpty(Request.Params["oid"]))
                 {
-                    query.item_upc = Request.Params["oid"].ToString().Trim();//料位和條碼不再通過長度來判斷了
-                    ////System.Text.RegularExpressions.Regex rex = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
-                    ////string id = Request.Params["oid"].ToString().Trim();
-                    ////if (rex.IsMatch(id))
-                    ////{
-                    ////    query.item_id = uint.Parse(id);
-                    ////}
-                    ////else
-                    ////{
-                    ////    query.upc_id = id;
-                    ////}
+                    string id = Request.Params["oid"].ToString().Trim();
+                   
+                    System.Text.RegularExpressions.Regex rex = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
+                    
+                    if (rex.IsMatch(id))
+                    {
+                        query.item_id = uint.Parse(id);
+                    }
+                    else
+                    {
+                        query.item_upc = Request.Params["oid"].ToString().Trim();//料位和條碼不再通過長度來判斷了
+                    }
                 }
                 DateTime time;
                 if (DateTime.TryParse(Request.Params["time_start"], out time))
@@ -12332,30 +12333,30 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return Response;
         }
-        public static DataTable AseldPDF(DataTable aseldTable)
-        {
-            DataTable table = new DataTable();
-            table.Columns.Add("商品編號", typeof(string));
-            table.Columns.Add("商品名稱", typeof(string));
-            table.Columns.Add("細項編號", typeof(string));
-            table.Columns.Add("規格", typeof(string));
-            table.Columns.Add("待檢貨量", typeof(string));
-            table.Columns.Add("已檢貨量", typeof(string));
-            table.Columns.Add("創建時間", typeof(string));
-            for (int i = 0; i < aseldTable.Rows.Count; i++)
-            {
-                DataRow row = table.NewRow();
-                row["商品編號"] = aseldTable.Rows[i]["product_id"];
-                row["商品名稱"] = aseldTable.Rows[i]["product_name"];
-                row["細項編號"] = aseldTable.Rows[i]["item_id"];
-                row["規格"] = aseldTable.Rows[i]["spec"];
-                row["待檢貨量"] = aseldTable.Rows[i]["out_qty"];
-                row["已檢貨量"] = aseldTable.Rows[i]["act_pick_qty"];
-                row["創建時間"] = aseldTable.Rows[i]["create_dtim"];
-                table.Rows.Add(row);
-            }
-            return table;
-        }
+        //public static DataTable AseldPDF(DataTable aseldTable)
+        //{
+        //    DataTable table = new DataTable();
+        //    table.Columns.Add("商品編號", typeof(string));
+        //    table.Columns.Add("商品名稱", typeof(string));
+        //    table.Columns.Add("細項編號", typeof(string));
+        //    table.Columns.Add("規格", typeof(string));
+        //    table.Columns.Add("待檢貨量", typeof(string));
+        //    table.Columns.Add("已檢貨量", typeof(string));
+        //    table.Columns.Add("創建時間", typeof(string));
+        //    for (int i = 0; i < aseldTable.Rows.Count; i++)
+        //    {
+        //        DataRow row = table.NewRow();
+        //        row["商品編號"] = aseldTable.Rows[i]["product_id"];
+        //        row["商品名稱"] = aseldTable.Rows[i]["product_name"];
+        //        row["細項編號"] = aseldTable.Rows[i]["item_id"];
+        //        row["規格"] = aseldTable.Rows[i]["spec"];
+        //        row["待檢貨量"] = aseldTable.Rows[i]["out_qty"];
+        //        row["已檢貨量"] = aseldTable.Rows[i]["act_pick_qty"];
+        //        row["創建時間"] = aseldTable.Rows[i]["create_dtim"];
+        //        table.Rows.Add(row);
+        //    }
+        //    return table;
+        //}
         //public string MakePDF(DataTable aseldTable, string assg_id, string user_username, string newPDFName, int index)
         //{
         //    int columnNum = 10;
@@ -13099,6 +13100,7 @@ namespace Admin.gigade.Controllers
             #region 數據行
             if (ase_query.assg_id != string.Empty)
             {
+                _dtBody.Rows.Clear();
                 aseldTable = aseldMgr.GetAseldTable(ase_query, out total);
                 #region 標頭
                 #region 表頭
@@ -13371,6 +13373,8 @@ namespace Admin.gigade.Controllers
                                     row["備註"] = " ";
                                     _dtBody.Rows.Add(row);
                                     P_num -= Store[i].prod_qty;
+                                    if (P_num == 0)
+                                        break;
                                 }
 
                             }
@@ -13413,6 +13417,7 @@ namespace Admin.gigade.Controllers
                 {
                     ase_query.assg_id = assg_idTable.Rows[a]["assg_id"].ToString();
                     aseldTable = aseldMgr.GetAseldTable(ase_query, out total);
+                    _dtBody.Rows.Clear();
                     #region 標頭
                     #region 表頭
                     PdfPTable ptable = new PdfPTable(11);
@@ -13681,6 +13686,8 @@ namespace Admin.gigade.Controllers
                                         row["備註"] = " ";
                                         _dtBody.Rows.Add(row);
                                         P_num -= Store[i].prod_qty;
+                                        if (P_num == 0)
+                                            break;
                                     }
 
                                 }
