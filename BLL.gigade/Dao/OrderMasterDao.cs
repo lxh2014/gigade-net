@@ -2254,7 +2254,7 @@ namespace BLL.gigade.Dao
             try
             {
                 sql.Append("SELECT u.user_name,FROM_UNIXTIME(om.order_createdate) 'order_createdate',om.order_id,om.order_payment, om.order_amount,om.order_status,imr.invoice_number,imr.total_amount,FROM_UNIXTIME(invoice_date) 'invoice_date' ,od.item_id,");
-                sql.Append(" od.detail_status,v.vendor_name_simple,v.vendor_code,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,od.single_money*buy_num 'total_money' ,  ");
+                sql.Append(" od.detail_status,v.vendor_name_simple,v.vendor_code,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,od.single_money*buy_num 'total_money' ,od.item_mode,od.parent_num, ");
                 sql.Append(" od.single_cost,od.bag_check_money,od.single_cost*od.buy_num 'total_cost' , FROM_UNIXTIME(os.slave_date_close) 'slave_date_close',mu.user_username as 'pm',om.source_trace as 'ID',rg.group_name, od.product_mode   ");
                 sql.Append(" from order_master om LEFT JOIN order_slave os ON om.order_id=os.order_id  ");
                 sql.Append(" LEFT JOIN order_detail od ON os.slave_id=od.slave_id LEFT JOIN invoice_master_record imr ON om.order_id=imr.order_id  ");
@@ -2294,6 +2294,20 @@ namespace BLL.gigade.Dao
             catch (Exception ex)
             {
                 throw new Exception("OrderMasterDao-->GetParaByPayment-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetOrderFreight(uint order_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                  sql.AppendFormat(" select order_freight_normal,order_freight_low from order_master where order_id='{0}';",order_id);
+                 return    _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetOrderFreight-->" + sql.ToString() + ex.Message, ex);
             }
         }
 

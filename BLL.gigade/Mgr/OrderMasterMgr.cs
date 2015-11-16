@@ -1144,5 +1144,18 @@ set ");
                 throw new Exception("OrderMasterMgr-->GetParaByPayment-->" + ex.Message, ex);
             }
         }
+
+        public DataTable GetOrderFreight(uint order_id)
+        {
+            try
+            {
+                DataTable _dt = _orderMasterDao.GetOrderFreight(order_id);
+                return _dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->GetOrderFreight-->" + ex.Message, ex);
+            }
+        }
     }
 }

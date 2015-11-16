@@ -109,5 +109,6 @@ namespace BLL.gigade.Dao.Impl
         DataTable OrderSerchExport(OrderMasterQuery query);
         DataTable GetPara(string type, int order_status);
         DataTable GetParaByPayment(int payment);
+        DataTable GetOrderFreight(uint order_id);
     }
 }
