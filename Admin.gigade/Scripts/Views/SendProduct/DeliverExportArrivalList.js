@@ -638,6 +638,7 @@ Query = function () {
     var time_start = Ext.getCmp('time_start').getValue(); if (time_start != null) { falg++; }
     var time_end = Ext.getCmp('time_end').getValue(); if (time_end != null) { falg++; }
 
+    DeliverExpectArrivalStore.removeAll();
     if (falg == 0) {
         Ext.Msg.alert("提示", "請輸入查詢條件");
         return false;
@@ -652,7 +653,7 @@ Query = function () {
     }
     
     
-    DeliverExpectArrivalStore.removeAll();
+   
     
     Ext.getCmp("deliverExpectArrivalGrid").store.loadPage(1, {
         params: {

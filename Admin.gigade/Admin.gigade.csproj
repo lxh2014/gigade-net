@@ -1968,6 +1968,7 @@
     <Content Include="Scripts\Views\SendProduct\DeliverMasterList.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverExportArrivalList.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverExportArrivalEdit.js" />
+    <Content Include="Scripts\Views\SendProduct\ExportArrivalChangeLogList.js" />
     <Content Include="Scripts\Views\Service\OrderQuestionAdd.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaEdit.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaList.js" />
@@ -4470,6 +4471,7 @@
     <Content Include="Template\SiteStatistics\SiteStatistics.xlsx" />
     <Content Include="Views\WareHouse\Aseld.cshtml" />
     <Content Include="Views\SendProduct\DeliverExpectArrival.cshtml" />
+    <Content Include="Views\SendProduct\ExpectArrivalChangeLog.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

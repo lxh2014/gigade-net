@@ -11,5 +11,6 @@ namespace BLL.gigade.Dao.Impl
     public interface IDeliverChangeLogImplDao
     {
         int insertDeliverChangeLog(DeliverChangeLog dCL);
+        List<DeliverChangeLogQuery> GetDeliverChangeLogList(DeliverChangeLogQuery Query, out int totalCount);
     }
 }

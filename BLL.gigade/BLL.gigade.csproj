@@ -1397,6 +1397,7 @@
     <Compile Include="Model\Query\BrowseDataQuery.cs" />
     <Compile Include="Model\Query\CertificateCategoryQuery.cs" />
     <Compile Include="Model\Query\CourseQuery.cs" />
+    <Compile Include="Model\Query\DeliverChangeLogQuery.cs" />
     <Compile Include="Model\Query\DeliveryStorePlaceQuery.cs" />
     <Compile Include="Model\Query\DesignRequestQuery.cs" />
     <Compile Include="Model\Query\DisableKeywordsQuery.cs" />
