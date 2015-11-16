@@ -35,14 +35,20 @@
             id: 'expect_arrive_date',
             name: 'expect_arrive_date',
             submitValue: true,
-            editable: true,
+            editable:false,
             hidden: false,
             listeners: {               
-                change: function (ths, newValue, oldValue, eOpts) {
-                    if (newValue) {
-                        Ext.getCmp('flag').setValue(Ext.getCmp('flag').getValue() + 1);
-                    }                    
-                }               
+                //change: function (ths, newValue, oldValue, eOpts) {
+                //    if (oldValue)
+                //    {
+
+                //    }
+                //    if (newValue != oldValue) {
+                //        alert(newValue != oldValue);
+                //        Ext.getCmp('flag').setValue(Ext.getCmp('flag').getValue() + 1);
+
+                //    }                    
+                //}               
             }
         }, {          
             xtype: 'combobox',
@@ -59,11 +65,12 @@
             value: -1
             ,
             listeners: {                
-                change: function (ths, newValue, oldValue, eOpts) {
-                    if (newValue){
-                        Ext.getCmp('flag').setValue(Ext.getCmp('flag').getValue() + 1);
-                    }
-                }              
+                //change: function (ths, newValue, oldValue, eOpts) {
+                //    if (newValue != oldValue) {
+                //        alert(newValue != oldValue);
+                //        Ext.getCmp('flag').setValue(Ext.getCmp('flag').getValue() + 1);
+                //    }
+                //}              
             }
         }, {
             xtype: 'textfield',
@@ -73,9 +80,12 @@
             submitValue: true,
             hidden: false,
             listeners: {
-                change: function (ths, newValue, oldValue, eOpts) {
-                    Ext.getCmp('flag').setValue(Ext.getCmp('flag').getValue() + 1);
-                }             
+                //change: function (ths, newValue, oldValue, eOpts) {
+                //    if (newValue != oldValue) {
+                //        alert(newValue != oldValue);
+                //        Ext.getCmp('flag').setValue(Ext.getCmp('flag').getValue() + 1);
+                //    }                  
+                //}             
             }
         }, {
             xtype: 'textfield',
@@ -91,11 +101,31 @@
             //disabled: true,
             id: 'saveBtn',
             text: '保存',
-            handler: function () {              
-                if (Ext.getCmp('flag').getValue() == 111) {
-                    Ext.Msg.alert('提示', '請修改參數后再保存');
-                    return false;
-                }                
+            handler: function () {
+                var bool_1 = (Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('expect_arrive_date').getValue()), 'Y-m-d')) == row.data.expect_arrive_date.toString());
+                var bool_1_1 = (Ext.htmlEncode(Ext.getCmp('expect_arrive_date').getValue()) == 'Mon Jan 01 0001 00:00:00 GMT+0800');
+                var bool_2 = (Ext.getCmp('expect_arrive_period').getValue() == row.data.expect_arrive_period);
+                var bool_3 = (Ext.getCmp('dcl_note').getValue().trim() == '');
+                var start = Ext.getCmp("expect_arrive_date").getValue();
+                //alert((Ext.htmlEncode(Ext.getCmp('expect_arrive_date').getValue())));
+                //alert(bool_1);
+                //alert(bool_1_1);
+                //alert(bool_2);
+                //alert(bool_3);
+                if (bool_1_1) {
+                    if (bool_1_1 && bool_2 && bool_3) {
+                        Ext.Msg.alert('提示', '請修改參數后再保存');
+                        return false;
+                    }
+                }
+                else {
+                    if (bool_1 && bool_2 && bool_3) {
+                        Ext.Msg.alert('提示', '請修改參數后再保存');
+                        return false;
+                    }
+                }               
+                //time1 = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('expect_arrive_date').getValue()), 'Y-m-d'));
+                                                                        
                 var form = this.up('form').getForm();
                 form.submit({
                     params: {

@@ -40,6 +40,17 @@ namespace BLL.gigade.Mgr
             {
                 throw new Exception("DeliverChangeLogMgr-->insertDeliverChangeLog-->" + ex.Message, ex);
             }
-        } 
+        }
+        public List<DeliverChangeLogQuery> GetDeliverChangeLogList(DeliverChangeLogQuery Query, out int totalCount)
+        {
+            try
+            {
+                return _IDeliverChangeLogDao.GetDeliverChangeLogList(Query,out totalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("DeliverChangeLogMgr-->GetDeliverChangeLogList-->" + ex.Message, ex);
+            }
+        }
     }
 }
