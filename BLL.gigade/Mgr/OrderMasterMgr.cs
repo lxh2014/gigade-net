@@ -1093,6 +1093,18 @@ set ");
             {
                 throw new Exception("OrderMasterMgr-->VerifySession-->" + ex.Message, ex);
             }
-        }      
+        }
+
+        public DataTable OrderDetialExportInfo(OrderDetailQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.OrderDetialExportInfo(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->OrderDetialExportInfo-->" + ex.Message, ex);
+            }
+        }
     }
 }

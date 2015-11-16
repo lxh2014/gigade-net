@@ -991,5 +991,95 @@ where 1=1 AND item_mode in(0,1) and  pcs.category_id={0} ", query.category_id);
                 throw new Exception("OrderDetailDao.GetCategorySummaryList -->" + ex.Message + sql.ToString(), ex);
             }
         }
+
+        public DataTable GetAmountDetial(OrderDetailQuery query ,out int totalCount)
+        {
+            StringBuilder sql = new StringBuilder();
+            totalCount = 0;
+            DataTable dt = new DataTable();
+            try
+            {
+                sql.AppendFormat(@"SELECT  om.order_id,u.user_name, sum(od.single_money * buy_num) AS amount,
+                                pcs.category_id ,om.order_product_subtotal,om.order_amount,dm.delivery_name,
+                                (SELECT parameterName FROM t_parametersrc WHERE parameterType='payment' AND parameterCode=om.order_payment) AS order_payment,
+                                (SELECT remark FROM t_parametersrc WHERE parameterType='order_status' AND parameterCode= os.slave_status) AS slave_status,
+                                (SELECT site_name FROM site WHERE od.site_id=site.site_id ) AS site_name ,
+                                FROM_UNIXTIME(om.order_createdate) AS order_createdate
+	                        FROM  order_detail od
+	                        INNER JOIN product_item pit USING(item_id)
+	                        INNER JOIN order_slave os USING (slave_id)
+	                        INNER JOIN order_master om USING (order_id)
+	                        INNER JOIN product p USING (product_id)
+	                        INNER JOIN product_category_set pcs USING(product_id)
+			                INNER JOIN users u ON u.user_id=om.user_id
+			                LEFT JOIN (SELECT order_id,delivery_name FROM deliver_master GROUP BY order_id ) dm on om.order_id=dm.order_id
+			                INNER JOIN (SELECT	category_id FROM product_category
+                            WHERE category_display = 1 AND (category_id={0})) pc USING(category_id) 
+	                        WHERE 1=1 AND item_mode in(0,1) AND od.detail_status <> 90 ", query.category_id);
+                if (query.category_status != 0)
+                {
+                    sql.AppendFormat(" AND om.money_collect_date > 0");
+                }
+                if (query.date_stauts != 0)
+                {
+                    if (query.date_start != DateTime.MinValue && query.date_end != DateTime.MinValue)
+                    {
+                        sql.AppendFormat(" AND om.order_createdate>='{0}' and  om.order_createdate<='{1}'", CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_start)), CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_end)));
+                    }
+                }
+                sql.AppendFormat(" GROUP BY  om.order_id");
+                if (query.IsPage)
+                {
+                    dt = _dbAccess.getDataTable(sql.ToString());
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        totalCount = dt.Rows.Count;
+                    }
+                    sql.AppendFormat(" limit {0},{1}", query.Start, query.Limit);
+
+                }
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderDetailDao.GetAmountDetial -->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+
+        public DataTable CategoryDetialExportInfo(OrderDetailQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"select  od.detail_id,om.order_id,sum(od.single_money * buy_num) as amount,
+(SELECT remark FROM t_parametersrc WHERE parameterType='order_status' AND parameterCode= om.order_status) as order_status,
+od.item_id,
+(SELECT remark FROM t_parametersrc WHERE parameterType='order_status' AND parameterCode= os.slave_status) as slave_status,
+v.vendor_name_simple,v.vendor_code,od.product_name,od.buy_num,od.single_money,om.order_amount
+	    from  order_detail od inner join product_item pit using(item_id) INNER JOIN order_slave os USING (slave_id)
+	    INNER JOIN order_master om USING (order_id) INNER JOIN product p using (product_id)
+			LEFT JOIN vendor v ON od.item_vendor_id=v.vendor_id INNER JOIN product_category_set pcs using(product_id)
+			INNER JOIN users u on u.user_id=om.user_id
+			INNER JOIN (SELECT	category_id FROM product_category WHERE category_display = 1 and (category_id={0})) pc using(category_id) 
+	where 1=1 AND item_mode in(0,1) AND od.detail_status <> 90  ", query.category_id);
+                if (query.category_status != 0)
+                {
+                    sql.AppendFormat(" AND om.money_collect_date > 0");
+                }
+                if (query.date_stauts != 0)
+                {
+                    if (query.date_start != DateTime.MinValue && query.date_end != DateTime.MinValue)
+                    {
+                        sql.AppendFormat(" AND om.order_createdate>='{0}' and  om.order_createdate<='{1}'", CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_start)), CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_end)));
+                    }
+                }
+                sql.AppendFormat(" GROUP BY  od.detail_id;");
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->CategoryDetialExportInfo-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
     }
 }
