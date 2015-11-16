@@ -214,11 +214,11 @@ namespace BLL.gigade.Mgr
                     }
                     else if (dtProduct.Rows[i]["prod_classify"] == "20")
                     {
-                        strurl = @"<![CDATA[http://" + "www.gigade100.com/newweb" + "/stuff/product_stuff.php?pid=" + dtProduct.Rows[i]["product_id"] + "&view=" + DateTime.Now.ToString("yyyyMMdd") + "]]>"; ;
+                        strurl = @"<![CDATA[http://" + "www.gigade100.com/newweb" + "/stuff/product_stuff.php?pid=" + dtProduct.Rows[i]["product_id"] + "&view=" + DateTime.Now.ToString("yyyyMMdd") + "]]>";
                     }
                     else
                     {
-                        strurl = @"<![CDATA[http://" + "www.gigade100.com/newweb" + "/product.php?pid=" + dtProduct.Rows[i]["product_id"] + "&view=" + DateTime.Now.ToString("yyyyMMdd") + "]]>"; ;//商品預覽
+                        strurl = @"<![CDATA[http://" + "www.gigade100.com/newweb" + "/product.php?pid=" + dtProduct.Rows[i]["product_id"] + "&view=" + DateTime.Now.ToString("yyyyMMdd") + "]]>";//商品預覽
                     }
                     str.AppendLine(@"<url>" + strurl + "</url>");
                     str.AppendLine(@"<imgurl>" + "<![CDATA[" + picPath +"/product/"+ dtProduct.Rows[i]["product_image"] + "]]>" + "</imgurl>");//图片
