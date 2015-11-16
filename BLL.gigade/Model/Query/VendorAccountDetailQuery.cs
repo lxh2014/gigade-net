@@ -18,6 +18,7 @@ namespace BLL.gigade.Model.Query
         public uint single_price { get; set; }
         public uint single_money { get; set; }
         public uint buy_num { get; set; }
+        public uint parent_num { get; set; }
         public uint detail_status { get; set; }
         public uint item_mode { get; set; }
         public int parent_id { get; set; }
@@ -36,6 +37,7 @@ namespace BLL.gigade.Model.Query
         public string search_end_time { get; set; }
         public string newname { get; set; }
         public string orderIds { get; set; }
+        public string upc_id { get; set; }
         public VendorAccountDetailQuery()
         {
 
@@ -49,6 +51,7 @@ namespace BLL.gigade.Model.Query
             single_price = 0;
             single_money = 0;
             buy_num = 0;
+            parent_num = 0;
             detail_status = 0;
             item_mode = 0;
             pack_id = 0;
@@ -64,6 +67,7 @@ namespace BLL.gigade.Model.Query
             newname = string.Empty;
             account_dates = DateTime.MinValue;
             orderIds = string.Empty;
+            upc_id = string.Empty;
         }
     }
 }
