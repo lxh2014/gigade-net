@@ -49,6 +49,88 @@ namespace BLL.gigade.Dao
             {
                 throw new Exception("DeliverChangeLogDao-->insertDeliverChangeLog-->" + ex.Message + sbSql.ToString(), ex);
             }          
-        }       
+        }
+
+        public List<DeliverChangeLogQuery> GetDeliverChangeLogList(DeliverChangeLogQuery Query, out int totalCount)
+        {
+            StringBuilder sbSql = new StringBuilder();
+            StringBuilder conndSql = new StringBuilder();
+            Query.Replace4MySQL();
+            
+            try
+            {                      
+                sbSql.AppendFormat(@"select deliver_id,dcl_create_datetime,dcl_create_type,dcl_note,dcl_ipfrom, expect_arrive_date,expect_arrive_period,
+                                              u.user_name as dcl_create_username,mu.user_username as dcl_create_musername                                        
+                                     from delivery_change_log dcl LEFT JOIN users u on u.user_id=dcl.dcl_create_user 
+                                     LEFT JOIN manage_user mu on mu.user_id=dcl.dcl_create_muser where 1=1 ");
+                if (Query.deliver_id != 0)
+                {
+                    conndSql.AppendFormat(" and deliver_id='{0}' ", Query.deliver_id);
+                }              
+                if (Query.dcl_create_type != 0)
+                {
+                    conndSql.AppendFormat(" and dcl_create_type='{0}' ", Query.dcl_create_type);
+                }
+
+
+                if (Query.dcl_user_name != string.Empty)
+                {
+                    if (Query.dcl_create_type == 0)
+                    {
+                        conndSql.AppendFormat(" and (u.user_name like '%{0}%' or mu.user_username like '%{0}%') ", Query.dcl_user_name);
+                    }
+                    if (Query.dcl_create_type == 1)
+                    {
+                        conndSql.AppendFormat(" and u.user_name like '%{0}%' ", Query.dcl_user_name);
+                    }
+                    if (Query.dcl_create_type == 2)
+                    {
+                        conndSql.AppendFormat(" and mu.user_username like '%{0}%' ", Query.dcl_user_name);
+                    }                   
+                }
+                if (Query.dcl_user_email != string.Empty)
+                {
+                    if (Query.dcl_create_type == 0)
+                    {
+                        conndSql.AppendFormat(" and (u.user_email like '%{0}%' or mu.user_email like '%{0}%') ", Query.dcl_user_email);
+                    }
+                    if (Query.dcl_create_type == 1)
+                    {
+                        conndSql.AppendFormat(" and u.user_email like '%{0}%' ", Query.dcl_user_email);
+                    }
+                    if (Query.dcl_create_type == 2)
+                    {
+                        conndSql.AppendFormat(" and mu.user_email like '%{0}%' ", Query.dcl_user_email);
+                    }                 
+                }
+
+
+                if (Query.time_start != DateTime.MinValue && Query.time_end != DateTime.MinValue)
+                {
+                    conndSql.AppendFormat(" and dcl_create_datetime BETWEEN '{0}' and '{1}'", Query.time_start, Query.time_end);
+                }
+
+                
+
+                totalCount = 0;
+                if (Query.IsPage)
+                {
+                    DataTable _dt = new DataTable();
+                    _dt = _access.getDataTable(@"select count(deliver_id) as totalCount from delivery_change_log dcl LEFT JOIN users u on u.user_id=dcl.dcl_create_user 
+                                              LEFT JOIN manage_user mu on mu.user_id=dcl.dcl_create_muser where 1=1 " + conndSql.ToString());
+                    if (_dt.Rows.Count > 0)
+                    {
+                        totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
+                    }
+                    sbSql.AppendFormat( conndSql.ToString() + " limit {0},{1}",Query.Start,Query.Limit);
+
+                }
+                return _access.getDataTableForObj<DeliverChangeLogQuery>(sbSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("DeliverChangeLogDao-->GetDeliverChangeLogList-->" + ex.Message + sbSql.ToString(), ex);
+            }
+        }
     }
 }

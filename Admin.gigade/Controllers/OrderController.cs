@@ -2907,7 +2907,10 @@ namespace Admin.gigade.Controllers
                         }
                     }
                     int rowsnum = oacli.Count;
-                    errorStr = errorStr.Remove(errorStr.Length - 1);
+                    if (!string.IsNullOrEmpty(errorStr))
+                    {
+                        errorStr = errorStr.Remove(errorStr.Length - 1);
+                    }
                     if (rowsnum > 0)//判斷是否是這個表
                     {
                         _OrderMasterMgr = new OrderMasterMgr(connectionString);
@@ -2917,16 +2920,37 @@ namespace Admin.gigade.Controllers
                         {
                             if (i == 99999)
                             {
-                                json = "{success:true,msg:\"" + "無數據可匯入!另文件第" + errorStr + "行數據異常\"}";
+                                if (!string.IsNullOrEmpty(errorStr))
+                                {
+                                    json = "{success:true,msg:\"" + "無數據可匯入!另文件第" + errorStr + "行數據異常\"}";
+                                }
+                                else
+                                {
+                                    json = "{success:true,msg:\"" + "無數據可匯入!\"}";
+                                }
                             }
                             else
                             {
-                                json = "{success:true,msg:\"" + "匯入成功!另文件第" + errorStr + "行數據異常\"}";
+                                if (!string.IsNullOrEmpty(errorStr))
+                                {
+                                    json = "{success:true,msg:\"" + "匯入成功!另文件第" + errorStr + "行數據異常\"}";
+                                }
+                                else
+                                {
+                                    json = "{success:true,msg:\"" + "匯入成功!\"}";
+                                }
                             }
                         }
                         else
                         {
-                            json = "{success:true,msg:\"" + "操作失敗!另文件第" + errorStr + "行數據異常\"}";
+                            if (!string.IsNullOrEmpty(errorStr))
+                            {
+                                json = "{success:true,msg:\"" + "操作失敗!另文件第" + errorStr + "行數據異常\"}";
+                            }
+                            else
+                            {
+                                json = "{success:true,msg:\"" + "操作失敗!\"}";
+                            }
                         }
                     }
                     else

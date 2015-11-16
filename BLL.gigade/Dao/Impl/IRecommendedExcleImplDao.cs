@@ -25,10 +25,15 @@ namespace BLL.gigade.Dao.Impl
         //獲得訂單信息最小年份
         DataTable GetOrderInfoByMinYear();
         //獲取商品信息
-        DataTable GetThisProductInfo();
+        DataTable GetThisProductInfo(int start_product_id, int end_product_id);
 
         List<CategoryItem> GetVendorCategoryMsg(CategoryItem pcb,List<CategoryItem> lscm);
 
         DataTable GetVendorBrandMsg(CategoryItem pcb);
+
+        string GetCidMessage(int porduct_id,int brand_id);
+
+        DataTable GetAllBrandByProductId();
+
     }
 }
