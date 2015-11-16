@@ -1093,6 +1093,56 @@ set ");
             {
                 throw new Exception("OrderMasterMgr-->VerifySession-->" + ex.Message, ex);
             }
-        }      
+        }
+
+        public DataTable OrderSerchExport(OrderMasterQuery query)
+        {
+            DataTable _dt = new DataTable();
+            try
+            {
+                _dt = _orderMasterDao.OrderSerchExport(query);
+                return _dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->OrderSerchExport-->" + ex.Message, ex);
+            }
+        }
+
+        public string   GetPara(string type,int order_status)
+        {
+            string data = string.Empty;
+            try
+            {
+                DataTable _dt = _orderMasterDao.GetPara(type,order_status);
+                if (_dt != null && _dt.Rows.Count > 0)
+                {
+                    data = _dt.Rows[0][0].ToString();
+                }
+                return data;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->GetParaByOrderStatus-->" + ex.Message, ex);
+            }
+        }
+
+        public string GetParaByPayment(int payment)
+        {
+            string data = string.Empty;
+            try
+            {
+                DataTable _dt = _orderMasterDao.GetParaByPayment(payment);
+                if (_dt != null && _dt.Rows.Count > 0)
+                {
+                    data = _dt.Rows[0][0].ToString();
+                }
+                return data;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->GetParaByPayment-->" + ex.Message, ex);
+            }
+        }
     }
 }

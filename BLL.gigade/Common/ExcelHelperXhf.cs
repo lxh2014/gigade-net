@@ -534,7 +534,7 @@ namespace gigadeExcel.Comment
                 sheet.AutoSizeColumn(10, true);
                 sheet.AutoSizeColumn(11, true);
                 sheet.AutoSizeColumn(12, true);
-                sheet.AutoSizeColumn(13, true);
+               // sheet.AutoSizeColumn(13, true);
                 sheet.AutoSizeColumn(14, true);
                 sheet.AutoSizeColumn(15, true);
                 sheet.AutoSizeColumn(16, true);
@@ -553,6 +553,8 @@ namespace gigadeExcel.Comment
                 sheet.AutoSizeColumn(29, true);
                 sheet.AutoSizeColumn(30, true);
                 sheet.AutoSizeColumn(31, true);
+                sheet.AutoSizeColumn(32, true);
+                sheet.AutoSizeColumn(33, true);
             }
             using (MemoryStream ms = new MemoryStream())
             {

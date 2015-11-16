@@ -2246,5 +2246,57 @@ namespace BLL.gigade.Dao
                 throw new Exception("OrderMasterDao-->VerifySession-->" + sql.ToString() + ex.Message, ex);
             }
         }
+
+        public DataTable OrderSerchExport(OrderMasterQuery query)
+        {
+            DataTable _dt = new DataTable();
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.Append("SELECT u.user_name,FROM_UNIXTIME(om.order_createdate) 'order_createdate',om.order_id,om.order_payment, om.order_amount,om.order_status,imr.invoice_number,imr.total_amount,FROM_UNIXTIME(invoice_date) 'invoice_date' ,od.item_id,");
+                sql.Append(" od.detail_status,v.vendor_name_simple,v.vendor_code,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,od.single_money*buy_num 'total_money' ,  ");
+                sql.Append(" od.single_cost,od.bag_check_money,od.single_cost*od.buy_num 'total_cost' , FROM_UNIXTIME(os.slave_date_close) 'slave_date_close',mu.user_username as 'pm',om.source_trace as 'ID',rg.group_name, od.product_mode   ");
+                sql.Append(" from order_master om LEFT JOIN order_slave os ON om.order_id=os.order_id  ");
+                sql.Append(" LEFT JOIN order_detail od ON os.slave_id=od.slave_id LEFT JOIN invoice_master_record imr ON om.order_id=imr.order_id  ");
+                sql.Append("LEFT JOIN vendor v ON v.vendor_id = od.item_vendor_id left join redirect r on r.redirect_id=om.source_trace  ");
+                sql.Append(" LEFT JOIN redirect_group rg  ON r.group_id = rg.group_id  LEFT JOIN manage_user mu on mu.user_id=v.product_manage LEFT JOIN users u on u.user_id=om.user_id ");
+                sql.AppendFormat(" where  od.item_mode in (0,2) and om.order_date_pay<>0 and om.order_createdate>='{0}' and  om.order_createdate<='{1}'; ", CommonFunction.GetPHPTime(query.datestart.ToString()), CommonFunction.GetPHPTime(query.dateend.ToString()));
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->OrderSerchExport-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetPara(string type,int order_status)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" select  remark   from t_parametersrc where parameterType='{0}'  and parameterCode='{1}';", type, order_status);
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetParaByOrderStatus-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetParaByPayment(int payment)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" select  parameterName   from t_parametersrc where parameterType='payment'  and parameterCode='{0}';", payment);
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetParaByPayment-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+
     }
 }

@@ -50,6 +50,8 @@ namespace BLL.gigade.Model.Custom
         public uint single_cost_subtotal { get; set; }
         public string ProductMode { get; set; }
         public string itemmode { get; set; }
+        public uint parent_num { get; set; }
+        public string upc_id { get; set; }
         public VendorAccountCustom()
         {
             Detail_Id = 0;
@@ -94,7 +96,9 @@ namespace BLL.gigade.Model.Custom
             ProductMode = string.Empty;
             itemmode = string.Empty;
             parent_id = 0;
-            taxtype=string.Empty;
+            taxtype = string.Empty;
+            parent_num = 0;
+            upc_id = string.Empty;
         }
     }
 }

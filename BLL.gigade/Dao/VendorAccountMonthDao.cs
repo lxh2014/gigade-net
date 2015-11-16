@@ -16,6 +16,7 @@ namespace BLL.gigade.Dao
         private IDBAccess _access;
         string strSql = string.Empty;
         private string connStr;
+        private IiupcImplDao _iupc;
         public VendorAccountMonthDao(string connectionString)
         {
             _access = DBFactory.getDBAccess(DBType.MySql, connectionString);
@@ -63,7 +64,7 @@ namespace BLL.gigade.Dao
                         sqlfrom.AppendFormat(" and v.vendor_code like '%{0}%'", query.keyworks);
                     }
                 }
-             
+
                 sqlfrom.AppendFormat(" and vam.account_year='{0}' ", query.account_year);
                 sqlfrom.AppendFormat(" and vam.account_month='{0}' ", query.account_month);
                 sql.AppendFormat(sqlfrom.ToString());
@@ -255,6 +256,7 @@ namespace BLL.gigade.Dao
         {
             StringBuilder sql = new StringBuilder();
             StringBuilder sqlfrom = new StringBuilder();
+            _iupc = new IupcDao(connStr);
             try
             {
                 // sql.AppendFormat(" select p.tax_type, vad.slave_id,vad.vendor_id,vad.order_id,vad.creditcard_1_percent,vad.creditcard_3_percent,vad.sales_limit, ");
@@ -267,7 +269,7 @@ namespace BLL.gigade.Dao
                 sql.AppendFormat("vad.freight_return_normal,vad.account_amount,account_date,vad.gift,vad.deduction,vad.bag_check_money,vad.freight_return_low_money,imr.free_tax,imr.total_amount,imr.tax_amount, ");
                 sql.AppendFormat("od.detail_id,od.slave_id,od.item_id,od.item_vendor_id,od.item_mode,od.product_freight_set,od.product_mode,od.product_name,od.product_spec_name,od.single_cost,od.deduct_account,od.parent_id,");
                 //sql.AppendFormat("od.single_price,od.buy_num,od.event_cost,od.single_money,od.detail_status,FROM_UNIXTIME (os.slave_date_delivery,'%Y/%m/%d')   slave_date_delivery,os.slave_date_close,om.order_payment,");
-                sql.AppendFormat("od.single_price,od.buy_num,od.event_cost,od.single_money,od.detail_status, slave_date_delivery,os.slave_date_close,om.order_payment,");
+                sql.AppendFormat("od.single_price,od.buy_num,od.parent_num,od.event_cost,od.single_money,od.detail_status, slave_date_delivery,os.slave_date_close,om.order_payment,");
                 sql.AppendFormat(" od.deduct_bonus,od.deduct_welfare,od.deduct_happygo_money, ");
                 //sql.AppendFormat(" FROM_UNIXTIME( om.order_createdate,'%Y/%m/%d') order_createdate,om.note_admin,od.bag_check_money as od_bag_check_money,tp.parameterName,tp1.parameterName as product_freight,tp2.remark order_status_name ");
 
@@ -287,7 +289,6 @@ namespace BLL.gigade.Dao
                 sqlfrom.AppendFormat(" where 1=1 and vad.vendor_id = {0} and vad.account_date >= {1} and vad.account_date <= {2} and	od.detail_status <> 89 ", query.vendor_id, query.search_start_time, query.search_end_time);
                 sqlfrom.AppendFormat(" order by account_date asc, order_id asc,vad.slave_id ASC, od.item_mode asc ");
                 sql.AppendFormat(sqlfrom.ToString());
-
                 //return _access.getDataTable(sql.ToString());
 
 
@@ -329,6 +330,7 @@ namespace BLL.gigade.Dao
                     q.accountdate = Common.CommonFunction.GetNetTime(q.account_date);
                     q.slavedate_delivery = Common.CommonFunction.GetNetTime(q.slave_date_delivery);
                     q.ordercreatedate = Common.CommonFunction.GetNetTime(q.Order_Createdate);
+                    q.upc_id = _iupc.Getupc(q.Item_Id.ToString(), "1");
                 }
                 return list;
 

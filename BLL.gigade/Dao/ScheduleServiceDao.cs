@@ -209,9 +209,9 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               totalCount = 0;
               try
               {
-                  sqlCount.AppendFormat("SELECT count(rowid) as totalCount ");
-                  sql.AppendFormat("select sl.rowid,sl.schedule_code,mu1.user_username as create_username,sl.create_time,sl.ipfrom ");
-                  sqlCondi.Append(" from schedule_log sl LEFT JOIN manage_user mu1 on mu1.user_id=sl.create_user ");
+                  sqlCount.AppendFormat("SELECT count(sl.rowid) as totalCount from schedule_log sl ");
+                  sql.AppendFormat("select sl.rowid,sl.schedule_code,schedule_master.schedule_name,mu1.user_username as create_username,sl.create_time,sl.ipfrom ");
+                  sql.Append(" from schedule_log sl left join schedule_master on schedule_master.schedule_code=sl.schedule_code LEFT JOIN manage_user mu1 on mu1.user_id=sl.create_user ");
                   sqlCondi.Append(" where 1=1 ");
                   if (!string.IsNullOrEmpty(query.schedule_code))
                   {
@@ -225,7 +225,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                   {
                       sqlCondi.AppendFormat(" and sl.create_time <= '{0}' ", query.end_time);
                   }
-                  sql.Append(sqlCondi.ToString());
+                  
                   if (query.IsPage)
                   {
                       //StringBuilder strpage = new StringBuilder();
@@ -235,10 +235,10 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
                       if (_dt.Rows.Count > 0)
                       {
                           totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
-                          sql.AppendFormat(" order by rowid desc  limit {0},{1} ", query.Start, query.Limit);
+                          sqlCondi.AppendFormat(" order by sl.rowid desc  limit {0},{1} ", query.Start, query.Limit);
                       }
                   }
-                  return _access.getDataTableForObj<ScheduleLogQuery>(sql.ToString());
+                  return _access.getDataTableForObj<ScheduleLogQuery>(sql.ToString() + sqlCondi.ToString());
               }
               catch (Exception ex)
               {
@@ -346,7 +346,7 @@ UPDATE  `schedule_period` SET `schedule_code`='{0}', `period_type`='{1}', `perio
               query.Replace4MySQL();
               try
               {
-                  sql.AppendFormat("update schedule_period set schedule_code = '{0}', period_type = '{1}', period_nums = '{2}',current_nums='{3}',create_user='{4}',change_user='{5}',change_time='{6}',limit_nums='{7}' where rowid='{8}' ", query.schedule_code, query.period_type, query.period_nums, query.current_nums, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), query.limit_nums, query.rowid);
+                  sql.AppendFormat("update schedule_period set schedule_code = '{0}', period_type = '{1}', period_nums = '{2}',begin_datetime='{3}',current_nums='{4}',create_user='{5}',change_user='{6}',change_time='{7}',limit_nums='{8}' where rowid='{9}' ", query.schedule_code, query.period_type, query.period_nums, query.begin_datetime, query.current_nums, query.create_user, query.change_user, CommonFunction.GetPHPTime(DateTime.Now.ToString()), query.limit_nums, query.rowid);
                   return _access.execCommand(sql.ToString());
               }
               catch (Exception ex)
