@@ -3452,7 +3452,7 @@ namespace Admin.gigade.Controllers
                         q.iarc_id = "KS";
                         q.qty_o = store.prod_qty;
                         q.type = 1;
-                        q.adj_qty = 0;
+                        q.adj_qty = -store.prod_qty;
                         q.create_dtim = DateTime.Now;
                         q.create_user = int.Parse((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString());
                         q.made_dt = store.made_date;
@@ -3479,16 +3479,34 @@ namespace Admin.gigade.Controllers
                     else
                     {
                         Iinvd store = _iinvd.GetIinvd(nvd).FirstOrDefault();
-                        Caller call = new Caller();
-                        call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
-                        ProductItem proitem = new ProductItem();
-                        _proditemMgr = new ProductItemMgr(mySqlConnectionString);
-                        int item_stock = store.prod_qty;
-                        proitem.Item_Stock = item_stock;
-                        proitem.Item_Id = store.item_id;
-                        string path = "/WareHouse/KutiaoAddorReduce";
-                        _proditemMgr.UpdateItemStock(proitem, path, call);
-                        return Json(new { success = "true" });
+                        q.loc_id = store.plas_loc_id;
+                        q.item_id = store.item_id;
+                        q.iarc_id = "KS";
+                        q.qty_o = 0;
+                        q.type = 1;
+                        q.adj_qty = store.prod_qty;
+                        q.create_dtim = DateTime.Now;
+                        q.create_user = int.Parse((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString());
+                        q.made_dt = store.made_date;
+                        q.cde_dt = store.cde_dt;
+                        if (_iagMgr.insertiialg(q) > 0)
+                        {
+                            Caller call = new Caller();
+                            call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
+                            ProductItem proitem = new ProductItem();
+                            _proditemMgr = new ProductItemMgr(mySqlConnectionString);
+                            int item_stock = store.prod_qty;
+                            proitem.Item_Stock = item_stock;
+                            proitem.Item_Id = store.item_id;
+                            string path = "/WareHouse/KutiaoAddorReduce";
+                            _proditemMgr.UpdateItemStock(proitem, path, call);
+                            return Json(new { success = "true" });
+                        }
+                        else
+                        {
+
+                            return Json(new { success = "false" });
+                        }
                     }
                 }
                 else
@@ -4972,11 +4990,14 @@ namespace Admin.gigade.Controllers
             string json = string.Empty;
             IialgQuery q = new IialgQuery();
             uint id = 0; DateTime dt = new DateTime(); int sun = 0;
+            _proditemMgr = new ProductItemMgr(mySqlConnectionString);
+            ProductItem Proitems = new ProductItem();
             try
             {
                 if (uint.TryParse(Request.Params["item_id"].ToString(), out id))
                 {//商品id
                     q.item_id = id;
+                    Proitems.Item_Id = id;
                 }
                 if (DateTime.TryParse(Request.Params["made_date"].ToString(), out dt))
                 {//商品製造日期
@@ -5001,12 +5022,16 @@ namespace Admin.gigade.Controllers
                 q.create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 //進行庫調
                 _iagMgr = new IialgMgr(mySqlConnectionString);
+                Caller call = new Caller();
+                call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
+                string path = "/WareHouse/KutiaoAddorReduce";
                 if (q.loc_id == "YY999999")
                 {
                     json = "{success:false}";
                 }
                 else
                 {
+                    Proitems.Item_Stock = q.pnum - q.qty_o;
                     int result = _iagMgr.addIialgIstock(q);
                     if (result == 2)
                     {
@@ -5014,6 +5039,7 @@ namespace Admin.gigade.Controllers
                     }
                     if (result == 100)
                     {
+                        _proditemMgr.UpdateItemStock(Proitems, path, call);
                         json = "{success:true,msg:100}";
                     }
                 }
@@ -7268,6 +7294,10 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["vender"]))
                 {//vender
                     m.vender = Request.Params["vender"].ToString().ToUpper();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["prepaid"]))
+                {
+                    m.prepaid = int.Parse(Request.Params["prepaid"]);
                 }
                 #endregion
                 DataTable dt = iinvdMgr.getproduct(m);

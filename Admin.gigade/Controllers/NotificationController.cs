@@ -963,12 +963,12 @@ namespace Admin.gigade.Controllers
             string endRunInfo = "";
             try
             {
-                if (Request.Url.Host == "mng.gigade100.com")//判断是否为正式线
-                {
-                    return "{success:false,data:'',msg:'未驗收，暫不執行！'}";
-                }
-                else
-                {
+                //if (Request.Url.Host == "mng.gigade100.com")//判断是否为正式线
+                //{
+                //    return "{success:false,data:'',msg:'未驗收，暫不執行！'}";
+                //}
+                //else
+                //{
                     startRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown Start";
                     _proRemoveMgr = new ProductRemoveReasonMgr(connectionString);
 
@@ -1100,8 +1100,8 @@ namespace Admin.gigade.Controllers
                     if (resultone > 0 && resulttwo > 0 && resultthree > 0)
                     {
                         SaleStatus();
-                        DataTable _excelMsg = _proRemoveMgr.GetStockMsg();
-                        ExeclProductRmoveDownMsg(_excelMsg);
+                        //DataTable _excelMsg = _proRemoveMgr.GetStockMsg();
+                        //ExeclProductRmoveDownMsg(_excelMsg);
                         endRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown End ";
                         WriterInfo("SetProductRmoveDown-Success", startRunInfo, endRunInfo);
                         return "{success:true}";
@@ -1112,7 +1112,7 @@ namespace Admin.gigade.Controllers
                         WriterInfo("SetProductRmoveDown-Fail", startRunInfo, endRunInfo);
                         return "{success:false}";
                     }
-                }
+                //}
             }
             catch (Exception ex)
             {
@@ -1384,32 +1384,49 @@ namespace Admin.gigade.Controllers
                 //導出XML
                 int start_product_id = 0;
                 int end_product_id = 0;
-                if (!string.IsNullOrEmpty(Request.Params["start_product_id"]))
+                if (!string.IsNullOrEmpty(Request.Params["type"]))
                 {
-                    start_product_id = Convert.ToInt32(Request.Params["start_product_id"]);
+                    StringBuilder sb = _recommendedExcleMgr.GetThisProductInfo(start_product_id, end_product_id);
+                    StringWriter swone = new StringWriter();
+                    swone.WriteLine(sb.ToString());
+                    swone.Close();
+                    string filename = "128_MYFONE_item_" + nowtime.ToString("yyyyMMdd-HHmm-ss") + ".xml";
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
+                    Response.ContentType = "application/octet-stream";
+                    Response.ContentEncoding = Encoding.UTF8;
+                    Response.Write(swone);
+                    Response.End();
+                    return "{success:true}";
                 }
-                if (!string.IsNullOrEmpty(Request.Params["end_product_id"]))
+                else
                 {
-                    end_product_id = Convert.ToInt32(Request.Params["end_product_id"]);
+                    if (!string.IsNullOrEmpty(Request.Params["start_product_id"]))
+                    {
+                        start_product_id = Convert.ToInt32(Request.Params["start_product_id"]);
+                    }
+                    if (!string.IsNullOrEmpty(Request.Params["end_product_id"]))
+                    {
+                        end_product_id = Convert.ToInt32(Request.Params["end_product_id"]);
+                    }
+                    #region 汇出信息
+                    StringBuilder sb = _recommendedExcleMgr.GetThisProductInfo(start_product_id, end_product_id);
+                    string filename = "128_MYFONE_item_" + nowtime.ToString("yyyyMMdd-HHmm-ss") + ".xml";
+                    string xmlserverPath = Server.MapPath("../ImportUserIOExcel/" + filename);
+                    FileStream aFile = new FileStream(xmlserverPath, FileMode.OpenOrCreate);
+                    StreamWriter sw = new StreamWriter(aFile);
+                    sw.Write(sb.ToString());
+                    sw.Close();
+                    aFile.Close();
+                    UploadFTP(ftpliaozhiPath, xmlserverPath, ftpliaozhiuser, ftpliaozhipwd);
+                    FileInfo file = new FileInfo(xmlserverPath);//指定文件路径
+                    if (file.Exists)//判断文件是否存在
+                    {
+                        file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
+                        file.Delete();//删除文件
+                    }
+                    #endregion
+                    return "{success:true}";
                 }
-                #region 汇出信息
-                StringBuilder sb = _recommendedExcleMgr.GetThisProductInfo(start_product_id, end_product_id);
-                string filename = "128_MYFONE_item_" + nowtime.ToString("yyyyMMdd-HHmm-ss") + ".xml";
-                string xmlserverPath = Server.MapPath("../ImportUserIOExcel/" + filename);
-                FileStream aFile = new FileStream(xmlserverPath, FileMode.OpenOrCreate);
-                StreamWriter sw = new StreamWriter(aFile);
-                sw.Write(sb.ToString());
-                sw.Close();
-                aFile.Close();
-                UploadFTP(ftpliaozhiPath, xmlserverPath, ftpliaozhiuser, ftpliaozhipwd);
-                FileInfo file = new FileInfo(xmlserverPath);//指定文件路径
-                if (file.Exists)//判断文件是否存在
-                {
-                    file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
-                    file.Delete();//删除文件
-                }
-                #endregion
-                return "{success:true}";
 
             }
             catch (Exception ex)
@@ -1432,20 +1449,35 @@ namespace Admin.gigade.Controllers
                 DateTime nowtime = DateTime.Now;
                 string filename = "食用品館類別樹-含品牌" + nowtime.ToString("yyyyMMdd-HHmm-ss") + ".txt";
                 StringBuilder sb = _recommendedExcleMgr.GetVendorCategoryMsg();
-                string txtserverPath = Server.MapPath("../ImportUserIOExcel/" + filename);
-                FileStream aFile = new FileStream(txtserverPath, FileMode.OpenOrCreate);
-                StreamWriter sw = new StreamWriter(aFile);
-                sw.Write(sb.ToString());
-                sw.Close();
-                aFile.Close();
-                UploadFTP(ftpliaozhiPath, txtserverPath, ftpliaozhiuser, ftpliaozhipwd);
-                FileInfo file = new FileInfo(txtserverPath);//指定文件路径
-                if (file.Exists)//判断文件是否存在
+                if (!string.IsNullOrEmpty(Request.Params["type"]))
                 {
-                    file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
-                    file.Delete();//删除文件
+                    StringWriter sw = new StringWriter();
+                    sw.WriteLine(sb.ToString());
+                    sw.Close();
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
+                    Response.ContentType = "application/octet-stream";
+                    Response.ContentEncoding = Encoding.UTF8;
+                    Response.Write(sw);
+                    Response.End();
+                    return "{success:true}";
                 }
-                return "{success:true}";
+                else
+                {
+                    string txtserverPath = Server.MapPath("../ImportUserIOExcel/" + filename);
+                    FileStream aFile = new FileStream(txtserverPath, FileMode.OpenOrCreate);
+                    StreamWriter sw = new StreamWriter(aFile);
+                    sw.Write(sb.ToString());
+                    sw.Close();
+                    aFile.Close();
+                    UploadFTP(ftpliaozhiPath, txtserverPath, ftpliaozhiuser, ftpliaozhipwd);
+                    FileInfo file = new FileInfo(txtserverPath);//指定文件路径
+                    if (file.Exists)//判断文件是否存在
+                    {
+                        file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
+                        file.Delete();//删除文件
+                    }
+                    return "{success:true}";
+                }
             }
             catch (Exception ex)
             {

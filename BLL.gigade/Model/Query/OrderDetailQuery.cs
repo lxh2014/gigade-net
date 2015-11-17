@@ -141,6 +141,8 @@ namespace BLL.gigade.Model.Query
         public int date_stauts { get; set; }
         public DateTime date_start { get; set; }
         public DateTime date_end { get; set; }
+        public string delivery_name { get; set; }
+        public DateTime order_createdate { get; set; }
         public OrderDetailQuery()
         {            
             //Detail_Id = 0;
@@ -243,6 +245,8 @@ namespace BLL.gigade.Model.Query
             date_stauts = 0;
             date_start = DateTime.MinValue;
             date_end = DateTime.MinValue;
+            order_createdate = DateTime.MinValue;
+            delivery_name = string.Empty;
         }
     }
 }

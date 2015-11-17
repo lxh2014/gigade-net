@@ -7,6 +7,7 @@ using BLL.gigade.Dao;
 using BLL.gigade.Dao.Impl;
 using BLL.gigade.Mgr.Impl;
 using BLL.gigade.Model;
+using BLL.gigade.Model.Query;
 
 namespace BLL.gigade.Mgr
 {
@@ -14,10 +15,12 @@ namespace BLL.gigade.Mgr
     {
 
           private IOrderImplDao _orderDao;
+          private IOrderMasterImplDao _orderMasterDao;
           public OrderMgr(string connectionString)
-        {
-            _orderDao = new OrderDao(connectionString);
-        }
+          {
+              _orderDao = new OrderDao(connectionString);
+              _orderMasterDao = new OrderMasterDao(connectionString);
+          }
           public bool ThingsMethod(string[] rows, OrderDeliver order, OrderSlaveMaster master, string Descriptions) 
           {
               try
@@ -40,5 +43,6 @@ namespace BLL.gigade.Mgr
                   throw new Exception("OrderMgr-->SelfThingsMethod-->" + ex.Message, ex);
               }
           }
+        
     }
 }

@@ -1,5 +1,4 @@
 ﻿pageSize = 25;
-
 // 類別下拉框store
 Ext.define('gigade.ProductCategory', {
     extend: 'Ext.data.Model',
@@ -34,6 +33,7 @@ Ext.define('gigade.OrderDetail', {
     extend: 'Ext.data.Model',
     fields: [
     { name: 'amount', type: 'int' },
+    { name: 'category_id', type: 'int' },
     { name: 'category_name', type: 'string' }
     ]
 });
@@ -109,7 +109,7 @@ Ext.onReady(function () {
                 margin: '5 5 0 0',
                 editable: false,
                 labelWidth: 60,
-                value: new Date(new Date().getFullYear(), new Date().getMonth()-1, new Date().getDate()),
+                value: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
                 listeners: {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("timestart");
@@ -225,11 +225,18 @@ Ext.onReady(function () {
         frame: true,
         flex: 8,
         columns: [
+        { header: "品牌編號", dataIndex: 'amount', flex: 1, align: 'center', hidden: true },
         { header: "類別", dataIndex: 'category_name', flex: 1, align: 'center' },
-        { header: "金額", dataIndex: 'amount', flex: 1, align: 'center' }
+        {
+            header: "金額", dataIndex: 'amount', flex: 1, align: 'center',
+            renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                return "<a href='javascript:void(0)' onclick='openAmountDetial(" + rowIndex + ")'>" + change(value) + "</a>";
+            }
+        }
+        ,
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
-            id:"toobar",
+            id: "toobar",
             store: CategorySummaryStore,
             pageSize: pageSize,
             displayInfo: true,
@@ -279,12 +286,12 @@ Query = function () {
         }
         CategorySummaryStore.load({
             callback: function (records, operation, success) {
-                if (success) {                   
-                    var result = Ext.decode(operation.response.responseText)                  
-                    Ext.getCmp("sumValue").setValue(result.sumAmount);
+                if (success) {
+                    var result = Ext.decode(operation.response.responseText)
+                    Ext.getCmp("sumValue").setValue(change(result.sumAmount));
                 }
             }
-        })       
+        })
     }
 }
 setNextMonth = function (source, n) {
@@ -297,4 +304,37 @@ setNextMonth = function (source, n) {
         s.setHours(23, 59, 59);
     }
     return s;
+}
+
+function openAmountDetial(index) {
+    var id = Ext.getCmp("gdList").store.data.items[index].data.category_id;
+    var name = Ext.getCmp("gdList").store.data.items[index].data.category_name;
+    var amount = Ext.getCmp("gdList").store.data.items[index].data.amount;
+    var dateCon = Ext.getCmp('dateCon').getValue();
+    var date_start = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('timestart').getValue()), 'Y-m-d H:i:s'));
+    var date_end = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('timeend').getValue()), 'Y-m-d H:i:s'));
+    var receiptStatus = Ext.getCmp('receiptStatus').getValue().status;
+    var params = id + '|' + name + '|' + amount + '|' + receiptStatus + '|' + dateCon + '|' + date_start + '|' + date_end;
+    var urlTran = '/Order/OrderAmountDetial?_parameters=' + params;
+    var panel = window.parent.parent.Ext.getCmp('ContentPanel');
+    var copy = panel.down('#OrderAmountDetial');
+    if (copy) {
+        copy.close();
+    }
+    copy = panel.add({
+        id: 'OrderAmountDetial',
+        title: '類別訂單明細',
+        html: window.top.rtnFrame(urlTran),
+        closable: true
+    });
+    panel.setActiveTab(copy);
+    panel.doLayout();
+}
+
+function change(value) {
+    value = value.toString();
+    if (/^\d+$/.test(value)) {
+        value = value.replace(/^(\d+)(\d{3})$/, "$1,$2");
+    }
+    return value;
 }

@@ -395,5 +395,30 @@ namespace BLL.gigade.Mgr
                 throw new Exception("OrderMasterMgr-->GetCategorySummaryList-->" + ex.Message, ex);
             }
         }
+
+        public DataTable GetAmountDetial(OrderDetailQuery query,out int totalCount)
+        {
+            totalCount = 0;
+            try
+            {
+               return _orderDetailDao.GetAmountDetial(query,out totalCount);
+            }
+            catch (Exception ex)
+            {
+               throw new Exception("OrderMasterMgr-->GetAmountDetial-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable CategoryDetialExportInfo(OrderDetailQuery query)
+        {
+            try
+            {
+                return _orderDetailDao.CategoryDetialExportInfo(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->CategoryDetialExportInfo-->" + ex.Message, ex);
+            }
+        }
     }
 }
