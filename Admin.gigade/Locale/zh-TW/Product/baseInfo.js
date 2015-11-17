@@ -52,8 +52,8 @@
 
     //add by zhuoqin0830w  2015/07/15
     OFF_GRADE = "失格";
-    EXPECT_TIME_IS_ERROR = "預計出貨時間必須大於預購時間的結束時間！";
-
+    EXPECT_TIME_IS_ERROR = "預計出貨時間必須大於(預購結束時間-10天)的最低限度！";
+    EXPECT_TIME_IS_ERRORTO = "預計出貨時間必須大於預購開始時間!";
     //add by mingwei0727w  2015/07/17
     CURRICULUM_NAME = "課程名稱";
     SCHEDULE_SELECT = "排程選擇";

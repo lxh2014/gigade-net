@@ -47,9 +47,13 @@ namespace Admin.gigade.Controllers
 
         private IRecommendedExcleImplMgr _recommendedExcleMgr;
         private IParametersrcImplMgr _iParametersrcImplMgr;
-        string ftpuser = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.ftpuser);//ftp用戶名
-        string ftppwd = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.ftppwd);//ftp密碼
-        string RecommendExcleLocalPath = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.local);//ftp地址
+        
+        string ftpyuhuiPath = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.FtpYuhuiPath);//ftp地址宇匯
+        string ftpyuhuiuser = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.ftpyhuser);//ftp用戶名
+        string ftpyuhuipwd = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.ftpyhpwd);//ftp密碼
+        string ftpliaozhiPath = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.FtpLiaozhiPath);//ftp地址曜智
+        string ftpliaozhiuser = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.ftplzuser);//ftp用戶名
+        string ftpliaozhipwd = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.ftplzpwd);//ftp密碼
         public ActionResult Index()
         {
             return View();
@@ -959,12 +963,12 @@ namespace Admin.gigade.Controllers
             string endRunInfo = "";
             try
             {
-                if (Request.Url.Host == "mng.gigade100.com")//判断是否为正式线
-                {
-                    return "{success:false,data:'',msg:'未驗收，暫不執行！'}";
-                }
-                else
-                {
+                //if (Request.Url.Host == "mng.gigade100.com")//判断是否为正式线
+                //{
+                //    return "{success:false,data:'',msg:'未驗收，暫不執行！'}";
+                //}
+                //else
+                //{
                     startRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown Start";
                     _proRemoveMgr = new ProductRemoveReasonMgr(connectionString);
 
@@ -1096,8 +1100,8 @@ namespace Admin.gigade.Controllers
                     if (resultone > 0 && resulttwo > 0 && resultthree > 0)
                     {
                         SaleStatus();
-                        DataTable _excelMsg = _proRemoveMgr.GetStockMsg();
-                        ExeclProductRmoveDownMsg(_excelMsg);
+                        //DataTable _excelMsg = _proRemoveMgr.GetStockMsg();
+                        //ExeclProductRmoveDownMsg(_excelMsg);
                         endRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown End ";
                         WriterInfo("SetProductRmoveDown-Success", startRunInfo, endRunInfo);
                         return "{success:true}";
@@ -1108,7 +1112,7 @@ namespace Admin.gigade.Controllers
                         WriterInfo("SetProductRmoveDown-Fail", startRunInfo, endRunInfo);
                         return "{success:false}";
                     }
-                }
+                //}
             }
             catch (Exception ex)
             {
@@ -1176,8 +1180,19 @@ namespace Admin.gigade.Controllers
             {
                 //獲取傳參并封裝到對象
                 RecommendedOutPra rop = new RecommendedOutPra();
-                string outType = Request.Params["outType"].ToString();
-                string outTime = Request.Params["outTime"].ToString();
+
+                string outType = string.Empty;
+                if (!string.IsNullOrEmpty(Request.Params["outType"]))
+                {
+                    outType = Request.Params["outType"].ToString();
+                }
+
+                string outTime = string.Empty;
+                if (!string.IsNullOrEmpty(Request.Params["outTime"]))
+                {
+                    outTime = Request.Params["outTime"].ToString();
+                }
+
                 if (!string.IsNullOrEmpty(outType))
                 {
                     rop.outType = outType;
@@ -1220,15 +1235,15 @@ namespace Admin.gigade.Controllers
                 strPath = AddstrPath(strPath, strNewPath);
                 #region
                 //打包壓縮文件
-                string zipfifilename = "吉甲地推薦系統匯出.zip";
-                string strZipPath = Server.MapPath("../ImportUserIOExcel/" + zipfifilename + "");
-                string strZipTopDirectoryPath = Server.MapPath("../ImportUserIOExcel/");
-                int intZipLevel = 6;
-                string strPassword = "";
-                SharpZipLibHelp szlh = new SharpZipLibHelp();
-                szlh.Zip(strZipPath, strZipTopDirectoryPath, intZipLevel, strPassword, strPath);
+                //string zipfifilename = "吉甲地推薦系統匯出.zip";
+                //string strZipPath = Server.MapPath("../ImportUserIOExcel/" + zipfifilename + "");
+                //string strZipTopDirectoryPath = Server.MapPath("../ImportUserIOExcel/");
+                //int intZipLevel = 6;
+                //string strPassword = "";
+                //SharpZipLibHelp szlh = new SharpZipLibHelp();
+                //szlh.Zip(strZipPath, strZipTopDirectoryPath, intZipLevel, strPassword, strPath);
                 //下載
-                downLoad(strZipPath, zipfifilename);
+                //downLoad(strZipPath, zipfifilename);
                 //下載完後刪除本次的緩存文件
                 DeleteFileByPath(strPath);
                 #endregion
@@ -1257,7 +1272,7 @@ namespace Admin.gigade.Controllers
                 fs.Close();
                 ms[i].Close();
                 //上傳FTP
-                //UploadFTP(RecommendExcleLocalPath, serverPath, ftpuser, ftppwd);
+                UploadFTP(ftpyuhuiPath, serverPath, ftpyuhuiuser, ftpyuhuipwd);
                 //記錄本次導出文件
                 strPath.Add(serverPath);
             }
@@ -1271,6 +1286,7 @@ namespace Admin.gigade.Controllers
             }
             return strPath;
         }
+        #region 上传Ftp  
         /// <summary>
         /// 上傳FTP方法
         /// </summary>
@@ -1325,6 +1341,8 @@ namespace Admin.gigade.Controllers
                 Response.Write("Upload Error：" + ex.Message);
             }
         }
+        #endregion
+
         //文件下載方法
         private void downLoad(string path, string filename)
         {
@@ -1355,7 +1373,7 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        #region 匯出xml信息
+        #region 匯出xml商品信息
         public string OutXmlForProduct()
         {
             try
@@ -1364,15 +1382,51 @@ namespace Admin.gigade.Controllers
                 _recommendedExcleMgr = new RecommendedExcleMgr(connectionString);
                 DateTime nowtime = DateTime.Now;
                 //導出XML
-                StringWriter sw = _recommendedExcleMgr.GetThisProductInfo();
-                string filename = "128_MYFONE_item_" + nowtime.ToString("yyyyMMdd-HHmm") + ".xml";
-
-                Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
-                Response.ContentType = "application/octet-stream";
-                Response.ContentEncoding = Encoding.UTF8;
-                Response.Write(sw);
-                Response.End();
-                return "{success:true}";
+                int start_product_id = 0;
+                int end_product_id = 0;
+                if (!string.IsNullOrEmpty(Request.Params["type"]))
+                {
+                    StringBuilder sb = _recommendedExcleMgr.GetThisProductInfo(start_product_id, end_product_id);
+                    StringWriter swone = new StringWriter();
+                    swone.WriteLine(sb.ToString());
+                    swone.Close();
+                    string filename = "128_MYFONE_item_" + nowtime.ToString("yyyyMMdd-HHmm-ss") + ".xml";
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
+                    Response.ContentType = "application/octet-stream";
+                    Response.ContentEncoding = Encoding.UTF8;
+                    Response.Write(swone);
+                    Response.End();
+                    return "{success:true}";
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(Request.Params["start_product_id"]))
+                    {
+                        start_product_id = Convert.ToInt32(Request.Params["start_product_id"]);
+                    }
+                    if (!string.IsNullOrEmpty(Request.Params["end_product_id"]))
+                    {
+                        end_product_id = Convert.ToInt32(Request.Params["end_product_id"]);
+                    }
+                    #region 汇出信息
+                    StringBuilder sb = _recommendedExcleMgr.GetThisProductInfo(start_product_id, end_product_id);
+                    string filename = "128_MYFONE_item_" + nowtime.ToString("yyyyMMdd-HHmm-ss") + ".xml";
+                    string xmlserverPath = Server.MapPath("../ImportUserIOExcel/" + filename);
+                    FileStream aFile = new FileStream(xmlserverPath, FileMode.OpenOrCreate);
+                    StreamWriter sw = new StreamWriter(aFile);
+                    sw.Write(sb.ToString());
+                    sw.Close();
+                    aFile.Close();
+                    UploadFTP(ftpliaozhiPath, xmlserverPath, ftpliaozhiuser, ftpliaozhipwd);
+                    FileInfo file = new FileInfo(xmlserverPath);//指定文件路径
+                    if (file.Exists)//判断文件是否存在
+                    {
+                        file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
+                        file.Delete();//删除文件
+                    }
+                    #endregion
+                    return "{success:true}";
+                }
 
             }
             catch (Exception ex)
@@ -1393,14 +1447,37 @@ namespace Admin.gigade.Controllers
             {
                 _recommendedExcleMgr = new RecommendedExcleMgr(connectionString);
                 DateTime nowtime = DateTime.Now;
-                string filename = "食用品館類別樹-含品牌" + nowtime.ToString("yyyyMMdd-HHmm") + ".txt";
-                StringWriter sw = _recommendedExcleMgr.GetVendorCategoryMsg();
-                Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
-                Response.ContentType = "application/octet-stream";
-                Response.ContentEncoding = Encoding.UTF8;
-                Response.Write(sw);
-                Response.End();
-                return "{success:true}";
+                string filename = "食用品館類別樹-含品牌" + nowtime.ToString("yyyyMMdd-HHmm-ss") + ".txt";
+                StringBuilder sb = _recommendedExcleMgr.GetVendorCategoryMsg();
+                if (!string.IsNullOrEmpty(Request.Params["type"]))
+                {
+                    StringWriter sw = new StringWriter();
+                    sw.WriteLine(sb.ToString());
+                    sw.Close();
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
+                    Response.ContentType = "application/octet-stream";
+                    Response.ContentEncoding = Encoding.UTF8;
+                    Response.Write(sw);
+                    Response.End();
+                    return "{success:true}";
+                }
+                else
+                {
+                    string txtserverPath = Server.MapPath("../ImportUserIOExcel/" + filename);
+                    FileStream aFile = new FileStream(txtserverPath, FileMode.OpenOrCreate);
+                    StreamWriter sw = new StreamWriter(aFile);
+                    sw.Write(sb.ToString());
+                    sw.Close();
+                    aFile.Close();
+                    UploadFTP(ftpliaozhiPath, txtserverPath, ftpliaozhiuser, ftpliaozhipwd);
+                    FileInfo file = new FileInfo(txtserverPath);//指定文件路径
+                    if (file.Exists)//判断文件是否存在
+                    {
+                        file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
+                        file.Delete();//删除文件
+                    }
+                    return "{success:true}";
+                }
             }
             catch (Exception ex)
             {

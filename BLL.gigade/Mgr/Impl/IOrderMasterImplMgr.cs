@@ -85,5 +85,10 @@ namespace BLL.gigade.Mgr.Impl
         string ModifyDeliveryData(OrderMasterQuery om);
         int VerifySession(uint user_id);
         bool IsSendProduct(OrderMasterQuery om);
+        DataTable OrderSerchExport(OrderMasterQuery query);
+        string GetPara(string type, int order_status);
+        string GetParaByPayment(int payment);
+        DataTable GetOrderFreight(uint order_id);
+        DataTable OrderDetialExportInfo(OrderDetailQuery query);
     }
 }

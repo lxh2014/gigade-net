@@ -402,6 +402,9 @@ editFunction = function (row, store, fatherid, fathername) {
                         case 2:
                             Ext.getCmp("lm").setValue(true);
                             break;
+                        default:
+                            Ext.getCmp("lm").setValue(true);
+                            break;
                     };
                     switch (row.data.banner_status) {
                         case 1:
@@ -410,12 +413,18 @@ editFunction = function (row, store, fatherid, fathername) {
                         case 2:
                             Ext.getCmp("noStatus").setValue(true);
                             break;
+                        default:
+                            Ext.getCmp("noStatus").setValue(true);
+                            break;
                     };
                     switch (row.data.banner_link_mode) {
                         case 1:
                             Ext.getCmp("link_mode1").setValue(true);
                             break;
                         case 2:
+                            Ext.getCmp("link_mode12").setValue(true);
+                            break;
+                        default:
                             Ext.getCmp("link_mode12").setValue(true);
                             break;
                     };

@@ -32,6 +32,7 @@ namespace Admin.gigade.Controllers
         static string excelPath = ConfigurationManager.AppSettings["ImportOrderExcel"];
         static string pdfPath = ConfigurationManager.AppSettings["ImportOrderPDF"];
         static string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];
+        static string excelPath_export = ConfigurationManager.AppSettings["ImportUserIOExcel"];
 
         private IOrderImport orderImport;
         private IChannelImplMgr channelMgr;
@@ -97,6 +98,56 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+
+        public ActionResult OrderAmountDetial()
+        {
+            if (!string.IsNullOrEmpty(Request.Params["_parameters"]))
+            {
+                string s = Request.Params["_parameters"];
+                string[] arr = s.Split('|');
+                for (int i = 0; i < arr.Length; i++)
+                { 
+                    switch(i)
+                    {
+                        case 0:
+                            ViewBag.category_id = arr[i];
+                            break;
+                        case 1:
+                            ViewBag.category_name = arr[i];
+                            break;
+                        case 2:
+                            ViewBag.category_amount = arr[i];
+                            break;
+                        case 3:
+                            ViewBag.category_status = arr[i];
+                            break;
+                        case 4:
+                            ViewBag.date_stauts = arr[i];
+                            break;
+                        case 5:
+                            ViewBag.date_start = Convert.ToDateTime(arr[i]);
+                            ViewBag.date_start = Convert.ToDateTime(ViewBag.date_start.ToString("yyyy-MM-dd 00:00:00"));
+                            break;
+                        case 6:
+                            ViewBag.date_end = Convert.ToDateTime(arr[i]);
+                            ViewBag.date_end = Convert.ToDateTime(ViewBag.date_end.ToString("yyyy-MM-dd  23:59:59"));
+                            break;
+                    }
+                
+                }
+            }
+            else
+            {
+                ViewBag.category_id = "5";
+                ViewBag.category_status = "0";
+                ViewBag.date_stauts = "0";
+                ViewBag.date_start = CommonFunction.DateTimeToString(Convert.ToDateTime(DateTime.MinValue.ToString("yyyy-MM-dd 00:00:00")));
+                ViewBag.date_end = CommonFunction.DateTimeToString(Convert.ToDateTime(DateTime.MinValue.ToString("yyyy-MM-dd 23:59:59")));
+            }
+           
+            return View();
+        }
+
         #region Gigade商品查詢
         #region 獲取組合商品下的子商品
         [HttpPost]
@@ -2907,7 +2958,10 @@ namespace Admin.gigade.Controllers
                         }
                     }
                     int rowsnum = oacli.Count;
-                    errorStr = errorStr.Remove(errorStr.Length - 1);
+                    if (!string.IsNullOrEmpty(errorStr))
+                    {
+                        errorStr = errorStr.Remove(errorStr.Length - 1);
+                    }
                     if (rowsnum > 0)//判斷是否是這個表
                     {
                         _OrderMasterMgr = new OrderMasterMgr(connectionString);
@@ -2917,16 +2971,37 @@ namespace Admin.gigade.Controllers
                         {
                             if (i == 99999)
                             {
-                                json = "{success:true,msg:\"" + "無數據可匯入!另文件第" + errorStr + "行數據異常\"}";
+                                if (!string.IsNullOrEmpty(errorStr))
+                                {
+                                    json = "{success:true,msg:\"" + "無數據可匯入!另文件第" + errorStr + "行數據異常\"}";
+                                }
+                                else
+                                {
+                                    json = "{success:true,msg:\"" + "無數據可匯入!\"}";
+                                }
                             }
                             else
                             {
-                                json = "{success:true,msg:\"" + "匯入成功!另文件第" + errorStr + "行數據異常\"}";
+                                if (!string.IsNullOrEmpty(errorStr))
+                                {
+                                    json = "{success:true,msg:\"" + "匯入成功!另文件第" + errorStr + "行數據異常\"}";
+                                }
+                                else
+                                {
+                                    json = "{success:true,msg:\"" + "匯入成功!\"}";
+                                }
                             }
                         }
                         else
                         {
-                            json = "{success:true,msg:\"" + "操作失敗!另文件第" + errorStr + "行數據異常\"}";
+                            if (!string.IsNullOrEmpty(errorStr))
+                            {
+                                json = "{success:true,msg:\"" + "操作失敗!另文件第" + errorStr + "行數據異常\"}";
+                            }
+                            else
+                            {
+                                json = "{success:true,msg:\"" + "操作失敗!\"}";
+                            }
                         }
                     }
                     else
@@ -3568,7 +3643,7 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        #region 類別營業額  訂單查詢
+        #region 類別營業額 
         #region 類別選擇store
         public HttpResponseBase GetProductCategoryStore()
         {
@@ -3654,6 +3729,423 @@ namespace Admin.gigade.Controllers
 
             this.Response.Clear();
             this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+        #region 類別訂單明細
+        public HttpResponseBase GetAmountDetial()
+        {
+            string json = string.Empty;
+            try
+            {
+                _orderDetialMgr = new OrderDetailMgr(connectionString);
+                OrderDetailQuery query = new OrderDetailQuery();
+                int totalCount = 0;
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
+                if (!string.IsNullOrEmpty(Request.Params["category_id"]))
+                {
+                    query.category_id = Convert.ToUInt32(Request.Params["category_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["category_status"]))
+                {
+                    query.category_status = Convert.ToInt32(Request.Params["category_status"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_stauts"]))
+                {
+                    query.date_stauts = Convert.ToInt32(Request.Params["date_stauts"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_start"]))
+                {
+                    query.date_start = Convert.ToDateTime(Request.Params["date_start"]);
+                    query.date_start = Convert.ToDateTime(query.date_start.ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_end"]))
+                {
+                    query.date_end = Convert.ToDateTime(Request.Params["date_end"]);
+                    query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
+                }
+                DataTable store = _orderDetialMgr.GetAmountDetial(query, out totalCount);
+                if (store != null && store.Rows.Count > 0)
+                {
+                    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                    timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                    json = "{success:true,totalCount:" + totalCount +  ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+
+
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+        #region 訂單明細匯出
+        public HttpResponseBase OrderDetialExport()
+        {
+            string json = string.Empty;
+            try
+            {
+                _OrderMasterMgr = new OrderMasterMgr (connectionString);
+                OrderDetailQuery query = new OrderDetailQuery();                
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
+                DataTable store = new DataTable();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                if (!string.IsNullOrEmpty(Request.Params["category_id"]))
+                {
+                    query.category_id = Convert.ToUInt32(Request.Params["category_id"]);
+                }           
+                if (!string.IsNullOrEmpty(Request.Params["category_status"]))
+                {
+                    query.category_status = Convert.ToInt32(Request.Params["category_status"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_stauts"]))
+                {
+                    query.date_stauts = Convert.ToInt32(Request.Params["date_stauts"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_start"]))
+                {
+                    query.date_start = Convert.ToDateTime(Request.Params["date_start"]);
+                    query.date_start = Convert.ToDateTime(query.date_start.ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_end"]))
+                {
+                    query.date_end = Convert.ToDateTime(Request.Params["date_end"]);
+                    query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
+                }
+                query.IsPage = false;
+                DataTable dtHZ = new DataTable();
+                string newExcelName = string.Empty;
+                dtHZ.Columns.Add("會員姓名", typeof(String));
+                dtHZ.Columns.Add("購買時間", typeof(String));
+                dtHZ.Columns.Add("付款單號", typeof(int));
+                dtHZ.Columns.Add("付款方式", typeof(String));
+                dtHZ.Columns.Add("購買金額", typeof(int));
+                dtHZ.Columns.Add("付款狀態", typeof(String));
+                dtHZ.Columns.Add("發票號碼", typeof(String));
+                dtHZ.Columns.Add("發票金額", typeof(int));
+                dtHZ.Columns.Add("發票開立日期", typeof(String));
+                dtHZ.Columns.Add("商品細項編號", typeof(int));
+                dtHZ.Columns.Add("訂單狀態", typeof(String));
+                dtHZ.Columns.Add("供應商", typeof(String));
+                dtHZ.Columns.Add("供應商編碼", typeof(String));
+                dtHZ.Columns.Add("品名", typeof(String));
+                dtHZ.Columns.Add("數量", typeof(int));
+                dtHZ.Columns.Add("購買單價", typeof(int));
+                dtHZ.Columns.Add("折抵購物金", typeof(int));
+                dtHZ.Columns.Add("抵用券", typeof(int));
+                dtHZ.Columns.Add("總價", typeof(int));
+                dtHZ.Columns.Add("成本單價", typeof(int));
+                dtHZ.Columns.Add("寄倉費", typeof(int));
+                dtHZ.Columns.Add("成本總額", typeof(int));
+                dtHZ.Columns.Add("出貨單歸檔期", typeof(String));
+                dtHZ.Columns.Add("負責PM", typeof(String));
+                dtHZ.Columns.Add("來源ID", typeof(String));
+                dtHZ.Columns.Add("來源名稱", typeof(String));
+                dtHZ.Columns.Add("出貨方式", typeof(String));
+
+                store = _OrderMasterMgr.OrderDetialExportInfo(query);
+                foreach (DataRow dr_v in store.Rows)
+                {
+                    DataRow dr = dtHZ.NewRow();
+                    dr[0] = dr_v["user_name"].ToString();
+                    if (!string.IsNullOrEmpty(dr_v["order_createdate"].ToString()))
+                    {
+                        DateTime order_createdate = Convert.ToDateTime(dr_v["order_createdate"].ToString());
+                        dr[1] = CommonFunction.DateTimeToString(order_createdate);
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["order_id"].ToString()))
+                    {
+                        dr[2] = Convert.ToInt32(dr_v["order_id"].ToString());
+                    }
+                    else {
+                        dr[2] = 0;
+                    }
+                    dr[3] = dr_v["order_payment"].ToString();
+                    if (!string.IsNullOrEmpty(dr_v["order_amount"].ToString()))
+                    {
+                        dr[4] = Convert.ToInt32(dr_v["order_amount"].ToString());
+                    }
+                    else
+                    {
+                        dr[4] = 0;
+                    }
+                    dr[5] = dr_v["order_status"].ToString();
+                    dr[6] = dr_v["invoice_number"].ToString() == "" ? "" : dr_v["invoice_number"].ToString();                    
+                    if (!string.IsNullOrEmpty(dr_v["total_amount"].ToString()))
+                    {
+                        dr[7] =Convert.ToInt32( dr_v["total_amount"].ToString());
+                    }
+                    else
+                    {
+                        dr[7] = 0;
+                    }                   
+                    if (!string.IsNullOrEmpty(dr_v["invoice_date"].ToString()))
+                    {
+                        DateTime invoice_date = Convert.ToDateTime(dr_v["invoice_date"].ToString());
+                        dr[8] = CommonFunction.DateTimeToString(invoice_date);
+                    }
+                    else
+                    {
+                        dr[8] = "";
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["item_id"].ToString()))
+                    {
+                        dr[9] =Convert.ToInt32( dr_v["item_id"].ToString());
+                    }
+                    else
+                    {
+                        dr[9] = 0;
+                    }
+                    dr[10] = dr_v["slave_status"].ToString();
+                    dr[11] = dr_v["vendor_name_simple"].ToString();
+                    dr[12] = dr_v["vendor_code"].ToString();
+                    dr[13] = dr_v["product_name"].ToString();
+                    if (!string.IsNullOrEmpty(dr_v["buy_num"].ToString()))
+                    {
+                        dr[14] =Convert.ToInt32( dr_v["buy_num"].ToString());
+                    }
+                    else
+                    {
+                        dr[14] = 0;
+                    }
+
+                    if (!string.IsNullOrEmpty(dr_v["single_money"].ToString()))
+                    {
+                        dr[15] = Convert.ToInt32(dr_v["single_money"].ToString());
+                    }
+                    else
+                    {
+                        dr[15] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["deduct_bonus"].ToString()))
+                    {
+                        dr[16] =Convert.ToInt32( dr_v["deduct_bonus"].ToString());
+                    }
+                    else
+                    {
+                        dr[16] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["deduct_welfare"].ToString()))
+                    {
+                        dr[17] =Convert.ToInt32( dr_v["deduct_welfare"].ToString());
+                    }
+                    else
+                    {
+                        dr[17] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["od.single_money*buy_num"].ToString()))
+                    {
+                        dr[18] = Convert.ToInt32(dr_v["od.single_money*buy_num"].ToString()) - Convert.ToInt32(dr[16]) - Convert.ToInt32(dr[17]);
+                    }
+                    else
+                    {
+                        dr[18] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["single_cost"].ToString()))
+                    {
+                        dr[19] =Convert.ToInt32( dr_v["single_cost"].ToString());
+                    }
+                    else
+                    {
+                        dr[19] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["bag_check_money"].ToString()))
+                    {
+                        dr[20] =Convert.ToInt32( dr_v["bag_check_money"].ToString());
+                    }
+                    else
+                    {
+                        dr[20] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["od.single_cost*od.buy_num"].ToString()))
+                    {
+                        dr[21] = Convert.ToInt32(dr_v["od.single_cost*od.buy_num"].ToString());
+                    }
+                    else
+                    {
+                        dr[21] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["slave_date_close"].ToString()))
+                    {
+                        DateTime slave_date_close = Convert.ToDateTime(dr_v["slave_date_close"].ToString());
+                        dr[22] = slave_date_close == Convert.ToDateTime("1/1/1970 8:00:00 AM") ? "未歸檔" : CommonFunction.DateTimeToString(slave_date_close);
+                    }
+                    dr[23] = dr_v["pm"].ToString();
+                    dr[24] = dr_v["ID"].ToString() == "0" ? "" : dr_v["ID"].ToString();                 
+                    dr[25] = dr_v["group_name"].ToString();
+                    dr[26] = dr_v["product_mode"].ToString();
+                    dtHZ.Rows.Add(dr);
+                }
+                string[] colname = new string[dtHZ.Columns.Count];
+                string filename = "訂單明細"+ DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                newExcelName = Server.MapPath(excelPath_export) + filename;
+                for (int i = 0; i < dtHZ.Columns.Count; i++)
+                {
+                    colname[i] = dtHZ.Columns[i].ColumnName;
+                }
+
+                if (System.IO.File.Exists(newExcelName))
+                {
+                    System.IO.File.Delete(newExcelName);
+                }
+                ExcelHelperXhf.ExportDTtoExcel(dtHZ, "", newExcelName);
+                json = "{success:true,ExcelName:\'" + filename + "\'}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        } 
+        #endregion
+
+        #region 類別訂單明細匯出
+        public HttpResponseBase CategoryDetialExport()
+        {
+            string json = string.Empty;
+            try
+            {
+                _orderDetialMgr = new  OrderDetailMgr(connectionString);
+                OrderDetailQuery query = new OrderDetailQuery();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
+                DataTable store = new DataTable();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                if (!string.IsNullOrEmpty(Request.Params["category_id"]))
+                {
+                    query.category_id = Convert.ToUInt32(Request.Params["category_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["category_name"]))
+                {
+                    query.category_name = Request.Params["category_name"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["category_status"]))
+                {
+                    query.category_status = Convert.ToInt32(Request.Params["category_status"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_stauts"]))
+                {
+                    query.date_stauts = Convert.ToInt32(Request.Params["date_stauts"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_start"]))
+                {
+                    query.date_start = Convert.ToDateTime(Request.Params["date_start"]);
+                    query.date_start = Convert.ToDateTime(query.date_start.ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_end"]))
+                {
+                    query.date_end = Convert.ToDateTime(Request.Params["date_end"]);
+                    query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
+                }
+                query.IsPage = false;
+                DataTable dtHZ = new DataTable();
+                string newExcelName = string.Empty;
+                dtHZ.Columns.Add("購買金額", typeof(int));
+                dtHZ.Columns.Add("付款狀態", typeof(String));
+                dtHZ.Columns.Add("商品細項編號", typeof(int));
+                dtHZ.Columns.Add("訂單狀態", typeof(String));
+                dtHZ.Columns.Add("供應商", typeof(String));
+                dtHZ.Columns.Add("供應商編碼", typeof(String));
+                dtHZ.Columns.Add("品名", typeof(String));
+                dtHZ.Columns.Add("數量", typeof(int));
+                dtHZ.Columns.Add("購買單價", typeof(int));
+                dtHZ.Columns.Add("總價", typeof(int));
+                store = _orderDetialMgr.CategoryDetialExportInfo(query);
+                foreach (DataRow dr_v in store.Rows)
+                {
+                    DataRow dr = dtHZ.NewRow();
+                    if (!string.IsNullOrEmpty(dr_v["order_amount"].ToString()))
+                    {
+                        dr[0] = Convert.ToInt32(dr_v["order_amount"].ToString());
+                    }
+                    else
+                    {
+                        dr[0] = 0;
+                    }
+                    dr[1] = dr_v["order_status"].ToString();
+                    if (!string.IsNullOrEmpty(dr_v["item_id"].ToString()))
+                    {
+                        dr[2] = Convert.ToInt32(dr_v["item_id"].ToString());
+                    }
+                    else
+                    {
+                        dr[2] = 0;
+                    }
+                    dr[3] = dr_v["slave_status"].ToString();
+                    dr[4] = dr_v["vendor_name_simple"].ToString();
+                    dr[5] = dr_v["vendor_code"].ToString();
+                    dr[6] = dr_v["product_name"].ToString();
+                    if (!string.IsNullOrEmpty(dr_v["buy_num"].ToString()))
+                    {
+                        dr[7] = Convert.ToInt32(dr_v["buy_num"].ToString());
+                    }
+                    else
+                    {
+                        dr[7] = 0;
+                    }
+
+                    if (!string.IsNullOrEmpty(dr_v["single_money"].ToString()))
+                    {
+                        dr[8] = Convert.ToInt32(dr_v["single_money"].ToString());
+                    }
+                    else
+                    {
+                        dr[8] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["amount"].ToString()))
+                    {
+                        dr[9] = Convert.ToInt32(dr_v["amount"].ToString());
+                    }
+                    else
+                    {
+                        dr[9] = 0;
+                    }                   
+                    dtHZ.Rows.Add(dr);
+                }
+                string[] colname = new string[dtHZ.Columns.Count];
+                string filename = query.category_name + "-類別訂單明細" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                newExcelName = Server.MapPath(excelPath_export) + filename;
+                for (int i = 0; i < dtHZ.Columns.Count; i++)
+                {
+                    colname[i] = dtHZ.Columns[i].ColumnName;
+                }
+
+                if (System.IO.File.Exists(newExcelName))
+                {
+                    System.IO.File.Delete(newExcelName);
+                }
+                ExcelHelperXhf.ExportDTtoExcel(dtHZ, "", newExcelName);
+                json = "{success:true,ExcelName:\'" + filename + "\'}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
             this.Response.End();
             return this.Response;
         }

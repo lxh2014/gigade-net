@@ -12,10 +12,15 @@ public class Unitle
         local,
         server
     }
-    //吉甲地推薦系統FTP地址  guodong1130w 20151014
+    //吉甲地宇匯,曜智匯出ftp設定
     public enum RecommendExcle
     {
-        local
+        FtpYuhuiPath,//宇匯ftp账号和密码 add by dongya 2015/11/12
+        ftpyhuser,
+        ftpyhpwd,
+        FtpLiaozhiPath,//曜智ftp账号和密码 add by dongya2015/11/12
+        ftplzuser,
+        ftplzpwd
     }
 
     public enum ImgGigade100ComType
@@ -143,8 +148,8 @@ public class Unitle
             case ImgGigade100ComType.MemberEventPath:
                 result = ConfigurationManager.AppSettings["MemberEventPath"];
                 break;
-                
-                
+
+
         }
         return result;
     }
@@ -171,9 +176,28 @@ public class Unitle
         string result = string.Empty;
         switch (pathType)
         {
-            case RecommendExcle.local:
-                result = ConfigurationManager.AppSettings["RecommendLocalPath"];
+            //宇匯ftp账号和密码 add by dongya 2015/11/12
+            case RecommendExcle.FtpYuhuiPath:
+                result = ConfigurationManager.AppSettings["FtpYuhuiPath"];
                 break;
+            case RecommendExcle.ftpyhuser:
+                result = ConfigurationManager.AppSettings["ftpyhuser"];
+                break;
+            case RecommendExcle.ftpyhpwd:
+                result = ConfigurationManager.AppSettings["ftpyhpwd"];
+                break;
+            //曜智ftp账号和密码 add by dongya2015/11/12
+
+            case RecommendExcle.FtpLiaozhiPath:
+                result = ConfigurationManager.AppSettings["FtpLiaozhiPath"];
+                break;
+            case RecommendExcle.ftplzuser:
+                result = ConfigurationManager.AppSettings["ftplzuser"];
+                break;
+            case RecommendExcle.ftplzpwd:
+                result = ConfigurationManager.AppSettings["ftplzpwd"];
+                break;
+
             default:
                 break;
         }

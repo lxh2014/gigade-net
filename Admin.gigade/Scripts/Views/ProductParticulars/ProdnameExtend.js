@@ -174,8 +174,7 @@ Ext.onReady(function () {
             value: new Date(),
             allowBlank: false,
             endDateField: 'start_to_date'
-        },
-        {
+        }, {
             xtype: 'datefield',
             format: 'Y/m/d',
             vtype: 'daterange',
@@ -351,7 +350,7 @@ Ext.onReady(function () {
             { header: STATUS, dataIndex: 'Flag', width: 100, align: 'center', menuDisabled: true, sortable: false, hidden: true },
             {
                 header: PREFIX, dataIndex: 'Product_Prefix', width: 150, align: 'right', menuDisabled: true, renderer: function (val) {
-                    return val == "" ? "" : '〖' + val + '〗';
+                    return val == "" ? "" : '[' + val + ']';
                 }, sortable: false, editor: { xtype: 'textfield' }
             },
             {
@@ -362,7 +361,7 @@ Ext.onReady(function () {
             },
             {
                 header: SUFFIX, dataIndex: 'Product_Suffix', width: 150, align: 'left', menuDisabled: true, renderer: function (val, metaData, record, rowIndex, colIndex) {
-                    return val == "" ? "" : '〖' + val + '〗';
+                    return val == "" ? "" : '[' + val + ']';
                 }, sortable: false, editor: { xtype: 'textfield' }
             }, {
                 header: BEGIN_DATE, dataIndex: 'Event_Start', width: 140, align: 'center', sortable: false, menuDisabled: true, hidden: true,//开始時間
@@ -527,8 +526,7 @@ function Save() {
     要更新的數據沒有,但做出了列表修改
     可以預防該情況
     */
-    if (prodNameExtend == '[]' && upDataStore.length != 0)
-    {
+    if (prodNameExtend == '[]' && upDataStore.length != 0) {
         Ext.Msg.alert(INFORMATION, NOMESSAGEINFOOFSITE);
         myMask.hide();
         return;
