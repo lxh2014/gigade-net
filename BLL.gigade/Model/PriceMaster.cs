@@ -23,7 +23,7 @@ namespace BLL.gigade.Model
     [DBTableInfo("price_master")]
     public class PriceMaster : PageBase, ICloneable
     {
-        public readonly static char L_KH = '(', R_KH = ')', L_HKH = '〖', R_HKH = '〗';
+        public readonly static char L_KH = '(', R_KH = ')', L_HKH = '[', R_HKH = ']';///應用戶要求,將〖〗改成[]  edit by ww2015/2015/11/11
 
         public uint price_master_id { get; set; }
         public uint product_id { get; set; }
