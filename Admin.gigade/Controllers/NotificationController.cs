@@ -963,12 +963,12 @@ namespace Admin.gigade.Controllers
             string endRunInfo = "";
             try
             {
-                if (Request.Url.Host == "mng.gigade100.com")//判断是否为正式线
-                {
-                    return "{success:false,data:'',msg:'未驗收，暫不執行！'}";
-                }
-                else
-                {
+                //if (Request.Url.Host == "mng.gigade100.com")//判断是否为正式线
+                //{
+                //    return "{success:false,data:'',msg:'未驗收，暫不執行！'}";
+                //}
+                //else
+                //{
                     startRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown Start";
                     _proRemoveMgr = new ProductRemoveReasonMgr(connectionString);
 
@@ -1100,8 +1100,8 @@ namespace Admin.gigade.Controllers
                     if (resultone > 0 && resulttwo > 0 && resultthree > 0)
                     {
                         SaleStatus();
-                        DataTable _excelMsg = _proRemoveMgr.GetStockMsg();
-                        ExeclProductRmoveDownMsg(_excelMsg);
+                        //DataTable _excelMsg = _proRemoveMgr.GetStockMsg();
+                        //ExeclProductRmoveDownMsg(_excelMsg);
                         endRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown End ";
                         WriterInfo("SetProductRmoveDown-Success", startRunInfo, endRunInfo);
                         return "{success:true}";
@@ -1112,7 +1112,7 @@ namespace Admin.gigade.Controllers
                         WriterInfo("SetProductRmoveDown-Fail", startRunInfo, endRunInfo);
                         return "{success:false}";
                     }
-                }
+                //}
             }
             catch (Exception ex)
             {
