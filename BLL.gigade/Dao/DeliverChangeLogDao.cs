@@ -41,7 +41,7 @@ namespace BLL.gigade.Dao
             {           
                 sbSql.AppendFormat(@"insert into delivery_change_log (deliver_id,dcl_create_user,dcl_create_datetime,dcl_create_muser,dcl_create_type,
                                  dcl_note,dcl_ipfrom,expect_arrive_date,expect_arrive_period) values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}')", dCL.deliver_id,
-                                     dCL.dcl_create_user, dCL.dcl_create_datetime, dCL.dcl_create_muser, dCL.dcl_create_type,
+                                     dCL.dcl_create_user,BLL.gigade.Common.CommonFunction.DateTimeToString( dCL.dcl_create_datetime), dCL.dcl_create_muser, dCL.dcl_create_type,
                                      dCL.dcl_note, dCL.dcl_ipfrom, dCL.expect_arrive_date.ToString("yyyy-MM-dd"), dCL.expect_arrive_period);
                 return _access.execCommand(sbSql.ToString());
             }
@@ -110,7 +110,8 @@ namespace BLL.gigade.Dao
                     conndSql.AppendFormat(" and dcl_create_datetime BETWEEN '{0}' and '{1}'", Query.time_start, Query.time_end);
                 }
 
-                
+                conndSql.AppendFormat(" order by dcl_create_datetime desc ");
+                sbSql.AppendFormat(conndSql.ToString());
 
                 totalCount = 0;
                 if (Query.IsPage)
@@ -122,7 +123,7 @@ namespace BLL.gigade.Dao
                     {
                         totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
                     }
-                    sbSql.AppendFormat( conndSql.ToString() + " limit {0},{1}",Query.Start,Query.Limit);
+                    sbSql.AppendFormat(" limit {0},{1}",Query.Start,Query.Limit);
 
                 }
                 return _access.getDataTableForObj<DeliverChangeLogQuery>(sbSql.ToString());
