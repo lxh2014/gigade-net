@@ -24,73 +24,73 @@
                 listeners: {
                     blur: function () {
                         var id = Ext.getCmp('plas_prod_id').getValue();
-                        Ext.Ajax.request({
-                            url: "/WareHouse/Getprodbyid",
-                            method: 'post',
-                            type: 'text',
-                            params: {
-                                id: Ext.getCmp('plas_prod_id').getValue()
-                            },
-                            success: function (form, action) {
-                                var result = Ext.decode(form.responseText);
-                                if (result.success) {                                   
-                                    msg = result.msg;
-                                    locid = result.locid;
-                                    vendor_id = result.vendor_id;
-                                    P_itemid = result.item_id;
-                                    Ext.getCmp("product_name").setValue(msg);                                    
-                                    if (result.day == "")
-                                    {
-                                        Ext.getCmp("cde_dt_var").setValue("999");
-                                    }
-                                    else
-                                    {
-                                        Ext.getCmp("cde_dt_var").setValue(result.day);
-                                    }                                
-                                    if (locid.length > 0) {
-                                        Ext.getCmp("loc_id").setValue(locid);
-                                    } else {
-                                        Ext.getCmp("loc_id").setValue("無");
-                                    }
-                                    Ext.getCmp("Pitem_id").setValue(P_itemid);
-                                    cde_dt_shp = result.cde_dt_shp;
-                                    pwy_dte_ctl = result.pwy_dte_ctl;
-                                    cde_dt = result.cde_dt;
-                                    cde_dt_var = result.cde_dt_var;
-                                    cde_dt_incr = result.cde_dt_incr;
-                                    //設置為可用
-                                    //Ext.getCmp('startTime').setDisabled(false);
-                                    Ext.getCmp('prod_qty').show();
-                                    Ext.getCmp('plas_loc_id').setDisabled(false);
-                                    Ext.getCmp('plas_loc_id').allowBlank = false;
-                                    if (pwy_dte_ctl != "Y") {
-                                        //如果不是有效期控管的商品就不顯示填寫時間
-                                        Ext.getCmp("createtime").hide();
-                                        Ext.getCmp("cdttime").hide();
-                                        Ext.getCmp('cde_dt').setDisabled(false);
-                                        Ext.getCmp('startTime').allowBlank = true;
-                                        Ext.getCmp('cde_dt').allowBlank = true;
+                        if (id.trim().length > 0) {
+                            Ext.Ajax.request({
+                                url: "/WareHouse/Getprodbyid",
+                                method: 'post',
+                                type: 'text',
+                                params: {
+                                    id: Ext.getCmp('plas_prod_id').getValue()
+                                },
+                                success: function (form, action) {
+                                    var result = Ext.decode(form.responseText);
+                                    if (result.success) {
+                                        msg = result.msg;
+                                        locid = result.locid;
+                                        vendor_id = result.vendor_id;
+                                        P_itemid = result.item_id;
+                                        Ext.getCmp("product_name").setValue(msg);
+                                        if (result.day == "") {
+                                            Ext.getCmp("cde_dt_var").setValue("999");
+                                        }
+                                        else {
+                                            Ext.getCmp("cde_dt_var").setValue(result.day);
+                                        }
+                                        if (locid.length > 0) {
+                                            Ext.getCmp("loc_id").setValue(locid);
+                                        } else {
+                                            Ext.getCmp("loc_id").setValue("無");
+                                        }
+                                        Ext.getCmp("Pitem_id").setValue(P_itemid);
+                                        cde_dt_shp = result.cde_dt_shp;
+                                        pwy_dte_ctl = result.pwy_dte_ctl;
+                                        cde_dt = result.cde_dt;
+                                        cde_dt_var = result.cde_dt_var;
+                                        cde_dt_incr = result.cde_dt_incr;
+                                        //設置為可用
+                                        //Ext.getCmp('startTime').setDisabled(false);
+                                        Ext.getCmp('prod_qty').show();
+                                        Ext.getCmp('plas_loc_id').setDisabled(false);
+                                        Ext.getCmp('plas_loc_id').allowBlank = false;
+                                        if (pwy_dte_ctl != "Y") {
+                                            //如果不是有效期控管的商品就不顯示填寫時間
+                                            Ext.getCmp("createtime").hide();
+                                            Ext.getCmp("cdttime").hide();
+                                            Ext.getCmp('cde_dt').setDisabled(false);
+                                            Ext.getCmp('startTime').allowBlank = true;
+                                            Ext.getCmp('cde_dt').allowBlank = true;
+                                        }
+                                        else {
+                                            Ext.getCmp('createtime').show();
+                                            Ext.getCmp('cdttime').show();
+                                            Ext.getCmp('us1').setDisabled(false);
+                                            Ext.getCmp('us2').setDisabled(false);
+                                            Ext.getCmp('cde_dt').setDisabled(true);
+                                            Ext.getCmp('startTime').setDisabled(false);
+                                            Ext.getCmp('startTime').allowBlank = false;
+                                            Ext.getCmp('cde_dt').allowBlank = false;
+                                        }
                                     }
                                     else {
-                                        Ext.getCmp('createtime').show();
-                                        Ext.getCmp('cdttime').show();
-                                        Ext.getCmp('us1').setDisabled(false);
-                                        Ext.getCmp('us2').setDisabled(false);
-                                        Ext.getCmp('cde_dt').setDisabled(true);
-                                        Ext.getCmp('startTime').setDisabled(false);
-                                        Ext.getCmp('startTime').allowBlank = false;
-                                        Ext.getCmp('cde_dt').allowBlank = false;
+                                        Ext.getCmp("product_name").setValue("沒有該商品信息！");
+                                        Ext.getCmp('startTime').setDisabled(true);
+                                        Ext.getCmp('plas_loc_id').setDisabled(true);
+                                        Ext.getCmp('us1').setDisabled(true);
+                                        Ext.getCmp('us2').setDisabled(true);
                                     }
                                 }
-                                else {
-                                    Ext.getCmp("product_name").setValue("沒有該商品信息！");
-                                    Ext.getCmp('startTime').setDisabled(true);
-                                    Ext.getCmp('plas_loc_id').setDisabled(true);
-                                    Ext.getCmp('us1').setDisabled(true);
-                                    Ext.getCmp('us2').setDisabled(true);
-                                }
-                            }
-                        });                        
+                            });
+                        }
                     }
                 }
             },
