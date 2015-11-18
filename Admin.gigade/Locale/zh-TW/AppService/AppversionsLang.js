@@ -24,6 +24,7 @@ VERSIONS_NAME = "版本名稱"
 VERSIONS_DESC = "版本描述"
 RELEASE_DATE = "上架日"
 ADDBTN = "新增"
+EDITBTN = "編輯";
 DELETEBTN="刪除"
 SEARCHBTN = "查詢"
 REPEATBTN = "重置"
@@ -40,4 +41,8 @@ SHULDWRITEVERSIONS_CODE = "請輸入版本code"
 SHULDWRITEVERSIONS_NAME = "請輸入版本名稱"
 SHULDWRITEVERSIONS_DESC = "請輸入版本描述"
 SHULDWRITEDRIVERTEXT = "請輸入平臺"
+
+RELEASE = "發佈";
+YESORNORELEASE = "是否發佈";
+RELEASESTATUS = "發佈狀態";
 /*編輯頁顯示結束*/
