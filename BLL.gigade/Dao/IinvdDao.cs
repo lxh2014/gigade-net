@@ -321,7 +321,7 @@ LEFT JOIN product p ON pi.product_id=p.product_id
 LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id
 LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id
 left join vendor_brand vb on p.brand_id=vb.brand_id
-LEFT JOIN iplas ip ON i.item_id=ip.item_id
+LEFT JOIN iplas ip ON pi.item_id=ip.item_id
 LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where 1=1 ");
             sbStr.AppendFormat("select item_id from product_item where item_id='{0}';", id);
             DataTable _dtresult = _access.getDataTable(sbStr.ToString());
@@ -841,17 +841,19 @@ where loc.loc_id='{0}' {2} LIMIT 1;", m.loc_id, sbjoin, sbWhere);
                         sbWhere.Append(" and SUBSTR(loc.loc_id,5,1) in ('0','2','4','6','8')");
                     }
                 }
+                if (m.prepaid != 0)
+                {
+                    sbWhere.AppendFormat(" and p.prepaid='{0}' ", m.prepaid);
+                }
                 if (!string.IsNullOrEmpty(m.vender))
                 {
-                    sbWhere.AppendFormat(" AND (vv.vendor_code LIKE'%{0}%' OR vv.vendor_name_simple LIKE'%{0}%') ", m.vender);
-                    sbjoin.Append(@" LEFT JOIN product p on p.product_id = loc.product_id 	 
-LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id 
-LEFT JOIN vendor vv ON  v.vendor_id=vv.vendor_id");
+                    sbWhere.AppendFormat(" AND (vv.vendor_id ='{0}' OR vv.vendor_name_simple LIKE'%{0}%') ", m.vender);
+                    sbjoin.Append(@"	LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id  LEFT JOIN vendor vv ON  v.vendor_id=vv.vendor_id ");
                 }
                 sbSql.AppendFormat(@" SELECT  loc.item_id, loc.loc_id, loc.product_id, loc.row_id FROM iloc INNER JOIN (
 SELECT i.item_id,i.plas_loc_id as 'loc_id',pi.product_id,i.row_id from iinvd i LEFT JOIN product_item pi ON i.item_id = pi.item_id
 UNION
-SELECT i.item_id,i.loc_id,pi.product_id,'' as 'row_id' from iplas i LEFT JOIN  product_item pi ON i.item_id = pi.item_id) loc ON loc.loc_id=iloc.loc_id  {1} where iloc.lsta_id NOT in ('H','F')   {0}
+SELECT i.item_id,i.loc_id,pi.product_id,'' as 'row_id' from iplas i LEFT JOIN  product_item pi ON i.item_id = pi.item_id) loc ON loc.loc_id=iloc.loc_id  LEFT JOIN product p on p.product_id = loc.product_id  {1} where iloc.lsta_id NOT in ('H','F')   {0}
 ORDER BY loc.loc_id,loc.row_id DESC  ", sbWhere.ToString(), sbjoin.ToString());
                 DataTable dt = _access.getDataTable(sbSql.ToString());
                 return dt;

@@ -7,8 +7,8 @@ namespace BLL.gigade.Model
 {
     public class DeliverChangeLog:PageBase
     {
-        public uint dcl_id { get; set; }
-        public uint deliver_id { get; set; }//出貨單編號
+        public int dcl_id { get; set; }
+        public int deliver_id { get; set; }//出貨單編號
         public int dcl_create_user { get; set; }//創建人(用戶)
         public DateTime dcl_create_datetime { get; set; }//創建時間
         public int dcl_create_muser { get; set; }//創建人(管理員)

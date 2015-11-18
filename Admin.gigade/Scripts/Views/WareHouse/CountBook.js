@@ -175,6 +175,19 @@ Ext.onReady(function () {
                     }
                 ]
             },
+              {
+                  xtype: 'checkboxgroup',
+                  fieldLabel: '是否買斷商品',
+                  labelWidth: 80,
+                  width: 350,
+                  margin: '0 10 0 0',
+                  id: 'prepaid',
+                  name: 'prepaid',
+                  columns: 1,
+                  items: [
+                      { id: 'prepaidCheck', name: 'vtype', inputValue: '1', checked: true },
+                  ]
+              },
             {
                 fieldLabel: "供應商編號/名稱",
                 xtype: "textfield",
@@ -216,7 +229,16 @@ Ext.onReady(function () {
     });
 
     function ExportCountBook() {
-        window.open("/WareHouse/GetCountBook?level=" + Ext.getCmp('level').getValue() + "&startIloc=" + Ext.getCmp('startIloc').getValue() + "&endIloc=" + Ext.getCmp('endIloc').getValue() + "&sort=" + sort + "&firstsd=" + Ext.getCmp('Firstsd').getValue() + "&vender=" + Ext.getCmp('vender').getValue());
+        var checked = Ext.getCmp("prepaid").items;
+        var check = "";
+
+        if (checked.get(0).checked) {
+
+            check = "1";
+        } else {
+            check = "0";
+        }
+        window.open("/WareHouse/GetCountBook?level=" + Ext.getCmp('level').getValue() + "&startIloc=" + Ext.getCmp('startIloc').getValue() + "&endIloc=" + Ext.getCmp('endIloc').getValue() + "&sort=" + sort + "&firstsd=" + Ext.getCmp('Firstsd').getValue() + "&vender=" + Ext.getCmp('vender').getValue() + "&prepaid=" + check);
         //+ "&search_vendor=" + Ext.getCmp('search_vendor').getValue());
     }
 

@@ -1936,6 +1936,7 @@
     <Content Include="Scripts\Views\OrderManage\OrderReturn.js" />
     <Content Include="Scripts\Views\OrderManage\OrderReturnList.js" />
     <Content Include="Scripts\Views\OrderManage\ReturnAllOrder.js" />
+    <Content Include="Scripts\Views\Order\OrderAmountDetial.js" />
     <Content Include="Scripts\Views\Order\OrderCategortSum.js" />
     <Content Include="Scripts\Views\Order\OrderStatusModify.js" />
     <Content Include="Scripts\Views\PageErrorLog\list.js" />
@@ -1968,6 +1969,7 @@
     <Content Include="Scripts\Views\SendProduct\DeliverMasterList.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverExportArrivalList.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverExportArrivalEdit.js" />
+    <Content Include="Scripts\Views\SendProduct\ExportArrivalChangeLogList.js" />
     <Content Include="Scripts\Views\Service\OrderQuestionAdd.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaEdit.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaList.js" />
@@ -2022,6 +2024,9 @@
     <Content Include="Scripts\Views\Website\BannerNewsList.js" />
     <Content Include="Scripts\Views\Website\BannernewssiteList.js" />
     <Content Include="Scripts\Views\XMLManage\Index.js" />
+    <Content Include="Template\EdmNew\empty_content.html" />
+    <Content Include="Template\EdmNew\empty_edit.html" />
+    <Content Include="Template\EdmNew\index.html" />
     <Content Include="Template\ProductDetail\product_detail_safe.txt" />
     <Content Include="XML\Exceptional.xml" />
     <Content Include="XML\ItemPrice.xml" />
@@ -4470,6 +4475,8 @@
     <Content Include="Template\SiteStatistics\SiteStatistics.xlsx" />
     <Content Include="Views\WareHouse\Aseld.cshtml" />
     <Content Include="Views\SendProduct\DeliverExpectArrival.cshtml" />
+    <Content Include="Views\SendProduct\ExpectArrivalChangeLog.cshtml" />
+    <Content Include="Views\Order\OrderAmountDetial.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

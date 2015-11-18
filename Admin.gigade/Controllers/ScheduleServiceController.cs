@@ -959,124 +959,124 @@ namespace Admin.gigade.Controllers
             return true;
         }
 
-        public bool SendEMail()
-        {
-            string json = string.Empty;
-            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
-            {
-                return false;
-            }
-            try
-            {
-                #region
-                string schedule_code = Request.Params["schedule_code"].ToString();
-                MailModel mailModel = new MailModel();
-                mailModel.MysqlConnectionString = mySqlConnectionString;
-                string GroupCode = string.Empty;
-                string MailTitle = string.Empty;
-                string MailBody = string.Empty;
-                bool IsSeparate = false;
-                bool IsDisplyName = true;
+        //public bool SendEMail()
+        //{
+        //    string json = string.Empty;
+        //    if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+        //    {
+        //        return false;
+        //    }
+        //    try
+        //    {
+        //        #region
+        //        string schedule_code = Request.Params["schedule_code"].ToString();
+        //        MailModel mailModel = new MailModel();
+        //        mailModel.MysqlConnectionString = mySqlConnectionString;
+        //        string GroupCode = string.Empty;
+        //        string MailTitle = string.Empty;
+        //        string MailBody = string.Empty;
+        //        bool IsSeparate = false;
+        //        bool IsDisplyName = true;
 
-                List<MailRequest> MR = new List<MailRequest>();
-                MailRequest model = new MailRequest();
-                List<ScheduleConfigQuery> store_config = new List<ScheduleConfigQuery>();
-                ScheduleConfigQuery query_config = new ScheduleConfigQuery();
-                if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
-                {
-                    return false;
-                }
-                query_config.schedule_code = schedule_code;
-                _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
-                store_config = _secheduleServiceMgr.GetScheduleConfig(query_config);
-                foreach (ScheduleConfigQuery item in store_config)
-                {
-                    if (item.parameterCode.Equals("MailFromAddress"))
-                    {
-                        mailModel.MailFromAddress = item.value;
-                    }
-                    else if (item.parameterCode.Equals("MailHost"))
-                    {
-                        mailModel.MailHost = item.value;
-                    }
-                    else if (item.parameterCode.Equals("MailPort"))
-                    {
-                        mailModel.MailPort = item.value;
-                    }
-                    else if (item.parameterCode.Equals("MailFromUser"))
-                    {
-                        mailModel.MailFromUser = item.value;
-                    }
-                    else if (item.parameterCode.Equals("EmailPassWord"))
-                    {
-                        mailModel.MailFormPwd = item.value;
-                    }
-                    else if (item.parameterCode.Equals("GroupCode"))
-                    {
-                        GroupCode = item.value;
-                    }
-                    else if (item.parameterCode.Equals("MailTitle"))
-                    {
-                        MailTitle = item.value;
-                    }
-                    else if (item.parameterCode.Equals("MailTitle"))
-                    {
-                        MailTitle = item.value;
-                    }
-                    else if (item.parameterCode.Equals("MailBody"))
-                    {
-                        MailBody = item.value;
-                    }
-                    else if (item.parameterCode.Equals("IsSeparate"))
-                    {
-                        if (item.value.ToString().Trim().ToLower() == "false")
-                        {
-                            IsSeparate = false;
-                        }
-                        else if (item.value.ToString().Trim().ToLower() == "true")
-                        {
-                            IsSeparate = true;
-                        }
-                    }
-                    else if (item.parameterCode.Equals("IsDisplyName"))
-                    {
-                        if (item.value.ToString().Trim().ToLower() == "false")
-                        {
-                            IsDisplyName = false;
-                        }
-                        else if (item.value.ToString().Trim().ToLower() == "true")
-                        {
-                            IsDisplyName = true;
-                        }
-                    }
-                    else if (!string.IsNullOrEmpty(Request.Params["IsDisplyName"]))
-                    {
-                        if (Request.Params["IsDisplyName"].ToString().Trim().ToLower() == "false")
-                        {
-                            IsSeparate = false;
-                        }
-                        else if (Request.Params["IsDisplyName"].ToString().Trim().ToLower() == "true")
-                        {
-                            IsSeparate = true;
-                        }
-                    }
-                } 
-                MailHelper mail = new MailHelper(mailModel);
-                _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
-                _secheduleServiceMgr.SendEMail(mail);
+        //        List<MailRequest> MR = new List<MailRequest>();
+        //        MailRequest model = new MailRequest();
+        //        List<ScheduleConfigQuery> store_config = new List<ScheduleConfigQuery>();
+        //        ScheduleConfigQuery query_config = new ScheduleConfigQuery();
+        //        if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+        //        {
+        //            return false;
+        //        }
+        //        query_config.schedule_code = schedule_code;
+        //        _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+        //        store_config = _secheduleServiceMgr.GetScheduleConfig(query_config);
+        //        foreach (ScheduleConfigQuery item in store_config)
+        //        {
+        //            if (item.parameterCode.Equals("MailFromAddress"))
+        //            {
+        //                mailModel.MailFromAddress = item.value;
+        //            }
+        //            else if (item.parameterCode.Equals("MailHost"))
+        //            {
+        //                mailModel.MailHost = item.value;
+        //            }
+        //            else if (item.parameterCode.Equals("MailPort"))
+        //            {
+        //                mailModel.MailPort = item.value;
+        //            }
+        //            else if (item.parameterCode.Equals("MailFromUser"))
+        //            {
+        //                mailModel.MailFromUser = item.value;
+        //            }
+        //            else if (item.parameterCode.Equals("EmailPassWord"))
+        //            {
+        //                mailModel.MailFormPwd = item.value;
+        //            }
+        //            else if (item.parameterCode.Equals("GroupCode"))
+        //            {
+        //                GroupCode = item.value;
+        //            }
+        //            else if (item.parameterCode.Equals("MailTitle"))
+        //            {
+        //                MailTitle = item.value;
+        //            }
+        //            else if (item.parameterCode.Equals("MailTitle"))
+        //            {
+        //                MailTitle = item.value;
+        //            }
+        //            else if (item.parameterCode.Equals("MailBody"))
+        //            {
+        //                MailBody = item.value;
+        //            }
+        //            else if (item.parameterCode.Equals("IsSeparate"))
+        //            {
+        //                if (item.value.ToString().Trim().ToLower() == "false")
+        //                {
+        //                    IsSeparate = false;
+        //                }
+        //                else if (item.value.ToString().Trim().ToLower() == "true")
+        //                {
+        //                    IsSeparate = true;
+        //                }
+        //            }
+        //            else if (item.parameterCode.Equals("IsDisplyName"))
+        //            {
+        //                if (item.value.ToString().Trim().ToLower() == "false")
+        //                {
+        //                    IsDisplyName = false;
+        //                }
+        //                else if (item.value.ToString().Trim().ToLower() == "true")
+        //                {
+        //                    IsDisplyName = true;
+        //                }
+        //            }
+        //            else if (!string.IsNullOrEmpty(Request.Params["IsDisplyName"]))
+        //            {
+        //                if (Request.Params["IsDisplyName"].ToString().Trim().ToLower() == "false")
+        //                {
+        //                    IsSeparate = false;
+        //                }
+        //                else if (Request.Params["IsDisplyName"].ToString().Trim().ToLower() == "true")
+        //                {
+        //                    IsSeparate = true;
+        //                }
+        //            }
+        //        } 
+        //        MailHelper mail = new MailHelper(mailModel);
+        //        _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
+        //        _secheduleServiceMgr.SendEMail(mail);
                
-                #endregion
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:false}";
-            }
-            return true;
-        }
+        //        #endregion
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+        //        logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+        //        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+        //        log.Error(logMessage);
+        //        json = "{success:false}";
+        //    }
+        //    return true;
+        //}
 
         //檢測文件夾下是否有內容,如果有內容則發送email  add by yachao1120j 2015-11-04  
         public bool setconfigxml()

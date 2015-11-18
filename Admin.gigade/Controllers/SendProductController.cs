@@ -193,6 +193,14 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+        /// <summary>
+        /// 期望到貨日調整記錄
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult ExpectArrivalChangeLog()
+        {
+            return View();
+        }
         #endregion
 
         #region 供應商出貨單+HttpResponseBase OrderWaitDeliverList()
@@ -5609,7 +5617,7 @@ namespace Admin.gigade.Controllers
                 {
                     dmQuery.type = Convert.ToUInt32(Request.Params["productMode"]);
                 }
-                if (!string.IsNullOrEmpty(Request.Params["freightType"]))//freight_set為0時，表示全部
+                if (Request.Params["freightType"] != "-1")//freight_set為0時，表示全部
                 {
                     dmQuery.freight_set = Convert.ToUInt32(Request.Params["freightType"]);
                 }
@@ -5686,7 +5694,7 @@ namespace Admin.gigade.Controllers
             try
             {
                                              
-                dCL.deliver_id = Convert.ToUInt32(Request.Params["deliver_id"]);
+                dCL.deliver_id = Convert.ToInt32(Request.Params["deliver_id"]);
                 dCL.dcl_create_datetime = DateTime.Now;
                 dCL.dcl_ipfrom = CommonFunction.GetIP4Address(Request.UserHostAddress.ToString());
                 dCL.dcl_create_muser = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
@@ -5750,6 +5758,82 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+        #endregion
+
+        #region 期望到貨日調整記錄
+        /// <summary>
+        /// 期望到货日调整记录
+        /// </summary>
+        /// <returns></returns>
+        // by zhaozhi0623j add at 20151112
+        public HttpResponseBase GetDeliveryChangeLogList()
+        {
+            string json = string.Empty;
+            DeliverChangeLogQuery dclQuery = new DeliverChangeLogQuery();
+            _DeliverChangeLogMgr = new DeliverChangeLogMgr(mySqlConnectionString);
+            List<DeliverChangeLogQuery> dclList = new List<DeliverChangeLogQuery>();
+            try
+            {
+                dclQuery.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                dclQuery.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");//用於分頁的變量
+
+                #region 查詢條件
+
+                if (!string.IsNullOrEmpty(Request.Params["deliver_id"]))//出貨單單號
+                {
+                    dclQuery.deliver_id = Convert.ToInt32(Request.Params["deliver_id"]);
+                }
+                if (Request.Params["dcl_create_type"] != "-1")//創建類型1:前台創建 2:後台創建
+                {
+                    dclQuery.dcl_create_type = Convert.ToInt32(Request.Params["dcl_create_type"]);
+                }               
+                if (!string.IsNullOrEmpty(Request.Params["userName_ro_email"]))//出貨單記錄調整人員
+                {
+                    if (Request.Params["query_type"] == "1")
+                    {
+                        dclQuery.dcl_user_name = Request.Params["userName_ro_email"];
+                    }
+                    if (Request.Params["query_type"] == "2")
+                    {
+                        dclQuery.dcl_user_email = Request.Params["userName_ro_email"];
+                    }                  
+                }
+
+                if (!string.IsNullOrEmpty(Request.Params["time_start"]))//dcl_create_datetime
+                {
+                    dclQuery.time_start = Convert.ToDateTime(Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["time_end"]))
+                {
+                    dclQuery.time_end = Convert.ToDateTime(Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy-MM-dd 23:59:59"));
+                }
+                #endregion
+
+                int totalCount = 0;
+                dclList = _DeliverChangeLogMgr.GetDeliverChangeLogList(dclQuery, out totalCount);
+                //foreach (var item in dclList)
+                //{
+                //  
+                //}
+
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式                   
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(dclList, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        } 
         #endregion
 
     }

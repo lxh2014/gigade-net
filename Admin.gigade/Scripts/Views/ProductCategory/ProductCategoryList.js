@@ -117,11 +117,11 @@ Ext.onReady(function () {
             {
                 header: LINKMODE, dataIndex: 'category_link_mode', width: 100, align: 'center',
                 renderer: function (val) {
-                    if (val == 2) {
-                        return NEWWIN;
+                    if (val == 1) {
+                        return OLDWIN;
                     }
                     else {
-                        return OLDWIN;
+                        return NEWWIN;
                     }
                 }
             },
@@ -131,7 +131,7 @@ Ext.onReady(function () {
                      if (val == 1) {
                          return ACTIVE;
                      }
-                     else if (val == 2) {
+                     else {
                          return "<span style=' color:red'>" + NOTACTIVE + "</span>";
                      }
                  }
@@ -142,7 +142,7 @@ Ext.onReady(function () {
                      if (val == 1) {
                          return OLDWIN;
                      }
-                     else if (val == 2) {
+                     else {
                          return NEWWIN;
                      }
                  }
