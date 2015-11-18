@@ -2320,8 +2320,7 @@ namespace BLL.gigade.Dao
             {
                 sql.AppendFormat(@"SELECT pcs.category_id,u.user_name,FROM_UNIXTIME(om.order_createdate) AS order_createdate,om.order_id,
 (SELECT parameterName FROM t_parametersrc WHERE parameterType='payment' AND parameterCode=om.order_payment) AS order_payment,om.order_amount,
-(SELECT remark FROM t_parametersrc WHERE parameterType='order_status' AND parameterCode=om.order_status) AS order_status,imr.invoice_number,
-imr.total_amount,FROM_UNIXTIME(invoice_date) AS invoice_date,od.item_id,
+(SELECT remark FROM t_parametersrc WHERE parameterType='order_status' AND parameterCode=om.order_status) AS order_status,od.item_id,
 (SELECT remark FROM t_parametersrc WHERE parameterType='order_status' AND parameterCode=os.slave_status) AS slave_status,
 v.vendor_name_simple,v.vendor_code,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,od.single_money*buy_num,
 od.single_cost,od.bag_check_money,od.single_cost*od.buy_num,FROM_UNIXTIME(os.slave_date_close) slave_date_close,mu.user_username AS 'pm',om.source_trace AS 'ID',	
@@ -2329,8 +2328,7 @@ rg.group_name AS group_name,
 (SELECT remark FROM t_parametersrc WHERE parameterType='product_mode' AND parameterCode= od.product_mode) AS product_mode 
 from order_master om 
         LEFT JOIN order_slave os ON om.order_id=os.order_id
-        LEFT JOIN order_detail od ON os.slave_id=od.slave_id
-        LEFT JOIN invoice_master_record imr ON om.order_id=imr.order_id
+        LEFT JOIN order_detail od ON os.slave_id=od.slave_id      
         LEFT JOIN vendor v ON v.vendor_id = od.item_vendor_id
         left join redirect r ON r.redirect_id=om.source_trace
         LEFT JOIN redirect_group rg  ON r.group_id = rg.group_id 
