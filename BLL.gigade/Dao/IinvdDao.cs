@@ -847,7 +847,7 @@ where loc.loc_id='{0}' {2} LIMIT 1;", m.loc_id, sbjoin, sbWhere);
                 }
                 if (!string.IsNullOrEmpty(m.vender))
                 {
-                    sbWhere.AppendFormat(" AND (vv.vendor_code LIKE'%{0}%' OR vv.vendor_name_simple LIKE'%{0}%') ", m.vender);
+                    sbWhere.AppendFormat(" AND (vv.vendor_id ='{0}' OR vv.vendor_name_simple LIKE'%{0}%') ", m.vender);
                     sbjoin.Append(@"	LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id  LEFT JOIN vendor vv ON  v.vendor_id=vv.vendor_id ");
                 }
                 sbSql.AppendFormat(@" SELECT  loc.item_id, loc.loc_id, loc.product_id, loc.row_id FROM iloc INNER JOIN (

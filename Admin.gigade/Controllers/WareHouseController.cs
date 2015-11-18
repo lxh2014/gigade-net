@@ -3623,7 +3623,7 @@ namespace Admin.gigade.Controllers
                 _iinvd = new IinvdMgr(mySqlConnectionString);
                 store = _iinvd.GetIinvdExprotList(iivd);
                 #region 列名
-                dtIinvdExcel.Columns.Add("商品編號", typeof(String));
+                dtIinvdExcel.Columns.Add("商品品號", typeof(String));
                 dtIinvdExcel.Columns.Add("商品名稱", typeof(String));
                 dtIinvdExcel.Columns.Add("數量", typeof(String));
                 dtIinvdExcel.Columns.Add("有效日期", typeof(String));
@@ -6758,18 +6758,29 @@ namespace Admin.gigade.Controllers
                         }
                     }
                 }
+                DateTime time;
+                asd.create_dtim = DateTime.MinValue;
+                if (DateTime.TryParse(Request.Params["starttime"].ToString(), out time) && Request.Params["starttime"].Substring(0, 10) != "1970-01-01")
+                {
+
+                    asd.create_dtim = DateTime.Parse(Request.Params["starttime"]).ToString("yyyy-MM-dd") == "1970-01-01" ? DateTime.MinValue : DateTime.Parse(Request.Params["starttime"]);
+                }
+                if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time) && Request.Params["endtime"].Substring(0, 10) != "1970-01-01")
+                {
+                    asd.create_dtim2 = DateTime.Parse(Request.Params["endtime"]).ToString("yyyy-MM-dd") == "1970-01-01" ? DateTime.MinValue : DateTime.Parse(Request.Params["endtime"]);
+                }
                 string jobNumbers = sbJobsNumber.ToString().TrimEnd(',');
                 string fileName = string.Empty;
                 MemoryStream ms = new MemoryStream();
                 if (type == "0")
                 {
                     fileName = "缺貨總報表_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
-                    ms = ExcelHelperXhf.ExportDT(_iasdMgr.GetDetailOrSimple(type, jobNumbers), "總表~未完成理貨工作_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
+                    ms = ExcelHelperXhf.ExportDT(_iasdMgr.GetDetailOrSimple(type, jobNumbers, asd), "總表~未完成理貨工作_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
                 }
                 else if (type == "1")
                 {
                     fileName = "缺貨明細報表_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
-                    ms = ExcelHelperXhf.ExportDT(_iasdMgr.GetDetailOrSimple(type, jobNumbers), "缺貨明細~未完成理貨工作_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
+                    ms = ExcelHelperXhf.ExportDT(_iasdMgr.GetDetailOrSimple(type, jobNumbers, asd), "缺貨明細~未完成理貨工作_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
                 }
 
                 Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);

@@ -13,5 +13,8 @@ namespace BLL.gigade.Dao.Impl
         int DeleteAppversionsById(string rowid);
         //增加方法
         int AddAppversions(Model.AppversionsQuery appsions);
+
+        int EditAppversions(Model.AppversionsQuery appsions);
+        int UpdateAppversionsActive(int id, int status);
     }
 }

@@ -35,7 +35,7 @@ var deliveryStatusStore = Ext.create('Ext.data.Store', {
 var freightTypeStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
-        { "txt": '全部', "value": "0" },
+        //{ "txt": '全部', "value": "0" },
         { "txt": '常溫', "value": "1" },
         { "txt": '低溫', "value": "2" }
     ]
@@ -76,7 +76,7 @@ Ext.define('GIGADE.deliverExpectArrival', {
         { name: 'type', type: 'int' },//出貨方式
         { name: 'freight_set', type: 'int' },//運送方式：freight_set 1 => '常溫',  2 => '冷凍', 5 => '冷藏'
         { name: 'vendor_name_full', type: 'string' },//供應商名稱
-        { name: 'delivery_status', type: 'int' },//出貨單狀態        
+        { name: 'delivery_status_str', type: 'string' },//出貨單狀態        
         { name: 'estimated_delivery_date', type: 'string' },//預計出貨日期
         { name: 'estimated_arrival_date', type: 'string' },//預計到貨日期
         { name: 'estimated_arrival_period', type: 'int' },//預計到貨時段：0 => '不限時', 1 => '12:00以前',2 => '12:00-17:00', 3 => '17:00-20:00'
@@ -180,7 +180,8 @@ Ext.onReady(function () {
                         displayField: 'txt',
                         valueField: 'value',
                         submitValue: true,
-                        value: 0
+                        emptyText: '全部',
+                        value: -1
                         ,
                         listeners: {
                             specialkey: function (field, e) {
@@ -457,38 +458,40 @@ Ext.onReady(function () {
                 }
             },
             { header: '供應商名稱', dataIndex: 'vendor_name_full', width: 150, align: 'center' },
-            { header: '出貨單狀態', dataIndex: 'delivery_status', width: 90, align: 'center',
-                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    switch (record.data.delivery_status) {
-                        case 0:
-                            return "待出貨";
-                            break;
-                        case 1:
-                            return "可出貨";
-                            break;
-                        case 2:
-                            return "出貨中";
-                            break;
-                        case 3:
-                            return "已出貨";
-                            break;
-                        case 4:
-                            return "已到貨";
-                            break;
-                        case 5:
-                            return "未到貨";
-                            break;
-                        case 6:
-                            return "取消出貨";
-                            break;
-                        case 7:
-                            return "待取貨";
-                            break;
-                        default:
-                            return "意外數據錯誤";
-                            break;
-                    }
-                }
+            {
+                header: '出貨單狀態', dataIndex: 'delivery_status_str', width: 90, align: 'center'
+                //,
+                //renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                //    switch (record.data.delivery_status) {
+                //        case 0:
+                //            return "待出貨";
+                //            break;
+                //        case 1:
+                //            return "可出貨";
+                //            break;
+                //        case 2:
+                //            return "出貨中";
+                //            break;
+                //        case 3:
+                //            return "已出貨";
+                //            break;
+                //        case 4:
+                //            return "已到貨";
+                //            break;
+                //        case 5:
+                //            return "未到貨";
+                //            break;
+                //        case 6:
+                //            return "取消出貨";
+                //            break;
+                //        case 7:
+                //            return "待取貨";
+                //            break;
+                //        default:
+                //            return "意外數據錯誤";
+                //            break;
+                //    }
+                //}
             },
             {
                 header: '預計出貨日', dataIndex: 'estimated_delivery_date', width: 100, align: 'center',
@@ -628,7 +631,7 @@ function Tomorrow() {
 Query = function () {
     var falg = 0;
     var productMode = Ext.getCmp('productMode').getValue(); if (productMode != -1) { falg++; }
-    var freightType = Ext.getCmp('freightType').getValue(); if (freightType != 0) { falg++; }
+    var freightType = Ext.getCmp('freightType').getValue(); if (freightType != -1) { falg++; }
     var deliveryStatus = Ext.getCmp('deliveryStatus').getValue(); if (deliveryStatus != 10000) { falg++; }
 
     var deliverId = Ext.getCmp('deliverId').getValue().trim(); if (deliverId != '') { falg++; }

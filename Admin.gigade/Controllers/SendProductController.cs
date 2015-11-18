@@ -5617,7 +5617,7 @@ namespace Admin.gigade.Controllers
                 {
                     dmQuery.type = Convert.ToUInt32(Request.Params["productMode"]);
                 }
-                if (!string.IsNullOrEmpty(Request.Params["freightType"]))//freight_set為0時，表示全部
+                if (Request.Params["freightType"] != "-1")//freight_set為0時，表示全部
                 {
                     dmQuery.freight_set = Convert.ToUInt32(Request.Params["freightType"]);
                 }

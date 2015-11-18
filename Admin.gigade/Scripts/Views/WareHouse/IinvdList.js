@@ -380,7 +380,7 @@ function UpdateActive(id) {
                 },
                 {
                     xtype: 'textfield',
-                    fieldLabel: '相關單號',
+                    fieldLabel: '前置單號',
                     id: 'po_id',
                     colName: 'po_id',
                     submitValue: false,
