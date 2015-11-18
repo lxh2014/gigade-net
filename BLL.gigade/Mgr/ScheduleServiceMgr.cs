@@ -526,23 +526,7 @@ namespace BLL.gigade.Mgr
            
         }
 
-        #region 郵件排成使用
-        //清除過期信件
-        public bool SendEMail(MailHelper mail)
-        {
-            try
-            {
-                _secheduleServiceDao.ValidUntilDate();
-                _secheduleServiceDao.MaxRetry();
-                
-                return _secheduleServiceDao.SendEMail(mail);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("ScheduleServiceDao-->SendEMail-->" + ex.Message);
-            }    
-        }
-        #endregion
+      
 
     }
 }

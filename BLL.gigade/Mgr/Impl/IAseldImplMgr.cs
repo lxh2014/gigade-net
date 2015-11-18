@@ -33,7 +33,7 @@ namespace BLL.gigade.Mgr.Impl
         int UpdScaned(Aseld m);
         string updgry(Aseld a, Dictionary<string, string> str);
 
-        DataTable GetDetailOrSimple(string type, string jobNumbers);
+        DataTable GetDetailOrSimple(string type, string jobNumbers, AseldQuery query = null);
         int UpdateScnd(Aseld ase);
         int Updwust(Aseld a);
         DataTable getTime(AseldQuery a);
