@@ -118,7 +118,7 @@ namespace BLL.gigade.Dao
                     {
                         str.AppendFormat("  return_collection_time={0},return_collection_money={1},return_poundage={2}, ", "NULL", "NULL", "NULL");
                     }
-                    if (model.return_collection_time != null && model.return_collection_time != DateTime.MinValue)
+                    if (model.invoice_date_manual != null && model.invoice_date_manual != DateTime.MinValue)
                     {
                         str.AppendFormat("  invoice_date_manual='{0}',invoice_sale_manual='{1}',invoice_tax_manual='{2}', ", Common.CommonFunction.DateTimeToString(model.invoice_date_manual), model.invoice_sale_manual, model.invoice_tax_manual);
                     }
