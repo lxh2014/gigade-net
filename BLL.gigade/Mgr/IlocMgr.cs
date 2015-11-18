@@ -201,5 +201,17 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IlocMgr-->GetLocidByHash-->" + ex.Message, ex);
             }
         }
+
+        public bool GetIlocCount(IlocQuery loc)
+        {
+            try
+            {
+                return _IocDao.GetIlocCount(loc);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IlocMgr-->GetIlocCount-->" + ex.Message, ex);
+            }
+        }
     }
 }

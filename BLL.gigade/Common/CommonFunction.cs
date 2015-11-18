@@ -1030,6 +1030,15 @@ namespace BLL.gigade.Common
             }
 
         }
+        /// <summary>
+        /// 將net時間轉化為字符串
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        public static string DateTimeToShortString(DateTime dt)
+        {
+            return dt.ToString("yyyy-MM-dd");
+        }
     }
 
 }

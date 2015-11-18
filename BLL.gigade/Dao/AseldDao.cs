@@ -586,7 +586,7 @@ LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id
             StringBuilder sql = new StringBuilder();
             StringBuilder sqlwhere = new StringBuilder();
             sql.AppendLine(@"SELECT ase.assg_id as '工作代號',CASE when ase.assg_id LIKE 'N%' THEN '常溫' WHEN ase.assg_id LIKE 'F%' THEN '冷凍' END AS '溫層',");
-            sql.AppendLine(@"SUM(out_qty) as'缺貨數量' ,CASE(commodity_type) when 2 THEN '寄倉' WHEN 3 THEN '調度' END AS '寄倉/調度',SUBSTRING(am.create_time,1,10 )as '產生時間',ase.create_dtim as '生成理貨單時間' ");
+            sql.AppendLine(@"SUM(out_qty) as'缺貨數量' ,CASE(commodity_type) when 2 THEN '寄倉' WHEN 3 THEN '調度' END AS '寄倉/調度',ase.create_dtim as '生成理貨單時間' ");
             sql.AppendLine(@" from aseld_master am INNER JOIN aseld ase on am.assg_id =ase.assg_id");
             sqlwhere.AppendLine(@" where 1=1  ");
             if (query != null)

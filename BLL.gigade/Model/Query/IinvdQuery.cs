@@ -51,6 +51,8 @@ namespace BLL.gigade.Model.Query
         public DateTime starttime { get; set; }//查詢區間日期
         public DateTime endtime { get; set; }//查詢區間日期
         public string remarks { get; set; }
+        public string spec{get;set;}
+        public int prod_qtys { get; set; }
         public string item_upc { set; get; }//料位條碼
       
         public IinvdQuery()
@@ -83,6 +85,8 @@ namespace BLL.gigade.Model.Query
             user_name = string.Empty;
             vendor_id = 0;
             remarks = string.Empty;
+            spec=string.Empty;
+            prod_qtys = 0;
             item_upc = string.Empty;
         }
     }
