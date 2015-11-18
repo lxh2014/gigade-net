@@ -30,6 +30,7 @@ namespace Admin.gigade.Controllers
         public EmailBlockListMgr _emailBlockListMgr;
         private EmailGroupMgr _emailGroupMgr;
         private static DataTable _newDt = new DataTable();
+        private ScheduleServiceMgr _secheduleServiceMgr;
         // GET: /EdmNew/
 
         #region view
@@ -1678,5 +1679,7 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
+
+        
     }
 }

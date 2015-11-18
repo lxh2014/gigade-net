@@ -63,7 +63,8 @@ AppVersionsStore.on('beforeload', function () {
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
-            Ext.getCmp("AppVersionsList").down('#DeleteBtn').setDisabled(selections.length == 0);
+            Ext.getCmp("AppVersionsList").down('#delete').setDisabled(selections.length == 0);
+            Ext.getCmp("AppVersionsList").down('#edit').setDisabled(selections.length == 0);
         }
     }
 });
@@ -153,7 +154,21 @@ Ext.onReady(function () {
             {
                 header: RELEASE_DATE, dataIndex: 'releasedateQuery', width: 100, align: 'center', menuDisabled: true, sortable: false,
                 renderer: function (val) { return val == '1970-01-01' ? "" : val; }
-            }
+            },
+             {
+                 header: RELEASESTATUS,
+                 dataIndex: 'release_type',
+                 id: 'release_status',
+                 align: 'center',
+                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                     if (value) {
+                         return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.id + ")'><img hidValue='0' id='img" + record.data.id + "' src='../../../Content/img/icons/accept.gif'/></a>";
+                     } else {
+
+                         return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.id + ")'><img hidValue='1' id='img" + record.data.id + "' src='../../../Content/img/icons/drop-no.gif'/></a>";
+                     }
+                 }
+             }
         ],
         dockedItems: [{
             dock: 'top',
@@ -186,11 +201,25 @@ Ext.onReady(function () {
             iconCls: 'ui-icon ui-icon-user-add',
             xtype: 'button',
             handler: btnAdd
-        }, {
+        },
+        {
             xtype: 'button',
             labelWidth: 50,
-            id: 'DeleteBtn',
+            id: 'edit',
+            text: EDITBTN,
+            hidden:true,
+            disabled:true,
+            iconCls: 'ui-icon ui-icon-user-edit',
+            xtype: 'button',
+            handler: btnEdit
+        }
+        ,
+        {
+            xtype: 'button',
+            labelWidth: 50,
+            id: 'delete',
             text: DELETEBTN,
+            hidden:true,
             disabled: true,
             iconCls: 'ui-icon ui-icon-user-delete',
             xtype: 'button',
@@ -267,6 +296,49 @@ function btnDelete() {
 }
 /****************刪除方法結束****************/
 //添加信息
-function btnAdd() {
-    SaveReport(null);
+btnAdd = function () {
+    SaveReport(null, AppVersionsStore);
+}
+
+btnEdit = function () {
+    var row = Ext.getCmp("AppVersionsList").getSelectionModel().getSelection();
+    if (row.length == 0) {
+        Ext.Msg.alert(INFORMATION, NO_SELECTION);
+    } else if (row.length > 1) {
+        Ext.Msg.alert(INFORMATION, ONE_SELECTION);
+    } else if (row.length == 1) {
+        SaveReport(row[0], AppVersionsStore);
+    }
+};
+//改變狀態
+function UpdateActive(id) {
+    var activeValue = $("#img" + id).attr("hidValue");
+    $.ajax({
+        url: "/AppService/UpdateAppversionsActive",
+        data: {
+            "id": id,
+            "active": activeValue
+        },
+        type: "POST",
+        dataType: "json",
+        success: function (msg) {
+            if (msg.success == "true") {
+                AppVersionsStore.removeAll();
+                AppVersionsStore.load();
+                if (activeValue == 1) {
+                    $("#img" + id).attr("hidValue", 0);
+                    $("#img" + id).attr("src", "../../../Content/img/icons/accept.gif");
+                } else {
+                    $("#img" + id).attr("hidValue", 1);
+                    $("#img" + id).attr("src", "../../../Content/img/icons/drop-no.gif");
+                }
+            }
+            else {
+                Ext.Msg.alert("提示信息", "更改失敗");
+            }
+        },
+        error: function (msg) {
+            Ext.Msg.alert(INFORMATION, FAILURE);
+        }
+    });
 }
