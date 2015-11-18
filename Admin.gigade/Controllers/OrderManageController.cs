@@ -1498,7 +1498,6 @@ namespace Admin.gigade.Controllers
         }
         #endregion
         #endregion
-
         #region 物流單
         public HttpResponseBase GetOrderDeliverInfo()
         {
@@ -1510,7 +1509,7 @@ namespace Admin.gigade.Controllers
                 query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");//用於分頁的變量
                 IOrderDeliverImplMgr _IorderDeliver = new OrderDeliverMgr(mySqlConnectionString);
-                query.serchs = Request.Params["serchs"].ToString();//查詢條件
+                query.serchs = Request.Params["serchs"].ToString().Trim();//查詢條件
                 if (Request.Params["orderid"] == "" || Request.Params["orderid"] == null)//查詢內容
                 {
                     query.order_id = 0;
@@ -1558,111 +1557,7 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
-        #region 取消單
-        #region 取消單列表
-        [CustomHandleError]
-        public HttpResponseBase GetOrderCancelMasterList()
-        {
-            List<OrderCancelMaster> stores = new List<OrderCancelMaster>();
-            string json = string.Empty;
-            try
-            {
-                int totalCount = 0;
-                OrderCancelMaster query = new OrderCancelMaster();
-                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
-                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//
-                _orderCancelMgr = new OrderCancelMasterMgr(mySqlConnectionString);
-                stores = _orderCancelMgr.GetOrderCancelMasterList(query, out totalCount);
-                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
-                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                //listUser是准备转换的对象
-                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(stores, Formatting.Indented, timeConverter) + "}";//返回json數據
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:true,totalCount:0,data:[]}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
-        #endregion
-        #region 修改取消單
-        public HttpResponseBase ModifyOrderCancelMasterList()
-        {
-            List<OrderCancelMaster> stores = new List<OrderCancelMaster>();
-            string json = string.Empty;
-            try
-            {
-                OrderCancelMaster query = new OrderCancelMaster();
-                query.order_id = Convert.ToUInt32(Request.Form["order_id"]);
-                query.cancel_id = Convert.ToUInt32(Request.Form["cancel_id"]);
-                query.cancel_status = Convert.ToUInt32(Request.Form["cancel_status"]);
-                query.cancel_note = Request.Params["cancel_note"];
-                query.bank_note = Request.Params["bank_note"];
-                query.cancel_createdate = Convert.ToDateTime(Request.Params["cancel_createdate"]);
-                query.cancel_updatedate = Convert.ToDateTime(Request.Params["cancel_updatedate"]);
-                System.Net.IPAddress[] ips = Dns.GetHostByName(Dns.GetHostName()).AddressList;
-                if (ips.Length > 0)
-                {
-                    query.cancel_ipfrom = ips[0].ToString();
-                }
-                _orderCancelMgr = new OrderCancelMasterMgr(mySqlConnectionString);
-                int result = _orderCancelMgr.Update(query);
-                string msg="";
-                switch (result)
-                {
-                    case 1:
-                        msg="bonus not enough!";
-                        break;
-                    case 2:
-                        msg = "bonus type error!";
-                        break;
-                    case 3:
-                        msg = "取得身分證字號失敗!";
-                        break;
-                    case 4:
-                        msg = "扣除HappyGo點數失敗!";
-                        break;
-                    case 5:
-                        msg = "bonus type error !";
-                        break;
-                    case 100:
-                         msg = "";//操作成功!
-                        break;
-                    default:
-                        break;
-                }
-                if (string.IsNullOrEmpty(msg))
-                {
-                    json = "{success:true}";//返回json數據
-                }
-                else 
-                {
-                    json = "{success:true,msg:\"" + msg + "\"}";
-                }
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:false,data:[]}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
-        #endregion
-        #endregion
+
         #region 品牌訂單查詢
         #region 品牌訂單查詢列表
         public HttpResponseBase GetOrderBrandProduces()
@@ -2229,7 +2124,7 @@ namespace Admin.gigade.Controllers
                 //dt.Columns.Add("電子信箱", typeof(String));
                 dt.Columns.Add("宅配代碼", typeof(String));
                 dt.Columns.Add("宅配時間", typeof(String));
-                dt.Columns.Add("商品編號", typeof(String));
+                dt.Columns.Add("商品細項編號", typeof(String));
                 dt.Columns.Add("假日可出貨", typeof(String));
                 #endregion
                 foreach (DataRow dr in dta.Rows)
@@ -2457,7 +2352,7 @@ namespace Admin.gigade.Controllers
         }
         #endregion
         #endregion
-        #region 類別營養額
+        #region 類別營業額
         public HttpResponseBase GetCategoryList()
         {
             List<CategoryQuery> stores = new List<CategoryQuery>();
@@ -2763,694 +2658,7 @@ namespace Admin.gigade.Controllers
         }
         #endregion
         #endregion
-        #region 品牌营业额统计
-        private ChannelMgr _channel;/*賣場*/
-        private VendorBrandMgr _vbrand;/*品牌*/
-        static DataTable dt;
-        #region 品牌营业额列表
-        public HttpResponseBase GetOrderRevenueList()
-        {
-            string json = string.Empty;
-            string brandserch = "是否单个查询";
-            StringBuilder sb = new StringBuilder();//查詢訂單的條件
-            StringBuilder Sbandlist = new StringBuilder();//查詢賣場和管別的條件
-            OrderBrandProducesQuery oq = new OrderBrandProducesQuery();
-            uint id; int cid;
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Params["Brand_Id"]))/*品牌編號*/
-                {
-                    oq.bid = Request.Params["Brand_Id"];
-                    if (oq.bid.Substring(0, 1) != "0")
-                    {
-                        sb.AppendFormat("and p.brand_id in ({0})", oq.bid);
-                        Sbandlist.AppendFormat("and vb.brand_id in ( {0})", oq.bid);
-                    }
-                }
-                if (uint.TryParse(Request.Params["product_manage"], out id))
-                {//獲取管理人
-                    oq.product_manage = id;
-                    if (id > 0)
-                    {
-                        sb.AppendFormat(" AND v.product_manage='{0}'", id);
-                    }
-                }
-                if (int.TryParse(Request.Params["channel"], out cid))
-                {//獲取管理人
-                    oq.channel = cid;
-                    if (cid > 0)
-                    {
-                        sb.AppendFormat(" AND om.channel='{0}'", cid);
-                    }
-                }
-                if (uint.TryParse(Request.Params["slave_status"], out id))
-                {//獲取 訂單狀態
-                    oq.slave_status = id;
-                    switch (id)
-                    {
-                        case 0:
-                            sb.AppendFormat(" and os.slave_status in(0,2,4,99,5,6)");
-                            break;
-                        default:
-                            sb.AppendFormat(" and os.slave_status={0}", id);
-                            break;
-                    }
-                }
-                if (uint.TryParse(Request.Params["order_payment"], out id))
-                {//獲取 付款方式
-                    oq.order_payment = id;
-                    if (id > 0)
-                    {
-                        sb.AppendFormat(" and om.order_payment={0}", id);
-                    }
-                }
-                if (!string.IsNullOrEmpty(Request.Params["selecttype"]))
-                {
-                    oq.selecttype = Request.Params["selecttype"].ToString();
-                }
-                if (!string.IsNullOrEmpty(Request.Params["searchcon"]))
-                {
-                    oq.searchcon = Request.Params["searchcon"].ToString();
-                    if (string.IsNullOrEmpty(oq.searchcon) && oq.searchcon != "null")
-                    {//查詢內容不為空就執行模糊查詢
-                        switch (oq.selecttype)
-                        {
-                            case "1":
-                                sb.AppendFormat(" AND od.product_name LIKE  '%{0}%'", oq.searchcon);
-                                break;
-                            case "2"://會員編號
-                                sb.AppendFormat(" AND om.user_id LIKE '%{0}%'", oq.searchcon);
-                                break;
-                            case "3":
-                                sb.AppendFormat(" om.order_name LIKE   '%{0}%'", oq.searchcon);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-                string sqlap = sb.ToString();
-                #region 日期條件
-                DateTime dtime;
-                if (DateTime.TryParse(Request.Params["dateOne"], out dtime))
-                {
-                    oq.dateOne = DateTime.Parse(dtime.ToString("yyyy-MM-dd 00:00:00"));
-                    if (oq.dateOne > DateTime.MinValue)
-                    {
-                        sb.AppendFormat(" AND om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(oq.dateOne.ToString()));
-                    }
-                }
-                if (DateTime.TryParse(Request.Params["dateTwo"], out dtime))
-                {
-                    oq.dateTwo = DateTime.Parse(dtime.ToString("yyyy-MM-dd 23:59:59"));
-                    if (oq.dateTwo > DateTime.MinValue)
-                    {
-                        sb.AppendFormat(" AND om.order_createdate <= '{0}' ", CommonFunction.GetPHPTime(oq.dateTwo.ToString()));
-                    }
-                }
-                #endregion
-                int a = 0;
-                _vbrand = new VendorBrandMgr(mySqlConnectionString);
-                _Iorderbrandproduces = new OrderBrandProducesMgr(mySqlConnectionString);
-                dt = _vbrand.GetBandList(Sbandlist.ToString());//查詢品牌列表
-                if (string.IsNullOrEmpty(brandserch))//查询所有
-                {
-                    DataTable ds = _Iorderbrandproduces.GetOrderVendorRevenuebyday(sb.ToString(), brandserch);//查詢品牌列表中的營業額，之查詢每天的
-                    #region 没有的品牌添加上
-                    foreach (DataRow item in ds.Rows)
-                    {
-                        DataRow[] rows = dt.Select("brand_id='" + item["brand_id"] + "' and vendor_id='" + item["vendor_id"] + "'");
-                        if (rows.Count() == 0)
-                        {
-                            DataRow drr = dt.NewRow();
-                            drr[0] = item["brand_id"];
-                            drr[1] = item["brand_name"];
-                            drr[2] = item["vendor_id"];
-                            drr[3] = item["vendor_name_simple"];
-                            dt.Rows.Add(drr);
-
-                        }
-                    }
-
-                    //for (int i = 0; i < dt.Rows.Count; i++)
-                    //{
-                    //    DataRow[] rows = ds.Select("brand_id='" + dt.Rows[i]["brand_id"] + "'");
-                    //    foreach (DataRow row in rows)//篩選出的最多只有一條數據，如果有，加入某個品牌的每日營業額，沒有就為初始值
-                    //    {
-                    //        if (string.IsNullOrEmpty(row["brand_id"].ToString()))
-                    //        {
-                    //            DataRow drr = dt.NewRow();
-                    //            drr[0] = dt.Rows[i]["brand_id"];
-                    //            drr[1] = dt.Rows[i]["brand_name"];
-                    //            drr[2] = dt.Rows[i]["vendor_id"];
-                    //            drr[3] = dt.Rows[i]["vendor_name_simple"];
-                    //            dt.Rows.Add(drr);
-                    //        }
-                    //    }
-                    //}
-                    #endregion
-                }
-                string q = a.ToString();
-                //去掉注释，把sbliint改成sb
-                //DateTime starttime = DateTime.Parse(dateOne);//查詢的時間範圍~~開始時間
-                //DateTime endtime = DateTime.Parse(dateTwo);//查詢的時間範圍~~結束時間
-                TimeSpan s = oq.dateTwo - oq.dateOne;//查詢的開始日期和結束日期相差的天數
-                int day = s.Days;
-
-                #region 測試方法
-                _Iorderbrandproduces = new OrderBrandProducesMgr(mySqlConnectionString);
-                DataColumn addcolms;//循環添加列每月的統計
-                DataRow addrow = dt.NewRow();//添加一行每日小計
-                addrow[3] = "每日小計";
-                int m = 0;//記錄增加了多少列，來確定每月一記的具體位置
-                int M_total = 0;//每月一記
-
-                StringBuilder html_table = new StringBuilder();//匯出html頁面
-                html_table.AppendFormat(@"<div style='overflow:auto;text-align:right;width:1650px;height:550px;'><table style='border:1px;'>");
-                html_table.AppendFormat("<tr><td>品牌名稱</td><td>供應商名稱</td>");
-
-                int startclome = 4;//設求每月之初的列的下標，初始為4/。
-                int stopclome = 3;//每個月結束的列的下標，初始為3/。
-                #region  循環每天
-
-                for (int d = 0; d <= day; d++)//查詢每天
-                {
-                    int D_bandsum = 0; //所有品牌每日的營業額
-                    string daytimes = oq.dateOne.AddDays(d).ToString("yyyy-MM-dd");//循環的每一天
-                    addcolms = new DataColumn(daytimes, typeof(String));
-                    dt.Columns.Add(addcolms);
-                    html_table.AppendFormat("<td>&nbsp;&nbsp;{0}&nbsp;&nbsp;</td>", daytimes);
-
-                    stopclome++;//加一列
-                    #region 每日一記
-                    string daytimeone = DateTime.Parse(daytimes).ToString("yyyy-MM-dd 00:00:00");//把每天轉換成初始從零點開始
-                    string daytimetwo = DateTime.Parse(daytimes).ToString("yyyy-MM-dd 23:59:59");//每天的結束時間
-                    string orderby = string.Format(" AND om.order_createdate  >= '{0}' AND om.order_createdate <= '{1}'", CommonFunction.GetPHPTime(daytimeone), CommonFunction.GetPHPTime(daytimetwo));
-                    DataTable ds = _Iorderbrandproduces.GetOrderVendorRevenuebyday(sqlap + orderby, brandserch);//查詢品牌列表中的營業額，之查詢每天的
-
-
-                    for (int i = 0; i < dt.Rows.Count; i++)//循環品牌列表,把每天的營業額追加進這個表裡
-                    {
-                        DataRow[] rows = ds.Select("brand_id='" + dt.Rows[i]["brand_id"] + "' and vendor_id='" + dt.Rows[i]["vendor_id"] + "'");//篩選出一個品牌的這個時間段的營業額
-                        dt.Rows[i][daytimes] = 0;//單個品牌每日的營業額先賦初始值為0
-                        foreach (DataRow row in rows)//篩選出的最多只有一條數據，如果有，加入某個品牌的每日營業額，沒有就為初始值
-                        {
-                            if (!string.IsNullOrEmpty(row["order_createdate"].ToString()))
-                            {
-                                string tb_createdate = CommonFunction.GetNetTime(long.Parse(rows[0]["order_createdate"].ToString())).ToString("yyyy-MM-dd");
-
-                                dt.Rows[i][daytimes] = int.Parse(rows[0]["subtotal"].ToString());
-                                D_bandsum = D_bandsum + int.Parse(rows[0]["subtotal"].ToString());
-                            }
-                        }
-                    }
-                    #endregion
-                    #region 是否添加每月小計
-
-                    addrow[4 + d + m] = D_bandsum;
-                    M_total = M_total + D_bandsum;
-                    if (oq.dateOne.Month != oq.dateTwo.Month || oq.dateOne.Year != oq.dateTwo.Year)//開始時間和結束時間不是在同一個月
-                    {
-                        DateTime days = DateTime.Parse(daytimes);
-                        int t = DateTime.DaysInMonth(days.Year, days.Month);//一個月多少天
-                        if (t == days.Day || d == day)//現在這個月的月底
-                        {
-                            addcolms = new DataColumn(days.Month + "月小計", typeof(String));//style='float:left;width:500px'
-                            dt.Columns.Add(addcolms);
-                            html_table.AppendFormat("<td ><font color='red'>&nbsp;&nbsp;&nbsp;&nbsp;{0}月小計&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></td>", days.Month);
-                            m++;
-                            foreach (DataRow item in dt.Rows)
-                            {
-                                item[stopclome + 1] = 0;//每月總計賦初始值
-                                for (int i = startclome; i <= stopclome; i++)//每個品牌的每月總計
-                                {
-                                    item[stopclome + 1] = int.Parse(item[stopclome + 1].ToString()) + int.Parse(item[i].ToString());
-                                }
-                            }
-                            addrow[stopclome + 1] = M_total;
-                            startclome = stopclome + 2;
-                            stopclome++;
-                            M_total = 0;
-                        }
-                    }
-                    #endregion
-                }
-                #endregion
-                dt.Rows.InsertAt(addrow, 0);//添加一行總計
-                #region  品牌總計
-                addcolms = new DataColumn("品牌總計", typeof(String));
-                html_table.AppendFormat("<td><font color='red'>品牌總計</font></td></tr>");
-                dt.Columns.Add(addcolms);
-                int S_total = 0;//所有品牌的總計
-                DataTable dstable = _Iorderbrandproduces.GetOrderVendorRevenuebyday(sb.ToString(), brandserch);//查詢品牌列表中的營業額
-                for (int i = 1; i < dt.Rows.Count; i++)
-                {
-                    int Aull_bandSum = 0;//每個商品的開始時間和結束時間的總計
-                    DataRow[] rows = dstable.Select("brand_id='" + dt.Rows[i]["brand_id"] + "' and vendor_id='" + dt.Rows[i]["vendor_id"] + "'");//篩選出一個品牌的這個時間段的營業額
-                    foreach (DataRow row in rows)
-                    {
-                        if (!string.IsNullOrEmpty(row["subtotal"].ToString()))
-                        {
-                            Aull_bandSum = Aull_bandSum + int.Parse(row["subtotal"].ToString());
-                        }
-                        S_total = S_total + Aull_bandSum;
-                    }
-                    dt.Rows[i]["品牌總計"] = Aull_bandSum;
-                }
-                dt.Rows[0]["品牌總計"] = S_total;
-                #endregion
-                #endregion
-                #region  要查詢的列表,匯成一張table
-                dt.Columns.RemoveAt(2);//移除多餘的列，供應商編號
-                dt.Columns.RemoveAt(0);//移除多餘的列，品牌編號
-                dt.Columns[0].ColumnName = "品牌名稱";
-                dt.Columns[1].ColumnName = "供應商名稱";
-                for (int x = 0; x < dt.Rows.Count; x++)
-                {
-                    html_table.AppendFormat("<tr>");
-                    for (int y = 0; y < dt.Columns.Count; y++)
-                    {
-                        if (dt.Columns[y].ColumnName.ToString().IndexOf("月小計") > 0 || dt.Columns[y].ColumnName.ToString() == "品牌總計")
-                        {
-                            html_table.AppendFormat("<td style='text-align:right'>&nbsp;&nbsp;<font color='red'>{0}</font>&nbsp;&nbsp;</td>", dt.Rows[x][y]);
-                        }
-                        else
-                        {
-                            html_table.AppendFormat("<td style='text-align:right'>&nbsp;&nbsp;{0}&nbsp;&nbsp;</td>", dt.Rows[x][y]);
-                        }
-
-                        if (y == dt.Columns.Count - 1)
-                        {
-                            html_table.AppendFormat("</tr>");
-                        }
-                    }
-                }
-                html_table.AppendFormat(@"</table></div>");
-                #endregion
-                string n = html_table.ToString();
-                json = "{success:true,msg:\"" + html_table.ToString() + "\"}";
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:false,totalCount:0,data:[]}";
-
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-
-
-        }
-        //加購物金欄位
-        public HttpResponseBase GetOrderRevenue()
-        {
-            string json = string.Empty;
-            string brandserch = "是否单个查询";
-            StringBuilder sb = new StringBuilder();//查詢訂單的條件
-            StringBuilder Sbandlist = new StringBuilder();//查詢賣場和管別的條件
-            OrderBrandProducesQuery oq = new OrderBrandProducesQuery();
-            uint id; int cid;
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Params["Brand_Id"]))/*品牌編號*/
-                {
-                    oq.bid = Request.Params["Brand_Id"];
-                    if (oq.bid.Substring(0, 1) != "0")
-                    {
-                        sb.AppendFormat("and p.brand_id in ({0})", oq.bid);
-                        Sbandlist.AppendFormat("and vb.brand_id in ( {0})", oq.bid);
-                    }
-                }
-                if (uint.TryParse(Request.Params["product_manage"], out id))
-                {//獲取管理人
-                    oq.product_manage = id;
-                    if (id > 0)
-                    {
-                        sb.AppendFormat(" AND v.product_manage='{0}'", id);
-                    }
-                }
-                if (int.TryParse(Request.Params["channel"], out cid))
-                {//獲取管理人
-                    oq.channel = cid;
-                    if (cid > 0)
-                    {
-                        sb.AppendFormat(" AND om.channel='{0}'", cid);
-                    }
-                }
-                if (uint.TryParse(Request.Params["slave_status"], out id))
-                {//獲取 訂單狀態
-                    oq.slave_status = id;
-                    switch (id)
-                    {
-                        case 0:
-                            sb.AppendFormat(" and os.slave_status in(0,2,4,99,5,6)");
-                            break;
-                        default:
-                            sb.AppendFormat(" and os.slave_status={0}", id);
-                            break;
-                    }
-                }
-                if (uint.TryParse(Request.Params["order_payment"], out id))
-                {//獲取 付款方式
-                    oq.order_payment = id;
-                    if (id > 0)
-                    {
-                        sb.AppendFormat(" and om.order_payment={0}", id);
-                    }
-                }
-                if (!string.IsNullOrEmpty(Request.Params["selecttype"]))
-                {
-                    oq.selecttype = Request.Params["selecttype"].ToString();
-                }
-                if (!string.IsNullOrEmpty(Request.Params["searchcon"]))
-                {
-                    oq.searchcon = Request.Params["searchcon"].ToString();
-                    if (string.IsNullOrEmpty(oq.searchcon) && oq.searchcon != "null")
-                    {//查詢內容不為空就執行模糊查詢
-                        switch (oq.selecttype)
-                        {
-                            case "1":
-                                sb.AppendFormat(" AND od.product_name LIKE  '%{0}%'", oq.searchcon);
-                                break;
-                            case "2"://會員編號
-                                sb.AppendFormat(" AND om.user_id LIKE '%{0}%'", oq.searchcon);
-                                break;
-                            case "3":
-                                sb.AppendFormat(" om.order_name LIKE   '%{0}%'", oq.searchcon);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-                string sqlap = sb.ToString();
-                #region 日期條件
-                DateTime dtime;
-                if (DateTime.TryParse(Request.Params["dateOne"], out dtime))
-                {
-                    oq.dateOne = DateTime.Parse(dtime.ToString("yyyy-MM-dd 00:00:00"));
-                    if (oq.dateOne > DateTime.MinValue)
-                    {
-                        sb.AppendFormat(" AND om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(oq.dateOne.ToString()));
-                    }
-                }
-                if (DateTime.TryParse(Request.Params["dateTwo"], out dtime))
-                {
-                    oq.dateTwo = DateTime.Parse(dtime.ToString("yyyy-MM-dd 23:59:59"));
-                    if (oq.dateTwo > DateTime.MinValue)
-                    {
-                        sb.AppendFormat(" AND om.order_createdate <= '{0}' ", CommonFunction.GetPHPTime(oq.dateTwo.ToString()));
-                    }
-                }
-                #endregion
-                int a = 0;
-                _vbrand = new VendorBrandMgr(mySqlConnectionString);
-                _Iorderbrandproduces = new OrderBrandProducesMgr(mySqlConnectionString);
-                dt = _vbrand.GetBandList(Sbandlist.ToString());//查詢品牌列表
-                if (string.IsNullOrEmpty(brandserch))//查询所有
-                {
-                    DataTable ds = _Iorderbrandproduces.GetOrderVendorRevenuebyday(sb.ToString(), brandserch);//查詢品牌列表中的營業額，之查詢每天的
-                    #region 没有的品牌添加上
-                    foreach (DataRow item in ds.Rows)
-                    {
-                        DataRow[] rows = dt.Select("brand_id='" + item["brand_id"] + "' and vendor_id='" + item["vendor_id"] + "'");
-                        if (rows.Count() == 0)
-                        {
-                            DataRow drr = dt.NewRow();
-                            drr[0] = item["brand_id"];
-                            drr[1] = item["brand_name"];
-                            drr[2] = item["vendor_id"];
-                            drr[3] = item["vendor_name_simple"];
-                            dt.Rows.Add(drr);
-                        }
-                    }
-                    #endregion
-                }
-                string q = a.ToString();
-                TimeSpan s = oq.dateTwo - oq.dateOne;//查詢的開始日期和結束日期相差的天數
-                int day = s.Days;
-
-                #region 測試方法
-                _Iorderbrandproduces = new OrderBrandProducesMgr(mySqlConnectionString);
-                DataColumn addcolms;//循環添加列每月的統計
-                DataRow addrow = dt.NewRow();//添加一行每日小計
-                addrow[3] = "每日小計";
-                int m = 0;//記錄增加了多少列，來確定每月一記的具體位置
-                int M_total = 0;//每月一記
-
-                StringBuilder html_table = new StringBuilder();//匯出html頁面
-                html_table.AppendFormat(@"<div style='overflow:auto;text-align:right;width:1650px;height:550px;'><table style='border:1px;'>");
-                html_table.AppendFormat("<tr><td>品牌名稱</td><td>供應商名稱</td>");
-
-                int startclome = 4;//設求每月之初的列的下標，初始為4/。
-                int stopclome = 3;//每個月結束的列的下標，初始為3/。
-                #region  循環每天
-
-                for (int d = 0; d <= day; d++)//查詢每天
-                {
-                    int D_bandsum = 0; //所有品牌每日的營業額
-                    string daytimes = oq.dateOne.AddDays(d).ToString("yyyy-MM-dd");//循環的每一天
-                    addcolms = new DataColumn(daytimes, typeof(String));
-                    dt.Columns.Add(addcolms);
-                    html_table.AppendFormat("<td>&nbsp;&nbsp;{0}&nbsp;&nbsp;</td>", daytimes);
-
-                    stopclome++;//加一列
-                    #region 每日一記
-                    string daytimeone = DateTime.Parse(daytimes).ToString("yyyy-MM-dd 00:00:00");//把每天轉換成初始從零點開始
-                    string daytimetwo = DateTime.Parse(daytimes).ToString("yyyy-MM-dd 23:59:59");//每天的結束時間
-                    string orderby = string.Format(" AND om.order_createdate  >= '{0}' AND om.order_createdate <= '{1}'", CommonFunction.GetPHPTime(daytimeone), CommonFunction.GetPHPTime(daytimetwo));
-                    DataTable ds = _Iorderbrandproduces.GetOrderVendorRevenuebyday(sqlap + orderby, brandserch);//查詢品牌列表中的營業額，之查詢每天的
-
-
-                    for (int i = 0; i < dt.Rows.Count; i++)//循環品牌列表,把每天的營業額追加進這個表裡
-                    {
-                        DataRow[] rows = ds.Select("brand_id='" + dt.Rows[i]["brand_id"] + "' and vendor_id='" + dt.Rows[i]["vendor_id"] + "'");//篩選出一個品牌的這個時間段的營業額
-                        dt.Rows[i][daytimes] = 0;//單個品牌每日的營業額先賦初始值為0
-                        foreach (DataRow row in rows)//篩選出的最多只有一條數據，如果有，加入某個品牌的每日營業額，沒有就為初始值
-                        {
-                            if (!string.IsNullOrEmpty(row["order_createdate"].ToString()))
-                            {
-                                string tb_createdate = CommonFunction.GetNetTime(long.Parse(rows[0]["order_createdate"].ToString())).ToString("yyyy-MM-dd");
-
-                                dt.Rows[i][daytimes] = int.Parse(rows[0]["subtotal"].ToString());
-                                D_bandsum = D_bandsum + int.Parse(rows[0]["subtotal"].ToString());
-                            }
-                        }
-                    }
-                    #endregion
-                    #region 是否添加每月小計
-
-                    addrow[4 + d + m] = D_bandsum;
-                    M_total = M_total + D_bandsum;
-                    if (oq.dateOne.Month != oq.dateTwo.Month || oq.dateOne.Year != oq.dateTwo.Year)//開始時間和結束時間不是在同一個月
-                    {
-                        DateTime days = DateTime.Parse(daytimes);
-                        int t = DateTime.DaysInMonth(days.Year, days.Month);//一個月多少天
-                        if (t == days.Day || d == day)//現在這個月的月底
-                        {
-                            addcolms = new DataColumn(days.Month + "月小計", typeof(String));//style='float:left;width:500px'
-                            dt.Columns.Add(addcolms);
-                            html_table.AppendFormat("<td ><font color='red'>&nbsp;&nbsp;&nbsp;&nbsp;{0}月小計&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></td>", days.Month);
-                            m++;
-                            foreach (DataRow item in dt.Rows)
-                            {
-                                item[stopclome + 1] = 0;//每月總計賦初始值
-                                for (int i = startclome; i <= stopclome; i++)//每個品牌的每月總計
-                                {
-                                    item[stopclome + 1] = int.Parse(item[stopclome + 1].ToString()) + int.Parse(item[i].ToString());
-                                }
-                            }
-                            addrow[stopclome + 1] = M_total;
-                            startclome = stopclome + 2;
-                            stopclome++;
-                            M_total = 0;
-                        }
-                    }
-                    #endregion
-                }
-                #endregion
-                dt.Rows.InsertAt(addrow, 0);//添加一行總計
-                #region  品牌總計
-                addcolms = new DataColumn("品牌總計", typeof(String));
-                html_table.AppendFormat("<td><font color='red'>品牌總計</font></td></tr>");
-                dt.Columns.Add(addcolms);
-                int S_total = 0;//所有品牌的總計
-                DataTable dstable = _Iorderbrandproduces.GetOrderVendorRevenuebyday(sb.ToString(), brandserch);//查詢品牌列表中的營業額
-                for (int i = 1; i < dt.Rows.Count; i++)
-                {
-                    int Aull_bandSum = 0;//每個商品的開始時間和結束時間的總計
-                    DataRow[] rows = dstable.Select("brand_id='" + dt.Rows[i]["brand_id"] + "' and vendor_id='" + dt.Rows[i]["vendor_id"] + "'");//篩選出一個品牌的這個時間段的營業額
-                    foreach (DataRow row in rows)
-                    {
-                        if (!string.IsNullOrEmpty(row["subtotal"].ToString()))
-                        {
-                            Aull_bandSum = Aull_bandSum + int.Parse(row["subtotal"].ToString());
-                        }
-                        S_total = S_total + Aull_bandSum;
-                    }
-                    dt.Rows[i]["品牌總計"] = Aull_bandSum;
-                }
-                dt.Rows[0]["品牌總計"] = S_total;
-                #endregion
-                #endregion
-                #region  要查詢的列表,匯成一張table
-                dt.Columns.RemoveAt(2);//移除多餘的列，供應商編號
-                dt.Columns.RemoveAt(0);//移除多餘的列，品牌編號
-                dt.Columns[0].ColumnName = "品牌名稱";
-                dt.Columns[1].ColumnName = "供應商名稱";
-                for (int x = 0; x < dt.Rows.Count; x++)
-                {
-                    html_table.AppendFormat("<tr>");
-                    for (int y = 0; y < dt.Columns.Count; y++)
-                    {
-                        if (dt.Columns[y].ColumnName.ToString().IndexOf("月小計") > 0 || dt.Columns[y].ColumnName.ToString() == "品牌總計")
-                        {
-                            html_table.AppendFormat("<td style='text-align:right'>&nbsp;&nbsp;<font color='red'>{0}</font>&nbsp;&nbsp;</td>", dt.Rows[x][y]);
-                        }
-                        else
-                        {
-                            html_table.AppendFormat("<td style='text-align:right'>&nbsp;&nbsp;{0}&nbsp;&nbsp;</td>", dt.Rows[x][y]);
-                        }
-
-                        if (y == dt.Columns.Count - 1)
-                        {
-                            html_table.AppendFormat("</tr>");
-                        }
-                    }
-                }
-
-                html_table.AppendFormat(@"</table></div>");
-                #endregion
-                string n = html_table.ToString();
-                json = "{success:true,msg:\"" + html_table.ToString() + "\"}";
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:false,totalCount:0,data:[]}";
-
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
-
-        #endregion
-        #region 賣場列表
-        public HttpResponseBase GetChannel()/*賣場列表*/
-        {
-            _channel = new ChannelMgr(mySqlConnectionString);
-            List<Channel> stores = new List<Channel>();
-            string json = string.Empty;
-            try
-            {
-                stores = _channel.QueryList();
-                //Channel channel = new Channel();
-                //channel.channel_name_simple = "全部";
-                //stores.Insert(0, channel);
-                json = "{success:true,data:" + JsonConvert.SerializeObject(stores) + "}";//返回json數據
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:true,totalCount:0,data:[]}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
-
-        #endregion
-        public HttpResponseBase GetVendorBand()/*品牌列表*/
-        {
-            VendorBrand vb = new VendorBrand();
-            _vbrand = new VendorBrandMgr(mySqlConnectionString);
-            List<VendorBrand> stores = new List<VendorBrand>();
-            string json = string.Empty;
-            try
-            {
-                DataTable dt = _vbrand.GetBandList("");
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    vb = new VendorBrand();
-                    vb.Brand_Id = uint.Parse(dt.Rows[i]["brand_id"].ToString());
-                    vb.Brand_Name = dt.Rows[i]["brand_name"].ToString();
-                    stores.Add(vb);
-                }
-                json = "{success:true,data:" + JsonConvert.SerializeObject(stores) + "}";//返回json數據
-
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:true,totalCount:0,data:[]}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
-        #region 品牌營業額匯出excel
-        public void Export()
-        {
-            string newExcelName = string.Empty;
-            if (!System.IO.Directory.Exists(Server.MapPath(excelPath)))
-            {
-                System.IO.Directory.CreateDirectory(Server.MapPath(excelPath));
-            }
-            try
-            {
-                string[] colname = new string[dt.Columns.Count];
-                string filename = "order_vendor_revenue.csv";
-                newExcelName = Server.MapPath(excelPath) + filename;
-                for (int i = 0; i < dt.Columns.Count; i++)
-                {
-                    colname[i] = dt.Columns[i].ColumnName;
-                }
-                if (System.IO.File.Exists(newExcelName))
-                {
-                    System.IO.File.Delete(newExcelName);
-                }
-                //CsvHelper.ExportDataTableToCsv(dt, newExcelName, colname, true);
-                if (dt.Rows.Count > 0)
-                {
-                    string fileName = "品牌營業額_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
-                    MemoryStream ms = ExcelHelperXhf.ExportDT(dt, "品牌營業額_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
-                    Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
-                    Response.BinaryWrite(ms.ToArray());
-                }
-                else
-                {
-                    Response.Write("匯出數據不存在");
-                }
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-            }
-        }
-
-        #endregion
-        #endregion
+        
         #region 重寫品牌營業額統計
 
         public HttpResponseBase GetNewOrderRevenueList()
@@ -4930,62 +4138,291 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
-
-        #endregion
-        #region 促銷減免查詢
-        #region 促銷減免查詢列表頁
-        public HttpResponseBase GetOrderUserReduce()
+        #region 會計報表
+        public void ExportReport()
         {
-            string json = string.Empty;
-            List<PromotionsAmountReduceMemberQuery> store = new List<PromotionsAmountReduceMemberQuery>();
-            PromotionsAmountReduceMemberQuery query = new PromotionsAmountReduceMemberQuery();
+            List<OrderMasterQuery> stores = new List<OrderMasterQuery>();
+            OrderMasterQuery query = new OrderMasterQuery();
+            DateTime dtime;
+            string payment = string.Empty;
+            string order_status = string.Empty;
+            string detail_status = string.Empty;
+            string product_mode = string.Empty;
             try
             {
-                int totalCount = 0;
-                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
-                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
-                if (!string.IsNullOrEmpty(Request.Params["select_type"]))//查詢條件
+                _orderMasterMgr = new OrderMasterMgr(mySqlConnectionString);
+                #region 查詢條件
+                string dateOne = Request.Params["dateOne"];
+                string dateTwo = Request.Params["dateTwo"];
+                if (DateTime.TryParse(Request.Params["dateOne"].ToString(), out dtime))//開始時間
                 {
-                    query.select_type = Request.Params["select_type"];
+                    query.datestart = dtime;
                 }
-                if (!string.IsNullOrEmpty(Request.Params["search_con"]))//查詢內容
+                if (DateTime.TryParse(Request.Params["dateTwo"].ToString(), out dtime))
                 {
-                    query.search_con = Request.Params["search_con"];
+                    query.dateend = dtime;
                 }
-                if (!string.IsNullOrEmpty(Request.Params["reduce_id"]))
-                {
-                    query.reduce_id = Convert.ToInt32(Request.Params["reduce_id"]);
-                }
-                if (!string.IsNullOrEmpty(Request.Params["date"]))
-                {
-                    query.search_date = Convert.ToInt32(Request.Params["date"]);
-                }
-                if (!string.IsNullOrEmpty(Request.Params["start_time"]))
-                {
-                    query.start_time = Convert.ToDateTime(Request.Params["start_time"]);
-                }
-                if (!string.IsNullOrEmpty(Request.Params["end_time"]))
-                {
-                    query.end_time = Convert.ToDateTime(Request.Params["end_time"]);
-                }
-                if (!string.IsNullOrEmpty(Request.Params["group_id"]))
-                {
-                    query.group_id = Convert.ToInt32(Request.Params["group_id"]);
-                }
-                if (!string.IsNullOrEmpty(Request.Params["type"]))
-                {
-                    query.type = Convert.ToInt32(Request.Params["type"]);
-                }
-                _IOrderUserMgr = new OrderUserReduceMgr(mySqlConnectionString);
-                store = _IOrderUserMgr.GetOrderUserReduce(query, out totalCount);
-                foreach (var item in store)
-                {
 
-                    item.suser_reg_date = CommonFunction.GetNetTime(item.user_reg_date);
+                #endregion
+                DataTable dtHZ = new DataTable();
+                dtHZ.Columns.Add("會員姓名", typeof(String));
+                dtHZ.Columns.Add("購買時間", typeof(String));
+                dtHZ.Columns.Add("付款單號", typeof(String));
+                dtHZ.Columns.Add("付款方式", typeof(String));
+                dtHZ.Columns.Add("購買金額", typeof(String));
+                dtHZ.Columns.Add("付款狀態", typeof(String));
+                dtHZ.Columns.Add("發票號碼", typeof(String));
+                dtHZ.Columns.Add("發票金額", typeof(String));
+                dtHZ.Columns.Add("發票開立日期", typeof(String));
+                dtHZ.Columns.Add("商品細項編號", typeof(String));
+                dtHZ.Columns.Add("訂單狀態", typeof(String));
+                dtHZ.Columns.Add("供應商", typeof(String));
+                dtHZ.Columns.Add("供應商編碼", typeof(String));
+                dtHZ.Columns.Add("品名", typeof(String));
+                dtHZ.Columns.Add("數量", typeof(String));
+                dtHZ.Columns.Add("購買單價", typeof(String));
+                dtHZ.Columns.Add("折抵購物金", typeof(String));
+                dtHZ.Columns.Add("抵用卷", typeof(String));
+                dtHZ.Columns.Add("總價", typeof(String));
+                dtHZ.Columns.Add("成本單價", typeof(String));
+                dtHZ.Columns.Add("寄倉費", typeof(String));
+                dtHZ.Columns.Add("成本總額", typeof(String));
+                dtHZ.Columns.Add("出貨單歸檔期", typeof(String));
+                dtHZ.Columns.Add("負責PM", typeof(String));
+                dtHZ.Columns.Add("來源ID", typeof(String));
+                dtHZ.Columns.Add("來源名稱", typeof(String));
+                dtHZ.Columns.Add("出貨方式", typeof(String));
+                DataTable _dt = _orderMasterMgr.OrderSerchExport(query);
+                for (int i = 0; i < _dt.Rows.Count; i++)
+                {
+                    DataRow row = dtHZ.NewRow();
+                    row["會員姓名"] = _dt.Rows[i]["user_name"];
+                    row["購買時間"] =Convert.ToDateTime(_dt.Rows[i]["order_createdate"]).ToString("yyyy-MM-dd HH:mm:ss");
+                    row["付款單號"] = _dt.Rows[i]["order_id"];
+                    #region 付款方式
+                    if (_dt.Rows[i]["order_payment"] != "")
+                    {
+                        int n = 1;
+                        if (int.TryParse(_dt.Rows[i]["order_payment"].ToString(), out n))
+                        {
+                        row["付款方式"] = _orderMasterMgr.GetParaByPayment(Convert.ToInt32(_dt.Rows[i]["order_payment"].ToString()));
+                        payment = row["付款方式"].ToString();
+                        }
+                        else
+                        {
+                            row["付款方式"] = "未知";
+                        }
+                    }
+                    else
+                    {
+                        row["付款方式"] = "";
+                    }
+                    #endregion
+                    row["購買金額"] = _dt.Rows[i]["order_amount"];
+                    #region 付款狀態
+                    if (_dt.Rows[i]["order_status"] != "")
+                    {
+                        int n = 1;
+                        if (int.TryParse(_dt.Rows[i]["order_status"].ToString(), out n))
+                        {
+                            row["付款狀態"] = _orderMasterMgr.GetPara("order_status", Convert.ToInt32(_dt.Rows[i]["order_status"].ToString()));
+                            order_status = row["付款狀態"].ToString();
+                        }
+                        else
+                        {
+                            row["付款狀態"] = "";
+                        }
+                    }
+                    else
+                    {
+                        row["付款狀態"] = "";
+                    }
+                    #endregion
+                    row["發票金額"] = _dt.Rows[i]["total_amount"];
+                    
+                    if ( Convert.IsDBNull(_dt.Rows[i]["invoice_date"]))
+                    {
+                        row["發票開立日期"] = "1970-01-01 08:00:00";
+                        row["發票號碼"] = "0";
+                    }
+                    else
+                    {
+                        row["發票開立日期"] = Convert.ToDateTime(_dt.Rows[i]["invoice_date"]).ToString("yyyy-MM-dd HH:mm:ss");
+                        row["發票號碼"] = _dt.Rows[i]["invoice_number"];
+                    }
+                    row["商品細項編號"] = _dt.Rows[i]["item_id"];
+                    #region 訂單狀態
+                    if (_dt.Rows[i]["detail_status"] != "")
+                    {
+                        int n = 1;
+                        if (int.TryParse(_dt.Rows[i]["detail_status"].ToString(), out n))
+                        {
+                            row["訂單狀態"] = _orderMasterMgr.GetPara("order_status", Convert.ToInt32(_dt.Rows[i]["detail_status"].ToString()));
+                            detail_status = row["訂單狀態"].ToString();
+                        }
+                        else
+                        {
+                            row["訂單狀態"] = "";
+                        }
+                    }
+                    else
+                    {
+                        row["訂單狀態"] = "";
+                    }
+                    #endregion
+                    row["供應商"] = _dt.Rows[i]["vendor_name_simple"];
+                    row["供應商編碼"] = _dt.Rows[i]["vendor_code"];
+                    row["品名"] = _dt.Rows[i]["product_name"];
+                    row["數量"] = _dt.Rows[i]["buy_num"];
+                    row["購買單價"] = _dt.Rows[i]["single_money"];
+                    row["折抵購物金"] = _dt.Rows[i]["deduct_bonus"];
+                    row["抵用卷"] = _dt.Rows[i]["deduct_welfare"];
+                    row["總價"] =( Convert.ToInt32(_dt.Rows[i]["total_money"]) - (Convert.ToInt32(_dt.Rows[i]["deduct_bonus"]) + Convert.ToInt32(_dt.Rows[i]["deduct_welfare"]))).ToString(); 
+                    row["成本單價"] = _dt.Rows[i]["single_cost"]; 
+                    row["寄倉費"] = _dt.Rows[i]["bag_check_money"];
+                    row["成本總額"] = (Convert.ToInt32(_dt.Rows[i]["total_cost"]) - (Convert.ToInt32(_dt.Rows[i]["bag_check_money"])));
+                    if ( Convert.ToDateTime(_dt.Rows[i]["slave_date_close"]).ToString("yyyy-MM-dd HH:mm:ss") == "1970-01-01 08:00:00")
+                    {
+                        row["出貨單歸檔期"] = "未歸檔";
+                    }
+                    else
+                    {
+                        row["出貨單歸檔期"] = _dt.Rows[i]["slave_date_close"];
+                    }
+                    //1970-01-01 08:00:00
+                    row["負責PM"] = _dt.Rows[i]["pm"];//todo
+                    row["來源ID"] = _dt.Rows[i]["ID"];
+                    row["來源名稱"] = _dt.Rows[i]["group_name"];
+                    #region 出貨方式
+                    if (_dt.Rows[i]["product_mode"] != "")
+                    {
+                        int n = 1;
+                        if (int.TryParse(_dt.Rows[i]["product_mode"].ToString(), out n))
+                        {
+                            row["出貨方式"] = _orderMasterMgr.GetPara("product_mode", Convert.ToInt32(_dt.Rows[i]["product_mode"].ToString()));
+                            product_mode = row["出貨方式"].ToString();
+                        }
+                        else
+                        {
+                            row["出貨方式"] = "未知";
+                        }
+                    }
+                    else
+                    {
+                        row["出貨方式"] = "";
+                    }
+                    #endregion
+                    dtHZ.Rows.Add(row);
+                    DataTable _dtFreight=_orderMasterMgr.GetOrderFreight(Convert.ToUInt32(_dt.Rows[i]["order_id"]));
+                    if (_dtFreight != null && _dtFreight.Rows.Count > 0)
+                    {
+                        #region 常溫運費
+                        if (Convert.ToInt32(_dtFreight.Rows[0][0]) != 0)//常溫運費
+                        {
+                            DataRow rowNormal = dtHZ.NewRow();
+                            rowNormal["會員姓名"] = _dt.Rows[i]["user_name"];
+                            rowNormal["購買時間"] = Convert.ToDateTime(_dt.Rows[i]["order_createdate"]).ToString("yyyy-MM-dd HH:mm:ss");
+                            rowNormal["付款單號"] = _dt.Rows[i]["order_id"];
+                            rowNormal["付款方式"] = payment;
+                            rowNormal["購買金額"] = _dt.Rows[i]["order_amount"];
+                            rowNormal["付款狀態"] = order_status;
+                            rowNormal["發票金額"] = _dt.Rows[i]["total_amount"];
+
+                           if (Convert.IsDBNull(_dt.Rows[i]["invoice_date"]))
+                           {
+                               rowNormal["發票開立日期"] = "1970-01-01 08:00:00";
+                               rowNormal["發票號碼"] = "0";
+                           }
+                           else
+                           {
+                               rowNormal["發票開立日期"] = Convert.ToDateTime(_dt.Rows[i]["invoice_date"]).ToString("yyyy-MM-dd HH:mm:ss");
+                               rowNormal["發票號碼"] = _dt.Rows[i]["invoice_number"];
+                           }
+                           rowNormal["商品細項編號"] = "G00001";
+                           rowNormal["訂單狀態"] = "";
+                           rowNormal["供應商"] = "";
+                           rowNormal["供應商編碼"] ="";
+                           rowNormal["品名"] = "常溫運費";
+                           rowNormal["數量"] = "1";
+                           rowNormal["購買單價"] = _dtFreight.Rows[0][0];
+                           rowNormal["折抵購物金"] = "";
+                           rowNormal["抵用卷"] = "";
+                           rowNormal["總價"] = _dtFreight.Rows[0][0];
+                           rowNormal["成本單價"] = "";
+                           rowNormal["寄倉費"] = "";
+                           rowNormal["成本總額"] = "";
+                           if (Convert.ToDateTime(_dt.Rows[i]["slave_date_close"]).ToString("yyyy-MM-dd HH:mm:ss") == "1970-01-01 08:00:00")
+                           {
+                               rowNormal["出貨單歸檔期"] = "未歸檔";
+                           }
+                           else
+                           {
+                               rowNormal["出貨單歸檔期"] = _dt.Rows[i]["slave_date_close"];
+                           }
+                           //1970-01-01 08:00:00
+                           rowNormal["負責PM"] = "";//todo
+                           rowNormal["來源ID"] = "";
+                           rowNormal["來源名稱"] = "";
+                           rowNormal["出貨方式"] = "";
+                           dtHZ.Rows.Add(rowNormal);
+                        }
+                        #endregion
+                        #region 低溫運費
+                        if (Convert.ToInt32(_dtFreight.Rows[0][1]) != 0)//低溫運費
+                        {
+                            DataRow rowLow = dtHZ.NewRow();
+                            rowLow["會員姓名"] = _dt.Rows[i]["user_name"];
+                            rowLow["購買時間"] = Convert.ToDateTime(_dt.Rows[i]["order_createdate"]).ToString("yyyy-MM-dd HH:mm:ss");
+                            rowLow["付款單號"] = _dt.Rows[i]["order_id"];
+                            rowLow["付款方式"] = payment;
+                            rowLow["購買金額"] = _dt.Rows[i]["order_amount"];
+                            rowLow["付款狀態"] = order_status;
+                            rowLow["發票金額"] = _dt.Rows[i]["total_amount"];
+
+                            if (Convert.IsDBNull(_dt.Rows[i]["invoice_date"]))
+                            {
+                                rowLow["發票開立日期"] = "1970-01-01 08:00:00";
+                                rowLow["發票號碼"] = "0";
+                            }
+                            else
+                            {
+                                rowLow["發票開立日期"] = Convert.ToDateTime(_dt.Rows[i]["invoice_date"]).ToString("yyyy-MM-dd HH:mm:ss");
+                                rowLow["發票號碼"] = _dt.Rows[i]["invoice_number"];
+                            }
+                            rowLow["商品細項編號"] = "G00002";
+                            rowLow["訂單狀態"] = "";
+                            rowLow["供應商"] = "";
+                            rowLow["供應商編碼"] ="";
+                            rowLow["品名"] = "低溫運費";
+                            rowLow["數量"] = "1";
+                            rowLow["購買單價"] = _dtFreight.Rows[0][1];
+                            rowLow["折抵購物金"] = "";
+                            rowLow["抵用卷"] = "";
+                            rowLow["總價"] = _dtFreight.Rows[0][1];
+                            rowLow["成本單價"] = "";
+                            rowLow["寄倉費"] = "";
+                            rowLow["成本總額"] = "";
+                            if (Convert.ToDateTime(_dt.Rows[i]["slave_date_close"]).ToString("yyyy-MM-dd HH:mm:ss") == "1970-01-01 08:00:00")
+                            {
+                                rowLow["出貨單歸檔期"] = "未歸檔";
+                            }
+                            else
+                            {
+                                rowLow["出貨單歸檔期"] = _dt.Rows[i]["slave_date_close"];
+                            }
+                            rowLow["負責PM"] = "";
+                            rowLow["來源ID"] = "";
+                            rowLow["來源名稱"] = "";
+                            rowLow["出貨方式"] = "";
+                            dtHZ.Rows.Add(rowLow);
+                        }
+                        #endregion
+                    }
                 }
-                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
+                string fileName = "會計總表" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "");
+                Response.AddHeader("Content-Disposition", "attach-ment;filename=" + fileName);
+                Response.BinaryWrite(ms.ToArray());
             }
             catch (Exception ex)
             {
@@ -4993,41 +4430,7 @@ namespace Admin.gigade.Controllers
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
-                json = "{success:true,totalCount:0,data:[]}";
             }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
-        #endregion
-        #region 減免活動
-        public HttpResponseBase GetPromotionsAmoutReduce()
-        {
-            string json = string.Empty;
-            List<PromotionsAmountReduceMemberQuery> store = new List<PromotionsAmountReduceMemberQuery>();
-            PromotionsAmountReduceMemberQuery PAM = new PromotionsAmountReduceMemberQuery();
-            try
-            {
-                _IOrderUserMgr = new OrderUserReduceMgr(mySqlConnectionString);
-                store = _IOrderUserMgr.GetReduceStore();
-                PAM.id = 0;
-                PAM.name = "所有減免活動";
-                store.Insert(0, PAM);
-                json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented) + "}";
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:true,totalCount:0,data:[]}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
         }
         #endregion
         #endregion
@@ -5875,6 +5278,10 @@ namespace Admin.gigade.Controllers
                 {
                     query.account_name = (Request.Params["account_name"]);
                 }
+                if (!string.IsNullOrEmpty(Request.Params["bank_note"]))
+                {
+                    query.bank_note = (Request.Params["bank_note"]);
+                }
                 query.ors_status = 4;
                 query.ors_createuser = (Session["caller"] as Caller).user_id;
                json = _orderReturnStatus.CouldReturnMoney(query);
@@ -6014,7 +5421,1087 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
+        #region 更改收貨人資訊
+        public HttpResponseBase ModifyDeliveryData()
+        {
+            string json = string.Empty;
+            OrderMasterQuery om = new OrderMasterQuery();
+            DeliverMasterQuery dm = new DeliverMasterQuery();
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["order_id"]))
+                {
+                    om.Order_Id = Convert.ToUInt32(Request.Params["order_id"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_name"]))
+                {
+                    om.delivery_name = Request.Params["user_name"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_gender"]))
+                {
+                    om.user_gender = Convert.ToUInt32(Request.Params["user_gender"]);//delivery_gender
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_mobile"]))
+                {
+                    om.Delivery_Mobile = Request.Params["user_mobile"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_phone"]))
+                {
+                    om.Delivery_Phone = Request.Params["user_phone"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_zip"]))
+                {
+                    om.Delivery_Zip = Convert.ToUInt32(Request.Params["user_zip"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["user_address"]))
+                {
+                    om.Delivery_Address = Request.Params["user_address"].ToString();
+                }
+                om.user_id = Convert.ToUInt32((Session["caller"] as Caller).user_id);
+                om.user_name = (Session["caller"] as Caller).user_username;
+                System.Net.IPAddress[] addlist = Dns.GetHostByName(Dns.GetHostName()).AddressList;
+                om.Order_Ipfrom = addlist[0].ToString();
+                _orderMasterMgr = new OrderMasterMgr(mySqlConnectionString);
+                json = _orderMasterMgr.ModifyDeliveryData(om);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+
+        #region 訂單內容權限
+        //列表頁
+        public HttpResponseBase GetODMList()
+        {
+            List<OrderDetailManagerQuery> store = new List<OrderDetailManagerQuery>();
+            OrderDetailManagerQuery query = new OrderDetailManagerQuery();
+            string json = string.Empty;
+            try
+            {
+                int totalCount = 0;
+                _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");//用於分頁的變量
+                if(!string.IsNullOrEmpty(Request.Params["odm_status"]))
+                {
+                    query.odm_status = Convert.ToInt32(Request.Params["odm_status"]);
+                }
+                store = _orderDetailManagerMgr.GetODMList(query, out totalCount);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}"; 
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        //新增
+        public HttpResponseBase InsertODM()
+        {
+            OrderDetailManagerQuery query = new OrderDetailManagerQuery();
+            string json = string.Empty;
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["odm_user_id"]))
+                {
+                    query.odm_user_id = Convert.ToUInt32(Request.Params["odm_user_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["odm_user_name"]))
+                {
+                    query.odm_user_name =Request.Params["odm_user_name"];
+                }
+                query.odm_status = 1;
+             query.odm_createuser=(Session["caller"] as Caller).user_id;
+             _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
+             json = _orderDetailManagerMgr.InsertODM(query);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        //變更狀態
+        public JsonResult UpODMStatus()
+        {
+            try
+            {
+                OrderDetailManagerQuery query = new OrderDetailManagerQuery();
+                if (!string.IsNullOrEmpty(Request.Params["odm_id"].ToString()))
+                {
+                    query.odm_id = Convert.ToInt32(Request.Params["odm_id"].ToString());
+                }
+                query.odm_status = Convert.ToInt32(Request.Params["active"]);
+
+                _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
+                int result = _orderDetailManagerMgr.UpODMStatus(query);
+                if (result > 0)
+                {
+                    return Json(new { success = "true" });
+                }
+                else
+                {
+                    return Json(new { success = "false" });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                return Json(new { success = "false" });
+            }
+        }
+
+        //store
+        public HttpResponseBase ManageUserStore()
+        {
+            List<ManageUserQuery> store = new List<ManageUserQuery>();
+        
+            string json = string.Empty;
+            try
+            {
+                _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
+                store = _orderDetailManagerMgr.ManageUserStore();
+                json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
         #region --------棄用功能--------
+        #region 取消單
+        #region 取消單列表
+        [CustomHandleError]
+        public HttpResponseBase GetOrderCancelMasterList()
+        {
+            List<OrderCancelMaster> stores = new List<OrderCancelMaster>();
+            string json = string.Empty;
+            try
+            {
+                int totalCount = 0;
+                OrderCancelMaster query = new OrderCancelMaster();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//
+                _orderCancelMgr = new OrderCancelMasterMgr(mySqlConnectionString);
+                stores = _orderCancelMgr.GetOrderCancelMasterList(query, out totalCount);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                //listUser是准备转换的对象
+                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(stores, Formatting.Indented, timeConverter) + "}";//返回json數據
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+        #region 修改取消單
+        public HttpResponseBase ModifyOrderCancelMasterList()
+        {
+            List<OrderCancelMaster> stores = new List<OrderCancelMaster>();
+            string json = string.Empty;
+            try
+            {
+                OrderCancelMaster query = new OrderCancelMaster();
+                query.order_id = Convert.ToUInt32(Request.Form["order_id"]);
+                query.cancel_id = Convert.ToUInt32(Request.Form["cancel_id"]);
+                query.cancel_status = Convert.ToUInt32(Request.Form["cancel_status"]);
+                query.cancel_note = Request.Params["cancel_note"];
+                query.bank_note = Request.Params["bank_note"];
+                query.cancel_createdate = Convert.ToDateTime(Request.Params["cancel_createdate"]);
+                query.cancel_updatedate = Convert.ToDateTime(Request.Params["cancel_updatedate"]);
+                System.Net.IPAddress[] ips = Dns.GetHostByName(Dns.GetHostName()).AddressList;
+                if (ips.Length > 0)
+                {
+                    query.cancel_ipfrom = ips[0].ToString();
+                }
+                _orderCancelMgr = new OrderCancelMasterMgr(mySqlConnectionString);
+                int result = _orderCancelMgr.Update(query);
+                string msg = "";
+                switch (result)
+                {
+                    case 1:
+                        msg = "bonus not enough!";
+                        break;
+                    case 2:
+                        msg = "bonus type error!";
+                        break;
+                    case 3:
+                        msg = "取得身分證字號失敗!";
+                        break;
+                    case 4:
+                        msg = "扣除HappyGo點數失敗!";
+                        break;
+                    case 5:
+                        msg = "bonus type error !";
+                        break;
+                    case 100:
+                        msg = "";//操作成功!
+                        break;
+                    default:
+                        break;
+                }
+                if (string.IsNullOrEmpty(msg))
+                {
+                    json = "{success:true}";//返回json數據
+                }
+                else
+                {
+                    json = "{success:true,msg:\"" + msg + "\"}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+        #endregion
+        #region 品牌營業額統計
+        private ChannelMgr _channel;/*賣場*/
+        private VendorBrandMgr _vbrand;/*品牌*/
+        static DataTable dt;
+        #region 品牌营业额列表
+        public HttpResponseBase GetOrderRevenueList()
+        {
+            string json = string.Empty;
+            string brandserch = "是否单个查询";
+            StringBuilder sb = new StringBuilder();//查詢訂單的條件
+            StringBuilder Sbandlist = new StringBuilder();//查詢賣場和管別的條件
+            OrderBrandProducesQuery oq = new OrderBrandProducesQuery();
+            uint id; int cid;
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["Brand_Id"]))/*品牌編號*/
+                {
+                    oq.bid = Request.Params["Brand_Id"];
+                    if (oq.bid.Substring(0, 1) != "0")
+                    {
+                        sb.AppendFormat("and p.brand_id in ({0})", oq.bid);
+                        Sbandlist.AppendFormat("and vb.brand_id in ( {0})", oq.bid);
+                    }
+                }
+                if (uint.TryParse(Request.Params["product_manage"], out id))
+                {//獲取管理人
+                    oq.product_manage = id;
+                    if (id > 0)
+                    {
+                        sb.AppendFormat(" AND v.product_manage='{0}'", id);
+                    }
+                }
+                if (int.TryParse(Request.Params["channel"], out cid))
+                {//獲取管理人
+                    oq.channel = cid;
+                    if (cid > 0)
+                    {
+                        sb.AppendFormat(" AND om.channel='{0}'", cid);
+                    }
+                }
+                if (uint.TryParse(Request.Params["slave_status"], out id))
+                {//獲取 訂單狀態
+                    oq.slave_status = id;
+                    switch (id)
+                    {
+                        case 0:
+                            sb.AppendFormat(" and os.slave_status in(0,2,4,99,5,6)");
+                            break;
+                        default:
+                            sb.AppendFormat(" and os.slave_status={0}", id);
+                            break;
+                    }
+                }
+                if (uint.TryParse(Request.Params["order_payment"], out id))
+                {//獲取 付款方式
+                    oq.order_payment = id;
+                    if (id > 0)
+                    {
+                        sb.AppendFormat(" and om.order_payment={0}", id);
+                    }
+                }
+                if (!string.IsNullOrEmpty(Request.Params["selecttype"]))
+                {
+                    oq.selecttype = Request.Params["selecttype"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["searchcon"]))
+                {
+                    oq.searchcon = Request.Params["searchcon"].ToString();
+                    if (string.IsNullOrEmpty(oq.searchcon) && oq.searchcon != "null")
+                    {//查詢內容不為空就執行模糊查詢
+                        switch (oq.selecttype)
+                        {
+                            case "1":
+                                sb.AppendFormat(" AND od.product_name LIKE  '%{0}%'", oq.searchcon);
+                                break;
+                            case "2"://會員編號
+                                sb.AppendFormat(" AND om.user_id LIKE '%{0}%'", oq.searchcon);
+                                break;
+                            case "3":
+                                sb.AppendFormat(" om.order_name LIKE   '%{0}%'", oq.searchcon);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                string sqlap = sb.ToString();
+                #region 日期條件
+                DateTime dtime;
+                if (DateTime.TryParse(Request.Params["dateOne"], out dtime))
+                {
+                    oq.dateOne = DateTime.Parse(dtime.ToString("yyyy-MM-dd 00:00:00"));
+                    if (oq.dateOne > DateTime.MinValue)
+                    {
+                        sb.AppendFormat(" AND om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(oq.dateOne.ToString()));
+                    }
+                }
+                if (DateTime.TryParse(Request.Params["dateTwo"], out dtime))
+                {
+                    oq.dateTwo = DateTime.Parse(dtime.ToString("yyyy-MM-dd 23:59:59"));
+                    if (oq.dateTwo > DateTime.MinValue)
+                    {
+                        sb.AppendFormat(" AND om.order_createdate <= '{0}' ", CommonFunction.GetPHPTime(oq.dateTwo.ToString()));
+                    }
+                }
+                #endregion
+                int a = 0;
+                _vbrand = new VendorBrandMgr(mySqlConnectionString);
+                _Iorderbrandproduces = new OrderBrandProducesMgr(mySqlConnectionString);
+                dt = _vbrand.GetBandList(Sbandlist.ToString());//查詢品牌列表
+                if (string.IsNullOrEmpty(brandserch))//查询所有
+                {
+                    DataTable ds = _Iorderbrandproduces.GetOrderVendorRevenuebyday(sb.ToString(), brandserch);//查詢品牌列表中的營業額，之查詢每天的
+                    #region 没有的品牌添加上
+                    foreach (DataRow item in ds.Rows)
+                    {
+                        DataRow[] rows = dt.Select("brand_id='" + item["brand_id"] + "' and vendor_id='" + item["vendor_id"] + "'");
+                        if (rows.Count() == 0)
+                        {
+                            DataRow drr = dt.NewRow();
+                            drr[0] = item["brand_id"];
+                            drr[1] = item["brand_name"];
+                            drr[2] = item["vendor_id"];
+                            drr[3] = item["vendor_name_simple"];
+                            dt.Rows.Add(drr);
+
+                        }
+                    }
+
+                    //for (int i = 0; i < dt.Rows.Count; i++)
+                    //{
+                    //    DataRow[] rows = ds.Select("brand_id='" + dt.Rows[i]["brand_id"] + "'");
+                    //    foreach (DataRow row in rows)//篩選出的最多只有一條數據，如果有，加入某個品牌的每日營業額，沒有就為初始值
+                    //    {
+                    //        if (string.IsNullOrEmpty(row["brand_id"].ToString()))
+                    //        {
+                    //            DataRow drr = dt.NewRow();
+                    //            drr[0] = dt.Rows[i]["brand_id"];
+                    //            drr[1] = dt.Rows[i]["brand_name"];
+                    //            drr[2] = dt.Rows[i]["vendor_id"];
+                    //            drr[3] = dt.Rows[i]["vendor_name_simple"];
+                    //            dt.Rows.Add(drr);
+                    //        }
+                    //    }
+                    //}
+                    #endregion
+                }
+                string q = a.ToString();
+                //去掉注释，把sbliint改成sb
+                //DateTime starttime = DateTime.Parse(dateOne);//查詢的時間範圍~~開始時間
+                //DateTime endtime = DateTime.Parse(dateTwo);//查詢的時間範圍~~結束時間
+                TimeSpan s = oq.dateTwo - oq.dateOne;//查詢的開始日期和結束日期相差的天數
+                int day = s.Days;
+
+                #region 測試方法
+                _Iorderbrandproduces = new OrderBrandProducesMgr(mySqlConnectionString);
+                DataColumn addcolms;//循環添加列每月的統計
+                DataRow addrow = dt.NewRow();//添加一行每日小計
+                addrow[3] = "每日小計";
+                int m = 0;//記錄增加了多少列，來確定每月一記的具體位置
+                int M_total = 0;//每月一記
+
+                StringBuilder html_table = new StringBuilder();//匯出html頁面
+                html_table.AppendFormat(@"<div style='overflow:auto;text-align:right;width:1650px;height:550px;'><table style='border:1px;'>");
+                html_table.AppendFormat("<tr><td>品牌名稱</td><td>供應商名稱</td>");
+
+                int startclome = 4;//設求每月之初的列的下標，初始為4/。
+                int stopclome = 3;//每個月結束的列的下標，初始為3/。
+                #region  循環每天
+
+                for (int d = 0; d <= day; d++)//查詢每天
+                {
+                    int D_bandsum = 0; //所有品牌每日的營業額
+                    string daytimes = oq.dateOne.AddDays(d).ToString("yyyy-MM-dd");//循環的每一天
+                    addcolms = new DataColumn(daytimes, typeof(String));
+                    dt.Columns.Add(addcolms);
+                    html_table.AppendFormat("<td>&nbsp;&nbsp;{0}&nbsp;&nbsp;</td>", daytimes);
+
+                    stopclome++;//加一列
+                    #region 每日一記
+                    string daytimeone = DateTime.Parse(daytimes).ToString("yyyy-MM-dd 00:00:00");//把每天轉換成初始從零點開始
+                    string daytimetwo = DateTime.Parse(daytimes).ToString("yyyy-MM-dd 23:59:59");//每天的結束時間
+                    string orderby = string.Format(" AND om.order_createdate  >= '{0}' AND om.order_createdate <= '{1}'", CommonFunction.GetPHPTime(daytimeone), CommonFunction.GetPHPTime(daytimetwo));
+                    DataTable ds = _Iorderbrandproduces.GetOrderVendorRevenuebyday(sqlap + orderby, brandserch);//查詢品牌列表中的營業額，之查詢每天的
+
+
+                    for (int i = 0; i < dt.Rows.Count; i++)//循環品牌列表,把每天的營業額追加進這個表裡
+                    {
+                        DataRow[] rows = ds.Select("brand_id='" + dt.Rows[i]["brand_id"] + "' and vendor_id='" + dt.Rows[i]["vendor_id"] + "'");//篩選出一個品牌的這個時間段的營業額
+                        dt.Rows[i][daytimes] = 0;//單個品牌每日的營業額先賦初始值為0
+                        foreach (DataRow row in rows)//篩選出的最多只有一條數據，如果有，加入某個品牌的每日營業額，沒有就為初始值
+                        {
+                            if (!string.IsNullOrEmpty(row["order_createdate"].ToString()))
+                            {
+                                string tb_createdate = CommonFunction.GetNetTime(long.Parse(rows[0]["order_createdate"].ToString())).ToString("yyyy-MM-dd");
+
+                                dt.Rows[i][daytimes] = int.Parse(rows[0]["subtotal"].ToString());
+                                D_bandsum = D_bandsum + int.Parse(rows[0]["subtotal"].ToString());
+                            }
+                        }
+                    }
+                    #endregion
+                    #region 是否添加每月小計
+
+                    addrow[4 + d + m] = D_bandsum;
+                    M_total = M_total + D_bandsum;
+                    if (oq.dateOne.Month != oq.dateTwo.Month || oq.dateOne.Year != oq.dateTwo.Year)//開始時間和結束時間不是在同一個月
+                    {
+                        DateTime days = DateTime.Parse(daytimes);
+                        int t = DateTime.DaysInMonth(days.Year, days.Month);//一個月多少天
+                        if (t == days.Day || d == day)//現在這個月的月底
+                        {
+                            addcolms = new DataColumn(days.Month + "月小計", typeof(String));//style='float:left;width:500px'
+                            dt.Columns.Add(addcolms);
+                            html_table.AppendFormat("<td ><font color='red'>&nbsp;&nbsp;&nbsp;&nbsp;{0}月小計&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></td>", days.Month);
+                            m++;
+                            foreach (DataRow item in dt.Rows)
+                            {
+                                item[stopclome + 1] = 0;//每月總計賦初始值
+                                for (int i = startclome; i <= stopclome; i++)//每個品牌的每月總計
+                                {
+                                    item[stopclome + 1] = int.Parse(item[stopclome + 1].ToString()) + int.Parse(item[i].ToString());
+                                }
+                            }
+                            addrow[stopclome + 1] = M_total;
+                            startclome = stopclome + 2;
+                            stopclome++;
+                            M_total = 0;
+                        }
+                    }
+                    #endregion
+                }
+                #endregion
+                dt.Rows.InsertAt(addrow, 0);//添加一行總計
+                #region  品牌總計
+                addcolms = new DataColumn("品牌總計", typeof(String));
+                html_table.AppendFormat("<td><font color='red'>品牌總計</font></td></tr>");
+                dt.Columns.Add(addcolms);
+                int S_total = 0;//所有品牌的總計
+                DataTable dstable = _Iorderbrandproduces.GetOrderVendorRevenuebyday(sb.ToString(), brandserch);//查詢品牌列表中的營業額
+                for (int i = 1; i < dt.Rows.Count; i++)
+                {
+                    int Aull_bandSum = 0;//每個商品的開始時間和結束時間的總計
+                    DataRow[] rows = dstable.Select("brand_id='" + dt.Rows[i]["brand_id"] + "' and vendor_id='" + dt.Rows[i]["vendor_id"] + "'");//篩選出一個品牌的這個時間段的營業額
+                    foreach (DataRow row in rows)
+                    {
+                        if (!string.IsNullOrEmpty(row["subtotal"].ToString()))
+                        {
+                            Aull_bandSum = Aull_bandSum + int.Parse(row["subtotal"].ToString());
+                        }
+                        S_total = S_total + Aull_bandSum;
+                    }
+                    dt.Rows[i]["品牌總計"] = Aull_bandSum;
+                }
+                dt.Rows[0]["品牌總計"] = S_total;
+                #endregion
+                #endregion
+                #region  要查詢的列表,匯成一張table
+                dt.Columns.RemoveAt(2);//移除多餘的列，供應商編號
+                dt.Columns.RemoveAt(0);//移除多餘的列，品牌編號
+                dt.Columns[0].ColumnName = "品牌名稱";
+                dt.Columns[1].ColumnName = "供應商名稱";
+                for (int x = 0; x < dt.Rows.Count; x++)
+                {
+                    html_table.AppendFormat("<tr>");
+                    for (int y = 0; y < dt.Columns.Count; y++)
+                    {
+                        if (dt.Columns[y].ColumnName.ToString().IndexOf("月小計") > 0 || dt.Columns[y].ColumnName.ToString() == "品牌總計")
+                        {
+                            html_table.AppendFormat("<td style='text-align:right'>&nbsp;&nbsp;<font color='red'>{0}</font>&nbsp;&nbsp;</td>", dt.Rows[x][y]);
+                        }
+                        else
+                        {
+                            html_table.AppendFormat("<td style='text-align:right'>&nbsp;&nbsp;{0}&nbsp;&nbsp;</td>", dt.Rows[x][y]);
+                        }
+
+                        if (y == dt.Columns.Count - 1)
+                        {
+                            html_table.AppendFormat("</tr>");
+                        }
+                    }
+                }
+                html_table.AppendFormat(@"</table></div>");
+                #endregion
+                string n = html_table.ToString();
+                json = "{success:true,msg:\"" + html_table.ToString() + "\"}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+
+
+        }
+        //加購物金欄位
+        public HttpResponseBase GetOrderRevenue()
+        {
+            string json = string.Empty;
+            string brandserch = "是否单个查询";
+            StringBuilder sb = new StringBuilder();//查詢訂單的條件
+            StringBuilder Sbandlist = new StringBuilder();//查詢賣場和管別的條件
+            OrderBrandProducesQuery oq = new OrderBrandProducesQuery();
+            uint id; int cid;
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["Brand_Id"]))/*品牌編號*/
+                {
+                    oq.bid = Request.Params["Brand_Id"];
+                    if (oq.bid.Substring(0, 1) != "0")
+                    {
+                        sb.AppendFormat("and p.brand_id in ({0})", oq.bid);
+                        Sbandlist.AppendFormat("and vb.brand_id in ( {0})", oq.bid);
+                    }
+                }
+                if (uint.TryParse(Request.Params["product_manage"], out id))
+                {//獲取管理人
+                    oq.product_manage = id;
+                    if (id > 0)
+                    {
+                        sb.AppendFormat(" AND v.product_manage='{0}'", id);
+                    }
+                }
+                if (int.TryParse(Request.Params["channel"], out cid))
+                {//獲取管理人
+                    oq.channel = cid;
+                    if (cid > 0)
+                    {
+                        sb.AppendFormat(" AND om.channel='{0}'", cid);
+                    }
+                }
+                if (uint.TryParse(Request.Params["slave_status"], out id))
+                {//獲取 訂單狀態
+                    oq.slave_status = id;
+                    switch (id)
+                    {
+                        case 0:
+                            sb.AppendFormat(" and os.slave_status in(0,2,4,99,5,6)");
+                            break;
+                        default:
+                            sb.AppendFormat(" and os.slave_status={0}", id);
+                            break;
+                    }
+                }
+                if (uint.TryParse(Request.Params["order_payment"], out id))
+                {//獲取 付款方式
+                    oq.order_payment = id;
+                    if (id > 0)
+                    {
+                        sb.AppendFormat(" and om.order_payment={0}", id);
+                    }
+                }
+                if (!string.IsNullOrEmpty(Request.Params["selecttype"]))
+                {
+                    oq.selecttype = Request.Params["selecttype"].ToString();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["searchcon"]))
+                {
+                    oq.searchcon = Request.Params["searchcon"].ToString();
+                    if (string.IsNullOrEmpty(oq.searchcon) && oq.searchcon != "null")
+                    {//查詢內容不為空就執行模糊查詢
+                        switch (oq.selecttype)
+                        {
+                            case "1":
+                                sb.AppendFormat(" AND od.product_name LIKE  '%{0}%'", oq.searchcon);
+                                break;
+                            case "2"://會員編號
+                                sb.AppendFormat(" AND om.user_id LIKE '%{0}%'", oq.searchcon);
+                                break;
+                            case "3":
+                                sb.AppendFormat(" om.order_name LIKE   '%{0}%'", oq.searchcon);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                string sqlap = sb.ToString();
+                #region 日期條件
+                DateTime dtime;
+                if (DateTime.TryParse(Request.Params["dateOne"], out dtime))
+                {
+                    oq.dateOne = DateTime.Parse(dtime.ToString("yyyy-MM-dd 00:00:00"));
+                    if (oq.dateOne > DateTime.MinValue)
+                    {
+                        sb.AppendFormat(" AND om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(oq.dateOne.ToString()));
+                    }
+                }
+                if (DateTime.TryParse(Request.Params["dateTwo"], out dtime))
+                {
+                    oq.dateTwo = DateTime.Parse(dtime.ToString("yyyy-MM-dd 23:59:59"));
+                    if (oq.dateTwo > DateTime.MinValue)
+                    {
+                        sb.AppendFormat(" AND om.order_createdate <= '{0}' ", CommonFunction.GetPHPTime(oq.dateTwo.ToString()));
+                    }
+                }
+                #endregion
+                int a = 0;
+                _vbrand = new VendorBrandMgr(mySqlConnectionString);
+                _Iorderbrandproduces = new OrderBrandProducesMgr(mySqlConnectionString);
+                dt = _vbrand.GetBandList(Sbandlist.ToString());//查詢品牌列表
+                if (string.IsNullOrEmpty(brandserch))//查询所有
+                {
+                    DataTable ds = _Iorderbrandproduces.GetOrderVendorRevenuebyday(sb.ToString(), brandserch);//查詢品牌列表中的營業額，之查詢每天的
+                    #region 没有的品牌添加上
+                    foreach (DataRow item in ds.Rows)
+                    {
+                        DataRow[] rows = dt.Select("brand_id='" + item["brand_id"] + "' and vendor_id='" + item["vendor_id"] + "'");
+                        if (rows.Count() == 0)
+                        {
+                            DataRow drr = dt.NewRow();
+                            drr[0] = item["brand_id"];
+                            drr[1] = item["brand_name"];
+                            drr[2] = item["vendor_id"];
+                            drr[3] = item["vendor_name_simple"];
+                            dt.Rows.Add(drr);
+                        }
+                    }
+                    #endregion
+                }
+                string q = a.ToString();
+                TimeSpan s = oq.dateTwo - oq.dateOne;//查詢的開始日期和結束日期相差的天數
+                int day = s.Days;
+
+                #region 測試方法
+                _Iorderbrandproduces = new OrderBrandProducesMgr(mySqlConnectionString);
+                DataColumn addcolms;//循環添加列每月的統計
+                DataRow addrow = dt.NewRow();//添加一行每日小計
+                addrow[3] = "每日小計";
+                int m = 0;//記錄增加了多少列，來確定每月一記的具體位置
+                int M_total = 0;//每月一記
+
+                StringBuilder html_table = new StringBuilder();//匯出html頁面
+                html_table.AppendFormat(@"<div style='overflow:auto;text-align:right;width:1650px;height:550px;'><table style='border:1px;'>");
+                html_table.AppendFormat("<tr><td>品牌名稱</td><td>供應商名稱</td>");
+
+                int startclome = 4;//設求每月之初的列的下標，初始為4/。
+                int stopclome = 3;//每個月結束的列的下標，初始為3/。
+                #region  循環每天
+
+                for (int d = 0; d <= day; d++)//查詢每天
+                {
+                    int D_bandsum = 0; //所有品牌每日的營業額
+                    string daytimes = oq.dateOne.AddDays(d).ToString("yyyy-MM-dd");//循環的每一天
+                    addcolms = new DataColumn(daytimes, typeof(String));
+                    dt.Columns.Add(addcolms);
+                    html_table.AppendFormat("<td>&nbsp;&nbsp;{0}&nbsp;&nbsp;</td>", daytimes);
+
+                    stopclome++;//加一列
+                    #region 每日一記
+                    string daytimeone = DateTime.Parse(daytimes).ToString("yyyy-MM-dd 00:00:00");//把每天轉換成初始從零點開始
+                    string daytimetwo = DateTime.Parse(daytimes).ToString("yyyy-MM-dd 23:59:59");//每天的結束時間
+                    string orderby = string.Format(" AND om.order_createdate  >= '{0}' AND om.order_createdate <= '{1}'", CommonFunction.GetPHPTime(daytimeone), CommonFunction.GetPHPTime(daytimetwo));
+                    DataTable ds = _Iorderbrandproduces.GetOrderVendorRevenuebyday(sqlap + orderby, brandserch);//查詢品牌列表中的營業額，之查詢每天的
+
+
+                    for (int i = 0; i < dt.Rows.Count; i++)//循環品牌列表,把每天的營業額追加進這個表裡
+                    {
+                        DataRow[] rows = ds.Select("brand_id='" + dt.Rows[i]["brand_id"] + "' and vendor_id='" + dt.Rows[i]["vendor_id"] + "'");//篩選出一個品牌的這個時間段的營業額
+                        dt.Rows[i][daytimes] = 0;//單個品牌每日的營業額先賦初始值為0
+                        foreach (DataRow row in rows)//篩選出的最多只有一條數據，如果有，加入某個品牌的每日營業額，沒有就為初始值
+                        {
+                            if (!string.IsNullOrEmpty(row["order_createdate"].ToString()))
+                            {
+                                string tb_createdate = CommonFunction.GetNetTime(long.Parse(rows[0]["order_createdate"].ToString())).ToString("yyyy-MM-dd");
+
+                                dt.Rows[i][daytimes] = int.Parse(rows[0]["subtotal"].ToString());
+                                D_bandsum = D_bandsum + int.Parse(rows[0]["subtotal"].ToString());
+                            }
+                        }
+                    }
+                    #endregion
+                    #region 是否添加每月小計
+
+                    addrow[4 + d + m] = D_bandsum;
+                    M_total = M_total + D_bandsum;
+                    if (oq.dateOne.Month != oq.dateTwo.Month || oq.dateOne.Year != oq.dateTwo.Year)//開始時間和結束時間不是在同一個月
+                    {
+                        DateTime days = DateTime.Parse(daytimes);
+                        int t = DateTime.DaysInMonth(days.Year, days.Month);//一個月多少天
+                        if (t == days.Day || d == day)//現在這個月的月底
+                        {
+                            addcolms = new DataColumn(days.Month + "月小計", typeof(String));//style='float:left;width:500px'
+                            dt.Columns.Add(addcolms);
+                            html_table.AppendFormat("<td ><font color='red'>&nbsp;&nbsp;&nbsp;&nbsp;{0}月小計&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></td>", days.Month);
+                            m++;
+                            foreach (DataRow item in dt.Rows)
+                            {
+                                item[stopclome + 1] = 0;//每月總計賦初始值
+                                for (int i = startclome; i <= stopclome; i++)//每個品牌的每月總計
+                                {
+                                    item[stopclome + 1] = int.Parse(item[stopclome + 1].ToString()) + int.Parse(item[i].ToString());
+                                }
+                            }
+                            addrow[stopclome + 1] = M_total;
+                            startclome = stopclome + 2;
+                            stopclome++;
+                            M_total = 0;
+                        }
+                    }
+                    #endregion
+                }
+                #endregion
+                dt.Rows.InsertAt(addrow, 0);//添加一行總計
+                #region  品牌總計
+                addcolms = new DataColumn("品牌總計", typeof(String));
+                html_table.AppendFormat("<td><font color='red'>品牌總計</font></td></tr>");
+                dt.Columns.Add(addcolms);
+                int S_total = 0;//所有品牌的總計
+                DataTable dstable = _Iorderbrandproduces.GetOrderVendorRevenuebyday(sb.ToString(), brandserch);//查詢品牌列表中的營業額
+                for (int i = 1; i < dt.Rows.Count; i++)
+                {
+                    int Aull_bandSum = 0;//每個商品的開始時間和結束時間的總計
+                    DataRow[] rows = dstable.Select("brand_id='" + dt.Rows[i]["brand_id"] + "' and vendor_id='" + dt.Rows[i]["vendor_id"] + "'");//篩選出一個品牌的這個時間段的營業額
+                    foreach (DataRow row in rows)
+                    {
+                        if (!string.IsNullOrEmpty(row["subtotal"].ToString()))
+                        {
+                            Aull_bandSum = Aull_bandSum + int.Parse(row["subtotal"].ToString());
+                        }
+                        S_total = S_total + Aull_bandSum;
+                    }
+                    dt.Rows[i]["品牌總計"] = Aull_bandSum;
+                }
+                dt.Rows[0]["品牌總計"] = S_total;
+                #endregion
+                #endregion
+                #region  要查詢的列表,匯成一張table
+                dt.Columns.RemoveAt(2);//移除多餘的列，供應商編號
+                dt.Columns.RemoveAt(0);//移除多餘的列，品牌編號
+                dt.Columns[0].ColumnName = "品牌名稱";
+                dt.Columns[1].ColumnName = "供應商名稱";
+                for (int x = 0; x < dt.Rows.Count; x++)
+                {
+                    html_table.AppendFormat("<tr>");
+                    for (int y = 0; y < dt.Columns.Count; y++)
+                    {
+                        if (dt.Columns[y].ColumnName.ToString().IndexOf("月小計") > 0 || dt.Columns[y].ColumnName.ToString() == "品牌總計")
+                        {
+                            html_table.AppendFormat("<td style='text-align:right'>&nbsp;&nbsp;<font color='red'>{0}</font>&nbsp;&nbsp;</td>", dt.Rows[x][y]);
+                        }
+                        else
+                        {
+                            html_table.AppendFormat("<td style='text-align:right'>&nbsp;&nbsp;{0}&nbsp;&nbsp;</td>", dt.Rows[x][y]);
+                        }
+
+                        if (y == dt.Columns.Count - 1)
+                        {
+                            html_table.AppendFormat("</tr>");
+                        }
+                    }
+                }
+
+                html_table.AppendFormat(@"</table></div>");
+                #endregion
+                string n = html_table.ToString();
+                json = "{success:true,msg:\"" + html_table.ToString() + "\"}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        #endregion
+        #region 賣場列表
+        public HttpResponseBase GetChannel()/*賣場列表*/
+        {
+            _channel = new ChannelMgr(mySqlConnectionString);
+            List<Channel> stores = new List<Channel>();
+            string json = string.Empty;
+            try
+            {
+                stores = _channel.QueryList();
+                //Channel channel = new Channel();
+                //channel.channel_name_simple = "全部";
+                //stores.Insert(0, channel);
+                json = "{success:true,data:" + JsonConvert.SerializeObject(stores) + "}";//返回json數據
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
+        #endregion
+        public HttpResponseBase GetVendorBand()/*品牌列表*/
+        {
+            VendorBrand vb = new VendorBrand();
+            _vbrand = new VendorBrandMgr(mySqlConnectionString);
+            List<VendorBrand> stores = new List<VendorBrand>();
+            string json = string.Empty;
+            try
+            {
+                DataTable dt = _vbrand.GetBandList("");
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    vb = new VendorBrand();
+                    vb.Brand_Id = uint.Parse(dt.Rows[i]["brand_id"].ToString());
+                    vb.Brand_Name = dt.Rows[i]["brand_name"].ToString();
+                    stores.Add(vb);
+                }
+                json = "{success:true,data:" + JsonConvert.SerializeObject(stores) + "}";//返回json數據
+
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #region 品牌營業額匯出excel
+        public void Export()
+        {
+            string newExcelName = string.Empty;
+            if (!System.IO.Directory.Exists(Server.MapPath(excelPath)))
+            {
+                System.IO.Directory.CreateDirectory(Server.MapPath(excelPath));
+            }
+            try
+            {
+                string[] colname = new string[dt.Columns.Count];
+                string filename = "order_vendor_revenue.csv";
+                newExcelName = Server.MapPath(excelPath) + filename;
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    colname[i] = dt.Columns[i].ColumnName;
+                }
+                if (System.IO.File.Exists(newExcelName))
+                {
+                    System.IO.File.Delete(newExcelName);
+                }
+                //CsvHelper.ExportDataTableToCsv(dt, newExcelName, colname, true);
+                if (dt.Rows.Count > 0)
+                {
+                    string fileName = "品牌營業額_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                    MemoryStream ms = ExcelHelperXhf.ExportDT(dt, "品牌營業額_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                    Response.BinaryWrite(ms.ToArray());
+                }
+                else
+                {
+                    Response.Write("匯出數據不存在");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+        }
+
+        #endregion
+        #endregion
+        #region 促銷減免查詢
+        #region 促銷減免查詢列表頁
+        public HttpResponseBase GetOrderUserReduce()
+        {
+            string json = string.Empty;
+            List<PromotionsAmountReduceMemberQuery> store = new List<PromotionsAmountReduceMemberQuery>();
+            PromotionsAmountReduceMemberQuery query = new PromotionsAmountReduceMemberQuery();
+            try
+            {
+                int totalCount = 0;
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                if (!string.IsNullOrEmpty(Request.Params["select_type"]))//查詢條件
+                {
+                    query.select_type = Request.Params["select_type"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["search_con"]))//查詢內容
+                {
+                    query.search_con = Request.Params["search_con"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["reduce_id"]))
+                {
+                    query.reduce_id = Convert.ToInt32(Request.Params["reduce_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date"]))
+                {
+                    query.search_date = Convert.ToInt32(Request.Params["date"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["start_time"]))
+                {
+                    query.start_time = Convert.ToDateTime(Request.Params["start_time"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["end_time"]))
+                {
+                    query.end_time = Convert.ToDateTime(Request.Params["end_time"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["group_id"]))
+                {
+                    query.group_id = Convert.ToInt32(Request.Params["group_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["type"]))
+                {
+                    query.type = Convert.ToInt32(Request.Params["type"]);
+                }
+                _IOrderUserMgr = new OrderUserReduceMgr(mySqlConnectionString);
+                store = _IOrderUserMgr.GetOrderUserReduce(query, out totalCount);
+                foreach (var item in store)
+                {
+
+                    item.suser_reg_date = CommonFunction.GetNetTime(item.user_reg_date);
+                }
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+        #region 減免活動
+        public HttpResponseBase GetPromotionsAmoutReduce()
+        {
+            string json = string.Empty;
+            List<PromotionsAmountReduceMemberQuery> store = new List<PromotionsAmountReduceMemberQuery>();
+            PromotionsAmountReduceMemberQuery PAM = new PromotionsAmountReduceMemberQuery();
+            try
+            {
+                _IOrderUserMgr = new OrderUserReduceMgr(mySqlConnectionString);
+                store = _IOrderUserMgr.GetReduceStore();
+                PAM.id = 0;
+                PAM.name = "所有減免活動";
+                store.Insert(0, PAM);
+                json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+        #endregion
+
         #region 暫存退貨單
         //public HttpResponseBase GetReturnMasterList()
         //{
@@ -6682,195 +7169,7 @@ namespace Admin.gigade.Controllers
         }
         #endregion
         #endregion
-        #endregion
 
-
-        #region 更改收貨人資訊
-        public HttpResponseBase ModifyDeliveryData()
-        {
-            string json = string.Empty;
-            OrderMasterQuery om = new OrderMasterQuery();
-            DeliverMasterQuery dm = new DeliverMasterQuery();
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Params["order_id"]))
-                {
-                    om.Order_Id = Convert.ToUInt32(Request.Params["order_id"].ToString());
-                }
-                if (!string.IsNullOrEmpty(Request.Params["user_name"]))
-                {
-                    om.delivery_name = Request.Params["user_name"].ToString();
-                }
-                if (!string.IsNullOrEmpty(Request.Params["user_gender"]))
-                {
-                    om.user_gender = Convert.ToUInt32(Request.Params["user_gender"]);//delivery_gender
-                }
-                if (!string.IsNullOrEmpty(Request.Params["user_mobile"]))
-                {
-                    om.Delivery_Mobile = Request.Params["user_mobile"].ToString();
-                }
-                if (!string.IsNullOrEmpty(Request.Params["user_phone"]))
-                {
-                    om.Delivery_Phone = Request.Params["user_phone"].ToString();
-                }
-                if (!string.IsNullOrEmpty(Request.Params["user_zip"]))
-                {
-                    om.Delivery_Zip = Convert.ToUInt32(Request.Params["user_zip"]);
-                }
-                if (!string.IsNullOrEmpty(Request.Params["user_address"]))
-                {
-                    om.Delivery_Address = Request.Params["user_address"].ToString();
-                }
-                om.user_id = Convert.ToUInt32((Session["caller"] as Caller).user_id);
-                om.user_name = (Session["caller"] as Caller).user_username;
-                System.Net.IPAddress[] addlist = Dns.GetHostByName(Dns.GetHostName()).AddressList;
-                om.Order_Ipfrom = addlist[0].ToString();
-                _orderMasterMgr = new OrderMasterMgr(mySqlConnectionString);
-                json = _orderMasterMgr.ModifyDeliveryData(om);
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:false}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
-        #endregion
-
-        #region order_detail_manager
-        //列表頁
-        public HttpResponseBase GetODMList()
-        {
-            List<OrderDetailManagerQuery> store = new List<OrderDetailManagerQuery>();
-            OrderDetailManagerQuery query = new OrderDetailManagerQuery();
-            string json = string.Empty;
-            try
-            {
-                int totalCount = 0;
-                _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
-                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
-                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");//用於分頁的變量
-                if(!string.IsNullOrEmpty(Request.Params["odm_status"]))
-                {
-                    query.odm_status = Convert.ToInt32(Request.Params["odm_status"]);
-                }
-                store = _orderDetailManagerMgr.GetODMList(query, out totalCount);
-                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}"; 
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:false,totalCount:0,data:[]}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
-
-        //新增
-        public HttpResponseBase InsertODM()
-        {
-            OrderDetailManagerQuery query = new OrderDetailManagerQuery();
-            string json = string.Empty;
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Params["odm_user_id"]))
-                {
-                    query.odm_user_id = Convert.ToUInt32(Request.Params["odm_user_id"]);
-                }
-                if (!string.IsNullOrEmpty(Request.Params["odm_user_name"]))
-                {
-                    query.odm_user_name =Request.Params["odm_user_name"];
-                }
-                query.odm_status = 1;
-             query.odm_createuser=(Session["caller"] as Caller).user_id;
-             _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
-             json = _orderDetailManagerMgr.InsertODM(query);
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:false}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
-
-        //變更狀態
-        public JsonResult UpODMStatus()
-        {
-            try
-            {
-                OrderDetailManagerQuery query = new OrderDetailManagerQuery();
-                if (!string.IsNullOrEmpty(Request.Params["odm_id"].ToString()))
-                {
-                    query.odm_id = Convert.ToInt32(Request.Params["odm_id"].ToString());
-                }
-                query.odm_status = Convert.ToInt32(Request.Params["active"]);
-
-                _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
-                int result = _orderDetailManagerMgr.UpODMStatus(query);
-                if (result > 0)
-                {
-                    return Json(new { success = "true" });
-                }
-                else
-                {
-                    return Json(new { success = "false" });
-                }
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                return Json(new { success = "false" });
-            }
-        }
-
-        //store
-        public HttpResponseBase ManageUserStore()
-        {
-            List<ManageUserQuery> store = new List<ManageUserQuery>();
-        
-            string json = string.Empty;
-            try
-            {
-                _orderDetailManagerMgr = new OrderDetailManagerMgr(mySqlConnectionString);
-                store = _orderDetailManagerMgr.ManageUserStore();
-                json = "{success:true,data:" + JsonConvert.SerializeObject(store, Formatting.Indented) + "}";
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:false}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return this.Response;
-        }
         #endregion
 
     }

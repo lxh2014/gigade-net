@@ -737,6 +737,10 @@ on ld.deliver_id=dm.deliver_id  where 1=1 ");
                 {
                     strcondition.AppendFormat(" and om.order_status='{0}' ", deliver.i_order_status);
                 }
+                if (deliver.order_day != 0)
+                {
+                    strcondition.AppendFormat(" and dm.deliver_org_days<='{0}' ", Common.CommonFunction.GetPHPTime(DateTime.Now.AddDays(deliver.order_day).ToString("yyyy-MM-dd 23:59:59")));//預計到貨日期且未到貨
+                }
                 if (deliver.i_slave_status != -1)
                 {
                     strcondition.AppendFormat(" and os.slave_status='{0}' ", deliver.i_slave_status);
@@ -771,13 +775,13 @@ on ld.deliver_id=dm.deliver_id  where 1=1 ");
                     strcondition.AppendFormat(" where overdue_day>='{0}' ", deliver.t_days);
                 }
                 str.AppendFormat(@"SELECT delivery_code,deliver_id,created,delivery_date,order_id,order_date,order_status,order_payment,delivery_store,
-logisticsTypes,delivery_status,dvendor_name_simple,vendor_name_simple,freight_set,delivery_freight_cost,
+logisticsTypes,delivery_status,dvendor_name_simple,vendor_name_simple,freight_set,delivery_freight_cost,delivery_date_str,
 overdue_day,
 arrival_date,estimated_delivery_date 
 ,estimated_arrival_date,estimated_arrival_period,delivery_name,product_name,note_order,note_admin,
 buy_num,item_id,product_mode,deliver_master_date,slave_status,detail_status,product_id,detail_id 
 FROM (
-SELECT dm.delivery_code,dm.deliver_id,dm.created,om.order_id,DATE(FROM_UNIXTIME(om.order_createdate)) as order_date,dd.detail_id,pt.product_id,om.order_status,om.order_payment,dm.delivery_store,
+SELECT dm.delivery_code, case dm.deliver_org_days when 0 then '-' else FROM_UNIXTIME(dm.deliver_org_days) end as delivery_date_str,dm.deliver_id,dm.created,om.order_id,DATE(FROM_UNIXTIME(om.order_createdate)) as order_date,dd.detail_id,pt.product_id,om.order_status,om.order_payment,dm.delivery_store,
 ld.logisticsTypes,dm.delivery_status,vds.vendor_name_simple as dvendor_name_simple,vd.vendor_name_simple,dm.freight_set,dm.delivery_freight_cost,
 case ISNULL(dm.delivery_date) when TRUE then DATEDIFF(NOW(),DATE(FROM_UNIXTIME(om.order_date_pay)))  ELSE datediff(dm.delivery_date,DATE(FROM_UNIXTIME(om.order_date_pay))) end as overdue_day,
 dm.arrival_date,dm.estimated_delivery_date 
@@ -859,6 +863,10 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1  "
                 {
                     strcondition.AppendFormat(" and om.order_status='{0}' ", deliver.i_order_status);
                 }
+                if (deliver.order_day != 0)
+                {
+                    strcondition.AppendFormat(" and dm.deliver_org_days<='{0}'  ", Common.CommonFunction.GetPHPTime(DateTime.Now.AddDays(deliver.order_day).ToString("yyyy-MM-dd 23:59:59")));//預計到貨日期且未到貨
+                }
                 if (deliver.i_slave_status != -1)
                 {
                     strcondition.AppendFormat(" and os.slave_status='{0}' ", deliver.i_slave_status);
@@ -893,13 +901,13 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1  "
                     strcondition.AppendFormat(" where overdue_day>='{0}' ", deliver.t_days);
                 }
                 str.AppendFormat(@"SELECT delivery_code,deliver_id,delivery_date,created,order_id,order_date,order_status,order_payment,delivery_store,
-logisticsTypes,delivery_status,dvendor_name_simple,vendor_name_simple,freight_set,delivery_freight_cost,
+logisticsTypes,delivery_status,dvendor_name_simple,vendor_name_simple,freight_set,delivery_freight_cost,delivery_date_str,
 overdue_day,
 arrival_date,estimated_delivery_date 
 ,estimated_arrival_date,estimated_arrival_period,delivery_name,product_name,note_order,note_admin,
 buy_num,item_id,product_mode,deliver_master_date,slave_status,detail_status,product_id,detail_id 
 FROM (
-SELECT dm.delivery_code,dm.deliver_id,dm.created,om.order_id,DATE(FROM_UNIXTIME(om.order_createdate)) as order_date,dd.detail_id ,pt.product_id,om.order_status,om.order_payment,dm.delivery_store,
+SELECT dm.delivery_code,case dm.deliver_org_days when 0 then '-' else FROM_UNIXTIME(dm.deliver_org_days) end as delivery_date_str,dm.deliver_id,dm.created,om.order_id,DATE(FROM_UNIXTIME(om.order_createdate)) as order_date,dd.detail_id ,pt.product_id,om.order_status,om.order_payment,dm.delivery_store,
 ld.logisticsTypes,dm.delivery_status,vds.vendor_name_simple as dvendor_name_simple,vd.vendor_name_simple,dm.freight_set,dm.delivery_freight_cost,
 case ISNULL(dm.delivery_date) when TRUE then DATEDIFF(NOW(),DATE(FROM_UNIXTIME(om.order_date_pay)))  ELSE datediff(dm.delivery_date,DATE(FROM_UNIXTIME(om.order_date_pay))) end as overdue_day,
 dm.arrival_date,dm.estimated_delivery_date 
@@ -958,5 +966,115 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1 ")
             DataTable table = _access.getDataTable(sql);
             return table;
         }
+
+        #region 出貨單期望到貨日
+        ///add by zhaozhi0623j 20151110 pm
+        /// <summary>
+        /// 根據出貨單編號更新期望到貨日期、時段   
+        /// </summary>
+        /// <returns></returns>
+        public int UpdateExpectArrive(DeliverMasterQuery Query)
+        {
+            StringBuilder sbSql = new StringBuilder();
+            Query.Replace4MySQL();
+
+            try
+            {
+                sbSql.AppendFormat(@"update deliver_master set expect_arrive_date='{0}',expect_arrive_period='{1}' where deliver_id='{2}'",
+                                Query.expect_arrive_date.ToString("yyyy-MM-dd"), Query.expect_arrive_period, Query.deliver_id);     
+                return _access.execCommand(sbSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(" DeliverMasterDao-->UpdateExpectArrive-->" + ex.Message + sbSql.ToString(), ex);
+            }
+        }
+        /// <summary>
+        /// 獲得出貨單期望到貨日list   
+        /// </summary>
+        /// <returns></returns>
+        public List<DeliverMasterQuery> GetDeliverExpectArriveList(DeliverMasterQuery Query, out int totalCount)
+        {
+            StringBuilder finalSql = new StringBuilder();
+            StringBuilder sbSql = new StringBuilder();
+            StringBuilder fromSql = new StringBuilder();
+            StringBuilder conSql = new StringBuilder();
+            Query.Replace4MySQL();
+            try
+            {
+                sbSql.Append(@"select dm.deliver_id,dm.order_id,om.user_id,tp.parameterName as delivery_status_str,dm.type,dm.freight_set,v.vendor_name_full,
+                                            dm.estimated_delivery_date,dm.estimated_arrival_date,dm.estimated_arrival_period,
+                                            dm.expect_arrive_date,dm.expect_arrive_period ");
+                fromSql.Append(@"from deliver_master dm inner JOIN vendor v on v.vendor_id=dm.export_id inner JOIN order_master om on om.order_id=dm.order_id                                
+                           LEFT JOIN (SELECT * from t_parametersrc  where parameterType ='delivery_status') tp on tp.parameterCode=dm.delivery_status 
+
+                                    where 1=1 ");
+                if (Query.type != 0)
+                {
+                    if (Query.type == 3)
+                    {
+                        conSql.AppendFormat(" and dm.type='{0}'", 101);
+                    }
+                    else
+                    {
+                        conSql.AppendFormat(" and dm.type='{0}'", Query.type);
+                    }              
+                }
+                if (Query.freight_set != 0)
+                {
+                    conSql.AppendFormat(" and dm.freight_set='{0}'", Query.freight_set);
+                }
+                if (Query.delivery_status != 10000)
+                {
+                    conSql.AppendFormat(" and dm.delivery_status='{0}'", Query.delivery_status);
+                }
+
+
+                if (Query.deliver_id != 0)
+                {
+                    conSql.AppendFormat(" and dm.deliver_id='{0}'", Query.deliver_id);
+                }
+                if (Query.order_id != 0)
+                {
+                    conSql.AppendFormat(" and dm.order_id='{0}'", Query.order_id);
+                }
+                if (Query.time_start != DateTime.MinValue && Query.time_end != DateTime.MinValue)
+                {
+                    conSql.AppendFormat(" and dm.estimated_arrival_date between '{0}' and '{1}'", Query.time_start.ToString("yyyy-MM-dd"), Query.time_end.ToString("yyyy-MM-dd"));
+                    
+                }
+                //if (Query.time_end != DateTime.MinValue)
+                //{
+                //    conSql.AppendFormat(" and dm.estimated_arrival_date <= '{0}'", Query.time_end.ToString("yyyy-MM-dd"));
+                //    //BLL.gigade.Common.CommonFunction.DateTimeToString(Query.time_end)
+                //}
+                if (Query.vendor_id != 0)
+                {
+                    conSql.AppendFormat(" and dm.export_id='{0}'",Query.vendor_id);
+                }
+                if (!string.IsNullOrEmpty(Query.vendor_name_full))
+                {
+                    conSql.AppendFormat(" and v.vendor_name_full like '%{0}%'", Query.vendor_name_full);
+                }
+                finalSql.Append(sbSql.ToString() + fromSql.ToString() + conSql.ToString());
+
+                totalCount = 0;
+                if (Query.IsPage)
+                {
+                    DataTable _dt = _access.getDataTable(" select dm.deliver_id " + fromSql.ToString() + conSql.ToString());
+                    if (_dt.Rows.Count > 0)
+                    {
+                        totalCount = _dt.Rows.Count;
+                    }
+                    finalSql.AppendFormat(" limit {0},{1} ", Query.Start, Query.Limit);
+                }
+                return _access.getDataTableForObj<DeliverMasterQuery>(finalSql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(" DeliverMasterDao-->GetDeliverExpectArriveList-->" + ex.Message + finalSql.ToString(), ex);
+            }
+        } 
+        #endregion
     }
 }

@@ -112,7 +112,7 @@ namespace BLL.gigade.Dao
             }
             catch (Exception ex)
             {
-                throw new Exception("EmailGroupDao-->Export-->" + sql.ToString() + ex.Message, ex);
+                throw new Exception("EmailGroupDao-->InsertEmailGroup-->" + sql.ToString() + ex.Message, ex);
             }
         }
 

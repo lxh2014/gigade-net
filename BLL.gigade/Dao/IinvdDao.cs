@@ -34,7 +34,7 @@ namespace BLL.gigade.Dao
         public List<IinvdQuery> GetIinvdList(Model.Query.IinvdQuery ivd, out int totalCount)
         {
             StringBuilder sql = new StringBuilder();
-            StringBuilder sb = new StringBuilder();
+             StringBuilder sb = new StringBuilder();
             StringBuilder sbwhere = new StringBuilder();
             totalCount = 0;
             try
@@ -112,6 +112,69 @@ namespace BLL.gigade.Dao
             }
         }
         #endregion
+        #region 根據產品條碼獲取數據
+        /// <summary>
+        /// 根據產品條碼獲取庫存數據
+        /// </summary>
+        /// <param name="ivd">上架料位對象</param>
+        /// <param name="totalCount">返回的數據總條數</param>
+        /// <returns>上架料位列表</returns>
+        public List<IinvdQuery> GetIinvdListByItemid(Model.Query.IinvdQuery ivd, out int totalCount)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
+            StringBuilder sbwhere = new StringBuilder();
+            totalCount = 0;
+            try
+            {
+                sb.Append("select count(ii.row_id) as totalcounts from iinvd ii  left join iupc iu on iu.item_id=ii.item_id where 1=1 ");
+                sql.Append(@"select Tp_table.parameterName as qity_name,ii.row_id,lic_plt_id,ii.dc_id,ii.whse_id,ii.made_date,po_id,prod_qty,rcpt_id,lot_no,hgt_used,ii.create_user,ii.create_dtim,ii.change_user,ii.change_dtim,cde_dt,ista_id,receipt_dtim,stor_ti,stor_hi,inv_pos_cat,qity_id,plas_loc_id,ii.item_id,plas_prdd_id,CONCAT(vb.brand_name,'-',p.product_name) as product_name,ip.loc_id,pe.cde_dt_var,pe.cde_dt_shp,pe.pwy_dte_ctl,pe.cde_dt_incr,us.user_username as user_name,vb.vendor_id from iinvd ii");
+                sql.Append(" left join iplas ip on ii.item_id=ip.item_id ");
+                //sql.Append(" left join iupc iu on iu.item_id=ii.item_id ");
+                sql.Append(" left join product_item pi on ii.item_id=pi.item_id ");
+                sql.Append(" left JOIN product_ext pe ON ii.item_id=pe.item_id ");
+                sql.Append(" LEFT JOIN (SELECT parameterCode,parameterName from t_parametersrc where parameterType='loc_lock_msg') as Tp_table on ii.qity_id=Tp_table.parameterCode ");
+                sql.Append(" left join product p on p.product_id=pi.product_id  ");
+                sql.Append(" LEFT JOIN  manage_user us on ii.create_user=us.user_id  ");
+                sql.Append(" left join vendor_brand vb on p.brand_id=vb.brand_id where 1=1 ");
+                if (ivd.item_id!=0)
+                {
+                    sbwhere.AppendFormat(" and ii.item_id='{0}' ", ivd.item_id);
+                }
+                DateTime dt = DateTime.Parse("1970-01-02 08:00:00");
+                if (!string.IsNullOrEmpty(ivd.starttime.ToString()) && dt < ivd.starttime)
+                {
+                    sbwhere.AppendFormat(" and ii.create_dtim>'{0}' ", CommonFunction.DateTimeToString(ivd.starttime));
+                }
+                if (!string.IsNullOrEmpty(ivd.endtime.ToString()) && dt < ivd.endtime)
+                {
+                    sbwhere.AppendFormat(" and ii.create_dtim<'{0}' ", CommonFunction.DateTimeToString(ivd.endtime));
+                }
+
+                if (ivd.IsPage)
+                {
+                    DataTable _dt = _access.getDataTable(sb.ToString() + sbwhere.ToString());
+                    if (_dt != null && _dt.Rows.Count > 0)
+                    {
+                        totalCount = Convert.ToInt32(_dt.Rows[0]["totalcounts"]);
+                    }
+                    if (!string.IsNullOrEmpty(ivd.ista_id))
+                    {//理貨員工作用到庫存
+                        sbwhere.AppendFormat(" and ii.ista_id='{0}'  order by ii.cde_dt ;", ivd.ista_id);
+                    }
+                    else
+                    {//收貨上架列表頁
+                        sbwhere.AppendFormat(" group by ii.row_id order by ii.row_id limit {0},{1};", ivd.Start, ivd.Limit);
+                    }
+                }
+                return _access.getDataTableForObj<IinvdQuery>(sql.ToString() + sbwhere.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IupcDao-->GetIinvdListByItemid-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+        #endregion
 
         #region 新增
         public int Insert(Iinvd ivd)
@@ -160,7 +223,9 @@ namespace BLL.gigade.Dao
                 }
                 else
                 {
+                    sql.Append("set sql_safe_updates = 0;");
                     sql.AppendFormat("UPDATE iloc SET Ista_id='F'  where lcat_id='R' AND plas_loc_id='{0}';", m.plas_loc_id);
+                    sql.Append("set sql_safe_updates = 1;");
                     sql.AppendFormat("Delete from iinvd where plas_loc_id='{0}' AND item_id='{1}' AND cde_dt='{2}';", m.plas_loc_id, m.item_id, CommonFunction.DateTimeToString(m.cde_dt));
                 }
             }
@@ -248,15 +313,26 @@ LEFT JOIN product_ext pe ON pi.item_id=pe.item_id where pi.item_id='{0}'  ;", id
         public DataTable Getprodubybar(string id)
         {//根據條碼獲取數據
             StringBuilder sql = new StringBuilder();
-            sql.AppendFormat(@"SELECT vb.vendor_id,i.upc_id,i.item_id,CONCAT(vb.brand_name,'-',p.product_name) as product_name,ps.spec_name,ps2.spec_name,ip.loc_id,pe.cde_dt_var,pe.cde_dt_shp,pe.pwy_dte_ctl,pe.cde_dt_var,pe.cde_dt_incr 
-from iupc i
-left JOIN product_item pi on i.item_id=pi.item_id
+            StringBuilder sbStr = new StringBuilder();
+            sql.AppendFormat(@"SELECT vb.vendor_id,i.upc_id,pi.item_id,CONCAT(vb.brand_name,'-',p.product_name) as product_name,ps.spec_name,ps2.spec_name,ip.loc_id,pe.cde_dt_var,pe.cde_dt_shp,pe.pwy_dte_ctl,pe.cde_dt_var,pe.cde_dt_incr 
+from product_item pi
+left JOIN iupc i on i.item_id=pi.item_id
 LEFT JOIN product p ON pi.product_id=p.product_id 
 LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id
 LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id
 left join vendor_brand vb on p.brand_id=vb.brand_id
-LEFT JOIN iplas ip ON i.item_id=ip.item_id
-LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where i.upc_id='{0}' ;", id);
+LEFT JOIN iplas ip ON pi.item_id=ip.item_id
+LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where 1=1 ");
+            sbStr.AppendFormat("select item_id from product_item where item_id='{0}';", id);
+            DataTable _dtresult = _access.getDataTable(sbStr.ToString());
+            if (_dtresult.Rows.Count > 0)
+            {
+                sql.AppendFormat(" and pi.item_id='{0}' ", id);
+            }
+            else
+            {
+                sql.AppendFormat(" and pi.item_id =(select item_id from iupc where upc_id='{0}'limit 1 )", id);
+            }          
             try
             {
                 return _access.getDataTable(sql.ToString());
@@ -456,7 +532,7 @@ LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where i.upc_id='{0}' ;", id);
             sql.Append(@"iifuliaowei.plas_loc_id as '副料位編號',");
             sql.Append(@"iifuliaowei.prod_qty as '副料位數量',");
             sql.Append(@"iplas.loc_id as '主料位編號',");
-            sql.Append(@"(SELECT IFNULL(sum(prod_qty),0) from iinvd i LEFT JOIN iloc loc on loc.loc_id=i.plas_loc_id where i.item_id  = iplas.item_id and loc.lcat_id='S') as '主數量',");
+            sql.Append(@"(SELECT IFNULL(sum(prod_qty),0) from iinvd i right JOIN iplas ip on ip.loc_id=i.plas_loc_id where i.item_id  = pi.item_id and i.ista_id='A') as '主數量',");
             sql.Append(@"iplas.loc_stor_cse_cap AS '容量','' AS '實際補貨量',iifuliaowei.item_id AS '商品細項編號',");
             sql.Append(@"CONCAT(v.brand_name,'-',p.product_name) AS '品名',");
             sql.Append(@"concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as '規格',");
@@ -490,11 +566,11 @@ LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where i.upc_id='{0}' ;", id);
 
             if (vd.auto == 1)
             {
-                sql.AppendFormat(" AND (SELECT IFNULL(sum(prod_qty),0) from iinvd i LEFT JOIN iloc loc on loc.loc_id=i.plas_loc_id where i.item_id  = pi.item_id  and loc.lcat_id='S')< iplas.loc_stor_cse_cap");
+                sql.AppendFormat(" AND (SELECT IFNULL(sum(prod_qty),0) from iinvd i right join iplas ip on ip.loc_id=i.plas_loc_id where i.item_id  = pi.item_id and i.ista_id='A')< iplas.loc_stor_cse_cap");//LEFT JOIN iplas ip on ip.loc_id=i.plas_loc_id
             }
             else
             {
-                sql.AppendFormat(" AND (SELECT IFNULL(sum(prod_qty),0) from iinvd i LEFT JOIN iloc loc on loc.loc_id=i.plas_loc_id where i.item_id  = pi.item_id and   loc.lcat_id='S')<={0}", vd.sums);
+                sql.AppendFormat(" AND (SELECT IFNULL(sum(prod_qty),0) from iinvd i right JOIN  iplas ip on ip.loc_id=i.plas_loc_id where i.item_id  = pi.item_id  and i.ista_id='A')<={0}", vd.sums);
             }
             sql.AppendFormat(" and iifuliaowei.plas_loc_id is not NULL ORDER BY iifuliaowei.cde_dt ASC ");
             return _access.getDataTable(sql.ToString());
@@ -770,17 +846,19 @@ where loc.loc_id='{0}' {2} LIMIT 1;", m.loc_id, sbjoin, sbWhere);
                         sbWhere.Append(" and SUBSTR(loc.loc_id,5,1) in ('0','2','4','6','8')");
                     }
                 }
+                if (m.prepaid != 0)
+                {
+                    sbWhere.AppendFormat(" and p.prepaid='{0}' ", m.prepaid);
+                }
                 if (!string.IsNullOrEmpty(m.vender))
                 {
-                    sbWhere.AppendFormat(" AND (vv.vendor_code LIKE'%{0}%' OR vv.vendor_name_simple LIKE'%{0}%') ", m.vender);
-                    sbjoin.Append(@" LEFT JOIN product p on p.product_id = loc.product_id 	 
-LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id 
-LEFT JOIN vendor vv ON  v.vendor_id=vv.vendor_id");
+                    sbWhere.AppendFormat(" AND (vv.vendor_id ='{0}' OR vv.vendor_name_simple LIKE'%{0}%') ", m.vender);
+                    sbjoin.Append(@"	LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id  LEFT JOIN vendor vv ON  v.vendor_id=vv.vendor_id ");
                 }
                 sbSql.AppendFormat(@" SELECT  loc.item_id, loc.loc_id, loc.product_id, loc.row_id FROM iloc INNER JOIN (
 SELECT i.item_id,i.plas_loc_id as 'loc_id',pi.product_id,i.row_id from iinvd i LEFT JOIN product_item pi ON i.item_id = pi.item_id
 UNION
-SELECT i.item_id,i.loc_id,pi.product_id,'' as 'row_id' from iplas i LEFT JOIN  product_item pi ON i.item_id = pi.item_id) loc ON loc.loc_id=iloc.loc_id  {1} where iloc.lsta_id NOT in ('H','F')   {0}
+SELECT i.item_id,i.loc_id,pi.product_id,'' as 'row_id' from iplas i LEFT JOIN  product_item pi ON i.item_id = pi.item_id) loc ON loc.loc_id=iloc.loc_id  LEFT JOIN product p on p.product_id = loc.product_id  {1} where iloc.lsta_id NOT in ('H','F')   {0}
 ORDER BY loc.loc_id,loc.row_id DESC  ", sbWhere.ToString(), sbjoin.ToString());
                 DataTable dt = _access.getDataTable(sbSql.ToString());
                 return dt;
@@ -973,7 +1051,6 @@ WHERE st_qty=0 AND ia.create_dtim> ADDDATE(NOW(),-3) AND iarc_id='OB' {0} ", sbW
                         _locDt = _access.getDataTable(sql.ToString());
                         return _locDt.Rows.Count;
                     }
-
                 }
             }
             catch (Exception ex)
@@ -1238,14 +1315,11 @@ us.user_username as user_name from iinvd ii ");
          */
         public List<IinvdQuery> GetSearchIinvd(Model.Query.IinvdQuery ivd)
         {
-
             StringBuilder sql = new StringBuilder();
             StringBuilder sbwhere = new StringBuilder();
-
             try
             {
-                sql.Append(@"select row_id from iinvd ii");
-
+                sql.Append(@"select row_id,plas_loc_id,made_date,cde_dt,prod_qty from iinvd ii");
                 sql.Append(" where 1=1 ");
                 if (!string.IsNullOrEmpty(ivd.plas_loc_id))
                 {
@@ -1254,6 +1328,55 @@ us.user_username as user_name from iinvd ii ");
                 if (!string.IsNullOrEmpty(ivd.ista_id))
                 {
                     sbwhere.AppendFormat(" and ii.ista_id='{0}' ", ivd.ista_id);
+                }
+                if (ivd.item_id != 0)
+                {
+                    sbwhere.AppendFormat(" and ii.item_id='{0}' ", ivd.item_id);
+                }
+                if (ivd.made_date != ivd.cde_dt && ivd.made_date > DateTime.MinValue)
+                {
+                    sbwhere.AppendFormat(" and ii.made_date='{0}' ", ivd.made_date.ToString("yyyy-MM-dd"));
+                }
+                if (ivd.made_date != ivd.cde_dt && ivd.cde_dt > DateTime.MinValue)
+                {
+                    sbwhere.AppendFormat(" and ii.cde_dt='{0}' ", ivd.cde_dt.ToString("yyyy-MM-dd"));
+                }
+                if (ivd.made_date == ivd.cde_dt && ivd.made_date > DateTime.MinValue)
+                {
+                    sbwhere.AppendFormat(" and ii.cde_dt='{0}' and ii.made_date='{1}' ", ivd.cde_dt.ToString("yyyy-MM-dd"), ivd.made_date.ToString("yyyy-MM-dd"));
+                }
+                return _access.getDataTableForObj<IinvdQuery>(sql.ToString() + sbwhere.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdDao-->GetSearchIinvd-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+        /**
+         * chaojie1124j待檢貨商品報表中，查詢主料位的額庫存，然後分批進行檢貨的 
+         */
+        public List<IinvdQuery> GetPlasIinvd(Model.Query.IinvdQuery ivd)
+        {
+
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sbwhere = new StringBuilder();
+
+            try
+            {
+                sql.Append(@"select plas_loc_id,made_date,cde_dt,prod_qty ");
+                sql.Append(@" from iplas ip left join iinvd ii  on ip.loc_id=ii.plas_loc_id ");
+                sql.Append(" where 1=1 ");
+                if (!string.IsNullOrEmpty(ivd.plas_loc_id))
+                {
+                    sbwhere.AppendFormat(" and ii.plas_loc_id='{0}' ", ivd.plas_loc_id.ToString().ToUpper());
+                }
+                if (!string.IsNullOrEmpty(ivd.ista_id))
+                {
+                    sbwhere.AppendFormat(" and ii.ista_id='{0}' ", ivd.ista_id);
+                }
+                if (ivd.item_id != 0)
+                {
+                    sbwhere.AppendFormat(" and ip.item_id='{0}' ", ivd.item_id);
                 }
                 if (ivd.made_date != ivd.cde_dt && ivd.made_date > DateTime.MinValue)
                 {
@@ -1273,11 +1396,10 @@ us.user_username as user_name from iinvd ii ");
             }
             catch (Exception ex)
             {
-                throw new Exception("IinvdDao-->GetSearchIinvd-->" + ex.Message + sql.ToString(), ex);
+                throw new Exception("IupcDao-->GetPlasIinvd-->" + ex.Message + sql.ToString(), ex);
             }
         }
-
-        #region 料位循環盤點 add by yafeng0715j201511041535
+ #region 料位循環盤點 add by yafeng0715j201511041535
 
         public List<IinvdQuery> GetIinvdList(string loc_id)
         {
@@ -1441,4 +1563,5 @@ us.user_username as user_name from iinvd ii ");
         #endregion
 
     }
-}
+    }
+

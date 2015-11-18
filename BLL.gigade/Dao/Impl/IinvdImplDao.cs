@@ -14,6 +14,7 @@ namespace BLL.gigade.Dao.Impl
         DataTable Getprodubybar(string id);
         int Islocid(string id,string zid, string prod_id);
         List<Model.Query.IinvdQuery> GetIinvdList(Model.Query.IinvdQuery ivd, out int totalCount);
+        List<Model.Query.IinvdQuery> GetIinvdListByItemid(Model.Query.IinvdQuery ivd, out int totalCount);
         int IsUpd(Iinvd m);
         int Upd(Iinvd m);
         int Selnum(Iinvd m); 
@@ -52,5 +53,6 @@ namespace BLL.gigade.Dao.Impl
         int GetIinvdCount(IinvdQuery iinvd);
         DateTime GetCde_dt(int row_id);
         int GetProd_qty(int item_id, string loc_id);
+        List<IinvdQuery> GetPlasIinvd(Model.Query.IinvdQuery ivd);
     }
 }

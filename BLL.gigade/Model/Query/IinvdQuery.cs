@@ -53,6 +53,8 @@ namespace BLL.gigade.Model.Query
         public string remarks { get; set; }
         public string spec{get;set;}
         public int prod_qtys { get; set; }
+        public string item_upc { set; get; }//料位條碼
+      
         public IinvdQuery()
         {
             product_name = string.Empty;
@@ -85,6 +87,7 @@ namespace BLL.gigade.Model.Query
             remarks = string.Empty;
             spec=string.Empty;
             prod_qtys = 0;
+            item_upc = string.Empty;
         }
     }
 }

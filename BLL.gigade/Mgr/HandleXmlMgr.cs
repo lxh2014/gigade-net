@@ -20,7 +20,9 @@ namespace BLL.gigade.Mgr
         private string fileName = "";
 
         private string xmlStr = "";
-            
+
+        private int rowId = 1;
+
         public List<XmlModelCustom> GetXmlName(string fullPath)
         {
             try
@@ -45,28 +47,20 @@ namespace BLL.gigade.Mgr
             {
                 ///加載xmlDoc
                 XmlDocument xmlDoc = LoadXmlFolder(fullPath);
-
-                //baseUrl = xmlDoc.BaseURI;
-                ///獲得xmlDoc文檔中的節點
-                XmlNodeList listXml = xmlDoc.GetElementsByTagName("*");
-
-                ///得到xml節點轉換后的List集合
-                List<XmlModelCustom> xmlModelList = GetXmlList(listXml);
-
-                ///從XmlModelList中得到頂層節點
-                List<XmlModelCustom> xmlRootList = GetRootNode(xmlModelList);
-
-                ///循環遞歸給xmlList集合分組
-                List<XmlModelCustom> resultXmlList = ToSortChildNode(xmlModelList, xmlRootList);
+                ///定義一個空集合
+                List<XmlModelCustom> xList = new List<XmlModelCustom>();
+                ///獲得排序號的結果集合
+                List<XmlModelCustom> sortResultList = ToSort(xmlDoc.ChildNodes, xList);
 
                 ///得到xml的字符串格式????
-                xmlStr = GetXmlStr(resultXmlList, "#document","");
+                xmlStr = GetXmlStr(sortResultList, "#document", "");
 
+                ///讓根節點的xmlStr屬性獲得預覽的xmlStr
+                sortResultList.FindAll(m => m.parentName == "#document").FirstOrDefault<XmlModelCustom>().xmlStr = xmlStr;
 
-                resultXmlList.FindAll(m => m.parentName == "#document").FirstOrDefault<XmlModelCustom>().xmlStr = xmlStr;
 
                 ///序列化結果集合
-                resultStr = JsonConvert.SerializeObject(resultXmlList);
+                resultStr = JsonConvert.SerializeObject(sortResultList);
 
                 ///將大寫Checked換成小寫
                 ///註釋掉后樹節點不會存在checkBox選擇
@@ -121,47 +115,7 @@ namespace BLL.gigade.Mgr
             }
         }
 
-        //public bool AddNode(int rowId,string fullPath,string nodeName,int type)
-        //{
-        //    try
-        //    {
-        //        int index = 0;
 
-        //        ///加載xmlDoc
-        //        XmlDocument xmlDoc = LoadXmlFolder(fullPath);
-
-        //        ///在xmlDoc文檔中創建節點
-        //        XmlElement targetNode = xmlDoc.CreateElement(nodeName);
-
-        //        ///獲得xmlDoc文檔中的節點
-        //        XmlNodeList listXml = xmlDoc.GetElementsByTagName("*");
-
-        //        foreach (XmlElement xn in listXml)
-        //        {
-        //            index++;
-        //            if (index == rowId)
-        //            {
-        //                switch (type)
-        //                { 
-        //                    case 1:
-        //                        xn.ParentNode.AppendChild(targetNode);
-        //                        break;
-        //                    case 2:
-        //                        xn.AppendChild(targetNode);
-        //                        break;
-        //                    default:
-        //                        break;
-        //                }
-        //            }
-        //        }
-        //        return false;
-                
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("HandleXmlMgr-->AddNode" + ex.Message,ex);
-        //    }
-        //}
 
         public bool SaveOrUpdate(string fullPath,XmlModelCustom xmc,int type)
         {
@@ -225,6 +179,7 @@ namespace BLL.gigade.Mgr
                  else
                  {
                      newNode = doc.CreateElement(xmc.name);
+                     
                  }
                 ///分割屬性
                 string [] attrArray = xmc.attributes.Split('|');
@@ -240,7 +195,13 @@ namespace BLL.gigade.Mgr
                 }
 
                 ///設置內容
-                newNode.InnerText = xmc.code;
+                //newNode.InnerText = xmc.code;
+
+                if (type == 0)
+                {
+                    newNode = (XmlElement)LoopAddNode(newNode, handleXn);
+                }
+
                 ///添加新節點
                 if (type == 1)
                 {
@@ -271,6 +232,39 @@ namespace BLL.gigade.Mgr
             
         }
 
+
+        private XmlNode LoopAddNode(XmlNode newNode,XmlNode oldNode)
+        {
+            try
+            {
+                if (oldNode.HasChildNodes)
+                {
+                    XmlNodeList childNode = oldNode.ChildNodes;
+                    int index = 0;
+                    int count = childNode.Count;///因為child.count在後面會改變所以先記錄下來
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (childNode[index] != null)
+                        {
+                            newNode.AppendChild(childNode[index]);
+                        }
+                    }
+                    //newNode.AppendChild(childNode[0]);
+                    //newNode.AppendChild(childNode[0]);
+                    //foreach (XmlNode xn in childNode)
+                    //{
+                    //    XmlNode temp = xn;
+                    //    newNode.AppendChild(temp);
+                    //}
+                }
+                return newNode;
+            }
+            catch (Exception ex)
+            {
+                
+                throw new Exception("HandleXmlMgr-->LoopAddNode" + ex.Message,ex);
+            }
+        }
 
         /// <summary>
         /// 打開指定文件夾
@@ -346,45 +340,49 @@ namespace BLL.gigade.Mgr
             return xmlDoc;
         }
 
-        /// <summary>
-        /// 將XmlNodeList集合 轉換為標準treePanel所需要的json格式數據
-        /// </summary>
-        /// <param name="xmlList">XmlNodeList集合</param>
-        /// <returns>JsonStr</returns>
-        private List<XmlModelCustom> GetXmlList(XmlNodeList xmlList)
+
+        private List<XmlModelCustom> ToSort(XmlNodeList xmlList,List<XmlModelCustom> sortList)
         {
             try
             {
-                if (xmlList == null || xmlList.Count == 0) return new List<XmlModelCustom>();
-                List<XmlModelCustom> XmlModelList = new List<XmlModelCustom>();///定義一個XmlModelList用來接收xml文檔中的對象
-                int indexTemp = 1;///定義一個索引變量
-                foreach (XmlElement xn in xmlList)
+
+                foreach (XmlNode xn in xmlList)
                 {
-                    XmlModelCustom xmlModelTemp = new XmlModelCustom();
-                    xmlModelTemp = GetAttributes(xn);///設置和屬性相關內容
-                    xmlModelTemp.fileName = this.fileName;
-                    xmlModelTemp.rowId = indexTemp;
-                    xmlModelTemp.name = xn.Name;///設置Node節點的名稱
-                    xmlModelTemp.text = xn.Name;
-                    xmlModelTemp.parentName = xn.ParentNode.Name;///設置父節點名稱
-                    xmlModelTemp.isTopNode = xn.ParentNode.Name == "#document" ? true : false;///設置是否是根節點
-                    xmlModelTemp.isLastNode = xn.InnerText == xn.InnerXml ? true : false;///設置是否是最後節點(當InnerText屬性==InnerXml屬性時,可證明為最後節點)
-                    xmlModelTemp.code = xmlModelTemp.isLastNode == true ? xn.InnerText : string.Empty;///設置節點中內容.只有最後節點才能有內容
-                    if (xmlModelTemp.isLastNode == true && xmlModelTemp.code!="") xmlModelTemp.text = xmlModelTemp.code;
-                    //xmlStr = xmlStr.Replace(">", "").Replace("<","");
-                    //xmlStr = xmlStr.Replace(">", "&gt;").Replace("<","&lt;");
-                    //xmlStr = xmlStr.Replace(">", " >").Replace("<","< ");
-                    if (xmlModelTemp.isTopNode == true) xmlModelTemp.xmlStr = xmlStr;
-                    XmlModelList.Add(xmlModelTemp);///添加進list
-                    indexTemp++;
+                    if (xn.InnerText.IndexOf("version=\"1.0\"") >= 0 || xn.Name == "#text"||xn.Name=="#comment")
+                    {
+                        continue;
+                    }
+                    XmlModelCustom xTemp = new XmlModelCustom();
+                    xTemp.isTopNode = xn.ParentNode.Name == "#document" ? true : false;///設置是否是根節點
+                    if (xn.Attributes != null)
+                    {
+                        xTemp = GetAttributes((XmlElement)xn, xTemp);///設置和屬性相關內容
+                    }
+                    xTemp.fileName = this.fileName;
+                    xTemp.name = xn.Name;///設置Node節點的名稱
+                    xTemp.text = xn.Name;
+                    xTemp.parentName = xn.ParentNode.Name;///設置父節點名稱
+                    xTemp.isLastNode = xn.InnerText == xn.InnerXml ? true : false;///設置是否是最後節點(當InnerText屬性==InnerXml屬性時,可證明為最後節點)
+                    xTemp.code = xTemp.isLastNode == true ? xn.InnerText : string.Empty;///設置節點中內容.只有最後節點才能有內容
+                    if (xTemp.isLastNode == true && xTemp.code != "") xTemp.text = xTemp.code;
+                    if (xTemp.isTopNode == true) xTemp.xmlStr = xmlStr;
+                    sortList.Add(xTemp);
+                    if (xn.HasChildNodes)
+                    {
+                        XmlNodeList xList = xn.ChildNodes;
+                        xTemp.children = ToSort(xList, xTemp.children);
+                    }
                 }
-                return XmlModelList;
+
+                return sortList;
             }
             catch (Exception ex)
             {
-                throw new Exception("HandleXmlMgr-->GetXmlList" + ex.Message, ex);
+                throw new Exception("HandleXmlMgr-->ToSortChildNode" + ex.Message, ex);
             }
         }
+
+
 
         /// <summary>
         /// 從xmlModelList中找出根節點
@@ -406,43 +404,38 @@ namespace BLL.gigade.Mgr
             }
         }
 
-        /// <summary>
-        /// 循環遞歸排序分組各node
-        /// </summary>
-        /// <param name="allXmlNodeList">所有節點集合</param>
-        /// <param name="rootXmlList">根節點集合</param>
-        /// <returns>分組完成后的節點結合</returns>
-        private List<XmlModelCustom> ToSortChildNode(List<XmlModelCustom> allXmlNodeList,List<XmlModelCustom> rootXmlList)
-        {
-            try
-            {
-                foreach(XmlModelCustom xmlRoot in rootXmlList)
-                {
-                    List<XmlModelCustom> childTempList = new List<XmlModelCustom>();///用來保存子節點集合
-                    childTempList = allXmlNodeList.FindAll(m => m.parentName == xmlRoot.name && xmlRoot.code=="");///查找父節點是上一級節點的子節點集合
-                    allXmlNodeList.RemoveAll(m => m.parentName == xmlRoot.name && xmlRoot.code == "");
-                    xmlRoot.children = childTempList;
-                    if (childTempList.Count > 0) 
-                    {
-                        ToSortChildNode(allXmlNodeList, childTempList);
-                    }
-                }
-                return rootXmlList;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("HandleXmlMgr-->ToSortChildNode" + ex.Message, ex);
-            }
-        }
+
+
+
+
+        //private List<XmlModelCustom> ToSortChildNodeaaa(List<XmlModelCustom> allXmlNodeList, List<XmlModelCustom> rootXmlList, XmlNodeList xmlList)
+        //{
+        //    try
+        //    {
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //         throw new Exception("HandleXmlMgr-->ToSortChildNode" + ex.Message, ex);
+        //    }
+        //}
+
+
+
+
+
+
+
+    
 
         /// <summary>
         /// 獲取屬性相關信息
         /// </summary>
         /// <param name="xn">node節點</param>
         /// <returns>包含Attributes相關信息的XmlModeCustom對象</returns>
-        private XmlModelCustom GetAttributes(XmlElement xn)
+        private XmlModelCustom GetAttributes(XmlElement xn, XmlModelCustom xmlModelTemp)
         {
-            XmlModelCustom xmlModelTemp = new XmlModelCustom();
+            
             string attris = string.Empty;
             string attrisXml = string.Empty;
             try
@@ -573,8 +566,6 @@ namespace BLL.gigade.Mgr
         /// <returns>預覽顯示的xmlStr</returns>
         private string GetXmlStr(List<XmlModelCustom> xmlModelList,string parentNode,string code)
         {
-
-            //string aaa = "< {0} {1} = \"{2}\" >{3}< /{0}>";
             List<XmlModelCustom> tempList = xmlModelList.FindAll(m => m.parentName == parentNode);
             if (tempList.Count == 0) return "";
             StringBuilder sb = new StringBuilder();
@@ -618,18 +609,10 @@ namespace BLL.gigade.Mgr
             try
             {
                 XmlDocument xmlDoc = LoadXmlFolder(fullPath);
-                XmlNodeList listXml = xmlDoc.GetElementsByTagName("*");
-                List<XmlModelCustom> xmlModelList = GetXmlList(listXml);
-
-                ///從XmlModelList中得到頂層節點
-                List<XmlModelCustom> xmlRootList = GetRootNode(xmlModelList);
-
-                ///循環遞歸給xmlList集合分組
-                List<XmlModelCustom> resultXmlList = ToSortChildNode(xmlModelList, xmlRootList);
-
-                ///得到xml的字符串格式????
+                List<XmlModelCustom> TempList= new List<XmlModelCustom>();
+                List<XmlModelCustom> resultXmlList = ToSort(xmlDoc.ChildNodes, TempList);
+                ///得到xml格式字符串
                 xmlStr = GetXmlStr(resultXmlList, "#document", "");
-
                 return xmlStr;
             }
             catch (Exception ex)

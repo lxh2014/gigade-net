@@ -33,6 +33,7 @@ namespace Admin.gigade.Controllers
         //   private IInvoiceAllowanceRecordlMgr _invoiceAllow;
         private IOrderMasterImplMgr _orderMasterMgr;
         private IOrderSlaveImplMgr _orderSlaveMgr;
+
         //  private IOrderPaymentCtImplMgr _iopcMgr;
         private InvoiceMasterRecordMgr imrMgr;
         private IOrderDetailImplMgr _orderDetailMgr;
@@ -44,6 +45,8 @@ namespace Admin.gigade.Controllers
         private static DataTable DTExcel = new DataTable();
         private static DataTable DTExcel1 = new DataTable();
         private static string excelPath = ConfigurationManager.AppSettings["ImportUserIOExcel"];//關於導入的excel文件的限制
+        private IupcMgr _iupc;
+
         #region 視圖
         public ActionResult Index()
         {
@@ -3120,7 +3123,7 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("總毛利率(毛利/總售價)");
                 for (int i = 0; i < _dt.Rows.Count; i++)
                 {
-                    if (Convert.ToInt32(_dt.Rows[i]["m_product_money"]) != 0)
+                    if (Convert.ToInt32(_dt.Rows[i]["m_product_cost"]) != 0)
                     {
                         DataRow dr = dtHZ.NewRow();
                         dr[0] = _dt.Rows[i]["vendor_id"];
@@ -3208,7 +3211,14 @@ namespace Admin.gigade.Controllers
                             dr[25] = "";
                         }
                         dr[26] = Convert.ToInt32(_dt.Rows[i]["m_product_money"]) - Convert.ToInt32(_dt.Rows[i]["m_product_cost"]);
-                        dr[27] = (Convert.ToInt32(_dt.Rows[i]["m_product_money"]) - Convert.ToInt32(_dt.Rows[i]["m_product_cost"])) / Convert.ToDecimal(_dt.Rows[i]["m_product_money"]);
+                        if (Convert.ToDecimal(_dt.Rows[i]["m_product_money"]) != 0)
+                        {
+                            dr[27] = (Convert.ToInt32(_dt.Rows[i]["m_product_money"]) - Convert.ToInt32(_dt.Rows[i]["m_product_cost"])) / Convert.ToDecimal(_dt.Rows[i]["m_product_money"]);
+                        }
+                        else
+                        {
+                            dr[27] = "";
+                        }
                         dtHZ.Rows.Add(dr);
                     }
 
@@ -3253,6 +3263,7 @@ namespace Admin.gigade.Controllers
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
 
                 _IVAMMgr = new VendorAccountMonthMgr(mySqlConnectionString);
+                _iupc = new IupcMgr(mySqlConnectionString);
                 int totalCount = 0;
                 stores = _IVAMMgr.GetVendorAccountMonthDetailList(query, out totalCount);
                 foreach (var item in stores)
@@ -3260,12 +3271,22 @@ namespace Admin.gigade.Controllers
                     item.order_createdates = CommonFunction.GetNetTime(item.order_createdate);
                     item.account_dates = CommonFunction.GetNetTime(item.account_date);
                     item.slave_date_deliverys = CommonFunction.GetNetTime(item.slave_date_delivery);
-
-                }
-                foreach (var item in stores)
-                {
+                    if (item.item_mode == 2)
+                    {
+                        item.buy_num *= item.parent_num;
+                    }
                     item.search_start_time = query.search_start_time;
                     item.search_end_time = query.search_end_time;
+                    if (item.item_mode == 1)
+                    {
+                        item.item_id = 0;
+                        item.upc_id = "";
+                    }
+                    else
+                    {
+                        item.upc_id = _iupc.Getupc(item.item_id.ToString(), "1");
+                    }
+
                 }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
@@ -5547,7 +5568,9 @@ namespace Admin.gigade.Controllers
             dr9[28] = "父親商品編號";
             dr9[29] = "寄倉費";
             dr9[30] = "稅別";
-            dr9[31] = "管理員備註";
+            dr9[31] = "商品細項編號";
+            dr9[32] = "國際編碼";
+            dr9[33] = "管理員備註";
             dtHZ.Rows.Add(dr1);
             dtHZ.Rows.Add(dr2);
             dtHZ.Rows.Add(dr3);
@@ -5679,7 +5702,7 @@ namespace Admin.gigade.Controllers
                 dr[17] = item.Product_Name + item.Product_Spec_Name;
                 if (item.item_mode == 2)
                 {
-                    dr[19] = item.Buy_Num;
+                    dr[19] = item.Buy_Num * item.parent_num;
                 }
                 else
                 {
@@ -5707,6 +5730,7 @@ namespace Admin.gigade.Controllers
                 dr[26] = "";
                 dr[27] = item.order_status_name;
                 dr[28] = item.parent_id;
+
                 if (item.od_bag_check_money * item.Buy_Num == 0)
                 {
                     dr[29] = 0;
@@ -5715,6 +5739,7 @@ namespace Admin.gigade.Controllers
                 {
                     dr[29] = "-" + (item.od_bag_check_money * item.Buy_Num);
                 }
+
                 //dr[29] = item.od_bag_check_money * item.Buy_Num == 0 ? 0 : '-' + (item.od_bag_check_money * item.Buy_Num);
 
                 if (item.tax_type == 1)
@@ -5728,7 +5753,17 @@ namespace Admin.gigade.Controllers
                 }
 
                 dr[30] = item.taxtype;
-                dr[31] = item.Note_Admin;
+                if (item.item_mode != 1)
+                {
+                    dr[31] = item.Item_Id;
+                    dr[32] = " " + item.upc_id;
+                }
+                else
+                {
+                    dr[31] = "";
+                    dr[32] = "";
+                }
+                dr[33] = item.Note_Admin;
                 dtHZ.Rows.Add(dr);
             }
             if (type == 1 || type == 3)
@@ -5759,13 +5794,23 @@ namespace Admin.gigade.Controllers
                 }
                 dre[13] = account_amount;
                 dtHZ.Rows.Add(dre);
+                DataRow drJiC = dtHZ.NewRow();
+                drJiC[12] = "寄倉費";
+                drJiC[13] = "-" + Convert.ToInt32(tempTemp.Rows[0]["m_bag_check_money"].ToString());
+                if (drJiC[13].ToString() != "-0")
+                {
+                    dtHZ.Rows.Add(drJiC);
+                }
                 DataRow drFre = dtHZ.NewRow();
                 drFre[12] = "運費";
-                fritotal = tempFreightDelivery_Low + tempFreightDelivery_Normal - (Convert.ToInt32(tempTemp.Rows[0]["m_bag_check_money"].ToString())) + 0;
-                drFre[13] = fritotal;
+                drFre[13] = tempFreightDelivery_Low + tempFreightDelivery_Normal;
                 if (drFre[13].ToString() != "0")
                 {
                     dtHZ.Rows.Add(drFre);
+                }
+                fritotal = tempFreightDelivery_Low + tempFreightDelivery_Normal - (Convert.ToInt32(tempTemp.Rows[0]["m_bag_check_money"].ToString())) + 0;
+                if (drJiC[13].ToString() != "-0" || drFre[13].ToString() != "0")
+                {
                     DataRow drFreTotal = dtHZ.NewRow();
                     drFreTotal[13] = account_amount + fritotal;
                     dtHZ.Rows.Add(drFreTotal);
@@ -5776,7 +5821,7 @@ namespace Admin.gigade.Controllers
                 int month = Convert.ToInt32(Request.Params["dateTwo"].ToString());
                 DateTime dtime = new DateTime(year, month, 1);
 
-                drT1[0] = "※" + Request.Params["dateTwo"].ToString() + "月對帳表出貨日期(+10天)：" + dtime.AddDays(-10).ToShortDateString() + "～" + dtime.AddMonths(1).AddDays(-11).ToShortDateString() + "(到店取貨(+15天):" + dtime.AddDays(-15).ToShortDateString() + "～" + dtime.AddMonths(1).AddDays(-16).ToShortDateString() + ")";
+                drT1[0] = "※" + Request.Params["dateTwo"].ToString() + "月對帳表出貨日期：" + dtime.AddDays(-11).ToShortDateString() + "～" + dtime.AddMonths(1).AddDays(-12).ToShortDateString() + "(到店取貨:" + dtime.AddDays(-16).ToShortDateString() + "～" + dtime.AddMonths(1).AddDays(-17).ToShortDateString() + ")";
                 dtHZ.Rows.Add(drT1);
                 DataRow drT2 = dtHZ.NewRow();
                 drT2[0] = "※發票抬頭：吉甲地好市集股份有限公司，統編：25137186。";
@@ -5796,7 +5841,9 @@ namespace Admin.gigade.Controllers
                 DataRow drT6 = dtHZ.NewRow();
                 drT6[0] = "3.付款:吉甲地廠商款付款，每月最後一工作日";
                 dtHZ.Rows.Add(drT6);
-
+                DataRow drT8 = dtHZ.NewRow();
+                drT8[13] = "(稅別金額如下，提供開立發票參考,如金額有誤,請跟吉甲地連絡,如為開立收據,可毋需理會)";
+                dtHZ.Rows.Add(drT8);
                 DataRow drShuiBei = dtHZ.NewRow();
                 drShuiBei[13] = "稅別";
                 drShuiBei[14] = "免稅";
@@ -5805,6 +5852,11 @@ namespace Admin.gigade.Controllers
                 dtHZ.Rows.Add(drShuiBei);
                 DataRow DrXS = dtHZ.NewRow();
                 DrXS[13] = "銷售額";
+                if (yingTotal < 0)
+                {
+                    mianx = mianx + yingTotal;
+                    yingTotal = 0;
+                }
                 DrXS[14] = mianx;
                 DrXS[15] = Math.Round(yingTotal / 1.05);
                 DrXS[16] = "/";
@@ -5906,7 +5958,7 @@ namespace Admin.gigade.Controllers
                 query.search_end_time = list[1];
                 int tempFreightDelivery_Normal = 0;
                 int tempFreightDelivery_Low = 0;
-                for (int i = 1; i <= 32; i++)
+                for (int i = 1; i <= 34; i++)
                 {
                     dtHZ.Columns.Add("", typeof(String));
                 }
@@ -5979,7 +6031,7 @@ namespace Admin.gigade.Controllers
                 query.search_end_time = list[1];
                 int tempFreightDelivery_Normal = 0;
                 int tempFreightDelivery_Low = 0;
-                for (int i = 1; i <= 32; i++)
+                for (int i = 1; i <= 34; i++)
                 {
                     dtHZ.Columns.Add("", typeof(String));
                 }
@@ -6104,7 +6156,7 @@ namespace Admin.gigade.Controllers
                     //tempDT.Add(0, tempTemp);
                     //供應商信息
                     vendorQuery = _IVAMMgr.GetVendorInfoByCon(vendorQuery);
-                    for (int i = 1; i <= 32; i++)
+                    for (int i = 1; i <= 34; i++)
                     {
                         dtHZ.Columns.Add("", typeof(String));
                     }

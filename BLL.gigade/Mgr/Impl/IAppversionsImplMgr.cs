@@ -14,5 +14,7 @@ namespace BLL.gigade.Mgr.Impl
         string DeleteAppversionsById(string id);
         //編輯事件
         string EditAppversionsInfo(AppversionsQuery anpq);
+
+        int UpdateAppversionsActive(int id, int status);
     }
 }

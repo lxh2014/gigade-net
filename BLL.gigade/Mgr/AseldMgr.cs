@@ -100,6 +100,19 @@ namespace BLL.gigade.Mgr
             }
         }
         #endregion
+        #region
+        public List<AseldQuery> GetAseldListByItemid(Aseld ase)
+        {
+            try
+            {
+                return _aseldDao.GetAseldListByItemid(ase);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldMgr-->GetAseldListByItemid-->" + ex.Message, ex);
+            }
+        }
+        #endregion
         public string UpdTicker(string m)
         {
             try
@@ -216,17 +229,17 @@ namespace BLL.gigade.Mgr
                 throw new Exception("AseldMgr-->UpdScaned-->" + ex.Message, ex);
             }
         }
-        public DataTable GetDetailOrSimple(string type, string jobNumbers)
+        public DataTable GetDetailOrSimple(string type, string jobNumbers, AseldQuery query = null)
         {
             try
             {
                 if (type == "0")
                 {
-                    return _aseldDao.GetNComJobSimple();
+                    return _aseldDao.GetNComJobSimple(query);
                 }
                 else
                 {
-                    return _aseldDao.GetNComJobDetail(jobNumbers);
+                    return _aseldDao.GetNComJobDetail(jobNumbers,query);
                 } 
             }
             catch (Exception ex)

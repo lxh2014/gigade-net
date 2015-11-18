@@ -15,10 +15,11 @@ Ext.define('GIGADE.Log', {
     fields: [
         { name: 'rowid', type: 'int' },
         { name: 'schedule_code', type: 'string' },
+        { name: 'schedule_name', type: 'string' },
         { name: "create_username", type: "string" },
         { name: "create_time", type: "int" },
         {name:"show_create_time",type:"string"},
-         { name: "ipfrom", type: 'string' },
+        { name: "ipfrom", type: 'string' },
         //  { name: "start_time", type: "int" },//開始時間
         //{ name: "end_time", type: "int" },//結束時間
     ]
@@ -82,11 +83,12 @@ Ext.onReady(function () {
         frame: true,
         flex: 9.4,
         columns: [
-            new Ext.grid.RowNumberer(),//自動顯示行號
+            //new Ext.grid.RowNumberer(),//自動顯示行號
          { header: "編號", dataIndex: "rowid", width: 80, align: 'center' },
-        { header: "排程名稱", dataIndex: "schedule_code", width: 120, align: 'center' },
-        { header: "創建人", dataIndex: "create_username", width: 100, align: 'center' },
-        { header: "創建時間", dataIndex: "show_create_time", width: 150, align: 'center' },
+         { header: "排程Code", dataIndex: "schedule_code", width: 150, align: 'center' },
+        { header: "排程名稱", dataIndex: "schedule_name", width: 150, align: 'center' },
+        { header: "執行用戶", dataIndex: "create_username", width: 100, align: 'center' },
+        { header: "執行時間", dataIndex: "show_create_time", width: 150, align: 'center' },
         { header: "ip來源", dataIndex: "ipfrom", width: 150, align: 'center' },
         ],
         tbar: [

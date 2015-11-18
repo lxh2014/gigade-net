@@ -36,7 +36,7 @@ Ext.define('gridlistMaster', {
 //master 列表頁的數據源 
 var ScheduleStore = Ext.create('Ext.data.Store', {
     pageSize: pageSize,
-   // autoLoad:true,
+    autoLoad:true,
     autoDestroy: true,
     model: 'gridlistMaster',
     proxy: {
@@ -123,10 +123,10 @@ Ext.define('GIGADE.Period', {
         { name: "create_time", type: "int" },
         { name: "change_username", type: "string" },
         { name: "change_time", type: "int" },
-         { name: 'period_type', type: 'int' },
-         {name:"show_period_type",type:'string'},
+        { name: 'period_type', type: 'int' },
+        {name:"show_period_type",type:'string'},
         { name: 'period_nums', type: 'int' },
-        { name: 'show_begin_datetime', type: 'date' },
+        { name: 'show_begin_datetime', type: 'date', dateFormat: "Y-m-d H:i:s" },
         { name: 'current_nums', type: 'int' },
         { name: 'limit_nums', type: 'int' },
         { name: "show_create_time", type: "string" },
@@ -191,7 +191,7 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
     columnLines: true,
     store: ScheduleStore,
     columns: [                      //顯示master
-        { header: '編號', dataIndex: 'rowid', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+        { header: '編號', dataIndex: 'rowid', align: 'left', width: 40, menuDisabled: true, sortable: false, align: 'center' },
          {
              header: "排程狀態", dataIndex: 'schedule_state', align: 'center', width: 60, hidden: false,
              renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
@@ -202,7 +202,7 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
                  }
              }
          },
-        { header: '排程Code', dataIndex: 'schedule_code', align: 'left', width: 80, menuDisabled: true, sortable: false, align: 'center' },
+        { header: '排程Code', dataIndex: 'schedule_code', align: 'left', width: 100, menuDisabled: true, sortable: false, align: 'center' },
         { header: '排程名稱', dataIndex: 'schedule_name', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
        { header: 'contriller/action', dataIndex: 'schedule_api', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
        { header: '排程描述', dataIndex: 'schedule_description', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
@@ -220,7 +220,7 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
      { xtype: 'button', text: "刪除", id: 'delete_master', iconCls: 'icon-user-remove', hidden: true, disabled: true, handler: ondelete_master },
      { xtype: 'button', text: "立即執行", id: 'runonce_master', iconCls: 'icon-user-edit', hidden: true, disabled: true, handler: onrunonce_master },
      '->',
-     { xtype: 'button', text: "查詢", id: 'grid_btn_search', iconCls: 'ui-icon ui-icon-search', width: 65, handler: Search },
+     { xtype: 'button', text: "刷新", id: 'grid_btn_search', iconCls: 'ui-icon ui-icon-search', width: 65, handler: Search },
     ],
     bbar: Ext.create('Ext.PagingToolbar', {
         store: ScheduleStore,
@@ -349,7 +349,7 @@ var center = Ext.create('Ext.form.Panel', {
                                     }
                                 },
                                 resize: function () {
-                                    this.doLayout();
+                                    this.doLayout(); 
                                 }
                             },
                             selModel: sm_period
@@ -373,7 +373,7 @@ Ext.onReady(function () {
             xtype: 'panel',
             autoScroll: true,
             frame: false,
-            width: 400,
+            width: 500,
             margins: '5 4 5 5',
             id: 'west-region-container',
             layout: 'anchor',
@@ -416,7 +416,7 @@ function LoadDetail(record) {
         Schedule_Period_Store.removeAll();
     }
 else 
-  {
+    {
         Ext.getCmp("schedule_code").setValue(record.data.schedule_code);
         //center.getForm().loadRecord(record);
         Schedule_Config_Store.load();
@@ -693,7 +693,7 @@ function onrunonce_master() {
                         }
                     },
                     failure: function () {
-                        Ext.Msg.alert("執行失敗!");
+                        Ext.Msg.alert(INFORMATION, "執行失敗!");
                     }
                 });
             }

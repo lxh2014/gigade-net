@@ -83,24 +83,32 @@ var DeliversListStore = Ext.create("Ext.data.Store", {
 });
 //加載前
 DeliversListStore.on('beforeload', function () {
-    Ext.apply(DeliversListStore.proxy.extraParams, {
-        order_id: Ext.getCmp("order_id").getValue(),
-        deliver_id: Ext.getCmp("deliver_id").getValue(),
-        shipment_id: Ext.getCmp("shipment").getValue(),
-        order_status_id: Ext.getCmp("order_id_status").getValue(),
-        slave_status_id: Ext.getCmp("slave_id_status").getValue(),
-        detail_status_id: Ext.getCmp("detail_id_status").getValue(),
-        payment_id: Ext.getCmp("payment_id").getValue(),
-        dateStart: Ext.getCmp("dateStart").getValue(),
-        dateEnd: Ext.getCmp("dateEnd").getValue(),
-        logistics_type: Ext.getCmp("logistics_type").getValue(),
-        delivery_status: Ext.getCmp("delivery_status").getValue(),
-        product_mode: Ext.getCmp("product_mode").getValue(),
-        serch_msg: Ext.getCmp("serch_msg").getValue(),
-        serch_where: Ext.getCmp("serch_where").getValue(),
-        t_days: Ext.getCmp("t_days").getValue(),
-        serch_time: Ext.getCmp("serch_time").getValue()
-    })
+    var order = Ext.getCmp("order_day");
+    if (!order.isValid()) {
+        Ext.Msg.alert("提示", "請輸入正確的距離預計到貨日");
+        return;
+    } else {
+        Ext.apply(DeliversListStore.proxy.extraParams, {
+            order_id: Ext.getCmp("order_id").getValue(),
+            deliver_id: Ext.getCmp("deliver_id").getValue(),
+            shipment_id: Ext.getCmp("shipment").getValue(),
+            order_status_id: Ext.getCmp("order_id_status").getValue(),
+            slave_status_id: Ext.getCmp("slave_id_status").getValue(),
+            detail_status_id: Ext.getCmp("detail_id_status").getValue(),
+            payment_id: Ext.getCmp("payment_id").getValue(),
+            dateStart: Ext.getCmp("dateStart").getValue(),
+            dateEnd: Ext.getCmp("dateEnd").getValue(),
+            logistics_type: Ext.getCmp("logistics_type").getValue(),
+            delivery_status: Ext.getCmp("delivery_status").getValue(),
+            product_mode: Ext.getCmp("product_mode").getValue(),
+            serch_msg: Ext.getCmp("serch_msg").getValue(),
+            serch_where: Ext.getCmp("serch_where").getValue(),
+            t_days: Ext.getCmp("t_days").getValue(),
+            serch_time: Ext.getCmp("serch_time").getValue(),
+            order_day: Ext.getCmp("order_day").getValue()
+
+        })
+    }
 
 });
 
@@ -341,7 +349,14 @@ Ext.onReady(function () {
                     name: 'order_id',
                     allowBlank: true,
                     margin: '0 20px',
-                    labelWidth: 70
+                    labelWidth: 70,
+                    listeners: {
+                        specialkey: function (field, e) {
+                            if (e.getKey() == e.ENTER) {
+                                Query();
+                            }
+                        }
+                    }
                 },
                 {
                     xtype: 'textfield',
@@ -528,7 +543,23 @@ Ext.onReady(function () {
                       }
                   }
                     ,
-                       { xtype: 'numberfield', labelWidth: 135, margin: '0 20px', fieldLabel: '距離壓單日(大於等於)',minValue:0,allowDecimals:false, id: 't_days' }//距離壓單日
+                       {
+                           xtype: 'numberfield',
+                           labelWidth: 135,
+                           margin: '0 20px',
+                           fieldLabel: '訂單成立天數(大於等於)',
+                           minValue: 0,
+                           value: 0,
+                           allowDecimals: false,
+                           id: 't_days',
+                           listeners: {
+                               specialkey: function (field, e) {
+                                   if (e.getKey() == e.ENTER) {
+                                       Query();
+                                   }
+                               }
+                           }
+                       }//距離壓單日
                   ]
               },
 
@@ -580,7 +611,20 @@ Ext.onReady(function () {
                                     typeAhead: true,
                                     forceSelection: false
                                 },
-                                 { xtype: 'textfield', labelWidth: 60, margin: '0 20px', allowBlank: true, id: 'serch_where' }
+                                 {
+                                     xtype: 'textfield',
+                                     labelWidth: 60,
+                                     margin: '0 20px',
+                                     allowBlank: true,
+                                     id: 'serch_where',
+                                     listeners: {
+                                         specialkey: function (field, e) {
+                                             if (e.getKey() == e.ENTER) {
+                                                 Query();
+                                             }
+                                         }
+                                     }
+                                 }
                             ]
                         },
 
@@ -667,6 +711,26 @@ Ext.onReady(function () {
                                 }
                             }
                         }
+                    },
+                    {
+                        xtype: 'numberfield',
+                        id: 'order_day',
+                        fieldLabel: "距離預計到貨日",
+                        name: 'order_day',
+                        allowBlank: true,
+                        hideTrigger: true,
+                        minValue:0,
+                        allowDecimals:false,
+                        margin: '0 0 0 10',
+                        labelWidth: 90,
+                        value: 0,
+                        listeners: {
+                            specialkey: function (field, e) {
+                                if (e.getKey() == e.ENTER) {
+                                    Query();
+                                }
+                            }
+                        }
                     }
                 ]
             },
@@ -687,6 +751,7 @@ Ext.onReady(function () {
                         xtype: 'button',
                         text: "重置",
                         margin: '0 20px',
+                        iconCls: 'ui-icon ui-icon-reset',
                         id: 'btn_reset',
                         listeners: {
                             click: function () {
@@ -704,9 +769,9 @@ Ext.onReady(function () {
                                 Ext.getCmp("product_mode").setValue(0);
                                 Ext.getCmp("serch_msg").setValue(null);
                                 Ext.getCmp("serch_where").setValue("");
-                                Ext.getCmp("t_days").setValue();
+                                Ext.getCmp("t_days").setValue(0);
                                 Ext.getCmp("serch_time").setValue(2);
-                                
+                                Ext.getCmp("order_day").setValue(0);
                             }
                         }
                     }
@@ -724,7 +789,7 @@ Ext.onReady(function () {
         frame: true,
         columns: [
             {
-                header: '距離壓單日', dataIndex: 'overdue_day', width: 65, align: 'center',
+                header: '訂單成立天數', dataIndex: 'overdue_day', width: 85, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (record.data.order_status == 99) {
                         return "<div style='color:#AAAAEE;'> " + value + "</div>";
@@ -798,10 +863,10 @@ Ext.onReady(function () {
                 }
             },
             {
-                header: '最近出貨時間', dataIndex: 'estimated_delivery_date', width: 110, align: 'center'
+                header: '預計出貨日期', dataIndex: 'estimated_delivery_date', width: 110, align: 'center'//最近出貨時間
             },
             {
-                header: '貨物運達時間', dataIndex: 'estimated_arrival_date', width: 110, align: 'center'
+                header: '預計到貨日期', dataIndex: 'estimated_arrival_date', width: 110, align: 'center'//貨物運達時間
             },
 
             {
@@ -830,15 +895,21 @@ Ext.onReady(function () {
              hidden:true,
              id: 'btnExcel',
              handler: function () {
-                 window.open("/ReportManagement/GetDeliversExcelList?order_id=" +
-                     Ext.getCmp('order_id').getValue() + "&deliver_id=" + Ext.getCmp('deliver_id').getValue() +
-                     "&shipment_id=" + Ext.getCmp('shipment').getValue() + "&order_status_id=" + Ext.getCmp('order_id_status').getValue() +
-                     "&payment_id=" + Ext.getCmp('payment_id').getValue() + "&dateStart=" + Ext.Date.format(Ext.getCmp('dateStart').getValue(), 'Y-m-d') +
-                     "&dateEnd=" + Ext.Date.format(Ext.getCmp('dateEnd').getValue(), 'Y-m-d') + "&logistics_type=" + Ext.getCmp("logistics_type").getValue() +
-                     "&delivery_status=" + Ext.getCmp("delivery_status").getValue() + "&t_days=" + Ext.getCmp("t_days").getValue() + "&serch_where=" + Ext.getCmp("serch_where").getValue()
-                     + "&serch_msg=" + Ext.getCmp("serch_msg").getValue() + "&product_mode=" + Ext.getCmp("product_mode").getValue() + "&slave_status_id=" + Ext.getCmp("slave_id_status").getValue()
-                      + "&detail_status_id=" + Ext.getCmp("detail_id_status").getValue()+"&serch_time="+Ext.getCmp("serch_time").getValue()
-                     );
+                 var order = Ext.getCmp("order_day");
+                 if (!order.isValid()) {
+                     Ext.Msg.alert("提示", "請輸入正確的距離預計到貨日");
+                     return;
+                 } else {
+                     window.open("/ReportManagement/GetDeliversExcelList?order_id=" +
+                         Ext.getCmp('order_id').getValue() + "&deliver_id=" + Ext.getCmp('deliver_id').getValue() +
+                         "&shipment_id=" + Ext.getCmp('shipment').getValue() + "&order_status_id=" + Ext.getCmp('order_id_status').getValue() +
+                         "&payment_id=" + Ext.getCmp('payment_id').getValue() + "&dateStart=" + Ext.Date.format(Ext.getCmp('dateStart').getValue(), 'Y-m-d') +
+                         "&dateEnd=" + Ext.Date.format(Ext.getCmp('dateEnd').getValue(), 'Y-m-d') + "&logistics_type=" + Ext.getCmp("logistics_type").getValue() +
+                         "&delivery_status=" + Ext.getCmp("delivery_status").getValue() + "&t_days=" + Ext.getCmp("t_days").getValue() + "&serch_where=" + Ext.getCmp("serch_where").getValue()
+                         + "&serch_msg=" + Ext.getCmp("serch_msg").getValue() + "&product_mode=" + Ext.getCmp("product_mode").getValue() + "&slave_status_id=" + Ext.getCmp("slave_id_status").getValue()
+                          + "&detail_status_id=" + Ext.getCmp("detail_id_status").getValue() + "&serch_time=" + Ext.getCmp("serch_time").getValue() + "&order_day=" + Ext.getCmp("order_day").getValue()
+                         );
+                 }
              }
          }, '->'
          ,
@@ -880,7 +951,7 @@ Ext.onReady(function () {
 //    s += d.getFullYear() + "/";                     // 获取年份。
 //    s += (d.getMonth() + 1) + "/";              // 获取月份。
 //    s += d.getDate() + days;                          // 获取日。
-//    return (new Date(s));                                 // 返回日期。
+//    return (new Date(s));                                 // 返回日期。  
 //}
 setNextMonth = function (source, n) {
     var s = new Date(source);
@@ -895,25 +966,32 @@ setNextMonth = function (source, n) {
 }
 //查询
 Query = function () {
-    DeliversListStore.removeAll();
-    Ext.getCmp("VendorListGrid").store.loadPage(1, {
-        params: {
-            order_id: Ext.getCmp("order_id").getValue(),
-            deliver_id: Ext.getCmp("deliver_id").getValue(),
-            shipment_id: Ext.getCmp("shipment").getValue(),
-            order_status_id: Ext.getCmp("order_id_status").getValue(),
-            slave_status_id: Ext.getCmp("slave_id_status").getValue(),
-            detail_status_id: Ext.getCmp("detail_id_status").getValue(),
-            payment_id: Ext.getCmp("payment_id").getValue(),
-            dateStart: Ext.getCmp("dateStart").getValue(),
-            dateEnd: Ext.getCmp("dateEnd").getValue(),
-            logistics_type: Ext.getCmp("logistics_type").getValue(),
-            delivery_status: Ext.getCmp("delivery_status").getValue(),
-            product_mode: Ext.getCmp("product_mode").getValue(),
-            serch_msg: Ext.getCmp("serch_msg").getValue(),
-            serch_where: Ext.getCmp("serch_where").getValue(),
-            t_days: Ext.getCmp("t_days").getValue(),
-            serch_time:Ext.getCmp("serch_time").getValue()
-        }
-    });
+    var order = Ext.getCmp("order_day");
+    if (!order.isValid()) {
+        Ext.Msg.alert("提示", "請輸入正確的距離預計到貨日");
+        return;
+    } else {
+        DeliversListStore.removeAll();
+        Ext.getCmp("VendorListGrid").store.loadPage(1, {
+            params: {
+                order_id: Ext.getCmp("order_id").getValue(),
+                deliver_id: Ext.getCmp("deliver_id").getValue(),
+                shipment_id: Ext.getCmp("shipment").getValue(),
+                order_status_id: Ext.getCmp("order_id_status").getValue(),
+                slave_status_id: Ext.getCmp("slave_id_status").getValue(),
+                detail_status_id: Ext.getCmp("detail_id_status").getValue(),
+                payment_id: Ext.getCmp("payment_id").getValue(),
+                dateStart: Ext.getCmp("dateStart").getValue(),
+                dateEnd: Ext.getCmp("dateEnd").getValue(),
+                logistics_type: Ext.getCmp("logistics_type").getValue(),
+                delivery_status: Ext.getCmp("delivery_status").getValue(),
+                product_mode: Ext.getCmp("product_mode").getValue(),
+                serch_msg: Ext.getCmp("serch_msg").getValue(),
+                serch_where: Ext.getCmp("serch_where").getValue(),
+                t_days: Ext.getCmp("t_days").getValue(),
+                serch_time: Ext.getCmp("serch_time").getValue(),
+                order_day: Ext.getCmp("order_day").getValue()
+            }
+        });
+    }
 }

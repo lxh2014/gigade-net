@@ -361,7 +361,7 @@ namespace BLL.gigade.Mgr
                 _newDt.Columns.Add("delivery_freight_cost", typeof(String));
                 _newDt.Columns.Add("delivery_date", typeof(String));
                 _newDt.Columns.Add("arrival_date", typeof(String));
-                _newDt.Columns.Add("estimated_delivery_date", typeof(String));
+                _newDt.Columns.Add("estimated_delivery_date", typeof(String));//14
                 _newDt.Columns.Add("estimated_arrival_date", typeof(String));
                 _newDt.Columns.Add("estimated_arrival_period", typeof(String));
                 _newDt.Columns.Add("delivery_name", typeof(String));
@@ -447,10 +447,12 @@ namespace BLL.gigade.Mgr
                     _newDtRow[11] = _dt.Rows[i]["delivery_freight_cost"];
                     _newDtRow[12] = _dt.Rows[i]["delivery_date"]; 
                     _newDtRow[13] = _dt.Rows[i]["arrival_date"]; 
-                    //_newDtRow[14] = _dt.Rows[i]["estimated_delivery_date"];//預計出貨時間 
-                    _newDtRow[14] = ExpectTime("product", product_id);
+                    _newDtRow[14] = _dt.Rows[i]["estimated_delivery_date"];//預計出貨時間 
+                  
+                    //_newDtRow[14] = ExpectTime("product", product_id);
                     //_newDtRow[15] = _dt.Rows[i]["estimated_arrival_date"];//預計到貨時間 
-                    _newDtRow[15] = ArriveTime(item_id, created);
+                   // _newDtRow[15] = ArriveTime(item_id, created);
+                    _newDtRow[15] = _dt.Rows[i]["delivery_date_str"];//預計到貨時間deliver_org_days delivery_date_str
                     _newDtRow[16] = _dt.Rows[i]["estimated_arrival_period"]; 
                     _newDtRow[17] = _dt.Rows[i]["delivery_name"];
                     _newDtRow[18] = _dt.Rows[i]["product_name"];
@@ -668,9 +670,12 @@ namespace BLL.gigade.Mgr
                     _newDtRow[12] = _dt.Rows[i]["delivery_date"];
                     _newDtRow[13] = _dt.Rows[i]["arrival_date"];
                     //_newDtRow[14] = _dt.Rows[i]["estimated_delivery_date"];//預計出貨時間 
-                    _newDtRow[14] = ExpectTime("product", product_id);
+                    //_newDtRow[14] = ExpectTime("product", product_id);
                     //_newDtRow[15] = _dt.Rows[i]["estimated_arrival_date"];//預計到貨時間 
-                    _newDtRow[15] = ArriveTime(item_id, created);
+                    //_newDtRow[15] = ArriveTime(item_id, created);
+                    _newDtRow[14] = _dt.Rows[i]["estimated_delivery_date"];//預計出貨時間 
+                    _newDtRow[15] = _dt.Rows[i]["delivery_date_str"];
+
                     _newDtRow[16] = _dt.Rows[i]["estimated_arrival_period"];
                     _newDtRow[17] = _dt.Rows[i]["delivery_name"];
                     _newDtRow[18] = _dt.Rows[i]["product_name"];
@@ -937,6 +942,37 @@ namespace BLL.gigade.Mgr
                 throw new Exception("DeliverMasterMgr-->GetDeliverMaster-->" + ex.Message, ex);
             }
         }
+        #region 出貨單期望到貨日 
+        /// <summary>
+        /// 出貨單期望到貨日
+        /// </summary>
+        /// <returns></returns>
+        /// //by add zhaozhi0623j 20151111 am
+        //更新期望到貨日期、時段
+        public int UpdateExpectArrive(DeliverMasterQuery query)
+        {
+            try
+            {
+                return _ideliver.UpdateExpectArrive(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("DeliverMasterMgr-->UpdateExpectArrive-->" + ex.Message, ex);
+            }
+        }
+        //獲得出貨單期望到貨日list
+        public List<DeliverMasterQuery> GetDeliverExpectArriveList(DeliverMasterQuery query, out int totalCount)
+        {
+            try
+            {
+                return _ideliver.GetDeliverExpectArriveList(query, out totalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("DeliverMasterMgr-->GetDeliverExpectArriveList-->" + ex.Message, ex);
+            }
+        } 
+        #endregion
 
     }
 }

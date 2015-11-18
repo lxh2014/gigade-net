@@ -45,7 +45,7 @@ namespace BLL.gigade.Mgr
                     {
                         item.Flag = 0;
                     }
-                    else if ((item.Event_End > time) && ((item.Product_Name.Contains(item.Product_Prefix) && item.Product_Prefix.Length > 0) || (item.Product_Name.Contains(item.Product_Suffix) && item.Product_Suffix.Length > 0))) //擁有前後綴的情況
+                    else if ((item.Event_End > time) && ((item.Product_Name.Contains(PriceMaster.L_HKH + item.Product_Prefix + PriceMaster.R_HKH) && item.Product_Prefix.Length > 0) || (item.Product_Name.Contains(PriceMaster.L_HKH + item.Product_Suffix + PriceMaster.R_HKH) && item.Product_Suffix.Length > 0))) //擁有前後綴的情況
                     {
                         item.Flag = 2;  ///Flag==2 為商品作用中
                     }

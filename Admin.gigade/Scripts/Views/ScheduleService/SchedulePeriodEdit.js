@@ -119,6 +119,7 @@ editFunction_period= function (row, store) {
                                 period_nums: Ext.htmlEncode(Ext.getCmp('period_nums').getValue()),
                                 current_nums: Ext.htmlEncode(Ext.getCmp('current_nums').getValue()),
                                 limit_nums: Ext.htmlEncode(Ext.getCmp('limit_nums').getValue()),
+                                begin_datetime: Ext.getCmp('begin_datetime').getValue(),
                             },
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);
@@ -148,7 +149,7 @@ editFunction_period= function (row, store) {
     //点击关闭按钮后  提示信息
     //一个指定的打算作为一个应用程序窗口的面板。
     var editWin = Ext.create('Ext.window.Window', {
-        title: "新增Period",
+        title: "排程執行Period",
         id: 'editWin',
         iconCls: "icon-user-add",
         width: 460,

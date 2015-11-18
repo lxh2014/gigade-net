@@ -22,6 +22,7 @@ namespace BLL.gigade.Dao.Impl
         DataTable GetOrderProductInformation(AseldQuery ase);
         string UpdTicker(string id);
         List<AseldQuery> GetAseldList(Aseld ase);
+        List<AseldQuery> GetAseldListByItemid(Aseld ase);
         string UpdAseld(Aseld a);
         int SelCom(Aseld a);
         int SelComA(Aseld a);
@@ -34,8 +35,8 @@ namespace BLL.gigade.Dao.Impl
 
         int UpdScaned(Aseld a);
 
-        DataTable GetNComJobDetail(string jobNumbers);
-        DataTable GetNComJobSimple();
+        DataTable GetNComJobDetail(string jobNumbers, AseldQuery query = null);
+        DataTable GetNComJobSimple(AseldQuery query = null);
 
         int UpdateScnd(Aseld ase);
         int Updwust(Aseld a);

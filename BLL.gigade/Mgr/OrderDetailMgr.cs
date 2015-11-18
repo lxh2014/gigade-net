@@ -33,6 +33,7 @@ namespace BLL.gigade.Mgr
         private IOrderMasterImplDao _orderMaterDao;
         private ISerialImplDao _serial;
         private MySqlDao _mySqlDao;
+        private IProductCategoryImplDao _productCategoryDao;
         private OrderMasterStatusDao _orderMaterStatusDao;
         
         //private OrderDetailDao _orderDetailDao;
@@ -44,6 +45,7 @@ namespace BLL.gigade.Mgr
             _orderMaterStatusDao = new OrderMasterStatusDao(connectionStr);
             _serial = new SerialDao(connectionStr);
             _mySqlDao = new MySqlDao(connectionStr);
+            _productCategoryDao = new ProductCategoryDao(connectionStr);
         }
 
         #region 開發用
@@ -330,6 +332,92 @@ namespace BLL.gigade.Mgr
             catch (Exception ex)
             {
                 throw new Exception("OrderDetailMgr-->OrderWaitClick-->sql:" + sql + ",Message:" + ex.Message, ex);
+            }
+        }
+
+        public List<OrderDetailQuery> GetCategorySummaryList(OrderDetailQuery query, out int totalCount, out int SumAmount)
+        {
+            try
+            {
+                SumAmount = 0;
+                totalCount = 0;
+                ProductCategory pc_query = new ProductCategory();
+                List<OrderDetailQuery> list = new List<OrderDetailQuery>();
+                pc_query.category_id = query.category_id;
+                pc_query.Start = query.Start;
+                pc_query.Limit = query.Limit;
+                DataTable dt = _productCategoryDao.GetCagegoryIdsByIdAndFatherId(pc_query);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    totalCount = dt.Rows.Count;
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        if (!string.IsNullOrEmpty(dt.Rows[i]["category_id"].ToString()))
+                        {
+                            query.category_id = Convert.ToUInt32(dt.Rows[i]["category_id"]);
+                            DataTable model = _orderDetailDao.GetCategorySummary(query);
+                            OrderDetailQuery listRow = new OrderDetailQuery();
+                            if (model != null && model.Rows.Count > 0)
+                            {
+                                listRow.category_name = dt.Rows[i]["category_name"].ToString();
+                                listRow.category_id = query.category_id;
+                                if (!string.IsNullOrEmpty(model.Rows[0]["amount"].ToString()))
+                                {
+                                    SumAmount += Convert.ToInt32(model.Rows[0]["amount"]);
+                                    listRow.amount = Convert.ToInt32(model.Rows[0]["amount"]);
+                                }
+                                list.Add(listRow);
+                            }
+                        }
+                    }
+                }
+                if (query.Start + query.Limit > list.Count)
+                {
+                    query.Limit = list.Count - query.Start;
+                    if (query.Limit < 0)
+                    {
+                        query.Start = 0;
+                        if (list.Count > 25)
+                        {
+                            query.Limit = 25;
+                        }
+                        else
+                        {
+                            query.Limit = list.Count;
+                        }
+                    }
+                }
+                list = list.GetRange(query.Start, query.Limit);
+                return list;              
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->GetCategorySummaryList-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetAmountDetial(OrderDetailQuery query,out int totalCount)
+        {
+            totalCount = 0;
+            try
+            {
+               return _orderDetailDao.GetAmountDetial(query,out totalCount);
+            }
+            catch (Exception ex)
+            {
+               throw new Exception("OrderMasterMgr-->GetAmountDetial-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable CategoryDetialExportInfo(OrderDetailQuery query)
+        {
+            try
+            {
+                return _orderDetailDao.CategoryDetialExportInfo(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterMgr-->CategoryDetialExportInfo-->" + ex.Message, ex);
             }
         }
     }

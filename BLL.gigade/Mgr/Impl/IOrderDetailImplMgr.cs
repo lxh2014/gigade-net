@@ -45,5 +45,8 @@ namespace BLL.gigade.Mgr.Impl
         DataTable GetBuyAmountAndTaxType(OrderDetailQuery query);
         List<Vendor> GetVendor(Vendor query);
         string OrderWaitClick(OrderMasterStatusQuery query);
+        List<OrderDetailQuery> GetCategorySummaryList(OrderDetailQuery query, out int totalCount, out int SumAmount);
+        DataTable GetAmountDetial(OrderDetailQuery query, out int totalCount);
+        DataTable CategoryDetialExportInfo(OrderDetailQuery query);
     }
 }

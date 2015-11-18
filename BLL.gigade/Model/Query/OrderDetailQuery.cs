@@ -134,8 +134,15 @@ namespace BLL.gigade.Model.Query
         //public string singlemoney { get; set; }
         //public string Total { get; set; }
         public string channel_name_simple { get; set; }
-        
-       
+        public int amount { get; set; }//類別營業額 ：金額
+        public string category_name { get; set; }//類別營業額 ：類別名稱
+        public uint category_id { get; set; }//類別營業額 ：類別編號
+        public int category_status { get; set; }
+        public int date_stauts { get; set; }
+        public DateTime date_start { get; set; }
+        public DateTime date_end { get; set; }
+        public string delivery_name { get; set; }
+        public DateTime order_createdate { get; set; }
         public OrderDetailQuery()
         {            
             //Detail_Id = 0;
@@ -231,7 +238,15 @@ namespace BLL.gigade.Model.Query
             channel = 0;
             order_payment = 0;
             Status = 0;
-         
+            amount = 0;
+            category_name = string.Empty;
+            category_id = 0;
+            category_status = 0;
+            date_stauts = 0;
+            date_start = DateTime.MinValue;
+            date_end = DateTime.MinValue;
+            order_createdate = DateTime.MinValue;
+            delivery_name = string.Empty;
         }
     }
 }

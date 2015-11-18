@@ -30,6 +30,7 @@ namespace Admin.gigade.Controllers
         public EmailBlockListMgr _emailBlockListMgr;
         private EmailGroupMgr _emailGroupMgr;
         private static DataTable _newDt = new DataTable();
+        private ScheduleServiceMgr _secheduleServiceMgr;
         // GET: /EdmNew/
 
         #region view
@@ -46,6 +47,16 @@ namespace Admin.gigade.Controllers
         //電子報
         public ActionResult EdmContentNew()
         {
+            _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+            DataTable _dt = _edmContentNewMgr.GetPraraData(3);
+            if (_dt != null && _dt.Rows.Count > 0)
+            {
+                ViewBag.split_str = _dt.Rows[0][0].ToString();
+            }
+            else
+            {
+                ViewBag.split_str = "&nbsp;&nbsp;";
+            }
             ViewBag.path = ConfigurationManager.AppSettings["webDavImage"];
             ViewBag.BaseAddress = ConfigurationManager.AppSettings["webDavBaseAddress"];
             return View();
@@ -53,6 +64,7 @@ namespace Admin.gigade.Controllers
         //擋信名單
         public ActionResult EmailBlockList()
         {
+            
             return View();
         }
 
@@ -545,20 +557,23 @@ namespace Admin.gigade.Controllers
         #region edit_url
         public HttpResponseBase GetEditUrlData()
         {
-            string json = string.Empty;
+            string data = string.Empty;
             try
             {
                 #region 獲取edit_url
-                if (!string.IsNullOrEmpty(Request.Params["edit_url"]))
+                if (!string.IsNullOrEmpty(Request.Params["template_id"]))
                 {
                     #region 獲取網頁內容方法
-                    string url = Request.Params["edit_url"].ToString();
-                    HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
-                    httpRequest.Timeout = 5000;
-                    httpRequest.Method = "GET";
-                    HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
-                    StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
-                    json = sr.ReadToEnd();
+                    string url = _edmContentNewMgr.GetEditUrl(Convert.ToInt32(Request.Params["template_id"]));
+                    if (!string.IsNullOrEmpty(url))
+                    {
+                        HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
+                        httpRequest.Timeout = 9000;
+                        httpRequest.Method = "GET";
+                        HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                        StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
+                        data = sr.ReadToEnd();
+                    }
                     #endregion
                 }
                 #endregion
@@ -570,10 +585,10 @@ namespace Admin.gigade.Controllers
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
-                json = "獲取網頁出現異常！";
+                data = "獲取網頁出現異常！}";
             }
             this.Response.Clear();
-            this.Response.Write(json);
+            this.Response.Write(data);
             this.Response.End();
             return this.Response;
         }
@@ -587,8 +602,10 @@ namespace Admin.gigade.Controllers
             string template_data = string.Empty;
             string contentJson = string.Empty;
             string replaceStr = string.Empty;
+            string editStr = string.Empty;
             try
             {
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
                 if (!string.IsNullOrEmpty(Request.Params["content_url"]))
                 {
                     #region 獲取網頁內容方法
@@ -605,7 +622,7 @@ namespace Admin.gigade.Controllers
                 {
                     template_data = Request.Params["template_data"];
                 }
-                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+             
                 DataTable _dt = _edmContentNewMgr.GetPraraData(1);
                 if (_dt != null && _dt.Rows.Count > 0)
                 {
@@ -615,6 +632,16 @@ namespace Admin.gigade.Controllers
                 {
                     replaceStr = "&nbsp;&nbsp;";
                 }
+                DataTable _dtEdit = _edmContentNewMgr.GetPraraData(3);
+                if (_dtEdit != null && _dtEdit.Rows.Count > 0)
+                {
+                    editStr = _dtEdit.Rows[0][0].ToString();
+                }
+                else
+                {
+                    editStr = "&nbsp;&nbsp;";
+                }
+                template_data = template_data.Replace(editStr,"");
                 contentJson=contentJson.Replace(replaceStr,template_data);
                 json = contentJson;
             }
@@ -758,6 +785,38 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
+
+
+        public HttpResponseBase GetHtml()
+        {
+            string htmlStr = string.Empty;
+            try
+            {
+                EdmContentNew query = new EdmContentNew();
+                if (!string.IsNullOrEmpty(Request.Params["content_id"]))
+                {
+                    query.content_id = Convert.ToInt32(Request.Params["content_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["template_id"]))
+                {
+                    query.template_id = Convert.ToInt32(Request.Params["template_id"]);
+                }
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                htmlStr=_edmContentNewMgr.GetHtml(query);
+                htmlStr = Server.HtmlDecode(Server.HtmlDecode(htmlStr));
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            this.Response.Clear();
+            this.Response.Write(htmlStr);
+            this.Response.End();
+            return this.Response;
+        }
 
         #endregion
 
@@ -1620,5 +1679,7 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
+
+        
     }
 }

@@ -47,7 +47,7 @@ editFunction_config = function (row, store)
                 displayField: 'schedule_code',
                 valueField: 'schedule_code',
                 store: Schedule_Code_Store,
-                value: Ext.getCmp("schedule_code").getValue(),
+                value: Ext.getCmp("schedule_code").getValue()
                 
             },
             {
@@ -59,7 +59,7 @@ editFunction_config = function (row, store)
                 allowBlank: false,
                 displayField: 'parameterName',
                 valueField: 'parameterCode',
-                store: ParameterCodeStore,
+                store: ParameterCodeStore
                 //value: Ext.getCmp("schedule_code").getValue(),
                 //listeners: {
                 //    change: function ()
@@ -73,7 +73,7 @@ editFunction_config = function (row, store)
                 fieldLabel: '參數值',
                 id: 'value',
                 name: 'value',
-                allowBlank: false,
+                allowBlank: false
             },
             
         ],
@@ -85,6 +85,7 @@ editFunction_config = function (row, store)
                 disabled: true,
                 text: '保存',
                 handler: function () {
+                    alert(Ext.getCmp('value').getValue() + ":" + Ext.htmlEncode(Ext.getCmp('value').getValue()));
                     var form = this.up('form').getForm();
                     if (form.isValid()) {
                         form.submit({
@@ -93,7 +94,7 @@ editFunction_config = function (row, store)
                                 schedule_code: Ext.htmlEncode(Ext.getCmp('schedule_code_config').getValue()),
                                 parameterCode: Ext.htmlEncode(Ext.getCmp('parameterCode').getValue()),
                                 value: Ext.htmlEncode(Ext.getCmp('value').getValue()),
-                                parameterName: Ext.htmlEncode(Ext.getCmp('parameterCode').getRawValue()),
+                                parameterName: Ext.htmlEncode(Ext.getCmp('parameterCode').getRawValue())
                             },
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);
@@ -123,7 +124,7 @@ editFunction_config = function (row, store)
     //点击关闭按钮后  提示信息
     //一个指定的打算作为一个应用程序窗口的面板。
     var editWin = Ext.create('Ext.window.Window', {
-        title: "新增參數",
+        title: "排程參數",
         id: 'editWin',
         iconCls: "icon-user-add",
         width: 460,

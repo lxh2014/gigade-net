@@ -972,6 +972,15 @@ namespace BLL.gigade.Dao
                         sql.AppendFormat(" ,return_poundage='{0}'  ", model.return_poundage);
                     }
                 }
+                if (string.IsNullOrEmpty(DtTemp.Rows[0]["invoice_date_manual"].ToString()))
+                {
+                    if (model.invoice_date_manual != DateTime.MinValue && model.invoice_date_manual != null)
+                    {
+                        sql.AppendFormat("  ,invoice_date_manual='{0}'  ", model.invoice_date_manual.ToString("yyyy-MM-dd"));
+                        sql.AppendFormat(" ,invoice_sale_manual='{0}' ", model.invoice_sale_manual);
+                        sql.AppendFormat(" ,invoice_tax_manual='{0}'  ", model.invoice_tax_manual);
+                    }
+                }
                 if (string.IsNullOrEmpty(DtTemp.Rows[0]["remark"].ToString()))
                 {
                     sql.AppendFormat("  ,remark='{0}'  ", model.remark);
@@ -989,7 +998,8 @@ namespace BLL.gigade.Dao
             StringBuilder str = new StringBuilder();
             try
             {
-                str.Append(@"insert into order_account_collection(order_id,remark,account_collection_time,account_collection_money,poundage,return_collection_time,return_collection_money,return_poundage) ");
+                str.Append(@"insert into order_account_collection (order_id,remark,account_collection_time,account_collection_money,poundage,return_collection_time,return_collection_money,return_poundage, ");
+                str.Append("  invoice_date_manual,invoice_sale_manual,invoice_tax_manual ) ");
                 str.AppendFormat(" values('{0}','{1}'", model.order_id, model.remark);
                 if (model.account_collection_time != null && model.account_collection_time != DateTime.MinValue)
                 {
@@ -1006,6 +1016,13 @@ namespace BLL.gigade.Dao
                 else
                 {
                     str.AppendFormat(" , NULL  ,NULL  ,NULL ");
+                } if (model.invoice_date_manual != null && model.invoice_date_manual != DateTime.MinValue)
+                {
+                    str.AppendFormat(" ,'{0}','{1}','{2}'", Common.CommonFunction.DateTimeToString(model.invoice_date_manual), model.invoice_sale_manual, model.invoice_tax_manual);
+                }
+                else
+                {
+                    str.AppendFormat(" ,NULL ,NULL  ,NULL  ");
                 }
                 str.AppendFormat(" );");
                 return str.ToString();
@@ -1060,6 +1077,7 @@ namespace BLL.gigade.Dao
                 sql.AppendFormat("  SUM(imr.free_tax) as free_tax,SUM(imr.sales_amount) as sales_amount,SUM(imr.tax_amount) as tax_amount,SUM(imr.total_amount) imramount,");
                 sql.AppendFormat("om.money_cancel,om.money_return,om.delivery_name,om.order_amount,om.order_payment,'' as parameterName,om.order_createdate, '' as ordercreatedate,");
                 sql.AppendFormat("oac.account_collection_time,oac.account_collection_money,oac.poundage,oac.return_collection_time,oac.return_collection_money,oac.return_poundage,oac.remark,");
+                sql.AppendFormat(" oac.invoice_date_manual,oac.invoice_sale_manual,oac.invoice_tax_manual , ");
                 sql.AppendFormat(" '' as oacamount ,'' as invoice_diff ");
                 sqlCondition.Append(" from  order_master om  ");
                 sqlCondition.Append(" left join order_account_collection oac   on om.order_id  = oac.order_id ");
@@ -1159,6 +1177,7 @@ namespace BLL.gigade.Dao
                 Int64 Rcoll = 0;
                 Int64 totalMoney = 0;
                 Int64 imramount = 0;
+                Int64 invoice = 0;
                 foreach (DataRow dr in dt.Rows)
                 {
                     var alist = parameterList.Find(m => m.ParameterCode == dr["order_payment"].ToString());
@@ -1212,12 +1231,32 @@ namespace BLL.gigade.Dao
                     }
                     dr["oacamount"] = totalMoney;
                     imramount = 0;
-                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) && !string.IsNullOrEmpty(dr["imramount"].ToString()))
+                    invoice = 0;
+                    if (!string.IsNullOrEmpty(dr["imramount"].ToString()))
                     {
-                        if (Int64.TryParse(dr["imramount"].ToString(), out imramount))
+                        if (Int64.TryParse(dr["imramount"].ToString(), out invoice))
                         {
-                            dr["invoice_diff"] = totalMoney - imramount;//J=E-H
+                            imramount += Convert.ToInt64(dr["imramount"].ToString());
                         }
+                    }
+                    if (!string.IsNullOrEmpty(dr["invoice_sale_manual"].ToString()))
+                    {
+                        if (Int64.TryParse(dr["invoice_sale_manual"].ToString(), out invoice))
+                        {
+                            imramount += Convert.ToInt64(dr["invoice_sale_manual"].ToString());
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(dr["invoice_tax_manual"].ToString()))
+                    {
+                        if (Int64.TryParse(dr["invoice_tax_manual"].ToString(), out invoice))
+                        {
+                            imramount += Convert.ToInt64(dr["invoice_tax_manual"].ToString());
+                        }
+                    }
+                    dr["imramount"] = imramount;
+                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) || !string.IsNullOrEmpty(dr["imramount"].ToString()) || !string.IsNullOrEmpty(dr["invoice_tax_manual"].ToString()) || !string.IsNullOrEmpty(dr["invoice_sale_manual"].ToString()))
+                    {
+                        dr["invoice_diff"] = totalMoney - imramount;//J=E-H
                     }
                 }
                 return dt;
@@ -1245,9 +1284,12 @@ namespace BLL.gigade.Dao
                 //sql.Append("from (");
                 //sql.Append(" select om.order_id,SUM(imr.free_tax)  free_tax ,SUM(imr.tax_amount) tax_amount,oac.account_collection_money+oac.return_collection_money as  AccountCollectionMoney ,oac.poundage++oac.return_poundage as ZPoundage ");
 
-                sql.Append("      select  sum(IFNULL(free_tax,0))as FreeTax,sum(IFNULL(tax_amount,0))as SalesAmount,sum(IFNULL(AccountCollectionMoney,0)) as  AccountCollectionMoney,  sum(IFNULL(ZPoundage,0)) as ZPoundage  from  ( ");
+                sql.Append("      select  sum(IFNULL(free_tax,0)+invoice_sale_manual)as FreeTax,sum(IFNULL(tax_amount,0)+invoice_tax_manual)as SalesAmount,sum(IFNULL(AccountCollectionMoney,0)) as  AccountCollectionMoney,  sum(IFNULL(ZPoundage,0)) as ZPoundage  from  ( ");
                 sql.Append(" select SUM( IFNULL(imr.free_tax,0))  free_tax ,  ");
-                sql.Append(" SUM( IFNULL(imr.tax_amount,0)) tax_amount, IFNULL(oac.account_collection_money,0)+IFNULL(oac.return_collection_money,0) as  AccountCollectionMoney ,  ");
+                sql.Append(" SUM( IFNULL(imr.tax_amount,0)) tax_amount, ");
+                sql.Append(" IFNULL(oac.invoice_sale_manual,0) invoice_sale_manual, ");
+                sql.Append(" IFNULL(oac.invoice_tax_manual,0) invoice_tax_manual, ");
+                sql.Append(" IFNULL(oac.account_collection_money,0)+IFNULL(oac.return_collection_money,0) as  AccountCollectionMoney ,  ");
                 sql.Append(" IFNULL(oac.poundage,0)+IFNULL(oac.return_poundage,0) as ZPoundage    ");
                 sqlCondition.AppendFormat("  from  order_master om left join order_account_collection oac  on oac.order_id=om.order_id  ");
                 sqlCondition.AppendFormat(" left join invoice_master_record imr  on imr.order_id=om.order_id   and invoice_attribute=1 ");
@@ -1347,6 +1389,7 @@ namespace BLL.gigade.Dao
                 sql.AppendFormat("  SUM(imr.free_tax) as free_tax,SUM(imr.sales_amount) as sales_amount,SUM(imr.tax_amount) as tax_amount,SUM(imr.total_amount) imramount,");
                 sql.AppendFormat("om.money_cancel,om.money_return,om.delivery_name,om.order_amount,om.order_payment,'' as parameterName,om.order_createdate, '' as ordercreatedate,");
                 sql.AppendFormat("oac.account_collection_time,oac.account_collection_money,oac.poundage,oac.return_collection_time,oac.return_collection_money,oac.return_poundage,oac.remark,");
+                sql.AppendFormat(" oac.invoice_date_manual,oac.invoice_sale_manual,oac.invoice_tax_manual , ");
                 sql.AppendFormat(" '' as oacamount , '' as invoice_diff ");
                 sql.Append(" from  order_master om  ");
                 sql.Append(" left join order_account_collection oac   on om.order_id  = oac.order_id ");
@@ -1435,6 +1478,7 @@ namespace BLL.gigade.Dao
                 Int64 Rcoll = 0;
                 Int64 totalMoney = 0;
                 Int64 imramount = 0;
+                Int64 invoice = 0;
                 foreach (DataRow dr in dt.Rows)
                 {
                     var alist = parameterList.Find(m => m.ParameterCode == dr["order_payment"].ToString());
@@ -1487,12 +1531,32 @@ namespace BLL.gigade.Dao
                     }
                     dr["oacamount"] = totalMoney;
                     imramount = 0;
-                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) && !string.IsNullOrEmpty(dr["imramount"].ToString()))
+                    invoice = 0;
+                    if (!string.IsNullOrEmpty(dr["imramount"].ToString()))
                     {
-                        if (Int64.TryParse(dr["imramount"].ToString(), out imramount))
+                        if (Int64.TryParse(dr["imramount"].ToString(), out invoice))
                         {
-                            dr["invoice_diff"] = totalMoney - imramount;//J=E-H
+                            imramount += Convert.ToInt64(dr["imramount"].ToString());
                         }
+                    }
+                    if (!string.IsNullOrEmpty(dr["invoice_sale_manual"].ToString()))
+                    {
+                        if (Int64.TryParse(dr["invoice_sale_manual"].ToString(), out invoice))
+                        {
+                            imramount += Convert.ToInt64(dr["invoice_sale_manual"].ToString());
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(dr["invoice_tax_manual"].ToString()))
+                    {
+                        if (Int64.TryParse(dr["invoice_tax_manual"].ToString(), out invoice))
+                        {
+                            imramount += Convert.ToInt64(dr["invoice_tax_manual"].ToString());
+                        }
+                    }
+                    dr["imramount"] = imramount;
+                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) || !string.IsNullOrEmpty(dr["imramount"].ToString()) || !string.IsNullOrEmpty(dr["invoice_tax_manual"].ToString()) || !string.IsNullOrEmpty(dr["invoice_sale_manual"].ToString()))
+                    {
+                        dr["invoice_diff"] = totalMoney - imramount;//J=E-H
                     }
                 }
                 return dt;
@@ -2180,6 +2244,119 @@ namespace BLL.gigade.Dao
             catch (Exception ex)
             {
                 throw new Exception("OrderMasterDao-->VerifySession-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable OrderSerchExport(OrderMasterQuery query)
+        {
+            DataTable _dt = new DataTable();
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.Append("SELECT u.user_name,FROM_UNIXTIME(om.order_createdate) 'order_createdate',om.order_id,om.order_payment, om.order_amount,om.order_status,imr.invoice_number,imr.total_amount,FROM_UNIXTIME(invoice_date) 'invoice_date' ,od.item_id,");
+                sql.Append(" od.detail_status,v.vendor_name_simple,v.vendor_code,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,od.single_money*buy_num 'total_money' ,od.item_mode,od.parent_num, ");
+                sql.Append(" od.single_cost,od.bag_check_money,od.single_cost*od.buy_num 'total_cost' , FROM_UNIXTIME(os.slave_date_close) 'slave_date_close',mu.user_username as 'pm',om.source_trace as 'ID',rg.group_name, od.product_mode   ");
+                sql.Append(" from order_master om LEFT JOIN order_slave os ON om.order_id=os.order_id  ");
+                sql.Append(" LEFT JOIN order_detail od ON os.slave_id=od.slave_id LEFT JOIN invoice_master_record imr ON om.order_id=imr.order_id  ");
+                sql.Append("LEFT JOIN vendor v ON v.vendor_id = od.item_vendor_id left join redirect r on r.redirect_id=om.source_trace  ");
+                sql.Append(" LEFT JOIN redirect_group rg  ON r.group_id = rg.group_id  LEFT JOIN manage_user mu on mu.user_id=v.product_manage LEFT JOIN users u on u.user_id=om.user_id ");
+                sql.AppendFormat(" where  od.item_mode in (0,2) and om.order_date_pay<>0 and om.order_createdate>='{0}' and  om.order_createdate<='{1}'; ", CommonFunction.GetPHPTime(query.datestart.ToString()), CommonFunction.GetPHPTime(query.dateend.ToString()));
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->OrderSerchExport-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetPara(string type,int order_status)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" select  remark   from t_parametersrc where parameterType='{0}'  and parameterCode='{1}';", type, order_status);
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetParaByOrderStatus-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetParaByPayment(int payment)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" select  parameterName   from t_parametersrc where parameterType='payment'  and parameterCode='{0}';", payment);
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetParaByPayment-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetOrderFreight(uint order_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                  sql.AppendFormat(" select order_freight_normal,order_freight_low from order_master where order_id='{0}';",order_id);
+                 return    _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetOrderFreight-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+
+
+        public DataTable OrderDetialExportInfo(OrderDetailQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT pcs.category_id,u.user_name,FROM_UNIXTIME(om.order_createdate) AS order_createdate,om.order_id,
+(SELECT parameterName FROM t_parametersrc WHERE parameterType='payment' AND parameterCode=om.order_payment) AS order_payment,om.order_amount,
+(SELECT remark FROM t_parametersrc WHERE parameterType='order_status' AND parameterCode=om.order_status) AS order_status,imr.invoice_number,
+imr.total_amount,FROM_UNIXTIME(invoice_date) AS invoice_date,od.item_id,
+(SELECT remark FROM t_parametersrc WHERE parameterType='order_status' AND parameterCode=os.slave_status) AS slave_status,
+v.vendor_name_simple,v.vendor_code,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,od.single_money*buy_num,
+od.single_cost,od.bag_check_money,od.single_cost*od.buy_num,FROM_UNIXTIME(os.slave_date_close) slave_date_close,mu.user_username AS 'pm',om.source_trace AS 'ID',	
+rg.group_name AS group_name,
+(SELECT remark FROM t_parametersrc WHERE parameterType='product_mode' AND parameterCode= od.product_mode) AS product_mode 
+from order_master om 
+        LEFT JOIN order_slave os ON om.order_id=os.order_id
+        LEFT JOIN order_detail od ON os.slave_id=od.slave_id
+        LEFT JOIN invoice_master_record imr ON om.order_id=imr.order_id
+        LEFT JOIN vendor v ON v.vendor_id = od.item_vendor_id
+        left join redirect r ON r.redirect_id=om.source_trace
+        LEFT JOIN redirect_group rg  ON r.group_id = rg.group_id 
+        LEFT JOIN manage_user mu ON mu.user_id=v.product_manage
+        LEFT JOIN users u ON u.user_id=om.user_id
+	    INNER JOIN product_item pi ON od.item_id=pi.item_id
+	    INNER JOIN product_category_set pcs ON pi.product_id=pcs.product_id
+        INNER JOIN (SELECT	category_id FROM product_category
+                        WHERE category_display = 1 AND (category_id={0})) pc USING(category_id) 
+        where od.item_mode in(0,1)  AND order_date_pay <> 0 ",query.category_id);
+                if (query.category_status != 0)
+                {
+                    sql.AppendFormat(" AND om.money_collect_date > 0");
+                }
+                if (query.date_stauts != 0)
+                {
+                    if (query.date_start != DateTime.MinValue && query.date_end != DateTime.MinValue)
+                    {
+                        sql.AppendFormat(" AND om.order_createdate>='{0}' and  om.order_createdate<='{1}'", CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_start)), CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_end)));
+                    }
+                }
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex )
+            {
+                throw new Exception("OrderMasterDao-->OrderDetialExportInfo-->" + sql.ToString() + ex.Message, ex);
             }
         }
     }

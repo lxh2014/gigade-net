@@ -32,6 +32,7 @@ namespace Admin.gigade.Controllers
         static string excelPath = ConfigurationManager.AppSettings["ImportOrderExcel"];
         static string pdfPath = ConfigurationManager.AppSettings["ImportOrderPDF"];
         static string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];
+        static string excelPath_export = ConfigurationManager.AppSettings["ImportUserIOExcel"];
 
         private IOrderImport orderImport;
         private IChannelImplMgr channelMgr;
@@ -45,6 +46,8 @@ namespace Admin.gigade.Controllers
         private IOrderMasterImplMgr _OrderMasterMgr;
         private IBonusMasterImplMgr _bonusMasterMgr;
         private ZipMgr zMgr;
+        private IProductCategoryImplMgr _productCategoryMgr;
+        private IOrderDetailImplMgr _orderDetialMgr;
         [CustomHandleError]
         public ActionResult Index()
         {
@@ -91,6 +94,60 @@ namespace Admin.gigade.Controllers
             return View();
         }
 
+        public ActionResult OrderCategorySum()
+        {
+            return View();
+        }
+
+        public ActionResult OrderAmountDetial()
+        {
+            if (!string.IsNullOrEmpty(Request.Params["_parameters"]))
+            {
+                string s = Request.Params["_parameters"];
+                string[] arr = s.Split('|');
+                for (int i = 0; i < arr.Length; i++)
+                { 
+                    switch(i)
+                    {
+                        case 0:
+                            ViewBag.category_id = arr[i];
+                            break;
+                        case 1:
+                            ViewBag.category_name = arr[i];
+                            break;
+                        case 2:
+                            ViewBag.category_amount = arr[i];
+                            break;
+                        case 3:
+                            ViewBag.category_status = arr[i];
+                            break;
+                        case 4:
+                            ViewBag.date_stauts = arr[i];
+                            break;
+                        case 5:
+                            ViewBag.date_start = Convert.ToDateTime(arr[i]);
+                            ViewBag.date_start = Convert.ToDateTime(ViewBag.date_start.ToString("yyyy-MM-dd 00:00:00"));
+                            break;
+                        case 6:
+                            ViewBag.date_end = Convert.ToDateTime(arr[i]);
+                            ViewBag.date_end = Convert.ToDateTime(ViewBag.date_end.ToString("yyyy-MM-dd  23:59:59"));
+                            break;
+                    }
+                
+                }
+            }
+            else
+            {
+                ViewBag.category_id = "5";
+                ViewBag.category_status = "0";
+                ViewBag.date_stauts = "0";
+                ViewBag.date_start = CommonFunction.DateTimeToString(Convert.ToDateTime(DateTime.MinValue.ToString("yyyy-MM-dd 00:00:00")));
+                ViewBag.date_end = CommonFunction.DateTimeToString(Convert.ToDateTime(DateTime.MinValue.ToString("yyyy-MM-dd 23:59:59")));
+            }
+           
+            return View();
+        }
+
         #region Gigade商品查詢
         #region 獲取組合商品下的子商品
         [HttpPost]
@@ -114,6 +171,7 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
+        #region 內部訂單輸入組合商品>商品ID查詢
         /// <summary>
         /// 订单输入查询Giagde站台下的組合商品
         /// </summary>
@@ -131,6 +189,7 @@ namespace Admin.gigade.Controllers
             ProductCombo pcombo = new ProductCombo();
             if (pid != 0)
             {
+                long nowTime = BLL.gigade.Common.CommonFunction.GetPHPTime();//獲取當前時間  add by zhuoqin0830w  2015/11/09
                 Product prod = _proMgr.Query(new Product { Product_Id = pid }).FirstOrDefault();
                 if (prod != null)
                 {
@@ -156,6 +215,7 @@ namespace Admin.gigade.Controllers
                                 jsonStr = "{success:true";
                                 double comboPrice = 0.0;     //組合商品的價格 ＝sum( 子商品價格 * 子商品必選數量(s_must_buy);
                                 double comboCost = 0.0;  //組合商品的成本
+                                double comboEventCost = 0.0;  //組合商品的活動成本  add by zhuoqin0830w  2015/11/09
                                 int childSum = 0;      //必選商品的必購數量之和
                                 int minStock = 0;
                                 int stockIndex = 0;
@@ -361,8 +421,10 @@ namespace Admin.gigade.Controllers
                                 jsonStr += ",child:[";
                                 double totalPrice = 0;
                                 double totalCost = 0;
+                                double totalEventCost = 0; //add by zhuoqin0830w  2015/11/09
                                 string priceScales = "";//單一商品價格所占比例
                                 string costScales = ""; //單一商品成本所占比例
+                                string eventcostScales = "";//單一商品活動成本所占比例  add by zhuoqin0830w  2015/11/09
                                 int minStock = 0;
                                 if (prod.Price_type == 1)
                                 {
@@ -385,8 +447,15 @@ namespace Admin.gigade.Controllers
                                             child_id = 0
                                         });
                                         List<ItemPriceCustom> ipList = new List<ItemPriceCustom>();
+
                                         if (pM != null)
                                         {
+                                            //add by zhuoqin0830w  2015/11/06  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動成本為 0 如果沒有過期則顯示活動成本
+                                            if (nowTime > pM.event_end)
+                                            {
+                                                pM.event_cost = 0;
+                                            }
+
                                             //遍歷此商品所有item_id,找出第一筆在item_price中的item_id返回，若無，則此組合商品不能加入訂單
                                             foreach (ProductItem items in pItemList)
                                             {
@@ -401,11 +470,13 @@ namespace Admin.gigade.Controllers
                                                     {
                                                         totalPrice += pM.price * item.S_Must_Buy;
                                                         totalCost += pM.cost * item.S_Must_Buy;
+                                                        totalEventCost += pM.event_cost * item.S_Must_Buy;//add by zhuoqin0830w  2015/11/09
                                                     }
                                                     else
                                                     {
                                                         totalPrice += ipList[0].item_money * item.S_Must_Buy;
                                                         totalCost += ipList[0].item_cost * item.S_Must_Buy;
+                                                        totalEventCost += ipList[0].event_cost * item.S_Must_Buy;//add by zhuoqin0830w  2015/11/09
                                                     }
                                                     price_data_right_list.Add(items);
                                                     findState = true;
@@ -425,6 +496,16 @@ namespace Admin.gigade.Controllers
                                     int index = 0;
                                     int comboPrice = orderAdd.product_cost;   //組合商品的定價
                                     int comboCost = orderAdd.cost;
+                                    int comboEventCost = 0;
+                                    //add by zhuoqin0830w  2015/11/06  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動成本為 0 如果沒有過期則顯示活動成本
+                                    if (orderAdd != null)
+                                    {
+                                        if (nowTime > orderAdd.event_start && nowTime < orderAdd.event_end)
+                                        {
+                                            comboEventCost = orderAdd.event_cost;
+                                        }
+                                        else { orderAdd.event_cost = 0; }
+                                    }
                                     for (int i = 0; i < prodComList.Count; i++)
                                     {
                                         index++;
@@ -482,12 +563,16 @@ namespace Admin.gigade.Controllers
                                             {
                                                 double singlePrice = 0;
                                                 double singleCost = 0;
+                                                double singleEventCost = 0;//add by zhuoqin0830w  2015/11/09
+
                                                 if (pM.same_price == 1)
                                                 {
                                                     oc.original_price = pM.price;
                                                     oc.Item_Cost = uint.Parse(pM.cost.ToString());
+                                                    oc.Event_Item_Cost = uint.Parse(pm.event_cost.ToString());//add by zhuoqin0830w  2015/11/09
                                                     singlePrice = pM.price * oc.s_must_buy;
                                                     singleCost = pM.cost * oc.s_must_buy;
+                                                    singleEventCost = pM.event_cost * oc.s_must_buy;//add by zhuoqin0830w  2015/11/09
                                                 }
                                                 else
                                                 {
@@ -500,14 +585,17 @@ namespace Admin.gigade.Controllers
                                                     {
                                                         oc.original_price = int.Parse(ipList[0].item_money.ToString());
                                                         oc.Item_Cost = ipList[0].item_cost;
+                                                        oc.Event_Item_Cost = ipList[0].event_cost;//add by zhuoqin0830w  2015/11/09
                                                         singlePrice = ipList[0].item_money * oc.s_must_buy;
                                                         singleCost = ipList[0].item_cost * oc.s_must_buy;
+                                                        singleEventCost = ipList[0].event_cost * oc.s_must_buy;//add by zhuoqin0830w  2015/11/09
                                                     }
                                                 }
                                                 if (totalPrice == 0)
                                                 {
                                                     priceScales += "0";
                                                     costScales += "0";
+                                                    eventcostScales += "0";//add by zhuoqin0830w  2015/11/09
                                                     oc.product_cost = 0;
                                                 }
                                                 else
@@ -515,19 +603,36 @@ namespace Admin.gigade.Controllers
                                                     //new logic 算比例
                                                     double priceScale = double.Parse((singlePrice / totalPrice).ToString());
                                                     double costScale = double.Parse((singleCost / totalCost).ToString());
+                                                    //add by zhuoqin0830w  2015/11/09  添加活動成本的比例
+                                                    double eventcostScale = 0;
+                                                    if (totalEventCost != 0)
+                                                    {
+                                                        eventcostScale = double.Parse((singleEventCost / totalEventCost).ToString());
+                                                    }
+                                                    else
+                                                    {
+                                                        eventcostScale = priceScale;// 如果 活動成本的比例為0 則表示沒有活動成本則按照價格的比例進行計算
+                                                    }
 
                                                     priceScales += priceScale + ",";
                                                     costScales += costScale + ",";
+                                                    eventcostScales += eventcostScale + ",";//add by zhuoqin0830w  2015/11/09
 
                                                     var afterprice = Convert.ToInt16(Math.Round(comboPrice * priceScale / oc.s_must_buy));
                                                     var aftercost = Convert.ToInt16(Math.Round(comboCost * costScale / oc.s_must_buy));
+                                                    var aftereventcost = Convert.ToInt16(Math.Round(comboEventCost * eventcostScale / oc.s_must_buy));//add by zhuoqin0830w  2015/11/09
 
                                                     comboPrice -= afterprice * oc.s_must_buy;
                                                     comboCost -= aftercost * oc.s_must_buy;
+                                                    comboEventCost -= aftereventcost * oc.s_must_buy;//add by zhuoqin0830w  2015/11/09
+
                                                     totalPrice -= singlePrice;
                                                     totalCost -= singleCost;
+                                                    totalEventCost -= singleEventCost;//add by zhuoqin0830w  2015/11/09
+
                                                     oc.product_cost = uint.Parse(afterprice.ToString());
                                                     oc.Item_Cost = uint.Parse(aftercost.ToString());
+                                                    oc.Event_Item_Cost = uint.Parse(aftereventcost.ToString());//add by zhuoqin0830w  2015/11/09
                                                 }
                                             }
                                         }
@@ -596,8 +701,8 @@ namespace Admin.gigade.Controllers
                                 jsonStr = jsonStr.Substring(0, jsonStr.Length - 1) + "]";
                                 jsonStr += ",data:[";
                                 //拼接組合商品   cost為組合商品之成本,product_cost為組合商品之售價
-                                jsonStr += "{product_id:'" + orderAdd.product_id + "',product_name:'" + orderAdd.product_name + "',Item_Cost:'" + orderAdd.cost + "',product_cost:'" + orderAdd.product_cost + "',item_id:0";
-                                jsonStr += ",s_must_buy:'" + prodComList.Count + "',child_scale:'" + priceScales + "',child_cost_scale:'" + costScales + "',stock:'" + minStock + "',g_must_buy:'" + prodComList.Count + "',child:" + orderAdd.child + ",product_status_name:'" + (upFlag ? "上架" : "未上架") + "'}";
+                                jsonStr += "{product_id:'" + orderAdd.product_id + "',product_name:'" + orderAdd.product_name + "',Item_Cost:'" + orderAdd.cost + "',product_cost:'" + orderAdd.product_cost + "',item_id:0" + ",Event_Item_Cost:" + orderAdd.event_cost;
+                                jsonStr += ",s_must_buy:'" + prodComList.Count + "',child_scale:'" + priceScales + "',child_cost_scale:'" + costScales + "',child_event_cost_scale:'" + eventcostScales + "',stock:'" + minStock + "',g_must_buy:'" + prodComList.Count + "',child:" + orderAdd.child + ",product_status_name:'" + (upFlag ? "上架" : "未上架") + "'}";
                                 jsonStr += "]}";
                             }
                             catch (Exception ex)
@@ -721,7 +826,6 @@ namespace Admin.gigade.Controllers
                                     oc.Spec_Id_2 = pItemList[0].Spec_Id_2;
                                     oc.Item_Id = pItemList[0].Item_Id;
                                     oc.Item_Stock = pItemList[0].Item_Stock;
-                                    long nowTime = BLL.gigade.Common.CommonFunction.GetPHPTime();
                                     if (ipList.Count() > 0)
                                     {
                                         //取成本
@@ -733,6 +837,14 @@ namespace Admin.gigade.Controllers
                                         {
                                             oc.Item_Cost = ipList[0].item_cost;
                                         }
+
+                                        //add by zhuoqin0830w  2015/11/06  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動成本為 0 如果沒有過期則顯示活動成本
+                                        if (nowTime > pM.event_start && nowTime < pM.event_end)
+                                        {
+                                            oc.Event_Item_Cost = uint.Parse(pM.event_cost.ToString());
+                                        }
+                                        else { oc.Event_Item_Cost = 0; }
+
                                         if (nowTime > pItemList[0].Event_Product_Start && nowTime < pItemList[0].Event_Product_End)
                                         {
                                             if (pM.same_price == 1)
@@ -811,9 +923,11 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+        #endregion
 
+        #region 內部訂單輸入單一商品>商品細項查詢
         /// <summary>
-        /// 使用商品細項查詢商品信息  add by zhuoqin0830w  2015/07/10
+        /// 使用商品細項查詢商品信息  add by zhuoqin0830w  2015/07/10 (內部訂單輸入單一商品>商品細項查詢)
         /// </summary>
         /// <returns></returns>
         public HttpResponseBase OrderInfoQueryBySoleGigade()
@@ -851,11 +965,11 @@ namespace Admin.gigade.Controllers
                                 if (pList.Count() <= 0)
                                 {
                                     jsonStr = "{success:false,msg:'" + Resources.OrderAdd.PRODUCT_NOT_EXIST + "'}";//商品不存在
-            this.Response.Clear();
-            this.Response.Write(jsonStr);
-            this.Response.End();
-            return this.Response;
-        }
+                                    this.Response.Clear();
+                                    this.Response.Write(jsonStr);
+                                    this.Response.End();
+                                    return this.Response;
+                                }
                                 //補貨中停止販售 1:是 0:否
                                 if (pList[0].Shortage == 1)
                                 {
@@ -904,6 +1018,14 @@ namespace Admin.gigade.Controllers
                                         {
                                             oc.Item_Cost = ipList[0].item_cost;
                                         }
+
+                                        //add by zhuoqin0830w  2015/11/06  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動成本為 0 如果沒有過期則顯示活動成本
+                                        if (nowTime > pM.event_start && nowTime < pM.event_end)
+                                        {
+                                            oc.Event_Item_Cost = uint.Parse(pM.event_cost.ToString());
+                                        }
+                                        else { oc.Event_Item_Cost = 0; }
+
                                         if (nowTime > proItem[0].Event_Product_Start && nowTime < proItem[0].Event_Product_End)
                                         {
                                             if (pM.same_price == 1)
@@ -938,7 +1060,7 @@ namespace Admin.gigade.Controllers
                                     StringBuilder stb = new StringBuilder();
                                     stb.Append("[");
                                     stb.Append("{product_id:" + oc.Product_Id + ",price_type:" + oc.price_type + ",child:" + c_combination + ",buy_limit:" + c_buy_limit + ",item_id:" + oc.Item_Id + ",product_name:'" + oc.product_name + "',");
-                                    stb.Append("product_cost:" + oc.Item_Money + ",Item_Cost:" + oc.Item_Cost + ",Event_Item_Cost:" + pM.event_cost + ",stock:" + oc.Item_Stock + ",s_must_buy:" + oc.s_must_buy + ",Spec_Name_1:'" + proItem[0].Spec_Name_1 + "',Spec_Name_2:'" + proItem[0].Spec_Name_2 + "',spec1:" + proItem[0].Spec_Id_1 + ",spec2:" + proItem[0].Spec_Id_2 + ",price_master_id:" + oc.price_master_id + ",ignore_stock:" + pList[0].Ignore_Stock + ",product_status_name:'" + (upFlag ? "上架" : "未上架") + "'}");
+                                    stb.Append("product_cost:" + oc.Item_Money + ",Item_Cost:" + oc.Item_Cost + ",Event_Item_Cost:" + oc.Event_Item_Cost + ",stock:" + oc.Item_Stock + ",s_must_buy:" + oc.s_must_buy + ",Spec_Name_1:'" + proItem[0].Spec_Name_1 + "',Spec_Name_2:'" + proItem[0].Spec_Name_2 + "',spec1:" + proItem[0].Spec_Id_1 + ",spec2:" + proItem[0].Spec_Id_2 + ",price_master_id:" + oc.price_master_id + ",ignore_stock:" + pList[0].Ignore_Stock + ",product_status_name:'" + (upFlag ? "上架" : "未上架") + "'}");
                                     stb.Append("]");
                                     jsonStr = "{success:true,data:" + stb.ToString() + "}";
                                 }
@@ -946,7 +1068,7 @@ namespace Admin.gigade.Controllers
                                 {
                                     jsonStr = "{success:false,msg:'" + Resources.OrderAdd.PRODUCT_PRICE_NOT_EXIST + "'}";
                                 }
-        #endregion
+                                #endregion
                             }
                             else
                             {
@@ -980,6 +1102,8 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+        #endregion
+
         #endregion
 
         #region 合作外站商品查詢
@@ -2541,6 +2665,8 @@ namespace Admin.gigade.Controllers
                     NPOI4ExcelHelper helper = new NPOI4ExcelHelper(newExcelName);
                     dt = helper.SheetData();
                     List<OrderAccountCollection> oacli = new List<OrderAccountCollection>();
+                    string errorStr = string.Empty;
+                    Int64[] orderArr = new Int64[dt.Rows.Count];
                     for (int j = 0; j < dt.Rows.Count; j++)
                     {
                         OrderAccountCollection model = new OrderAccountCollection();
@@ -2553,11 +2679,13 @@ namespace Admin.gigade.Controllers
                             }
                             else
                             {
+                                errorStr += (j + 2) + ",";
                                 continue;
                             }
                         }
                         else
                         {
+                            errorStr += (j + 2) + ",";
                             continue;
                         }
                         if (!string.IsNullOrEmpty(dt.Rows[j][1].ToString()))
@@ -2578,22 +2706,31 @@ namespace Admin.gigade.Controllers
                                 {
                                     string[] str = dt.Rows[j][1].ToString().Split('/');
                                     int year = 0;
-                                    if (str[2].Length == 2)
+                                    if (str.Length == 3)
                                     {
-                                        year = Convert.ToInt32("20" + str[2]);
+                                        if (str[2].Length == 2)
+                                        {
+                                            year = Convert.ToInt32("20" + str[2]);
+                                        }
+                                        else
+                                        {
+                                            year = Convert.ToInt32(str[2]);
+                                        }
+                                        int month = Convert.ToInt32(str[0]);
+                                        int day = Convert.ToInt32(str[1]);
+                                        if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
+                                        {
+                                            model.account_collection_time = st;
+                                        }
+                                        else
+                                        {
+                                            errorStr += (j + 2) + ",";
+                                            continue;
+                                        }
                                     }
                                     else
                                     {
-                                        year = Convert.ToInt32(str[2]);
-                                    }
-                                    int month = Convert.ToInt32(str[0]);
-                                    int day = Convert.ToInt32(str[1]);
-                                    if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
-                                    {
-                                        model.account_collection_time = st;
-                                    }
-                                    else
-                                    {
+                                        errorStr += (j + 2) + ",";
                                         continue;
                                     }
                                 }
@@ -2608,11 +2745,13 @@ namespace Admin.gigade.Controllers
                                 }
                                 else
                                 {
+                                    errorStr += (j + 2) + ",";
                                     continue;
                                 }
                             }
                             else
                             {
+                                errorStr += (j + 2) + ",";
                                 continue;
                             }
                             if (!string.IsNullOrEmpty(dt.Rows[j][3].ToString()))
@@ -2624,11 +2763,13 @@ namespace Admin.gigade.Controllers
                                 }
                                 else
                                 {
+                                    errorStr += (j + 2) + ",";
                                     continue;
                                 }
                             }
                             else
                             {
+                                errorStr += (j + 2) + ",";
                                 continue;
                             }
                         }
@@ -2651,22 +2792,31 @@ namespace Admin.gigade.Controllers
                                 {
                                     string[] strR = dt.Rows[j][4].ToString().Split('/');
                                     int yearR = 0;
-                                    if (strR[2].Length == 2)
+                                    if (strR.Length == 3)
                                     {
-                                        yearR = Convert.ToInt32("20" + strR[2]);
+                                        if (strR[2].Length == 2)
+                                        {
+                                            yearR = Convert.ToInt32("20" + strR[2]);
+                                        }
+                                        else
+                                        {
+                                            yearR = Convert.ToInt32(strR[2]);
+                                        }
+                                        int monthR = Convert.ToInt32(strR[0]);
+                                        int dayR = Convert.ToInt32(strR[1]);
+                                        if (DateTime.TryParse(yearR + "/" + monthR + "/" + dayR, out streturn))
+                                        {
+                                            model.return_collection_time = streturn;
+                                        }
+                                        else
+                                        {
+                                            errorStr += (j + 2) + ",";
+                                            continue;
+                                        }
                                     }
                                     else
                                     {
-                                        yearR = Convert.ToInt32(strR[2]);
-                                    }
-                                    int monthR = Convert.ToInt32(strR[0]);
-                                    int dayR = Convert.ToInt32(strR[1]);
-                                    if (DateTime.TryParse(yearR + "/" + monthR + "/" + dayR, out streturn))
-                                    {
-                                        model.return_collection_time = streturn;
-                                    }
-                                    else
-                                    {
+                                        errorStr += (j + 2) + ",";
                                         continue;
                                     }
                                 }
@@ -2680,11 +2830,13 @@ namespace Admin.gigade.Controllers
                                 }
                                 else
                                 {
+                                    errorStr += (j + 2) + ",";
                                     continue;
                                 }
                             }
                             else
                             {
+                                errorStr += (j + 2) + ",";
                                 continue;
                             }
                             if (!string.IsNullOrEmpty(dt.Rows[j][6].ToString()))
@@ -2696,22 +2848,120 @@ namespace Admin.gigade.Controllers
                                 }
                                 else
                                 {
+                                    errorStr += (j + 2) + ",";
                                     continue;
                                 }
                             }
                             else
                             {
+                                errorStr += (j + 2) + ",";
                                 continue;
                             }
                         }
-
-                        model.remark = dt.Rows[j][7].ToString();
-                        if (model != null && !(model.account_collection_time == model.return_collection_time && model.return_collection_time == DateTime.MinValue))
+                        if (!string.IsNullOrEmpty(dt.Rows[j][7].ToString()))
                         {
-                            oacli.Add(model);
+                            DateTime st;
+                            if (DateTime.TryParse(dt.Rows[j][7].ToString(), out st))
+                            {
+                                model.invoice_date_manual = st;
+                            }
+                            else
+                            {
+                                string strtime = Regex.Replace(dt.Rows[j][1].ToString().Trim(), "/(\\s+)|(，)|(-)|(,)|(.)/g", "/");
+                                if (DateTime.TryParse(strtime, out st))
+                                {
+                                    model.invoice_date_manual = st;
+                                }
+                                else
+                                {
+                                    string[] str = dt.Rows[j][7].ToString().Split('/');
+                                    int year = 0;
+                                    if (str.Length == 3)
+                                    {
+                                        if (str[2].Length == 2)
+                                        {
+                                            year = Convert.ToInt32("20" + str[2]);
+                                        }
+                                        else
+                                        {
+                                            year = Convert.ToInt32(str[2]);
+                                        }
+                                        int month = Convert.ToInt32(str[0]);
+                                        int day = Convert.ToInt32(str[1]);
+                                        if (DateTime.TryParse(year + "/" + month + "/" + day, out st))
+                                        {
+                                            model.invoice_date_manual = st;
+                                        }
+                                        else
+                                        {
+                                            errorStr += (j + 2) + ",";
+                                            continue;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        errorStr += (j + 2) + ",";
+                                        continue;
+                                    }
+                                }
+                            }
+
+                            if (!string.IsNullOrEmpty(dt.Rows[j][8].ToString()))
+                            {
+                                int invoice_sale_manual = 0;
+                                if (int.TryParse(dt.Rows[j][8].ToString(), out invoice_sale_manual))
+                                {
+                                    model.invoice_sale_manual = invoice_sale_manual;
+                                }
+                                else
+                                {
+                                    errorStr += (j + 2) + ",";
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                errorStr += (j + 2) + ",";
+                                continue;
+                            }
+                            if (!string.IsNullOrEmpty(dt.Rows[j][9].ToString()))
+                            {
+                                int invoice_tax_manual = 0;
+                                if (int.TryParse(dt.Rows[j][9].ToString(), out invoice_tax_manual))
+                                {
+                                    model.invoice_tax_manual = invoice_tax_manual;
+                                }
+                                else
+                                {
+                                    errorStr += (j + 2) + ",";
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                errorStr += (j + 2) + ",";
+                                continue;
+                            }
+                        }
+                        model.remark = dt.Rows[j][10].ToString();
+                        if (model != null && !(model.account_collection_time == model.return_collection_time && model.account_collection_time == model.invoice_date_manual && model.return_collection_time == DateTime.MinValue))
+                        {
+                            if (!orderArr.Contains(model.order_id))
+                            {
+                                orderArr[j] = order_id;
+                                oacli.Add(model);
+                            }
+                            else
+                            {
+                                errorStr += (j + 2) + ",";
+                            }
                         }
                     }
                     int rowsnum = oacli.Count;
+                    if (!string.IsNullOrEmpty(errorStr))
+                    {
+                        errorStr = errorStr.Remove(errorStr.Length - 1);
+                    }
                     if (rowsnum > 0)//判斷是否是這個表
                     {
                         _OrderMasterMgr = new OrderMasterMgr(connectionString);
@@ -2721,16 +2971,37 @@ namespace Admin.gigade.Controllers
                         {
                             if (i == 99999)
                             {
-                                json = "{success:true,msg:\"" + "無數據可匯入!" + "\"}";
+                                if (!string.IsNullOrEmpty(errorStr))
+                                {
+                                    json = "{success:true,msg:\"" + "無數據可匯入!另文件第" + errorStr + "行數據異常\"}";
+                                }
+                                else
+                                {
+                                    json = "{success:true,msg:\"" + "無數據可匯入!\"}";
+                                }
                             }
                             else
                             {
-                                json = "{success:true,msg:\"" + "匯入成功!" + "\"}";
+                                if (!string.IsNullOrEmpty(errorStr))
+                                {
+                                    json = "{success:true,msg:\"" + "匯入成功!另文件第" + errorStr + "行數據異常\"}";
+                                }
+                                else
+                                {
+                                    json = "{success:true,msg:\"" + "匯入成功!\"}";
+                                }
                             }
                         }
                         else
                         {
-                            json = "{success:true,msg:\"" + "操作失敗" + "\"}";
+                            if (!string.IsNullOrEmpty(errorStr))
+                            {
+                                json = "{success:true,msg:\"" + "操作失敗!另文件第" + errorStr + "行數據異常\"}";
+                            }
+                            else
+                            {
+                                json = "{success:true,msg:\"" + "操作失敗!\"}";
+                            }
                         }
                     }
                     else
@@ -2783,6 +3054,9 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("退貨入帳日期", typeof(String));
                 dtHZ.Columns.Add("退貨入帳金額", typeof(String));
                 dtHZ.Columns.Add("退貨入帳手續費", typeof(String));
+                dtHZ.Columns.Add("手開發票日期", typeof(String));
+                dtHZ.Columns.Add("手開發票銷售額", typeof(String));
+                dtHZ.Columns.Add("手開發票稅額", typeof(String));
                 dtHZ.Columns.Add("備註", typeof(String));
                 DataRow dr = dtHZ.NewRow();
                 dr[0] = "";
@@ -2793,6 +3067,9 @@ namespace Admin.gigade.Controllers
                 dr[5] = "";
                 dr[6] = "";
                 dr[7] = "";
+                dr[8] = "";
+                dr[9] = "";
+                dr[10] = "";
                 dtHZ.Rows.Add(dr);
                 string fileName = DateTime.Now.ToString("會計入帳_yyyyMMddHHmmss") + ".xls";
                 MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "");
@@ -3214,6 +3491,9 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("開立發票日期", typeof(String));
                 dtHZ.Columns.Add("發票銷售額", typeof(String));
                 dtHZ.Columns.Add("發票稅額", typeof(String));
+                dtHZ.Columns.Add("手開發票日期", typeof(String));
+                dtHZ.Columns.Add("手開發票銷售額", typeof(String));
+                dtHZ.Columns.Add("手開發票稅額", typeof(String));
                 dtHZ.Columns.Add("發票總額", typeof(String));
                 dtHZ.Columns.Add("商品取消金額", typeof(String));
                 dtHZ.Columns.Add("發票金額差異", typeof(String));
@@ -3306,6 +3586,12 @@ namespace Admin.gigade.Controllers
                         }
                         dr["發票銷售額"] = _dt.Rows[i]["free_tax"];//F
                         dr["發票稅額"] = _dt.Rows[i]["tax_amount"];//G
+                        if (!string.IsNullOrEmpty(_dt.Rows[i]["invoice_date_manual"].ToString()))
+                        {
+                            dr["手開發票日期"] = Convert.ToDateTime(_dt.Rows[i]["invoice_date_manual"]).ToString("yyyy/MM/dd");
+                        }
+                        dr["手開發票銷售額"] = _dt.Rows[i]["invoice_sale_manual"];//F
+                        dr["手開發票稅額"] = _dt.Rows[i]["invoice_tax_manual"];//G
                         dr["發票總額"] = _dt.Rows[i]["imramount"];//F+G
                         //if (!string.IsNullOrEmpty(dr["發票銷售額"].ToString()) && !string.IsNullOrEmpty(dr["發票稅額"].ToString()))
                         //{
@@ -3355,6 +3641,515 @@ namespace Admin.gigade.Controllers
                 json = "{success:false,totalCount:0,data:[]}";
             }
         }
+        #endregion
+
+        #region 類別營業額 
+        #region 類別選擇store
+        public HttpResponseBase GetProductCategoryStore()
+        {
+            string json = string.Empty;
+            try
+            {
+                _productCategoryMgr = new ProductCategoryMgr(connectionString);
+                DataTable store = _productCategoryMgr.GetProductCategoryStore();
+                if (store != null)
+                {
+                    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                    timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                    json = "{success:true" + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+
+
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }  
+        #endregion
+        #region 列表頁store
+        public HttpResponseBase GetCategorySummaryList()
+        {
+            string json = string.Empty;
+            int sumAmount = 0;
+            int totalCount = 0;
+            try
+            {
+                _orderDetialMgr = new OrderDetailMgr(connectionString);
+                OrderDetailQuery query = new OrderDetailQuery();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
+                if (!string.IsNullOrEmpty(Request.Params["chooseCategory"]))
+                {
+                    query.category_id = Convert.ToUInt32(Request.Params["chooseCategory"]);                
+                }
+                if (!string.IsNullOrEmpty(Request.Params["receiptStatus"]))
+                {
+                    query.category_status = Convert.ToInt32(Request.Params["receiptStatus"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["dateCon"]))
+                {
+                    query.date_stauts = Convert.ToInt32(Request.Params["dateCon"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_start"]))
+                {
+                    query.date_start = Convert.ToDateTime(Request.Params["date_start"]);
+                    query.date_start = Convert.ToDateTime(query.date_start.ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_end"]))
+                {
+                    query.date_end = Convert.ToDateTime(Request.Params["date_end"]);
+                    query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
+                }
+                List<OrderDetailQuery> store = _orderDetialMgr.GetCategorySummaryList(query,out totalCount, out sumAmount);
+                if (store != null && store.Count > 0)
+                {
+                    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                    timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                    json = "{success:true,totalCount:" + totalCount + ",sumAmount:" + sumAmount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+
+
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+        #region 類別訂單明細
+        public HttpResponseBase GetAmountDetial()
+        {
+            string json = string.Empty;
+            try
+            {
+                _orderDetialMgr = new OrderDetailMgr(connectionString);
+                OrderDetailQuery query = new OrderDetailQuery();
+                int totalCount = 0;
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
+                if (!string.IsNullOrEmpty(Request.Params["category_id"]))
+                {
+                    query.category_id = Convert.ToUInt32(Request.Params["category_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["category_status"]))
+                {
+                    query.category_status = Convert.ToInt32(Request.Params["category_status"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_stauts"]))
+                {
+                    query.date_stauts = Convert.ToInt32(Request.Params["date_stauts"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_start"]))
+                {
+                    query.date_start = Convert.ToDateTime(Request.Params["date_start"]);
+                    query.date_start = Convert.ToDateTime(query.date_start.ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_end"]))
+                {
+                    query.date_end = Convert.ToDateTime(Request.Params["date_end"]);
+                    query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
+                }
+                DataTable store = _orderDetialMgr.GetAmountDetial(query, out totalCount);
+                if (store != null && store.Rows.Count > 0)
+                {
+                    IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                    timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                    json = "{success:true,totalCount:" + totalCount +  ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+
+
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+        #region 訂單明細匯出
+        public HttpResponseBase OrderDetialExport()
+        {
+            string json = string.Empty;
+            try
+            {
+                _OrderMasterMgr = new OrderMasterMgr (connectionString);
+                OrderDetailQuery query = new OrderDetailQuery();                
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
+                DataTable store = new DataTable();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                if (!string.IsNullOrEmpty(Request.Params["category_id"]))
+                {
+                    query.category_id = Convert.ToUInt32(Request.Params["category_id"]);
+                }           
+                if (!string.IsNullOrEmpty(Request.Params["category_status"]))
+                {
+                    query.category_status = Convert.ToInt32(Request.Params["category_status"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_stauts"]))
+                {
+                    query.date_stauts = Convert.ToInt32(Request.Params["date_stauts"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_start"]))
+                {
+                    query.date_start = Convert.ToDateTime(Request.Params["date_start"]);
+                    query.date_start = Convert.ToDateTime(query.date_start.ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_end"]))
+                {
+                    query.date_end = Convert.ToDateTime(Request.Params["date_end"]);
+                    query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
+                }
+                query.IsPage = false;
+                DataTable dtHZ = new DataTable();
+                string newExcelName = string.Empty;
+                dtHZ.Columns.Add("會員姓名", typeof(String));
+                dtHZ.Columns.Add("購買時間", typeof(String));
+                dtHZ.Columns.Add("付款單號", typeof(int));
+                dtHZ.Columns.Add("付款方式", typeof(String));
+                dtHZ.Columns.Add("購買金額", typeof(int));
+                dtHZ.Columns.Add("付款狀態", typeof(String));
+                dtHZ.Columns.Add("發票號碼", typeof(String));
+                dtHZ.Columns.Add("發票金額", typeof(int));
+                dtHZ.Columns.Add("發票開立日期", typeof(String));
+                dtHZ.Columns.Add("商品細項編號", typeof(int));
+                dtHZ.Columns.Add("訂單狀態", typeof(String));
+                dtHZ.Columns.Add("供應商", typeof(String));
+                dtHZ.Columns.Add("供應商編碼", typeof(String));
+                dtHZ.Columns.Add("品名", typeof(String));
+                dtHZ.Columns.Add("數量", typeof(int));
+                dtHZ.Columns.Add("購買單價", typeof(int));
+                dtHZ.Columns.Add("折抵購物金", typeof(int));
+                dtHZ.Columns.Add("抵用券", typeof(int));
+                dtHZ.Columns.Add("總價", typeof(int));
+                dtHZ.Columns.Add("成本單價", typeof(int));
+                dtHZ.Columns.Add("寄倉費", typeof(int));
+                dtHZ.Columns.Add("成本總額", typeof(int));
+                dtHZ.Columns.Add("出貨單歸檔期", typeof(String));
+                dtHZ.Columns.Add("負責PM", typeof(String));
+                dtHZ.Columns.Add("來源ID", typeof(String));
+                dtHZ.Columns.Add("來源名稱", typeof(String));
+                dtHZ.Columns.Add("出貨方式", typeof(String));
+
+                store = _OrderMasterMgr.OrderDetialExportInfo(query);
+                foreach (DataRow dr_v in store.Rows)
+                {
+                    DataRow dr = dtHZ.NewRow();
+                    dr[0] = dr_v["user_name"].ToString();
+                    if (!string.IsNullOrEmpty(dr_v["order_createdate"].ToString()))
+                    {
+                        DateTime order_createdate = Convert.ToDateTime(dr_v["order_createdate"].ToString());
+                        dr[1] = CommonFunction.DateTimeToString(order_createdate);
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["order_id"].ToString()))
+                    {
+                        dr[2] = Convert.ToInt32(dr_v["order_id"].ToString());
+                    }
+                    else {
+                        dr[2] = 0;
+                    }
+                    dr[3] = dr_v["order_payment"].ToString();
+                    if (!string.IsNullOrEmpty(dr_v["order_amount"].ToString()))
+                    {
+                        dr[4] = Convert.ToInt32(dr_v["order_amount"].ToString());
+                    }
+                    else
+                    {
+                        dr[4] = 0;
+                    }
+                    dr[5] = dr_v["order_status"].ToString();
+                    dr[6] = dr_v["invoice_number"].ToString() == "" ? "" : dr_v["invoice_number"].ToString();                    
+                    if (!string.IsNullOrEmpty(dr_v["total_amount"].ToString()))
+                    {
+                        dr[7] =Convert.ToInt32( dr_v["total_amount"].ToString());
+                    }
+                    else
+                    {
+                        dr[7] = 0;
+                    }                   
+                    if (!string.IsNullOrEmpty(dr_v["invoice_date"].ToString()))
+                    {
+                        DateTime invoice_date = Convert.ToDateTime(dr_v["invoice_date"].ToString());
+                        dr[8] = CommonFunction.DateTimeToString(invoice_date);
+                    }
+                    else
+                    {
+                        dr[8] = "";
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["item_id"].ToString()))
+                    {
+                        dr[9] =Convert.ToInt32( dr_v["item_id"].ToString());
+                    }
+                    else
+                    {
+                        dr[9] = 0;
+                    }
+                    dr[10] = dr_v["slave_status"].ToString();
+                    dr[11] = dr_v["vendor_name_simple"].ToString();
+                    dr[12] = dr_v["vendor_code"].ToString();
+                    dr[13] = dr_v["product_name"].ToString();
+                    if (!string.IsNullOrEmpty(dr_v["buy_num"].ToString()))
+                    {
+                        dr[14] =Convert.ToInt32( dr_v["buy_num"].ToString());
+                    }
+                    else
+                    {
+                        dr[14] = 0;
+                    }
+
+                    if (!string.IsNullOrEmpty(dr_v["single_money"].ToString()))
+                    {
+                        dr[15] = Convert.ToInt32(dr_v["single_money"].ToString());
+                    }
+                    else
+                    {
+                        dr[15] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["deduct_bonus"].ToString()))
+                    {
+                        dr[16] =Convert.ToInt32( dr_v["deduct_bonus"].ToString());
+                    }
+                    else
+                    {
+                        dr[16] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["deduct_welfare"].ToString()))
+                    {
+                        dr[17] =Convert.ToInt32( dr_v["deduct_welfare"].ToString());
+                    }
+                    else
+                    {
+                        dr[17] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["od.single_money*buy_num"].ToString()))
+                    {
+                        dr[18] = Convert.ToInt32(dr_v["od.single_money*buy_num"].ToString()) - Convert.ToInt32(dr[16]) - Convert.ToInt32(dr[17]);
+                    }
+                    else
+                    {
+                        dr[18] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["single_cost"].ToString()))
+                    {
+                        dr[19] =Convert.ToInt32( dr_v["single_cost"].ToString());
+                    }
+                    else
+                    {
+                        dr[19] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["bag_check_money"].ToString()))
+                    {
+                        dr[20] =Convert.ToInt32( dr_v["bag_check_money"].ToString());
+                    }
+                    else
+                    {
+                        dr[20] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["od.single_cost*od.buy_num"].ToString()))
+                    {
+                        dr[21] = Convert.ToInt32(dr_v["od.single_cost*od.buy_num"].ToString());
+                    }
+                    else
+                    {
+                        dr[21] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["slave_date_close"].ToString()))
+                    {
+                        DateTime slave_date_close = Convert.ToDateTime(dr_v["slave_date_close"].ToString());
+                        dr[22] = slave_date_close == Convert.ToDateTime("1/1/1970 8:00:00 AM") ? "未歸檔" : CommonFunction.DateTimeToString(slave_date_close);
+                    }
+                    dr[23] = dr_v["pm"].ToString();
+                    dr[24] = dr_v["ID"].ToString() == "0" ? "" : dr_v["ID"].ToString();                 
+                    dr[25] = dr_v["group_name"].ToString();
+                    dr[26] = dr_v["product_mode"].ToString();
+                    dtHZ.Rows.Add(dr);
+                }
+                string[] colname = new string[dtHZ.Columns.Count];
+                string filename = "訂單明細"+ DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                newExcelName = Server.MapPath(excelPath_export) + filename;
+                for (int i = 0; i < dtHZ.Columns.Count; i++)
+                {
+                    colname[i] = dtHZ.Columns[i].ColumnName;
+                }
+
+                if (System.IO.File.Exists(newExcelName))
+                {
+                    System.IO.File.Delete(newExcelName);
+                }
+                ExcelHelperXhf.ExportDTtoExcel(dtHZ, "", newExcelName);
+                json = "{success:true,ExcelName:\'" + filename + "\'}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        } 
+        #endregion
+
+        #region 類別訂單明細匯出
+        public HttpResponseBase CategoryDetialExport()
+        {
+            string json = string.Empty;
+            try
+            {
+                _orderDetialMgr = new  OrderDetailMgr(connectionString);
+                OrderDetailQuery query = new OrderDetailQuery();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");//用於分頁的變量
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
+                DataTable store = new DataTable();
+                query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+                query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+                if (!string.IsNullOrEmpty(Request.Params["category_id"]))
+                {
+                    query.category_id = Convert.ToUInt32(Request.Params["category_id"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["category_name"]))
+                {
+                    query.category_name = Request.Params["category_name"];
+                }
+                if (!string.IsNullOrEmpty(Request.Params["category_status"]))
+                {
+                    query.category_status = Convert.ToInt32(Request.Params["category_status"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_stauts"]))
+                {
+                    query.date_stauts = Convert.ToInt32(Request.Params["date_stauts"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_start"]))
+                {
+                    query.date_start = Convert.ToDateTime(Request.Params["date_start"]);
+                    query.date_start = Convert.ToDateTime(query.date_start.ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["date_end"]))
+                {
+                    query.date_end = Convert.ToDateTime(Request.Params["date_end"]);
+                    query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
+                }
+                query.IsPage = false;
+                DataTable dtHZ = new DataTable();
+                string newExcelName = string.Empty;
+                dtHZ.Columns.Add("購買金額", typeof(int));
+                dtHZ.Columns.Add("付款狀態", typeof(String));
+                dtHZ.Columns.Add("商品細項編號", typeof(int));
+                dtHZ.Columns.Add("訂單狀態", typeof(String));
+                dtHZ.Columns.Add("供應商", typeof(String));
+                dtHZ.Columns.Add("供應商編碼", typeof(String));
+                dtHZ.Columns.Add("品名", typeof(String));
+                dtHZ.Columns.Add("數量", typeof(int));
+                dtHZ.Columns.Add("購買單價", typeof(int));
+                dtHZ.Columns.Add("總價", typeof(int));
+                store = _orderDetialMgr.CategoryDetialExportInfo(query);
+                foreach (DataRow dr_v in store.Rows)
+                {
+                    DataRow dr = dtHZ.NewRow();
+                    if (!string.IsNullOrEmpty(dr_v["order_amount"].ToString()))
+                    {
+                        dr[0] = Convert.ToInt32(dr_v["order_amount"].ToString());
+                    }
+                    else
+                    {
+                        dr[0] = 0;
+                    }
+                    dr[1] = dr_v["order_status"].ToString();
+                    if (!string.IsNullOrEmpty(dr_v["item_id"].ToString()))
+                    {
+                        dr[2] = Convert.ToInt32(dr_v["item_id"].ToString());
+                    }
+                    else
+                    {
+                        dr[2] = 0;
+                    }
+                    dr[3] = dr_v["slave_status"].ToString();
+                    dr[4] = dr_v["vendor_name_simple"].ToString();
+                    dr[5] = dr_v["vendor_code"].ToString();
+                    dr[6] = dr_v["product_name"].ToString();
+                    if (!string.IsNullOrEmpty(dr_v["buy_num"].ToString()))
+                    {
+                        dr[7] = Convert.ToInt32(dr_v["buy_num"].ToString());
+                    }
+                    else
+                    {
+                        dr[7] = 0;
+                    }
+
+                    if (!string.IsNullOrEmpty(dr_v["single_money"].ToString()))
+                    {
+                        dr[8] = Convert.ToInt32(dr_v["single_money"].ToString());
+                    }
+                    else
+                    {
+                        dr[8] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["amount"].ToString()))
+                    {
+                        dr[9] = Convert.ToInt32(dr_v["amount"].ToString());
+                    }
+                    else
+                    {
+                        dr[9] = 0;
+                    }                   
+                    dtHZ.Rows.Add(dr);
+                }
+                string[] colname = new string[dtHZ.Columns.Count];
+                string filename = query.category_name + "-類別訂單明細" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                newExcelName = Server.MapPath(excelPath_export) + filename;
+                for (int i = 0; i < dtHZ.Columns.Count; i++)
+                {
+                    colname[i] = dtHZ.Columns[i].ColumnName;
+                }
+
+                if (System.IO.File.Exists(newExcelName))
+                {
+                    System.IO.File.Delete(newExcelName);
+                }
+                ExcelHelperXhf.ExportDTtoExcel(dtHZ, "", newExcelName);
+                json = "{success:true,ExcelName:\'" + filename + "\'}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
         #endregion
 
     }

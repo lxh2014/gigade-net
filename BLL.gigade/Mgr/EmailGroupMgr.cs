@@ -148,7 +148,7 @@ namespace BLL.gigade.Mgr
             }
             catch (Exception ex)
             {
-                throw new Exception("EmailGroupDao-->Export-->" + ex.Message, ex);
+                throw new Exception("EmailGroupDao-->SaveEmailGroup-->" + ex.Message, ex);
             }
 
         }

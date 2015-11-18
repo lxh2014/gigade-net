@@ -1,16 +1,156 @@
 ﻿@{
     ViewBag.Title = "MarketTally";
 }
-
-<!DOCTYPE html>
-
-<html>
 <head>
-    <title>MarketTally</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes " />
+
+<script src="../../Scripts/jquery-2.1.4.min.js"></script>
+<link href="../../Scripts/Bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<script src="../../Scripts/Bootstrap/bootstrap.min.js"></script>
+    <title></title>
 </head>
-<body>
-    <div>
-        
+
+<div class="container">
+    <h1 >提示：請輸入工作代號!</h1>
+    <br />
+    <br />
+   @* <select class="btn btn-default btn-lg combobox">
+        <option value="0">常溫</option>
+        <option value="1">冷凍</option>
+    </select>
+    <p></p>*@
+    <div class="row hidden" >
+      <div class="col-xs-2">
+        <select class="form-control input-lg" id="freight_set">
+            <option value="2">冷凍</option>
+            <option value="1">常溫</option>
+        </select>
+      </div>  
     </div>
-</body>
-</html>
+    <br />
+@*<div class="alert alert-danger" id="alert" hidden="hidden" role="alert">
+  <strong id="MessageContentId">提示</strong>
+</div>*@
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="alert alert-danger" id="alert" hidden="hidden" role="alert">
+    <h4 class="glyphicon glyphicon-exclamation-sign"  id="MessageContentId">提示</h4>
+  </div>
+  </div><!-- /.col-lg-8 -->
+  <div class="col-lg-8">
+    <div class="input-group">
+      <span class="input-group-btn">
+        <button class="btn btn-default btn-lg" type="button">工作代號</button>
+      </span>
+      <input type="text" class="form-control input-lg" id="number" onKeypress= "javascript:if(event.keyCode==13) onNumberButtonClick();" placeholder="例如 N20151001011200">
+      <span class="input-group-btn">
+        <button class="btn btn-default btn-lg " id="numberbutton" onClick="onNumberButtonClick()" type="button">確定</button>
+        @*<button class="close" id="numberbutton" data-dismiss="alert" type="button">確定</button>*@
+      </span>
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-8 -->
+    
+</div><!-- /.row -->
+</div>
+
+<div class="modal fade MarketTally-modal-alert" role="dialog" aria-labelledby="gridSystemModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 class="modal-title" >提示</h3>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">         
+          <h4 id="MessageContentId2" class="text-center">錯誤提示</h4>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="modal-dialog-close" data-dismiss="modal">關閉</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        
+      {
+          $("#number").focus()
+      }
+        //$('#numberbutton').on('click', function ()
+        onNumberButtonClick = function()
+       {
+          var number = document.getElementById("number").value.trim();
+          if (number.length != 15)
+          {
+              //$('#alert').
+              $('#MessageContentId').text(number+"格式錯誤，"+"請輸入正確的工作代號!");
+              $('#alert').show();
+              $("#number").focus();
+
+              //$('#MessageContentId').text("請輸入正確的工作代號!");
+              //$('.MarketTally-modal-alert').modal('toggle')
+              //$('#modal - dialog - close').focus();
+              return false;                                                                                                                                                                                         
+          }
+  
+          $.get('/MarketTally/GetAseldMasterAssgCount', { number: number }, function (data)
+          {
+              var result = eval("(" + data + ")");
+              if (result.success)
+              {
+                  if (result.data > 0)
+                  {
+                      document.location.href = "/MarketTally/MarketTallyWD?number=" + number;
+                  }
+                  else
+                  {
+                      $('#MessageContentId').text("工作代號("+number+")中沒有需要分貨的寄倉商品!");
+                      $('#alert').show();
+                      $("#number").focus()
+                  }
+              }
+              
+          }).error(function ()
+          {
+              $('#MessageContentId').text("查詢失敗!");
+              $('#alert').show();
+              $("#number").focus()
+          })
+
+          ////////////
+
+          //$.ajax({
+          //    url: "/WareHouse/GetAseldMasterAssgCount",
+          //    data: {
+          //        "number": number
+          //    },
+          //    type: "POST",
+          //    dataType: "text",
+          //    success: function (msg)
+          //    {
+          //        alert("success")
+          //        var result = eval("(" + msg + ")");
+          //        if (result.success == "true")
+          //        {
+          //            alert("result.success == true")
+          //        }
+          //        else
+          //        {
+          //            alert("result.success == false")
+          //        }
+          //    },
+          //    error: function (msg)
+          //    {
+          //        alert("服务器异常")
+          //    }
+          //});
+
+          /////////
+      }
+  });
+</script>

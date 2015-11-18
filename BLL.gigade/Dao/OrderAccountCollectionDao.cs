@@ -26,7 +26,9 @@ namespace BLL.gigade.Dao
             try
             {
                 sqlCount.Append("select count(oac.row_id)  as totalCount ");
-                sql.Append(" select oac.row_id,oac.order_id,oac.account_collection_time,oac.account_collection_money,oac.poundage,oac.return_collection_time,oac.return_collection_money,oac.return_poundage,oac.remark ");
+                sql.Append(" select oac.row_id,oac.order_id,oac.account_collection_time,oac.account_collection_money,oac.poundage,");
+                sql.Append(" oac.return_collection_time,oac.return_collection_money,oac.return_poundage,oac.remark, ");
+                sql.Append("   invoice_date_manual,invoice_sale_manual,invoice_tax_manual");
                 sqlFrom.Append(" from order_account_collection oac ");
 
                 sqlWhere.Append(" where 1=1  ");
@@ -65,7 +67,9 @@ namespace BLL.gigade.Dao
             {
                 if (model.row_id == 0)
                 {
-                    str.Append(@"insert into order_account_collection(order_id,remark,account_collection_time,account_collection_money,poundage,return_collection_time,return_collection_money,return_poundage) ");
+                    str.Append(@"insert into order_account_collection(order_id,remark,account_collection_time,account_collection_money,");
+                    str.Append(@"  poundage,return_collection_time,return_collection_money,return_poundage, ");
+                    str.Append("  invoice_date_manual,invoice_sale_manual,invoice_tax_manual ) ");
                     str.AppendFormat(" values('{0}','{1}'", model.order_id, model.remark);
                     if (model.account_collection_time != null && model.account_collection_time != DateTime.MinValue)
                     {
@@ -82,6 +86,14 @@ namespace BLL.gigade.Dao
                     else
                     {
                         str.AppendFormat(" , NULL  ,NULL  ,NULL ");
+                    }
+                    if (model.invoice_date_manual != null && model.invoice_date_manual != DateTime.MinValue)
+                    {
+                        str.AppendFormat(" ,'{0}','{1}','{2}'", Common.CommonFunction.DateTimeToString(model.invoice_date_manual), model.invoice_sale_manual, model.invoice_tax_manual);
+                    }
+                    else
+                    {
+                        str.AppendFormat(" ,NULL ,NULL  ,NULL  ");
                     }
                     str.AppendFormat(" );");
                 }
@@ -105,6 +117,14 @@ namespace BLL.gigade.Dao
                     else
                     {
                         str.AppendFormat("  return_collection_time={0},return_collection_money={1},return_poundage={2}, ", "NULL", "NULL", "NULL");
+                    }
+                    if (model.invoice_date_manual != null && model.invoice_date_manual != DateTime.MinValue)
+                    {
+                        str.AppendFormat("  invoice_date_manual='{0}',invoice_sale_manual='{1}',invoice_tax_manual='{2}', ", Common.CommonFunction.DateTimeToString(model.invoice_date_manual), model.invoice_sale_manual, model.invoice_tax_manual);
+                    }
+                    else
+                    {
+                        str.AppendFormat("  invoice_date_manual={0},invoice_sale_manual={1},invoice_tax_manual={2}, ", "NULL", "NULL", "NULL");
                     }
                     str.AppendFormat(@" remark='{0}' ", model.remark);
                     str.AppendFormat(" where row_id='{0}' ", model.row_id);

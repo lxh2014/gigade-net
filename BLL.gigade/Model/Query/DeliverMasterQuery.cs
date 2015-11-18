@@ -71,6 +71,11 @@ namespace BLL.gigade.Model.Query
 
         public string estimated_arrival_period_str { get; set; }
         public string delivery_date_str { get; set; }
+        public int order_day { set; get; }//add by chaojie1124j 2015/11/3 05:21PM,距離預計到貨日，實現訂單細項查詢中，預計到貨日-今天<=order_day的未到貨的出貨單show出來
+        public uint type { get; set; }//add by zhaozhi0623j 2015/11/11 03:23PM,用於“出貨單期望到貨日”的查詢
+        public uint freight_set { get; set; }//add by zhaozhi0623j 2015/11/11 03:23PM,用於“出貨單期望到貨日”的查詢
+        public uint user_id { set; get; }//add by zhaozhi0623j 2015/11/11 03:23PM,用於“出貨單期望到貨日”的查詢
+        public string delivery_status_str { set; get; }//add by zhaozhi0623j 2015/11/16 PM,用於“出貨單期望到貨日”的查詢
         public DeliverMasterQuery()
         {
             vendor_id = 0;
@@ -123,6 +128,10 @@ namespace BLL.gigade.Model.Query
             time_type = 0;
             estimated_arrival_period_str = string.Empty;
             delivery_date_str = string.Empty;
+            type = 0;
+            freight_set = 0;
+            user_id = 0;
+            delivery_status_str = string.Empty;
         }
     }
 }

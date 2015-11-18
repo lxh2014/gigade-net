@@ -16,6 +16,7 @@ namespace BLL.gigade.Mgr.Impl
         DataTable Getprodubybar(string id);
         int Islocid(string id, string zid, string prod_id);
         List<Model.Query.IinvdQuery> GetIinvdList(Model.Query.IinvdQuery ivd, out int totalCount);
+        List<Model.Query.IinvdQuery> GetIinvdListByItemid(Model.Query.IinvdQuery ivd, out int totalCount);
         int IsUpd(Iinvd m, IstockChangeQuery stock = null);/*chaojie1124j 2015/10/30添加stock用來判斷庫存調整和收貨上架,並且交易單號，備註，前置單號記錄到料位帳卡*/
         int Selnum(Iinvd m);
         int UpdateIinvdLock(Iinvd nvd,IialgQuery q);
@@ -50,5 +51,6 @@ namespace BLL.gigade.Mgr.Impl
         int GetIinvdCount(IinvdQuery iinvd);
         DateTime GetCde_dt(int row_id);
         int GetProd_qty(int item_id, string loc_id);
+        List<IinvdQuery> GetPlasIinvd(Model.Query.IinvdQuery ivd);
     }
 }
