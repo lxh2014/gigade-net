@@ -161,6 +161,11 @@ Ext.onReady(function () {
                        }
             ]
         },
+         {
+             xtype: 'fieldcontainer',
+             combineErrors: true,
+             layout: 'hbox',
+             items: [
      {
          xtype: 'button',
          text: '確定',
@@ -173,7 +178,24 @@ Ext.onReady(function () {
              window.open('/WareHouse/OutUndoneJobExl?radio1=' + Ext.getCmp('radio1').getValue() + '&radio2=' + Ext.getCmp('radio2').getValue() + '&assg_id=' + Ext.getCmp("assg_id").getValue() + "&starttime=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s') + "&endtime=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'));
             
          }
-     }]
+
+     },
+     {
+         xtype: 'button',
+         text: "重置",
+         width: 70,
+         //iconCls: 'icon-search',
+         margin: '0 10 0 20',
+         id: 'btnresult',
+         iconCls: 'ui-icon ui-icon-reset',
+         handler: function () {
+             this.up('form').getForm().reset();
+         }
+
+     }
+     ]}
+
+        ]
 
     });
     setNextMonth = function (source, n) {

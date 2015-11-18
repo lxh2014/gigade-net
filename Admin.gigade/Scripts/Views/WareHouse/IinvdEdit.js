@@ -16,10 +16,10 @@
         items: [
             {
                 xtype: 'textfield',
-                fieldLabel: "商品品號/條碼",
+                fieldLabel: "商品細項編號/條碼",
                 name: 'plas_prod_id',
                 id: 'plas_prod_id',
-                //labelWidth: 120,
+                labelWidth: 120,
                 allowBlank:false,
                 listeners: {
                     blur: function () {
@@ -97,6 +97,7 @@
             {
                 xtype: 'displayfield',
                 fieldLabel: "品名",
+                labelWidth: 120,
                 name: 'product_name',
                 id: 'product_name',
                 allowBlank: false
@@ -105,6 +106,7 @@
                  xtype: 'displayfield',
                  fieldLabel: "細項編號",
                  name: 'Pitem_id',
+                 labelWidth: 120,
                  id: 'Pitem_id',
                  hidden: true
             
@@ -114,6 +116,7 @@
                 fieldLabel: "數量",
                 name: 'prod_qty',
                 id: 'prod_qty',
+                labelWidth: 120,
                 hidden:true,
                 minValue: 1,
                 allowBlank:false
@@ -121,6 +124,7 @@
             {
                 xtype: 'fieldcontainer',
                 fieldLabel: "製造日期",
+                labelWidth: 120,
                 combineErrors: true,
                 height: 24,
                 margins: '0 200 0 0',
@@ -159,6 +163,7 @@
                         fieldLabel: "製造日期",
                         id: 'startTime',
                         name: 'startTime',
+                        labelWidth: 120,
                         allowBlank: false,
                         submitValue: true,
                         listeners: {                            
@@ -204,6 +209,7 @@
                 combineErrors: true,
                 hidden: true,
                 layout: 'hbox',
+                labelWidth: 120,
                 height:24,
                 //margins: '0 200 0 0',
                 id: 'cdttime',
@@ -284,6 +290,7 @@
             {
                 xtype: 'textfield',
                 fieldLabel: "上架料位",
+                labelWidth: 120,
                 id: 'plas_loc_id',
                 name: 'plas_loc_id',
                 regex: /^[A-Za-z]{2}\d{3}[A-Za-z]\d{2}$/,
@@ -294,12 +301,14 @@
             {
                 xtype: 'displayfield',
                 fieldLabel: "主料位",
+                labelWidth: 120,
                 id: 'loc_id',
                 name: 'loc_id'
             },
             {
                 xtype: 'displayfield',
                 fieldLabel: "允收天數",
+                labelWidth: 120,
                 id: 'cde_dt_var',
                 name: 'cde_dt_var',
                 allowBlank:false
