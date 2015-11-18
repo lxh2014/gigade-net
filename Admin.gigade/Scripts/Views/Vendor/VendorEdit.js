@@ -368,7 +368,7 @@ function editFunction(rowID) {
                 }
             },
             {
-                header: '姓名', dataIndex: 'contact_name', width: 65, align: 'center',
+                header: '姓名', dataIndex: 'contact_name', width: 120, align: 'center',
                 editor: {
                     // id: 'txt_contactname',
                     listeners: {
@@ -408,7 +408,7 @@ function editFunction(rowID) {
                 }
             },
             {
-                header: '電話1', dataIndex: 'contact_phone1', width: 70, align: 'center', editor: { id: 'txt_contactphone' },
+                header: '電話1', dataIndex: 'contact_phone1', width: 120, align: 'center', editor: { id: 'txt_contactphone' },
                 editor: {
                     xtype: "textfield",
                     minLength: 5,
@@ -418,7 +418,7 @@ function editFunction(rowID) {
                 }
             },
             {
-                header: '電話2', dataIndex: 'contact_phone2', width: 70, align: 'center', editor: { id: 'txt_contactphone1' },
+                header: '電話2', dataIndex: 'contact_phone2', width: 120, align: 'center', editor: { id: 'txt_contactphone1' },
                 editor: {
                     xtype: "textfield",
                     minLength: 5,
@@ -428,7 +428,7 @@ function editFunction(rowID) {
                 }
             },
             {
-                header: '手機', dataIndex: 'contact_mobile', width: 70, align: 'center', editor: { id: 'txt_contactmobile' },
+                header: '手機', dataIndex: 'contact_mobile', width: 120, align: 'center', editor: { id: 'txt_contactmobile' },
                 editor: {
                     xtype: "textfield",
                     minLength: 10,
@@ -437,7 +437,7 @@ function editFunction(rowID) {
                 }
             },
             {
-                header: 'E-mail', dataIndex: 'contact_email', width: 80, align: 'center', editor: { id: 'txt_contactemail' },
+                header: 'E-mail', dataIndex: 'contact_email', width: 150, align: 'center', editor: { id: 'txt_contactemail' },
                 editor: {
                     xtype: "textfield",
                     sumbitValue: true,
