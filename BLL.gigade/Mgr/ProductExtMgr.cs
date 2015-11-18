@@ -143,5 +143,16 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductExtMgr-->OutToExcel" + ex.Message,ex);
             }
         }
+        public int GetCde_dt_incr(int item_id)
+        {
+            try
+            {
+              return  pei.GetCde_dt_incr(item_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductExtMgr-->GetCde_dt_incr" + ex.Message, ex);
+            }
+        }
     }
 }

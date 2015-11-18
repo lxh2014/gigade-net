@@ -11,7 +11,7 @@ using BLL.gigade.Model.Query;
 
 namespace BLL.gigade.Mgr
 {
-    public class IinvdMgr:IinvdImplMgr
+    public class IinvdMgr : IinvdImplMgr
     {
         private IinvdImplDao _ivddao;
         private IstockChangeDao _istockdao;
@@ -95,7 +95,7 @@ namespace BLL.gigade.Mgr
         {
             try
             {
-                return _ivddao.Islocid(id,zid, prod_id);
+                return _ivddao.Islocid(id, zid, prod_id);
             }
             catch (Exception ex)
             {
@@ -121,14 +121,14 @@ namespace BLL.gigade.Mgr
                             break;
                     }
                 }
-                return _ivddao.GetIinvdList(ivd,out totalCount);
+                return _ivddao.GetIinvdList(ivd, out totalCount);
             }
             catch (Exception ex)
             {
                 throw new Exception("IinvdMgr-->GetIinvdList-->" + ex.Message, ex);
             }
         }
-        public int IsUpd(Iinvd i,IstockChangeQuery stock=null)/*chaojie1124j添加，區分是庫存調整，還是收貨上架*/
+        public int IsUpd(Iinvd i, IstockChangeQuery stock = null)/*chaojie1124j添加，區分是庫存調整，還是收貨上架*/
         {
             try
             {
@@ -152,7 +152,7 @@ namespace BLL.gigade.Mgr
                 m.sc_num_new = GetProqtyByItemid(int.Parse(i.item_id.ToString())) + i.prod_qty;
                 m.sc_time = i.change_dtim;
                 m.sc_user = i.create_user;
-               
+
                 _istockdao.insert(m);
                 return _ivddao.IsUpd(i);
             }
@@ -171,8 +171,8 @@ namespace BLL.gigade.Mgr
             {
                 throw new Exception("IinvdMgr-->Selnum-->" + ex.Message, ex);
             }
-        }        
-        public int UpdateIinvdLock(Iinvd i,IialgQuery q)
+        }
+        public int UpdateIinvdLock(Iinvd i, IialgQuery q)
         {
             try
             {
@@ -181,9 +181,9 @@ namespace BLL.gigade.Mgr
                 m.sc_trans_type = 1;
                 m.sc_num_old = GetProqtyByItemid(int.Parse(m.item_id.ToString()));
                 m.sc_num_chg = GetIinvd(i).FirstOrDefault().prod_qty;
-                if (i.ista_id=="H")
+                if (i.ista_id == "H")
                 {
-                    m.sc_num_chg = -m.sc_num_chg;                
+                    m.sc_num_chg = -m.sc_num_chg;
                 }
                 m.sc_num_new = m.sc_num_old + m.sc_num_chg;
                 m.sc_time = i.change_dtim;
@@ -209,7 +209,7 @@ namespace BLL.gigade.Mgr
         {
             try
             {
-                return _ivddao.ExportExcel (vd);
+                return _ivddao.ExportExcel(vd);
             }
             catch (Exception ex)
             {
@@ -287,7 +287,7 @@ namespace BLL.gigade.Mgr
         {
             try
             {
-                
+
                 return _ivddao.CountBook(m);
             }
             catch (Exception ex)
@@ -430,13 +430,13 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IinvdMgr-->Getcost-->" + ex.Message, ex);
             }
         }
-        public int SumProd_qty(Iinvd i) 
+        public int SumProd_qty(Iinvd i)
         {
             try
             {
 
                 return _ivddao.SumProd_qty(i);
-               
+
             }
             catch (Exception ex)
             {
@@ -445,7 +445,7 @@ namespace BLL.gigade.Mgr
         }
         public DataTable Getloc()
         {
-            DataTable dt =  _ivddao.Getloc();
+            DataTable dt = _ivddao.Getloc();
             try
             {
                 return dt;
@@ -487,7 +487,7 @@ namespace BLL.gigade.Mgr
         {
             try
             {
-                return  _ivddao.GetProqtyByItemid(item_id);
+                return _ivddao.GetProqtyByItemid(item_id);
             }
             catch (Exception ex)
             {
@@ -503,6 +503,63 @@ namespace BLL.gigade.Mgr
             catch (Exception ex)
             {
                 throw new Exception("IinvdMgr-->GetSearchIinvd-->" + ex.Message, ex);
+            }
+        }
+
+        public List<IinvdQuery> GetIinvdList(string loc_id)
+        {
+            try
+            {
+                return _ivddao.GetIinvdList(loc_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->GetIinvdList-->" + ex.Message, ex);
+            }
+        }
+
+        public int SaveIinvd(IinvdQuery query)
+        {
+            try
+            {
+                return _ivddao.SaveIinvd(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->SaveIinvd-->" + ex.Message, ex);
+            }
+        }
+        public int GetIinvdCount(IinvdQuery iinvd)
+        {
+            try
+            {
+                return _ivddao.GetIinvdCount(iinvd);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->GetIinvdCount-->" + ex.Message, ex);
+            }
+        }
+        public DateTime GetCde_dt(int row_id)
+        {
+            try
+            {
+                return _ivddao.GetCde_dt(row_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->GetCde_dt-->" + ex.Message, ex);
+            }
+        }
+        public int GetProd_qty(int item_id, string loc_id)
+        {
+            try
+            {
+                return _ivddao.GetProd_qty(item_id,loc_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->GetProd_qty-->" + ex.Message, ex);
             }
         }
     }

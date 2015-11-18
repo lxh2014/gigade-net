@@ -37,5 +37,6 @@ namespace BLL.gigade.Mgr.Impl
         ///歷史記錄excel匯出方法
         /// </summary>
         MemoryStream OutToExcel(string fileName, Int64 Update_start, Int64 Update_end, int Brand_id = 0, string Item_ids = null, string Product_ids = null);
+        int GetCde_dt_incr(int item_id);
     }
 }
