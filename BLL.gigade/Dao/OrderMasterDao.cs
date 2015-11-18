@@ -1254,7 +1254,7 @@ namespace BLL.gigade.Dao
                         }
                     }
                     dr["imramount"] = imramount;
-                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) && !string.IsNullOrEmpty(dr["imramount"].ToString()) && !string.IsNullOrEmpty(dr["invoice_tax_manual"].ToString()) && !string.IsNullOrEmpty(dr["invoice_sale_manual"].ToString()))
+                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) || !string.IsNullOrEmpty(dr["imramount"].ToString()) || !string.IsNullOrEmpty(dr["invoice_tax_manual"].ToString()) || !string.IsNullOrEmpty(dr["invoice_sale_manual"].ToString()))
                     {
                         dr["invoice_diff"] = totalMoney - imramount;//J=E-H
                     }
@@ -1554,7 +1554,7 @@ namespace BLL.gigade.Dao
                         }
                     }
                     dr["imramount"] = imramount;
-                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) && !string.IsNullOrEmpty(dr["imramount"].ToString()) && !string.IsNullOrEmpty(dr["invoice_tax_manual"].ToString()) && !string.IsNullOrEmpty(dr["invoice_sale_manual"].ToString()))
+                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) || !string.IsNullOrEmpty(dr["imramount"].ToString()) || !string.IsNullOrEmpty(dr["invoice_tax_manual"].ToString()) || !string.IsNullOrEmpty(dr["invoice_sale_manual"].ToString()))
                     {
                         dr["invoice_diff"] = totalMoney - imramount;//J=E-H
                     }
