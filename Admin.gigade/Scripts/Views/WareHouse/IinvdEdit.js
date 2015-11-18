@@ -90,6 +90,24 @@
                                     }
                                 }
                             });
+                        } else {
+
+                            Ext.getCmp("product_name").setValue("沒有該商品信息！");
+                            Ext.getCmp("createtime").hide();
+                            Ext.getCmp("cdttime").hide();
+                            Ext.getCmp('cde_dt').allowBlank = true;
+                            Ext.getCmp('cde_dt').setDisabled(false);
+                            Ext.getCmp('startTime').allowBlank = true;
+                            Ext.getCmp('startTime').setDisabled(true);
+                            Ext.getCmp('prod_qty').setDisabled(true);
+                            Ext.getCmp('prod_qty').hide();
+                            Ext.getCmp('plas_loc_id').setDisabled(true);
+                            Ext.getCmp('plas_loc_id').setValue(" ");
+                            Ext.getCmp('us1').setDisabled(true);
+                            Ext.getCmp('us2').setDisabled(true);
+                            Ext.getCmp('loc_id').setValue(" ");//cde_dt_var
+                            Ext.getCmp('cde_dt_var').setValue(" ");
+
                         }
                     }
                 }
