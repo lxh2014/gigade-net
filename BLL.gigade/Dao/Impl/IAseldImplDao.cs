@@ -35,8 +35,8 @@ namespace BLL.gigade.Dao.Impl
 
         int UpdScaned(Aseld a);
 
-        DataTable GetNComJobDetail(string jobNumbers);
-        DataTable GetNComJobSimple();
+        DataTable GetNComJobDetail(string jobNumbers, AseldQuery query = null);
+        DataTable GetNComJobSimple(AseldQuery query = null);
 
         int UpdateScnd(Aseld ase);
         int Updwust(Aseld a);

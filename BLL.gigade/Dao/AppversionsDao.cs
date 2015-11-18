@@ -85,9 +85,9 @@ namespace BLL.gigade.Dao
             try
             {
                 anpq.Replace4MySQL();
-                strSql = string.Format(@"insert into appversions(versions_id,versions_code,versions_name,versions_desc,drive,release_date) 
-                                                    values({0},{1},'{2}','{3}',{4},{5});select @@identity",
-                        anpq.versions_id, anpq.versions_code,anpq.versions_name, anpq.versions_desc, anpq.drive, anpq.release_date
+                strSql = string.Format(@"insert into appversions(versions_id,versions_code,versions_name,versions_desc,drive,release_date,release_type) 
+                                                    values({0},{1},'{2}','{3}',{4},{5},{6});select @@identity",
+                        anpq.versions_id, anpq.versions_code,anpq.versions_name, anpq.versions_desc, anpq.drive, anpq.release_date,anpq.release_type
                 );
                 return _access.execCommand(strSql);
             }
@@ -96,6 +96,39 @@ namespace BLL.gigade.Dao
                 throw new Exception("AppversionsDao-->AddAppversions" + ex.Message + strSql.ToString(), ex);
             }
 
+        }
+
+
+        public int UpdateAppversionsActive(int id, int status)
+        {
+            StringBuilder str = new StringBuilder();
+            try
+            {
+
+                str.AppendFormat(@"update appversions set release_type='{0}' where id='{1}';", status, id);
+                return _access.execCommand(str.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AppversionsDao-->UpdateAppversionsActive" + ex.Message + str.ToString(), ex);
+            }
+        }
+
+
+        public int EditAppversions(AppversionsQuery appsions)
+        {
+            StringBuilder str = new StringBuilder();
+            try
+            {
+                appsions.Replace4MySQL();
+                str.AppendFormat(@"update appversions set versions_id='{0}',versions_code='{1}',versions_name='{2}', versions_desc='{3}',drive='{4}',release_date='{5}',release_type='{6}' where id='{7}';"
+                    ,appsions.versions_id,appsions.versions_code,appsions.versions_name,appsions.versions_desc,appsions.drive,appsions.release_date,appsions.release_type,appsions.id); 
+                return _access.execCommand(str.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AppversionsDao-->EditAppversions" + ex.Message + str.ToString(), ex);
+            }
         }
     }
 }

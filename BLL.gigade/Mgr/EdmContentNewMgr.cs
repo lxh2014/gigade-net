@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using BLL.gigade.Common;
 
 namespace BLL.gigade.Mgr
 {
@@ -771,5 +772,22 @@ namespace BLL.gigade.Mgr
             }
         }
 
+        #region 郵件排成使用
+        //清除過期信件
+        public bool SendEMail(MailHelper mail)
+        {
+            try
+            {
+                _edmContentNewDao.ValidUntilDate();
+                _edmContentNewDao.MaxRetry();
+
+                return _edmContentNewDao.SendEMail(mail);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ScheduleServiceDao-->SendEMail-->" + ex.Message);
+            }
+        }
+        #endregion
     }
 }
