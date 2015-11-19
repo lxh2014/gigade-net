@@ -13349,110 +13349,123 @@ namespace Admin.gigade.Controllers
                 int temp = 0;
                 if (int.TryParse(Request.Params["prod_qty"], out temp))
                 {
-                    IinvdQuery iinvd = new IinvdQuery();
+                    if (temp > 0)
+                    {
+                        IinvdQuery iinvd = new IinvdQuery();
 
-                    iinvd.create_user = (Session["caller"] as Caller).user_id;
-                    iinvd.create_dtim = DateTime.Now;
-                    iinvd.change_user = iinvd.create_user;
-                    iinvd.change_dtim = iinvd.create_dtim;
-                    iinvd.ista_id = "A";
-                    if (!string.IsNullOrEmpty(Request.Params["loc_id"]))
-                    {
-                        iinvd.plas_loc_id = Request.Params["loc_id"];
-                    }
-                    int change_prod_qty = int.Parse(Request.Params["prod_qty"]);
-                    iinvd.prod_qty = change_prod_qty;
-                    if (!string.IsNullOrEmpty(Request.Params["st_qty"]))
-                    {
-                        if (int.TryParse(Request.Params["st_qty"], out temp))
+                        iinvd.create_user = (Session["caller"] as Caller).user_id;
+                        iinvd.create_dtim = DateTime.Now;
+                        iinvd.change_user = iinvd.create_user;
+                        iinvd.change_dtim = iinvd.create_dtim;
+                        iinvd.ista_id = "A";
+                        if (!string.IsNullOrEmpty(Request.Params["loc_id"]))
                         {
-                            iinvd.st_qty = int.Parse(Request.Params["st_qty"]);
+                            iinvd.plas_loc_id = Request.Params["loc_id"];
                         }
-                    }
-                    if (!string.IsNullOrEmpty(Request.Params["item_id"]))
-                    {
-                        if (int.TryParse(Request.Params["item_id"], out temp))
+                        int change_prod_qty = int.Parse(Request.Params["prod_qty"]);
+                        iinvd.prod_qty = change_prod_qty;
+                        if (!string.IsNullOrEmpty(Request.Params["st_qty"]))
                         {
-                            iinvd.item_id = uint.Parse(Request.Params["item_id"]);
+                            if (int.TryParse(Request.Params["st_qty"], out temp))
+                            {
+                                iinvd.st_qty = int.Parse(Request.Params["st_qty"]);
+                            }
                         }
-                    }
-                    DateTime date = DateTime.Now;
-                    string sq = Request.Params["datetimepicker1"];
-                    if (DateTime.TryParse(Request.Params["datetimepicker1"], out date))
-                    {
-                        iinvd.made_date = date;
-                    }
-                    else
-                    {
-                        iinvd.made_date = DateTime.Now;
-                    }
-                    _iinvd = new IinvdMgr(mySqlConnectionString);
-                    if (Request.Params["pwy_dte_ctl"] == "Y")
-                    {
-                        IProductExtImplMgr productExt = new ProductExtMgr(mySqlConnectionString);
-                        int Cde_dt_incr = productExt.GetCde_dt_incr((int)iinvd.item_id);
-                        iinvd.cde_dt = date.AddDays(Cde_dt_incr);
-                    }
-                    IialgQuery iialg = new IialgQuery();
-                    iialg.cde_dt = iinvd.cde_dt;
-                    int prod_qty = _iinvd.GetProd_qty((int)iinvd.item_id,iinvd.plas_loc_id);
-                    if (Request.Params["pwy_dte_ctl"] == "Y")
-                    {
-                        iinvd.pwy_dte_ctl = "Y";
-                        if (_iinvd.GetIinvdCount(iinvd) == 1)
+                        if (!string.IsNullOrEmpty(Request.Params["item_id"]))
                         {
-                            json = "{success:true}";
+                            if (int.TryParse(Request.Params["item_id"], out temp))
+                            {
+                                iinvd.item_id = uint.Parse(Request.Params["item_id"]);
+                            }
+                        }
+                        DateTime date = DateTime.Now;
+                        string sq = Request.Params["datetimepicker1"];
+                        if (DateTime.TryParse(Request.Params["datetimepicker1"], out date))
+                        {
+                            iinvd.made_date = date;
                         }
                         else
                         {
-                            if (_iinvd.Insert(iinvd) == 1)
+                            iinvd.made_date = DateTime.Now;
+                        }
+                        _iinvd = new IinvdMgr(mySqlConnectionString);
+                        if (Request.Params["pwy_dte_ctl"] == "Y")
+                        {
+                            IProductExtImplMgr productExt = new ProductExtMgr(mySqlConnectionString);
+                            int Cde_dt_incr = productExt.GetCde_dt_incr((int)iinvd.item_id);
+                            iinvd.cde_dt = date.AddDays(Cde_dt_incr);
+                        }
+                        IialgQuery iialg = new IialgQuery();
+                        iialg.cde_dt = iinvd.cde_dt;
+                        int prod_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
+                        if (Request.Params["pwy_dte_ctl"] == "Y")
+                        {
+                            iinvd.pwy_dte_ctl = "Y";
+                            if (_iinvd.GetIinvdCount(iinvd) == 1)
                             {
                                 json = "{success:true}";
                             }
-                        }
+                            else
+                            {
+                                if (_iinvd.Insert(iinvd) == 1)
+                                {
+                                    json = "{success:true}";
+                                }
+                            }
 
+                        }
+                        else
+                        {
+                            iinvd.cde_dt = DateTime.Now;
+                            if (_iinvd.GetIinvdCount(iinvd) == 1)
+                            {
+                                json = "{success:true}";
+                            }
+                            else
+                            {
+                                if (_iinvd.Insert(iinvd) == 1)
+                                {
+                                    json = "{success:true}";
+                                }
+                            }
+                        }
+                        iialg.qty_o = prod_qty;
+                        iialg.loc_id = iinvd.plas_loc_id;
+                        iialg.item_id = iinvd.item_id;
+                        iialg.iarc_id = "循環盤點";
+                        iialg.adj_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id) - prod_qty;
+                        iialg.create_dtim = DateTime.Now;
+                        iialg.create_user = iinvd.create_user;
+                        iialg.type = 2;
+                        iialg.doc_no = "C" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                        iialg.made_dt = iinvd.made_date;
+                        iialg.cde_dt = iinvd.cde_dt;
+                        iialg.c_made_dt = iinvd.made_date;
+                        iialg.c_cde_dt = iinvd.cde_dt;
+                        _iialgMgr = new IialgMgr(mySqlConnectionString);
+                        _iialgMgr.insertiialg(iialg);
+
+                        IstockChangeQuery istock = new IstockChangeQuery();
+                        istock.sc_trans_id = iialg.doc_no;
+                        istock.item_id = iinvd.item_id;
+                        istock.sc_istock_why = 2;
+                        istock.sc_trans_type = 2;
+                        istock.sc_num_old = prod_qty;
+                        istock.sc_num_chg = iialg.adj_qty;
+                        istock.sc_num_new = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
+                        istock.sc_time = iinvd.create_dtim;
+                        istock.sc_user = iinvd.create_user;
+                        istock.sc_note = "循環盤點";
+                        IstockChangeMgr istockMgr = new IstockChangeMgr(mySqlConnectionString);
+                        istockMgr.insert(istock);
                     }
                     else
                     {
-                        iinvd.cde_dt = DateTime.Now;
-                        if (_iinvd.Insert(iinvd) == 1)
-                        {
-                            json = "{success:true}";
-                        }
+                        json = "{success:false,message:'庫存不能小於0'}";
                     }
-                    iialg.qty_o = prod_qty;
-                    iialg.loc_id = iinvd.plas_loc_id;
-                    iialg.item_id = iinvd.item_id;
-                    iialg.iarc_id = "循環盤點";
-                    iialg.adj_qty = _iinvd.GetProd_qty((int)iinvd.item_id,iinvd.plas_loc_id) - prod_qty;
-                    iialg.create_dtim = DateTime.Now;
-                    iialg.create_user = iinvd.create_user;
-                    iialg.type = 2;
-                    iialg.doc_no = "C" + DateTime.Now.ToString("yyyyMMddHHmmss");
-                    iialg.made_dt = iinvd.made_date;
-                    iialg.cde_dt = iinvd.cde_dt;
-                    iialg.c_made_dt = iinvd.made_date;
-                    iialg.c_cde_dt = iinvd.cde_dt;
-                    _iialgMgr = new IialgMgr(mySqlConnectionString);
-                    _iialgMgr.insertiialg(iialg);
-
-                    IstockChangeQuery istock = new IstockChangeQuery();
-                    istock.sc_trans_id = iialg.doc_no;
-                    istock.item_id = iinvd.item_id;
-                    istock.sc_istock_why = 2;
-                    istock.sc_trans_type = 2;
-                    istock.sc_num_old = prod_qty;
-                    istock.sc_num_chg = iialg.adj_qty;
-                    istock.sc_num_new = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
-                    istock.sc_time = iinvd.create_dtim;
-                    istock.sc_user = iinvd.create_user;
-                    istock.sc_note = "循環盤點";
-                    IstockChangeMgr istockMgr = new IstockChangeMgr(mySqlConnectionString);
-                    istockMgr.insert(istock);
-
                 }
                 else
-                {
+                {                  
                     json = "{success:false,message:'庫存請輸入數字'}";
                 }
             }
@@ -13473,6 +13486,7 @@ namespace Admin.gigade.Controllers
         public JsonResult IinvdSave()
         {
             bool falg = false;
+            string message ="保存失敗";
             try
             {
                 string row_id = "";
@@ -13482,140 +13496,151 @@ namespace Admin.gigade.Controllers
                     row_id = Request.Params["rowid"].Substring(5);
                 }
                 string changeStore = Request.Params["changeStore"];
-                IinvdQuery iinvd = new IinvdQuery();
-                iinvd.pwy_dte_ctl = Request.Params["pwy_dte_ctl"];
-                iinvd.prod_qtys = int.Parse(Request.Params["prod_qtys"]);
-                int id = 0;
-                if (int.TryParse(row_id, out id))
+                int temp1=0;
+                if (int.TryParse(changeStore, out temp1))
                 {
-                    iinvd.row_id = id;
-                }
-                if (int.TryParse(changeStore, out id))
-                {
-                    iinvd.prod_qty = id;
-                }
-                if (!string.IsNullOrEmpty(Request.Params["loc_id"]))
-                {
-                    iinvd.plas_loc_id = Request.Params["loc_id"];
-                }
-                int temp = 0;
-                if (!string.IsNullOrEmpty(Request.Params["item_id"]))
-                {
-                    if (int.TryParse(Request.Params["item_id"], out temp))
+                    if (temp1 < 0)
                     {
-                        iinvd.item_id = uint.Parse(Request.Params["item_id"]);
-                    }
-                }
-                iinvd.create_user = (Session["caller"] as Caller).user_id;
-                iinvd.create_dtim = DateTime.Now;
-                iinvd.change_user = iinvd.create_user;
-                iinvd.change_dtim = iinvd.create_dtim;
-                _iinvd = new IinvdMgr(mySqlConnectionString);
-                if (iinvd.pwy_dte_ctl == "Y")
-                {
-                    iinvd.cde_dt = _iinvd.GetCde_dt(iinvd.row_id);
-                    IProductExtImplMgr productExt = new ProductExtMgr(mySqlConnectionString);
-                    int Cde_dt_incr = productExt.GetCde_dt_incr((int)iinvd.item_id);
-                    iinvd.made_date = iinvd.cde_dt.AddDays(-Cde_dt_incr);
-                }
-                else
-                {
-                    iinvd.made_date = iinvd.create_dtim;
-                    iinvd.cde_dt = iinvd.create_dtim;
-                }
-                if (iinvd.row_id != 0)
-                {
-                    if (iinvd.pwy_dte_ctl == "Y")
-                    {
-
-                        prod_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
+                        falg = false;
+                        message = "庫存不能小於0";
                     }
                     else
                     {
-                        prod_qty = iinvd.prod_qtys;
-                    }
-                    if (iinvd.pwy_dte_ctl == "N")
-                    {
-                        if (iinvd.prod_qtys < iinvd.prod_qty)
+                        IinvdQuery iinvd = new IinvdQuery();
+                        iinvd.pwy_dte_ctl = Request.Params["pwy_dte_ctl"];
+                        iinvd.prod_qtys = int.Parse(Request.Params["prod_qtys"]);
+                        int id = 0;
+                        if (int.TryParse(row_id, out id))
                         {
-                            iinvd.ista_id = "A";
-                            iinvd.prod_qty = iinvd.prod_qty - iinvd.prod_qtys;
-                            if (_iinvd.Insert(iinvd) == 1)
+                            iinvd.row_id = id;
+                        }
+                        if (int.TryParse(changeStore, out id))
+                        {
+                            iinvd.prod_qty = id;
+                        }
+                        if (!string.IsNullOrEmpty(Request.Params["loc_id"]))
+                        {
+                            iinvd.plas_loc_id = Request.Params["loc_id"];
+                        }
+                        int temp = 0;
+                        if (!string.IsNullOrEmpty(Request.Params["item_id"]))
+                        {
+                            if (int.TryParse(Request.Params["item_id"], out temp))
                             {
-                                falg = true;
-                            }
-                            else
-                            {
-                                falg = false;
+                                iinvd.item_id = uint.Parse(Request.Params["item_id"]);
                             }
                         }
-                        else if (iinvd.prod_qtys > iinvd.prod_qty)
+                        iinvd.create_user = (Session["caller"] as Caller).user_id;
+                        iinvd.create_dtim = DateTime.Now;
+                        iinvd.change_user = iinvd.create_user;
+                        iinvd.change_dtim = iinvd.create_dtim;
+                        _iinvd = new IinvdMgr(mySqlConnectionString);
+                        if (iinvd.pwy_dte_ctl == "Y")
                         {
-                            if (_iinvd.SaveIinvd(iinvd) == 1)
-                            {
-                                falg = true;
-                            }
-                            else
-                            {
-                                falg = false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (_iinvd.SaveIinvd(iinvd) == 1)
-                        {
-                            falg = true;
+                            iinvd.cde_dt = _iinvd.GetCde_dt(iinvd.row_id);
+                            IProductExtImplMgr productExt = new ProductExtMgr(mySqlConnectionString);
+                            int Cde_dt_incr = productExt.GetCde_dt_incr((int)iinvd.item_id);
+                            iinvd.made_date = iinvd.cde_dt.AddDays(-Cde_dt_incr);
                         }
                         else
                         {
-                            falg = false;
+                            iinvd.made_date = iinvd.create_dtim;
+                            iinvd.cde_dt = iinvd.create_dtim;
+                        }
+                        if (iinvd.row_id != 0)
+                        {
+                            if (iinvd.pwy_dte_ctl == "Y")
+                            {
+                                prod_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
+                            }
+                            else
+                            {
+                                prod_qty = iinvd.prod_qtys;
+                            }
+                            if (iinvd.pwy_dte_ctl == "N")
+                            {
+                                iinvd.row_id = 0;
+                                if (iinvd.prod_qtys < iinvd.prod_qty)
+                                {
+                                    iinvd.ista_id = "A";
+                                    iinvd.prod_qty = iinvd.prod_qty - iinvd.prod_qtys;
+                                    iinvd.cde_dt = DateTime.Now;
+                                    if (_iinvd.GetIinvdCount(iinvd) == 1)
+                                    {
+                                        falg = true;
+                                    }
+                                    else
+                                    {
+                                        if (_iinvd.Insert(iinvd) == 1)
+                                        {
+                                            falg = true;
+                                        }
+                                    }
+                                }
+                                else if (iinvd.prod_qtys > iinvd.prod_qty)
+                                {
+                                    if (_iinvd.SaveIinvd(iinvd) == 1)
+                                    {
+                                        falg = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (_iinvd.SaveIinvd(iinvd) == 1)
+                                {
+                                    falg = true;
+                                }
+                            }
+
+                            IialgQuery iialg = new IialgQuery();
+
+                            iialg.cde_dt = iinvd.cde_dt;
+                            iialg.qty_o = prod_qty;
+                            iialg.loc_id = iinvd.plas_loc_id;
+                            iialg.item_id = iinvd.item_id;
+                            iialg.iarc_id = "循環盤點";
+                            if (iinvd.pwy_dte_ctl == "Y")
+                            {
+                                iialg.adj_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id) - prod_qty;
+                            }
+                            else
+                            {
+                                iialg.adj_qty = int.Parse(changeStore) - prod_qty;
+                            }
+                            iialg.create_dtim = DateTime.Now;
+                            iialg.create_user = iinvd.create_user;
+                            iialg.type = 2;
+                            iialg.doc_no = "C" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                            iialg.made_dt = iinvd.made_date;
+                            iialg.cde_dt = iinvd.cde_dt;
+                            iialg.c_made_dt = iinvd.made_date;
+                            iialg.c_cde_dt = iialg.cde_dt;
+                            _iialgMgr = new IialgMgr(mySqlConnectionString);
+                            _iialgMgr.insertiialg(iialg);
+
+                            IstockChangeQuery istock = new IstockChangeQuery();
+                            istock.sc_trans_id = iialg.doc_no;
+                            istock.item_id = iinvd.item_id;
+                            istock.sc_istock_why = 2;
+                            istock.sc_trans_type = 2;
+                            istock.sc_num_old = prod_qty;
+                            istock.sc_num_chg = iialg.adj_qty;
+                            istock.sc_num_new = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
+                            istock.sc_time = iinvd.create_dtim;
+                            istock.sc_user = iinvd.create_user;
+                            istock.sc_note = "循環盤點";
+                            IstockChangeMgr istockMgr = new IstockChangeMgr(mySqlConnectionString);
+                            istockMgr.insert(istock);
+                        }
+                        else
+                        {
+                            return Json(new { success = falg });
                         }
                     }
-
-                    IialgQuery iialg = new IialgQuery();
-
-                    iialg.cde_dt = iinvd.cde_dt;
-                    iialg.qty_o = prod_qty;
-                    iialg.loc_id = iinvd.plas_loc_id;
-                    iialg.item_id = iinvd.item_id;
-                    iialg.iarc_id = "循環盤點";
-                    if (iinvd.pwy_dte_ctl == "Y")
-                    {
-                        iialg.adj_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id) - prod_qty;
-                    }
-                    else
-                    {
-                        iialg.adj_qty = int.Parse(changeStore) - prod_qty;
-                    }
-                    iialg.create_dtim = DateTime.Now;
-                    iialg.create_user = iinvd.create_user;
-                    iialg.type = 2;
-                    iialg.doc_no = "C" + DateTime.Now.ToString("yyyyMMddHHmmss");
-                    iialg.made_dt = iinvd.made_date;
-                    iialg.cde_dt = iinvd.cde_dt;
-                    iialg.c_made_dt = iinvd.made_date;
-                    iialg.c_cde_dt = iialg.cde_dt;
-                    _iialgMgr = new IialgMgr(mySqlConnectionString);
-                    _iialgMgr.insertiialg(iialg);
-
-                    IstockChangeQuery istock = new IstockChangeQuery();
-                    istock.sc_trans_id = iialg.doc_no;
-                    istock.item_id = iinvd.item_id;
-                    istock.sc_istock_why = 2;
-                    istock.sc_trans_type = 2;
-                    istock.sc_num_old = prod_qty;
-                    istock.sc_num_chg = iialg.adj_qty;
-                    istock.sc_num_new = _iinvd.GetProd_qty((int)iinvd.item_id,iinvd.plas_loc_id);
-                    istock.sc_time = iinvd.create_dtim;
-                    istock.sc_user = iinvd.create_user;
-                    istock.sc_note = "循環盤點";
-                    IstockChangeMgr istockMgr = new IstockChangeMgr(mySqlConnectionString);
-                    istockMgr.insert(istock);
                 }
-                else
-                {
-                    return Json(new { success = falg });
+                else {
+                    message = "庫存不能小於0";
                 }
             }
             catch (Exception ex)
@@ -13625,7 +13650,7 @@ namespace Admin.gigade.Controllers
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
             }
-            return Json(new { success = falg });
+            return Json(new { success = falg,message=message });
         }
         public JsonResult GetIlocCount()
         {
@@ -13633,7 +13658,7 @@ namespace Admin.gigade.Controllers
             try
             {
                 IlocQuery query = new IlocQuery();
-                query.loc_id = Request.Params["loc_id"];
+                query.loc_id = Request.Params["loc_id"].ToUpper();
                 List<IlocQuery> ilocList = new List<IlocQuery>();
                 _IlocMgr = new IlocMgr(mySqlConnectionString);
                 _iinvd = new IinvdMgr(mySqlConnectionString);

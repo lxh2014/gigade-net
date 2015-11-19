@@ -144,6 +144,23 @@
             </div>
             <!-- /.modal-dialog -->
         </div>
+        <div id="alert" class="modal fade MarketTally-modal-alert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="H1">溫馨提示</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="divalert" class="alert alert-warning">
+                            <strong id="alertmessage"></strong>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
 <%--        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>--%>
@@ -220,7 +237,8 @@
                     location.reload();
                 }
                 else {
-                    alert("系統異常，保存失敗！");
+                    $("#alertmessage").text(result.message);
+                    $('#alert').modal('toggle');
                 }
             }
         });
