@@ -335,6 +335,7 @@ CATESOET = "類別排序";
 CATEBANNER = "類別Banner";
 CATEBANNERIN = "類別焦點圖";
 CATEBANNEROUT = "類別失焦圖";
+CATEAPP = "APP圖片";
 ISSHOW = "是否顯示";
 LINKMODE = "開放方式";
 NEWWIN = "新視窗";

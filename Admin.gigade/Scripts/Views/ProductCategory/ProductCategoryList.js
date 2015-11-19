@@ -6,28 +6,29 @@ var fathername = "";
 Ext.define('gigade.ProductCategoryModel', {
     extend: 'Ext.data.Model',
     fields: [
-        { name: "category_id", type: "int" },
-        { name: "category_father_id", type: "int" },
-        { name: "category_name", type: "string" },
-        { name: "category_sort", type: "int" },
-        { name: "category_display", type: "int" },
-        { name: "category_show_mode", type: "int" },
-        { name: "category_image_in", type: "string" },
-        { name: "category_image_out", type: "string" },
-        { name: "category_link_mode", type: "int" },
-        { name: "category_link_url", type: "string" },
-        { name: "banner_image", type: "string" },
-        { name: "banner_status", type: "int" },
-        { name: "banner_link_mode", type: "int" },
-        { name: "banner_link_url", type: "string" },
-        { name: "startdate", type: "string" },
-        { name: "enddate", type: "string" },
-        { name: "category_createdate", type: "string" },
-        { name: "category_updatedate", type: "string" },
-        { name: "category_ipfrom", type: "string" },
-         { name: "category_father_name", type: "string" },
-        { name: "short_description", type: "string" },
-         { name: "status", type: "int" }
+    { name: "category_id", type: "int" },
+    { name: "category_father_id", type: "int" },
+    { name: "category_name", type: "string" },
+    { name: "category_sort", type: "int" },
+    { name: "category_display", type: "int" },
+    { name: "category_show_mode", type: "int" },
+    { name: "category_image_in", type: "string" },
+    { name: "category_image_out", type: "string" },
+    { name: "category_link_mode", type: "int" },
+    { name: "category_link_url", type: "string" },
+    { name: "banner_image", type: "string" },
+    { name: "banner_status", type: "int" },
+    { name: "banner_link_mode", type: "int" },
+    { name: "banner_link_url", type: "string" },
+    { name: "startdate", type: "string" },
+    { name: "enddate", type: "string" },
+    { name: "category_createdate", type: "string" },
+    { name: "category_updatedate", type: "string" },
+    { name: "category_ipfrom", type: "string" },
+    { name: "category_father_name", type: "string" },
+    { name: "short_description", type: "string" },
+    { name: "status", type: "int" },
+    { name: "category_image_app", type: "string" }
     ]
 });
 
@@ -89,110 +90,110 @@ Ext.onReady(function () {
             }
         },
         columns: [
-            { header: CATEGORYID, dataIndex: 'category_id', width: 70, align: 'center', align: 'center' },
-            {
-                header: CATEGORYNAME, dataIndex: 'category_name', width: 200, align: 'center'
-            },
-            { header: FATHERCATEID, dataIndex: 'category_father_id', width: 70, align: 'center', align: 'center', hidden: true },
-            {
-                header: FATHERCATENAME, dataIndex: 'category_father_name', width: 200, align: 'center'
-            },
-            {
-                header: CATESOET, dataIndex: 'category_sort', width: 70, align: 'center'
-            },
-            {
-                header: CATEBANNER, dataIndex: 'banner_image', width: 200, align: 'center', hidden: true
-            },
-            {
-                header: ISSHOW, dataIndex: 'category_display', width: 70, align: 'center',
-                renderer: function (val) {
-                    if (val == 1) {
-                        return SHOWSTATUS;
-                    }
-                    else {
-                        return "<span style=' color:red'>" + HIDESTATUS + "</span>";
-                    }
+        { header: CATEGORYID, dataIndex: 'category_id', width: 70, align: 'center', align: 'center' },
+        {
+            header: CATEGORYNAME, dataIndex: 'category_name', width: 200, align: 'center'
+        },
+        { header: FATHERCATEID, dataIndex: 'category_father_id', width: 70, align: 'center', align: 'center', hidden: true },
+        {
+            header: FATHERCATENAME, dataIndex: 'category_father_name', width: 200, align: 'center'
+        },
+        {
+            header: CATESOET, dataIndex: 'category_sort', width: 70, align: 'center'
+        },
+        {
+            header: CATEBANNER, dataIndex: 'banner_image', width: 200, align: 'center', hidden: true
+        },
+        {
+            header: ISSHOW, dataIndex: 'category_display', width: 70, align: 'center',
+            renderer: function (val) {
+                if (val == 1) {
+                    return SHOWSTATUS;
                 }
-            },
-            {
-                header: LINKMODE, dataIndex: 'category_link_mode', width: 100, align: 'center',
-                renderer: function (val) {
-                    if (val == 1) {
-                        return OLDWIN;
-                    }
-                    else {
-                        return NEWWIN;
-                    }
+                else {
+                    return "<span style=' color:red'>" + HIDESTATUS + "</span>";
                 }
-            },
-             {
-                 header: BANNERSTATUS, dataIndex: 'banner_status', width: 100, align: 'center',
-                 renderer: function (val) {
-                     if (val == 1) {
-                         return ACTIVE;
-                     }
-                     else {
-                         return "<span style=' color:red'>" + NOTACTIVE + "</span>";
-                     }
-                 }
-             },
-             {
-                 header: BANNERLINKMODE, dataIndex: 'banner_link_mode', width: 100, align: 'center',
-                 renderer: function (val) {
-                     if (val == 1) {
-                         return OLDWIN;
-                     }
-                     else {
-                         return NEWWIN;
-                     }
-                 }
-             },
-              {
-                  header: BANNERSTART, dataIndex: 'startdate', width: 100, align: 'center', hidden: true
-              },
-             {
-                 header: BANNEREND, dataIndex: 'enddate', width: 100, align: 'center', hidden: true
-             },
-             {
-                 header: SHOWCHILD,
-                 dataIndex: 'category_id',
-                 hidden: false,
-                 align: 'center',
-                 id: 'childCategory',
-                 hidden: false,
-                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                     return "<a href='javascript:void(0);' onclick='Query(" + value + ")'>" + CLICKSHOWCHILD + "</a>";
-                     //var value_name = record.data.category_name;
-                     //alert(value + "," + value_name)
-                     //Query(value, value_name);
-                     //alert("<a href='javascript:void(0);' onclick='" + "Query(" + value + ',"' + value_name + '")' + ">點擊查看子類別</a>")
-                     //  return "<a href='javascript:void(0);' onclick='" + "Query(" + value + ',"' + value_name + '")' + ">點擊查看子類別</a>";
-                 }
-             },
-             {
-                 header: STATUS,
-                 dataIndex: 'status',
-                 hidden: false,
-                 align: 'center',
-                 id: 'status',
-                 hidden: false,
-                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                     if (value == 1) {
-                         fatherid = record.data.category_father_id;
-                         fathername = record.data.category_father_name;
-                         return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.category_id + "," + record.data.category_father_id + ")'><img hidValue='0' id='img" + record.data.category_id + "' src='../../../Content/img/icons/accept.gif'/></a>";
-                     } else {
-                         return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.category_id + "," + record.data.category_father_id + ")'><img hidValue='1' id='img" + record.data.category_id + "' src='../../../Content/img/icons/drop-no.gif'/></a>";
-                     }
-                 }
-             }
+            }
+        },
+        {
+            header: LINKMODE, dataIndex: 'category_link_mode', width: 100, align: 'center',
+            renderer: function (val) {
+                if (val == 1) {
+                    return OLDWIN;
+                }
+                else {
+                    return NEWWIN;
+                }
+            }
+        },
+        {
+            header: BANNERSTATUS, dataIndex: 'banner_status', width: 100, align: 'center',
+            renderer: function (val) {
+                if (val == 1) {
+                    return ACTIVE;
+                }
+                else {
+                    return "<span style=' color:red'>" + NOTACTIVE + "</span>";
+                }
+            }
+        },
+        {
+            header: BANNERLINKMODE, dataIndex: 'banner_link_mode', width: 100, align: 'center',
+            renderer: function (val) {
+                if (val == 1) {
+                    return OLDWIN;
+                }
+                else {
+                    return NEWWIN;
+                }
+            }
+        },
+        {
+            header: BANNERSTART, dataIndex: 'startdate', width: 100, align: 'center', hidden: true
+        },
+        {
+            header: BANNEREND, dataIndex: 'enddate', width: 100, align: 'center', hidden: true
+        },
+        {
+            header: SHOWCHILD,
+            dataIndex: 'category_id',
+            hidden: false,
+            align: 'center',
+            id: 'childCategory',
+            hidden: false,
+            renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                return "<a href='javascript:void(0);' onclick='Query(" + value + ")'>" + CLICKSHOWCHILD + "</a>";
+                //var value_name = record.data.category_name;
+                //alert(value + "," + value_name)
+                //Query(value, value_name);
+                //alert("<a href='javascript:void(0);' onclick='" + "Query(" + value + ',"' + value_name + '")' + ">點擊查看子類別</a>")
+                //  return "<a href='javascript:void(0);' onclick='" + "Query(" + value + ',"' + value_name + '")' + ">點擊查看子類別</a>";
+            }
+        },
+        {
+            header: STATUS,
+            dataIndex: 'status',
+            hidden: false,
+            align: 'center',
+            id: 'status',
+            hidden: false,
+            renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                if (value == 1) {
+                    fatherid = record.data.category_father_id;
+                    fathername = record.data.category_father_name;
+                    return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.category_id + "," + record.data.category_father_id + ")'><img hidValue='0' id='img" + record.data.category_id + "' src='../../../Content/img/icons/accept.gif'/></a>";
+                } else {
+                    return "<a href='javascript:void(0);' onclick='UpdateActive(" + record.data.category_id + "," + record.data.category_father_id + ")'><img hidValue='1' id='img" + record.data.category_id + "' src='../../../Content/img/icons/drop-no.gif'/></a>";
+                }
+            }
+        }
         ],
         tbar: [
-            { xtype: 'button', text: ADD, id: 'add', hidden: false, iconCls: 'icon-user-add', handler: onAddClick },
-            { xtype: 'button', text: EDIT, id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
-            { xtype: 'button', id: 'Export', text: EXPORT, icon: '../../../Content/img/icons/excel.gif', hidden: false, handler: ExportCSV },
-            { xtype: 'button', text: PREVSTEP, id: 'back', hidden: false, iconCls: 'icon-search', handler: onBack },
-            '->',
+        { xtype: 'button', text: ADD, id: 'add', hidden: false, iconCls: 'icon-user-add', handler: onAddClick },
+        { xtype: 'button', text: EDIT, id: 'edit', hidden: false, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
+        { xtype: 'button', id: 'Export', text: EXPORT, icon: '../../../Content/img/icons/excel.gif', hidden: false, handler: ExportCSV },
+        { xtype: 'button', text: PREVSTEP, id: 'back', hidden: false, iconCls: 'icon-search', handler: onBack },
+        '->',
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: ProductCategoryStore,
