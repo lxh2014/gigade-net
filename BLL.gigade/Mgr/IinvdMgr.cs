@@ -11,7 +11,7 @@ using BLL.gigade.Model.Query;
 
 namespace BLL.gigade.Mgr
 {
-    public class IinvdMgr:IinvdImplMgr
+    public class IinvdMgr : IinvdImplMgr
     {
         private IinvdImplDao _ivddao;
         private IstockChangeDao _istockdao;
@@ -529,6 +529,63 @@ namespace BLL.gigade.Mgr
             catch (Exception ex)
             {
                 throw new Exception("IinvdMgr-->GetSearchIinvd-->" + ex.Message, ex);
+            }
+        }
+
+        public List<IinvdQuery> GetIinvdList(string loc_id)
+        {
+            try
+            {
+                return _ivddao.GetIinvdList(loc_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->GetIinvdList-->" + ex.Message, ex);
+            }
+        }
+
+        public int SaveIinvd(IinvdQuery query)
+        {
+            try
+            {
+                return _ivddao.SaveIinvd(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->SaveIinvd-->" + ex.Message, ex);
+            }
+        }
+        public int GetIinvdCount(IinvdQuery iinvd)
+        {
+            try
+            {
+                return _ivddao.GetIinvdCount(iinvd);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->GetIinvdCount-->" + ex.Message, ex);
+            }
+        }
+        public DateTime GetCde_dt(int row_id)
+        {
+            try
+            {
+                return _ivddao.GetCde_dt(row_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->GetCde_dt-->" + ex.Message, ex);
+            }
+        }
+        public int GetProd_qty(int item_id, string loc_id)
+        {
+            try
+            {
+                return _ivddao.GetProd_qty(item_id,loc_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->GetProd_qty-->" + ex.Message, ex);
             }
         }
         public List<IinvdQuery> GetPlasIinvd(Model.Query.IinvdQuery ivd)

@@ -40,7 +40,7 @@ var SearchStore = Ext.create('Ext.data.Store', {
     data: [
         { "txt": "料位", "value": "1" },
         { "txt": "條碼", "value": "2" },
-        { "txt": "商品品號", "value": "3" }
+        { "txt": "商品細項編號", "value": "3" }
     ]
 });
 IinvdStore.on('beforeload', function () {
@@ -232,7 +232,7 @@ Ext.onReady(function () {
         flex: 9.4,
         columns: [
             { header: "編號", dataIndex: 'row_id', width: 100, align: 'center' },
-            { header: "商品品號", dataIndex: 'item_id', width: 100, align: 'center' },
+            { header: "商品細項編號", dataIndex: 'item_id', width: 100, align: 'center' },
             { header: "品名", dataIndex: 'product_name', width: 150, align: 'center' },
             { header: "數量", dataIndex: 'prod_qty', width: 100, align: 'center' },
             { header: "有效日期", dataIndex: 'cde_dt', width: 150, align: 'center' },
@@ -380,7 +380,7 @@ function UpdateActive(id) {
                 },
                 {
                     xtype: 'textfield',
-                    fieldLabel: '相關單號',
+                    fieldLabel: '前置單號',
                     id: 'po_id',
                     colName: 'po_id',
                     submitValue: false,

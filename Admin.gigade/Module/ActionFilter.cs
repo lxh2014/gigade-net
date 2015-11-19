@@ -34,7 +34,7 @@ public class ActionFilter : IHttpModule
         //    || context.Request.Url.LocalPath.ToLower().IndexOf("/checkstockalarm") != -1 || context.Request.Url.LocalPath.ToLower().IndexOf("/productupdatenotice") != -1 || context.Request.Url.LocalPath.ToLower().IndexOf("/getxmlinfo") != -1
         //    || context.Request.Url.LocalPath.ToLower().IndexOf("/productitemupdatenotice") != -1 || context.Request.Url.LocalPath.ToLower().IndexOf("/operateextendname") != -1 || context.Request.Url.LocalPath.ToLower().IndexOf("/salestatus") != -1)
         if (context.Request.Url.LocalPath == "/" || context.Request.Url.LocalPath.ToLower().IndexOf("/login") != -1 || context.Request.Url.LocalPath.ToLower().IndexOf("/error") != -1
-    || context.Request.Url.LocalPath.ToLower().IndexOf("/notification") != -1 || context.Request.Url.LocalPath.ToLower().IndexOf("/open") != -1 || context.Request.Url.LocalPath.ToLower().IndexOf("/scheduleservice") != -1)
+    || context.Request.Url.LocalPath.ToLower().IndexOf("/notification") != -1 || context.Request.Url.LocalPath.ToLower().IndexOf("/open") != -1  || context.Request.Url.LocalPath.ToLower().IndexOf("/scheduleserviceworker") != -1)
         {
             return;
         }

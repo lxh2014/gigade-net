@@ -381,5 +381,30 @@ namespace BLL.gigade.Dao
                 throw new Exception("IlocDao.GetLocidByHash-->" + ex.Message + sql.ToString(), ex);
             }
         }
+
+        public bool GetIlocCount(IlocQuery loc)
+        {
+            StringBuilder sbt = new StringBuilder("SELECT count(row_id) FROM iloc WHERE 1=1");
+            if (loc.loc_id != "")
+            {
+                sbt.AppendFormat(@" and loc_id='{0}'", loc.loc_id);
+            }
+            try
+            {
+                string num = _access.getDataTable(sbt.ToString()).Rows[0][0].ToString();
+                if(num=="1")
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IlocDao.GetIocList-->" + ex.Message + sbt.ToString(), ex);
+            }
+        }
     }
 }

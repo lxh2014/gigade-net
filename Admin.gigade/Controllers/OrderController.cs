@@ -3833,10 +3833,7 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("付款單號", typeof(int));
                 dtHZ.Columns.Add("付款方式", typeof(String));
                 dtHZ.Columns.Add("購買金額", typeof(int));
-                dtHZ.Columns.Add("付款狀態", typeof(String));
-                dtHZ.Columns.Add("發票號碼", typeof(String));
-                dtHZ.Columns.Add("發票金額", typeof(int));
-                dtHZ.Columns.Add("發票開立日期", typeof(String));
+                dtHZ.Columns.Add("付款狀態", typeof(String));              
                 dtHZ.Columns.Add("商品細項編號", typeof(int));
                 dtHZ.Columns.Add("訂單狀態", typeof(String));
                 dtHZ.Columns.Add("供應商", typeof(String));
@@ -3882,111 +3879,93 @@ namespace Admin.gigade.Controllers
                     {
                         dr[4] = 0;
                     }
-                    dr[5] = dr_v["order_status"].ToString();
-                    dr[6] = dr_v["invoice_number"].ToString() == "" ? "" : dr_v["invoice_number"].ToString();                    
-                    if (!string.IsNullOrEmpty(dr_v["total_amount"].ToString()))
-                    {
-                        dr[7] =Convert.ToInt32( dr_v["total_amount"].ToString());
-                    }
-                    else
-                    {
-                        dr[7] = 0;
-                    }                   
-                    if (!string.IsNullOrEmpty(dr_v["invoice_date"].ToString()))
-                    {
-                        DateTime invoice_date = Convert.ToDateTime(dr_v["invoice_date"].ToString());
-                        dr[8] = CommonFunction.DateTimeToString(invoice_date);
-                    }
-                    else
-                    {
-                        dr[8] = "";
-                    }
+                    dr[5] = dr_v["order_status"].ToString();                  
                     if (!string.IsNullOrEmpty(dr_v["item_id"].ToString()))
                     {
-                        dr[9] =Convert.ToInt32( dr_v["item_id"].ToString());
+                        dr[6] =Convert.ToInt32( dr_v["item_id"].ToString());
                     }
                     else
                     {
-                        dr[9] = 0;
+                        dr[6] = 0;
                     }
-                    dr[10] = dr_v["slave_status"].ToString();
-                    dr[11] = dr_v["vendor_name_simple"].ToString();
-                    dr[12] = dr_v["vendor_code"].ToString();
-                    dr[13] = dr_v["product_name"].ToString();
+                    dr[7] = dr_v["slave_status"].ToString();
+                    dr[8] = dr_v["vendor_name_simple"].ToString();
+                    dr[9] = dr_v["vendor_code"].ToString();
+                    dr[10] = dr_v["product_name"].ToString();
                     if (!string.IsNullOrEmpty(dr_v["buy_num"].ToString()))
                     {
-                        dr[14] =Convert.ToInt32( dr_v["buy_num"].ToString());
+                        dr[11] =Convert.ToInt32( dr_v["buy_num"].ToString());
+                    }
+                    else
+                    {
+                        dr[11] = 0;
+                    }
+
+                    if (!string.IsNullOrEmpty(dr_v["single_money"].ToString()))
+                    {
+                        dr[12] = Convert.ToInt32(dr_v["single_money"].ToString());
+                    }
+                    else
+                    {
+                        dr[12] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["deduct_bonus"].ToString()))
+                    {
+                        dr[13] =Convert.ToInt32( dr_v["deduct_bonus"].ToString());
+                    }
+                    else
+                    {
+                        dr[13] = 0;
+                    }
+                    if (!string.IsNullOrEmpty(dr_v["deduct_welfare"].ToString()))
+                    {
+                        dr[14] =Convert.ToInt32( dr_v["deduct_welfare"].ToString());
                     }
                     else
                     {
                         dr[14] = 0;
                     }
-
-                    if (!string.IsNullOrEmpty(dr_v["single_money"].ToString()))
+                    if (!string.IsNullOrEmpty(dr_v["od.single_money*buy_num"].ToString()))
                     {
-                        dr[15] = Convert.ToInt32(dr_v["single_money"].ToString());
+                        dr[15] = Convert.ToInt32(dr_v["od.single_money*buy_num"].ToString()) - Convert.ToInt32(dr[13]) - Convert.ToInt32(dr[14]);
                     }
                     else
                     {
                         dr[15] = 0;
                     }
-                    if (!string.IsNullOrEmpty(dr_v["deduct_bonus"].ToString()))
+                    if (!string.IsNullOrEmpty(dr_v["single_cost"].ToString()))
                     {
-                        dr[16] =Convert.ToInt32( dr_v["deduct_bonus"].ToString());
+                        dr[16] =Convert.ToInt32( dr_v["single_cost"].ToString());
                     }
                     else
                     {
                         dr[16] = 0;
                     }
-                    if (!string.IsNullOrEmpty(dr_v["deduct_welfare"].ToString()))
+                    if (!string.IsNullOrEmpty(dr_v["bag_check_money"].ToString()))
                     {
-                        dr[17] =Convert.ToInt32( dr_v["deduct_welfare"].ToString());
+                        dr[17] =Convert.ToInt32( dr_v["bag_check_money"].ToString());
                     }
                     else
                     {
                         dr[17] = 0;
                     }
-                    if (!string.IsNullOrEmpty(dr_v["od.single_money*buy_num"].ToString()))
+                    if (!string.IsNullOrEmpty(dr_v["od.single_cost*od.buy_num"].ToString()))
                     {
-                        dr[18] = Convert.ToInt32(dr_v["od.single_money*buy_num"].ToString()) - Convert.ToInt32(dr[16]) - Convert.ToInt32(dr[17]);
+                        dr[18] = Convert.ToInt32(dr_v["od.single_cost*od.buy_num"].ToString());
                     }
                     else
                     {
                         dr[18] = 0;
                     }
-                    if (!string.IsNullOrEmpty(dr_v["single_cost"].ToString()))
-                    {
-                        dr[19] =Convert.ToInt32( dr_v["single_cost"].ToString());
-                    }
-                    else
-                    {
-                        dr[19] = 0;
-                    }
-                    if (!string.IsNullOrEmpty(dr_v["bag_check_money"].ToString()))
-                    {
-                        dr[20] =Convert.ToInt32( dr_v["bag_check_money"].ToString());
-                    }
-                    else
-                    {
-                        dr[20] = 0;
-                    }
-                    if (!string.IsNullOrEmpty(dr_v["od.single_cost*od.buy_num"].ToString()))
-                    {
-                        dr[21] = Convert.ToInt32(dr_v["od.single_cost*od.buy_num"].ToString());
-                    }
-                    else
-                    {
-                        dr[21] = 0;
-                    }
                     if (!string.IsNullOrEmpty(dr_v["slave_date_close"].ToString()))
                     {
                         DateTime slave_date_close = Convert.ToDateTime(dr_v["slave_date_close"].ToString());
-                        dr[22] = slave_date_close == Convert.ToDateTime("1/1/1970 8:00:00 AM") ? "未歸檔" : CommonFunction.DateTimeToString(slave_date_close);
+                        dr[19] = slave_date_close == Convert.ToDateTime("1/1/1970 8:00:00 AM") ? "未歸檔" : CommonFunction.DateTimeToString(slave_date_close);
                     }
-                    dr[23] = dr_v["pm"].ToString();
-                    dr[24] = dr_v["ID"].ToString() == "0" ? "" : dr_v["ID"].ToString();                 
-                    dr[25] = dr_v["group_name"].ToString();
-                    dr[26] = dr_v["product_mode"].ToString();
+                    dr[20] = dr_v["pm"].ToString();
+                    dr[21] = dr_v["ID"].ToString() == "0" ? "" : dr_v["ID"].ToString();                 
+                    dr[22] = dr_v["group_name"].ToString();
+                    dr[23] = dr_v["product_mode"].ToString();
                     dtHZ.Rows.Add(dr);
                 }
                 string[] colname = new string[dtHZ.Columns.Count];

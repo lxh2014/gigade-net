@@ -85,7 +85,7 @@ editFunction_config = function (row, store)
                 disabled: true,
                 text: '保存',
                 handler: function () {
-                    alert(Ext.getCmp('value').getValue() + ":" + Ext.htmlEncode(Ext.getCmp('value').getValue()));
+                    //alert(Ext.getCmp('value').getValue() + ":" + Ext.htmlEncode(Ext.getCmp('value').getValue()));
                     var form = this.up('form').getForm();
                     if (form.isValid()) {
                         form.submit({

@@ -20,12 +20,13 @@ var Versions_idRegstr = /^\d*$/;
 
 /*增加或修改開始*/
 //row為null為新增  為1為修改
-function SaveReport(row) {
+function SaveReport(row,store) {
     //平臺數據下拉列表框
     var EditDriver = Ext.create('Ext.form.ComboBox', {
         fieldLabel: DRIVERTEXT,
         store: driverModel,
-        id: "cmbdriverEdit",
+        id: "drive",
+        name:"drive",
         queryMode: 'local',
         displayField: 'drivername',
         valueField: 'drivervalue',
@@ -51,16 +52,16 @@ function SaveReport(row) {
             //定義 隱藏的 textfield 以便獲取 rid 的值
             xtype: 'textfield',
             fieldLabel: RID,
-            id: 'txtid',
-            name: 'txtid',
+            id: 'id',
+            name: 'id',
             submitValue: true,
             hidden: true,
             width: 300
         }, {
             xtype: 'textfield',
             fieldLabel:VERSIONS_ID,
-            name: 'txtversions_id',
-            id: 'txtversions_id',
+            name: 'versions_id',
+            id: 'versions_id',
             emptyText: SHULDWRITEVERSIONS_ID,
             allowBlank: false,
             labelWidth: 90,
@@ -72,8 +73,8 @@ function SaveReport(row) {
         }, {
             xtype: 'textfield',
             fieldLabel: VERSIONS_CODE,
-            name: 'txtversions_code',
-            id: 'txtversions_code',
+            name: 'versions_code',
+            id: 'versions_code',
             emptyText: SHULDWRITEVERSIONS_CODE,
             allowBlank: false,
             labelWidth: 90,
@@ -85,8 +86,8 @@ function SaveReport(row) {
         }, {
             xtype: 'textfield',
             fieldLabel:  VERSIONS_NAME,
-            name: 'txtversions_name',
-            id: 'txtversions_name',
+            name: 'versions_name',
+            id: 'versions_name',
             allowBlank: false,
             emptyText: SHULDWRITEVERSIONS_NAME,
             labelWidth: 90,
@@ -96,8 +97,8 @@ function SaveReport(row) {
         }, {
             xtype: 'textareafield',
             fieldLabel: VERSIONS_DESC,
-            name: 'txtversions_desc',
-            id: 'txtversions_desc',
+            name: 'versions_desc',
+            id: 'versions_desc',
             allowBlank: false,
             emptyText: SHULDWRITEVERSIONS_DESC,
             labelWidth: 90,
@@ -108,12 +109,20 @@ function SaveReport(row) {
         EditDriver, {
             xtype: 'datefield',
             fieldLabel: RELEASE_DATE,
-            name: 'daterelease_date',
-            id: 'daterelease_date',
+            name: 'releasedateQuery',
+            id: 'releasedateQuery',
             format: 'Y-m-d',
             editable: false,
             labelWidth: 90,
             width: 300
+        },
+        {
+            xtype: 'checkboxfield',
+            fieldLabel: YESORNORELEASE,
+            name: 'release_type',
+            id: 'release_type',
+            boxLabel: RELEASE,
+            checked:true
         }
         ],
         buttonAlign: 'center',
@@ -130,19 +139,20 @@ function SaveReport(row) {
                     //提交表單
                     form.submit({
                         params: {
-                            isAddOrEidt: row,
-                            txtid: Ext.getCmp("txtid").getValue(),
-                            txtversions_id: Ext.getCmp("txtversions_id").getValue(),
-                            txtversions_name: Ext.getCmp("txtversions_name").getValue(),
-                            txtversions_desc: Ext.getCmp("txtversions_desc").getValue(),
-                            txtversions_code: Ext.getCmp("txtversions_code").getValue(),
-                            cmbdriverEdit: Ext.getCmp("cmbdriverEdit").getValue(),
-                            daterelease_date: Ext.getCmp("daterelease_date").getValue()
+                            txtid: Ext.getCmp("id").getValue(),
+                            txtversions_id: Ext.getCmp("versions_id").getValue(),
+                            txtversions_name: Ext.getCmp("versions_name").getValue(),
+                            txtversions_desc: Ext.getCmp("versions_desc").getValue(),
+                            txtversions_code: Ext.getCmp("versions_code").getValue(),
+                            cmbdriverEdit: Ext.getCmp("drive").getValue(),//選擇的裝置
+                            daterelease_date: Ext.getCmp("releasedateQuery").getValue(),
+                            status_type: Ext.getCmp("release_type").getValue()==true?1:0
                         },
                         success: function (from, action) {
                             var result = action.result.msg;
                             Ext.MessageBox.alert(MESSAGEINFO, result,
                                             function () {
+                                                AppVersionsStore.load();
                                                 ReportWin.close();
                                             });
                         },
@@ -176,9 +186,17 @@ function SaveReport(row) {
             handler: function (event, toolEl, panel) {
                 ReportWin.destroy();
             }
-        }]
+        }],
+        listeners: {
+            'show': function () {
+                if (row) {
+                    ReportForm.getForm().loadRecord(row); //如果是編輯的話
+                }
+                else {
+                    ReportForm.getForm().reset(); //如果是編輯的話
+                }
+            }
+        }
     }).show();
 }
 /*增加或修改結束*/
-
-
