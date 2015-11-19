@@ -35,6 +35,9 @@
                                 success: function (form, action) {
                                     var result = Ext.decode(form.responseText);
                                     if (result.success) {
+                                        Ext.getCmp('prod_qty').setDisabled(false);
+                                        Ext.getCmp('prod_qty').allowBlank = false;
+                                        Ext.getCmp('prod_qty').show();
                                         msg = result.msg;
                                         locid = result.locid;
                                         vendor_id = result.vendor_id;
@@ -59,7 +62,7 @@
                                         cde_dt_incr = result.cde_dt_incr;
                                         //設置為可用
                                         //Ext.getCmp('startTime').setDisabled(false);
-                                        Ext.getCmp('prod_qty').show();
+                                       
                                         Ext.getCmp('plas_loc_id').setDisabled(false);
                                         Ext.getCmp('plas_loc_id').allowBlank = false;
                                         if (pwy_dte_ctl != "Y") {
@@ -83,13 +86,41 @@
                                     }
                                     else {
                                         Ext.getCmp("product_name").setValue("沒有該商品信息！");
+                                        Ext.getCmp("createtime").hide();
+                                        Ext.getCmp("cdttime").hide();
+                                        Ext.getCmp('cde_dt').allowBlank = true;
+                                        Ext.getCmp('cde_dt').setDisabled(false);
+                                        Ext.getCmp('startTime').allowBlank = true;
                                         Ext.getCmp('startTime').setDisabled(true);
+                                        Ext.getCmp('prod_qty').setDisabled(true);
+                                        Ext.getCmp('prod_qty').hide();
                                         Ext.getCmp('plas_loc_id').setDisabled(true);
+                                        Ext.getCmp('plas_loc_id').setValue(" ");
                                         Ext.getCmp('us1').setDisabled(true);
                                         Ext.getCmp('us2').setDisabled(true);
+                                        Ext.getCmp('loc_id').setValue(" ");//cde_dt_var
+                                        Ext.getCmp('cde_dt_var').setValue(" ");
                                     }
                                 }
                             });
+                        } else {
+
+                            Ext.getCmp("product_name").setValue("沒有該商品信息！");
+                            Ext.getCmp("createtime").hide();
+                            Ext.getCmp("cdttime").hide();
+                            Ext.getCmp('cde_dt').allowBlank = true;
+                            Ext.getCmp('cde_dt').setDisabled(false);
+                            Ext.getCmp('startTime').allowBlank = true;
+                            Ext.getCmp('startTime').setDisabled(true);
+                            Ext.getCmp('prod_qty').setDisabled(true);
+                            Ext.getCmp('prod_qty').hide();
+                            Ext.getCmp('plas_loc_id').setDisabled(true);
+                            Ext.getCmp('plas_loc_id').setValue(" ");
+                            Ext.getCmp('us1').setDisabled(true);
+                            Ext.getCmp('us2').setDisabled(true);
+                            Ext.getCmp('loc_id').setValue(" ");//cde_dt_var
+                            Ext.getCmp('cde_dt_var').setValue(" ");
+
                         }
                     }
                 }
