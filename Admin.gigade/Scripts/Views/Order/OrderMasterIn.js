@@ -130,14 +130,13 @@ OrderMasterExportStore.on('beforeload', function () {
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
-            if (selections.length == 0 || (selections.length != 0 && selections[0].data.account_collection_time == "" && selections[0].data.return_collection_time == "")) {
+            if (selections.length == 0 || (selections.length != 0 && selections[0].data.account_collection_time == "" && selections[0].data.return_collection_time == "" && selections[0].data.invoice_date_manual == "")) {
                 //  Ext.getCmp("pcGift").down('#edit').setDisabled(true);
                 Ext.getCmp("pcGift").down('#delete').setDisabled(true);
             } else {
                 // Ext.getCmp("pcGift").down('#edit').setDisabled(false);
                 Ext.getCmp("pcGift").down('#delete').setDisabled(false);
             }
-
             Ext.getCmp("pcGift").down('#edit').setDisabled(selections.length == 0);
             //Ext.getCmp("pcGift").down('#delete').setDisabled(selections.length == 0);
 
