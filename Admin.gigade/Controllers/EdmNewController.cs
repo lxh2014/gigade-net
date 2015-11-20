@@ -17,6 +17,7 @@ using System.Text;
 using System.Data;
 using System.Net.Mail;
 using BLL.gigade.Common;
+using System.Collections;
 namespace Admin.gigade.Controllers
 {
     public class EdmNewController : Controller
@@ -31,6 +32,8 @@ namespace Admin.gigade.Controllers
         private EmailGroupMgr _emailGroupMgr;
         private static DataTable _newDt = new DataTable();
         private ScheduleServiceMgr _secheduleServiceMgr;
+        private const string subscribe = "SUBSCRIBE_2015";
+        private const string subscribe_url ="<p style='text-align:center;'><span style='font-size:small;'><span style='color:#666666;'><a href='https://www.gigade100.com/member/mb_newsletter.php' target='_blank'>訂閱/解訂電子報</a></span></span></p>";
         // GET: /EdmNew/
 
         #region view
@@ -59,6 +62,7 @@ namespace Admin.gigade.Controllers
             }
             ViewBag.path = ConfigurationManager.AppSettings["webDavImage"];
             ViewBag.BaseAddress = ConfigurationManager.AppSettings["webDavBaseAddress"];
+            ViewBag.subscribe = subscribe;
             return View();
         }
         //擋信名單
@@ -456,6 +460,39 @@ namespace Admin.gigade.Controllers
                 {
                     query.template_data = Request.Params["template_data"];
                 }
+                if (!string.IsNullOrEmpty(Request.Params["pm"]))
+                {
+                    query.pm = Convert.ToInt32(Request.Params["pm"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["check"]))
+                {
+                    //點擊了訂閱電子電子報,在此埋入一個code，
+                    if (Request.Params["check"] == "true")
+                    {
+                        query.template_data = query.template_data + subscribe;
+                    }
+                    else
+                    {
+                        query.template_data = query.template_data.Replace(subscribe_url, "");
+                    }
+                    //query.pm = Convert.ToInt32(Request.Params["pm"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["active"]))
+                {
+                    int n=0;
+                    if (int.TryParse(Request.Params["active"].ToString(), out n))
+                    {
+                        query.active = Convert.ToInt32(Request.Params["active"]);
+                    }
+                    else
+                    {
+                        query.active = 0;
+                    }
+                    if (query.active != 0)
+                    {
+                        query.template_id = 0;
+                    }
+                }
                 query.content_create_userid = (Session["caller"] as Caller).user_id;
                 query.content_update_userid = (Session["caller"] as Caller).user_id;
                 json = _edmContentNewMgr.SaveEdmContentNew(query);
@@ -551,6 +588,32 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
 
+        public HttpResponseBase GetEdmPMStore()
+        {
+            string json = string.Empty;
+            try
+            {
+
+                _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                string para = "edm_pm_name";
+                DataTable _dt = _edmContentNewMgr.GetParaStore(para);
+                json = "{success:true,data:" + JsonConvert.SerializeObject(_dt, Formatting.Indented) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+
 
         #endregion
 
@@ -622,7 +685,7 @@ namespace Admin.gigade.Controllers
                 {
                     template_data = Request.Params["template_data"];
                 }
-             
+
                 DataTable _dt = _edmContentNewMgr.GetPraraData(1);
                 if (_dt != null && _dt.Rows.Count > 0)
                 {
@@ -666,6 +729,7 @@ namespace Admin.gigade.Controllers
             string json = string.Empty;
             EdmSendLog eslQuery = new EdmSendLog();
             MailRequest mQuery = new MailRequest();
+             ArrayList nameList=new ArrayList ();
             try
             {
                 _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
@@ -691,14 +755,18 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["body"]))
                 {
-                    mQuery.body = Request.Params["body"];
+                    mQuery.bodyData = Request.Params["body"];
+                    if (mQuery.bodyData.IndexOf(subscribe) > 0)//找到了埋的那個code，證明是點擊了訂閱電子報
+                    {
+                        mQuery.bodyData = mQuery.bodyData.Replace(subscribe, "\n") + subscribe_url;
+                         
+                    }
                 }
-
                 eslQuery.create_userid = (Session["caller"] as Caller).user_id;
                 mQuery.user_id = eslQuery.create_userid;
                 if (!string.IsNullOrEmpty(Request.Params["testSend"]))
                 {
-                    if (Request.Params["testSend"] == "true")//測試發送，只發送給自己
+                    if (Request.Params["testSend"] == "true")//
                     {
                         eslQuery.test_send_end = true;
                         #region 字段賦值
@@ -707,21 +775,35 @@ namespace Admin.gigade.Controllers
                         eslQuery.schedule_date = DateTime.Now;
                         eslQuery.expire_date = eslQuery.schedule_date.AddHours(1);
                         eslQuery.createdate = eslQuery.schedule_date;
-
-                        mQuery.receiver_address = (Session["caller"] as Caller).user_email;
-                        mQuery.receiver_name = (Session["caller"] as Caller).user_username;
                         mQuery.schedule_date = eslQuery.schedule_date;
                         mQuery.valid_until_date = eslQuery.expire_date;
                         mQuery.retry_count = 0;
                         mQuery.next_send = eslQuery.schedule_date;
                         mQuery.max_retry = 1;
-
-                        #endregion
-                        MailHelper mail = new MailHelper();
-                        mail.SendMailAction((Session["caller"] as Caller).user_email, mQuery.subject, mQuery.body + "   ");
+                        if (!string.IsNullOrEmpty(Request.Params["test_send_list"]))
                         {
+                            nameList = new ArrayList();
+                            string[] test_send_arr = Request.Params["test_send_list"].ToString().TrimEnd('\n').Split('\n');
+                            for (int i = 0; i < test_send_arr.Length; i++)
+                            {
+                                if (test_send_arr[i] != "")
+                                {
+                                    nameList.Add(test_send_arr[i]);
+                                    mQuery.receiver_address = test_send_arr[i];
+                                    eslQuery.receiver_count = test_send_arr.Length;
+                                    MailHelper mail = new MailHelper();
+                                    mail.SendMailAction(test_send_arr[i], mQuery.subject, mQuery.bodyData + "   ");
+                                    json = _edmContentNewMgr.MailAndRequest(eslQuery, mQuery);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            MailHelper mail = new MailHelper();
+                            mail.SendMailAction( (Session["caller"] as Caller).user_email, mQuery.subject, mQuery.body + "   ");
                             json = _edmContentNewMgr.MailAndRequest(eslQuery, mQuery);
                         }
+                        #endregion
                     }
                     else//正式發送，寫入排程所用表
                     {
@@ -814,6 +896,28 @@ namespace Admin.gigade.Controllers
             }
             this.Response.Clear();
             this.Response.Write(htmlStr);
+            this.Response.End();
+            return this.Response;
+        }
+
+        public HttpResponseBase GetTestSendList()
+        {
+            string json  = string.Empty;
+            try
+            {
+              _emailGroupMgr = new EmailGroupMgr(mySqlConnectionString);
+              json=  _emailGroupMgr.GetTestSendList();
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
             this.Response.End();
             return this.Response;
         }

@@ -130,14 +130,13 @@ OrderMasterExportStore.on('beforeload', function () {
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
-            if (selections.length == 0 || (selections.length != 0 && selections[0].data.account_collection_time == "" && selections[0].data.return_collection_time == "")) {
+            if (selections.length == 0 || (selections.length != 0 && selections[0].data.account_collection_time == "" && selections[0].data.return_collection_time == "" && selections[0].data.invoice_date_manual == "")) {
                 //  Ext.getCmp("pcGift").down('#edit').setDisabled(true);
                 Ext.getCmp("pcGift").down('#delete').setDisabled(true);
             } else {
                 // Ext.getCmp("pcGift").down('#edit').setDisabled(false);
                 Ext.getCmp("pcGift").down('#delete').setDisabled(false);
             }
-
             Ext.getCmp("pcGift").down('#edit').setDisabled(selections.length == 0);
             //Ext.getCmp("pcGift").down('#delete').setDisabled(selections.length == 0);
 
@@ -157,7 +156,7 @@ Ext.onReady(function () {
     var exportTab = Ext.create('Ext.form.Panel', {
         layout: 'anchor',
         title: '匯入',
-        width: 600,
+        width: 500,
         url: '/Order/OrderMasterImport',
         margin: '0 10 0 0',
         defaults: {
@@ -209,11 +208,11 @@ Ext.onReady(function () {
                         },
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
-                          alert(result.msg);
+                            alert(result.msg);
                         },
                         failure: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
-                          alert( result.msg);
+                            alert(result.msg);
                         }
                     });
                 }
@@ -224,7 +223,7 @@ Ext.onReady(function () {
     var hpanel = Ext.create('Ext.form.Panel', {
         //layout: 'hbox',
         title: '匯出查詢',
-        width: 800,
+        width: 700,
         border: false,
         plain: true,
         id: 'OrderMasterExport',
@@ -453,21 +452,30 @@ Ext.onReady(function () {
     var searchForm = Ext.create('Ext.form.Panel', {
         id: 'searchForm',
         layout: 'hbox',
-        //height: 450,
-        flex: 3.1,
+        height: 240,
+        //flex: 3.1,
         border: 0,
         bodyPadding: 10,
-        width: document.documentElement.clientWidth,
+        //width: document.documentElement.clientWidth>,
+        width: document.documentElement.clientWidth > 1230 ? document.documentElement.clientWidth : 1230,
         items: [
         exportTab,
         hpanel
-
-        ]
+        ],
+        autoScroll: true,
+        listeners: {
+            scrollershow: function (scroller) {
+                if (scroller && scroller.scrollEl) {
+                    scroller.clearManagedListeners();
+                    scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
+                }
+            }
+        },
     });
     var pcGift = Ext.create('Ext.grid.Panel', {
         id: 'pcGift',
         store: OrderMasterExportStore,
-        width: document.documentElement.clientWidth,
+        width: document.documentElement.clientWidth > 1230 ? document.documentElement.clientWidth : 1230,
         columnLines: true,
         frame: true,
         //hidden: true,
@@ -610,7 +618,7 @@ Ext.onReady(function () {
         autoScroll: true,
         listeners: {
             resize: function () {
-                pcGift.width = document.documentElement.clientWidth;
+                pcGift.width = document.documentElement.clientWidth > 1230 ? document.documentElement.clientWidth : 1230,
                 this.doLayout();
             }
         }

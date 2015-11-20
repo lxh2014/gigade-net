@@ -35,5 +35,6 @@ namespace BLL.gigade.Dao.Impl
         bool UpdateExtByCdedtincr(List<ParticularsSrc> particularsSrc);
 
         List<ProductExtCustom> QueryHistoryInfo(DateTime Update_start, DateTime Update_end, int Brand_id = 0, string Item_ids = null, string Product_ids = null);
+        int GetCde_dt_incr(int item_id);
     }
 }
