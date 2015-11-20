@@ -49,9 +49,10 @@
                 fieldLabel: '試閱連接',
                 id: 'trial_url',
                 name: 'trial_url',
-                allowBlank: false,
+                //allowBlank: false,
                 submitValue: true,
                 vtype: 'url',
+                hidden:true,
             }, {
                 xtype: 'numberfield',
                 fieldLabel: '排序',
