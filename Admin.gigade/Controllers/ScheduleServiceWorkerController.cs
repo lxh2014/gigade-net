@@ -8,6 +8,7 @@ using BLL.gigade.Common;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using BLL.gigade.Mgr;
+using BLL.gigade.Mgr.Impl;
 
 namespace Admin.gigade.Controllers
 {
@@ -160,6 +161,32 @@ namespace Admin.gigade.Controllers
             }
             return true;
         }
+        #endregion
+
+        #region 期望到貨日調整記錄通知排程 add by zhaozhi0623j 20151118PM
+
+        public bool DeliveryChangeLogSendMailSchedule()
+        {
+                    
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {            
+                IDeliverChangeLogImplMgr dclMgr = new DeliverChangeLogMgr(mySqlConnectionString);
+                dclMgr.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                //throw new Exception("ScheduleServiceWorkerController-->DeliveryChangeLogSendMailSchedule-->" + ex.Message, ex);
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return true;
+        } 
         #endregion
     }
 }
