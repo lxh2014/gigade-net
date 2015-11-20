@@ -421,7 +421,7 @@ namespace Admin.gigade.Controllers
                         }
                     }
                     #endregion
-                    json = "{success:true,qty:'" + m.out_qty + "',flag:'" + flag + "',ord:'" + ord + "',can:'" + cancel + "',ord_id:'" + ord_id + "'}";//返回json數據  
+                    json = "{success:true,qty:'" + m.out_qty + "',flag:'" + flag + "',ord:'" + ord + "',cancel:'" + cancel + "',ord_id:'" + ord_id + "'}";//返回json數據  
                     //qty 該物品是否缺貨，如果為零揀貨完成，否則彈框提示缺貨數量。
                     //over：0表示該訂單已經揀貨完畢，如果qty為零則提示該訂單可以封箱，qty不為零則提示該訂單還缺物品的數量。不為零則不提示任何信息。
                     #endregion

@@ -107,7 +107,7 @@ namespace BLL.gigade.Dao
 
                 if (Query.time_start != DateTime.MinValue && Query.time_end != DateTime.MinValue)
                 {
-                    conndSql.AppendFormat(" and dcl_create_datetime BETWEEN '{0}' and '{1}'", Query.time_start, Query.time_end);
+                    conndSql.AppendFormat(" and dcl_create_datetime BETWEEN '{0}' and '{1}'", Query.time_start.ToString("yyyy-MM-dd 00:00:00"), Query.time_end.ToString("yyyy-MM-dd 23:59:59"));                  
                 }
 
                 conndSql.AppendFormat(" order by dcl_create_datetime desc ");

@@ -3277,7 +3277,16 @@ namespace Admin.gigade.Controllers
                     }
                     item.search_start_time = query.search_start_time;
                     item.search_end_time = query.search_end_time;
-                    item.upc_id = _iupc.Getupc(item.item_id.ToString(), "1");
+                    if (item.item_mode == 1)
+                    {
+                        item.item_id = 0;
+                        item.upc_id = "";
+                    }
+                    else
+                    {
+                        item.upc_id = _iupc.Getupc(item.item_id.ToString(), "1");
+                    }
+
                 }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
@@ -5744,8 +5753,16 @@ namespace Admin.gigade.Controllers
                 }
 
                 dr[30] = item.taxtype;
-                dr[31] = item.Item_Id;
-                dr[32] = " " + item.upc_id;
+                if (item.item_mode != 1)
+                {
+                    dr[31] = item.Item_Id;
+                    dr[32] = " " + item.upc_id;
+                }
+                else
+                {
+                    dr[31] = "";
+                    dr[32] = "";
+                }
                 dr[33] = item.Note_Admin;
                 dtHZ.Rows.Add(dr);
             }

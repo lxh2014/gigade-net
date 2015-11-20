@@ -415,8 +415,13 @@ LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where 1=1 ");
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("SELECT prod_qty from iinvd where plas_loc_id='{0}' AND item_id='{1}' AND cde_dt='{2}';", m.plas_loc_id, m.item_id, m.cde_dt.ToShortDateString());
-                return Int32.Parse(_access.getDataTable(sql.ToString()).Rows[0]["prod_qty"].ToString());
+                sql.AppendFormat("SELECT prod_qty from iinvd where plas_loc_id='{0}' AND item_id='{1}' AND cde_dt='{2}';", m.plas_loc_id, m.item_id, CommonFunction.DateTimeToShortString(m.cde_dt));
+                DataTable table = _access.getDataTable(sql.ToString());
+                if(table.Rows.Count>0)
+                {
+                    return Int32.Parse(table.Rows[0]["prod_qty"].ToString());
+                }
+                return 0;   
             }
             catch (Exception ex)
             {
@@ -439,7 +444,7 @@ LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where 1=1 ");
             StringBuilder sql = new StringBuilder();
             StringBuilder sb = new StringBuilder();
             DataTable dt = new DataTable();
-            int sum =GetProqtyByItemid(int.Parse(a.item_id.ToString()));
+            int sum = GetProqtyByItemid(int.Parse(a.item_id.ToString()));
             try
             {
                 foreach (KeyValuePair<string, string> item in iinvd)
@@ -1296,7 +1301,7 @@ us.user_username as user_name from iinvd ii ");
                 }
                 catch (Exception ex)
                 {
-                  i=0;
+                    i = 0;
                 }
                 return i;
             }
@@ -1340,12 +1345,11 @@ us.user_username as user_name from iinvd ii ");
                 {
                     sbwhere.AppendFormat(" and ii.cde_dt='{0}' and ii.made_date='{1}' ", ivd.cde_dt.ToString("yyyy-MM-dd"), ivd.made_date.ToString("yyyy-MM-dd"));
                 }
-
                 return _access.getDataTableForObj<IinvdQuery>(sql.ToString() + sbwhere.ToString());
             }
             catch (Exception ex)
             {
-                throw new Exception("IupcDao-->GetSearchIinvd-->" + ex.Message + sql.ToString(), ex);
+                throw new Exception("IinvdDao-->GetSearchIinvd-->" + ex.Message + sql.ToString(), ex);
             }
         }
         /**
@@ -1395,5 +1399,171 @@ us.user_username as user_name from iinvd ii ");
                 throw new Exception("IupcDao-->GetPlasIinvd-->" + ex.Message + sql.ToString(), ex);
             }
         }
+        #region 料位循環盤點 add by yafeng0715j201511041535
+        public List<IinvdQuery> GetIinvdList(string loc_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sbwhere = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("SELECT pi.item_id, p.product_name,CONCAT(ps1.spec_name,'-',ps2.spec_name)AS spec, made_date,cde_dt,prod_qty,pe.pwy_dte_ctl,i.row_id  FROM iinvd i ");
+                sql.Append(" INNER  JOIN product_item pi ON i.item_id=pi.item_id");
+                sql.Append(" INNER JOIN product p ON p.product_id =pi.product_id");
+                sql.Append(" LEFT JOIN product_ext pe ON pe.item_id=pi.item_id");
+                sql.Append(" LEFT JOIN product_spec ps1 ON ps1.spec_id=pi.spec_id_1");
+                sql.Append(" LEFT JOIN product_spec ps2 ON ps2.spec_id=pi.spec_id_2");
+                sql.Append(" WHERE ista_id='A'");
+                if (!string.IsNullOrEmpty(loc_id))
+                {
+                    sbwhere.AppendFormat(" AND i.plas_loc_id='{0}'", loc_id);
+                }
+                return _access.getDataTableForObj<IinvdQuery>(sql.ToString() + sbwhere.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdDao-->GetIinvdList-->" + ex.Message + sql.ToString() + sbwhere.ToString(), ex);
+            }
+        }
+
+        public int GetIinvdCount(IinvdQuery iinvd)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("SELECT row_id,prod_qty FROM iinvd WHERE item_id={0} AND made_date='{1}' AND plas_loc_id='{2}' and ista_id='A';", iinvd.item_id, CommonFunction.DateTimeToShortString(iinvd.made_date), iinvd.plas_loc_id);
+                DataTable table = _access.getDataTable(sql.ToString());
+                if (table.Rows.Count > 0)
+                {
+                    string row_id = table.Rows[0][0].ToString();
+                    string prod_qty = table.Rows[0][1].ToString();
+                    sql.Clear();
+                    iinvd.row_id = int.Parse(row_id);
+                    iinvd.prod_qty = iinvd.prod_qty + int.Parse(prod_qty);
+                    return SaveIinvd(iinvd);
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdDao-->GetIinvdCount-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+
+        public int SaveIinvd(IinvdQuery query)
+        {
+            query.Replace4MySQL();
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                if (query.pwy_dte_ctl == "N")
+                {
+                    if (query.row_id != 0)
+                    {
+                        sql.Append("update iinvd set prod_qty=" + query.prod_qty + ",change_user=" + query.change_user + ",change_dtim='" + CommonFunction.DateTimeToString(query.change_dtim) + "' where row_id =" + query.row_id);
+                        return  _access.execCommand(sql.ToString());
+                    }
+                    else
+                    {
+                        sql.AppendFormat("SELECT row_id,prod_qty  FROM iinvd WHERE plas_loc_id='{0}' AND ista_id='A' ORDER BY made_date;", query.plas_loc_id);
+                        DataTable table = _access.getDataTable(sql.ToString());
+                        string row_id = "";
+                        string row_idend = "";
+                        int row_id_end_prod_pty = 0;
+                        int prod_qty = query.prod_qtys - query.prod_qty;
+                        int i = 0; 
+                        for (i = 0; i < table.Rows.Count; i++)
+                        {
+                            if ((int)table.Rows[i][1] <= prod_qty || (int)table.Rows[i][1] == 0)
+                            {
+                                row_id += table.Rows[i][0] + ",";
+                                prod_qty = prod_qty - (int)table.Rows[i][1];
+                            }
+                            else
+                            {
+                                row_idend = table.Rows[i][0].ToString();
+                                row_id_end_prod_pty = prod_qty;
+                                break;
+                            }
+                        }
+                        if (row_id != "")
+                        {
+                            _access.execCommand("DELETE FROM iinvd WHERE row_id IN(" + row_id.TrimEnd(',') + ")");
+                        }
+                        if(i!=table.Rows.Count){
+                            return _access.execCommand("update iinvd set prod_qty=prod_qty-" + row_id_end_prod_pty + ",change_user=" + query.change_user + ",change_dtim='" + CommonFunction.DateTimeToString(query.change_dtim) + "' where row_id =" + row_idend);
+                        } 
+                    }
+                }
+                else
+                {
+                    if (query.row_id != 0)
+                    {
+                        if (query.prod_qty == 0)
+                        {
+                            sql.AppendFormat("DELETE FROM iinvd WHERE row_id={0};", query.row_id);
+                        }
+                        else {
+                            sql.AppendFormat("UPDATE iinvd  SET prod_qty={0},change_user={2},change_dtim='{3}' WHERE row_id={1};", query.prod_qty, query.row_id, query.change_user, CommonFunction.DateTimeToString(query.change_dtim));
+                        }  
+                    }
+                    else
+                    {
+                        sql.AppendFormat("UPDATE iinvd  SET prod_qty=prod_qty+{0},change_user={2},change_dtim='{3}' WHERE plas_loc_id='{1}';", query.prod_qty, query.plas_loc_id, query.change_user, CommonFunction.DateTimeToString(query.change_dtim));
+                    }
+                }
+
+                return _access.execCommand(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdDao-->SaveIinvd-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+
+        public DateTime GetCde_dt(int row_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("SELECT cde_dt FROM iinvd WHERE row_id={0};",row_id);
+                DataTable table = _access.getDataTable(sql.ToString());
+                DateTime cde_dt = DateTime.MinValue;
+                if (table.Rows.Count > 0)
+                {
+                     cde_dt =Convert.ToDateTime(table.Rows[0][0].ToString());
+                }
+                return cde_dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdDao-->GetCde_dt-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+
+        public int GetProd_qty(int item_id,string loc_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("SELECT SUM(prod_qty) FROM iinvd WHERE item_id={0} AND ista_id='A' AND plas_loc_id='{1}';", item_id,loc_id);
+                DataTable table = _access.getDataTable(sql.ToString());
+                int prod_qty = 0;
+                if (table.Rows.Count > 0)
+                {
+                    prod_qty = int.Parse(table.Rows[0][0].ToString());
+                }
+                return prod_qty;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdDao-->GetProd_qty-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+        #endregion
+
     }
-}
+    }
+

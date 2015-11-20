@@ -139,6 +139,7 @@ namespace Admin.gigade.Controllers
                     cq.banner_image = oldCq.banner_image;
                     cq.category_image_in = oldCq.category_image_in;
                     cq.category_image_out = oldCq.category_image_out;
+                    cq.category_image_app = oldCq.category_image_app;
                 }
                 #region 上傳圖片
 
@@ -208,6 +209,9 @@ namespace Admin.gigade.Controllers
                                         case 2:
                                             cq.category_image_out = fileName;
                                             break;
+                                        case 3:
+                                            cq.category_image_app = fileName;
+                                            break;
                                         default:
                                             break;
                                     }
@@ -225,6 +229,9 @@ namespace Admin.gigade.Controllers
                                             break;
                                         case 2:
                                             cq.category_image_out = fileName;
+                                            break;
+                                        case 3:
+                                            cq.category_image_app = fileName;
                                             break;
                                         default:
                                             break;

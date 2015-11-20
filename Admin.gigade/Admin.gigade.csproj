@@ -701,9 +701,12 @@
     <Content Include="Scripts\Bootstrap\css\bootstrap-table.min.css" />
     <Content Include="Scripts\Bootstrap\css\bootstrap.css" />
     <Content Include="Locale\zh-TW\XMLManage\XMLIndex.js" />
-    <Content Include="Scripts\Bootstrap\bootstrap.js" />
+    <Content Include="Scripts\Bootstrap\bootstrap-datetimepicker.min.js" />
+    <Content Include="Scripts\Bootstrap\bootstrap-table.js" />
+    <Content Include="Scripts\Bootstrap\css\bootstrap-datetimepicker.min.css" />
     <Content Include="Scripts\Bootstrap\css\bootstrap.min.css" />
     <Content Include="Scripts\Bootstrap\bootstrap.min.js" />
+    <Content Include="Scripts\Bootstrap\locales\bootstrap-datetimepicker.zh-TW.js" />
     <Content Include="Scripts\Common\ManageButton.js" />
     <Content Include="Scripts\ext-5.1.0\.sencha\package\Boot.js" />
     <Content Include="Scripts\ext-5.1.0\bootstrap-files.js" />
@@ -2028,6 +2031,7 @@
     <Content Include="Template\EdmNew\empty_edit.html" />
     <Content Include="Template\EdmNew\index.html" />
     <Content Include="Template\ProductDetail\product_detail_safe.txt" />
+    <Content Include="Views\WareHouse\IinvdCheck.aspx" />
     <Content Include="XML\Exceptional.xml" />
     <Content Include="XML\ItemPrice.xml" />
     <Content Include="XML\ParticularsSrc.xml">
@@ -4474,6 +4478,9 @@
     <Content Include="Views\EdmNew\Editkendo2.cshtml" />
     <Content Include="Template\SiteStatistics\SiteStatistics.xlsx" />
     <Content Include="Views\WareHouse\Aseld.cshtml" />
+    <Content Include="Views\WareHouse\IlocCheck.cshtml">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="Views\SendProduct\DeliverExpectArrival.cshtml" />
     <Content Include="Views\SendProduct\ExpectArrivalChangeLog.cshtml" />
     <Content Include="Views\Order\OrderAmountDetial.cshtml" />
@@ -4691,7 +4698,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>57707</DevelopmentServerPort>
+          <DevelopmentServerPort>58630</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

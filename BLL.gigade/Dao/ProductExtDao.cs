@@ -196,5 +196,21 @@ namespace BLL.gigade.Dao
                 throw new Exception("ProductExtDao-->QueryHistoryInfo" + ex.Message, ex);
             }
         }
+
+        #region 料位循環盤點add by yafeng0715j11111101
+        #endregion
+        public int GetCde_dt_incr(int item_id)
+        {
+            try
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("SELECT cde_dt_incr FROM product_ext WHERE item_id={0};", item_id);
+                return int.Parse(_dbAccess.getDataTable(sb.ToString()).Rows[0][0].ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductExtDao.GetCde_dt_incr-->" + ex.Message, ex);
+            }
+        }
     }
 }

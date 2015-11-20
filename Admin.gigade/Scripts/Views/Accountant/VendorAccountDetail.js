@@ -335,8 +335,17 @@ Ext.onReady(function () {
             }
 
         },
-        { header: "細項編號", dataIndex: 'item_id', align: 'center', width: 50 },
-        { header: "國際編碼", dataIndex: 'upc_id', align: 'center', width: 50 },
+        {
+            header: "細項編號", dataIndex: 'item_id', align: 'center', width: 70,
+            renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                if (value == 0) {
+                    return "";
+                } else {
+                    return value;
+                }
+            }
+        },
+        { header: "國際編碼", dataIndex: 'upc_id', align: 'center', width: 80 },
 
 
 

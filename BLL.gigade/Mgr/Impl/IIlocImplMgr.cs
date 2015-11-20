@@ -28,5 +28,6 @@ namespace BLL.gigade.Mgr.Impl
         int HashAll();
 
         string GetLocidByHash(string loc_id);
+        bool GetIlocCount(IlocQuery loc);
     }
 }
