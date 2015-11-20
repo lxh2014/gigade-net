@@ -225,5 +225,20 @@ namespace BLL.gigade.Dao
                 throw new Exception("EmailGroupDao-->EmailGroup-->" + ex.Message+sql.ToString(), ex);
             }
         }
+
+        public DataTable GetTestSendList()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.Append("select email_address from email_list where group_id=(select group_id from email_group where group_name='電子報測試小組');");
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EmailGroupDao-->GetTestSendList-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
+
     }
 }

@@ -122,6 +122,7 @@ namespace BLL.gigade.Mgr
             }
         }
 
+        #region 測試發送與正式發送
         public string MailAndRequest(EdmSendLog eslQuery, MailRequest MRquery)
         {
             eslQuery.Replace4MySQL();
@@ -567,6 +568,7 @@ namespace BLL.gigade.Mgr
                 throw new Exception("EdmContentNewMgr-->MailAndRequest-->" + ex.Message, ex);
             }
         }
+        #endregion
 
         public int GetSendMailSCount(int content_id,int log_id)
         {
@@ -789,5 +791,17 @@ namespace BLL.gigade.Mgr
             }
         }
         #endregion
+
+        public DataTable GetParaStore(string paraType)
+        {
+            try
+            {
+                return _edmContentNewDao.GetParaStore(paraType);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetParaStore-->" + ex.Message, ex);
+            }
+        }
     }
 }
