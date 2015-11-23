@@ -12,5 +12,7 @@ namespace BLL.gigade.Mgr.Impl
     {
         int insertDeliverChangeLog(DeliverChangeLog dCL);
         List<DeliverChangeLogQuery> GetDeliverChangeLogList(DeliverChangeLogQuery Query, out int totalCount);
+        bool Start(string schedule_code);
+        string GetHtmlByDataTable(DataTable _dtmyMonth);
     }
 }

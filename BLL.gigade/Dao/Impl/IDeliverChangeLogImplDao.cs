@@ -12,5 +12,7 @@ namespace BLL.gigade.Dao.Impl
     {
         int insertDeliverChangeLog(DeliverChangeLog dCL);
         List<DeliverChangeLogQuery> GetDeliverChangeLogList(DeliverChangeLogQuery Query, out int totalCount);
+        DataTable GetDeliverChangeLogDataTable(DeliverChangeLogQuery Query);
+        DataTable GetExpectArriveDateByCreatetime(DeliverChangeLogQuery Query);
     }
 }
