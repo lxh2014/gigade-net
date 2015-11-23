@@ -31,7 +31,7 @@ namespace BLL.gigade.Dao
 SELECT cm.sta_id,idd.item_id,idd.st_qty,cd.cb_newid,cd.cb_jobid,idd.cde_dt,idd.made_date as made_dt,idd.plas_loc_id as         
 loc_id,idd.prod_qty,cd.create_datetime,cd.create_user,cd.iinvd_id,mu.user_username,CONCAT(v.brand_name,'-',p.product_name) as 'product_name' FROM cbjob_detail cd 
 left JOIN iinvd idd on cd.iinvd_id=idd.row_id 
-LEFT JOIN product_item pi on pi.item_id=idd.item_id 
+inner JOIN product_item pi on pi.item_id=idd.item_id 
 LEFT JOIN product p on p.product_id =pi.product_id
 LEFT JOIN cbjob_master cm on cm.cbjob_id=cd.cb_jobid
 LEFT JOIN manage_user mu on cd.create_user=mu.user_id 
@@ -154,6 +154,13 @@ WHERE cm.cbjob_id='{0}'
 and invd.st_qty<> invd.prod_qty 
 and cm.status=1 and sta_id= 'COM' and invd.st_qty=0 and cm.create_datetime>='{1}' and cm.create_datetime<= '{2}' group by cd.iinvd_id;", cbjobQuery.cb_jobid, cbjobQuery.StartDate, cbjobQuery.EndDate);
                     DataTable _dt = _access.getDataTable(strsql.ToString());
+
+                    strsqltwo.AppendFormat(@"SELECT cd.iinvd_id,cd.cb_jobid FROM cbjob_master cm LEFT JOIN cbjob_detail cd on cd.cb_jobid=cm.cbjob_id
+LEFT JOIN iinvd invd on invd.row_id=cd.iinvd_id 
+WHERE cm.cbjob_id='{0}'
+and invd.st_qty<> invd.prod_qty 
+and cm.status=1 and sta_id= 'COM'and invd.st_qty <> 0 and invd.st_qty <> invd.prod_qty and cm.create_datetime>='{1}' and cm.create_datetime<= '{2}' group by cd.iinvd_id;", cbjobQuery.cb_jobid, cbjobQuery.StartDate, cbjobQuery.EndDate);
+                    DataTable _dttwo = _access.getDataTable(strsqltwo.ToString());
                     if (_dt.Rows.Count > 0)//表示有要求要刪除的數據
                     {
                         for (int i = 0; i < _dt.Rows.Count; i++)
@@ -163,8 +170,16 @@ and cm.status=1 and sta_id= 'COM' and invd.st_qty=0 and cm.create_datetime>='{1}
                             sbstr.AppendFormat("select st_qty,plas_loc_id from iinvd where row_id ='{0}';", _dt.Rows[i][0]);
                           
                             DataTable qtdt = _access.getDataTable(sbstr.ToString());
+                            sbstr.Clear();
                             sbstr2.AppendFormat("select row_id from iinvd where plas_loc_id='{0}';",qtdt.Rows[0][1]);
                             DataTable qtdt2 = _access.getDataTable(sbstr2.ToString());
+                            sbstr.AppendFormat("select st_qty,plas_loc_id,item_id,prod_qty,made_date,cde_dt from iinvd where row_id ='{0}';", _dt.Rows[i][0]);
+                            DataTable qtdt3 = _access.getDataTable(sbstr.ToString());
+                            sbstr.Clear();
+                            int adj_qty = Convert.ToInt32(qtdt3.Rows[0][0]) - Convert.ToInt32(qtdt3.Rows[0][3]);
+                            iinvdidstr = iinvdidstr + string.Format(@"insert into iialg (loc_id,item_id,iarc_id,qty_o,create_dtim,create_user,doc_no, made_dt,cde_dt,adj_qty )
+ values ('{0}','{1}','{2}','{3}', '{4}','{5}', '{6}','{7}', '{8}','{9}');", qtdt3.Rows[0][1], qtdt3.Rows[0][2], "PC", qtdt3.Rows[0][3], Common.CommonFunction.DateTimeToString(cbjobQuery.create_datetime), cbjobQuery.create_user, jobnumber, Common.CommonFunction.DateTimeToString(Convert.ToDateTime(qtdt3.Rows[0][4])), Common.CommonFunction.DateTimeToString(Convert.ToDateTime(qtdt3.Rows[0][5])), adj_qty);
+
                             iinvdidstr = iinvdidstr + string.Format("delete from iinvd where row_id='{0}';", _dt.Rows[i][0]);
                             if (qtdt2.Rows.Count < 2)
                             {
@@ -172,12 +187,7 @@ and cm.status=1 and sta_id= 'COM' and invd.st_qty=0 and cm.create_datetime>='{1}
                             }
                         }
                     }
-                    strsqltwo.AppendFormat(@"SELECT cd.iinvd_id,cd.cb_jobid FROM cbjob_master cm LEFT JOIN cbjob_detail cd on cd.cb_jobid=cm.cbjob_id
-LEFT JOIN iinvd invd on invd.row_id=cd.iinvd_id 
-WHERE cm.cbjob_id='{0}'
-and invd.st_qty<> invd.prod_qty 
-and cm.status=1 and sta_id= 'COM'and invd.st_qty <> 0 and invd.st_qty <> invd.prod_qty and cm.create_datetime>='{1}' and cm.create_datetime<= '{2}' group by cd.iinvd_id;", cbjobQuery.cb_jobid, cbjobQuery.StartDate, cbjobQuery.EndDate);
-                    DataTable _dttwo = _access.getDataTable(strsqltwo.ToString());
+                   
                     if (_dttwo.Rows.Count > 0)
                     {
                         for (int i = 0; i < _dttwo.Rows.Count; i++)
@@ -211,7 +221,14 @@ LEFT JOIN cbjob_detail cd on cd.cb_jobid=cm.cbjob_id
 LEFT JOIN iinvd invd on invd.row_id=cd.iinvd_id 
 WHERE invd.st_qty<> invd.prod_qty 
 and cm.status=1 and sta_id= 'COM'and invd.st_qty = 0 and cm.create_datetime>='{0}' and cm.create_datetime<= '{1}'  group by cd.iinvd_id;",cbjobQuery.StartDate, cbjobQuery.EndDate);
-                    DataTable _dt = _access.getDataTable(strsql.ToString());
+                    DataTable _dt = _access.getDataTable(strsql.ToString()); 
+                    
+                    strsqltwo.AppendFormat(@"SELECT cd.iinvd_id,cd.cb_jobid FROM cbjob_master cm 
+LEFT JOIN cbjob_detail cd on cd.cb_jobid=cm.cbjob_id
+LEFT JOIN iinvd invd on invd.row_id=cd.iinvd_id 
+WHERE invd.st_qty<> invd.prod_qty 
+and cm.status=1 and sta_id= 'COM'and invd.st_qty <> 0 and invd.st_qty <> invd.prod_qty and  cm.create_datetime>='{0}' and cm.create_datetime<= '{1}' group by cd.iinvd_id;",cbjobQuery.StartDate, cbjobQuery.EndDate);
+                    DataTable _dttwo = _access.getDataTable(strsqltwo.ToString());
                     if (_dt.Rows.Count > 0)//表示有要求要刪除的數據
                     {
                         for (int i = 0; i < _dt.Rows.Count; i++)
@@ -220,21 +237,24 @@ and cm.status=1 and sta_id= 'COM'and invd.st_qty = 0 and cm.create_datetime>='{0
                             StringBuilder sbstr2 = new StringBuilder();
                             sbstr.AppendFormat("select st_qty,plas_loc_id from iinvd where row_id ='{0}';", _dt.Rows[i][0]);
                             DataTable qtdt = _access.getDataTable(sbstr.ToString());
+                            sbstr.Clear();
                             sbstr2.AppendFormat("select row_id from iinvd where plas_loc_id='{0}';",qtdt.Rows[0][1]);
                             DataTable qtdt2 = _access.getDataTable(sbstr2.ToString());
+
+                            sbstr.AppendFormat("select st_qty,plas_loc_id,item_id,prod_qty,made_date,cde_dt from iinvd where row_id ='{0}';", _dt.Rows[i][0]);
+                            DataTable qtdt3 = _access.getDataTable(sbstr.ToString());
+                            sbstr.Clear();
+                            int adj_qty = Convert.ToInt32(qtdt3.Rows[0][0]) - Convert.ToInt32(qtdt3.Rows[0][3]);
+                            iinvdidstr = iinvdidstr + string.Format(@"insert into iialg (loc_id,item_id,iarc_id,qty_o,create_dtim,create_user,doc_no, made_dt,cde_dt,adj_qty )
+ values ('{0}','{1}','{2}','{3}', '{4}','{5}', '{6}','{7}', '{8}','{9}');", qtdt3.Rows[0][1], qtdt3.Rows[0][2], "PC", qtdt3.Rows[0][3], Common.CommonFunction.DateTimeToString(cbjobQuery.create_datetime), cbjobQuery.create_user, jobnumber, Common.CommonFunction.DateTimeToString(Convert.ToDateTime(qtdt3.Rows[0][4])), Common.CommonFunction.DateTimeToString(Convert.ToDateTime(qtdt3.Rows[0][5])), adj_qty);
+
                             iinvdidstr = iinvdidstr + string.Format("delete from iinvd where row_id='{0}';", _dt.Rows[i][0]);
                             if (qtdt2.Rows.Count < 2)
                             {
                                 iinvdidstr = iinvdidstr + string.Format("update iloc set lsta_id='F' where loc_id='{0}' and lcat_id='R';", qtdt.Rows[0][1]);
                             }
                         }
-                    }
-                    strsqltwo.AppendFormat(@"SELECT cd.iinvd_id,cd.cb_jobid FROM cbjob_master cm 
-LEFT JOIN cbjob_detail cd on cd.cb_jobid=cm.cbjob_id
-LEFT JOIN iinvd invd on invd.row_id=cd.iinvd_id 
-WHERE invd.st_qty<> invd.prod_qty 
-and cm.status=1 and sta_id= 'COM'and invd.st_qty <> 0 and invd.st_qty <> invd.prod_qty and  cm.create_datetime>='{0}' and cm.create_datetime<= '{1}' group by cd.iinvd_id;",cbjobQuery.StartDate, cbjobQuery.EndDate);
-                    DataTable _dttwo = _access.getDataTable(strsqltwo.ToString());
+                    }               
                     if (_dttwo.Rows.Count > 0)
                     {
                         for (int i = 0; i < _dttwo.Rows.Count; i++)

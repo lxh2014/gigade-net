@@ -756,6 +756,25 @@ namespace BLL.gigade.Mgr
             }
         }
 
+
+        public string GetContentUrl(int template_id)
+        {
+            string url = string.Empty;
+            try
+            {
+                DataTable _dt = _edmContentNewDao.GetContentUrl(template_id);
+                if (_dt.Rows.Count > 0 && _dt != null)
+                {
+                    url = _dt.Rows[0][0].ToString();
+                }
+                return url;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetContentUrl-->" + ex.Message, ex);
+            }
+        }
+
         public string GetHtml(EdmContentNew query)
         {
             string htmlStr = string.Empty;
