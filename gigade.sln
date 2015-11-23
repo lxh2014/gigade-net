@@ -8,11 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.gigade", "Admin.gigad
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLL.gigade", "BLL.gigade\BLL.gigade.csproj", "{143FF511-FAAE-48A9-821B-35D27EB13899}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductMigration", "ProductMigration\ProductMigration.csproj", "{D1C0B449-D97C-4AE7-B51D-106ABFE97090}"
-	ProjectSection(ProjectDependencies) = postProject
-		{143FF511-FAAE-48A9-821B-35D27EB13899} = {143FF511-FAAE-48A9-821B-35D27EB13899}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SendMailService", "SendMailService\SendMailService.csproj", "{4492FC5F-D34B-4FAF-8ABE-C9282948FE93}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GigadeService", "GigadeService\GigadeService.csproj", "{722FD6AB-D10E-41DD-9B25-A6836D084DDC}"
@@ -49,16 +44,6 @@ Global
 		{143FF511-FAAE-48A9-821B-35D27EB13899}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{143FF511-FAAE-48A9-821B-35D27EB13899}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{143FF511-FAAE-48A9-821B-35D27EB13899}.Release|x86.ActiveCfg = Release|Any CPU
-		{D1C0B449-D97C-4AE7-B51D-106ABFE97090}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{D1C0B449-D97C-4AE7-B51D-106ABFE97090}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{D1C0B449-D97C-4AE7-B51D-106ABFE97090}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{D1C0B449-D97C-4AE7-B51D-106ABFE97090}.Debug|x86.ActiveCfg = Debug|x86
-		{D1C0B449-D97C-4AE7-B51D-106ABFE97090}.Debug|x86.Build.0 = Debug|x86
-		{D1C0B449-D97C-4AE7-B51D-106ABFE97090}.Release|Any CPU.ActiveCfg = Release|x86
-		{D1C0B449-D97C-4AE7-B51D-106ABFE97090}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{D1C0B449-D97C-4AE7-B51D-106ABFE97090}.Release|Mixed Platforms.Build.0 = Release|x86
-		{D1C0B449-D97C-4AE7-B51D-106ABFE97090}.Release|x86.ActiveCfg = Release|x86
-		{D1C0B449-D97C-4AE7-B51D-106ABFE97090}.Release|x86.Build.0 = Release|x86
 		{4492FC5F-D34B-4FAF-8ABE-C9282948FE93}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{4492FC5F-D34B-4FAF-8ABE-C9282948FE93}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{4492FC5F-D34B-4FAF-8ABE-C9282948FE93}.Debug|Mixed Platforms.Build.0 = Debug|x86
