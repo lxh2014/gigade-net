@@ -410,7 +410,10 @@ editFunction = function (row, store) {
             },
             {
                 id: 'preview',
-                text:'預覽',
+                text: '預覽',
+                handler: function () {
+                    PreviewFun(Ext.getCmp('template_id').getValue(),Ext.getCmp('check').getValue());
+                }
             },
         ]
     });
@@ -561,12 +564,12 @@ editFunction = function (row, store) {
                      //    "exec":
                      //       function (e) {
                      //           var editor = $(this).data("kendoEditor");
-                     //           var htmlsrc = $('.editor3]').data("kendoEditor");// Ext.getCmp('kendoEditor').getValue();
+                     //           var htmlsrc = Ext.htmlDecode(document.getElementById('editor3').value)  //$('.editor3]').data("kendoEditor");// Ext.getCmp('kendoEditor').getValue();
                      //           var A = 1000;
                      //           var B = 700;
                      //           var C = (document.body.clientWidth - A) / 2;
                      //           var D = window.open('', null, 'toolbar=yes,location=no,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=' + A + ',height=' + B + ',left=' + C);
-                     //           var E = "<html><head><title>預覽</title></head><style>body{line-height:200%;padding:50px;}</style><body><div >" + htmlsrc.body.innerHTML + "</div></body></html>";
+                     //           var E = "<html><head><title>預覽</title></head><style>body{line-height:200%;padding:50px;}</style><body><div >" + htmlsrc + "</div></body></html>";
                      //           D.document.write(E);
                      //           D.document.close();
                      //       }
@@ -650,12 +653,12 @@ editFunction = function (row, store) {
         });
     }
      function LoadEpaperContent() {
-        number = 0;
         Ext.getCmp('check').setDisabled(false);
         Ext.getCmp('check').reset();
         var active = Ext.getCmp("active").getValue();
         if (active == null || active == "" || active == undefined) {
             Ext.Msg.alert("提示信息", "請輸入活動頁面id");
+            return;
         }
         else {
             Ext.Ajax.request({
@@ -668,8 +671,8 @@ editFunction = function (row, store) {
                     var result = Ext.decode(form.responseText);
                     if (result.success) {
                         Query(1);
-                        $("#editor3").data("kendoEditor").value(Ext.htmlDecode(result.data.epaper_content));
-                     
+                        Ext.getCmp('active_dis').setValue(active);
+                        $("#editor3").data("kendoEditor").value(Ext.htmlDecode(result.data.epaper_content).replace(/>\s*<map/g, '><map'));
                     }
                     else {
                         if (result.msg == '0') {
@@ -709,5 +712,6 @@ editFunction = function (row, store) {
                 }
             })
         }
-    }
+     }
+    
 }
