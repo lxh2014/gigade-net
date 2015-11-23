@@ -234,7 +234,7 @@ Ext.apply(Ext.form.field.VTypes, {
 });
 
 function pageCancel(object, panel) {
-    var id = object.attributes[1].nodeValue;
+    var id = object.attributes["name"].nodeValue;
     var panelId = panel.id;
     switch (panelId) {
         case "stockFrm":

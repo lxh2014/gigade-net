@@ -38,7 +38,7 @@ namespace BLL.gigade.Mgr
         private MySqlDao _mysqlDao;
         private SerialDao _serialDao;
         private OrderReturnStatusDao _orsDao;
-
+        private IParametersrcImplDao _parametersrcDao;
         private string conn;
         public OrderMasterMgr(string connectionStr)
         {
@@ -50,6 +50,7 @@ namespace BLL.gigade.Mgr
             _serialDao = new SerialDao(connectionStr);
             _mysqlDao = new MySqlDao(connectionStr);
             _orsDao = new OrderReturnStatusDao(connectionStr);
+            _parametersrcDao = new ParametersrcDao(connectionStr);
             conn = connectionStr;
         }
 
@@ -1157,11 +1158,70 @@ set ");
                 throw new Exception("OrderMasterMgr-->GetOrderFreight-->" + ex.Message, ex);
             }
         }
+
         public DataTable OrderDetialExportInfo(OrderDetailQuery query)
         {
             try
             {
-                return _orderMasterDao.OrderDetialExportInfo(query);
+                DataTable dt = _orderMasterDao.DetialExport(query, 1);
+                DataTable dtNew = new DataTable();
+                string newExcelName = string.Empty;
+                dtNew.Columns.Add("category_id", typeof(int));
+                dtNew.Columns.Add("user_name", typeof(String));
+                dtNew.Columns.Add("order_createdate", typeof(String));
+                dtNew.Columns.Add("order_id", typeof(int));
+                dtNew.Columns.Add("order_payment", typeof(String));
+                dtNew.Columns.Add("order_amount", typeof(int));
+                dtNew.Columns.Add("order_status", typeof(String));
+                dtNew.Columns.Add("item_id", typeof(int));
+                dtNew.Columns.Add("slave_status", typeof(String));
+                dtNew.Columns.Add("vendor_name_simple", typeof(String));
+                dtNew.Columns.Add("vendor_code", typeof(String));
+                dtNew.Columns.Add("product_name", typeof(String));
+                dtNew.Columns.Add("buy_num", typeof(int));
+                dtNew.Columns.Add("single_money", typeof(int));
+                dtNew.Columns.Add("deduct_bonus", typeof(int));
+                dtNew.Columns.Add("deduct_welfare", typeof(int));
+                dtNew.Columns.Add("single_money*buy_num", typeof(int));
+                dtNew.Columns.Add("single_cost", typeof(int));
+                dtNew.Columns.Add("bag_check_money", typeof(int));
+                dtNew.Columns.Add("single_cost*od.buy_num", typeof(int));
+                dtNew.Columns.Add("slave_date_close", typeof(String));
+                dtNew.Columns.Add("pm", typeof(String));
+                dtNew.Columns.Add("ID", typeof(String));
+                dtNew.Columns.Add("group_name", typeof(String));
+                dtNew.Columns.Add("product_mode", typeof(String));
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    DataRow dr = dtNew.NewRow();
+                    for (int j = 0; j < dt.Columns.Count; j++)
+                    {
+                        switch (j)
+                        {
+                            case 4:
+                                int order_payment = dt.Rows[i]["order_payment"].ToString() == "" ? 0 : Convert.ToInt32(dt.Rows[i]["order_payment"]);
+                                dr[j] = _parametersrcDao.GetOrderPayment(order_payment);
+                                break;
+                            case 6:
+                                int order_status = dt.Rows[i]["order_status"].ToString() == "" ? 0 : Convert.ToInt32(dt.Rows[i]["order_status"]);
+                                dr[j] = _parametersrcDao.GetOrderStatus(order_status);
+                                break;
+                            case 8:
+                                int slave_status = dt.Rows[i]["slave_status"].ToString() == "" ? 0 : Convert.ToInt32(dt.Rows[i]["slave_status"]);
+                                dr[j] = _parametersrcDao.GetSlaveStatus(slave_status);
+                                break;
+                            case 24:
+                                int product_mode = dt.Rows[i]["product_mode"].ToString() == "" ? 0 : Convert.ToInt32(dt.Rows[i]["product_mode"]);
+                                dr[j] = _parametersrcDao.GetProductMode(product_mode);
+                                break;
+                            default:
+                                dr[j] = dt.Rows[i][j];
+                                break;
+                        }
+                    }
+                    dtNew.Rows.Add(dr);
+                }
+                return dtNew;
             }
             catch (Exception ex)
             {

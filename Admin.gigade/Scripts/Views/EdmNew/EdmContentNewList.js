@@ -21,6 +21,9 @@ Ext.define('gigade.EdmContentNew', {
     { name: "sender_name", type: "string" },
     { name: "edit_url", type: "string" },
    { name: "content_url", type: "string" },
+   { name: "pm", type: "int" },
+   { name: "edm_pm", type: "string" },
+   
     ]
 });
 EdmContentNewStore = Ext.create('Ext.data.Store', {
@@ -92,6 +95,7 @@ Ext.onReady(function () {
         frame: true,
         columns: [
         { header: "編號", dataIndex: 'content_id', width: 60, align: 'center' },
+          { header: "需求申請者", dataIndex: 'edm_pm', width: 85, align: 'center' },
         { header: "正式發送", dataIndex: 'count', width: 150, align: 'center' },
         { header: "郵件主旨", dataIndex: 'subject', width: 200, align: 'center' },
                 {
@@ -189,27 +193,35 @@ onGoSendClick = function () {
     } else if (row.length == 1) {
         var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
         myMask.show();
-        Ext.Ajax.request({
-            url: '/EdmNew/GetContentUrl',
-            params: {
-                content_url: row[0].data.content_url,
-                template_data: row[0].data.template_data,
-            },
-            success: function (data) {
-                myMask.hide();
-                if (data.responseText == "獲取網頁出現異常！") {
+        if (row[0].data.template_id != 0) {
+            Ext.Ajax.request({
+                url: '/EdmNew/GetContentUrl',
+                params: {
+                    template_id:row[0].data.template_id,
+                    content_url: row[0].data.content_url,
+                    template_data: row[0].data.template_data,
+                },
+                success: function (data) {
+                    myMask.hide();
+                    if (data.responseText == "獲取網頁出現異常！") {
+                        Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
+                    }
+                    else {
+                        row[0].data.template_data_send = data.responseText;
+                        sendFunction(row[0], EdmContentNewStore);
+                    }
+                },
+                failure: function () {
+                    myMask.hide();
                     Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
                 }
-                else {
-                    row[0].data.template_data_send = data.responseText;
-                    sendFunction(row[0], EdmContentNewStore);
-                }
-            },
-            failure: function () {
-                myMask.hide();
-                Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
-            }
-        });
+            });
+        }
+        else {
+            myMask.hide();
+            row[0].data.template_data_send = row[0].data.template_data;
+            sendFunction(row[0], EdmContentNewStore);
+        }
 
     }
 }

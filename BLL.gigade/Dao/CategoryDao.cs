@@ -106,7 +106,7 @@ namespace BLL.gigade.Dao
             StringBuilder strSql = new StringBuilder();
             try
             {
-                strSql.Append("SELECT category_id,category_father_id,category_name,category_sort,category_display,category_show_mode,category_image_in,category_image_out,category_link_mode,category_link_url,banner_image,banner_status,banner_link_mode,banner_link_url,banner_show_end,category_createdate,category_updatedate,category_ipfrom,short_description,`status` FROM product_category WHERE banner_status = 1");
+                strSql.Append("SELECT category_id,category_father_id,category_name,category_sort,category_display,category_show_mode,category_image_in,category_image_out,category_image_app,category_link_mode,category_link_url,banner_image,banner_status,banner_link_mode,banner_link_url,banner_show_end,category_createdate,category_updatedate,category_ipfrom,short_description,`status` FROM product_category WHERE banner_status = 1");
                 return _dbAccess.getDataTableForObj<CategoryQuery>(strSql.ToString());
             }
             catch (Exception ex)
@@ -132,7 +132,7 @@ namespace BLL.gigade.Dao
                 strSelect.AppendFormat(" pc1.category_link_mode,pc1.category_link_url,pc1.banner_image,pc1.banner_status,pc1.banner_link_mode,");
                 strSelect.AppendFormat("pc1.banner_link_url,FROM_UNIXTIME(pc1.banner_show_start) as startdate,FROM_UNIXTIME(pc1.banner_show_end) as enddate,");
                 strSelect.AppendFormat("pc1.category_createdate,pc1.category_updatedate,pc1.category_ipfrom,pc1.status,pc2.category_name as category_father_name,pc1.short_description ");
-                strSelect.AppendFormat(",pc1.category_image_in,pc1.category_image_out ");
+                strSelect.AppendFormat(",pc1.category_image_in,pc1.category_image_out ,pc1.category_image_app ");
                 strCount.AppendFormat(" select count(pc1.category_id) as search_total ");
                 strCondition.AppendFormat(" from product_category pc1 ");
                 strCondition.AppendFormat(" left join product_category pc2 on pc1.category_father_id=pc2.category_id ");
@@ -181,11 +181,12 @@ namespace BLL.gigade.Dao
                 {
                     strSql.AppendFormat("insert into product_category (category_father_id,category_name,category_sort,category_display,category_link_mode,");
                     strSql.AppendFormat("category_link_url,banner_image,banner_status,banner_link_mode,banner_link_url,banner_show_start,banner_show_end,");
-                    strSql.AppendFormat("category_createdate,category_updatedate,category_ipfrom,short_description,status,category_image_in,category_image_out)values('{0}','{1}',", cq.category_father_id, cq.category_name);
+                    strSql.AppendFormat("category_createdate,category_updatedate,category_ipfrom,short_description,status,category_image_in,category_image_out,category_image_app)");
+                    strSql.AppendFormat(" values('{0}','{1}',", cq.category_father_id, cq.category_name);
                     strSql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',", cq.category_sort, cq.category_display, cq.category_link_mode, cq.category_link_url, cq.banner_image);
                     strSql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',", cq.banner_status, cq.banner_link_mode, cq.banner_link_url, cq.banner_show_start, cq.banner_show_end);
                     strSql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',", cq.category_createdate, cq.category_updatedate, cq.category_ipfrom, cq.short_description, cq.status);
-                    strSql.AppendFormat("'{0}','{1}')", cq.category_image_in, cq.category_image_out);
+                    strSql.AppendFormat("'{0}','{1}','{2}')", cq.category_image_in, cq.category_image_out, cq.category_image_app);
                     return _dbAccess.execCommand(strSql.ToString());
                 }
                 else
@@ -196,7 +197,7 @@ namespace BLL.gigade.Dao
                     strSql.AppendFormat("banner_link_mode='{0}',banner_link_url='{1}',banner_show_start='{2}',", cq.banner_link_mode, cq.banner_link_url, cq.banner_show_start);
                     strSql.AppendFormat("banner_show_end='{0}',category_updatedate='{1}',", cq.banner_show_end, cq.category_updatedate);
                     strSql.AppendFormat("short_description='{0}' , ", cq.short_description);
-                    strSql.AppendFormat("category_image_in='{0}' ,category_image_out='{1}', ", cq.category_image_in, cq.category_image_out);
+                    strSql.AppendFormat("category_image_in='{0}' ,category_image_out='{1}', category_image_app='{2}',", cq.category_image_in, cq.category_image_out, cq.category_image_app);
                     strSql.AppendFormat("category_ipfrom='{0}' where category_id='{1}'", cq.category_ipfrom, cq.category_id);
                     return _dbAccess.execCommand(strSql.ToString());
                 }
@@ -219,7 +220,7 @@ namespace BLL.gigade.Dao
             StringBuilder strSql = new StringBuilder();
             try
             {
-                strSql.AppendFormat("select category_id,category_father_id,category_name,category_sort,category_display,category_link_mode,category_link_url,banner_image,banner_status,banner_link_mode,banner_link_url,banner_show_start,banner_show_end,category_createdate,category_updatedate,category_ipfrom,short_description,status,category_image_in,category_image_out from product_category where category_id='{0}'", cq.category_id);
+                strSql.AppendFormat("select category_id,category_father_id,category_name,category_sort,category_display,category_link_mode,category_link_url,banner_image,banner_status,banner_link_mode,banner_link_url,banner_show_start,banner_show_end,category_createdate,category_updatedate,category_ipfrom,short_description,status,category_image_in,category_image_out,category_image_app from product_category where category_id='{0}'", cq.category_id);
                 return _dbAccess.getSinggleObj<CategoryQuery>(strSql.ToString());
             }
             catch (Exception ex)

@@ -200,6 +200,30 @@ namespace BLL.gigade.Mgr
             }
         }
 
+        public string GetTestSendList()
+        {
+            string test_send_data = string.Empty;
+            try
+            {
+                DataTable _dt = _emailGroupDao.GetTestSendList();
+                if (_dt != null && _dt.Rows.Count > 0)
+                {
+                    for (int i = 0; i < _dt.Rows.Count; i++)
+                    {
+                        if (_dt.Rows[i][0] != "" && !Convert.IsDBNull(_dt.Rows[i][0]))
+                        {
+                            test_send_data += _dt.Rows[i][0].ToString() + "\n";
+                        }
+                    }
+                }
+                return test_send_data;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EmailGroupDao-->GetTestSendList-->" + ex.Message, ex);
+            }
+        }
+
 
 
 

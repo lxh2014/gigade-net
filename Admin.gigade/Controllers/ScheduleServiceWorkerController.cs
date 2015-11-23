@@ -8,6 +8,7 @@ using BLL.gigade.Common;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using BLL.gigade.Mgr;
+using BLL.gigade.Mgr.Impl;
 
 namespace Admin.gigade.Controllers
 {
@@ -47,7 +48,7 @@ namespace Admin.gigade.Controllers
 
         #endregion
 
-        #region 寄信排成
+        #region 寄信排程
         public bool SendEMail()
         {
             string json = string.Empty;
@@ -160,6 +161,80 @@ namespace Admin.gigade.Controllers
             }
             return true;
         }
+        #endregion
+
+        #region 期望到貨日調整記錄通知排程 add by zhaozhi0623j 20151118PM
+
+        public bool DeliveryChangeLogSendMailSchedule()
+        {
+            bool result = false;     
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {            
+                IDeliverChangeLogImplMgr dclMgr = new DeliverChangeLogMgr(mySqlConnectionString);
+                result = dclMgr.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                //throw new Exception("ScheduleServiceWorkerController-->DeliveryChangeLogSendMailSchedule-->" + ex.Message, ex);
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return result;
+        }
+        #endregion
+
+        #region 用戶登陸日誌排程
+        public bool UserLoginLog()
+        {
+            bool result = false;
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+                BLL.gigade.Mgr.Schedules.UserLoginLogMgr UserLoginLog = new BLL.gigade.Mgr.Schedules.UserLoginLogMgr(mySqlConnectionString);
+                result = UserLoginLog.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return result;
+        } 
+        #endregion
+
+        #region 設置config文件排程
+        public bool setconfigxml()
+        {
+            bool result = false;
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+                SetConfigXmlMgr setconfigxml = new SetConfigXmlMgr(mySqlConnectionString);
+                result = setconfigxml.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return result;
+        } 
         #endregion
     }
 }

@@ -122,6 +122,7 @@ namespace BLL.gigade.Mgr
             }
         }
 
+        #region 測試發送與正式發送
         public string MailAndRequest(EdmSendLog eslQuery, MailRequest MRquery)
         {
             eslQuery.Replace4MySQL();
@@ -567,6 +568,7 @@ namespace BLL.gigade.Mgr
                 throw new Exception("EdmContentNewMgr-->MailAndRequest-->" + ex.Message, ex);
             }
         }
+        #endregion
 
         public int GetSendMailSCount(int content_id,int log_id)
         {
@@ -754,6 +756,25 @@ namespace BLL.gigade.Mgr
             }
         }
 
+
+        public string GetContentUrl(int template_id)
+        {
+            string url = string.Empty;
+            try
+            {
+                DataTable _dt = _edmContentNewDao.GetContentUrl(template_id);
+                if (_dt.Rows.Count > 0 && _dt != null)
+                {
+                    url = _dt.Rows[0][0].ToString();
+                }
+                return url;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetContentUrl-->" + ex.Message, ex);
+            }
+        }
+
         public string GetHtml(EdmContentNew query)
         {
             string htmlStr = string.Empty;
@@ -789,5 +810,17 @@ namespace BLL.gigade.Mgr
             }
         }
         #endregion
+
+        public DataTable GetParaStore(string paraType)
+        {
+            try
+            {
+                return _edmContentNewDao.GetParaStore(paraType);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetParaStore-->" + ex.Message, ex);
+            }
+        }
     }
 }

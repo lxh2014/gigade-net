@@ -3925,9 +3925,9 @@ namespace Admin.gigade.Controllers
                     {
                         dr[14] = 0;
                     }
-                    if (!string.IsNullOrEmpty(dr_v["od.single_money*buy_num"].ToString()))
+                    if (!string.IsNullOrEmpty(dr_v["single_money*buy_num"].ToString()))
                     {
-                        dr[15] = Convert.ToInt32(dr_v["od.single_money*buy_num"].ToString()) - Convert.ToInt32(dr[13]) - Convert.ToInt32(dr[14]);
+                        dr[15] = Convert.ToInt32(dr_v["single_money*buy_num"].ToString()) - Convert.ToInt32(dr[13]) - Convert.ToInt32(dr[14]);
                     }
                     else
                     {
@@ -3949,9 +3949,9 @@ namespace Admin.gigade.Controllers
                     {
                         dr[17] = 0;
                     }
-                    if (!string.IsNullOrEmpty(dr_v["od.single_cost*od.buy_num"].ToString()))
+                    if (!string.IsNullOrEmpty(dr_v["single_cost*od.buy_num"].ToString()))
                     {
-                        dr[18] = Convert.ToInt32(dr_v["od.single_cost*od.buy_num"].ToString());
+                        dr[18] = Convert.ToInt32(dr_v["single_cost*od.buy_num"].ToString());
                     }
                     else
                     {
@@ -3996,7 +3996,6 @@ namespace Admin.gigade.Controllers
             return this.Response;
         } 
         #endregion
-
         #region 類別訂單明細匯出
         public HttpResponseBase CategoryDetialExport()
         {
