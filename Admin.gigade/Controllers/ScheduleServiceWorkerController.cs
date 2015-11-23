@@ -167,7 +167,7 @@ namespace Admin.gigade.Controllers
 
         public bool DeliveryChangeLogSendMailSchedule()
         {
-                    
+            bool result = false;     
             if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
             {
                 return false;
@@ -175,7 +175,7 @@ namespace Admin.gigade.Controllers
             try
             {            
                 IDeliverChangeLogImplMgr dclMgr = new DeliverChangeLogMgr(mySqlConnectionString);
-                dclMgr.Start(Request.Params["schedule_code"]);
+                result = dclMgr.Start(Request.Params["schedule_code"]);
             }
             catch (Exception ex)
             {
@@ -185,9 +185,10 @@ namespace Admin.gigade.Controllers
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
             }
-            return true;
+            return result;
         }
         #endregion
+
         #region 用戶登陸日誌排程
         public bool UserLoginLog()
         {
