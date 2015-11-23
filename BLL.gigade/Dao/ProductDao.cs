@@ -1858,7 +1858,7 @@ WHERE   ((order_payment=8 and money_collect_date=0) or money_collect_date<>0)) a
                             strCondition.Append(" and p.shortage=1");//2.補貨中停止販售
                             break;
                         case 3:
-                            strCondition.Append(" and p.combination=1 and p.product_id in (select distinct product_id from product_item pi where item_stock <1 and pi.product_id=a.product_id)");//3.庫存數<1
+                            strCondition.Append(" and p.combination=1 and p.product_id in (select distinct product_id from product_item pi where item_stock <1 and pi.product_id=p.product_id)");//3.庫存數<1 edit by wwei0216w 不存在a.product_id 改為p.product_id 2015/11/18
                             break;
                         default:
                             throw new Exception("unaccepted StockStatus");
