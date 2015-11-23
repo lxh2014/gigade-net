@@ -264,7 +264,7 @@ var center = Ext.create('Ext.form.Panel', {
                 {
                     xtype: 'container',
                     autoScroll: true,
-                    defaults: { margin: '0 5 5 10', labelWidth: 60, autoScroll: true, width: 1210 },
+                    defaults: { margin: '0 5 5 10', labelWidth: 60, autoScroll: true, width: 1100 },
                     items: [
                           {
                               id: 'schedule_code',
@@ -285,7 +285,7 @@ var center = Ext.create('Ext.form.Panel', {
                               id: 'detailist1',
                               autoScroll: true,
                               columnLines: true,
-                              height: 330,
+                              height: 350,
                               frame: false,
                               //Height: 550,
                               store: Schedule_Config_Store,
@@ -307,6 +307,20 @@ var center = Ext.create('Ext.form.Panel', {
             { xtype: 'button', text: "刪除", id: 'delete_config', disabled: true, iconCls: 'icon-user-remove', hidden: true, handler: ondelete_config },
 
                               ],
+                              listeners: {
+                                  show: function (scroller)
+                                  {
+                                      if (scroller && scroller.scrollEl)
+                                      {
+                                          scroller.clearManagedListeners();
+                                          scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
+                                      }
+                                  },
+                                  resize: function ()
+                                  {
+                                      this.doLayout();
+                                  }
+                              },
                               selModel: sm_config
                           },
 
@@ -317,7 +331,7 @@ var center = Ext.create('Ext.form.Panel', {
                             id: 'detailist2',
                             autoScroll: true,
                             columnLines: true,
-                            height: document.documentElement.clientHeight - 400,
+                            height: document.documentElement.clientHeight - 420,
                             frame: false,
                             store: Schedule_Period_Store,
                             columns: [

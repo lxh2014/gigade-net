@@ -68,8 +68,19 @@ Ext.onReady(function () {
         columns: [
             new Ext.grid.RowNumberer(),//自動顯示行號
             { header: "編號", dataIndex: "group_id", align: 'center' },
-            { header: "群組名稱", dataIndex: "group_name", width: 300, align: 'center' },
-            { header: "會員電子報", dataIndex: "is_member_edm_string", width: 200, align: 'center' },
+            { header: "類型名稱", dataIndex: "group_name", width: 300, align: 'center' },
+            {
+                header: "會員電子報", dataIndex: "is_member_edm", width: 200, align: 'center',
+                renderer: function (value) {
+                    if (value == 1) {
+                        return "是";
+                    }
+                    else {
+                        return "否";
+                    }
+                }
+
+            },
             {
                 header: "試閱", dataIndex: "trial_url", align: 'center', width: 150,
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
@@ -198,28 +209,70 @@ function Query(x) {
 /*********************啟用/禁用**********************/
 function UpdateActive(id) {
     var activeValue = $("#img" + id).attr("hidValue");
-    $.ajax({
-        url: "/EdmNew/UpdateStats",
-        data: {
-            "id": id,
-            "active": activeValue
-        },
-        type: "post",
-        type: 'text',
-        success: function (msg) {
-            EdmGroupNewStore.load();
-            if (activeValue == 1) {
-                $("#img" + id).attr("hidValue", 0);
-                $("#img" + id).attr("src", "../../../Content/img/icons/drop-no.gif");
-            } else {
-                $("#img" + id).attr("hidValue", 1);
-                $("#img" + id).attr("src", "../../../Content/img/icons/accept.gif");
+    if (activeValue == 1) {
+        Ext.MessageBox.confirm("提示信息", "是否禁用數據", function (btn) {
+            if (btn == "yes") {
+                $.ajax({
+                    url: "/EdmNew/UpdateStats",
+                    data: {
+                        "id": id,
+                        "active": activeValue
+                    },
+                    type: "post",
+                    type: 'text',
+                    success: function (msg) {
+                        EdmGroupNewStore.load();
+                        if (activeValue == 1) {
+                            $("#img" + id).attr("hidValue", 0);
+                            $("#img" + id).attr("src", "../../../Content/img/icons/drop-no.gif");
+                        } else {
+                            $("#img" + id).attr("hidValue", 1);
+                            $("#img" + id).attr("src", "../../../Content/img/icons/accept.gif");
+                        }
+                    },
+                    error: function (msg) {
+                        Ext.Msg.alert(INFORMATION, FAILURE);
+                    }
+                });
             }
-        },
-        error: function (msg) {
-            Ext.Msg.alert(INFORMATION, FAILURE);
-        }
-    });
+            else {
+                return false;
+            }
+        });
+    }
+    else {
+        Ext.MessageBox.confirm("提示信息", "是否啟用數據", function (btn) {
+            if (btn == "yes") {
+                {
+                    $.ajax({
+                        url: "/EdmNew/UpdateStats",
+                        data: {
+                            "id": id,
+                            "active": activeValue
+                        },
+                        type: "post",
+                        type: 'text',
+                        success: function (msg) {
+                            EdmGroupNewStore.load();
+                            if (activeValue == 1) {
+                                $("#img" + id).attr("hidValue", 0);
+                                $("#img" + id).attr("src", "../../../Content/img/icons/drop-no.gif");
+                            } else {
+                                $("#img" + id).attr("hidValue", 1);
+                                $("#img" + id).attr("src", "../../../Content/img/icons/accept.gif");
+                            }
+                        },
+                        error: function (msg) {
+                            Ext.Msg.alert(INFORMATION, FAILURE);
+                        }
+                    });
+                }
+            }
+            else {
+                return false;
+            }
+        });
+    }
 }
 
 /*******************添加信息*****************************************/

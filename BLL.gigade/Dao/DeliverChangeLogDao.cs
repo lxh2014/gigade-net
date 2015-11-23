@@ -133,5 +133,50 @@ namespace BLL.gigade.Dao
                 throw new Exception("DeliverChangeLogDao-->GetDeliverChangeLogList-->" + ex.Message + sbSql.ToString(), ex);
             }
         }
+
+        public DataTable GetDeliverChangeLogDataTable(DeliverChangeLogQuery Query)
+        {
+            StringBuilder sbSql = new StringBuilder();            
+            Query.Replace4MySQL();
+            try
+            {
+                //sbSql.AppendFormat("select dm.order_id,dcl.deliver_id,dcl_create_type, u.user_name as dcl_create_username,mu.user_username as dcl_create_musername ,
+                //                            dcl.dcl_create_datetime,'' as ori_expect_arrive_date,dcl.expect_arrive_date,dcl.expect_arrive_period,dcl.dcl_note,dcl.dcl_ipfrom
+                sbSql.AppendFormat(@"select dm.order_id,dcl.deliver_id,dcl_create_type, u.user_name as dcl_create_username,mu.user_username as dcl_create_musername ,
+                                            dcl.dcl_create_datetime,dcl.expect_arrive_date,dcl.expect_arrive_period,dcl.dcl_note,dcl.dcl_ipfrom
+from delivery_change_log dcl
+LEFT JOIN deliver_master dm on dm.deliver_id=dcl.deliver_id 
+LEFT JOIN users u on u.user_id=dcl.dcl_create_user 
+LEFT JOIN manage_user mu on mu.user_id=dcl.dcl_create_muser where 1=1");
+                sbSql.AppendFormat(" and dcl.dcl_create_datetime between '{0}' and '{1}'", Query.time_start.ToString("yyyy-MM-dd HH:mm:ss"), Query.time_end.ToString("yyyy-MM-dd HH:mm:ss"));
+                sbSql.Append(" order by dcl_create_datetime desc");
+                System.Data.DataTable dt=_access.getDataTable(sbSql.ToString());
+                return dt;
+            
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("DeliverChangeLog-->GetDeliverChangeLogDataTable-->" + ex.Message + sbSql.ToString(), ex);
+            }
+        }
+        public DataTable GetExpectArriveDateByCreatetime(DeliverChangeLogQuery Query)
+        {
+            StringBuilder sbSql = new StringBuilder();
+            Query.Replace4MySQL();
+            try
+            {
+                sbSql.Append(@"select expect_arrive_date from delivery_change_log where 1=1");
+                sbSql.AppendFormat(" and deliver_id = '{0}'", Query.deliver_id);
+                sbSql.AppendFormat(" and dcl_create_datetime <= '{0}' ",Query.time_end.ToString("yyyy-MM-dd HH:mm:ss"));
+                sbSql.Append(" order by dcl_create_datetime desc");
+                System.Data.DataTable dt = _access.getDataTable(sbSql.ToString());
+                return dt;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("DeliverChangeLog-->GetExpectArriveDateByCreatetime-->" + ex.Message + sbSql.ToString(), ex);
+            }
+        }
     }
 }

@@ -1399,26 +1399,13 @@ us.user_username as user_name from iinvd ii ");
                 throw new Exception("IupcDao-->GetPlasIinvd-->" + ex.Message + sql.ToString(), ex);
             }
         }
- #region 料位循環盤點 add by yafeng0715j201511041535
-
+        #region 料位循環盤點 add by yafeng0715j201511041535
         public List<IinvdQuery> GetIinvdList(string loc_id)
         {
             StringBuilder sql = new StringBuilder();
             StringBuilder sbwhere = new StringBuilder();
             try
             {
-                //string sqlpwy_dte_ctl= string.Format("SELECT pwy_dte_ctl FROM iinvd i INNER JOIN product_ext pe ON i.item_id=pe.item_id  WHERE plas_loc_id='{0}'", loc_id);
-                //DataTable table = _access.getDataTable(sqlpwy_dte_ctl);
-                //string pwy_dte_ctl = "";
-                //if(table.Rows.Count>0)
-                //{
-                //     pwy_dte_ctl = table.Rows[0][0].ToString();
-                //}
-                //string prod_qty = "prod_qty";
-                //if (pwy_dte_ctl == "N")
-                //{
-                //    prod_qty = "sum(prod_qty)as prod_qtys";
-                //}
                 sql.AppendFormat("SELECT pi.item_id, p.product_name,CONCAT(ps1.spec_name,'-',ps2.spec_name)AS spec, made_date,cde_dt,prod_qty,pe.pwy_dte_ctl,i.row_id  FROM iinvd i ");
                 sql.Append(" INNER  JOIN product_item pi ON i.item_id=pi.item_id");
                 sql.Append(" INNER JOIN product p ON p.product_id =pi.product_id");
@@ -1473,39 +1460,54 @@ us.user_username as user_name from iinvd ii ");
             {
                 if (query.pwy_dte_ctl == "N")
                 {
-                    sql.AppendFormat("SELECT row_id,prod_qty  FROM iinvd WHERE plas_loc_id='{0}' AND ista_id='A' and prod_qty>0 ORDER BY made_date;", query.plas_loc_id);
-                    DataTable table = _access.getDataTable(sql.ToString());
-                    string row_id = "";
-                    string row_idend = "";
-                    int row_id_end_prod_pty=0;
-                    int prod_qty = query.prod_qtys - query.prod_qty;
-                    for (int i = 0; i < table.Rows.Count; i++)
+                    if (query.row_id != 0)
                     {
-
-                        if ((int)table.Rows[i][1] < prod_qty)
+                        sql.Append("update iinvd set prod_qty=" + query.prod_qty + ",change_user=" + query.change_user + ",change_dtim='" + CommonFunction.DateTimeToString(query.change_dtim) + "' where row_id =" + query.row_id);
+                        return  _access.execCommand(sql.ToString());
+                    }
+                    else
+                    {
+                        sql.AppendFormat("SELECT row_id,prod_qty  FROM iinvd WHERE plas_loc_id='{0}' AND ista_id='A' ORDER BY made_date;", query.plas_loc_id);
+                        DataTable table = _access.getDataTable(sql.ToString());
+                        string row_id = "";
+                        string row_idend = "";
+                        int row_id_end_prod_pty = 0;
+                        int prod_qty = query.prod_qtys - query.prod_qty;
+                        int i = 0; 
+                        for (i = 0; i < table.Rows.Count; i++)
                         {
-                            row_id += table.Rows[i][0] + ",";
-                            prod_qty = prod_qty - (int)table.Rows[i][1];
+                            if ((int)table.Rows[i][1] <= prod_qty || (int)table.Rows[i][1] == 0)
+                            {
+                                row_id += table.Rows[i][0] + ",";
+                                prod_qty = prod_qty - (int)table.Rows[i][1];
+                            }
+                            else
+                            {
+                                row_idend = table.Rows[i][0].ToString();
+                                row_id_end_prod_pty = prod_qty;
+                                break;
+                            }
                         }
-                        else {
-                            row_idend = table.Rows[i][0].ToString();
-                            row_id_end_prod_pty = prod_qty;
-                            break;
+                        if (row_id != "")
+                        {
+                            _access.execCommand("DELETE FROM iinvd WHERE row_id IN(" + row_id.TrimEnd(',') + ")");
                         }
+                        if(i!=table.Rows.Count){
+                            return _access.execCommand("update iinvd set prod_qty=prod_qty-" + row_id_end_prod_pty + ",change_user=" + query.change_user + ",change_dtim='" + CommonFunction.DateTimeToString(query.change_dtim) + "' where row_id =" + row_idend);
+                        } 
                     }
-                    if(row_id!="")
-                    {
-                        _access.execCommand("update iinvd set prod_qty=0,change_user="+query.change_user+",change_dtim='"+CommonFunction.DateTimeToString(query.change_dtim)+"' where row_id in (" + row_id.TrimEnd(',') + ")");
-                    }
-                    string sql1 = "update iinvd set prod_qty=prod_qty-" + row_id_end_prod_pty + ",change_user=" + query.change_user + ",change_dtim='" + CommonFunction.DateTimeToString(query.change_dtim) + "' where row_id =" + row_idend;
-                    _access.execCommand("update iinvd set prod_qty=prod_qty-" + row_id_end_prod_pty + ",change_user="+query.change_user+",change_dtim='"+CommonFunction.DateTimeToString(query.change_dtim)+"' where row_id =" + row_idend);
-                    return 1;
                 }
                 else
                 {
                     if (query.row_id != 0)
                     {
-                        sql.AppendFormat("UPDATE iinvd  SET prod_qty={0},change_user={2},change_dtim='{3}' WHERE row_id={1};", query.prod_qty, query.row_id, query.change_user, CommonFunction.DateTimeToString(query.change_dtim));
+                        if (query.prod_qty == 0)
+                        {
+                            sql.AppendFormat("DELETE FROM iinvd WHERE row_id={0};", query.row_id);
+                        }
+                        else {
+                            sql.AppendFormat("UPDATE iinvd  SET prod_qty={0},change_user={2},change_dtim='{3}' WHERE row_id={1};", query.prod_qty, query.row_id, query.change_user, CommonFunction.DateTimeToString(query.change_dtim));
+                        }  
                     }
                     else
                     {
