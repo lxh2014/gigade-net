@@ -50,6 +50,7 @@ var DateAllQueryStore = Ext.create('Ext.data.Store', {
     { "txt": '銀行入賬日期', "value": "1" },
     { "txt": '退貨入賬日期', "value": "4" },
     { "txt": '開立發票日期', "value": "2" },
+    { "txt": '手開發票日期', "value": "5" },
     { "txt": '訂單日期', "value": "3" }
 
     ]
@@ -172,7 +173,7 @@ Ext.onReady(function () {
             xtype: 'panel',
             bodyStyle: "padding:5px;background:#87CEEB",
             border: false,
-            html: "注意事項：<br/>1.檔案為.xls<br/>2.欄位：付款單號、銀行入帳日期、入賬金額、手續費、退貨入帳日期、退貨入賬金額、退貨入帳手續費、備註。<br/>3.當檔案中存在異常時,將不會處理異常數據,且其它數據會繼續匯入.<br/>4.<a href='javascript:void(0);' onclick='ShowMuBan()'>點擊下載匯入模板</a>"
+            html: "注意事項：<br/>1.檔案為.xls<br/>2.欄位：付款單號、銀行入帳日期、入賬金額、手續費、退貨入帳日期、退貨入賬金額、退貨入帳手續費、手開發票日期、手開發票銷售額、手開發票稅額、備註。<br/>3.當檔案中存在異常時,將不會處理異常數據,且其它數據會繼續匯入.<br/>4.<a href='javascript:void(0);' onclick='ShowMuBan()'>點擊下載匯入模板</a>"
         },
         {
             xtype: 'filefield',
@@ -232,7 +233,7 @@ Ext.onReady(function () {
             xtype: 'panel',
             bodyStyle: "padding:5px;background:#87CEEB",
             border: false,
-            html: "注意事項：<br/>查詢條件：銀行入賬日期、退貨入賬日期、開立發票日期，訂單日期，只能選其一查詢；若不選擇日期條件，請輸入訂單編號查詢。"
+            html: "注意事項：<br/>查詢條件：銀行入賬日期、退貨入賬日期、開立發票日期、手開發票日期、訂單日期，只能選其一查詢；若不選擇日期條件，請輸入訂單編號查詢。"
         },
         {
             xtype: 'fieldcontainer',
