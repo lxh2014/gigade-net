@@ -107,7 +107,7 @@ editFunction = function (row, store) {
             displayField: 'parameterName',
             valueField: 'ParameterCode',
             allowBlank: false,
-            emptyText: "请选择條碼类型",
+            emptyText: "請選擇條碼類型",
         }
         ],
         buttons: [{
