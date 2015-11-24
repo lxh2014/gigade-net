@@ -15,5 +15,6 @@ namespace BLL.gigade.Dao.Impl
        List<ArrivalNoticeQuery> ShowArrByUserList(ArrivalNoticeQuery query, out int totalCount);
        int SaveArrivaleNotice(ArrivalNotice query);
        int UpArrivaleNoticeStatus(ArrivalNotice query);
+       Dictionary<int, int> GetNoticeGoods(ArrivalNotice query);
     }
 }

@@ -9,6 +9,8 @@ namespace BLL.gigade.Model.Custom
     {
         public String Id { get; set; }
 
+        public String PId { get; set; }
+
         public String Name { get; set; }
 
         public Int32 Depth { get; set; }
@@ -16,6 +18,7 @@ namespace BLL.gigade.Model.Custom
         public CategoryItem()
         {
             Id = string.Empty;
+            PId = string.Empty;
             Name = string.Empty;
             Depth = 0;
         }

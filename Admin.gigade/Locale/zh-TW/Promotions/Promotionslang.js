@@ -118,7 +118,7 @@ DEL = "移除";
 PRICE = "價格";
 WEBSITESET = "web site 設定";
 PRODTIP = "該商品編號不符合要求！請重新填寫！";
-VENDORCOVERAGE = "廠商回饋(‰)";
+VENDORCOVERAGE = "廠商回饋(‱)";
 
 END = "結束時間";
 START = "開始時間";

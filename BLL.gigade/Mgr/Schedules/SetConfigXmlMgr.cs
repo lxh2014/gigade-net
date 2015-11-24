@@ -44,7 +44,8 @@ namespace BLL.gigade.Mgr.Schedules
                 string EmptyFilesPrompt = string.Empty;
                 string ExistFilesPrompt = string.Empty;
                 string NotExistDirectory = string.Empty;
-                string NotExistFtpDirectory = string.Empty;
+                //string NotExistFtpDirectory = string.Empty;
+                int isEmpty = -1;
 
                 List<ScheduleConfigQuery> store_config = new List<ScheduleConfigQuery>();
                 ScheduleConfigQuery query_config = new ScheduleConfigQuery();
@@ -106,10 +107,10 @@ namespace BLL.gigade.Mgr.Schedules
                     {
                         NotExistDirectory = item.value.Trim();
                     }
-                    else if (item.parameterCode.Equals("NotExistFtpDirectory"))
-                    {
-                        NotExistFtpDirectory = item.value.Trim();
-                    }
+                    //else if (item.parameterCode.Equals("NotExistFtpDirectory"))
+                    //{
+                    //    NotExistFtpDirectory = item.value.Trim();
+                    //}
                 }
                 string mailBody = string.Empty;
                 #region  統計目錄內容
@@ -125,40 +126,60 @@ namespace BLL.gigade.Mgr.Schedules
                     {
                         if (string.IsNullOrEmpty(ftpuser) || string.IsNullOrEmpty(ftppassword))
                         {
-                            mailBody += "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + "需要的FTP賬號或密碼沒有設定！" + "</h3>";
+                            //mailBody += "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + "需要的FTP賬號或密碼沒有設定！" + "</h3>";
+                            mailBody += "<br>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + " " + "需要的FTP賬號或密碼沒有設定！" + "<br>";
                         }
                         else
                         {
-                            mailBody += GetFtpContent(filepaths[i].Trim(), ftpuser, ftppassword, i, EmptyFilesPrompt, ExistFilesPrompt, NotExistFtpDirectory);
+                            mailBody += GetFtpContent(filepaths[i].Trim(), ftpuser, ftppassword, i, EmptyFilesPrompt, ExistFilesPrompt, NotExistDirectory, out isEmpty);
                         }
 
                     }
                     //判斷路徑是否正確
                     else if (!Directory.Exists(filepaths[i]))
                     {
-                        mailBody += "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + NotExistDirectory + "</h3>";
+                        //mailBody += "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + NotExistDirectory + "</h3>";
+                        mailBody += "<br>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + " " + NotExistDirectory + "<br>";
+                        isEmpty = -1;
                     }
                     //判斷路徑下是否有文件
                     else if (Directory.GetFiles(filepaths[i]).Length == 0)
                     {
-                        mailBody += "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + EmptyFilesPrompt + "</h3>";
+                        //mailBody += "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + EmptyFilesPrompt + "</h3>";
+                        mailBody += "<br>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + " " + EmptyFilesPrompt + "<br>";
+                        isEmpty = 1;
                     }
                     else if (Directory.GetFiles(filepaths[i]).Length > 0)
                     {
-                        string Content = "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + ExistFilesPrompt + "</h3>";
+                        //string Content = "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + ExistFilesPrompt + "</h3>";
+                        string Content = "<br>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + " " + ExistFilesPrompt + "<br>";
                         string[] files = Directory.GetFiles(filepaths[i]);
                         for (int j = 0; j < files.Length; j++)
                         {
                             FileInfo info = new FileInfo(files[j]);
                             files[j] = info.Name;
-                            Content += "<h5>" + "(" + (j + 1).ToString() + ")" + files[j] + "</h5>";
+                            //Content += "<h5>" + "(" + (j + 1).ToString() + ")" + files[j] + "</h5>";
+                            Content += "(" + (j + 1).ToString() + ")" + files[j] + "<br>";
                         }
                         mailBody += Content;
+                        isEmpty = 0;
                     }
                 }
                 #endregion
-                MailHelper mail = new MailHelper(mailModel);
-                mail.SendToGroup(GroupCode, MailTitle, mailBody, false, false);//發送郵件
+                if (isEmpty == 0 && string.IsNullOrEmpty(ExistFilesPrompt))
+                {
+
+                }
+                else if (isEmpty == 1 && string.IsNullOrEmpty(EmptyFilesPrompt))
+                {
+
+                }
+                else
+                {
+                    MailHelper mail = new MailHelper(mailModel);
+                    mail.SendToGroup(GroupCode, MailTitle, mailBody, false, false);//發送郵件
+                }
+
 
 
             }
@@ -168,30 +189,37 @@ namespace BLL.gigade.Mgr.Schedules
             }
             return true;
         }
-        private string GetFtpContent(string url, string ftpuser, string ftppassword, int i, string EmptyFilesPrompt, string ExistFilesPrompt, string NotExistFtpDirectory)
+        private string GetFtpContent(string url, string ftpuser, string ftppassword, int i, string EmptyFilesPrompt, string ExistFilesPrompt, string NotExistFtpDirectory, out int isEmpty)
         {
             string result = string.Empty;
+            isEmpty = -1;
             try
             {
                 List<string> files = GetFileNameList(url, ftpuser, ftppassword);
 
                 if (files.Count == 0)
                 {
-                    result += "<h3>" + (i + 1).ToString() + "." + "目錄 " + url + EmptyFilesPrompt + "</h3>";
+                    //result += "<h3>" + (i + 1).ToString() + "." + "目錄 " + url + EmptyFilesPrompt + "</h3>";
+                    result += "<br>" + (i + 1).ToString() + "." + "目錄 " + url + " " + EmptyFilesPrompt + "<br>";
+                    isEmpty = 1;
                 }
                 else if (files.Count > 0)
                 {
-                    result += "<h3>" + (i + 1).ToString() + "." + "目錄 " + url + ExistFilesPrompt + "</h3>";
+                    //result += "<h3>" + (i + 1).ToString() + "." + "目錄 " + url + ExistFilesPrompt + "</h3>";
+                    result += "<br>" + (i + 1).ToString() + "." + "目錄 " + url + " " + ExistFilesPrompt + "<br>";
                     for (int j = 0; j < files.Count; j++)
                     {
-                        result += "<h5>" + "(" + (j + 1).ToString() + ")" + files[j] + "</h5>";
+                        //result += "<h5>" + "(" + (j + 1).ToString() + ")" + files[j] + "</h5>";
+                        result += "(" + (j + 1).ToString() + ")" + files[j] + "<br>";
                     }
-                    
+                    isEmpty = 0;
+
                 }
             }
-            catch (Exception )
+            catch (Exception)
             {
-                result += "<h3>" + (i + 1).ToString() + "." + "目錄 " + url + NotExistFtpDirectory + "</h3>";
+                //result += "<h3>" + (i + 1).ToString() + "." + "目錄 " + url + NotExistFtpDirectory + "</h3>";
+                result += "<br>" + (i + 1).ToString() + "." + "目錄 " + url + " " + NotExistFtpDirectory + "<br>";
             }
             return result;
         }
@@ -204,7 +232,8 @@ namespace BLL.gigade.Mgr.Schedules
             ftpRequest.KeepAlive = false;
             ftpRequest.UsePassive = false;
             ftpRequest.UseBinary = true;
-            ftpRequest.Timeout = 3000; // 无效   
+            //ftpRequest.Timeout = 3000; // 无效   
+            //ftpRequest.ReadWriteTimeout = 3000; // 无效   
 
             List<string> result = new List<string>();
             ftpRequest.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
@@ -218,7 +247,7 @@ namespace BLL.gigade.Mgr.Schedules
             //}
             //return result;
             string Datastring = reader.ReadToEnd();
-            List<FileStruct> filesStruct =  GetList(Datastring);
+            List<FileStruct> filesStruct = GetList(Datastring);
             List<string> filesName = new List<string>();
             foreach (FileStruct item in filesStruct)
             {
