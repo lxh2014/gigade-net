@@ -119,9 +119,9 @@ editFunction = function (row, store) {
                 if (form.isValid()) {
                     form.submit({
                         params: {
-                            row_id: Ext.htmlEncode(Ext.getCmp('row_id').getValue()),
-                            item_id: Ext.htmlEncode(Ext.getCmp('item_id').getValue()),
-                            upc_id: Ext.htmlEncode(Ext.getCmp('upc_id').getValue()),
+                            row_id: Ext.htmlEncode(Ext.getCmp('row_id').getValue().trim()),
+                            item_id: Ext.htmlEncode(Ext.getCmp('item_id').getValue().trim()),
+                            upc_id: Ext.htmlEncode(Ext.getCmp('upc_id').getValue().trim()),
                             upc_type_flg: Ext.htmlEncode(Ext.getCmp('upc_type_flg').getValue())
                         },
                         success: function (form, action) {
