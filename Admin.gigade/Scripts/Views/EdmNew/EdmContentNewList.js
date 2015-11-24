@@ -197,6 +197,7 @@ onGoSendClick = function () {
             Ext.Ajax.request({
                 url: '/EdmNew/GetContentUrl',
                 params: {
+                    template_id:row[0].data.template_id,
                     content_url: row[0].data.content_url,
                     template_data: row[0].data.template_data,
                 },

@@ -63,6 +63,7 @@ namespace Admin.gigade.Controllers
             ViewBag.path = ConfigurationManager.AppSettings["webDavImage"];
             ViewBag.BaseAddress = ConfigurationManager.AppSettings["webDavBaseAddress"];
             ViewBag.subscribe = subscribe;
+            ViewBag.subscribe_url = subscribe_url;
             return View();
         }
         //擋信名單
@@ -477,12 +478,12 @@ namespace Admin.gigade.Controllers
                     }
                     //query.pm = Convert.ToInt32(Request.Params["pm"]);
                 }
-                if (!string.IsNullOrEmpty(Request.Params["active"]))
+                if (!string.IsNullOrEmpty(Request.Params["active_dis"]))
                 {
                     int n=0;
-                    if (int.TryParse(Request.Params["active"].ToString(), out n))
+                    if (int.TryParse(Request.Params["active_dis"].ToString(), out n))
                     {
-                        query.active = Convert.ToInt32(Request.Params["active"]);
+                        query.active = Convert.ToInt32(Request.Params["active_dis"]);
                     }
                     else
                     {
@@ -681,6 +682,17 @@ namespace Admin.gigade.Controllers
                     contentJson = sr.ReadToEnd();
                     #endregion
                 }
+                else
+                {
+                    int template_id = Convert.ToInt32(Request.Params["template_id"]);
+                    string url = _edmContentNewMgr.GetContentUrl(template_id);
+                    HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
+                    httpRequest.Timeout = 9000;
+                    httpRequest.Method = "GET";
+                    HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                    StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
+                    contentJson = sr.ReadToEnd();
+                }
                 if (!string.IsNullOrEmpty(Request.Params["template_data"]))
                 {
                     template_data = Request.Params["template_data"];
@@ -753,15 +765,7 @@ namespace Admin.gigade.Controllers
                 {
                     mQuery.subject = Request.Params["subject"];
                 }
-                if (!string.IsNullOrEmpty(Request.Params["body"]))
-                {
-                    mQuery.bodyData = Request.Params["body"];
-                    if (mQuery.bodyData.IndexOf(subscribe) > 0)//找到了埋的那個code，證明是點擊了訂閱電子報
-                    {
-                        mQuery.bodyData = mQuery.bodyData.Replace(subscribe, "\n") + subscribe_url;
-                         
-                    }
-                }
+               
                 eslQuery.create_userid = (Session["caller"] as Caller).user_id;
                 mQuery.user_id = eslQuery.create_userid;
                 if (!string.IsNullOrEmpty(Request.Params["testSend"]))
@@ -791,6 +795,14 @@ namespace Admin.gigade.Controllers
                                     nameList.Add(test_send_arr[i]);
                                     mQuery.receiver_address = test_send_arr[i];
                                     eslQuery.receiver_count = test_send_arr.Length;
+                                    if (!string.IsNullOrEmpty(Request.Params["body"]))
+                                    {
+                                        mQuery.bodyData = Request.Params["body"];
+                                        if (mQuery.bodyData.IndexOf(subscribe) > 0)//找到了埋的那個code，證明是點擊了訂閱電子報
+                                        {
+                                            mQuery.bodyData = mQuery.bodyData.Replace(subscribe, "\n") + subscribe_url;
+                                        }
+                                    }
                                     MailHelper mail = new MailHelper();
                                     mail.SendMailAction(test_send_arr[i], mQuery.subject, mQuery.bodyData + "   ");
                                     json = _edmContentNewMgr.MailAndRequest(eslQuery, mQuery);
@@ -807,6 +819,14 @@ namespace Admin.gigade.Controllers
                     }
                     else//正式發送，寫入排程所用表
                     {
+                        if (!string.IsNullOrEmpty(Request.Params["body"]))
+                        {
+                            mQuery.body = Request.Params["body"];
+                            if (mQuery.body.IndexOf(subscribe) > 0)//找到了埋的那個code，證明是點擊了訂閱電子報
+                            {
+                                mQuery.body = mQuery.body.Replace(subscribe, "\n") + subscribe_url;
+                            }
+                        }
                         eslQuery.test_send_end = false;
                         eslQuery.test_send = 0;
                         //eslQuery.receiver_count=""; 經計算後寫入
