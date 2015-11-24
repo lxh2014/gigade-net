@@ -187,6 +187,7 @@ namespace Admin.gigade.Controllers
                 model.muser = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString();
                 model.modified = DateTime.Now;
                 model.event_type = "P1";
+                model.vendor_coverage = int.Parse(Request.Params["vendor_coverage"]);
                 PPQuery.event_id = CommonFunction.GetEventId(model.event_type, model.id.ToString());
                 PPQuery.category_ipfrom = Request.UserHostAddress;
                 if (!string.IsNullOrEmpty(Request.Params["side"].ToString()))//修改時傳的值為siteName
@@ -475,6 +476,7 @@ namespace Admin.gigade.Controllers
                     model.event_name = Request.Params["event_name"].ToString();
                     model.event_desc = Request.Params["event_desc"].ToString();
                     model.event_type = oldermodel.event_type;
+                    model.vendor_coverage = int.Parse(Request.Params["vendor_coverage"]);
                     #region 會員群組 會員條件
                     if (Request.Params["group_id"].ToString() != "")
                     {
