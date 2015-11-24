@@ -30,6 +30,7 @@ namespace BLL.gigade.Model
         public int price { get; set; }
         public int discount { get; set; }
         public int status { get; set; }
+        public int vendor_coverage { get; set; }
 
         public PromoPair()
         {
@@ -56,6 +57,7 @@ namespace BLL.gigade.Model
             discount = 0;
             status = 1;
             website = string.Empty;
+            vendor_coverage = 0;
         }
 
     }

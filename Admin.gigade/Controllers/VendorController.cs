@@ -222,11 +222,13 @@ namespace Admin.gigade.Controllers
                     }
                     if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
                     {
-                        query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
+                       // query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
+                        query.create_dateOne = (uint)CommonFunction.GetPHPTime(Request.Params["dateOne"]);
                     }
                     if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
                     {
-                        query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
+                        //query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
+                        query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Request.Params["dateTwo"]);
                     }
                     stores = _vendorMgr.Query(query, ref totalCount);
                 }
@@ -239,11 +241,13 @@ namespace Admin.gigade.Controllers
                     }
                     if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
                     {
-                        query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
+                        //query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
+                        query.create_dateOne = (uint)CommonFunction.GetPHPTime(Request.Params["dateOne"]);
                     }
                     if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
                     {
-                        query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
+                        //query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
+                        query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Request.Params["dateTwo"]);
                     }
                     stores = _vendorMgr.Query(query, ref totalCount);
                 }
@@ -2368,11 +2372,13 @@ namespace Admin.gigade.Controllers
             string agreementEnd = string.Empty;
             if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
             {
-                agreementStart = Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00");
+               // agreementStart = Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00");
+                agreementStart = CommonFunction.DateTimeToString(Convert.ToDateTime(Request.Params["dateOne"]));
             }
             if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
             {
-                agreementEnd = Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59");
+              //  agreementEnd = Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59");
+                agreementEnd = CommonFunction.DateTimeToString(Convert.ToDateTime(Request.Params["dateTwo"]));
             }
             //匯出不需要查詢狀態
             if (!string.IsNullOrEmpty(content) && !string.IsNullOrEmpty(type) && type != "0")
@@ -2870,12 +2876,12 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["timestart"]))
                 {
                     query.serchstart = Convert.ToDateTime(Request.Params["timestart"]);
-                    query.serchstart = Convert.ToDateTime(query.serchstart.ToString("yyyy-MM-dd 00:00:00"));
+                   // query.serchstart = Convert.ToDateTime(query.serchstart.ToString("yyyy-MM-dd 00:00:00"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["timeend"]))
                 {
                     query.serchend = Convert.ToDateTime(Request.Params["timeend"]);
-                    query.serchend = Convert.ToDateTime(query.serchend.ToString("yyyy-MM-dd 23:59:59"));
+                   // query.serchend = Convert.ToDateTime(query.serchend.ToString("yyyy-MM-dd 23:59:59"));
                 }
                 _Ivendorloginlist = new VendorLoginListMgr(connectionString);
                 int totalCount = 0;
@@ -4948,12 +4954,12 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["date_one"]))
                 {
                     query.date_one = Convert.ToDateTime(Request.Params["date_one"]);
-                    query.date_one = Convert.ToDateTime(query.date_one.ToString("yyyy-MM-dd 00:00:00"));
+                    // query.date_one = Convert.ToDateTime(query.date_one.ToString("yyyy-MM-dd 00:00:00"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["date_two"]))
                 {
                     query.date_two = Convert.ToDateTime(Request.Params["date_two"]);
-                    query.date_two = Convert.ToDateTime(query.date_two.ToString("yyyy-MM-dd 23:59:59"));
+                    //query.date_two = Convert.ToDateTime(query.date_two.ToString("yyyy-MM-dd 23:59:59"));
 
                 }
                 // query.IsPage = false;
@@ -5054,12 +5060,12 @@ namespace Admin.gigade.Controllers
             if (!string.IsNullOrEmpty(Request.Params["date_one"]))
             {
                 query.date_one = Convert.ToDateTime(Request.Params["date_one"]);
-                query.date_one = Convert.ToDateTime(query.date_one.ToString("yyyy-MM-dd 00:00:00"));
+               // query.date_one = Convert.ToDateTime(query.date_one.ToString("yyyy-MM-dd 00:00:00"));
             }
             if (!string.IsNullOrEmpty(Request.Params["date_two"]))
             {
                 query.date_two = Convert.ToDateTime(Request.Params["date_two"]);
-                query.date_two = Convert.ToDateTime(query.date_two.ToString("yyyy-MM-dd 23:59:59"));
+               // query.date_two = Convert.ToDateTime(query.date_two.ToString("yyyy-MM-dd 23:59:59"));
             }
             TableChangeLogMgr _tclMgr = new TableChangeLogMgr(connectionString);
             DataTable dt = _tclMgr.VendorLogExport(query);

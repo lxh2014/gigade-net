@@ -121,19 +121,21 @@ namespace BLL.gigade.Dao
                     {
                         return -1;
                     }
-                    else//如果該工作編號未被蓋帳,並且處於COM狀態
+                    else//如果該工作編號未被蓋帳,並且處於COM狀態//and invd.st_qty <> 0
                     {
                         strsqltwo.AppendFormat(@"SELECT cd.iinvd_id,cd.cb_jobid,invd.item_id,sum(invd.prod_qty) as prod_qty,sum(invd.st_qty) as st_qty FROM cbjob_master cm LEFT JOIN cbjob_detail cd on cd.cb_jobid=cm.cbjob_id
 LEFT JOIN iinvd invd on invd.row_id=cd.iinvd_id 
 WHERE cm.cbjob_id='{0}'
 and invd.st_qty<> invd.prod_qty 
-and cm.status=1 and sta_id= 'COM'and invd.st_qty <> 0 and invd.st_qty <> invd.prod_qty and invd.ista_id='A' and cm.create_datetime>='{1}' and cm.create_datetime<= '{2}' group by invd.item_id;", cbQuery.cb_jobid, cbQuery.StartDate, cbQuery.EndDate);
+and cm.status=1 and sta_id= 'COM' and invd.st_qty <> invd.prod_qty and invd.ista_id='A' and cm.create_datetime>='{1}' and cm.create_datetime<= '{2}' group by invd.item_id;", cbQuery.cb_jobid, cbQuery.StartDate, cbQuery.EndDate);
                         DataTable _dttwo = _accessMySql.getDataTable(strsqltwo.ToString());
                         if (_dttwo.Rows.Count > 0)
                         {
                             for (int i = 0; i < _dttwo.Rows.Count; i++)
                             {
                                 StringBuilder sbstr = new StringBuilder();
+                                sbstr.AppendFormat(" select sum(prod_qty) from iinvd where item_id='{0}' and ista_id='A' ", _dttwo.Rows[i]["item_id"]);
+                                DataTable _tdSt = _accessMySql.getDataTable(sbstr.ToString());
                                 IstockChange Icg = new IstockChange();
                                 Icg.sc_trans_type = 4;
                                 Icg.sc_time = DateTime.Now;
@@ -145,6 +147,8 @@ and cm.status=1 and sta_id= 'COM'and invd.st_qty <> 0 and invd.st_qty <> invd.pr
                                 Icg.sc_num_old = Convert.ToInt32(_dttwo.Rows[i]["prod_qty"]);//總庫存;
                                 Icg.sc_num_new = Convert.ToInt32(_dttwo.Rows[i]["st_qty"]);
                                 Icg.sc_num_chg =  Convert.ToInt32(_dttwo.Rows[i]["st_qty"])-Convert.ToInt32(_dttwo.Rows[i]["prod_qty"]);
+                                Icg.sc_num_old = Convert.ToInt32(_tdSt.Rows[0][0]);
+                                Icg.sc_num_new = Icg.sc_num_old+ Icg.sc_num_chg;
                                 Icg.sc_istock_why = 2;//庫調
                                 iinvdidstr = iinvdidstr + string.Format(@"insert into istock_change(sc_trans_id,sc_cd_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_note,sc_istock_why) Values 
 ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}');",
@@ -181,6 +185,8 @@ WHERE invd.st_qty<> invd.prod_qty
                                    for (int i = 0; i < _dttwo.Rows.Count; i++)
                                    {
                                        StringBuilder sbstr = new StringBuilder();
+                                       sbstr.AppendFormat(" select sum(prod_qty) from iinvd where item_id='{0}' and ista_id='A' ", _dttwo.Rows[i]["item_id"]);
+                                       DataTable _tdSt = _accessMySql.getDataTable(sbstr.ToString());
                                        IstockChange Icg = new IstockChange();
                                        Icg.sc_trans_type = 4;
                                        Icg.sc_time = DateTime.Now;
@@ -192,6 +198,8 @@ WHERE invd.st_qty<> invd.prod_qty
                                        Icg.sc_num_old = Convert.ToInt32(_dttwo.Rows[i]["prod_qty"]);//總庫存;
                                        Icg.sc_num_new = Convert.ToInt32(_dttwo.Rows[i]["st_qty"]);
                                        Icg.sc_num_chg = Convert.ToInt32(_dttwo.Rows[i]["st_qty"]) - Convert.ToInt32(_dttwo.Rows[i]["prod_qty"]);
+                                       Icg.sc_num_old = Convert.ToInt32(_tdSt.Rows[0][0]);
+                                       Icg.sc_num_new = Icg.sc_num_old + Icg.sc_num_chg;
                                        Icg.sc_istock_why = 2;//庫調
                                        iinvdidstr = iinvdidstr + string.Format(@"insert into istock_change(sc_trans_id,sc_cd_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_note,sc_istock_why) Values 
 ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}');",

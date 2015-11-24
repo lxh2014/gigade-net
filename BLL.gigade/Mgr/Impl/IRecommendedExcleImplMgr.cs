@@ -30,6 +30,6 @@ namespace BLL.gigade.Mgr.Impl
         //導出product信息
         StringBuilder GetThisProductInfo(int start_product_id, int end_product_id);
 
-        StringBuilder GetVendorCategoryMsg();
+        DataTable GetVendorCategoryMsg();
     }
 }

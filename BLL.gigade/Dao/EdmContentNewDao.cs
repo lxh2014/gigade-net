@@ -454,6 +454,20 @@ WHERE content_id='{0}'  and log_id='{1}'   AND edm_trace.count>0;", content_id, 
             }
         }
 
+        public DataTable GetContentUrl(int template_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("select content_url  from edm_template where template_id='{0}';", template_id);
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetContentUrl-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
 
         public DataTable GetHtml(EdmContentNew query)
         {

@@ -1871,6 +1871,7 @@
     <Content Include="Scripts\Views\EdmNew\EdmContentNewEdit.js" />
     <Content Include="Scripts\Views\EdmNew\EdmContentNewList.js" />
     <Content Include="Scripts\Views\EdmNew\EdmContentNewReport.js" />
+    <Content Include="Scripts\Views\EdmNew\EdmContentPreview.js" />
     <Content Include="Scripts\Views\EdmNew\EdmSend.js" />
     <Content Include="Scripts\Views\EdmNew\EdmSendListCount.js" />
     <Content Include="Scripts\Views\EdmNew\EdmGroupNewEdit.js" />
@@ -4698,7 +4699,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>58630</DevelopmentServerPort>
+          <DevelopmentServerPort>37011</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

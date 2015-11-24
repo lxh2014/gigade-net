@@ -352,6 +352,7 @@ WHERE category_father_id='{0}' GROUP BY category_id, category_name, depth;", pcb
                     {
                         CategoryItem cm = new CategoryItem();
                         cm.Id = dtVendorMsg.Rows[i]["category_id"].ToString();
+                        cm.PId = pcb.Id;
                         cm.Name = dtVendorMsg.Rows[i]["category_name"].ToString();
                         cm.Depth = Convert.ToInt32(dtVendorMsg.Rows[i]["depth"]) - 1;
                         lscm.Add(cm);
@@ -364,7 +365,8 @@ WHERE category_father_id='{0}' GROUP BY category_id, category_name, depth;", pcb
                     for (int j = 0; j < _dttwo.Rows.Count; j++)
                     {
                         CategoryItem cmtwo = new CategoryItem();
-                        cmtwo.Id = String.Format("{0}-{1}", new Object[] { pcb.Id, Int32.Parse(_dttwo.Rows[j]["brand_id"].ToString()) });
+                        cmtwo.Id = _dttwo.Rows[j]["brand_id"].ToString();
+                        cmtwo.PId = pcb.Id;
                         cmtwo.Name = _dttwo.Rows[j]["brand_name"].ToString();
                         cmtwo.Depth = pcb.Depth + 1;
                         lscm.Add(cmtwo);

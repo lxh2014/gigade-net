@@ -159,7 +159,7 @@ namespace BLL.gigade.Mgr
             try
             {
                 //获取到所有商品的基本的信息
-                DataTable dtProduct = _iRecommendedExcleImplDao.GetThisProductInfo(start_product_id,end_product_id);
+                DataTable dtProduct = _iRecommendedExcleImplDao.GetThisProductInfo(start_product_id, end_product_id);
                 //获取到所有商品和品牌信息
                 DataTable dtBrand = _iRecommendedExcleImplDao.GetAllBrandByProductId();
                 string picPath = ConfigurationManager.AppSettings["imgServerPath"];//获取图片显示的路径
@@ -186,7 +186,7 @@ namespace BLL.gigade.Mgr
                         {
                             tcidstr = row[1].ToString() + "-" + row[2].ToString();
                         }
-                    } 
+                    }
                     #endregion
                     str.AppendLine(@"<cid>" + tcidstr + "</cid>");//類別id
                     str.AppendLine(@"<pubdate>" + dtProduct.Rows[i]["crate_time"] + "</pubdate>");//上架时间   
@@ -221,12 +221,12 @@ namespace BLL.gigade.Mgr
                         strurl = @"<![CDATA[http://" + "www.gigade100.com/newweb" + "/product.php?pid=" + dtProduct.Rows[i]["product_id"] + "&view=" + DateTime.Now.ToString("yyyyMMdd") + "]]>";//商品預覽
                     }
                     str.AppendLine(@"<url>" + strurl + "</url>");
-                    str.AppendLine(@"<imgurl>" + "<![CDATA[" + picPath +"/product/"+ dtProduct.Rows[i]["product_image"] + "]]>" + "</imgurl>");//图片
+                    str.AppendLine(@"<imgurl>" + "<![CDATA[" + picPath + "/product/" + dtProduct.Rows[i]["product_image"] + "]]>" + "</imgurl>");//图片
                     str.AppendLine(@"<adforbid>0</adforbid>");
                     str.AppendLine(@"</item>");
                 }
                 str.AppendLine(@"</feeds>");
-                
+
                 return str;
             }
             catch (Exception ex)
@@ -236,25 +236,15 @@ namespace BLL.gigade.Mgr
         }
         #endregion
 
-        #region 获取到食用品館類別樹含品牌txt文件信息的数据流
-
-        public string ToTxtString(CategoryItem cm)
-        {
-            String strPrefix = "";
-            for (Int32 i = 1; i < cm.Depth; i++)
-            {
-                strPrefix += "\t";
-            }
-            return strPrefix + String.Format("{0}: {1} - {2}", cm.Id, cm.Name, cm.Depth);
-        }
-
-        public StringBuilder GetVendorCategoryMsg()
+        #region 获取到食用品館類別樹含品牌
+        public DataTable GetVendorCategoryMsg()
         {
             StringBuilder str = new StringBuilder();
             List<CategoryItem> lscm = new List<CategoryItem>();
             CategoryItem foodItem = new CategoryItem()//食品館
             {
                 Id = "1162",
+                PId = "0",
                 Name = "食品館",
                 Depth = 1
             };
@@ -267,6 +257,7 @@ namespace BLL.gigade.Mgr
             CategoryItem stuffItem = new CategoryItem()//用品館
                    {
                        Id = "1239",
+                       PId = "0",
                        Name = "用品館",
                        Depth = 1
                    };
@@ -274,11 +265,22 @@ namespace BLL.gigade.Mgr
 
             List<CategoryItem> lsswtwo = _iRecommendedExcleImplDao.GetVendorCategoryMsg(stuffItem, lscm);
 
+            DataTable result = new DataTable();
+            result.Columns.Add("category_name", typeof(String));
+            result.Columns.Add("category_id", typeof(String));
+            result.Columns.Add("parent_id", typeof(String));
+            result.Columns.Add("level", typeof(String));
+
             foreach (var ls in lsswtwo)
             {
-                str.AppendLine(ToTxtString(ls));
+                DataRow drfood = result.NewRow();
+                drfood[0] = ls.Name;
+                drfood[1] = ls.Id;
+                drfood[2] = ls.PId;
+                drfood[3] = ls.Depth;
+                result.Rows.Add(drfood);
             }
-            return str;
+            return result;
         }
 
         #endregion
