@@ -3229,7 +3229,7 @@ namespace Admin.gigade.Controllers
             try
             {
                 query.dateType = Convert.ToInt32(Request.Params["dateType"]);
-                if (Request.Params["dateType"].ToString() == "1" || Request.Params["dateType"].ToString() == "4")
+                if (Request.Params["dateType"].ToString() == "1" || Request.Params["dateType"].ToString() == "4" || Request.Params["dateType"].ToString() == "5")
                 {
                     if (!string.IsNullOrEmpty(Request.Params["orderTimeStart"]))
                     {
@@ -3301,7 +3301,7 @@ namespace Admin.gigade.Controllers
             try
             {
                 query.dateType = Convert.ToInt32(Request.Params["dateType"]);
-                if (Request.Params["dateType"].ToString() == "1" || Request.Params["dateType"].ToString() == "4")
+                if (Request.Params["dateType"].ToString() == "1" || Request.Params["dateType"].ToString() == "4" || Request.Params["dateType"].ToString() == "5")
                 {
                     if (!string.IsNullOrEmpty(Request.Params["orderTimeStart"]))
                     {
@@ -3499,7 +3499,7 @@ namespace Admin.gigade.Controllers
                 dtHZ.Columns.Add("發票金額差異", typeof(String));
                 dtHZ.Columns.Add("備註", typeof(String));
                 query.dateType = Convert.ToInt32(Request.Params["dateType"]);
-                if (Request.Params["dateType"].ToString() == "1" || Request.Params["dateType"].ToString() == "4")
+                if (Request.Params["dateType"].ToString() == "1" || Request.Params["dateType"].ToString() == "4" || Request.Params["dateType"].ToString() == "5")
                 {
                     if (!string.IsNullOrEmpty(Request.Params["orderTimeStart"]))
                     {
