@@ -757,7 +757,7 @@ namespace BLL.gigade.Dao
         }
         public string InsertHGAccRefund(HgDeduct hg_deduct, int accumulated_happygo, uint order_id)
         {
-
+            //要改**********************//
             StringBuilder sql = new StringBuilder();
             try
             {
@@ -1087,7 +1087,7 @@ namespace BLL.gigade.Dao
         public string hg_batch_accumulate_refund(HgBatchAccumulateRefund query)
         {
             StringBuilder sql = new StringBuilder();
-
+            //要改********************maybe//
             try
             {
                 sql.AppendFormat("insert into hg_batch_accumulate_refund(order_id,head,card_no,card_checksum,enc_idno,");
@@ -1114,7 +1114,7 @@ namespace BLL.gigade.Dao
         public string hg_batch_deduct_refund(HgBatchAccumulateRefund query)
         {
             StringBuilder sql = new StringBuilder();
-
+            //要改**////////////////
             try
             {
                 sql.AppendFormat("insert into hg_batch_deduct_refund(order_id,head,card_no,card_checksum,enc_idno,");
