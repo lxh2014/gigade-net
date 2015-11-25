@@ -205,7 +205,7 @@ function editFunction(row, store) {
                  regex: /^[-+]?([1-9]\d*|0)$/,
                  regexText: VENDERTIP,
                  submitValue: true,
-                 labelWidth: 80
+             
 
              },
             {//專區Banner                
@@ -213,7 +213,6 @@ function editFunction(row, store) {
                 name: 'banner_image1',
                 id: 'banner_image1',
                 fieldLabel: BANNERIMG,
-                labelWidth: 80,
                 msgTarget: 'side',
                 allowBlank: false,
                 anchor: '90%',
@@ -711,15 +710,16 @@ function editFunction(row, store) {
                     value: 0,
                     regex: /^[-+]?([1-9]\d*|0)$/,
                     regexText: VENDERTIP,
-                    submitValue: true
-                },
+                    submitValue: true,
+                    
+                }, 
                 {
                     //專區Banner
                     xtype: 'filefield',
                     name: 'banner_image',
                     id: 'banner_image',
                     fieldLabel: '專區Banner',
-                    labelWidth: 60,
+                    labelWidth: 80,
                     msgTarget: 'side',
                     allowBlank: false,
                     anchor: '90%',
