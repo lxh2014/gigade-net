@@ -64,7 +64,7 @@ var IupcTypeStore = Ext.create('Ext.data.Store', {
 IupcStore.on('beforeload', function () {
     Ext.apply(IupcStore.proxy.extraParams,
         {
-            searchcontent: Ext.getCmp('searchcontent').getValue(),
+            searchcontent: Ext.getCmp('searchcontent').getValue().trim(),
             time_start: Ext.getCmp('start_time').getValue(),
             time_end: Ext.getCmp('end_time').getValue()
         });
@@ -92,7 +92,7 @@ function Query(x) {
     }
     Ext.getCmp("gdIupc").store.loadPage(1, {
         params: {
-            searchcontent: Ext.getCmp('searchcontent').getValue(),
+            searchcontent: Ext.getCmp('searchcontent').getValue().trim(),
             time_start: Ext.getCmp('start_time').getValue(),
             time_end: Ext.getCmp('end_time').getValue()
         }

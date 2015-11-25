@@ -1129,6 +1129,17 @@ namespace BLL.gigade.Dao
                         sqlCondition.AppendFormat(" and imr.invoice_date<='{0}' ", query.last_time);
                     }
                 }
+                else if (query.dateType == 5)
+                {
+                    if (query.order_date_pay_startTime != DateTime.MinValue)
+                    {
+                        sqlCondition.AppendFormat(" and oac.invoice_date_manual>='{0}' ", query.order_date_pay_startTime.ToString("yyyy-MM-dd 00:00:00"));
+                    }
+                    if (query.order_date_pay_endTime != DateTime.MinValue)
+                    {
+                        sqlCondition.AppendFormat(" and oac.invoice_date_manual<='{0}' ", query.order_date_pay_endTime.ToString("yyyy-MM-dd 23:59:59"));
+                    }
+                }
                 if (query.show_type == 1)
                 {
                     sqlCondition.AppendFormat(" and oac.row_id!='' ");
@@ -1339,6 +1350,17 @@ namespace BLL.gigade.Dao
                         sqlCondition.AppendFormat(" and imr.invoice_date<='{0}' ", query.last_time);
                     }
                 }
+                else if (query.dateType == 5)
+                {
+                    if (query.order_date_pay_startTime != DateTime.MinValue)
+                    {
+                        sqlCondition.AppendFormat(" and oac.invoice_date_manual>='{0}' ", query.order_date_pay_startTime.ToString("yyyy-MM-dd 00:00:00"));
+                    }
+                    if (query.order_date_pay_endTime != DateTime.MinValue)
+                    {
+                        sqlCondition.AppendFormat(" and oac.invoice_date_manual<='{0}' ", query.order_date_pay_endTime.ToString("yyyy-MM-dd 23:59:59"));
+                    }
+                }
                 if (query.show_type == 1)
                 {
                     sqlCondition.AppendFormat(" and oac.row_id!='' ");
@@ -1437,6 +1459,17 @@ namespace BLL.gigade.Dao
                     if (query.last_time != 0)
                     {
                         sql.AppendFormat(" and imr.invoice_date<='{0}' ", query.last_time);
+                    }
+                }
+                else if (query.dateType == 5)
+                {
+                    if (query.order_date_pay_startTime != DateTime.MinValue)
+                    {
+                        sql.AppendFormat(" and oac.invoice_date_manual>='{0}' ", query.order_date_pay_startTime.ToString("yyyy-MM-dd 00:00:00"));
+                    }
+                    if (query.order_date_pay_endTime != DateTime.MinValue)
+                    {
+                        sql.AppendFormat(" and oac.invoice_date_manual<='{0}' ", query.order_date_pay_endTime.ToString("yyyy-MM-dd 23:59:59"));
                     }
                 }
                 if (query.show_type == 1)
