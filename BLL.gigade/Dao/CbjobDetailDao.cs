@@ -36,7 +36,7 @@ LEFT JOIN product p on p.product_id =pi.product_id
 LEFT JOIN cbjob_master cm on cm.cbjob_id=cd.cb_jobid
 LEFT JOIN manage_user mu on cd.create_user=mu.user_id 
 LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id
-WHERE cd.cb_jobid='{0}'and cd.cb_newid>'{1}' and cd.status=1 ", cbjobQuery.searchcontent, cbjobQuery.cb_newid);
+WHERE cd.cb_jobid='{0}'and cd.cb_newid>'{1}' and idd.ista_id='A' and cd.status=1 ", cbjobQuery.searchcontent, cbjobQuery.cb_newid);
                 if (cbjobQuery.IsPage)
                 {
                     System.Data.DataTable _dt = _access.getDataTable(sql.ToString());

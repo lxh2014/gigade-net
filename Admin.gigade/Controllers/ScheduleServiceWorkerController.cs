@@ -371,7 +371,7 @@ namespace Admin.gigade.Controllers
                 query.category_ID_IN = query.category_ID_IN.TrimEnd(',');
                 DataTable _dt = _productItemMgr.GetSugestDatetable(query);
                 Dictionary<int, int> NoticeGoods = new Dictionary<int, int>();
-                MailHelper mail = new MailHelper();
+                MailHelper mail = new MailHelper(mailModel);
                 arriva.coming_time = query.sumDays;
                 NoticeGoods = _arrivalMgr.GetNoticeGoods(arriva);
                 if (_dt.Rows.Count > 0)
@@ -488,12 +488,12 @@ namespace Admin.gigade.Controllers
 
                     #endregion
                     string EmailContent = GetMail(dtExcel);
-                    mail.SendToGroup(GroupCode, MailTitle, EmailContent, false, true);//發送郵件給群組
+                    mail.SendToGroup(GroupCode, MailTitle, EmailContent, true, true);//發送郵件給群組
                    
                 }
                 else
                 {
-                    mail.SendToGroup(GroupCode, MailTitle,NOSuggestCountMsg, false, true);//發送郵件給群組 
+                    mail.SendToGroup(GroupCode, MailTitle,NOSuggestCountMsg, true, true);//發送郵件給群組 
                 }
                 result = true;
             }
@@ -576,6 +576,30 @@ namespace Admin.gigade.Controllers
         }
         #endregion 
          
+        #endregion
+
+        #region 用戶異常登錄提醒排程
+        public bool CheckUnsafeLogin()
+        {
+            bool result = false;
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+                BLL.gigade.Mgr.Schedules.CheckUnsafeLoginMgr CheckUnsafeLoginMgr  = new BLL.gigade.Mgr.Schedules.CheckUnsafeLoginMgr(mySqlConnectionString);
+                result = CheckUnsafeLoginMgr.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return result;
+        } 
         #endregion
     }
 }

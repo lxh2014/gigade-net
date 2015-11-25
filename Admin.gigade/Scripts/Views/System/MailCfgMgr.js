@@ -91,6 +91,11 @@ function save(panel) {
         default: break;
     }
 
+    if (result == -1) {///add by wwei0216w 如果email加起來超過300的長度限制result就 = -1
+        Ext.Msg.alert(INFORMATION, LENGTH_ERROR);
+        return;
+    }
+
     Ext.Ajax.request({
         url: '/System/mailSetSave',
         params: {

@@ -86,6 +86,10 @@ function getProduct(panel) {
         c_sendTo += sendStore2.data.items[i].data.user_mail + "|" + sendStore2.data.items[i].data.row_id + "|" + sendStore2.data.items[i].data.group_name + ","
     }
     c_sendTo = c_sendTo.substring(0, c_sendTo.length - 1);
+    if (c_sendTo.length > 298) {
+       // Ext.Msg.alert(INFORMATION, LENGTH_ERROR);
+        return -1;
+    }
     var c_sendTime = Ext.htmlEncode(panel.query('*[name=sendTime]')[0].getValue());
     var result = Ext.String.format('[{ParameterType:\'{0}\',ParameterCode:\'{1}\',parameterName:\'{2}\',Rowid:{3}}', 'warn_product', c_switch, 'switch', panel.query('*[name=switchId]')[0].getValue());
     result += Ext.String.format(',{ParameterType:\'{0}\',ParameterCode:\'{1}\',parameterName:\'{2}\',Rowid:{3}}', 'warn_product', c_sendTo, 'sendTo', panel.query('*[name=sendToId]')[0].getValue());

@@ -154,7 +154,8 @@ function editFunction(row, store) {
                             discount: Ext.htmlEncode(Ext.getCmp('num_discount').getValue()),
                             start_date: Ext.htmlEncode(Ext.getCmp('start_date').getValue()),
                             end_date: Ext.htmlEncode(Ext.getCmp('end_date').getValue()),
-                            side: Ext.htmlEncode(Ext.getCmp('website').getValue())
+                            side: Ext.htmlEncode(Ext.getCmp('website').getValue()),
+                            vendor_coverage: Ext.htmlEncode(Ext.getCmp('vendor_coverage').getValue())
                         },
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
@@ -192,12 +193,26 @@ function editFunction(row, store) {
         }],
         defaults: { anchor: "90%", msgTarget: "side" },
         items: [
+             {
+                 xtype: "numberfield",
+                 fieldLabel: VENDORCOVERAGE,
+                 id: 'vendor_coverage',
+                 name: 'vendor_coverage',
+                 allowBlank: false,
+                 margin: '5 0 5 0',
+                 minValue: 0,
+                 value: 0,
+                 regex: /^[-+]?([1-9]\d*|0)$/,
+                 regexText: VENDERTIP,
+                 submitValue: true,
+             
+
+             },
             {//專區Banner                
                 xtype: 'filefield',
                 name: 'banner_image1',
                 id: 'banner_image1',
                 fieldLabel: BANNERIMG,
-                labelWidth: 60,
                 msgTarget: 'side',
                 allowBlank: false,
                 anchor: '90%',
@@ -685,12 +700,26 @@ function editFunction(row, store) {
                     labelWidth: 80
                 },
                 {
+                    xtype: "numberfield",
+                    fieldLabel: VENDORCOVERAGE,
+                    id: 'vendor_coverage1',
+                    name: 'vendor_coverage',
+                    allowBlank: false,
+                    margin: '5 0 5 0',
+                    minValue: 0,
+                    value: 0,
+                    regex: /^[-+]?([1-9]\d*|0)$/,
+                    regexText: VENDERTIP,
+                    submitValue: true,
+                    
+                }, 
+                {
                     //專區Banner
                     xtype: 'filefield',
                     name: 'banner_image',
                     id: 'banner_image',
                     fieldLabel: '專區Banner',
-                    labelWidth: 60,
+                    labelWidth: 80,
                     msgTarget: 'side',
                     allowBlank: false,
                     anchor: '90%',
@@ -1118,7 +1147,8 @@ function editFunction(row, store) {
                             discount: Ext.htmlEncode(Ext.getCmp('discount').getValue()),
                             starts: Ext.htmlEncode(Ext.getCmp('starts').getValue()),
                             end: Ext.htmlEncode(Ext.getCmp('end').getValue()),
-                            side: Ext.htmlEncode(Ext.getCmp('website1').getValue())
+                            side: Ext.htmlEncode(Ext.getCmp('website1').getValue()),
+                            vendor_coverage:Ext.htmlEncode(Ext.getCmp('vendor_coverage1').getValue())
                         },
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
