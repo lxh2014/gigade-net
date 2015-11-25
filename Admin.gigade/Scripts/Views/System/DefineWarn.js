@@ -170,44 +170,79 @@ var receiverControl = {
                 var panel = btn.up('panel');
                 var rowId = panel.query('*[name=receiverComb]')[0].value;
                 if (panel.container.id.indexOf('stockFrm') != -1) {
-                    var oldItem = sendStore.data.items //需要被添加的數據
-                    sendStore.load({
+                    var oldItem = sendStore.data.items///記錄原始的sendStore數據
+                    var newItem = [];
+                    sendStore.load({    ///加載新的sendStore數據
                         params: { 'rowId': rowId },
                         callback: function (records, operation, success) {
-                            var a = 0;
                             if (success == true && records.length != 0) {
-                                if (findModel(oldItem, records) == true) {
-                                    sendStore.removeAll();
+                                for (var i = 0; i < records.length; i++) {///遍歷是否存在重複數據
+                                    var flag = true;
+                                    for (var j = 0; j < oldItem.length; j++) {
+                                        if (records[i].data.user_mail == oldItem[j].data.user_mail) {
+                                            flag = false;
+                                        }
+                                    }
+                                    if (flag) {
+                                        oldItem.push(records[i]);       ///如果不存在重複數據將其加上
+                                    }
                                 }
                             }
-                            sendStore.add(oldItem);
+                            sendStore.removeAll();      ///清空sendStore
+                            sendStore.add(oldItem);     ///重新添加上    
                         }
                     });
                 } else if (panel.container.id.indexOf('productFrm') != -1) {
                     var oldItem = sendStore2.data.items //需要被添加的數據
                     sendStore2.load({
                         params: { 'rowId': rowId },
+                        //callback: function (records, operation, success) {
+                        //    var a = 0;
+                        //    if (success == true && records.length != 0) {
+                        //        if (findModel(oldItem, records) == true) {
+                        //            sendStore2.removeAll();
+                        //        }
+                        //    }
+                        //    sendStore2.add(oldItem);
+                        //}
                         callback: function (records, operation, success) {
-                            var a = 0;
                             if (success == true && records.length != 0) {
-                                if (findModel(oldItem, records) == true) {
-                                    sendStore2.removeAll();
+                                for (var i = 0; i < records.length; i++) {
+                                    var flag = true;
+                                    for (var j = 0; j < oldItem.length; j++) {
+                                        if (records[i].data.user_mail == oldItem[j].data.user_mail) {
+                                            flag = false;
+                                        }
+                                    }
+                                    if (flag) {
+                                        oldItem.push(records[i]);
+                                    }
                                 }
                             }
+                            sendStore2.removeAll();
                             sendStore2.add(oldItem);
                         }
+
                     });
                 } else if (panel.container.id.indexOf('productMapFrm') != -1) {
                     var oldItem = sendStore3.data.items //需要被添加的數據
                     sendStore3.load({
                         params: { 'rowId': rowId },
                         callback: function (records, operation, success) {
-                            var a = 0;
                             if (success == true && records.length != 0) {
-                                if (findModel(oldItem, records) == true) {
-                                    sendStore3.removeAll();
+                                for (var i = 0; i < records.length; i++) {
+                                    var flag = true;
+                                    for (var j = 0; j < oldItem.length; j++) {
+                                        if (records[i].data.user_mail == oldItem[j].data.user_mail) {
+                                            flag = false;
+                                        }
+                                    }
+                                    if (flag) {
+                                        oldItem.push(records[i]);
+                                    }
                                 }
                             }
+                            sendStore3.removeAll();
                             sendStore3.add(oldItem);
                         }
                     });
@@ -310,6 +345,11 @@ var items = [{
             if (hourValue == '' || minuValue == '') {
                 hour.markInvalid(INPUT_PLEASE + TIME_HOUR);
                 minute.markInvalid(INPUT_PLEASE + TIME_MINUTE);
+                return;
+            }
+
+            ///add by wwei0216 2015/11/24 該段代碼并沒有對時間格式做出驗證
+            if (hour.isValid() == false || minute.isValid()==false) {
                 return;
             }
 
