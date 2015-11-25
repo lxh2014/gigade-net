@@ -87,7 +87,27 @@
                 //    }                  
                 //}             
             }
-        }, {
+        },      
+        {
+             xtype: 'fieldcontainer',
+             fieldLabel: '已協調營管',             
+             id: 'checkbox1',
+             layout: 'hbox',
+             items: [
+                 {
+                     xtype: 'checkbox',
+                     boxLabel: '是',
+                     name: 'yes',
+                     inputValue: '1',
+                     id: 'yes'
+                 },
+                 {
+                     xtype: 'displayfield',
+                     value: "&nbsp&nbsp&nbsp&nbsp&nbsp<font color='red'>* 與營管聯繫協調后再勾選</font>"
+                 }
+             ]
+        },
+        {
             xtype: 'textfield',
             fieldLabel: '標記',
             id: 'flag',
@@ -103,27 +123,40 @@
             text: '保存',
             handler: function () {
                 var bool_1 = (Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('expect_arrive_date').getValue()), 'Y-m-d')) == row.data.expect_arrive_date.toString());
-                var bool_1_1 = (Ext.htmlEncode(Ext.getCmp('expect_arrive_date').getValue()) == 'Mon Jan 01 0001 00:00:00 GMT+0800');
+                var bool_1_1 = (Ext.htmlEncode(Ext.getCmp('expect_arrive_date').getValue()) == 'Mon Jan 01 0001 00:00:00 GMT+0800');          
                 var bool_2 = (Ext.getCmp('expect_arrive_period').getValue() == row.data.expect_arrive_period);
                 var bool_3 = (Ext.getCmp('dcl_note').getValue().trim() == '');
+
+                var bool_4 = (Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('expect_arrive_date').getValue()), 'Y-m-d')) < row.data.expect_arrive_date.toString());
+                var bool_5 = Ext.getCmp('yes').getValue();
+                
                 var start = Ext.getCmp("expect_arrive_date").getValue();
                 //alert((Ext.htmlEncode(Ext.getCmp('expect_arrive_date').getValue())));
                 //alert(bool_1);
                 //alert(bool_1_1);
                 //alert(bool_2);
                 //alert(bool_3);
+                
                 if (bool_1_1) {
-                    if (bool_1_1 && bool_2 && bool_3) {
-                        Ext.Msg.alert('提示', '請修改參數后再保存');
-                        return false;
-                    }
+                    Ext.Msg.alert('提示', '請選擇“期望到貨日”');
+                    return false;
+                    //if (bool_1_1 && bool_2 && bool_3) {
+                    //    Ext.Msg.alert('提示', '請修改參數后再保存');
+                    //    return false;
+                    //}
                 }
                 else {
                     if (bool_1 && bool_2 && bool_3) {
                         Ext.Msg.alert('提示', '請修改參數后再保存');
                         return false;
                     }
-                }               
+                }
+                if (bool_4) {                    
+                    if(!bool_5){
+                        Ext.Msg.alert('提示', '您選擇的期望到貨日<font color="red">小於</font>修改前的日期，<br/>請與營管聯繫進行協調');
+                        return false;
+                    }
+                }
                 //time1 = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('expect_arrive_date').getValue()), 'Y-m-d'));
                                                                         
                 var form = this.up('form').getForm();
