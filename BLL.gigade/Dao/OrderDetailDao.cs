@@ -1015,7 +1015,7 @@ od.single_cost,od.event_cost,od.single_price,od.single_money,od.deduct_bonus,od.
                                     FROM_UNIXTIME(order_createdate) AS order_createdate from( ");
                 sqlSingle.AppendFormat(@" (SELECT  om.order_id,om.user_id,od.single_money,buy_num,pcs.category_id ,om.order_payment,
                                         om.order_product_subtotal,om.order_amount,os.slave_status,od.site_id,om.order_createdate,
-                                        od.deduct_bonus,od.deduct_welfare  FROM  order_detail od
+                                        od.deduct_bonus,od.deduct_welfare,od.detail_id  FROM  order_detail od
                                         INNER JOIN product_item pit USING(item_id)
                                         INNER JOIN order_slave os USING (slave_id)
                                         INNER JOIN order_master om USING (order_id)
@@ -1024,7 +1024,7 @@ od.single_cost,od.event_cost,od.single_price,od.single_money,od.deduct_bonus,od.
                                         WHERE category_id={0} AND item_mode =0 AND od.detail_status NOT IN(90,91) ", query.category_id);
                 sqlFather.AppendFormat(@"(SELECT  om.order_id,om.user_id,od.single_money,buy_num,pcs.category_id ,om.order_payment,
                                         om.order_product_subtotal,om.order_amount,os.slave_status,od.site_id,om.order_createdate,
-                                        od.deduct_bonus,od.deduct_welfare FROM  order_detail od
+                                        od.deduct_bonus,od.deduct_welfare,od.detail_id FROM  order_detail od
                                         INNER JOIN order_slave os USING (slave_id)
                                         INNER JOIN order_master om USING (order_id)
                                         INNER JOIN product_category_set pcs ON od.parent_id=pcs.product_id

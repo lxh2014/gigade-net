@@ -2351,13 +2351,13 @@ namespace BLL.gigade.Dao
             StringBuilder sqlWhere = new StringBuilder();
             try
             {
-                sqlSingle.AppendFormat(@"SELECT om.order_id FROM order_master om 
+                sqlSingle.AppendFormat(@"SELECT om.order_id ,od.detail_id FROM order_master om 
                                     LEFT JOIN order_slave os ON om.order_id=os.order_id
 	                                LEFT JOIN order_detail od ON os.slave_id=od.slave_id
 	                                INNER JOIN product_item pi ON od.item_id=pi.item_id
 	                                INNER JOIN product_category_set pcs ON pi.product_id=pcs.product_id
 	                                WHERE od.item_mode=0  AND pcs.category_id={0}",query.category_id);
-                sqlFather.AppendFormat(@" SELECT om.order_id FROM order_master om  
+                sqlFather.AppendFormat(@" SELECT om.order_id,od.detail_id FROM order_master om  
                                      LEFT JOIN order_slave os ON om.order_id=os.order_id
                                      LEFT JOIN order_detail od ON os.slave_id=od.slave_id
                                      INNER JOIN product_category_set pcs ON od.parent_id=pcs.product_id
@@ -2421,7 +2421,7 @@ rg.group_name AS group_name,od.product_mode ,'' as product_mode_name,od.item_mod
                             om.order_id,om.order_payment,'' as  payment_name,om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,'' as slave_status_name,
                             v.vendor_name_simple,v.vendor_code,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,od.single_money*od.buy_num,
                             od.single_cost,od.bag_check_money,od.single_cost*od.buy_num,FROM_UNIXTIME(os.slave_date_close) slave_date_close,mu.user_username AS 'pm',
-                            om.source_trace AS 'ID',rg.group_name AS group_name,od.product_mode,'' as product_mode_name,od.item_mode,dm.delivery_name,dm.delivery_address  FROM order_master om ");
+                            om.source_trace AS 'ID',rg.group_name AS group_name,od.product_mode,'' as product_mode_name,od.item_mode,dm.delivery_name,dm.delivery_address,od.detail_id  FROM order_master om ");
 
                 sqlJoin1.AppendFormat(@" LEFT JOIN order_slave os ON om.order_id=os.order_id
                                         LEFT JOIN order_detail od ON os.slave_id=od.slave_id
