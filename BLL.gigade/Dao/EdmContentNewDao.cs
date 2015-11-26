@@ -666,5 +666,20 @@ WHERE content_id='{0}'  and log_id='{1}'   AND edm_trace.count>0;", content_id, 
                 throw new Exception("EdmContentNewDao-->GetParaStore-->" + sql.ToString() + ex.Message, ex);
             }
         }
+
+        public DataTable GetContentUrlByContentId(int content_id)
+        {
+            DataTable _dt = new DataTable();
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("select et.content_url  from edm_content_new ecn LEFT JOIN edm_template et on ecn.template_id=et.template_id where ecn.content_id='{0}';",content_id);
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetContentUrlByContentId-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
     }
 }

@@ -29,7 +29,8 @@ Ext.define('gigade.Fares', {
         { name: "condition_id", type: "string" },
         { name: "category_link_url", type: "string" },
         { name: 'muser', type: 'int' },
-        { name: 'user_username', type: 'string' }
+        { name: 'user_username', type: 'string' },
+        { name: 'vendor_coverage',type:'string' }
     ]
 });
 
@@ -97,6 +98,7 @@ Ext.onReady(function () {
             { header: HDID, dataIndex: 'condition_name', width: 70, align: 'center', align: 'center' },
             { header: ACTIVENAME, dataIndex: 'event_name', width: 120, align: 'center' },
             { header: ACTIVEDESC, dataIndex: 'event_desc', width: 120, align: 'center' },
+            { header: VENDORCOVERAGE, dataIndex: 'vendor_coverage', width: 120, align: 'center' },
             {
                 header: BANNERIMG,
                 dataIndex: 'banner_image',

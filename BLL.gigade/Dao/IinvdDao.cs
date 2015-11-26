@@ -322,7 +322,7 @@ LEFT JOIN product_spec ps ON pi.spec_id_1= ps.spec_id
 LEFT JOIN product_spec ps2 ON pi.spec_id_2= ps2.spec_id
 left join vendor_brand vb on p.brand_id=vb.brand_id
 LEFT JOIN iplas ip ON pi.item_id=ip.item_id
-LEFT JOIN product_ext pe ON i.item_id=pe.item_id  where 1=1 ");
+LEFT JOIN product_ext pe ON pi.item_id=pe.item_id  where 1=1 ");
             sbStr.AppendFormat("select item_id from product_item where item_id='{0}';", id);
             DataTable _dtresult = _access.getDataTable(sbStr.ToString());
             if (_dtresult.Rows.Count > 0)

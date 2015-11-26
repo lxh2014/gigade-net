@@ -225,5 +225,34 @@ namespace BLL.gigade.Dao
                 throw new Exception("ArrivalNoticeDao-->UpArrivaleNoticeStatus-->" + ex.Message + sql.ToString(), ex);
             }
         }
+
+        #region 商品建議採購量排程
+       /// <summary>
+        /// 要通知補貨人員的個數。--chaojie1124j_2015/11/19+01:59PM
+       /// </summary>
+       /// <param name="query"></param>
+       /// <returns></returns>
+        public Dictionary<int, int> GetNoticeGoods(ArrivalNotice query)
+        {
+            StringBuilder sb = new StringBuilder();
+            Dictionary<int, int> NoticeGoods = new Dictionary<int, int>();
+            string startTime = DateTime.Now.AddDays(-query.coming_time).ToString("yyyy-MM-dd 00:00:00");
+            try
+            {
+                sb.AppendFormat(" select count(user_id) as Count,item_id from  arrival_notice  where create_time>='{0}' group by item_id ;", CommonFunction.GetPHPTime(startTime));
+                DataTable _dtGoods = _access.getDataTable(sb.ToString());
+                foreach (DataRow item in _dtGoods.Rows)
+                {
+                    NoticeGoods.Add(Convert.ToInt32(item["item_id"]), Convert.ToInt32(item["Count"]));
+                }
+                return NoticeGoods;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ArrivalNoticeDao-->GetNoticeGoods" + ex.Message, ex);
+            }
+        }
+        #endregion
+
     }
 }
