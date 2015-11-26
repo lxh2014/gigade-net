@@ -29,7 +29,7 @@ namespace BLL.gigade.Dao
             {//適當進行修改
                 sql.AppendFormat(@"
 SELECT cm.sta_id,idd.item_id,idd.st_qty,cd.cb_newid,cd.cb_jobid,idd.cde_dt,idd.made_date as made_dt,idd.plas_loc_id as         
-loc_id,idd.prod_qty,cd.create_datetime,cd.create_user,cd.iinvd_id,mu.user_username,CONCAT(v.brand_name,'-',p.product_name) as 'product_name' FROM cbjob_detail cd 
+loc_id,idd.prod_qty,cd.create_datetime,cd.create_user,pi.spec_id_1 ,p.spec_title_1,p.spec_title_2,pi.spec_id_2,cd.iinvd_id,mu.user_username,CONCAT(v.brand_name,'-',p.product_name) as 'product_name' FROM cbjob_detail cd 
 left JOIN iinvd idd on cd.iinvd_id=idd.row_id 
 inner JOIN product_item pi on pi.item_id=idd.item_id 
 LEFT JOIN product p on p.product_id =pi.product_id
@@ -46,7 +46,25 @@ WHERE cd.cb_jobid='{0}'and cd.cb_newid>'{1}' and idd.ista_id='A' and cd.status=1
                     }
                     sql.AppendFormat(" limit {0},{1}", cbjobQuery.Start, cbjobQuery.Limit);
                 }
-                return _access.getDataTableForObj<CbjobDetailQuery>(sql.ToString());
+                 List < Model.Query.CbjobDetailQuery > Store= _access.getDataTableForObj<CbjobDetailQuery>(sql.ToString());
+                 IProductSpecImplDao _specDao = new ProductSpecDao(connStr);
+                 for (int i = 0; i < Store.Count; i++)
+                 {
+                     ProductSpec spec1 = _specDao.query(int.Parse(Store[i].spec_id_1.ToString()));
+                     ProductSpec spec2 = _specDao.query(int.Parse(Store[i].spec_id_2.ToString()));
+                     if (spec1 != null)
+                     {
+                         Store[i].spec_title_1 = string.IsNullOrEmpty(Store[i].spec_title_1) ? "" :Store[i].spec_title_1 + ":" + spec1.spec_name;
+                     }
+                     if (spec2 != null)
+                     {
+                        Store[i].spec_title_2 = string.IsNullOrEmpty(Store[i].spec_title_2) ? "" : Store[i].spec_title_2 + ":" + spec2.spec_name;
+                     }
+                    Store[i].spec_title_1= string.IsNullOrEmpty(Store[i].spec_title_1) ? "" :Store[i].spec_title_1 + "  " + Store[i].spec_title_2;
+                    Store[i].product_name += Store[i].spec_title_1;
+                 
+                 }
+                     return Store;
             }
             catch (Exception ex)
             {

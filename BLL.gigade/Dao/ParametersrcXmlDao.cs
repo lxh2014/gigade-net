@@ -188,18 +188,7 @@ namespace BLL.gigade
             throw new NotImplementedException();
         }
 
-
-        public string GetOrderPayment(int order_payment)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string GetSlaveStatus(int slave_status)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string GetProductMode(int product_mode)
+        public List<Parametersrc> SearchParameters(params string[] types)
         {
             throw new NotImplementedException();
         }

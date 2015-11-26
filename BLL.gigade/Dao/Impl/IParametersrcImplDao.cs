@@ -50,9 +50,6 @@ namespace BLL.gigade.Dao.Impl
         string Getmail(string p);
         List<Parametersrc> ReturnParametersrcList();
         List<Parametersrc> GetKindTypeByStatus(string types);
-        string GetOrderPayment(int order_payment);       
-        string GetSlaveStatus(int slave_status);
-        string GetProductMode(int product_mode);
-       
+        List<Parametersrc> SearchParameters(params string[] types);
     }
 }

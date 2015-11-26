@@ -1466,6 +1466,36 @@ namespace gigadeExcel.Comment
 
         }
 
+        public static StringWriter SetCsvFromDataBySdy(System.Data.DataTable dt, string FileName)
+        {
+            StringWriter sw = new StringWriter();
+            StringBuilder sb = new StringBuilder();
+            //for (int i = 0; i < dt.Columns.Count; i++)
+            //{
+            //    sb.Append(dt.Columns[i].ColumnName);
+            //    if (i != dt.Columns.Count - 1)
+            //    {
+            //        sb.Append(",");
+            //    }
+            //}
+            //sw.WriteLine(sb.ToString());
+            foreach (DataRow dr in dt.Rows)
+            {
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    sw.Write(dr[i].ToString());
+                    if (i != dt.Columns.Count - 1)
+                    {
+                        sw.Write(",");
+                    }
+                }
+                sw.WriteLine("");
+            }
+            sw.Close();
+            return sw;
+        }
+
+
         public static StringWriter SetCsvFromData(System.Data.DataTable dt, string FileName)
         {
             StringWriter sw = new StringWriter();

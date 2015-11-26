@@ -45,7 +45,7 @@ namespace BLL.gigade.Dao
             StringBuilder sbWhr = new StringBuilder();
             StringBuilder sbPage = new StringBuilder();
             
-            sbAll.Append("SELECT ic.item_id,ic.sc_trans_id,ic.sc_cd_id,(CASE WHEN ic.sc_trans_type=1 THEN '收貨上架' WHEN ic.sc_trans_type=2 THEN '庫存調整' WHEN ic.sc_trans_type=3 THEN 'RF理貨' when ic.sc_trans_type=4 then '出盤復盤'END) AS typename,(CASE WHEN ic.sc_istock_why=1 THEN '庫鎖' WHEN ic.sc_istock_why=2 THEN '庫調' WHEN ic.sc_istock_why=3 THEN '收貨上架' WHEN ic.sc_istock_why=4 THEN '理貨' else '' END) AS istockwhy,ic.sc_num_chg,ic.sc_num_new,ic.sc_time,ic.sc_note,p.product_name,mu.user_username AS manager ");
+            sbAll.Append("SELECT ic.item_id,ic.sc_trans_id,ic.sc_cd_id,(CASE WHEN ic.sc_trans_type=1 THEN '收貨上架' WHEN ic.sc_trans_type=2 THEN '庫存調整' WHEN ic.sc_trans_type=3 THEN 'RF理貨' when ic.sc_trans_type=4 then '初盤復盤'END) AS typename,(CASE WHEN ic.sc_istock_why=1 THEN '庫鎖' WHEN ic.sc_istock_why=2 THEN '庫調' WHEN ic.sc_istock_why=3 THEN '收貨上架' WHEN ic.sc_istock_why=4 THEN '理貨' else '' END) AS istockwhy,ic.sc_num_chg,ic.sc_num_new,ic.sc_time,ic.sc_note,p.product_name,mu.user_username AS manager ");
             sbAll.Append("  ,CONCAT(ps.spec_name,'-',ps2.spec_name)as specname ");
             sbJoin.Append(" from istock_change ic LEFT JOIN product_item pi ON ic.item_id=pi.item_id LEFT JOIN product p ON pi.product_id=p.product_id ");
             sbJoin.Append("LEFT JOIN manage_user mu ON ic.sc_user=mu.user_id left join product_spec ps on pi.spec_id_1=ps.spec_id left join product_spec ps2 on pi.spec_id_2=ps2.spec_id where 1=1 ");

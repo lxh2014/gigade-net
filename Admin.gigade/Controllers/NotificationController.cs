@@ -1392,7 +1392,7 @@ namespace Admin.gigade.Controllers
                 {
                     StringBuilder sb = _recommendedExcleMgr.GetThisProductInfo(start_product_id, end_product_id);
                     swone.WriteLine(sb.ToString());
-                    string filename = "128_MYFONE_item_" + nowtime.ToString("yyyyMMddHHmmss") + ".xml";
+                    string filename = "33_gigade_item_" + nowtime.ToString("yyyyMMdd_HHmm") + ".xml";
                     Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
                     Response.ContentType = "application/octet-stream";
                     Response.ContentEncoding = Encoding.UTF8;
@@ -1412,7 +1412,7 @@ namespace Admin.gigade.Controllers
                     }
                     #region 汇出信息
                     StringBuilder sb = _recommendedExcleMgr.GetThisProductInfo(start_product_id, end_product_id);
-                    string filename = "128_MYFONE_item_" + nowtime.ToString("yyyyMMddHHmmss") + ".xml";
+                    string filename = "33_gigade_item_" + nowtime.ToString("yyyyMMdd_HHmm") + ".xml";
                     string xmlserverPath = Server.MapPath("../ImportUserIOExcel/" + filename);
                     FileStream aFile = new FileStream(xmlserverPath, FileMode.OpenOrCreate);
                     StreamWriter sw = new StreamWriter(aFile);
@@ -1454,15 +1454,15 @@ namespace Admin.gigade.Controllers
             {
                 _recommendedExcleMgr = new RecommendedExcleMgr(connectionString);
                 DateTime nowtime = DateTime.Now;
-                string filename = "食用品館類別樹-含品牌" + nowtime.ToString("yyyyMMddHHmmss") + ".csv";
+                string filename = "33_gigade_category_" + nowtime.ToString("yyyyMMdd_HHmm") + ".csv";
                 DataTable _result = _recommendedExcleMgr.GetVendorCategoryMsg();
                 if (!string.IsNullOrEmpty(Request.Params["type"]))
                 {
-                    sw = ExcelHelperXhf.SetCsvFromData(_result, filename);
+                    sw = ExcelHelperXhf.SetCsvFromDataBySdy(_result, filename);
                     Response.Clear();
                     Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
                     Response.ContentType = "application/ms-excel";
-                    Response.ContentEncoding = Encoding.Default;
+                    Response.ContentEncoding = Encoding.UTF8;
                     Response.Write(sw);
                     Response.End();
                     return "{success:true}";
@@ -1472,7 +1472,7 @@ namespace Admin.gigade.Controllers
                 {
                     string[] columnName = { "category_name", "category_id", "parent_id", "level" };
                     string txtserverPath = Server.MapPath("../ImportUserIOExcel/" + filename);
-                    CsvHelper.ExportDataTableToCsv(_result, txtserverPath, columnName, true);
+                    CsvHelper.ExportDataTableToCsvBySdy(_result, txtserverPath, columnName, false);
                     UploadFTP(ftpyuhuiPath, txtserverPath, ftpyuhuiuser, ftpyuhuipwd);//宇匯上傳csv文件
                     UploadFTP(ftpliaozhiPath, txtserverPath, ftpliaozhiuser, ftpliaozhipwd);//曜智上傳csv文件
                     FileInfo file = new FileInfo(txtserverPath);//指定文件路径
