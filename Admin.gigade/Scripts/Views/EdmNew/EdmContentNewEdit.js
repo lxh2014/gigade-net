@@ -412,7 +412,7 @@ editFunction = function (row, store) {
                 id: 'preview',
                 text: '預覽',
                 handler: function () {
-                    PreviewFun(Ext.getCmp('template_id').getValue(),Ext.getCmp('check').getValue());
+                    PreviewFun(Ext.getCmp('content_id').getValue(), Ext.getCmp('check').getValue(),Ext.getCmp('template_id').getValue());
                 }
             },
         ]
@@ -457,6 +457,7 @@ editFunction = function (row, store) {
                     Ext.getCmp('group_id').allowBlank = true;
                     Ext.getCmp('template_id').allowBlank = true;
                     editFrm.getForm().loadRecord(row);
+                    Ext.getCmp('preview').show(true);
                     initRow(row);
                 }
                 else {
@@ -467,6 +468,7 @@ editFunction = function (row, store) {
                     Ext.getCmp('sender_id').allowBlank = false;
                     Ext.getCmp('group_id').allowBlank = false;
                     Ext.getCmp('template_id').allowBlank = false;
+                    Ext.getCmp('preview').hide(true);
                     editFrm.getForm().reset();
                 }
             }

@@ -28,7 +28,7 @@
                 layout: 'hbox',
                 items: [
                 {
-                    fieldLabel: '會員電子報',
+                    fieldLabel: '可自由訂閱',
                     xtype: 'radiogroup',
                     id: 'is_member_edm',
                     labelWidth:100,

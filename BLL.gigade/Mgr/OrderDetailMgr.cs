@@ -413,7 +413,7 @@ namespace BLL.gigade.Mgr
         {
             try
             {
-                return _orderMaterDao.DetialExport(query, 0);
+                return _orderMaterDao.CagegoryDetialExport(query);
             }
             catch (Exception ex)
             {
