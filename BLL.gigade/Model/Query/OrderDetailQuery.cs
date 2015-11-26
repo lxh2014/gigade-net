@@ -143,8 +143,12 @@ namespace BLL.gigade.Model.Query
         public DateTime date_end { get; set; }
         public string delivery_name { get; set; }
         public DateTime order_createdate { get; set; }
+        public string payment_name { get; set; }
+        public string order_status_name { get; set; }
+        public string slave_status_name { get; set; }
+        public string product_mode_name { get; set; }
         public OrderDetailQuery()
-        {            
+        {
             //Detail_Id = 0;
             //Slave_Id = 0;
             //Item_Id = 0;
@@ -231,7 +235,7 @@ namespace BLL.gigade.Model.Query
             cost = 0;
             Brand_Id = 0;
             Brand_Id_In = string.Empty;
-            Order_Createdate=0;
+            Order_Createdate = 0;
             time_start = 0;
             time_end = 0;
             product_manage = 0;
@@ -247,6 +251,10 @@ namespace BLL.gigade.Model.Query
             date_end = DateTime.MinValue;
             order_createdate = DateTime.MinValue;
             delivery_name = string.Empty;
+            payment_name = string.Empty;
+            order_status_name = string.Empty;
+            slave_status_name = string.Empty;
+            product_mode_name = string.Empty;
         }
     }
 }
