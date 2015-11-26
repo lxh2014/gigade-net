@@ -108,7 +108,14 @@ namespace BLL.gigade.Dao
             DateTime dtime = DateTime.Parse("2010-01-01");
             try
             {
-                sql.Append(@"SELECT u.user_email,u.user_name,u.user_id FROM  users u ");
+                if (q.MailorPhone == 1)
+                {
+                    sql.Append(@"SELECT u.user_email,u.user_name,u.user_id FROM  users u ");
+                }
+                else
+                {
+                    sql.Append(@"SELECT u.user_mobile,u.user_name,u.user_id FROM  users u ");
+                }
                 where.Append(@"WHERE 1=1 ");
                 if(q.chkGender)
                 {//性別
@@ -245,6 +252,10 @@ namespace BLL.gigade.Dao
                 if (q.ChkBlackList)
                 {//不排除黑名單
                     where.Append(" AND u.user_id NOT IN (SELECT user_id from vip_user  WHERE group_id='48' ) ");
+                }
+                if (q.ChkPhone)
+                {//排除拒收廣告簡訊的人
+                    where.Append(" AND send_sms_ad=1 ");
                 }
                 return _dbAccess.getDataTable(sql.ToString() + join.ToString() + where.ToString());
             }

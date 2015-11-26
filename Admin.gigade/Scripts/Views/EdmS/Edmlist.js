@@ -620,8 +620,31 @@ Ext.onReady(function () {
             items: [
             {
                 xtype: 'checkbox',
+                id: 'ChkPhone',
+                //margin: '0 0 0 214',
+                checked: false,
+                handler: function () {
+                    //if (this.checked == false && zr != true) {
+                    //    Ext.MessageBox.confirm(CONFIRM, "確定取消排除黑名單？", function (btn) {
+                    //        if (btn == "yes") {
+                    //            Ext.getCmp("ChkBlackList").setValue(false);
+                    //        } else {
+                    //            Ext.getCmp("ChkBlackList").setValue(true);
+                    //        }
+                    //    });
+                    //}
+                }
+            },
+            {
+                xtype: 'displayfield',
+                margin: '0 0 0 5',
+                value: '排除拒收廣告簡訊用戶',
+                width:200
+            },
+            {
+                xtype: 'checkbox',
                 id: 'ChkBlackList',
-                margin: '0 0 0 214',
+                margin: '0 0 0 102',
                 checked: true,
                 handler: function () {
                     if (this.checked == false && zr != true) {
@@ -658,10 +681,8 @@ Ext.onReady(function () {
                     Ext.getCmp("conditionName").reset();
                     Ext.getCmp("show").reset();
                 }
-            }
-            ]
-        }
-        ]
+            }]            
+        }]        
     });
     var FrmSummary = Ext.create('Ext.form.Panel', {
         id: 'FrmSummary',
@@ -697,15 +718,22 @@ Ext.onReady(function () {
                 xtype: 'button',
                 text: " 查詢 ",
                 id: 'btnQuery',
-                margin: '5 5 0 340',
+                margin: '5 5 0 280',
                 handler: Query
             },
             {
                 xtype: 'button',
-                text: '下載CSV',
+                text: '下載郵件CSV',
                 id: 'btnDownLoad',
                 margin: '5 5 0 5',
                 handler: Export
+            },
+            {
+                xtype: 'button',
+                text: '下載手機CSV',
+                id: 'btnPhone',
+                margin: '5 5 0 5',
+                handler: Export2
             }
             ]
         }
@@ -853,6 +881,9 @@ loadListInfo = function () {
                     if (store[i].ChkBlackList != true) {
                         Ext.getCmp("ChkBlackList").setValue(false);
                     }
+                    if (store[i].ChkPhone == true) {
+                        Ext.getCmp("ChkPhone").setValue(true);
+                    }
                     zr = false;
                 }
             },
@@ -900,6 +931,7 @@ deleteListInfo = function () {
         })
     }
 }
+//保存篩選條件
 saveConditions = function () {
     var chkGender = Ext.getCmp("ChkGender").getValue();
     if (chkGender) {
@@ -1052,6 +1084,7 @@ saveConditions = function () {
         }
     }
 }
+//查詢
 Query = function () {
     Ext.getCmp("btnQuery").setDisabled(true);
     var chkGender = Ext.getCmp("ChkGender").getValue();
@@ -1112,6 +1145,7 @@ Query = function () {
         var totalConsumptionMax = Ext.getCmp("NumTotalConsumption2").getValue();
     }
     var ChkBlackList = Ext.getCmp("ChkBlackList").getValue();
+    var ChkPhone = Ext.getCmp("ChkPhone").getValue();
     if (chkGender || ChkBuy || ChkAge || ChkCancel || ChkRegisterTime || ChkReturn || ChkLastOrder || ChkNotice || ChkLastLogin || ChkTotalConsumption || ChkBlackList) {
         Ext.Ajax.request({
             url: '/EdmS/GetUserNum',
@@ -1152,7 +1186,9 @@ Query = function () {
                 ChkTotalConsumption: ChkTotalConsumption,
                 totalConsumptionMin: totalConsumptionMin,
                 totalConsumptionMax: totalConsumptionMax,
-                ChkBlackList: ChkBlackList
+                ChkBlackList: ChkBlackList,
+                ChkPhone: ChkPhone,
+                btn:1
             },
             success: function (form, action) {
                 var result = Ext.decode(form.responseText);
@@ -1173,6 +1209,7 @@ Query = function () {
         Ext.Msg.alert(INFORMATION, "請勾選條件");
     }
 }
+//匯出郵件csv
 Export = function () {
     var chkGender = Ext.getCmp("ChkGender").getValue();
     if (chkGender) {
@@ -1232,7 +1269,8 @@ Export = function () {
         var totalConsumptionMax = Ext.getCmp("NumTotalConsumption2").getValue();
     }
     var ChkBlackList = Ext.getCmp("ChkBlackList").getValue();
-    if (chkGender || ChkBuy || ChkAge || ChkCancel || ChkRegisterTime || ChkReturn || ChkLastOrder || ChkNotice || ChkLastLogin || ChkTotalConsumption || ChkBlackList) {
+    var ChkPhone = Ext.getCmp("ChkPhone").getValue();
+    if (chkGender || ChkBuy || ChkAge || ChkCancel || ChkRegisterTime || ChkReturn || ChkLastOrder || ChkNotice || ChkLastLogin || ChkTotalConsumption || ChkBlackList || ChkPhone) {
         Ext.MessageBox.show({
             msg: 'Loading....',
             wait: true
@@ -1277,7 +1315,9 @@ Export = function () {
                 ChkTotalConsumption: ChkTotalConsumption,
                 totalConsumptionMin: totalConsumptionMin,
                 totalConsumptionMax: totalConsumptionMax,
-                ChkBlackList: ChkBlackList
+                ChkBlackList: ChkBlackList,
+                ChkPhone: ChkPhone,
+                btn:1
             },
             success: function (form, action) {
                 Ext.MessageBox.hide();
@@ -1298,6 +1338,7 @@ Export = function () {
         Ext.Msg.alert(INFORMATION, "請勾選條件");
     }
 }
+//覆蓋之前查詢條件
 function ok() {
     Ext.Ajax.request({
         url: '/EdmS/UpdateCondition',
@@ -1339,7 +1380,8 @@ function ok() {
             ChkTotalConsumption: Ext.getCmp("ChkTotalConsumption").getValue(),
             totalConsumptionMin: Ext.getCmp("NumTotalConsumption1").getValue(),
             totalConsumptionMax: Ext.getCmp("NumTotalConsumption2").getValue(),
-            ChkBlackList: Ext.getCmp("ChkBlackList").getValue()
+            ChkBlackList: Ext.getCmp("ChkBlackList").getValue(),
+            ChkPhone: Ext.getCmp("ChkPhone").getValue()
         },
         success: function (form, action) {
             var result = Ext.decode(form.responseText);
@@ -1356,7 +1398,7 @@ function ok() {
         }
     });
 }
-
+//保存篩選條件名稱
 SaveNameFunction = function (store) {
     var saveFrm = Ext.create('Ext.form.Panel', {
         id: 'saveFrm',
@@ -1452,7 +1494,8 @@ SaveNameFunction = function (store) {
                         var totalConsumptionMax = Ext.getCmp("NumTotalConsumption2").getValue();
                     }
                     var ChkBlackList = Ext.getCmp("ChkBlackList").getValue();
-                    if (ChkGender || ChkBuy || ChkAge || ChkCancel || ChkRegisterTime || ChkReturn || ChkLastOrder || ChkNotice || ChkLastLogin || ChkTotalConsumption || ChkBlackList) {
+                    var ChkPhone = Ext.getCmp("ChkPhone").getValue();
+                    if (ChkGender || ChkBuy || ChkAge || ChkCancel || ChkRegisterTime || ChkReturn || ChkLastOrder || ChkNotice || ChkLastLogin || ChkTotalConsumption || ChkBlackList || ChkPhone) {
                         var form = this.up('form').getForm();
                         this.disable();
                         if (form.isValid()) {
@@ -1495,7 +1538,8 @@ SaveNameFunction = function (store) {
                                     ChkTotalConsumption: ChkTotalConsumption,
                                     totalConsumptionMin: totalConsumptionMin,
                                     totalConsumptionMax: totalConsumptionMax,
-                                    ChkBlackList: ChkBlackList
+                                    ChkBlackList: ChkBlackList,
+                                    ChkPhone: ChkPhone
                                 },
                                 success: function (form, action) {
                                     var result = Ext.decode(action.response.responseText);
@@ -1575,3 +1619,132 @@ SaveNameFunction = function (store) {
     });
     editWin.show();
 };
+//匯出手機號碼
+Export2 = function () {
+    var chkGender = Ext.getCmp("ChkGender").getValue();
+    if (chkGender) {
+        var genderCondition = Ext.getCmp("ComboxGender").getValue();
+    }
+    var ChkBuy = Ext.getCmp("ChkBuy").getValue();
+    if (ChkBuy) {
+        var buyCondition = Ext.getCmp("ComboxBuy").getValue();
+        var buyTimes = Ext.getCmp("NumBuyTimes").getValue();
+        var buyTimeMin = Ext.getCmp("DfBuyTime1").getValue();
+        var buyTimeMax = Ext.getCmp("DfBuyTime2").getValue();
+    }
+    var ChkAge = Ext.getCmp("ChkAge").getValue();
+    if (ChkAge) {
+        compareBeforeToAfter("NumAgeMin", "NumAgeMax");
+        var ageMin = Ext.getCmp("NumAgeMin").getValue();
+        var ageMax = Ext.getCmp("NumAgeMax").getValue();
+    }
+    var ChkCancel = Ext.getCmp("ChkCancel").getValue();
+    if (ChkCancel) {
+        var cancelCondition = Ext.getCmp("ComboxCancel").getValue();
+        var cancelTimes = Ext.getCmp("NumCanceltimes").getValue();
+        var cancelTimeMin = Ext.getCmp("DfCancel1").getValue();
+        var cancelTimeMax = Ext.getCmp("DfCancel2").getValue();
+    }
+    var ChkRegisterTime = Ext.getCmp("ChkRegisterTime").getValue();
+    if (ChkRegisterTime) {
+        var registerTimeMin = Ext.getCmp("DFRegisterTimeMin").getValue();
+        var registerTimeMax = Ext.getCmp("DFRegisterTimeMax").getValue();
+    }
+    var ChkReturn = Ext.getCmp("ChkReturn").getValue();
+    if (ChkReturn) {
+        var returnCondition = Ext.getCmp("ComboxReturn").getValue();
+        var returnTimes = Ext.getCmp("NumReturntimes").getValue();
+        var returnTimeMin = Ext.getCmp("DfReturn1").getValue();
+        var returnTimeMax = Ext.getCmp("DfReturn2").getValue();
+    }
+    var ChkLastOrder = Ext.getCmp("ChkLastOrder").getValue();
+    if (ChkLastOrder) {
+        var lastOrderMin = Ext.getCmp("DFLastOrderMin").getValue();
+        var lastOrderMax = Ext.getCmp("DFLastOrderMax").getValue();
+    }
+    var ChkNotice = Ext.getCmp("ChkNotice").getValue();
+    if (ChkNotice) {
+        var noticeCondition = Ext.getCmp("ComboxNotice").getValue();
+        var noticeTimes = Ext.getCmp("NumNotice").getValue();
+    }
+    var ChkLastLogin = Ext.getCmp("ChkLastLogin").getValue();
+    if (ChkLastLogin) {
+        var lastLoginMin = Ext.getCmp("DFLastLoginMin").getValue();
+        var lastLoginMax = Ext.getCmp("DFLastLoginMax").getValue();
+    }
+    var ChkTotalConsumption = Ext.getCmp("ChkTotalConsumption").getValue();
+    if (ChkTotalConsumption) {
+        compareBeforeToAfter("NumTotalConsumption1", "NumTotalConsumption2");
+        var totalConsumptionMin = Ext.getCmp("NumTotalConsumption1").getValue();
+        var totalConsumptionMax = Ext.getCmp("NumTotalConsumption2").getValue();
+    }
+    var ChkBlackList = Ext.getCmp("ChkBlackList").getValue();
+    var ChkPhone = Ext.getCmp("ChkPhone").getValue();
+    if (chkGender || ChkBuy || ChkAge || ChkCancel || ChkRegisterTime || ChkReturn || ChkLastOrder || ChkNotice || ChkLastLogin || ChkTotalConsumption || ChkBlackList) {
+        Ext.MessageBox.show({
+            msg: 'Loading....',
+            wait: true
+        });
+        Ext.Ajax.request({
+            url: '/EdmS/Export',
+            method: 'post',
+            timeout: 1000000,
+            params: {
+                chkGender: chkGender,
+                genderCondition: genderCondition,
+                ChkBuy: ChkBuy,
+                buyCondition: buyCondition,
+                buyTimes: buyTimes,
+                buyTimeMin: buyTimeMin,
+                buyTimeMax: buyTimeMax,
+                ChkAge: ChkAge,
+                ageMin: ageMin,
+                ageMax: ageMax,
+                ChkCancel: ChkCancel,
+                cancelCondition: cancelCondition,
+                cancelTimes: cancelTimes,
+                cancelTimeMin: cancelTimeMin,
+                cancelTimeMax: cancelTimeMax,
+                ChkRegisterTime: ChkRegisterTime,
+                registerTimeMin: registerTimeMin,
+                registerTimeMax: registerTimeMax,
+                ChkReturn: ChkReturn,
+                returnCondition: returnCondition,
+                returnTimes: returnTimes,
+                returnTimeMin: returnTimeMin,
+                returnTimeMax: returnTimeMax,
+                ChkLastOrder: ChkLastOrder,
+                lastOrderMin: lastOrderMin,
+                lastOrderMax: lastOrderMax,
+                ChkNotice: ChkNotice,
+                noticeCondition: noticeCondition,
+                noticeTimes: noticeTimes,
+                ChkLastLogin: ChkLastLogin,
+                lastLoginMin: lastLoginMin,
+                lastLoginMax: lastLoginMax,
+                ChkTotalConsumption: ChkTotalConsumption,
+                totalConsumptionMin: totalConsumptionMin,
+                totalConsumptionMax: totalConsumptionMax,
+                ChkBlackList: ChkBlackList,
+                ChkPhone:ChkPhone,
+                btn:2
+            },
+            success: function (form, action) {
+                Ext.MessageBox.hide();
+                var result = Ext.decode(form.responseText);
+                if (result.success) {
+                    window.location = '../../ImportUserIOExcel/' + result.fileName;
+                } else {
+                    Ext.MessageBox.hide();
+                    Ext.Msg.alert("提示信息", "匯出失敗或沒有數據！");
+                }
+            },
+            failure: function (form, action) {
+                Ext.Msg.alert(INFORMATION, FAILURE);
+            }
+        })
+    }
+    else {
+        Ext.Msg.alert(INFORMATION, "請勾選條件");
+    }
+}
