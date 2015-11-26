@@ -4125,8 +4125,13 @@ namespace Admin.gigade.Controllers
                 {
                     ialg.doc_no = Request.Params["doc_no"];
                 }
+                if (!string.IsNullOrEmpty(Request.Params["gzbh"]))
+                {
+                    ialg.doc_no = Request.Params["gzbh"];
+                }
                 ialg.create_user = userId;
                 invd.change_user = userId;
+               
                 ialg.create_dtim = DateTime.Now;
                 invd.change_dtim = DateTime.Now;
                 invd.row_id = row_id;
