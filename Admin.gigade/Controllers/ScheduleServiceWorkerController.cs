@@ -371,7 +371,7 @@ namespace Admin.gigade.Controllers
                 query.category_ID_IN = query.category_ID_IN.TrimEnd(',');
                 DataTable _dt = _productItemMgr.GetSugestDatetable(query);
                 Dictionary<int, int> NoticeGoods = new Dictionary<int, int>();
-                MailHelper mail = new MailHelper();
+                MailHelper mail = new MailHelper(mailModel);
                 arriva.coming_time = query.sumDays;
                 NoticeGoods = _arrivalMgr.GetNoticeGoods(arriva);
                 if (_dt.Rows.Count > 0)
@@ -488,12 +488,12 @@ namespace Admin.gigade.Controllers
 
                     #endregion
                     string EmailContent = GetMail(dtExcel);
-                    mail.SendToGroup(GroupCode, MailTitle, EmailContent, false, true);//發送郵件給群組
+                    mail.SendToGroup(GroupCode, MailTitle, EmailContent, true, true);//發送郵件給群組
                    
                 }
                 else
                 {
-                    mail.SendToGroup(GroupCode, MailTitle,NOSuggestCountMsg, false, true);//發送郵件給群組 
+                    mail.SendToGroup(GroupCode, MailTitle,NOSuggestCountMsg, true, true);//發送郵件給群組 
                 }
                 result = true;
             }

@@ -13,6 +13,7 @@ TIME_EXIST = '已經存在此時間~~';
 TIME_ARRAY = '時間集';
 MANY_SPLIT = '多個郵箱請用逗號分隔~~';
 
+LENGTH_ERROR = "對不起,Email總和超過規定長度!";
 STOCK_NOTICE = '庫存警告通知';
 PRODUCT_NOTICE = '商品異動通知';
 PRODUCT_MAP_NOTICE = '商品對照異動通知';

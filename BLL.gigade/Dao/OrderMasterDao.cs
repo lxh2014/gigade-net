@@ -1150,11 +1150,11 @@ namespace BLL.gigade.Dao
                 }
                 if (query.invoice_type == 1)
                 {
-                    sqlCondition.AppendFormat(" and imr.invoice_id!='' ");
+                    sqlCondition.AppendFormat(" and (imr.invoice_id!='' or  oac.invoice_date_manual!='' ) ");
                 }
                 else if (query.invoice_type == 2)
                 {
-                    sqlCondition.AppendFormat(" and   ISNULL(imr.invoice_id) ");
+                    sqlCondition.AppendFormat(" and  ISNULL(imr.invoice_id) and  ISNULL(oac.invoice_date_manual)  ");
                 }
 
                 if (query.Order_Id != 0)
@@ -1371,11 +1371,11 @@ namespace BLL.gigade.Dao
                 }
                 if (query.invoice_type == 1)
                 {
-                    sqlCondition.AppendFormat(" and imr.invoice_id!='' ");
+                    sqlCondition.AppendFormat(" and (imr.invoice_id!='' or  oac.invoice_date_manual!='' ) ");
                 }
                 else if (query.invoice_type == 2)
                 {
-                    sqlCondition.AppendFormat(" and   ISNULL(imr.invoice_id) ");
+                    sqlCondition.AppendFormat(" and  ISNULL(imr.invoice_id) and  ISNULL(oac.invoice_date_manual) ");
                 }
                 if (query.Order_Id != 0)
                 {
@@ -1482,11 +1482,11 @@ namespace BLL.gigade.Dao
                 }
                 if (query.invoice_type == 1)
                 {
-                    sql.AppendFormat(" and imr.invoice_id!='' ");
+                    sql.AppendFormat(" and (imr.invoice_id!='' or  oac.invoice_date_manual!='' ) ");
                 }
                 else if (query.invoice_type == 2)
                 {
-                    sql.AppendFormat(" and   ISNULL(imr.invoice_id) ");
+                    sql.AppendFormat(" and   ISNULL(imr.invoice_id) and  ISNULL(oac.invoice_date_manual)  ");
                 }
                 if (query.Order_Id != 0)
                 {

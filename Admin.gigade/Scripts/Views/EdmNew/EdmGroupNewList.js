@@ -70,7 +70,7 @@ Ext.onReady(function () {
             { header: "編號", dataIndex: "group_id", align: 'center' },
             { header: "類型名稱", dataIndex: "group_name", width: 300, align: 'center' },
             {
-                header: "會員電子報", dataIndex: "is_member_edm", width: 200, align: 'center',
+                header: "可自由訂閱", dataIndex: "is_member_edm", width: 200, align: 'center',
                 renderer: function (value) {
                     if (value == 1) {
                         return "是";
