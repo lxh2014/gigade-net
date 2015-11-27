@@ -79,6 +79,7 @@ namespace BLL.gigade.Model
 
         public Aseld()
         {
+            seld_id = 0;
             dc_id = 1;
             whse_id = 1;
             ord_id = 0;

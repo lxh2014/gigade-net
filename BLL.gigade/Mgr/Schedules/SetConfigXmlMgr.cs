@@ -172,7 +172,7 @@ namespace BLL.gigade.Mgr.Schedules
                 else
                 {
                     MailHelper mail = new MailHelper(mailModel);
-                    mail.SendToGroup(GroupCode, MailTitle, mailBody, false, false);//發送郵件
+                    mail.SendToGroup(GroupCode, MailTitle, mailBody+" ", false, false);//發送郵件
                 }
                 
 
