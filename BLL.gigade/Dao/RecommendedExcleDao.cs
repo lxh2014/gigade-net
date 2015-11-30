@@ -29,8 +29,7 @@ namespace BLL.gigade.Dao
             try
             {
                 sql.AppendFormat(@"SELECT distinct(us.user_id)  as '會員編號',CASE us.user_gender WHEN 0 THEN '女' ELSE '男' END as '性別', case vu.v_id WHEN null then '否' ELSE '是' end as 'VIP',
-(Year(CURDATE())-us.user_birthday_year)as '年齡',FROM_UNIXTIME(us.user_reg_date)as '註冊時間',
-us.buy_amount as '購買總金額',us.buy_times as '購買次數',uos.buy_counts as '購買次數',uos.order_product_subtotals as '購買總金額'
+(Year(CURDATE())-us.user_birthday_year)as '年齡',FROM_UNIXTIME(us.user_reg_date)as '註冊時間',uos.buy_counts as '購買次數',uos.order_product_subtotals as '購買總金額'
 ,om.deduct_bonuss as '購物金使用',uos.normal_product_subtotals as '常溫商品總額',uos.low_product_subtotals as '低溫商品總額'
 FROM users us LEFT JOIN (SELECT user_id,sum(buy_count)as buy_counts,SUM(order_product_subtotal) as order_product_subtotals
 ,sum(normal_product_subtotal)as normal_product_subtotals,sum(low_product_subtotal)as low_product_subtotals 
