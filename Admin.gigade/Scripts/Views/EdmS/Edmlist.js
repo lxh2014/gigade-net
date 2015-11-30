@@ -1087,6 +1087,8 @@ saveConditions = function () {
 //查詢
 Query = function () {
     Ext.getCmp("btnQuery").setDisabled(true);
+    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: 'Loading...' });
+    myMask.show();
     var chkGender = Ext.getCmp("ChkGender").getValue();
     if (chkGender) {
         var genderCondition = Ext.getCmp("ComboxGender").getValue();
@@ -1192,15 +1194,18 @@ Query = function () {
             },
             success: function (form, action) {
                 var result = Ext.decode(form.responseText);
+                myMask.hide();
+                Ext.getCmp("btnQuery").setDisabled(false);
                 if (result.success) {
                     Ext.getCmp("show").setValue(result.totalCount);
-                    Ext.getCmp("btnQuery").setDisabled(false);
                 }
                 else {
                     Ext.Msg.alert(INFORMATION, FAILURE);
                 }
             },
             failure: function (form, action) {
+                myMask.hide();
+                Ext.getCmp("btnQuery").setDisabled(false);
                 Ext.Msg.alert(INFORMATION, FAILURE);
             }
         })
