@@ -4197,16 +4197,77 @@ namespace Admin.gigade.Controllers
                 {
                     DataRow row = dtHZ.NewRow();
                     row["會員姓名"] = _dt.Rows[i]["user_name"];
-                    row["購買時間"] =Convert.ToDateTime(_dt.Rows[i]["order_createdate"]).ToString("yyyy-MM-dd HH:mm:ss");
+                    row["購買時間"] = Convert.ToDateTime(_dt.Rows[i]["order_createdate"]).ToString("yyyy-MM-dd HH:mm:ss");
+
+
                     row["付款單號"] = _dt.Rows[i]["order_id"];
+                    if (i == 0)
+                    {
+                        DataTable invoiceDt = _orderMasterMgr.GetInvoiceData(Convert.ToUInt32(_dt.Rows[i]["order_id"])); //根據order_id 進行查詢
+                        if (invoiceDt != null && invoiceDt.Rows.Count > 0)
+                        {
+                            row["發票金額"] = invoiceDt.Rows[0]["total_amount"];
+                            if (Convert.IsDBNull(invoiceDt.Rows[0]["invoice_date"]))
+                            {
+                                row["發票開立日期"] = "1970-01-01 08:00:00";
+                                row["發票號碼"] = "0";
+                            }
+                            else
+                            {
+                                row["發票開立日期"] = Convert.ToDateTime(invoiceDt.Rows[0]["invoice_date"]).ToString("yyyy-MM-dd HH:mm:ss");
+                                row["發票號碼"] = invoiceDt.Rows[0]["invoice_number"];
+                            }
+                        }
+                        else
+                        {
+                            row["發票金額"] = "";
+                            row["發票開立日期"] = "";
+                            row["發票號碼"] = "";
+                        }
+
+                    }
+                    else
+                    {
+                        if (_dt.Rows[i]["order_id"].ToString() == _dt.Rows[i - 1]["order_id"].ToString())
+                        {
+                            row["發票金額"] = "";
+                            row["發票開立日期"] = "";
+                            row["發票號碼"] = "";
+                        }
+                        else
+                        {
+                            DataTable invoiceDt = _orderMasterMgr.GetInvoiceData(Convert.ToUInt32(_dt.Rows[i]["order_id"]));//根據order_id 進行查詢
+                            if (invoiceDt != null && invoiceDt.Rows.Count > 0)
+                            {
+                                row["發票金額"] = invoiceDt.Rows[0]["total_amount"];
+                                if (Convert.IsDBNull(invoiceDt.Rows[0]["invoice_date"]))
+                                {
+                                    row["發票開立日期"] = "1970-01-01 08:00:00";
+                                    row["發票號碼"] = "0";
+                                }
+                                else
+                                {
+                                    row["發票開立日期"] = Convert.ToDateTime(invoiceDt.Rows[0]["invoice_date"]).ToString("yyyy-MM-dd HH:mm:ss");
+                                    row["發票號碼"] = invoiceDt.Rows[0]["invoice_number"];
+                                }
+                            }
+                            else
+                            {
+                                row["發票金額"] = "";
+                                row["發票開立日期"] = "";
+                                row["發票號碼"] = "";
+                            }
+                        }
+                    }
+
                     #region 付款方式
                     if (_dt.Rows[i]["order_payment"] != "")
                     {
                         int n = 1;
                         if (int.TryParse(_dt.Rows[i]["order_payment"].ToString(), out n))
                         {
-                        row["付款方式"] = _orderMasterMgr.GetParaByPayment(Convert.ToInt32(_dt.Rows[i]["order_payment"].ToString()));
-                        payment = row["付款方式"].ToString();
+                            row["付款方式"] = _orderMasterMgr.GetParaByPayment(Convert.ToInt32(_dt.Rows[i]["order_payment"].ToString()));
+                            payment = row["付款方式"].ToString();
                         }
                         else
                         {
@@ -4238,18 +4299,7 @@ namespace Admin.gigade.Controllers
                         row["付款狀態"] = "";
                     }
                     #endregion
-                    row["發票金額"] = _dt.Rows[i]["total_amount"];
-                    
-                    if ( Convert.IsDBNull(_dt.Rows[i]["invoice_date"]))
-                    {
-                        row["發票開立日期"] = "1970-01-01 08:00:00";
-                        row["發票號碼"] = "0";
-                    }
-                    else
-                    {
-                        row["發票開立日期"] = Convert.ToDateTime(_dt.Rows[i]["invoice_date"]).ToString("yyyy-MM-dd HH:mm:ss");
-                        row["發票號碼"] = _dt.Rows[i]["invoice_number"];
-                    }
+
                     row["商品細項編號"] = _dt.Rows[i]["item_id"];
                     #region 訂單狀態
                     if (_dt.Rows[i]["detail_status"] != "")
@@ -4277,11 +4327,11 @@ namespace Admin.gigade.Controllers
                     row["購買單價"] = _dt.Rows[i]["single_money"];
                     row["折抵購物金"] = _dt.Rows[i]["deduct_bonus"];
                     row["抵用卷"] = _dt.Rows[i]["deduct_welfare"];
-                    row["總價"] =( Convert.ToInt32(_dt.Rows[i]["total_money"]) - (Convert.ToInt32(_dt.Rows[i]["deduct_bonus"]) + Convert.ToInt32(_dt.Rows[i]["deduct_welfare"]))).ToString(); 
-                    row["成本單價"] = _dt.Rows[i]["single_cost"]; 
+                    row["總價"] = (Convert.ToInt32(_dt.Rows[i]["total_money"]) - (Convert.ToInt32(_dt.Rows[i]["deduct_bonus"]) + Convert.ToInt32(_dt.Rows[i]["deduct_welfare"]))).ToString();
+                    row["成本單價"] = _dt.Rows[i]["single_cost"];
                     row["寄倉費"] = _dt.Rows[i]["bag_check_money"];
                     row["成本總額"] = (Convert.ToInt32(_dt.Rows[i]["total_cost"]) - (Convert.ToInt32(_dt.Rows[i]["bag_check_money"])));
-                    if ( Convert.ToDateTime(_dt.Rows[i]["slave_date_close"]).ToString("yyyy-MM-dd HH:mm:ss") == "1970-01-01 08:00:00")
+                    if (Convert.ToDateTime(_dt.Rows[i]["slave_date_close"]).ToString("yyyy-MM-dd HH:mm:ss") == "1970-01-01 08:00:00")
                     {
                         row["出貨單歸檔期"] = "未歸檔";
                     }
@@ -4292,7 +4342,7 @@ namespace Admin.gigade.Controllers
                     //1970-01-01 08:00:00
                     row["負責PM"] = _dt.Rows[i]["pm"];//todo
                     row["來源ID"] = _dt.Rows[i]["ID"];
-                    row["來源名稱"] = _dt.Rows[i]["group_name"];
+                    row["來源名稱"] = _dt.Rows[i]["redirect_name"];
                     #region 出貨方式
                     if (_dt.Rows[i]["product_mode"] != "")
                     {
@@ -4313,7 +4363,7 @@ namespace Admin.gigade.Controllers
                     }
                     #endregion
                     dtHZ.Rows.Add(row);
-                    DataTable _dtFreight=_orderMasterMgr.GetOrderFreight(Convert.ToUInt32(_dt.Rows[i]["order_id"]));
+                    DataTable _dtFreight = _orderMasterMgr.GetOrderFreight(Convert.ToUInt32(_dt.Rows[i]["order_id"]));
                     if (_dtFreight != null && _dtFreight.Rows.Count > 0)
                     {
                         #region 常溫運費
@@ -4326,45 +4376,36 @@ namespace Admin.gigade.Controllers
                             rowNormal["付款方式"] = payment;
                             rowNormal["購買金額"] = _dt.Rows[i]["order_amount"];
                             rowNormal["付款狀態"] = order_status;
-                            rowNormal["發票金額"] = _dt.Rows[i]["total_amount"];
-
-                           if (Convert.IsDBNull(_dt.Rows[i]["invoice_date"]))
-                           {
-                               rowNormal["發票開立日期"] = "1970-01-01 08:00:00";
-                               rowNormal["發票號碼"] = "0";
-                           }
-                           else
-                           {
-                               rowNormal["發票開立日期"] = Convert.ToDateTime(_dt.Rows[i]["invoice_date"]).ToString("yyyy-MM-dd HH:mm:ss");
-                               rowNormal["發票號碼"] = _dt.Rows[i]["invoice_number"];
-                           }
-                           rowNormal["商品細項編號"] = "G00001";
-                           rowNormal["訂單狀態"] = "";
-                           rowNormal["供應商"] = "";
-                           rowNormal["供應商編碼"] ="";
-                           rowNormal["品名"] = "常溫運費";
-                           rowNormal["數量"] = "1";
-                           rowNormal["購買單價"] = _dtFreight.Rows[0][0];
-                           rowNormal["折抵購物金"] = "";
-                           rowNormal["抵用卷"] = "";
-                           rowNormal["總價"] = _dtFreight.Rows[0][0];
-                           rowNormal["成本單價"] = "";
-                           rowNormal["寄倉費"] = "";
-                           rowNormal["成本總額"] = "";
-                           if (Convert.ToDateTime(_dt.Rows[i]["slave_date_close"]).ToString("yyyy-MM-dd HH:mm:ss") == "1970-01-01 08:00:00")
-                           {
-                               rowNormal["出貨單歸檔期"] = "未歸檔";
-                           }
-                           else
-                           {
-                               rowNormal["出貨單歸檔期"] = _dt.Rows[i]["slave_date_close"];
-                           }
-                           //1970-01-01 08:00:00
-                           rowNormal["負責PM"] = "";//todo
-                           rowNormal["來源ID"] = "";
-                           rowNormal["來源名稱"] = "";
-                           rowNormal["出貨方式"] = "";
-                           dtHZ.Rows.Add(rowNormal);
+                            rowNormal["發票金額"] = "";
+                            rowNormal["發票開立日期"] = "";
+                            rowNormal["發票號碼"] = "";
+                            rowNormal["商品細項編號"] = "G00001";
+                            rowNormal["訂單狀態"] = "";
+                            rowNormal["供應商"] = "";
+                            rowNormal["供應商編碼"] = "";
+                            rowNormal["品名"] = "常溫運費";
+                            rowNormal["數量"] = "1";
+                            rowNormal["購買單價"] = _dtFreight.Rows[0][0];
+                            rowNormal["折抵購物金"] = "";
+                            rowNormal["抵用卷"] = "";
+                            rowNormal["總價"] = _dtFreight.Rows[0][0];
+                            rowNormal["成本單價"] = "";
+                            rowNormal["寄倉費"] = "";
+                            rowNormal["成本總額"] = "";
+                            if (Convert.ToDateTime(_dt.Rows[i]["slave_date_close"]).ToString("yyyy-MM-dd HH:mm:ss") == "1970-01-01 08:00:00")
+                            {
+                                rowNormal["出貨單歸檔期"] = "未歸檔";
+                            }
+                            else
+                            {
+                                rowNormal["出貨單歸檔期"] = _dt.Rows[i]["slave_date_close"];
+                            }
+                            //1970-01-01 08:00:00
+                            rowNormal["負責PM"] = "";//todo
+                            rowNormal["來源ID"] = "";
+                            rowNormal["來源名稱"] = "";
+                            rowNormal["出貨方式"] = "";
+                            dtHZ.Rows.Add(rowNormal);
                         }
                         #endregion
                         #region 低溫運費
@@ -4377,22 +4418,13 @@ namespace Admin.gigade.Controllers
                             rowLow["付款方式"] = payment;
                             rowLow["購買金額"] = _dt.Rows[i]["order_amount"];
                             rowLow["付款狀態"] = order_status;
-                            rowLow["發票金額"] = _dt.Rows[i]["total_amount"];
-
-                            if (Convert.IsDBNull(_dt.Rows[i]["invoice_date"]))
-                            {
-                                rowLow["發票開立日期"] = "1970-01-01 08:00:00";
-                                rowLow["發票號碼"] = "0";
-                            }
-                            else
-                            {
-                                rowLow["發票開立日期"] = Convert.ToDateTime(_dt.Rows[i]["invoice_date"]).ToString("yyyy-MM-dd HH:mm:ss");
-                                rowLow["發票號碼"] = _dt.Rows[i]["invoice_number"];
-                            }
+                            rowLow["發票金額"] = "";
+                            rowLow["發票開立日期"] = "";
+                            rowLow["發票號碼"] = "";
                             rowLow["商品細項編號"] = "G00002";
                             rowLow["訂單狀態"] = "";
                             rowLow["供應商"] = "";
-                            rowLow["供應商編碼"] ="";
+                            rowLow["供應商編碼"] = "";
                             rowLow["品名"] = "低溫運費";
                             rowLow["數量"] = "1";
                             rowLow["購買單價"] = _dtFreight.Rows[0][1];

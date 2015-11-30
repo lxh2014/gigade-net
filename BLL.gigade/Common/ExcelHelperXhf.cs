@@ -1483,7 +1483,7 @@ namespace gigadeExcel.Comment
             {
                 for (int i = 0; i < dt.Columns.Count; i++)
                 {
-                    sw.Write(dr[i].ToString());
+                    sw.Write(dr[i].ToString().Replace(',', '，').Replace("\r", "").Replace("\n", ""));
                     if (i != dt.Columns.Count - 1)
                     {
                         sw.Write(",");
