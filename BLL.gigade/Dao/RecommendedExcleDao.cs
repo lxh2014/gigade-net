@@ -29,7 +29,7 @@ namespace BLL.gigade.Dao
             try
             {
                 sql.AppendFormat(@"SELECT distinct(us.user_id)  as '會員編號',CASE us.user_gender WHEN 0 THEN '女' ELSE '男' END as '性別', case vu.v_id WHEN null then '否' ELSE '是' end as 'VIP',
-(Year(CURDATE())-us.user_birthday_year)as '年齡',FROM_UNIXTIME(us.user_reg_date)as '註冊時間',uos.order_product_subtotals as '購買總金額',
+(Year(CURDATE())-us.user_birthday_year)as '年齡',FROM_UNIXTIME(us.user_reg_date)as '註冊時間',uos.order_product_subtotals as '購買金額',
 uos.buy_counts as '購買次數',uos.order_product_subtotals/uos.buy_counts as '客單價'
 ,om.deduct_bonuss as '購物金使用',uos.normal_product_subtotals as '常溫商品總額',uos.low_product_subtotals as '低溫商品總額'
 FROM users us 
@@ -81,7 +81,7 @@ LEFT JOIN
 pro.product_type as '類別編號',pro.product_name as '名稱',pm.price as '售價',FROM_UNIXTIME(pro.product_start) as '上架時間',
 FROM_UNIXTIME(pro.product_end) as  '下架時間',
 pro.product_image as '商品圖片',pro.page_content_1 as '簡介',
-pro.page_content_2 as '商品規格',rpa.months,case ISNULL(rpa.months) WHEN TRUE then '否' else '是' end as '是否推薦商品',rpa.expend_day as '預計消耗時間',rpa.months AS '推薦月份設定',tp.parameterName as '商品狀態'
+pro.page_content_2 as '商品規格',case ISNULL(rpa.months) WHEN TRUE then '否' else '是' end as '是否推薦商品',rpa.expend_day as '預計消耗時間',rpa.months AS '推薦月份設定',tp.parameterName as '商品狀態'
 from product as pro 
 left join recommended_product_attribute as rpa on pro.product_id=rpa.product_id 
 LEFT JOIN (SELECT parameterCode,parameterName FROM t_parametersrc WHERE parameterType='product_status') as tp on tp.parameterCode=pro.product_status 
@@ -124,7 +124,7 @@ LEFT JOIN price_master pm on pm.product_id=pro.product_id  ");
             try
             {
                 sql.AppendFormat(@"SELECT om.order_id as '訂單編號',us.user_id as '會員編號',order_amount as '訂單金額',
-                                                    FROM_UNIXTIME(order_createdate) as '訂單創建時間' 
+                                                    FROM_UNIXTIME(order_createdate) as '訂單日期' 
                                                     FROM order_master om 
                                                     LEFT JOIN users us on om.user_id=us.user_id ");
                 sqlwhere.Append(" where 1=1 ");
@@ -244,7 +244,7 @@ INNER JOIN (SELECT parameterCode,parameterName FROM t_parametersrc WHERE paramet
             StringBuilder sqlwhere = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"select p.brand_id as '品牌編號',vb.brand_name as '品牌名稱',pcb.category_id as '品牌類別編號',p.prod_classify as '館別編號'
+                sql.AppendFormat(@"select p.brand_id as '品牌編號',vb.brand_name as '名稱',pcb.category_id as '品牌類別編號',p.prod_classify as '館別編號'
 from product as p left join product_category_brand as pcb
 on p.brand_id=pcb.brand_id 
 left join vendor_brand as vb 
