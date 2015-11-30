@@ -209,21 +209,43 @@ namespace Admin.gigade.Controllers
             {
                 _edmlistmainMgr = new EdmListConditionMainMgr(sqlConnectionString);
                 SetQueryValue(query);
-                DataTable _dt = _edmlistmainMgr.GetUserNum(query);
+                DataTable _dt = new DataTable();
                 string filename = "EDM名單篩選_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
                 string newFileName = Server.MapPath(excelPath_export + filename);
-                string[] colName = { "電子信箱" };
                 DataTable _newdt = new DataTable();
                 DataRow dr;
-                _newdt.Columns.Add("user_email", typeof(string));              
-                for (int i = 0; i < _dt.Rows.Count; i++)
+                if (query.MailorPhone == 1)
                 {
-                    dr = _newdt.NewRow();
-                    _newdt.Rows.Add(dr);
-                    _newdt.Rows[i]["user_email"] = _dt.Rows[i]["user_email"];                                     
+                    _dt = _edmlistmainMgr.GetUserNum(query);
+                    string[] colName = { "電子信箱,用戶ID" };
+                    _newdt.Columns.Add("user_email", typeof(string));
+                    _newdt.Columns.Add("user_id", typeof(string));
+                    for (int i = 0; i < _dt.Rows.Count; i++)
+                    {
+                        dr = _newdt.NewRow();
+                        _newdt.Rows.Add(dr);
+                        _newdt.Rows[i]["user_email"] = _dt.Rows[i]["user_email"];
+                        _newdt.Rows[i]["user_id"] = _dt.Rows[i]["user_id"];
+                    }
+                    CsvHelper.ExportDataTableToCsv(_newdt, newFileName, colName, true);
+                    json = "{success:true,fileName:\'" + filename + "\'}";
                 }
-                CsvHelper.ExportDataTableToCsv(_newdt, newFileName, colName, true);
-                json = "{success:true,fileName:\'" + filename + "\'}";
+                else
+                {
+                    _dt = _edmlistmainMgr.GetUserNum(query);
+                    string[] colName = { "手機號碼,用戶ID" };
+                    _newdt.Columns.Add("user_mobile", typeof(string));
+                    _newdt.Columns.Add("user_id", typeof(string));             
+                    for (int i = 0; i < _dt.Rows.Count; i++)
+                    {
+                        dr = _newdt.NewRow();
+                        _newdt.Rows.Add(dr);
+                        _newdt.Rows[i]["user_mobile"] = _dt.Rows[i]["user_mobile"];
+                        _newdt.Rows[i]["user_id"] = _dt.Rows[i]["user_id"];                                     
+                    }
+                    CsvHelper.ExportDataTableToCsv(_newdt, newFileName, colName, true);
+                    json = "{success:true,fileName:\'" + filename + "\'}";
+                }             
             }
             catch (Exception ex)
             {
@@ -451,6 +473,18 @@ namespace Admin.gigade.Controllers
                     {
                         query.ChkBlackList = true;
                     }
+                }
+                if (!string.IsNullOrEmpty(Request.Params["ChkPhone"]))
+                {
+                    if (Request.Params["ChkPhone"] == "true")
+                    {
+                        query.ChkPhone = true;
+                    }
+                }
+                int a;
+                if (int.TryParse(Request.Params["btn"],out a))
+                {
+                    query.MailorPhone = a;                    
                 }
                 return query;
             }

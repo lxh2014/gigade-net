@@ -146,6 +146,10 @@ namespace BLL.gigade.Dao
                 {
                     sql.AppendFormat(@"INSERT INTO edm_list_conditoin_sub (elcm_id,elcs_key,elcs_value1) VALUES({0},'black_list','{1}');", query.elcm_id, query.ChkBlackList);
                 }
+                if (query.ChkPhone == true)
+                {
+                    sql.AppendFormat(@"INSERT INTO edm_list_conditoin_sub (elcm_id,elcs_key,elcs_value1) VALUES({0},'phone','{1}');", query.elcm_id, query.ChkPhone);
+                }
                 return _dbAccess.execCommand(sql.ToString());
             }
             catch (Exception ex)

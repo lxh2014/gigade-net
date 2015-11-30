@@ -46,6 +46,8 @@ namespace BLL.gigade.Model.Query
         public int totalConsumptionMin { get; set; }
         public int totalConsumptionMax { get; set; }
         public bool excludeBlackList { get; set; }
+        public bool ChkPhone { get; set; }
+        public int MailorPhone { get; set; }
 
         public EdmListConditoinSubQuery()
         {

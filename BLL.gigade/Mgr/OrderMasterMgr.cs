@@ -1334,5 +1334,19 @@ set ");
                 throw new Exception("OrderMgr-->CagegoryDetialExportInfo-->" + ex.Message, ex);
             }
         }
+
+
+        public DataTable GetInvoiceData(uint order_id)
+        {
+
+            try
+            {
+                return _orderMasterDao.GetInvoiceData(order_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->GetInvoiceData-->" + ex.Message, ex);
+            }
+        }
     }
 }
