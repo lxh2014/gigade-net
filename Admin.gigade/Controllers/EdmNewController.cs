@@ -243,6 +243,33 @@ namespace Admin.gigade.Controllers
 
         #endregion
 
+        #region 點擊預覽
+        public HttpResponseBase AdvanceContent()
+        {
+            string contentStr = string.Empty;
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Params["group_id"]))
+                {
+                    int group_id = Convert.ToInt32(Request.Params["group_id"]);
+                    _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
+                    contentStr =Server.HtmlDecode(_edmContentNewMgr.GetContentIDAndUrl(group_id));
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            this.Response.Clear();
+            this.Response.Write(contentStr);
+            this.Response.End();
+            return this.Response;
+        }
+        #endregion
+
         #endregion`
 
         #region 電子報範本
@@ -476,7 +503,6 @@ namespace Admin.gigade.Controllers
                     {
                         query.template_data = query.template_data.Replace(subscribe_url, "");
                     }
-                    //query.pm = Convert.ToInt32(Request.Params["pm"]);
                 }
                 if (!string.IsNullOrEmpty(Request.Params["active_dis"]))
                 {
@@ -491,7 +517,7 @@ namespace Admin.gigade.Controllers
                     }
                     if (query.active != 0)
                     {
-                        query.template_id = 0;
+                        query.template_id = _edmContentNewMgr.AdvanceTemplate();
                     }
                 }
                 query.content_create_userid = (Session["caller"] as Caller).user_id;
@@ -660,7 +686,7 @@ namespace Admin.gigade.Controllers
 
 
         #region ContentUrl
-        public HttpResponseBase GetContentUrl()
+        /*public HttpResponseBase GetContentUrl()
         {
             string json = string.Empty;
             string template_data = string.Empty;
@@ -732,7 +758,7 @@ namespace Admin.gigade.Controllers
             this.Response.Write(json);
             this.Response.End();
             return this.Response;
-        }
+        }*/
         #endregion
 
         #region 發送電子報 （測試發送/正式發送）
@@ -802,8 +828,8 @@ namespace Admin.gigade.Controllers
                                     {
                                         mQuery.bodyData = Request.Params["body"]+ _edmContentNewMgr.GetRecommendHtml(0);
                                         #region   得到電子報整體內容
-                                        if (mQuery.template_id != 0)//不是通過活動頁面，而是選擇了範本
-                                        {
+                                       // if (mQuery.template_id != 0)//不是通過活動頁面，而是選擇了範本
+                                      //  {
                                             string replaceStr = string.Empty;
                                             string editStr = string.Empty;
                                             string content_url = _edmContentNewMgr.GetContentUrlByContentId(eslQuery.content_id);
@@ -845,16 +871,16 @@ namespace Admin.gigade.Controllers
                                                 }
                                                 #endregion
                                             }
-                                        }
-                                        else//選擇的是活動頁面
-                                        {
-                                            #region 是否點了訂閱電子報
-                                            if (mQuery.bodyData.IndexOf(subscribe) > 0)//找到了埋的那個code，證明是點擊了訂閱電子報
-                                            {
-                                                mQuery.bodyData = mQuery.bodyData.Replace(subscribe, "\n") + _edmContentNewMgr.GetRecommendHtml(0) + subscribe_url;
-                                            }
-                                            #endregion
-                                        }
+                                        //}
+                                        //else//選擇的是活動頁面
+                                        //{
+                                        //    #region 是否點了訂閱電子報
+                                        //    if (mQuery.bodyData.IndexOf(subscribe) > 0)//找到了埋的那個code，證明是點擊了訂閱電子報
+                                        //    {
+                                        //        mQuery.bodyData = mQuery.bodyData.Replace(subscribe, "\n") + _edmContentNewMgr.GetRecommendHtml(0) + subscribe_url;
+                                        //    }
+                                        //    #endregion
+                                        //}
                                             #endregion
                                     }
                                     MailHelper mail = new MailHelper();
