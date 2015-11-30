@@ -108,7 +108,14 @@ namespace BLL.gigade.Dao
             DateTime dtime = DateTime.Parse("2010-01-01");
             try
             {
-                sql.Append(@"SELECT u.user_email,u.user_name,u.user_id FROM  users u ");
+                if (q.MailorPhone == 1)
+                {
+                    sql.Append(@"SELECT u.user_email,u.user_name,u.user_id FROM  users u ");
+                }
+                else
+                {
+                    sql.Append(@"SELECT u.user_mobile,u.user_name,u.user_id FROM  users u ");
+                }
                 where.Append(@"WHERE 1=1 ");
                 if(q.chkGender)
                 {//性別
@@ -134,7 +141,7 @@ namespace BLL.gigade.Dao
                     else
                     {
                         where.AppendFormat(" AND gm.gmcs {0} {1} ", q.buyCondition == 0 ? ">" : "<", q.buyTimes);
-                        join.AppendFormat(" LEFT JOIN (select user_id,count(om.order_id) as 'gmcs' FROM order_master om WHERE order_status NOT IN(90,91) {0} GROUP BY user_id) gm ON u.user_id=gm.user_id ", buywhere);
+                        join.AppendFormat(" INNER JOIN (select user_id,count(om.order_id) as 'gmcs' FROM order_master om WHERE order_status NOT IN(90,91) {0} GROUP BY user_id) gm ON u.user_id=gm.user_id ", buywhere);
                     }
                 }
                 if (q.ChkAge)
@@ -159,7 +166,7 @@ namespace BLL.gigade.Dao
                     else
                     {
                         where.AppendFormat(" AND qx.qxcs {0} {1} ", q.cancelCondition == 0 ? ">" : "<", q.cancelTimes);
-                        join.AppendFormat(" LEFT JOIN (select user_id,count(om.order_id) as 'qxcs' FROM order_master om WHERE order_status IN (90) {0} GROUP BY user_id) qx ON u.user_id=qx.user_id ", buywhere);
+                        join.AppendFormat(" INNER JOIN (select user_id,count(om.order_id) as 'qxcs' FROM order_master om WHERE order_status IN (90) {0} GROUP BY user_id) qx ON u.user_id=qx.user_id ", buywhere);
                     }
                 }
                 if (q.ChkRegisterTime)
@@ -191,7 +198,7 @@ namespace BLL.gigade.Dao
                     else
                     {
                         where.AppendFormat(" AND th.thcs {0} {1} ", q.returnCondition == 0 ? ">" : "<", q.returnTimes);
-                        join.AppendFormat(" LEFT JOIN (select om.user_id,Count(orm.return_id) as thcs FROM order_return_master orm LEFT JOIN order_master om on orm.order_id=om.order_id WHERE return_status=1 {0} GROUP BY om.user_id) th ON u.user_id=th.user_id ", buywhere);
+                        join.AppendFormat(" INNER JOIN (select om.user_id,Count(orm.return_id) as thcs FROM order_return_master orm LEFT JOIN order_master om on orm.order_id=om.order_id WHERE return_status=1 {0} GROUP BY om.user_id) th ON u.user_id=th.user_id ", buywhere);
                     }
                 }
                 if (q.ChkLastOrder)
@@ -214,7 +221,7 @@ namespace BLL.gigade.Dao
                     }
                     else
                     {
-                        join.Append(" LEFT JOIN (SELECT user_id,Count(id) as hdtz from arrival_notice GROUP BY user_id) an ON u.user_id = an.user_id ");
+                        join.Append(" INNER JOIN (SELECT user_id,Count(id) as hdtz from arrival_notice GROUP BY user_id) an ON u.user_id = an.user_id ");
                         where.AppendFormat(" AND an.hdtz {0} {1} ", q.noticeCondition == 0 ? ">" : "<", q.noticeTimes);
                     }
                 }
@@ -245,6 +252,10 @@ namespace BLL.gigade.Dao
                 if (q.ChkBlackList)
                 {//不排除黑名單
                     where.Append(" AND u.user_id NOT IN (SELECT user_id from vip_user  WHERE group_id='48' ) ");
+                }
+                if (q.ChkPhone)
+                {//排除拒收廣告簡訊的人
+                    where.Append(" AND send_sms_ad=1 ");
                 }
                 return _dbAccess.getDataTable(sql.ToString() + join.ToString() + where.ToString());
             }
