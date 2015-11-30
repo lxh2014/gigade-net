@@ -29,13 +29,18 @@ namespace BLL.gigade.Dao
             try
             {
                 sql.AppendFormat(@"SELECT distinct(us.user_id)  as '會員編號',CASE us.user_gender WHEN 0 THEN '女' ELSE '男' END as '性別', case vu.v_id WHEN null then '否' ELSE '是' end as 'VIP',
-(Year(CURDATE())-us.user_birthday_year)as '年齡',FROM_UNIXTIME(us.user_reg_date)as '註冊時間',uos.buy_counts as '購買次數',uos.order_product_subtotals as '購買總金額'
+(Year(CURDATE())-us.user_birthday_year)as '年齡',FROM_UNIXTIME(us.user_reg_date)as '註冊時間',uos.order_product_subtotals as '購買總金額',
+uos.buy_counts as '購買次數',uos.order_product_subtotals/uos.buy_counts as '客單價'
 ,om.deduct_bonuss as '購物金使用',uos.normal_product_subtotals as '常溫商品總額',uos.low_product_subtotals as '低溫商品總額'
-FROM users us LEFT JOIN (SELECT user_id,sum(buy_count)as buy_counts,SUM(order_product_subtotal) as order_product_subtotals
+FROM users us 
+LEFT JOIN 
+(SELECT user_id,sum(buy_count)as buy_counts,SUM(order_product_subtotal) as order_product_subtotals 
 ,sum(normal_product_subtotal)as normal_product_subtotals,sum(low_product_subtotal)as low_product_subtotals 
 FROM user_orders_subtotal GROUP BY user_id) as uos on us.user_id=uos.user_id 
-left join vip_user vu on us.user_id=vu.user_id 
-LEFT JOIN (SELECT user_id,sum(deduct_bonus) as deduct_bonuss FROM  order_master GROUP BY user_id) as om on us.user_id = om.user_id  ");
+left join 
+vip_user vu on us.user_id=vu.user_id 
+LEFT JOIN 
+(SELECT user_id,sum(deduct_bonus) as deduct_bonuss FROM  order_master GROUP BY user_id) as om on us.user_id = om.user_id ");
                 sqlwhere.Append(" where 1=1 ");
                 //如果沒給類型就是導出全部時間的
                 if (!string.IsNullOrEmpty(rop.outType))
@@ -73,14 +78,16 @@ LEFT JOIN (SELECT user_id,sum(deduct_bonus) as deduct_bonuss FROM  order_master 
             try
             {
                 sql.AppendFormat(@"select pro.product_id as '商品編號',pro.brand_id as '品牌編號' ,
-pro.product_type as '類別編號',pro.product_name as '名稱',FROM_UNIXTIME(pro.product_start) as '上架時間',
-FROM_UNIXTIME(pro.product_end) as  '下架時間',pro.page_content_1 as '描述',
-pro.product_image as '商品圖片',pro.mobile_image as '手機圖片',rpa.months AS '推薦月份設定',
-pro.page_content_2 as '商品規格',case rpa.months WHEN null then '否' else '是' end as '是否推薦商品',
-rpa.expend_day as '預計消耗時間'
-from product as pro left join recommended_product_attribute as rpa on pro.product_id=rpa.product_id   ");
+pro.product_type as '類別編號',pro.product_name as '名稱',pm.price as '售價',FROM_UNIXTIME(pro.product_start) as '上架時間',
+FROM_UNIXTIME(pro.product_end) as  '下架時間',
+pro.product_image as '商品圖片',pro.page_content_1 as '簡介',
+pro.page_content_2 as '商品規格',rpa.months,case ISNULL(rpa.months) WHEN TRUE then '否' else '是' end as '是否推薦商品',rpa.expend_day as '預計消耗時間',rpa.months AS '推薦月份設定',tp.parameterName as '商品狀態'
+from product as pro 
+left join recommended_product_attribute as rpa on pro.product_id=rpa.product_id 
+LEFT JOIN (SELECT parameterCode,parameterName FROM t_parametersrc WHERE parameterType='product_status') as tp on tp.parameterCode=pro.product_status 
+LEFT JOIN price_master pm on pm.product_id=pro.product_id  ");
                 sqlwhere.Append(" where 1=1 ");
-                sqlwhere.Append(" and pro.product_id > 10000 and pro.product_status=5");
+                sqlwhere.Append(" and pro.product_id > 10000 ");
                 //如果沒給類型就是導出全部時間的
                 if (!string.IsNullOrEmpty(rop.outType))
                 {
@@ -119,7 +126,7 @@ from product as pro left join recommended_product_attribute as rpa on pro.produc
                 sql.AppendFormat(@"SELECT om.order_id as '訂單編號',us.user_id as '會員編號',order_amount as '訂單金額',
                                                     FROM_UNIXTIME(order_createdate) as '訂單創建時間' 
                                                     FROM order_master om 
-                                                    LEFT JOIN users us on om.user_id=us.user_id   ");
+                                                    LEFT JOIN users us on om.user_id=us.user_id ");
                 sqlwhere.Append(" where 1=1 ");
                 //如果沒給類型就是導出全部時間的
                 if (!string.IsNullOrEmpty(rop.outType))
@@ -157,14 +164,13 @@ from product as pro left join recommended_product_attribute as rpa on pro.produc
             try
             {
                 sql.AppendFormat(@"SELECT om.order_id as '訂單編號',pi.product_id as '商品編號',od.buy_num as '數量',
-tp.parameterName FROM order_master om 
+tp.parameterName as '溫層' FROM order_master om 
 INNER JOIN order_slave os on om.order_id =os.order_id 
 INNER JOIN order_detail od on os.slave_id=od.slave_id 
 INNER JOIN product_item pi on od.item_id=pi.item_id 
 INNER JOIN product pt on pi.product_id =pt.product_id 
-INNER JOIN t_parametersrc tp on pt.product_freight_set =tp.parameterCode    ");
+INNER JOIN (SELECT parameterCode,parameterName FROM t_parametersrc WHERE parameterType='product_freight') AS tp on pt.product_freight_set =tp.parameterCode ");
                 sqlwhere.Append(" where 1=1 ");
-                sqlwhere.Append(" and  tp.parameterType = 'product_freight'");
                 //如果沒給類型就是導出全部時間的
                 if (!string.IsNullOrEmpty(rop.outType))
                 {
@@ -238,15 +244,13 @@ INNER JOIN t_parametersrc tp on pt.product_freight_set =tp.parameterCode    ");
             StringBuilder sqlwhere = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"select case  p.prod_classify WHEN 10 then '食品館' WHEN 20 then '用品館' else '' end  as '館別編號',
-p.brand_id as '品牌編號',p.product_name as '商品名稱',
-vb.brand_name as '品牌名稱',pcb.category_id as '品牌類別編號'
+                sql.AppendFormat(@"select p.brand_id as '品牌編號',vb.brand_name as '品牌名稱',pcb.category_id as '品牌類別編號',p.prod_classify as '館別編號'
 from product as p left join product_category_brand as pcb
 on p.brand_id=pcb.brand_id 
-left join vendor_brand as vb
-on p.brand_id=vb.brand_id  ");
+left join vendor_brand as vb 
+on p.brand_id=vb.brand_id ");
                 sqlwhere.Append(" where 1=1 ");
-                sqlwhere.Append(" and  p.prod_classify<>0 group by p.brand_id ");
+                sqlwhere.Append(" and p.product_id>10000 group by p.brand_id ");
                 //如果沒給類型就是導出全部時間的
                 if (!string.IsNullOrEmpty(rop.outType))
                 {
