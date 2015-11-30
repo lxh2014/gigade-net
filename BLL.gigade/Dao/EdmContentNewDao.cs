@@ -681,5 +681,35 @@ WHERE content_id='{0}'  and log_id='{1}'   AND edm_trace.count>0;", content_id, 
                 throw new Exception("EdmContentNewDao-->GetContentUrlByContentId-->" + sql.ToString() + ex.Message, ex);
             }
         }
+
+        public DataTable GetContentIDAndUrl(int group_id)
+        {
+            DataTable _dt = new DataTable();
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("select edm_template.content_url, edm_content_new.content_id,edm_content_new.template_id,edm_content_new.template_data  from edm_group_new inner join edm_content_new	on edm_group_new.group_id=edm_content_new.group_id inner join edm_send_log on edm_send_log.content_id=edm_content_new.content_id inner join edm_template on edm_content_new.template_id=edm_template.template_id where edm_group_new.group_id='{0}' order by edm_send_log.createdate desc limit 1;", group_id);
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetContentIDAndUrl-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+
+        public DataTable AdvanceTemplate()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" select template_id from edm_template where template_name='預設'; ");
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->AdvanceTemplate-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
     }
 }

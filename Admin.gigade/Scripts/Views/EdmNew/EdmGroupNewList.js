@@ -84,8 +84,9 @@ Ext.onReady(function () {
             {
                 header: "試閱", dataIndex: "trial_url", align: 'center', width: 150,
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    //return "<a href='#'>" + value + "</a>";
-                    return Ext.String.format('<a href="{0}" target="_blank">{0}</a>', value);
+                    //return "<a href='javascript:void(0)' onclick='AdvanceContent(" + record.data.group_id + ")' > " + 點擊試閱 + "</a>";
+                    return "<a href='javascript:void(0)' onclick='AdvanceContent(" + record.data.group_id + ")'  >點擊試閱<a/>";
+                    //return Ext.String.format('<a href="{0}" target="_blank">{0}</a>', value);
                 }
             },
             {
@@ -293,4 +294,31 @@ onedit = function () {
         //Ext.Msg.alert(row[0].data.name);
         editFunction(row[0], EdmGroupNewStore);
     }
+}
+
+AdvanceContent = function (group_id) {
+    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+    myMask.show();
+    Ext.Ajax.request({
+        url: '/EdmNew/AdvanceContent',
+        params: {
+            group_id:group_id
+        },
+        success: function (data) {
+            myMask.hide();
+            var result = data.responseText;
+            if (result == "") {
+                Ext.Msg.alert("提示信息", "此類型下無發送電子報");
+            }
+            else {
+                var A = 1000;
+                var B = 700;
+                var C = (document.body.clientWidth - A) / 2;
+                var D = window.open('', null, 'toolbar=yes,location=no,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=' + A + ',height=' + B + ',left=' + C);
+                var E = "<html><head><title>預覽</title></head><style>body{line-height:200%;padding:50px;}</style><body><div >" + result + "</div></body></html>";
+                D.document.write(E);
+                D.document.close();
+            }
+        }
+    });
 }

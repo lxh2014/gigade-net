@@ -675,6 +675,7 @@ editFunction = function (row, store) {
                         Query(1);
                         Ext.getCmp('active_dis').setValue(active);
                         $("#editor3").data("kendoEditor").value(Ext.htmlDecode(result.data.epaper_content).replace(/>\s*<map/g, '><map'));
+                         
                     }
                     else {
                         if (result.msg == '0') {
