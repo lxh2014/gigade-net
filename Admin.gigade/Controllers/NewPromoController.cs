@@ -28,6 +28,7 @@ namespace Admin.gigade.Controllers
         private INewPromoCarnetImplMgr _INewPromoCarnetMgr;
         private INewPromoPresentImplMgr _INewPromoPresentMgr;
         private INewPromoRecordImplMgr _INewPromoRecordMgr;
+        private IParametersrcImplMgr _IParametersrcMgr;
         //上傳圖片
         string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];//圖片的限制條件，格式，最大、小值
         string imgLocalServerPath = ConfigurationManager.AppSettings["imgLocalServerPath"];//aimg.gigade100.com 
@@ -846,6 +847,13 @@ namespace Admin.gigade.Controllers
                 //query.event_id = Request.Params["entId"];
                 _INewPromoPresentMgr = new NewPromoPresentMgr(mySqlConnectionString);
                 _dt = _INewPromoPresentMgr.NewPromoPresentList(query, out  totalCount);
+                for (int i = 0; i < _dt.Rows.Count; i++)
+                {
+                    if(_dt.Rows[i]["event_type"].ToString()=="")
+                    {
+                        _dt.Rows[i]["event_type"] = "0";
+                    }
+                }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(_dt, Formatting.Indented, timeConverter) + "}";
@@ -865,6 +873,33 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
+        public HttpResponseBase GetNewPromoPresentEventType()
+        {
+            string json=string.Empty;
+            try
+            {
+                string type = "new_promo_present_event_type";
+                _IParametersrcMgr = new ParameterMgr(mySqlConnectionString);
+                List<Parametersrc> list = _IParametersrcMgr.GetElementType(type);
+                Parametersrc src = new Parametersrc();
+                src.parameterName = "不分";
+                src.ParameterCode = "0";
+                list.Insert(0, src);
+                json = "{data:" + JsonConvert.SerializeObject(list, Formatting.Indented) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }
         #region 根據product_id獲取到product_name
         public HttpResponseBase GetProductnameById()
         {
@@ -916,6 +951,11 @@ namespace Admin.gigade.Controllers
                 if (string.IsNullOrEmpty(Request.Params["row_id"]))
                 {
                     NewPromoPresentQuery newPresentQuery = new NewPromoPresentQuery();
+                    newPresentQuery.event_type = Request.Params["event_type"];
+                    if(newPresentQuery.event_type=="0")
+                    {
+                        newPresentQuery.event_type = "";
+                    }  
                     newPresentQuery.created = DateTime.Now;
                     newPresentQuery.kuser = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                     newPresentQuery.modified = newPresentQuery.created;
@@ -970,6 +1010,11 @@ namespace Admin.gigade.Controllers
                 else
                 {
                     NewPromoPresentQuery newPresentQuery = new NewPromoPresentQuery();
+                    newPresentQuery.event_type = Request.Params["event_type"];
+                    if (newPresentQuery.event_type == "0")
+                    {
+                        newPresentQuery.event_type = "";
+                    }  
                     _INewPromoPresentMgr = new NewPromoPresentMgr(mySqlConnectionString);
                     newPresentQuery.row_id = Convert.ToInt32(Request.Params["row_id"]);
                     newPresentQuery.start = Convert.ToDateTime((Convert.ToDateTime(Request.Params["valid_start"])).ToString("yyyy-MM-dd HH:mm:ss"));
