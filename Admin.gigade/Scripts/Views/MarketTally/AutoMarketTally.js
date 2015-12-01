@@ -49,13 +49,6 @@ var SearchTypeStore = Ext.create('Ext.data.Store', {
 //加載的時候得到數據 (排程日誌查詢) 
 Aseld_Store.on('beforeload', function ()
 {
-    search_con = Ext.getCmp("search_con").getValue();
-
-    if (search_con.trim() == "" && Ext.getCmp('start_time').getValue() == null && Ext.getCmp('end_time').getValue() == null)
-    {
-        Ext.Msg.alert(INFORMATION, '請先輸入查詢條件');
-        return false;
-    }
     Ext.apply(Aseld_Store.proxy.extraParams,
         {
             search_type: Ext.getCmp("search_type").getValue(),
@@ -318,6 +311,14 @@ function Reset()
 function Query(x)
 {
     Aseld_Store.removeAll();
+    search_con = Ext.getCmp("search_con").getValue();
+
+    if (search_con.trim() == "" && Ext.getCmp('start_time').getValue() == null && Ext.getCmp('end_time').getValue() == null)
+    {
+        Ext.Msg.alert(INFORMATION, '請先輸入查詢條件');
+        return false;
+    }
+
     Ext.getCmp('Aseld_grid').store.loadPage(1, {
         params: {
 

@@ -178,7 +178,8 @@ namespace BLL.gigade.Mgr
                 }
                 // (DateTime.TryParse(Request.Params["made_date"].ToString(), out dt))
                 {//商品製造日期
-                    q.made_dt = ivd.made_date;
+                    //q.made_dt = ivd.made_date;
+                    q.made_dt = DateTime.Now;
                 }
                 //if (int.TryParse(Request.Params["prod_qty"].ToString(), out sun))
                 {//商品原有數量
