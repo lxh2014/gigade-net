@@ -66,7 +66,7 @@ namespace BLL.gigade.Mgr
                 if (stocksum < out_qty)
                 {
                     //庫調
-                    int result = RFKT(ase[0], store_ivd[0], out_qty - stocksum);
+                    int result = RFKT(ase[0], store_ivd[0], out_qty - stocksum + store_ivd[0].prod_qty);
                     if (result == 100)
                     {
                         //刷新庫存信息
