@@ -30,6 +30,7 @@ namespace BLL.gigade.Model
         public DateTime modified { get; set; }
         public int bonus_expire_day { get; set; }
         public int use_span_day { get; set; }
+        public string event_type { get; set; }
         public NewPromoPresent()
         {
             row_id = 0;
@@ -55,6 +56,7 @@ namespace BLL.gigade.Model
             modified = DateTime.MinValue;
             bonus_expire_day = 0;
             use_span_day = 0;
+            event_type = string.Empty;
         }
     }
 }
