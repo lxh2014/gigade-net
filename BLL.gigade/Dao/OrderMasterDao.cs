@@ -2351,17 +2351,17 @@ namespace BLL.gigade.Dao
             StringBuilder sqlWhere = new StringBuilder();
             try
             {
-                sqlSingle.AppendFormat(@"SELECT om.order_id ,od.detail_id FROM order_master om 
+                sqlSingle.AppendFormat(@"SELECT om.order_id  FROM order_master om 
                                     LEFT JOIN order_slave os ON om.order_id=os.order_id
 	                                LEFT JOIN order_detail od ON os.slave_id=od.slave_id
 	                                INNER JOIN product_item pi ON od.item_id=pi.item_id
 	                                INNER JOIN product_category_set pcs ON pi.product_id=pcs.product_id
-	                                WHERE od.item_mode=0  AND pcs.category_id={0}",query.category_id);
-                sqlFather.AppendFormat(@" SELECT om.order_id,od.detail_id FROM order_master om  
+	                                WHERE od.item_mode=0  AND pcs.category_id={0} AND od.detail_status NOT IN (89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
+                sqlFather.AppendFormat(@" SELECT om.order_id FROM order_master om  
                                      LEFT JOIN order_slave os ON om.order_id=os.order_id
                                      LEFT JOIN order_detail od ON os.slave_id=od.slave_id
                                      INNER JOIN product_category_set pcs ON od.parent_id=pcs.product_id
-                                     WHERE od.item_mode=1  AND pcs.category_id={0}", query.category_id);
+                                     WHERE od.item_mode=1  AND pcs.category_id={0} AND od.detail_status NOT IN (89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
                 if (query.category_status != 0)
                 {
                     sqlWhere.AppendFormat(" AND om.money_collect_date > 0");
@@ -2385,22 +2385,15 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"SELECT DISTINCT od.detail_id, u.user_name,FROM_UNIXTIME(om.order_createdate) AS order_createdate,om.order_id,om.order_payment,'' as  payment_name,
-om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,'' as slave_status_name,
-v.vendor_name_simple,v.vendor_code,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,od.single_money*od.buy_num,
-od.single_cost,od.bag_check_money,od.single_cost*od.buy_num,FROM_UNIXTIME(os.slave_date_close) slave_date_close,mu.user_username AS 'pm',om.source_trace AS 'ID',	
-rg.group_name AS group_name,od.product_mode ,'' as product_mode_name,od.item_mode,dm.delivery_name,dm.delivery_address
-                    FROM order_master om
-                    LEFT JOIN order_slave os ON  om.order_id=os.order_id
-                    LEFT JOIN order_detail od ON os.slave_id=od.slave_id
-                    LEFT JOIN vendor v ON v.vendor_id = od.item_vendor_id
-                    LEFT JOIN manage_user mu ON mu.user_id=v.product_manage
-                    LEFT JOIN users u ON u.user_id=om.user_id
-                    LEFT JOIN redirect r ON r.redirect_id=om.source_trace
-                    LEFT JOIN redirect_group rg  ON r.group_id = rg.group_id 
-                    INNER JOIN product_item pi ON od.item_id=pi.item_id                   
-					LEFT JOIN (SELECT DISTINCT order_id,delivery_name,delivery_address FROM deliver_master) dm ON om.order_id=dm.order_id
-                    WHERE om.order_id='{0}' AND od.detail_status NOT IN (90,91) ; ", order_id);
+                sql.AppendFormat(@"SELECT DISTINCT od.detail_id,om.order_name,om.order_createdate,'' as order_createdate_format,om.order_id,om.order_payment,'' as  payment_name,
+                                om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,'' as slave_status_name,od.product_name,
+                                od.deduct_bonus,od.deduct_welfare,od.single_money,od.buy_num,od.single_cost,od.bag_check_money,od.single_cost,os.slave_date_close,'' as slave_date_close_format,
+                                od.product_mode ,'' as product_mode_name,od.item_mode,om.delivery_name,om.delivery_address,'' as amount,'' as cost_amount,od.event_cost
+                                FROM order_master om
+                                LEFT JOIN order_slave os ON  om.order_id=os.order_id
+                                LEFT JOIN order_detail od ON os.slave_id=od.slave_id                              
+                                INNER JOIN product_item pi ON od.item_id=pi.item_id                   
+                                WHERE om.order_id='{0}' AND od.detail_status NOT IN (89,90,91) ; ", order_id);
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)
@@ -2417,36 +2410,23 @@ rg.group_name AS group_name,od.product_mode ,'' as product_mode_name,od.item_mod
             StringBuilder sqlWhere = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"( SELECT pcs.category_id,u.user_name,FROM_UNIXTIME(om.order_createdate) AS order_createdate,
-                            om.order_id,om.order_payment,'' as  payment_name,om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,'' as slave_status_name,
-                            v.vendor_name_simple,v.vendor_code,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,od.single_money*od.buy_num,
-                            od.single_cost,od.bag_check_money,od.single_cost*od.buy_num,FROM_UNIXTIME(os.slave_date_close) slave_date_close,mu.user_username AS 'pm',
-                            om.source_trace AS 'ID',rg.group_name AS group_name,od.product_mode,'' as product_mode_name,od.item_mode,dm.delivery_name,dm.delivery_address,od.detail_id  FROM order_master om ");
-
+                sql.AppendFormat(@"( SELECT pcs.category_id,om.order_name,om.order_createdate,'' as order_createdate_format,
+                                    om.order_id,om.order_payment,'' as  payment_name,om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,
+                                    '' as slave_status_name,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,
+                                    od.single_cost,od.bag_check_money,od.single_cost,os.slave_date_close,'' as slave_date_close_format,'' as amount,'' as cost_amount,
+                                    od.product_mode,'' as product_mode_name,od.item_mode,om.delivery_name,om.delivery_address ,od.detail_id,od.event_cost   FROM order_master om ");
                 sqlJoin1.AppendFormat(@" LEFT JOIN order_slave os ON om.order_id=os.order_id
-                                        LEFT JOIN order_detail od ON os.slave_id=od.slave_id
-                                        LEFT JOIN vendor v ON v.vendor_id = od.item_vendor_id
-                                        left join redirect r ON r.redirect_id=om.source_trace
-                                        LEFT JOIN redirect_group rg  ON r.group_id = rg.group_id 
-                                        LEFT JOIN manage_user mu ON mu.user_id=v.product_manage
-                                        LEFT JOIN users u ON u.user_id=om.user_id
+                                        LEFT JOIN order_detail od ON os.slave_id=od.slave_id                                       
                                         INNER JOIN product_item pi ON od.item_id=pi.item_id
                                         INNER JOIN product_category_set pcs ON pi.product_id=pcs.product_id
-                                        LEFT JOIN (SELECT DISTINCT order_id,delivery_name,delivery_address FROM deliver_master) dm ON om.order_id=dm.order_id
-                                        WHERE od.item_mode=0  and pcs.category_id={0}
-                                        AND od.detail_status NOT IN(90,91)", query.category_id);
+                                        WHERE od.item_mode=0  AND pcs.category_id={0}
+                                        AND od.detail_status NOT IN(89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
 
                 sqlJoin2.AppendFormat(@"LEFT JOIN order_slave os ON om.order_id=os.order_id
                                         LEFT JOIN order_detail od ON os.slave_id=od.slave_id
-                                        LEFT JOIN vendor v ON v.vendor_id = od.item_vendor_id
-                                        LEFT JOIN redirect r ON r.redirect_id=om.source_trace
-                                        LEFT JOIN redirect_group rg  ON r.group_id = rg.group_id 
-                                        LEFT JOIN manage_user mu ON mu.user_id=v.product_manage
-                                        LEFT JOIN users u ON u.user_id=om.user_id
                                         INNER JOIN product_category_set pcs ON od.parent_id=pcs.product_id
-                                        LEFT JOIN (SELECT DISTINCT order_id,delivery_name,delivery_address FROM deliver_master) dm ON om.order_id=dm.order_id
-                                        WHERE od.item_mode=1  and pcs.category_id={0}
-                                        AND od.detail_status NOT IN(90,91)", query.category_id);
+                                        WHERE od.item_mode=1  AND pcs.category_id={0}
+                                        AND od.detail_status NOT IN(89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
 
                 if (query.category_status != 0)
                 {
@@ -2460,7 +2440,7 @@ rg.group_name AS group_name,od.product_mode ,'' as product_mode_name,od.item_mod
                     }
                 }
                 sqlWhere.AppendFormat(" GROUP BY  od.detail_id ");
-                return _dbAccess.getDataTable(sql.ToString() + sqlJoin1.ToString() + sqlWhere.ToString() + ")UNION" + sql.ToString() + sqlJoin2.ToString() + sqlWhere.ToString() + ")");
+                return _dbAccess.getDataTable(sql.ToString() + sqlJoin1.ToString() + sqlWhere.ToString() + ")UNION" + sql.ToString() + sqlJoin2.ToString() + sqlWhere.ToString() + ") ORDER BY order_id");
             }
             catch (Exception ex)
             {
@@ -2474,7 +2454,7 @@ rg.group_name AS group_name,od.product_mode ,'' as product_mode_name,od.item_mod
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("SELECT imr.total_amount,FROM_UNIXTIME(invoice_date) 'invoice_date',imr.invoice_number from (SELECT order_id,MAX(invoice_id) as 'invoice_id' from invoice_master_record GROUP BY order_id) im LEFT JOIN invoice_master_record imr ON im.invoice_id=imr.invoice_id  where im.order_id='{0}';",order_id);
+                sql.AppendFormat(" select invoice_number,total_amount,invoice_date from invoice_master_record where order_id='{0}' order by invoice_id DESC limit 1;",order_id);
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)

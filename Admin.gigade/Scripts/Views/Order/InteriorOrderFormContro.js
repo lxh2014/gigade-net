@@ -17,63 +17,40 @@ var OrderName = {
     labelWidth: 65,
     layout: 'hbox',
     defaultType: 'textfield',
-    items: [{
-        fieldLabel: CNFULLNAME,
-        name: 'b_txtName',
-        submitValue: false,
+    items: [{//edit by zhuoqin0830w  2015/11/12
+        fieldLabel: USERID,//會員編號
+        name: 'd_userID',
+        id: 'd_userID',
         labelWidth: 65,
         width: 200,
-        id: 'txtCNFullName',
-        xtype: 'combobox',
+        vtype: 'regxUserID',
         allowBlank: false,
-        store: nameStore,
-        enableKeyEvents: true,
-        queryCaching: true,
-        hideTrigger: true,
-        displayField: 'user_name',
-        valueField: 'user_id',
-        queryMode: 'local',
-        typeAhead: true,
-        autoScroll: false,
-        maxheight: 200,
-        hiddenName: 'selectUserID',
-        listConfig: {
-            getInnerTpl: function () {
-                return '<h4>{user_name} ({user_email})</h4>';
-            },
-            resizable: function () {
-                return true;
-            }
-        },
-        forceSelection: true,
         listeners: {
-            select: function (combo, record) {
-                Ext.getCmp('txtActionPhone').setValue(record[0].data.user_mobile);
-                Ext.getCmp('b_txtAddress').setValue(record[0].data.user_address);
-                Ext.getCmp("s_checkActionSex").setValue({ 's_checkActionSex': record[0].data.user_gender });
-                //add by zhuoqin0830w  2015/08/21  將選中的combobox數據的userid賦值給 隱藏的控件
-                Ext.getCmp("selectUserID").setValue(record[0].data.user_id);
-            },
-            change: function () {
-                var condition = Ext.getCmp("txtCNFullName").getRawValue();
-                if (condition != "") { // && nameStore.find("user_name", condition) < 0 
-                    Ext.Ajax.request({
-                        url: '/Order/GetInfoByTest',
-                        method: 'post',
-                        params: {
-                            condition: condition
-                        },
-                        success: function (form, action) {
-                            var result = Ext.decode(form.responseText);
-                            if (result.items.length > 0) {
-                                nameStore.loadData(result.items);
-                            } else {
-                                Ext.getCmp('txtActionPhone').setValue("");
-                                Ext.getCmp('b_txtAddress').setValue("");
+            specialkey: function (field, e) {
+                if (e.getKey() == e.ENTER) {
+                    var condition = Ext.getCmp("d_userID").getValue();
+                    if (condition != "") {
+                        Ext.Ajax.request({
+                            url: '/Order/GetInfoByTest',
+                            method: 'post',
+                            params: {
+                                condition: condition
+                            },
+                            success: function (form, action) {
+                                var result = Ext.decode(form.responseText);
+                                if (result.items.length > 0) {
+                                    Ext.getCmp("txtCNFullName").setValue(result.items[0].user_name);
+                                    Ext.getCmp('txtActionPhone').setValue(result.items[0].user_mobile);
+                                    Ext.getCmp('b_txtAddress').setValue(result.items[0].user_address);
+                                    Ext.getCmp("s_checkActionSex").setValue({ 's_checkActionSex': result.items[0].user_gender });
+                                    Ext.getCmp("d_userEmail").setValue(result.items[0].user_email);
+                                } else {
+                                    Ext.getCmp('txtActionPhone').setValue("");
+                                    Ext.getCmp('b_txtAddress').setValue("");
+                                }
                             }
-
-                        }
-                    });
+                        });
+                    }
                 }
             }
         }
@@ -82,7 +59,7 @@ var OrderName = {
         id: 's_checkActionSex',
         labelWidth: 45,
         fieldLabel: GENDER,
-        margin: '0 0 0 20',
+        margin: '0 0 0 10',
         width: 150,
         defaults: {
             name: 's_checkActionSex'
@@ -91,15 +68,8 @@ var OrderName = {
         vertical: true,
         items: [{ boxLabel: BOY, inputValue: '1', },
         { boxLabel: GIRL, inputValue: '0', checked: true }]
-    }, {
-        //add by zhuoqin0830w  2015/08/21  
-        //添加一個隱藏的 textfile控件  以存儲 combobox 選中後的數據 而不是 默認第一行的數據
-        submitValue: false,
-        hidden: true,
-        id: 'selectUserID'
     }]
 };
-
 
 //買場名稱
 var outsiteStore = Ext.create('Ext.data.Store', {
@@ -109,17 +79,22 @@ var outsiteStore = Ext.create('Ext.data.Store', {
     autoLoad: true
 });
 
-
 //訂單狀態
 var orderStatusStore = Ext.create('Ext.data.Store', {
     id: 'orderStatusStore',
     autoDestroy: true,
     fields: ['parameterCode', 'parameterName'],
     autoLoad: false,
-    data: [
-         { parameterCode: '2', parameterName: ORDER_STATUS_WAIT_DELIVER },
-         { parameterCode: '3', parameterName: ORDER_STATUS_DELIVER_NOW },
-         { parameterCode: '4', parameterName: ORDER_STATUS_DELIVER_SUCCESS },
-         { parameterCode: '0', parameterName: ORDER_STATUS_WAIT_PAYMENT }
-    ]
+    data: [{ parameterCode: '2', parameterName: ORDER_STATUS_WAIT_DELIVER },
+        { parameterCode: '3', parameterName: ORDER_STATUS_DELIVER_NOW },
+        { parameterCode: '4', parameterName: ORDER_STATUS_DELIVER_SUCCESS },
+        { parameterCode: '0', parameterName: ORDER_STATUS_WAIT_PAYMENT }]
+});
+
+//會員編號  add by zhuoqin0830w  2015/11/12
+Ext.apply(Ext.form.field.VTypes, {
+    regxUserID: function (val, field) {
+        return /^[1-9]\d*$/.test(val);
+    },
+    regxUserIDText: FORMAT_ERROR
 });

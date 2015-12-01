@@ -8,9 +8,9 @@ Ext.define('gigade.OrderDetial', {
     { name: 'order_product_subtotal', type: 'int' },
     { name: 'order_amount', type: 'int' },
     { name: 'amount', type: 'int' },
-    { name: 'order_payment', type: 'string' },
-    { name: 'slave_status', type: 'string' },
-    { name: 'order_createdate', type: 'string' },
+    { name: 'payment_name', type: 'string' },
+    { name: 'slave_status_name', type: 'string' },
+    { name: 'order_createdate_format', type: 'string' },
     { name: 'site_name', type: 'string' },
     { name: 'deducts', type: 'int' },
     ]
@@ -120,9 +120,9 @@ Ext.onReady(function () {
                 return change(value);
             }
         },
-        { header: "付款方式", dataIndex: 'order_payment', flex: 1.5, align: 'center' },
-        { header: "訂單狀態", dataIndex: 'slave_status', flex: 1, align: 'center' },
-        { header: "訂單日期", dataIndex: 'order_createdate', flex: 1, align: 'center' },
+        { header: "付款方式", dataIndex: 'payment_name', flex: 1.5, align: 'center' },
+        { header: "訂單狀態", dataIndex: 'slave_status_name', flex: 1, align: 'center' },
+        { header: "訂單日期", dataIndex: 'order_createdate_format', flex: 1, align: 'center' },
         { header: "賣場", dataIndex: 'site_name', flex: 1, align: 'center', }
         ],
         tbar: [

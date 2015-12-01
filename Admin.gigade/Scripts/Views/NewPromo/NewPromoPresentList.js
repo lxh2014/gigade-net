@@ -24,14 +24,32 @@ Ext.define('gigade.NewPromoPresent', {
         { name: 'muser', type: 'int' },
         { name: 'user_username', type: 'string' },
         { name: 'bonus_expire_day', type: 'int' }, //購物金抵用券有效天數
-          { name: 'use_span_day', type: 'int' },
+        { name: 'use_span_day', type: 'int' },
+        { name: 'event_type', type: 'string' } 
         
 
     //{ name: "isSame", type: "string" }
     ]
 });
 
-
+Ext.define('event.type', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: "ParameterCode", type: "string" },
+        { name: "parameterName", type: "string" }
+    ]
+});
+var EventTypeStore = Ext.create('Ext.data.Store', {
+    model: 'event.type',
+    proxy: {
+        type: 'ajax',
+        url: '/NewPromo/GetNewPromoPresentEventType',
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    }
+});
 var PromoRresentStore = Ext.create('Ext.data.Store', {
     autoDestroy: true,
     pageSize: pageSize,
@@ -84,7 +102,18 @@ Ext.onReady(function () {
         frame: true,
         columns: [
             { header: ROWID, dataIndex: 'trow_id', width: 90, align: 'center' },
-            { header: EVENTID, dataIndex: 'event_id', width: 90, align: 'center' },
+            { header: EVENTID, dataIndex: 'event_id', width: 80, align: 'center' },
+            {
+                header: '促銷類型', dataIndex: 'event_type', width: 140, align: 'center',
+                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                    if (value == "0" || value == null) {
+                        return "不分";
+                    }
+                    else {
+                        return value;
+                    }
+                }
+            },
             {
                  header: USERGROUP, dataIndex: 'group_name', width: 90, align: 'center',
                  renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
@@ -97,7 +126,7 @@ Ext.onReady(function () {
                  }
              },
             {
-                header: GIFTTIPE, dataIndex: 'gift_type', width: 90, align: 'center',
+                header: GIFTTIPE, dataIndex: 'gift_type', width: 80, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (value == 1) {
                         return PRODUCT;
@@ -125,9 +154,9 @@ Ext.onReady(function () {
                     }
                 }
             },
-            { header: BONUSWELFARE, dataIndex: 'deduct_welfare', width: 90, align: 'center' },
-            { header: GIFTNUM, dataIndex: 'gift_amount', width: 90, align: 'center' },
-            { header: FREIGHTPRICE, dataIndex: 'freight_price', width: 90, align: 'center' },
+            { header: BONUSWELFARE, dataIndex: 'deduct_welfare', width: 80, align: 'center' },
+            { header: GIFTNUM, dataIndex: 'gift_amount', width: 80, align: 'center' },
+            { header: FREIGHTPRICE, dataIndex: 'freight_price', width: 80, align: 'center' },
              { header: DATESTART, dataIndex: 'tstart', width: 150, align: 'center' },
             { header: DATEEND, dataIndex: 'tend', width: 150, align: 'center' },
             //{
@@ -147,6 +176,7 @@ Ext.onReady(function () {
              { header: QuanXianMuser, dataIndex: 'user_username', width: 80, align: 'center' },
             {
                 header: ACTIVE,
+                width: 70,
                 dataIndex: 'status',
                 id: 'status',
                 align: 'center',

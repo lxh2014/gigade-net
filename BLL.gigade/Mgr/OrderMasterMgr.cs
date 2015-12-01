@@ -1189,6 +1189,22 @@ set ");
                         {
                             dr["product_mode_name"] = dlist.remark;
                         }
+                        if (dr["order_createdate"] != null)
+                        {
+                            dr["order_createdate_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr["order_createdate"].ToString())));
+                        }
+                        if (dr["slave_date_close"] != null)
+                        {
+                            dr["slave_date_close_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr["slave_date_close"].ToString())));
+                        }
+                        if (dr["single_money"] != null && dr["buy_num"] != null)
+                        {
+                            dr["amount"] = Convert.ToInt32(dr["single_money"].ToString()) * Convert.ToInt32(dr["buy_num"]);
+                        }
+                        if (dr["single_cost"] != null && dr["buy_num"] != null)
+                        {
+                            dr["cost_amount"] = Convert.ToInt32(dr["single_cost"].ToString()) * Convert.ToInt32(dr["buy_num"]);
+                        }
                     }                  
                 }
                 return dt;
@@ -1236,6 +1252,22 @@ set ");
                                 if (dlist != null)
                                 {
                                     dr_t["product_mode_name"] = dlist.remark;
+                                }
+                                if (dr_t["order_createdate"] != null)
+                                {
+                                    dr_t["order_createdate_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr_t["order_createdate"].ToString())));
+                                }
+                                if (dr_t["slave_date_close"] != null)
+                                {
+                                    dr_t["slave_date_close_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr_t["slave_date_close"].ToString())));
+                                }
+                                if (dr_t["single_money"] != null && dr_t["buy_num"] != null)
+                                {
+                                    dr_t["amount"] = Convert.ToInt32(dr_t["single_money"].ToString()) * Convert.ToInt32(dr_t["buy_num"]);
+                                }
+                                if (dr_t["single_cost"] != null && dr_t["buy_num"] != null)
+                                {
+                                    dr_t["cost_amount"] = Convert.ToInt32(dr_t["single_cost"].ToString()) * Convert.ToInt32(dr_t["buy_num"]);
                                 }
                             }
                         }

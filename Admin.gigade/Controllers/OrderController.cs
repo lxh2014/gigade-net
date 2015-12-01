@@ -189,7 +189,7 @@ namespace Admin.gigade.Controllers
             ProductCombo pcombo = new ProductCombo();
             if (pid != 0)
             {
-                long nowTime = BLL.gigade.Common.CommonFunction.GetPHPTime();//獲取當前時間  add by zhuoqin0830w  2015/11/09
+                long time = BLL.gigade.Common.CommonFunction.GetPHPTime(Request.Params["combOrderDate"]);//獲取頁面上的訂單日期  edit by zhuoqin0830w  2015/11/17
                 Product prod = _proMgr.Query(new Product { Product_Id = pid }).FirstOrDefault();
                 if (prod != null)
                 {
@@ -422,9 +422,11 @@ namespace Admin.gigade.Controllers
                                 double totalPrice = 0;
                                 double totalCost = 0;
                                 double totalEventCost = 0; //add by zhuoqin0830w  2015/11/09
+                                double totalEventPrice = 0;//add by zhuoqin0830w  2015/11/17
                                 string priceScales = "";//單一商品價格所占比例
                                 string costScales = ""; //單一商品成本所占比例
                                 string eventcostScales = "";//單一商品活動成本所占比例  add by zhuoqin0830w  2015/11/09
+                                string eventpriceScales = "";//單一商品活動價所占比例  add by zhuoqin0830w  2015/11/17
                                 int minStock = 0;
                                 if (prod.Price_type == 1)
                                 {
@@ -443,7 +445,7 @@ namespace Admin.gigade.Controllers
                                             product_id = uint.Parse(item.Child_Id.ToString()),
                                             user_id = 0,
                                             user_level = 1,
-                                            site_id = 1,
+                                            site_id = uint.Parse(Request.Params["Site_Id"]),  //edit by zhuoqin0830w  2015/11/16  添加站台欄位詳細查詢是哪一個站台下的價格
                                             child_id = 0
                                         });
                                         List<ItemPriceCustom> ipList = new List<ItemPriceCustom>();
@@ -451,9 +453,10 @@ namespace Admin.gigade.Controllers
                                         if (pM != null)
                                         {
                                             //add by zhuoqin0830w  2015/11/06  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動成本為 0 如果沒有過期則顯示活動成本
-                                            if (nowTime > pM.event_end)
+                                            if (time > pM.event_end)
                                             {
                                                 pM.event_cost = 0;
+                                                pM.event_price = 0;
                                             }
 
                                             //遍歷此商品所有item_id,找出第一筆在item_price中的item_id返回，若無，則此組合商品不能加入訂單
@@ -471,12 +474,14 @@ namespace Admin.gigade.Controllers
                                                         totalPrice += pM.price * item.S_Must_Buy;
                                                         totalCost += pM.cost * item.S_Must_Buy;
                                                         totalEventCost += pM.event_cost * item.S_Must_Buy;//add by zhuoqin0830w  2015/11/09
+                                                        totalEventPrice += pM.event_price * item.S_Must_Buy;//add by zhuoqin0830w  2015/11/17
                                                     }
                                                     else
                                                     {
                                                         totalPrice += ipList[0].item_money * item.S_Must_Buy;
                                                         totalCost += ipList[0].item_cost * item.S_Must_Buy;
                                                         totalEventCost += ipList[0].event_cost * item.S_Must_Buy;//add by zhuoqin0830w  2015/11/09
+                                                        totalEventPrice += ipList[0].event_money * item.S_Must_Buy;//add by zhuoqin0830w  2015/11/17
                                                     }
                                                     price_data_right_list.Add(items);
                                                     findState = true;
@@ -492,19 +497,34 @@ namespace Admin.gigade.Controllers
                                                 return this.Response;
                                             }
                                         }
+                                        else
+                                        {
+                                            //price_master表中沒有相對應的站台價格  add by zhuoqin0830w  2015/11/16
+                                            jsonStr = "{success:false,msg:'" + Resources.OrderAdd.PRODUCT_PRICE_NOT_EXIST + "'}";
+                                            this.Response.Clear();
+                                            this.Response.Write(jsonStr);
+                                            this.Response.End();
+                                            return this.Response;
+                                        }
                                     }
                                     int index = 0;
                                     int comboPrice = orderAdd.product_cost;   //組合商品的定價
                                     int comboCost = orderAdd.cost;
                                     int comboEventCost = 0;
+                                    int comboEventPrice = 0;
                                     //add by zhuoqin0830w  2015/11/06  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動成本為 0 如果沒有過期則顯示活動成本
                                     if (orderAdd != null)
                                     {
-                                        if (nowTime > orderAdd.event_start && nowTime < orderAdd.event_end)
+                                        if (time > orderAdd.event_start && time < orderAdd.event_end)
                                         {
                                             comboEventCost = orderAdd.event_cost;
+                                            comboEventPrice = orderAdd.event_price;
                                         }
-                                        else { orderAdd.event_cost = 0; }
+                                        else
+                                        {
+                                            orderAdd.event_cost = 0;
+                                            orderAdd.event_price = 0;
+                                        }
                                     }
                                     for (int i = 0; i < prodComList.Count; i++)
                                     {
@@ -516,7 +536,7 @@ namespace Admin.gigade.Controllers
                                         IPriceMasterImplMgr pMgr = new PriceMasterMgr(connectionString);
                                         PriceMaster pm = pMgr.QueryPriceMaster(new PriceMaster
                                         {
-                                            site_id = 1,
+                                            site_id = uint.Parse(Request.Params["Site_Id"]),  //edit by zhuoqin0830w  2015/11/16  添加站台欄位詳細查詢是哪一個站台下的價格
                                             child_id = 0,
                                             user_level = 1,
                                             user_id = 0,
@@ -555,7 +575,7 @@ namespace Admin.gigade.Controllers
                                                 product_id = uint.Parse(price_data_right_list[i].Product_Id.ToString()),
                                                 user_id = 0,
                                                 user_level = 1,
-                                                site_id = 1,
+                                                site_id = uint.Parse(Request.Params["Site_Id"]),  //edit by zhuoqin0830w  2015/11/16  添加站台欄位詳細查詢是哪一個站台下的價格
                                                 child_id = 0
                                             });
                                             List<ItemPriceCustom> ipList = new List<ItemPriceCustom>();
@@ -564,15 +584,18 @@ namespace Admin.gigade.Controllers
                                                 double singlePrice = 0;
                                                 double singleCost = 0;
                                                 double singleEventCost = 0;//add by zhuoqin0830w  2015/11/09
+                                                double singleEventPrice = 0;//add by zhuoqin0830w  2015/11/17
 
                                                 if (pM.same_price == 1)
                                                 {
                                                     oc.original_price = pM.price;
                                                     oc.Item_Cost = uint.Parse(pM.cost.ToString());
                                                     oc.Event_Item_Cost = uint.Parse(pm.event_cost.ToString());//add by zhuoqin0830w  2015/11/09
+                                                    oc.Event_Item_Money = uint.Parse(pm.event_price.ToString());//add by zhuoqin0830w  2015/11/17
                                                     singlePrice = pM.price * oc.s_must_buy;
                                                     singleCost = pM.cost * oc.s_must_buy;
                                                     singleEventCost = pM.event_cost * oc.s_must_buy;//add by zhuoqin0830w  2015/11/09
+                                                    singleEventPrice = pM.event_price * oc.s_must_buy;//add by zhuoqin0830w  2015/11/17
                                                 }
                                                 else
                                                 {
@@ -586,9 +609,11 @@ namespace Admin.gigade.Controllers
                                                         oc.original_price = int.Parse(ipList[0].item_money.ToString());
                                                         oc.Item_Cost = ipList[0].item_cost;
                                                         oc.Event_Item_Cost = ipList[0].event_cost;//add by zhuoqin0830w  2015/11/09
+                                                        oc.Event_Item_Money = ipList[0].event_money;//add by zhuoqin0830w  2015/11/17
                                                         singlePrice = ipList[0].item_money * oc.s_must_buy;
                                                         singleCost = ipList[0].item_cost * oc.s_must_buy;
                                                         singleEventCost = ipList[0].event_cost * oc.s_must_buy;//add by zhuoqin0830w  2015/11/09
+                                                        singleEventPrice = ipList[0].event_money * oc.s_must_buy;//add by zhuoqin0830w  2015/11/17
                                                     }
                                                 }
                                                 if (totalPrice == 0)
@@ -596,6 +621,7 @@ namespace Admin.gigade.Controllers
                                                     priceScales += "0";
                                                     costScales += "0";
                                                     eventcostScales += "0";//add by zhuoqin0830w  2015/11/09
+                                                    eventpriceScales += "0";//add by zhuoqin0830w  2015/11/09
                                                     oc.product_cost = 0;
                                                 }
                                                 else
@@ -613,26 +639,40 @@ namespace Admin.gigade.Controllers
                                                     {
                                                         eventcostScale = priceScale;// 如果 活動成本的比例為0 則表示沒有活動成本則按照價格的比例進行計算
                                                     }
+                                                    double eventpriceScale = 0;
+                                                    if (totalEventPrice != 0)
+                                                    {
+                                                        eventpriceScale = double.Parse((singleEventPrice / totalEventPrice).ToString());
+                                                    }
+                                                    else
+                                                    {
+                                                        eventpriceScale = priceScale;// 如果 活動價的比例為0 則表示沒有活動成本則按照價格的比例進行計算
+                                                    }
 
                                                     priceScales += priceScale + ",";
                                                     costScales += costScale + ",";
                                                     eventcostScales += eventcostScale + ",";//add by zhuoqin0830w  2015/11/09
+                                                    eventpriceScales += eventpriceScale + ",";//add by zhuoqin0830w  2015/11/17
 
                                                     var afterprice = Convert.ToInt16(Math.Round(comboPrice * priceScale / oc.s_must_buy));
                                                     var aftercost = Convert.ToInt16(Math.Round(comboCost * costScale / oc.s_must_buy));
                                                     var aftereventcost = Convert.ToInt16(Math.Round(comboEventCost * eventcostScale / oc.s_must_buy));//add by zhuoqin0830w  2015/11/09
+                                                    var aftereventprice = Convert.ToInt16(Math.Round(comboEventPrice * eventpriceScale / oc.s_must_buy));//add by zhuoqin0830w  2015/11/17
 
                                                     comboPrice -= afterprice * oc.s_must_buy;
                                                     comboCost -= aftercost * oc.s_must_buy;
                                                     comboEventCost -= aftereventcost * oc.s_must_buy;//add by zhuoqin0830w  2015/11/09
+                                                    comboEventPrice -= aftereventprice * oc.s_must_buy;//add by zhuoqin0830w  2015/11/17
 
                                                     totalPrice -= singlePrice;
                                                     totalCost -= singleCost;
                                                     totalEventCost -= singleEventCost;//add by zhuoqin0830w  2015/11/09
+                                                    totalEventPrice -= singleEventPrice;//add by zhuoqin0830w  2015/11/17
 
                                                     oc.product_cost = uint.Parse(afterprice.ToString());
                                                     oc.Item_Cost = uint.Parse(aftercost.ToString());
                                                     oc.Event_Item_Cost = uint.Parse(aftereventcost.ToString());//add by zhuoqin0830w  2015/11/09
+                                                    oc.Event_Item_Money = uint.Parse(aftereventprice.ToString());//add by zhuoqin0830w  2015/11/17
                                                 }
                                             }
                                         }
@@ -661,7 +701,7 @@ namespace Admin.gigade.Controllers
                                             product_id = pid,
                                             user_id = 0,
                                             user_level = 1,
-                                            site_id = 1,
+                                            site_id = uint.Parse(Request.Params["Site_Id"]),  //edit by zhuoqin0830w  2015/11/16  添加站台欄位詳細查詢是哪一個站台下的價格
                                             child_id = Int32.Parse(item.Child_Id) //add by wangwei02016w 2014/9/24 
                                         });
                                         ItemPriceCustom ip = new ItemPriceCustom();
@@ -701,7 +741,7 @@ namespace Admin.gigade.Controllers
                                 jsonStr = jsonStr.Substring(0, jsonStr.Length - 1) + "]";
                                 jsonStr += ",data:[";
                                 //拼接組合商品   cost為組合商品之成本,product_cost為組合商品之售價
-                                jsonStr += "{product_id:'" + orderAdd.product_id + "',product_name:'" + orderAdd.product_name + "',Item_Cost:'" + orderAdd.cost + "',product_cost:'" + orderAdd.product_cost + "',item_id:0" + ",Event_Item_Cost:" + orderAdd.event_cost;
+                                jsonStr += "{product_id:'" + orderAdd.product_id + "',product_name:'" + orderAdd.product_name + "',Item_Cost:'" + orderAdd.cost + "',product_cost:'" + orderAdd.product_cost + "',item_id:0" + ",Event_Item_Cost:" + orderAdd.event_cost + ",Event_Item_Money:" + orderAdd.event_price;
                                 jsonStr += ",s_must_buy:'" + prodComList.Count + "',child_scale:'" + priceScales + "',child_cost_scale:'" + costScales + "',child_event_cost_scale:'" + eventcostScales + "',stock:'" + minStock + "',g_must_buy:'" + prodComList.Count + "',child:" + orderAdd.child + ",product_status_name:'" + (upFlag ? "上架" : "未上架") + "'}";
                                 jsonStr += "]}";
                             }
@@ -796,7 +836,7 @@ namespace Admin.gigade.Controllers
                                         product_id = uint.Parse(parent_id.ToString()),
                                         user_id = 0,
                                         user_level = 1,
-                                        site_id = 1,
+                                        site_id = uint.Parse(Request.Params["Site_Id"]),  //edit by zhuoqin0830w  2015/11/16  添加站台欄位詳細查詢是哪一個站台下的價格
                                         child_id = int.Parse(pList[0].Product_Id.ToString())
                                     });
                                 }
@@ -807,7 +847,7 @@ namespace Admin.gigade.Controllers
                                         product_id = pList[0].Product_Id,
                                         user_id = 0,
                                         user_level = 1,
-                                        site_id = 1,
+                                        site_id = uint.Parse(Request.Params["Site_Id"]),  //edit by zhuoqin0830w  2015/11/16  添加站台欄位詳細查詢是哪一個站台下的價格
                                         child_id = 0
                                     });
                                 }
@@ -828,44 +868,29 @@ namespace Admin.gigade.Controllers
                                     oc.Item_Stock = pItemList[0].Item_Stock;
                                     if (ipList.Count() > 0)
                                     {
-                                        //取成本
+                                        //edit by zhuoqin0830w  2015/11/16   將售價和活動售價的邏輯改為與成本和活動成本的邏輯一樣  eric說需要修改
                                         if (pM.same_price == 1)
                                         {
-                                            oc.Item_Cost = uint.Parse(pM.cost.ToString());
+                                            oc.Item_Cost = uint.Parse(pM.cost.ToString());//成本
+                                            oc.Item_Money = uint.Parse(pM.price.ToString());//定價
                                         }
                                         else
                                         {
                                             oc.Item_Cost = ipList[0].item_cost;
+                                            oc.Item_Money = ipList[0].item_money;
                                         }
 
                                         //add by zhuoqin0830w  2015/11/06  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動成本為 0 如果沒有過期則顯示活動成本
-                                        if (nowTime > pM.event_start && nowTime < pM.event_end)
+                                        if (time > pM.event_start && time < pM.event_end)
                                         {
                                             oc.Event_Item_Cost = uint.Parse(pM.event_cost.ToString());
-                                        }
-                                        else { oc.Event_Item_Cost = 0; }
-
-                                        if (nowTime > pItemList[0].Event_Product_Start && nowTime < pItemList[0].Event_Product_End)
-                                        {
-                                            if (pM.same_price == 1)
-                                            {
-                                                oc.Item_Money = uint.Parse(pM.event_price.ToString());
-                                            }
-                                            else
-                                            {
-                                                oc.Item_Money = ipList[0].event_money;
-                                            }
+                                            //add by zhuoqin0830w  2015/11/16  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動售價為 0 如果沒有過期則顯示活動售價
+                                            oc.Event_Item_Money = uint.Parse(pM.event_price.ToString());
                                         }
                                         else
                                         {
-                                            if (pM.same_price == 1)
-                                            {
-                                                oc.Item_Money = uint.Parse(pM.price.ToString());
-                                            }
-                                            else
-                                            {
-                                                oc.Item_Money = ipList[0].item_money;
-                                            }
+                                            oc.Event_Item_Cost = 0;
+                                            oc.Event_Item_Money = 0;
                                         }
                                     }
                                     else
@@ -884,8 +909,8 @@ namespace Admin.gigade.Controllers
                                     StringBuilder stb = new StringBuilder();
                                     stb.Append("[");
                                     stb.Append("{product_id:" + oc.Product_Id + ",price_type:" + oc.price_type + ",child:" + c_combination + ",buy_limit:" + c_buy_limit + ",item_id:" + oc.Item_Id + ",product_name:'" + oc.product_name + "',");
-                                    //添加 活動成本 金額顯示 ",Event_Item_Cost:" + pM.event_cost  zhuoqin0830w  2015/04/30
-                                    stb.Append("product_cost:" + oc.Item_Money + ",Item_Cost:" + oc.Item_Cost + ",Event_Item_Cost:" + pM.event_cost + ",stock:" + oc.Item_Stock + ",s_must_buy:" + oc.s_must_buy + ",Spec_Name_1:'" + pItemList[0].Spec_Name_1 + "',Spec_Name_2:'" + pItemList[0].Spec_Name_2 + "',spec1:" + pItemList[0].Spec_Id_1 + ",spec2:" + pItemList[0].Spec_Id_2 + ",price_master_id:" + oc.price_master_id + ",ignore_stock:" + pList[0].Ignore_Stock + ",product_status_name:'" + (upFlag ? "上架" : "未上架") + "'}");
+                                    //添加 活動成本 金額顯示 ",Event_Item_Cost:" + pM.event_cost  zhuoqin0830w  2015/04/30  添加活動售價  ",Event_Item_Money:" + oc.Event_Item_Money  zhuoqin0830w 2015/11/16
+                                    stb.Append("product_cost:" + oc.Item_Money + ",Event_Item_Money:" + oc.Event_Item_Money + ",Item_Cost:" + oc.Item_Cost + ",Event_Item_Cost:" + pM.event_cost + ",stock:" + oc.Item_Stock + ",s_must_buy:" + oc.s_must_buy + ",Spec_Name_1:'" + pItemList[0].Spec_Name_1 + "',Spec_Name_2:'" + pItemList[0].Spec_Name_2 + "',spec1:" + pItemList[0].Spec_Id_1 + ",spec2:" + pItemList[0].Spec_Id_2 + ",price_master_id:" + oc.price_master_id + ",ignore_stock:" + pList[0].Ignore_Stock + ",product_status_name:'" + (upFlag ? "上架" : "未上架") + "'}");
                                     stb.Append("]");
                                     jsonStr = "{success:true,data:" + stb.ToString() + "}";
                                 }
@@ -989,7 +1014,7 @@ namespace Admin.gigade.Controllers
                                     product_id = pList[0].Product_Id,
                                     user_id = 0,
                                     user_level = 1,
-                                    site_id = 1,
+                                    site_id = uint.Parse(Request.Params["Site_Id"]),  //edit by zhuoqin0830w  2015/11/16  添加站台欄位詳細查詢是哪一個站台下的價格
                                     child_id = 0
                                 });
                                 if (pM != null)
@@ -1007,46 +1032,32 @@ namespace Admin.gigade.Controllers
                                     oc.Spec_Id_2 = proItem[0].Spec_Id_2;
                                     oc.Item_Id = proItem[0].Item_Id;
                                     oc.Item_Stock = proItem[0].Item_Stock;
-                                    long nowTime = BLL.gigade.Common.CommonFunction.GetPHPTime();
+                                    long time = BLL.gigade.Common.CommonFunction.GetPHPTime(Request.Params["combOrderDate"]);//獲取頁面上的訂單日期  edit by zhuoqin0830w  2015/11/17
                                     if (ipList.Count() > 0)
                                     {
+                                        //edit by zhuoqin0830w  2015/11/16   將售價和活動售價的邏輯改為與成本和活動成本的邏輯一樣  eric說需要修改
                                         if (pM.same_price == 1)
                                         {
-                                            oc.Item_Cost = uint.Parse(pM.cost.ToString());
+                                            oc.Item_Cost = uint.Parse(pM.cost.ToString());//成本
+                                            oc.Item_Money = uint.Parse(pM.price.ToString());//定價
                                         }
                                         else
                                         {
                                             oc.Item_Cost = ipList[0].item_cost;
+                                            oc.Item_Money = ipList[0].item_money;
                                         }
 
                                         //add by zhuoqin0830w  2015/11/06  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動成本為 0 如果沒有過期則顯示活動成本
-                                        if (nowTime > pM.event_start && nowTime < pM.event_end)
+                                        if (time > pM.event_start && time < pM.event_end)
                                         {
                                             oc.Event_Item_Cost = uint.Parse(pM.event_cost.ToString());
-                                        }
-                                        else { oc.Event_Item_Cost = 0; }
-
-                                        if (nowTime > proItem[0].Event_Product_Start && nowTime < proItem[0].Event_Product_End)
-                                        {
-                                            if (pM.same_price == 1)
-                                            {
-                                                oc.Item_Money = uint.Parse(pM.event_price.ToString());
-                                            }
-                                            else
-                                            {
-                                                oc.Item_Money = ipList[0].event_money;
-                                            }
+                                            //add by zhuoqin0830w  2015/11/16  添加判斷 活動時間是否過期  如果過期則在頁面上顯示的活動售價為 0 如果沒有過期則顯示活動售價
+                                            oc.Event_Item_Money = uint.Parse(pM.event_price.ToString());
                                         }
                                         else
                                         {
-                                            if (pM.same_price == 1)
-                                            {
-                                                oc.Item_Money = uint.Parse(pM.price.ToString());
-                                            }
-                                            else
-                                            {
-                                                oc.Item_Money = ipList[0].item_money;
-                                            }
+                                            oc.Event_Item_Cost = 0;
+                                            oc.Event_Item_Money = 0;
                                         }
                                     }
                                     else
@@ -1060,7 +1071,8 @@ namespace Admin.gigade.Controllers
                                     StringBuilder stb = new StringBuilder();
                                     stb.Append("[");
                                     stb.Append("{product_id:" + oc.Product_Id + ",price_type:" + oc.price_type + ",child:" + c_combination + ",buy_limit:" + c_buy_limit + ",item_id:" + oc.Item_Id + ",product_name:'" + oc.product_name + "',");
-                                    stb.Append("product_cost:" + oc.Item_Money + ",Item_Cost:" + oc.Item_Cost + ",Event_Item_Cost:" + oc.Event_Item_Cost + ",stock:" + oc.Item_Stock + ",s_must_buy:" + oc.s_must_buy + ",Spec_Name_1:'" + proItem[0].Spec_Name_1 + "',Spec_Name_2:'" + proItem[0].Spec_Name_2 + "',spec1:" + proItem[0].Spec_Id_1 + ",spec2:" + proItem[0].Spec_Id_2 + ",price_master_id:" + oc.price_master_id + ",ignore_stock:" + pList[0].Ignore_Stock + ",product_status_name:'" + (upFlag ? "上架" : "未上架") + "'}");
+                                    //添加 活動成本 金額顯示 ",Event_Item_Cost:" + oc.Event_Item_Cost  zhuoqin0830w  2015/04/30    添加活動售價  ",Event_Item_Money:" + oc.Event_Item_Money  zhuoqin0830w 2015/11/16
+                                    stb.Append("product_cost:" + oc.Item_Money + ",Event_Item_Money:" + oc.Event_Item_Money + ",Item_Cost:" + oc.Item_Cost + ",Event_Item_Cost:" + oc.Event_Item_Cost + ",stock:" + oc.Item_Stock + ",s_must_buy:" + oc.s_must_buy + ",Spec_Name_1:'" + proItem[0].Spec_Name_1 + "',Spec_Name_2:'" + proItem[0].Spec_Name_2 + "',spec1:" + proItem[0].Spec_Id_1 + ",spec2:" + proItem[0].Spec_Id_2 + ",price_master_id:" + oc.price_master_id + ",ignore_stock:" + pList[0].Ignore_Stock + ",product_status_name:'" + (upFlag ? "上架" : "未上架") + "'}");
                                     stb.Append("]");
                                     jsonStr = "{success:true,data:" + stb.ToString() + "}";
                                 }
@@ -3944,38 +3956,32 @@ namespace Admin.gigade.Controllers
             dt.Columns.Add("購買金額", typeof(String));
             dt.Columns.Add("付款狀態", typeof(String));
             dt.Columns.Add("商品細項編號", typeof(int));
-            dt.Columns.Add("訂單狀態", typeof(String));
-            dt.Columns.Add("供應商", typeof(String));
-            dt.Columns.Add("供應商編碼", typeof(String));    
+            dt.Columns.Add("訂單狀態", typeof(String)); 
             dt.Columns.Add("品名", typeof(String));
             dt.Columns.Add("商品類型", typeof(String));
             dt.Columns.Add("數量", typeof(int));
             dt.Columns.Add("購買單價", typeof(int));
             dt.Columns.Add("折抵購物金", typeof(int));
             dt.Columns.Add("抵用券", typeof(int));
-            dt.Columns.Add("總價", typeof(int));
+            dt.Columns.Add("總價", typeof(int));          
             dt.Columns.Add("成本單價", typeof(int));
+            dt.Columns.Add("活動成本", typeof(int));
             dt.Columns.Add("寄倉費", typeof(int));
             dt.Columns.Add("成本總額", typeof(int));
             dt.Columns.Add("出貨單歸檔期", typeof(String));
-            dt.Columns.Add("負責PM", typeof(String));
-            dt.Columns.Add("來源ID", typeof(String));
-            dt.Columns.Add("來源名稱", typeof(String));
             dt.Columns.Add("出貨方式", typeof(String));
             dt.Columns.Add("收貨人", typeof(String));
             dt.Columns.Add("收貨地址", typeof(String));
-            //foreach (DataRow dr_v in store.Rows)
-            //{
             for(int i=0;i<store.Rows.Count;i++)
             {
                 DataRow dr = dt.NewRow();
                 DataRow dr_v=store.Rows[i];
                 if (i == 0 || (i > 0 && dr_v["order_id"].ToString() != store.Rows[i - 1]["order_id"].ToString()))
                 {
-                    dr[0] = dr_v["user_name"].ToString();
-                    if (!string.IsNullOrEmpty(dr_v["order_createdate"].ToString()))
+                    dr[0] = dr_v["order_name"].ToString();
+                    if (!string.IsNullOrEmpty(dr_v["order_createdate_format"].ToString()))
                     {
-                        DateTime order_createdate = Convert.ToDateTime(dr_v["order_createdate"].ToString());
+                        DateTime order_createdate = Convert.ToDateTime(dr_v["order_createdate_format"].ToString());
                         dr[1] = CommonFunction.DateTimeToString(order_createdate);
                     }
                     if (!string.IsNullOrEmpty(dr_v["order_id"].ToString()))
@@ -4006,9 +4012,8 @@ namespace Admin.gigade.Controllers
                     dr[6] = 0;
                 }
                 dr[7] = dr_v["slave_status_name"].ToString();
-                dr[8] = dr_v["vendor_name_simple"].ToString();
-                dr[9] = dr_v["vendor_code"].ToString();
-                dr[10] = dr_v["product_name"].ToString();
+               
+                dr[8] = dr_v["product_name"].ToString();
                 string item_mode;
                 switch (dr_v["item_mode"].ToString())
                 { 
@@ -4025,101 +4030,107 @@ namespace Admin.gigade.Controllers
                         item_mode = "";
                         break;
                 }
-                dr[11] = item_mode;
+                dr[9] = item_mode;
                 if (!string.IsNullOrEmpty(dr_v["buy_num"].ToString()))
                 {
-                    if (dr[11].ToString() == "父商品" || dr[11].ToString() == "單一商品")
+                    if (dr[9].ToString() == "父商品" || dr[9].ToString() == "單一商品")
                     {
-                        dr[12] = Convert.ToInt32(dr_v["buy_num"].ToString());
+                        dr[10] = Convert.ToInt32(dr_v["buy_num"].ToString());
                     }
                     else
                     {
                         for (int j = 1; j < i; j++)
                         {
-                            if (dt.Rows[i - j][11].ToString() == "父商品" && store.Rows[i - j]["order_id"].ToString() == dr_v["order_id"].ToString())
+                            if (dt.Rows[i - j][9].ToString() == "父商品" && store.Rows[i - j]["order_id"].ToString() == dr_v["order_id"].ToString())
                             {
-                                dr[12] = Convert.ToInt32(dt.Rows[i - j][12].ToString()) * Convert.ToInt32(dr_v["buy_num"].ToString());
+                                dr[10] = Convert.ToInt32(dt.Rows[i - j][10].ToString()) * Convert.ToInt32(dr_v["buy_num"].ToString());
                                 break;
                             }
                             else
                             {
-                                dr[12] = Convert.ToInt32(dr_v["buy_num"].ToString());
+                                dr[10] = Convert.ToInt32(dr_v["buy_num"].ToString());
                             }
                         }
                     }
                 }
                 else
                 {
-                    dr[12] = 0;
+                    dr[10] = 0;
                 }
 
                 if (!string.IsNullOrEmpty(dr_v["single_money"].ToString()))
                 {
-                    dr[13] = Convert.ToInt32(dr_v["single_money"].ToString());
+                    dr[11] = Convert.ToInt32(dr_v["single_money"].ToString());
+                }
+                else
+                {
+                    dr[11] = 0;
+                }
+                if (!string.IsNullOrEmpty(dr_v["deduct_bonus"].ToString()))
+                {
+                    dr[12] = Convert.ToInt32(dr_v["deduct_bonus"].ToString());
+                }
+                else
+                {
+                    dr[12] = 0;
+                }
+                if (!string.IsNullOrEmpty(dr_v["deduct_welfare"].ToString()))
+                {
+                    dr[13] = Convert.ToInt32(dr_v["deduct_welfare"].ToString());
                 }
                 else
                 {
                     dr[13] = 0;
                 }
-                if (!string.IsNullOrEmpty(dr_v["deduct_bonus"].ToString()))
+                if (!string.IsNullOrEmpty(dr_v["amount"].ToString()))
                 {
-                    dr[14] = Convert.ToInt32(dr_v["deduct_bonus"].ToString());
+                    dr[14] = Convert.ToInt32(dr_v["amount"].ToString()) - Convert.ToInt32(dr[12]) - Convert.ToInt32(dr[13]);
                 }
                 else
                 {
                     dr[14] = 0;
                 }
-                if (!string.IsNullOrEmpty(dr_v["deduct_welfare"].ToString()))
+               
+                if (!string.IsNullOrEmpty(dr_v["single_cost"].ToString()))
                 {
-                    dr[15] = Convert.ToInt32(dr_v["deduct_welfare"].ToString());
+                    dr[15] = Convert.ToInt32(dr_v["single_cost"].ToString());
                 }
                 else
                 {
                     dr[15] = 0;
                 }
-                if (!string.IsNullOrEmpty(dr_v["od.single_money*od.buy_num"].ToString()))
+                if (!string.IsNullOrEmpty(dr_v["event_cost"].ToString()))
                 {
-                    dr[16] = Convert.ToInt32(dr_v["od.single_money*od.buy_num"].ToString()) - Convert.ToInt32(dr[14]) - Convert.ToInt32(dr[15]);
+                    dr[16] = Convert.ToInt32(dr_v["event_cost"].ToString());
                 }
                 else
                 {
                     dr[16] = 0;
                 }
-                if (!string.IsNullOrEmpty(dr_v["single_cost"].ToString()))
+                if (!string.IsNullOrEmpty(dr_v["bag_check_money"].ToString()))
                 {
-                    dr[17] = Convert.ToInt32(dr_v["single_cost"].ToString());
+                    dr[17] = Convert.ToInt32(dr_v["bag_check_money"].ToString());
                 }
                 else
                 {
                     dr[17] = 0;
                 }
-                if (!string.IsNullOrEmpty(dr_v["bag_check_money"].ToString()))
+                if (!string.IsNullOrEmpty(dr_v["cost_amount"].ToString()))
                 {
-                    dr[18] = Convert.ToInt32(dr_v["bag_check_money"].ToString());
+                    dr[18] = Convert.ToInt32(dr_v["cost_amount"].ToString());
                 }
                 else
                 {
                     dr[18] = 0;
                 }
-                if (!string.IsNullOrEmpty(dr_v["od.single_cost*od.buy_num"].ToString()))
+                if (!string.IsNullOrEmpty(dr_v["slave_date_close_format"].ToString()))
                 {
-                    dr[19] = Convert.ToInt32(dr_v["od.single_cost*od.buy_num"].ToString());
+                    DateTime slave_date_close = Convert.ToDateTime(dr_v["slave_date_close_format"].ToString());
+                    dr[19] = slave_date_close == Convert.ToDateTime("1/1/1970 8:00:00 AM") ? "未歸檔" : CommonFunction.DateTimeToString(slave_date_close);
                 }
-                else
-                {
-                    dr[19] = 0;
-                }
-                if (!string.IsNullOrEmpty(dr_v["slave_date_close"].ToString()))
-                {
-                    DateTime slave_date_close = Convert.ToDateTime(dr_v["slave_date_close"].ToString());
-                    dr[20] = slave_date_close == Convert.ToDateTime("1/1/1970 8:00:00 AM") ? "未歸檔" : CommonFunction.DateTimeToString(slave_date_close);
-                }
-                dr[21] = dr_v["pm"].ToString();
-                dr[22] = dr_v["ID"].ToString() == "0" ? "" : dr_v["ID"].ToString();
-                dr[23] = dr_v["group_name"].ToString();
-                dr[24] = dr_v["product_mode_name"].ToString();
-                dr[25] = dr_v["delivery_name"].ToString();
-                dr[26] = dr_v["delivery_address"].ToString();
+                dr[20] = dr_v["product_mode_name"].ToString();
+                dr[21] = dr_v["delivery_name"].ToString();
+                dr[22] = dr_v["delivery_address"].ToString();
                 dt.Rows.Add(dr);
             }
             return dt;

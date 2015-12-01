@@ -971,12 +971,12 @@ od.single_cost,od.event_cost,od.single_price,od.single_money,od.deduct_bonus,od.
                                             INNER JOIN order_master om ON om.order_id=os.order_id
                                             INNER JOIN product_item pi ON od.item_id=pi.item_id
                                             INNER JOIN product_category_set pcs ON pcs.product_id=pi.product_id
-                                        WHERE od.item_mode =0 AND od.detail_status NOT IN(90,91) AND  pcs.category_id={0}", query.category_id);
+                                        WHERE od.item_mode =0 AND od.detail_status NOT IN(89,90,91) AND  pcs.category_id={0} AND om.order_status NOT IN(90,91)", query.category_id);
                 sqlFather.AppendFormat(@" SELECT DISTINCT om.order_id,od.detail_id,od.single_money,buy_num,pcs.category_id,od.deduct_bonus,od.deduct_welfare from order_detail od 
                                             INNER JOIN order_slave os ON os.slave_id=od.slave_id 
                                             INNER JOIN order_master om ON om.order_id=os.order_id
                                             INNER JOIN product_category_set pcs ON pcs.product_id=od.parent_id
-                                        WHERE od.item_mode =1 AND od.detail_status NOT IN(90,91) AND  pcs.category_id={0}", query.category_id);
+                                        WHERE od.item_mode =1 AND od.detail_status NOT IN(89,90,91) AND  pcs.category_id={0} AND om.order_status NOT IN(90,91)", query.category_id);
                 if (query.category_status != 0)
                 {
                     sqlSingle.AppendFormat(" AND om.money_collect_date > 0");
@@ -1003,16 +1003,18 @@ od.single_cost,od.event_cost,od.single_price,od.single_money,od.deduct_bonus,od.
             StringBuilder sql = new StringBuilder();
             StringBuilder sqlSingle = new StringBuilder();
             StringBuilder sqlFather = new StringBuilder();
+            StringBuilder sqlSingleCount = new StringBuilder();
+            StringBuilder sqlFatherCount = new StringBuilder();
             StringBuilder sqlWhere = new StringBuilder();
+            StringBuilder sqlCount = new StringBuilder();
             totalCount = 0;
             DataTable dt = new DataTable();
             try
             {
-                sql.AppendFormat(@"SELECT lb.order_id,u.user_name,sum(lb.single_money * lb.buy_num - deduct_bonus - deduct_welfare) AS amount,category_id,order_product_subtotal,order_amount,dm.delivery_name,
-                                    (SELECT parameterName FROM t_parametersrc WHERE parameterType='payment' AND parameterCode=order_payment) AS order_payment,
-                                    (SELECT remark FROM t_parametersrc WHERE parameterType='order_status' AND parameterCode=slave_status) AS slave_status,
-                                    (SELECT site_name FROM site WHERE lb.site_id=site.site_id ) AS site_name,SUM(deduct_bonus + deduct_welfare)as deducts,
-                                    FROM_UNIXTIME(order_createdate) AS order_createdate from( ");
+                sqlCount.AppendFormat("SELECT count(lb.order_id) from( ");
+                sql.AppendFormat(@"SELECT lb.order_id,u.user_name,single_money, lb.buy_num ,deduct_bonus, deduct_welfare,category_id,order_product_subtotal,
+                                    order_amount,dm.delivery_name,order_payment,'' as  payment_name,slave_status,'' as slave_status_name,site_id,
+                                    '' as site_name,order_createdate,'' as order_createdate_format,'' as deducts,'' as amount from( ");
                 sqlSingle.AppendFormat(@" (SELECT  om.order_id,om.user_id,od.single_money,buy_num,pcs.category_id ,om.order_payment,
                                         om.order_product_subtotal,om.order_amount,os.slave_status,od.site_id,om.order_createdate,
                                         od.deduct_bonus,od.deduct_welfare,od.detail_id  FROM  order_detail od
@@ -1021,14 +1023,26 @@ od.single_cost,od.event_cost,od.single_price,od.single_money,od.deduct_bonus,od.
                                         INNER JOIN order_master om USING (order_id)
                                         INNER JOIN product p USING (product_id)
                                         INNER JOIN product_category_set pcs USING(product_id)
-                                        WHERE category_id={0} AND item_mode =0 AND od.detail_status NOT IN(90,91) ", query.category_id);
+                                        WHERE category_id={0} AND item_mode =0 AND od.detail_status NOT IN(89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
                 sqlFather.AppendFormat(@"(SELECT  om.order_id,om.user_id,od.single_money,buy_num,pcs.category_id ,om.order_payment,
                                         om.order_product_subtotal,om.order_amount,os.slave_status,od.site_id,om.order_createdate,
                                         od.deduct_bonus,od.deduct_welfare,od.detail_id FROM  order_detail od
                                         INNER JOIN order_slave os USING (slave_id)
                                         INNER JOIN order_master om USING (order_id)
                                         INNER JOIN product_category_set pcs ON od.parent_id=pcs.product_id
-                                        WHERE category_id={0} AND item_mode =1 AND od.detail_status NOT IN(90,91)", query.category_id);
+                                        WHERE category_id={0} AND item_mode =1 AND od.detail_status NOT IN(89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
+                sqlSingleCount.AppendFormat(@" (SELECT  om.order_id,om.user_id FROM  order_detail od
+                                        INNER JOIN product_item pit USING(item_id)
+                                        INNER JOIN order_slave os USING (slave_id)
+                                        INNER JOIN order_master om USING (order_id)
+                                        INNER JOIN product p USING (product_id)
+                                        INNER JOIN product_category_set pcs USING(product_id)
+                                        WHERE category_id={0} AND item_mode =0 AND od.detail_status NOT IN(89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
+                sqlFatherCount.AppendFormat(@"(SELECT  om.order_id,om.user_id FROM  order_detail od
+                                        INNER JOIN order_slave os USING (slave_id)
+                                        INNER JOIN order_master om USING (order_id)
+                                        INNER JOIN product_category_set pcs ON od.parent_id=pcs.product_id
+                                        WHERE category_id={0} AND item_mode =1 AND od.detail_status NOT IN(89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
                 if (query.category_status != 0)
                 {
                     sqlWhere.AppendFormat(" AND om.money_collect_date > 0");
@@ -1039,22 +1053,23 @@ od.single_cost,od.event_cost,od.single_price,od.single_money,od.deduct_bonus,od.
                     {
                         sqlWhere.AppendFormat(" AND om.order_createdate>='{0}' and  om.order_createdate<='{1}'", CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_start)), CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_end)));
                     }
-                }
-                sqlSingle.AppendFormat(sqlWhere.ToString() + " ) ");
-                sqlFather.AppendFormat(sqlWhere.ToString() + " ) ");
-                sql.AppendFormat(sqlSingle.ToString() + " UNION " + sqlFather.ToString() + " )lb ");
-                sql.AppendFormat(@" INNER JOIN users u ON u.user_id=lb.user_id
-                                    LEFT  JOIN (SELECT order_id,delivery_name FROM deliver_master GROUP BY order_id ) dm on lb.order_id=dm.order_id
-                                    GROUP BY lb.order_id ");
+                }             
                 if (query.IsPage)
                 {
-                    dt = _dbAccess.getDataTable(sql.ToString());
+                    sqlCount.AppendFormat(sqlSingleCount.ToString() + sqlWhere.ToString() + ") UNION " + sqlFatherCount.ToString() + sqlWhere.ToString() + ") )lb ");
+                    sqlCount.AppendFormat(@" INNER JOIN users u ON u.user_id=lb.user_id
+                                    LEFT  JOIN deliver_master dm on lb.order_id=dm.order_id
+                                    GROUP BY lb.order_id ");
+                    dt = _dbAccess.getDataTable(sqlCount.ToString());
                     if (dt != null && dt.Rows.Count > 0)
                     {
                         totalCount = dt.Rows.Count;
                     }
+                    sql.AppendFormat(sqlSingle.ToString() + sqlWhere.ToString() + ") UNION " + sqlFather.ToString() + sqlWhere.ToString() + ") )lb ");
+                    sql.AppendFormat(@" INNER JOIN users u ON u.user_id=lb.user_id
+                                    LEFT  JOIN deliver_master dm on lb.order_id=dm.order_id
+                                    GROUP BY lb.order_id ");
                     sql.AppendFormat(" limit {0},{1};", query.Start, query.Limit);
-
                 }
                 return _dbAccess.getDataTable(sql.ToString());
             }
