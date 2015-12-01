@@ -4198,8 +4198,6 @@ namespace Admin.gigade.Controllers
                     DataRow row = dtHZ.NewRow();
                     row["會員姓名"] = _dt.Rows[i]["user_name"];
                     row["購買時間"] = Convert.ToDateTime(_dt.Rows[i]["order_createdate"]).ToString("yyyy-MM-dd HH:mm:ss");
-
-
                     row["付款單號"] = _dt.Rows[i]["order_id"];
                     if (i == 0)
                     {
@@ -4207,22 +4205,14 @@ namespace Admin.gigade.Controllers
                         if (invoiceDt != null && invoiceDt.Rows.Count > 0)
                         {
                             row["發票金額"] = invoiceDt.Rows[0]["total_amount"];
-                            if (Convert.IsDBNull(invoiceDt.Rows[0]["invoice_date"]))
-                            {
-                                row["發票開立日期"] = "1970-01-01 08:00:00";
-                                row["發票號碼"] = "0";
-                            }
-                            else
-                            {
-                                row["發票開立日期"] = Convert.ToDateTime(invoiceDt.Rows[0]["invoice_date"]).ToString("yyyy-MM-dd HH:mm:ss");
-                                row["發票號碼"] = invoiceDt.Rows[0]["invoice_number"];
-                            }
+                            row["發票開立日期"] = "1970-01-01 08:00:00";
+                            row["發票號碼"] = "0";
                         }
                         else
                         {
                             row["發票金額"] = "";
-                            row["發票開立日期"] = "";
-                            row["發票號碼"] = "";
+                            row["發票開立日期"] = "1970-01-01 08:00:00";
+                            row["發票號碼"] = "0";
                         }
 
                     }
@@ -4231,8 +4221,8 @@ namespace Admin.gigade.Controllers
                         if (_dt.Rows[i]["order_id"].ToString() == _dt.Rows[i - 1]["order_id"].ToString())
                         {
                             row["發票金額"] = "";
-                            row["發票開立日期"] = "";
-                            row["發票號碼"] = "";
+                            row["發票開立日期"] = "1970-01-01 08:00:00";
+                            row["發票號碼"] = "0";
                         }
                         else
                         {
@@ -4240,22 +4230,14 @@ namespace Admin.gigade.Controllers
                             if (invoiceDt != null && invoiceDt.Rows.Count > 0)
                             {
                                 row["發票金額"] = invoiceDt.Rows[0]["total_amount"];
-                                if (Convert.IsDBNull(invoiceDt.Rows[0]["invoice_date"]))
-                                {
-                                    row["發票開立日期"] = "1970-01-01 08:00:00";
-                                    row["發票號碼"] = "0";
-                                }
-                                else
-                                {
-                                    row["發票開立日期"] = Convert.ToDateTime(invoiceDt.Rows[0]["invoice_date"]).ToString("yyyy-MM-dd HH:mm:ss");
-                                    row["發票號碼"] = invoiceDt.Rows[0]["invoice_number"];
-                                }
+                                row["發票開立日期"] = "1970-01-01 08:00:00";
+                                row["發票號碼"] = "0";
                             }
                             else
                             {
                                 row["發票金額"] = "";
-                                row["發票開立日期"] = "";
-                                row["發票號碼"] = "";
+                                row["發票開立日期"] = "1970-01-01 08:00:00";
+                                row["發票號碼"] = "0";
                             }
                         }
                     }

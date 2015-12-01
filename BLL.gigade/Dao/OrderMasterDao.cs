@@ -2454,7 +2454,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("SELECT imr.total_amount,FROM_UNIXTIME(invoice_date) 'invoice_date',imr.invoice_number from (SELECT order_id,MAX(invoice_id) as 'invoice_id' from invoice_master_record GROUP BY order_id) im LEFT JOIN invoice_master_record imr ON im.invoice_id=imr.invoice_id  where im.order_id='{0}';",order_id);
+                sql.AppendFormat(" select invoice_number,total_amount,invoice_date from invoice_master_record where order_id='{0}' order by invoice_id DESC limit 1;",order_id);
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)
