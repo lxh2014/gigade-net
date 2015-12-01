@@ -3929,6 +3929,9 @@ namespace Admin.gigade.Controllers
                     System.IO.File.Delete(newExcelName);
                 }
                 ExcelHelperXhf.ExportDTtoExcel(dtHZ, "", newExcelName);
+                //MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "");
+                //Response.AddHeader("Content-Disposition", "attach-ment;filename=" + filename);
+                //Response.BinaryWrite(ms.ToArray());
                 json = "{success:true,ExcelName:\'" + filename + "\'}";
             }
             catch (Exception ex)
@@ -3955,7 +3958,7 @@ namespace Admin.gigade.Controllers
             dt.Columns.Add("付款方式", typeof(String));
             dt.Columns.Add("購買金額", typeof(String));
             dt.Columns.Add("付款狀態", typeof(String));
-            dt.Columns.Add("商品細項編號", typeof(int));
+            dt.Columns.Add("商品細項編號", typeof(String));
             dt.Columns.Add("訂單狀態", typeof(String)); 
             dt.Columns.Add("品名", typeof(String));
             dt.Columns.Add("商品類型", typeof(String));
@@ -4005,7 +4008,14 @@ namespace Admin.gigade.Controllers
                 }            
                 if (!string.IsNullOrEmpty(dr_v["item_id"].ToString()))
                 {
-                    dr[6] = Convert.ToInt32(dr_v["item_id"].ToString());
+                    if (dr_v["item_mode"].ToString() == "1")
+                    {
+                        dr[6] = "";
+                    }
+                    else
+                    {
+                        dr[6] = Convert.ToInt32(dr_v["item_id"].ToString());
+                    }
                 }
                 else
                 {
