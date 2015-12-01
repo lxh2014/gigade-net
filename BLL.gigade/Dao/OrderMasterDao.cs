@@ -2356,12 +2356,12 @@ namespace BLL.gigade.Dao
 	                                LEFT JOIN order_detail od ON os.slave_id=od.slave_id
 	                                INNER JOIN product_item pi ON od.item_id=pi.item_id
 	                                INNER JOIN product_category_set pcs ON pi.product_id=pcs.product_id
-	                                WHERE od.item_mode=0  AND pcs.category_id={0} AND od.detail_status NOT IN (90,91) AND om.order_status NOT IN(90,91)", query.category_id);
+	                                WHERE od.item_mode=0  AND pcs.category_id={0} AND od.detail_status NOT IN (89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
                 sqlFather.AppendFormat(@" SELECT om.order_id FROM order_master om  
                                      LEFT JOIN order_slave os ON om.order_id=os.order_id
                                      LEFT JOIN order_detail od ON os.slave_id=od.slave_id
                                      INNER JOIN product_category_set pcs ON od.parent_id=pcs.product_id
-                                     WHERE od.item_mode=1  AND pcs.category_id={0} AND od.detail_status NOT IN (90,91) AND om.order_status NOT IN(90,91)", query.category_id);
+                                     WHERE od.item_mode=1  AND pcs.category_id={0} AND od.detail_status NOT IN (89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
                 if (query.category_status != 0)
                 {
                     sqlWhere.AppendFormat(" AND om.money_collect_date > 0");
@@ -2393,7 +2393,7 @@ namespace BLL.gigade.Dao
                                 LEFT JOIN order_slave os ON  om.order_id=os.order_id
                                 LEFT JOIN order_detail od ON os.slave_id=od.slave_id                              
                                 INNER JOIN product_item pi ON od.item_id=pi.item_id                   
-                                WHERE om.order_id='{0}' AND od.detail_status NOT IN (90,91) ; ", order_id);
+                                WHERE om.order_id='{0}' AND od.detail_status NOT IN (89,90,91) ; ", order_id);
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)
@@ -2420,13 +2420,13 @@ namespace BLL.gigade.Dao
                                         INNER JOIN product_item pi ON od.item_id=pi.item_id
                                         INNER JOIN product_category_set pcs ON pi.product_id=pcs.product_id
                                         WHERE od.item_mode=0  AND pcs.category_id={0}
-                                        AND od.detail_status NOT IN(90,91) AND om.order_status NOT IN(90,91)", query.category_id);
+                                        AND od.detail_status NOT IN(89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
 
                 sqlJoin2.AppendFormat(@"LEFT JOIN order_slave os ON om.order_id=os.order_id
                                         LEFT JOIN order_detail od ON os.slave_id=od.slave_id
                                         INNER JOIN product_category_set pcs ON od.parent_id=pcs.product_id
                                         WHERE od.item_mode=1  AND pcs.category_id={0}
-                                        AND od.detail_status NOT IN(90,91) AND om.order_status NOT IN(90,91)", query.category_id);
+                                        AND od.detail_status NOT IN(89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
 
                 if (query.category_status != 0)
                 {
@@ -2440,7 +2440,7 @@ namespace BLL.gigade.Dao
                     }
                 }
                 sqlWhere.AppendFormat(" GROUP BY  od.detail_id ");
-                return _dbAccess.getDataTable(sql.ToString() + sqlJoin1.ToString() + sqlWhere.ToString() + ")UNION" + sql.ToString() + sqlJoin2.ToString() + sqlWhere.ToString() + ")");
+                return _dbAccess.getDataTable(sql.ToString() + sqlJoin1.ToString() + sqlWhere.ToString() + ")UNION" + sql.ToString() + sqlJoin2.ToString() + sqlWhere.ToString() + ") ORDER BY order_id");
             }
             catch (Exception ex)
             {
@@ -2454,7 +2454,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("SELECT imr.total_amount,FROM_UNIXTIME(invoice_date) 'invoice_date',imr.invoice_number from (SELECT order_id,MAX(invoice_id) as 'invoice_id' from invoice_master_record GROUP BY order_id) im LEFT JOIN invoice_master_record imr ON im.invoice_id=imr.invoice_id  where im.order_id='{0}';",order_id);
+                sql.AppendFormat(" select invoice_number,total_amount,invoice_date from invoice_master_record where order_id='{0}' order by invoice_id DESC limit 1;",order_id);
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)
