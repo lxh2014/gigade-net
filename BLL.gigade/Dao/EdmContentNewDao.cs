@@ -76,7 +76,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.Append("select group_id,group_name from edm_group_new;");
+                sql.Append("select group_id,group_name from edm_group_new where enabled=1 order by  is_member_edm  desc, sort_order  ;");
                 return _access.getDataTableForObj<EdmGroupNew>(sql.ToString());
             }
             catch (Exception ex)

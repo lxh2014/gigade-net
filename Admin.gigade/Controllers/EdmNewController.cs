@@ -1442,7 +1442,7 @@ namespace Admin.gigade.Controllers
                         newRow[2] = _dt.Rows[i]["name"];
                         _newDt.Rows.Add(newRow);
                     }
-                    string fileName = "email_group" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                    string fileName = "信箱名單管理匯出" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
                     MemoryStream ms = ExcelHelperXhf.ExportDT(_newDt, "");
                     Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
                     Response.BinaryWrite(ms.ToArray());
@@ -1469,7 +1469,7 @@ namespace Admin.gigade.Controllers
                 _dt.Columns.Add("收件人名稱", typeof(string));
                 DataRow newRow = _dt.NewRow();
                 _dt.Rows.Add();
-                string fileName = "email_group_template" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                string fileName = "信箱名單管理匯出模板" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
                 MemoryStream ms = ExcelHelperXhf.ExportDT(_dt, "");
                 Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
                 Response.BinaryWrite(ms.ToArray());
