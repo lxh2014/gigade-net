@@ -8,10 +8,11 @@ Ext.define('gigade.OrderDetial', {
     { name: 'order_product_subtotal', type: 'int' },
     { name: 'order_amount', type: 'int' },
     { name: 'amount', type: 'int' },
-    { name: 'order_payment', type: 'string' },
-    { name: 'slave_status', type: 'string' },
-    { name: 'order_createdate', type: 'string' },
-    { name: 'site_name', type: 'string' }
+    { name: 'payment_name', type: 'string' },
+    { name: 'slave_status_name', type: 'string' },
+    { name: 'order_createdate_format', type: 'string' },
+    { name: 'site_name', type: 'string' },
+    { name: 'deducts', type: 'int' },
     ]
 });
 var AmountDetial = Ext.create('Ext.data.Store', {
@@ -113,9 +114,15 @@ Ext.onReady(function () {
                 return change(value);
             }
         },
-        { header: "付款方式", dataIndex: 'order_payment', flex: 2, align: 'center' },
-        { header: "訂單狀態", dataIndex: 'slave_status', flex: 1, align: 'center' },
-        { header: "訂單日期", dataIndex: 'order_createdate', flex: 1, align: 'center' },
+        {
+            header: "購物金抵用券", dataIndex: 'deducts', flex: 1, align: 'center',
+            renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                return change(value);
+            }
+        },
+        { header: "付款方式", dataIndex: 'payment_name', flex: 1.5, align: 'center' },
+        { header: "訂單狀態", dataIndex: 'slave_status_name', flex: 1, align: 'center' },
+        { header: "訂單日期", dataIndex: 'order_createdate_format', flex: 1, align: 'center' },
         { header: "賣場", dataIndex: 'site_name', flex: 1, align: 'center', }
         ],
         tbar: [
@@ -191,6 +198,7 @@ OnOrderDetialExport = function () {
         timeout: 900000,
         params: {
             category_id: document.getElementById('category_id').value,
+            category_name: document.getElementById('category_name').value,
             category_status: document.getElementById('category_status').value,
             date_stauts: document.getElementById('date_stauts').value,
             date_start: document.getElementById('date_start').value,

@@ -127,6 +127,7 @@ namespace BLL.gigade.Mgr.Schedules
                         if (string.IsNullOrEmpty(ftpuser) || string.IsNullOrEmpty(ftppassword))
                         {
                             mailBody += "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + "需要的FTP賬號或密碼沒有設定！" + "</h3>";
+                            //mailBody += "<br>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + " " + "需要的FTP賬號或密碼沒有設定！" + "<br>";
                         }
                         else
                         {
@@ -137,24 +138,28 @@ namespace BLL.gigade.Mgr.Schedules
                     //判斷路徑是否正確
                     else if (!Directory.Exists(filepaths[i]))
                     {
-                        mailBody += "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + NotExistDirectory + "</h3>";
+                        mailBody += "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + " " + NotExistDirectory + "</h3>";
+                        //mailBody += "<br>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + " " + NotExistDirectory + "<br>";
                         isEmpty = -1;
                     }
                     //判斷路徑下是否有文件
                     else if (Directory.GetFiles(filepaths[i]).Length == 0)
                     {
-                        mailBody += "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + EmptyFilesPrompt + "</h3>";
+                        mailBody += "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + " " + EmptyFilesPrompt + "</h3>";
+                        //mailBody += "<br>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + " " + EmptyFilesPrompt + "<br>";
                         isEmpty = 1;
                     }
                     else if (Directory.GetFiles(filepaths[i]).Length > 0)
                     {
-                        string Content = "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + ExistFilesPrompt + "</h3>";
+                        string Content = "<h3>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + " " + ExistFilesPrompt + "</h3>";
+                        //string Content = "<br>" + (i + 1).ToString() + "." + "目錄 " + filepaths[i] + " " + ExistFilesPrompt + "<br>";
                         string[] files = Directory.GetFiles(filepaths[i]);
                         for (int j = 0; j < files.Length; j++)
                         {
                             FileInfo info = new FileInfo(files[j]);
                             files[j] = info.Name;
                             Content += "<h5>" + "(" + (j + 1).ToString() + ")" + files[j] + "</h5>";
+                            //Content += "(" + (j + 1).ToString() + ")" + files[j] + "<br>";
                         }
                         mailBody += Content;
                         isEmpty = 0;
@@ -174,8 +179,6 @@ namespace BLL.gigade.Mgr.Schedules
                     MailHelper mail = new MailHelper(mailModel);
                     mail.SendToGroup(GroupCode, MailTitle, mailBody+" ", false, false);//發送郵件
                 }
-                
-
 
             }
             catch (Exception ex)
@@ -194,23 +197,27 @@ namespace BLL.gigade.Mgr.Schedules
 
                 if (files.Count == 0)
                 {
-                    result += "<h3>" + (i + 1).ToString() + "." + "目錄 " + url + EmptyFilesPrompt + "</h3>";
+                    result += "<h3>" + (i + 1).ToString() + "." + "目錄 " + url + " " + EmptyFilesPrompt + "</h3>";
+                    //result += "<br>" + (i + 1).ToString() + "." + "目錄 " + url + " " + EmptyFilesPrompt + "<br>";
                     isEmpty = 1;
                 }
                 else if (files.Count > 0)
                 {
-                    result += "<h3>" + (i + 1).ToString() + "." + "目錄 " + url + ExistFilesPrompt + "</h3>";
+                    result += "<h3>" + (i + 1).ToString() + "." + "目錄 " + url + " " + ExistFilesPrompt + "</h3>";
+                    //result += "<br>" + (i + 1).ToString() + "." + "目錄 " + url + " " + ExistFilesPrompt + "<br>";
                     for (int j = 0; j < files.Count; j++)
                     {
                         result += "<h5>" + "(" + (j + 1).ToString() + ")" + files[j] + "</h5>";
+                        //result += "(" + (j + 1).ToString() + ")" + files[j] + "<br>";
                     }
                     isEmpty = 0;
-                    
+
                 }
             }
-            catch (Exception )
+            catch (Exception)
             {
-                result += "<h3>" + (i + 1).ToString() + "." + "目錄 " + url + NotExistFtpDirectory + "</h3>";
+                result += "<h3>" + (i + 1).ToString() + "." + "目錄 " + url + " " + NotExistFtpDirectory + "</h3>";
+                //result += "<br>" + (i + 1).ToString() + "." + "目錄 " + url + " " + NotExistFtpDirectory + "<br>";
             }
             return result;
         }
@@ -238,7 +245,7 @@ namespace BLL.gigade.Mgr.Schedules
             //}
             //return result;
             string Datastring = reader.ReadToEnd();
-            List<FileStruct> filesStruct =  GetList(Datastring);
+            List<FileStruct> filesStruct = GetList(Datastring);
             List<string> filesName = new List<string>();
             foreach (FileStruct item in filesStruct)
             {

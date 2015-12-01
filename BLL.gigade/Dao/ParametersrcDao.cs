@@ -722,49 +722,18 @@ namespace BLL.gigade.Dao
             }
         }
 
-        public string GetOrderPayment(int order_payment)
+        public List<Parametersrc> SearchParameters(params string[] types)
         {
-            StringBuilder strSql = new StringBuilder();
             try
             {
-                strSql.AppendFormat("SELECT parameterName FROM t_parametersrc WHERE parameterType='payment' AND parameterCode='{0}';", order_payment);
-                return _accessMySql.getDataTable(strSql.ToString()).Rows[0][0].ToString();
+                var sqlStr = string.Format("SELECT parameterName,parameterCode,parameterType,remark from t_parametersrc WHERE parametertype in ('{0}')", string.Join("','", types));
+                return _accessMySql.getDataTableForObj<Parametersrc>(sqlStr);
             }
             catch (Exception ex)
             {
-
-                throw new Exception("ParametersrcDao-->GetOrderPayment-->" + strSql.ToString() + ex.Message, ex);
+                throw new Exception("ParametersrcDao-->SearchParameters" + ex, ex);
             }
-        }
 
-        public string GetSlaveStatus(int slave_status)
-        {
-            StringBuilder strSql = new StringBuilder();
-            try
-            {
-                strSql.AppendFormat("SELECT remark FROM t_parametersrc WHERE parameterType='order_status' AND parameterCode='{0}';", slave_status);
-                return _accessMySql.getDataTable(strSql.ToString()).Rows[0][0].ToString();
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception("ParametersrcDao-->GetSlaveStatus-->" + strSql.ToString() + ex.Message, ex);
-            }
-        }
-
-        public string GetProductMode(int product_mode)
-        {
-            StringBuilder strSql = new StringBuilder();
-            try
-            {
-                strSql.AppendFormat("SELECT remark FROM t_parametersrc WHERE parameterType='product_mode' AND parameterCode='{0}';", product_mode);
-                return _accessMySql.getDataTable(strSql.ToString()).Rows[0][0].ToString();
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception("ParametersrcDao-->GetProductMode-->" + strSql.ToString() + ex.Message, ex);
-            }
         }
     }
 }

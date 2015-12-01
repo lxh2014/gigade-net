@@ -19,7 +19,6 @@
         }
     });
 
-
     Ext.define('gigade.email_group', {
         extend: 'Ext.data.Model',
         fields: [
@@ -39,10 +38,6 @@
             }
         }
     });
-
-
-
-
     var importanceStore = Ext.create('Ext.data.Store', {
         fields: ['txt', 'value'],
         data: [
@@ -487,6 +482,14 @@
                                                         fieldLabel: 'template_data',
                                                         hidden: true,
                                            },
+                                             {
+                                                 xtype: 'displayfield',
+                                                 id: 'template_id',
+                                                 name: 'template_id',
+                                                 fieldLabel: '模板編號',
+                                                 hidden: true,
+                                             },
+                                           
 
                                              {
                                                  xtype: 'displayfield',
@@ -535,7 +538,7 @@
                                                           subject: Ext.getCmp('subject').getValue(),
                                                           body: Ext.getCmp('template_data_send').getValue(),
                                                           test_send_list: Ext.getCmp('test_send_list').getValue(),
-
+                                                          template_id: Ext.getCmp('template_id').getValue(),
                                                       },
                                                       success: function (form, action) {
                                                           myMask.hide();
@@ -754,6 +757,7 @@
                                                   extra_no_send: Ext.getCmp('extra_no_send').getValue(),
                                                   is_outer: Ext.getCmp('checkbox1').getValue(),
                                                   email_group_id: Ext.getCmp('email_group_id').getValue(),
+                                                  template_id: Ext.getCmp('template_id').getValue(),
                                               },
                                               success: function (form, action) {
                                                   myMask.hide();
@@ -823,6 +827,8 @@
                 Ext.getCmp('group_id').setValue(row.data.group_id);
                 Ext.getCmp('subject').setValue(row.data.subject);
                 Ext.getCmp('template_data_send').setValue(row.data.template_data_send);
+                Ext.getCmp('template_id').setValue(row.data.template_id);
+                
             }
         }
     });

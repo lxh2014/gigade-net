@@ -1159,11 +1159,144 @@ set ");
             }
         }
 
+        public DataTable CagegoryDetialExportInfo(OrderDetailQuery query)
+        {
+            try
+            {
+                DataTable dt = _orderMasterDao.CagegoryDetialExport(query);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    List<Parametersrc> parameterList = _parametersrcDao.SearchParameters("payment", "order_status", "product_mode");
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        var alist = parameterList.Find(m => m.ParameterType == "payment" && m.ParameterCode == dr["order_payment"].ToString());
+                        var blist = parameterList.Find(m => m.ParameterType == "order_status" && m.ParameterCode == dr["order_status"].ToString());
+                        var clist = parameterList.Find(m => m.ParameterType == "order_status" && m.ParameterCode == dr["slave_status"].ToString());
+                        var dlist = parameterList.Find(m => m.ParameterType == "product_mode" && m.ParameterCode == dr["product_mode"].ToString());
+                        if (alist != null)
+                        {
+                            dr["payment_name"] = alist.parameterName;
+                        }
+                        if (blist != null)
+                        {
+                            dr["order_status_name"] = blist.remark;
+                        }
+                        if (clist != null)
+                        {
+                            dr["slave_status_name"] = clist.remark;
+                        }
+                        if (dlist != null)
+                        {
+                            dr["product_mode_name"] = dlist.remark;
+                        }
+                        if (dr["order_createdate"] != null)
+                        {
+                            dr["order_createdate_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr["order_createdate"].ToString())));
+                        }
+                        if (dr["slave_date_close"] != null)
+                        {
+                            dr["slave_date_close_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr["slave_date_close"].ToString())));
+                        }
+                        if (dr["single_money"] != null && dr["buy_num"] != null)
+                        {
+                            dr["amount"] = Convert.ToInt32(dr["single_money"].ToString()) * Convert.ToInt32(dr["buy_num"]);
+                        }
+                        if (dr["single_cost"] != null && dr["buy_num"] != null)
+                        {
+                            dr["cost_amount"] = Convert.ToInt32(dr["single_cost"].ToString()) * Convert.ToInt32(dr["buy_num"]);
+                        }
+                    }                  
+                }
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->CagegoryDetialExportInfo-->" + ex.Message, ex);
+            }
+        }
+
         public DataTable OrderDetialExportInfo(OrderDetailQuery query)
         {
             try
             {
-                DataTable dt = _orderMasterDao.DetialExport(query, 1);
+                DataTable dt_ids = _orderMasterDao.GetOrderDetialExportOrderid(query);
+                DataTable detial=new DataTable();
+                DataTable all = new DataTable();
+                foreach (DataRow dr in dt_ids.Rows)
+                {
+                    if (!string.IsNullOrEmpty(dr[0].ToString()))
+                    {
+                        int order_id = Convert.ToInt32(dr[0]);
+                        detial = _orderMasterDao.OrderDetialExportInfo(order_id);
+                        if (detial != null && detial.Rows.Count > 0)
+                        {
+                            List<Parametersrc> parameterList = _parametersrcDao.SearchParameters("payment", "order_status", "product_mode");
+                            foreach (DataRow dr_t in detial.Rows)
+                            {
+                                var alist = parameterList.Find(m => m.ParameterType == "payment" && m.ParameterCode == dr_t["order_payment"].ToString());
+                                var blist = parameterList.Find(m => m.ParameterType == "order_status" && m.ParameterCode == dr_t["order_status"].ToString());
+                                var clist = parameterList.Find(m => m.ParameterType == "order_status" && m.ParameterCode == dr_t["slave_status"].ToString());
+                                var dlist = parameterList.Find(m => m.ParameterType == "product_mode" && m.ParameterCode == dr_t["product_mode"].ToString());
+                                if (alist != null)
+                                {
+                                    dr_t["payment_name"] = alist.parameterName;
+                                }
+                                if (blist != null)
+                                {
+                                    dr_t["order_status_name"] = blist.remark;
+                                }
+                                if (clist != null)
+                                {
+                                    dr_t["slave_status_name"] = clist.remark;
+                                }
+                                if (dlist != null)
+                                {
+                                    dr_t["product_mode_name"] = dlist.remark;
+                                }
+                                if (dr_t["order_createdate"] != null)
+                                {
+                                    dr_t["order_createdate_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr_t["order_createdate"].ToString())));
+                                }
+                                if (dr_t["slave_date_close"] != null)
+                                {
+                                    dr_t["slave_date_close_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr_t["slave_date_close"].ToString())));
+                                }
+                                if (dr_t["single_money"] != null && dr_t["buy_num"] != null)
+                                {
+                                    dr_t["amount"] = Convert.ToInt32(dr_t["single_money"].ToString()) * Convert.ToInt32(dr_t["buy_num"]);
+                                }
+                                if (dr_t["single_cost"] != null && dr_t["buy_num"] != null)
+                                {
+                                    dr_t["cost_amount"] = Convert.ToInt32(dr_t["single_cost"].ToString()) * Convert.ToInt32(dr_t["buy_num"]);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                    if (all.Rows.Count == 0)
+                    {
+                        all = detial;
+                    }
+                    else
+                    {
+                        all.Merge(detial, true);
+                    }
+                }
+                return all;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->OrderDetialExportInfo-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable ExcelTitle()
+        {
+            try
+            {
                 DataTable dtNew = new DataTable();
                 string newExcelName = string.Empty;
                 dtNew.Columns.Add("category_id", typeof(int));
@@ -1173,6 +1306,7 @@ set ");
                 dtNew.Columns.Add("order_payment", typeof(String));
                 dtNew.Columns.Add("order_amount", typeof(int));
                 dtNew.Columns.Add("order_status", typeof(String));
+                dtNew.Columns.Add("item_mode", typeof(String));
                 dtNew.Columns.Add("item_id", typeof(int));
                 dtNew.Columns.Add("slave_status", typeof(String));
                 dtNew.Columns.Add("vendor_name_simple", typeof(String));
@@ -1191,41 +1325,27 @@ set ");
                 dtNew.Columns.Add("ID", typeof(String));
                 dtNew.Columns.Add("group_name", typeof(String));
                 dtNew.Columns.Add("product_mode", typeof(String));
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    DataRow dr = dtNew.NewRow();
-                    for (int j = 0; j < dt.Columns.Count; j++)
-                    {
-                        switch (j)
-                        {
-                            case 4:
-                                int order_payment = dt.Rows[i]["order_payment"].ToString() == "" ? 0 : Convert.ToInt32(dt.Rows[i]["order_payment"]);
-                                dr[j] = _parametersrcDao.GetOrderPayment(order_payment);
-                                break;
-                            case 6:
-                                int order_status = dt.Rows[i]["order_status"].ToString() == "" ? 0 : Convert.ToInt32(dt.Rows[i]["order_status"]);
-                                dr[j] = _parametersrcDao.GetOrderStatus(order_status);
-                                break;
-                            case 8:
-                                int slave_status = dt.Rows[i]["slave_status"].ToString() == "" ? 0 : Convert.ToInt32(dt.Rows[i]["slave_status"]);
-                                dr[j] = _parametersrcDao.GetSlaveStatus(slave_status);
-                                break;
-                            case 24:
-                                int product_mode = dt.Rows[i]["product_mode"].ToString() == "" ? 0 : Convert.ToInt32(dt.Rows[i]["product_mode"]);
-                                dr[j] = _parametersrcDao.GetProductMode(product_mode);
-                                break;
-                            default:
-                                dr[j] = dt.Rows[i][j];
-                                break;
-                        }
-                    }
-                    dtNew.Rows.Add(dr);
-                }
+                dtNew.Columns.Add("delivery_name", typeof(String));
+                dtNew.Columns.Add("delivery_address", typeof(String)); 
                 return dtNew;
             }
             catch (Exception ex)
             {
-                throw new Exception("OrderMgr-->OrderDetialExportInfo-->" + ex.Message, ex);
+                throw new Exception("OrderMgr-->CagegoryDetialExportInfo-->" + ex.Message, ex);
+            }
+        }
+
+
+        public DataTable GetInvoiceData(uint order_id)
+        {
+
+            try
+            {
+                return _orderMasterDao.GetInvoiceData(order_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->GetInvoiceData-->" + ex.Message, ex);
             }
         }
     }

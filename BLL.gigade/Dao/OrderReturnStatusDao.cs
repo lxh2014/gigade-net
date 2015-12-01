@@ -337,7 +337,7 @@ namespace BLL.gigade.Dao
                 arrList.Add(CouldReturn(query));
                 arrList.Add(UpOrderReturnMaster(query));
                 HgBatchAccumulateRefund hgBatch = new HgBatchAccumulateRefund();
-               //HGLogin hgLogin = GetHGLoginData((uint)query.ors_order_id);
+               HGLogin hgLogin = GetHGLoginData((uint)query.ors_order_id);
                 OrderMaster om = _ordermasterdao.GetOrderMasterByOrderId4Change(Convert.ToInt32(query.ors_order_id));
                 DataTable _returnDt = GetReturnId(query);
                 DataTable odli = _orderDetailDao.OrderDetailTable(Convert.ToUInt32(query.return_id),0);
@@ -348,7 +348,6 @@ namespace BLL.gigade.Dao
                 if (odli != null)
                 {
                     #region hg個字段賦值
-                  /*為方便測試暫時先注釋
                     if (hgLogin != null)
                     {
                         #region hg_batch_accumulate_refund
@@ -371,7 +370,7 @@ namespace BLL.gigade.Dao
                        // hgBatch.batch_import_time = Convert.ToInt32(CommonFunction.GetPHPTime());
                         #endregion
                     }
-                    */
+
                     #endregion
                     int paymoney = 0;
                     int returnmoney = 0;
@@ -429,9 +428,9 @@ namespace BLL.gigade.Dao
                         {
                          
                             //插入hg_batch_accumulate_refund
-                              /*為方便測試暫時先注釋
+                           
                              arrList.Add(hg_batch_accumulate_refund(hgBatch));
-                            */
+                          
                         }
                     }
                     #endregion
@@ -448,9 +447,9 @@ namespace BLL.gigade.Dao
                         if (accumulated_happygo > 0)
                         {
                             //插入hg_batch_accumulate_refund
-                             /*為方便測試暫時先注釋
+                            
                             arrList.Add(hg_batch_accumulate_refund(hgBatch));
-                              */
+                            
                         }
                     }
                     #endregion
@@ -461,9 +460,9 @@ namespace BLL.gigade.Dao
                     if (deduct_happygo > 0)
                     {
                         //插入hg_deduct_refund
-                        /*為方便測試暫時先注釋
+                       
                         arrList.Add(hg_batch_deduct_refund(hgBatch));
-                         */ 
+                        
                     }
                     if (deductbonus > 0)
                     {
@@ -757,7 +756,7 @@ namespace BLL.gigade.Dao
         }
         public string InsertHGAccRefund(HgDeduct hg_deduct, int accumulated_happygo, uint order_id)
         {
-
+            //要改**********************//
             StringBuilder sql = new StringBuilder();
             try
             {
@@ -1087,7 +1086,7 @@ namespace BLL.gigade.Dao
         public string hg_batch_accumulate_refund(HgBatchAccumulateRefund query)
         {
             StringBuilder sql = new StringBuilder();
-
+            //要改********************maybe//
             try
             {
                 sql.AppendFormat("insert into hg_batch_accumulate_refund(order_id,head,card_no,card_checksum,enc_idno,");
@@ -1114,7 +1113,7 @@ namespace BLL.gigade.Dao
         public string hg_batch_deduct_refund(HgBatchAccumulateRefund query)
         {
             StringBuilder sql = new StringBuilder();
-
+            //要改**////////////////
             try
             {
                 sql.AppendFormat("insert into hg_batch_deduct_refund(order_id,head,card_no,card_checksum,enc_idno,");

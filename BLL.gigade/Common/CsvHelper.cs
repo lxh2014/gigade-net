@@ -255,6 +255,61 @@ namespace BLL.gigade.Common
         }
         #endregion
 
+
+        #region 匯出csv解決特殊符號亂碼
+        public static void ExportDataTableToCsvBySdy(DataTable dt, string FileName, string[] ColumnName, bool HasColumnName)
+        {
+            StringBuilder sbValue = new StringBuilder();
+            //CSV 匯出的標題 要先塞一樣的格式字串 充當標題
+            if (HasColumnName == true)
+            {
+                sbValue.Append(string.Join(",", ColumnName));
+            }
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                for (int j = 0; j < dt.Columns.Count; j++)
+                {
+                    if (!string.IsNullOrEmpty(dt.Rows[i][j].ToString()))
+                    {
+                        if (j > 0)
+                        {
+                            sbValue.Append("," + dt.Rows[i][j].ToString().Replace(',', '，').Replace("\r", "").Replace("\n", ""));
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(sbValue.ToString()))
+                            {
+                                sbValue.Clear();
+                                sbValue.Append(dt.Rows[i][j].ToString().Replace(',', '，').Replace("\r", "").Replace("\n", ""));
+                            }
+                            else
+                            {
+                                sbValue.Append(Environment.NewLine + dt.Rows[i][j].ToString().Replace(',', '，').Replace("\r", "").Replace("\n", ""));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (j > 0)
+                        {
+                            sbValue.Append(",");
+                        }
+                        else
+                        {
+                            sbValue.Append(Environment.NewLine);
+                        }
+                    }
+                }
+
+            }
+            //存成檔案
+            string strFile = FileName;
+            if (!string.IsNullOrEmpty(sbValue.ToString()))
+            {
+                File.WriteAllText(strFile, sbValue.ToString(), Encoding.UTF8);
+            }
+        }
+        #endregion
         //add by shiwei0620j 201501221105
         public static void TitleCsv(DataTable dt, string FileName,string title, string[] ColumnName, bool HasColumnName)
         {
