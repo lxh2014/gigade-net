@@ -88,5 +88,16 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IialgMgr-->addIialgIstock-->" + ex.Message, ex);
             }
         }
+        public int addIialgIstock_AutoMarket(IialgQuery q)
+        {
+            try
+            {
+                return _iagDao.addIialgIstock_AutoMarket(q);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IialgMgr-->addIialgIstock_AutoMarket-->" + ex.Message, ex);
+            }
+        }
     }
 }
