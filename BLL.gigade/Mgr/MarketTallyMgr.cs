@@ -217,7 +217,7 @@ namespace BLL.gigade.Mgr
                     }
                     if (result == 100)
                     {
-                        _proditemMgr.UpdateItemStock(Proitems, path, call);
+                        //_proditemMgr.UpdateItemStock(Proitems, path, call);
                         json = "{success:true,msg:100}";
                     }
                 }
