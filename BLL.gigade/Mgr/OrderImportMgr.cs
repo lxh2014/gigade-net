@@ -824,7 +824,7 @@ namespace BLL.gigade.Mgr
                            product_id = p.parent_id == 0 ? p.Product_Id : uint.Parse(p.parent_id.ToString()),
                            user_id = 0,
                            user_level = 1,
-                           site_id = 1,
+                           site_id = p.Site_Id,//edit by zhuoqin0830w  2015/11/16  添加站台欄位詳細查詢是哪一個站台下的價格
                            child_id = int.Parse(p.Product_Id.ToString())
                        });
                     }
@@ -835,7 +835,7 @@ namespace BLL.gigade.Mgr
                             product_id = p.Product_Id,
                             user_id = 0,
                             user_level = 1,
-                            site_id = 1,
+                            site_id = p.Site_Id,//edit by zhuoqin0830w  2015/11/16  添加站台欄位詳細查詢是哪一個站台下的價格
                             child_id = (p.parent_id == 0 && p.Item_Id == 0) ? int.Parse(p.Product_Id.ToString()) : 0
                         });
                     }

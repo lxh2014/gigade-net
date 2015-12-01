@@ -922,7 +922,7 @@ namespace Admin.gigade.Controllers
                         }
                         if (!string.IsNullOrEmpty(Request.Params["expire_date"]))
                         {
-                            eslQuery.expire_date = Convert.ToDateTime(Request.Params["expire_date"]);
+                            eslQuery.expire_date = Convert.ToDateTime(Convert.ToDateTime(Request.Params["expire_date"]).ToString("yyyy-MM-dd 23:59:59"));
                             mQuery.valid_until_date = eslQuery.expire_date;
                         }
                         eslQuery.createdate = DateTime.Now;
@@ -949,7 +949,7 @@ namespace Admin.gigade.Controllers
                                 mQuery.is_outer = false;
                             }
                         }
-                        json = _edmContentNewMgr.MailAndRequest(eslQuery, mQuery);
+                       json = _edmContentNewMgr.MailAndRequest(eslQuery, mQuery);
                     }
                 }
             }

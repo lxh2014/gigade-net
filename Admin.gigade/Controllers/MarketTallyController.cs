@@ -28,6 +28,7 @@ namespace Admin.gigade.Controllers
         IProductItemImplMgr _iproductitemMgr;
         IPalletMoveImplMgr _ipalet;
         IIialgImplMgr _iialgMgr;
+        MarketTallyMgr _marketTallyMgr;
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly string mySqlConnectionString = System.Configuration.ConfigurationManager.AppSettings["MySqlConnectionString"].ToString();
 
@@ -51,7 +52,10 @@ namespace Admin.gigade.Controllers
             ViewBag.itemid = Request.Params["itemid"];
             return View();
         }
-
+        public ActionResult AutoMarketTally()
+        {
+            return View();
+        }
         //通過工作代號判斷在表中是否存在
         public HttpResponseBase GetAseldMasterAssgCount()
         {
@@ -165,10 +169,83 @@ namespace Admin.gigade.Controllers
 
 
         //根據工作代號、細項編號 獲取商品數據
+        /// <summary>
+        /// 自動理貨 根據工作代號/細項編號/訂單號/出貨單號獲取所有商品信息
+        /// </summary>
+        /// <returns></returns>
+        public HttpResponseBase GetAllAseldList()
+        {//判斷寄倉或者調度
+            string json = String.Empty;
+
+            AseldQuery m = new AseldQuery();
+            List<AseldQuery> list = new List<AseldQuery>();
+            _iasdMgr = new AseldMgr(mySqlConnectionString);
+            int totalCount = 0;
+            try
+            {
+
+                string search_type = Request.Params["search_type"].ToString().Trim();
+                if (!string.IsNullOrEmpty(Request.Params["search_con"].ToString().Trim()))
+                {
+                    if (search_type == "assg_id")
+                    {
+                        m.assg_id = Request.Params["search_con"].ToString().Trim();
+                    }
+                    else if (search_type == "item_id")
+                    {
+                        m.item_id = Convert.ToUInt32(Request.Params["search_con"].ToString().Trim());
+                    }
+                    else if (search_type == "ord_id")
+                    {
+                        m.ord_id = Convert.ToInt32(Request.Params["search_con"].ToString().Trim());
+                    }
+                    else if (search_type == "deliver_code")
+                    {
+                        m.deliver_code = Request.Params["search_con"].ToString().Trim();
+                    }
+                    else
+                    {
+
+                    }
+                }
+                if (!string.IsNullOrEmpty(Request.Params["start_time"]))
+                {
+                    m.start_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (!string.IsNullOrEmpty(Request.Params["end_time"]))
+                {
+                    m.end_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+                }
+                
+                list = _iasdMgr.GetAllAseldList(m, out totalCount);
+                foreach (var item in list)
+                {
+                    m.seld_id = item.seld_id;
+                }
+                m.wust_id = "BSY";
+                m.create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+                _iasdMgr.Updwust(m);
+                json = "{success:true,totalCount:"+ totalCount +",data:" + JsonConvert.SerializeObject(list, Formatting.Indented) + "}";//返回json數據              
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+        }
+
+        //根據工作代號、細項編號 獲取商品數據
         public HttpResponseBase GetAseldListByItemid()
         {//判斷寄倉或者調度
             string json = String.Empty;
-            
+
             Aseld m = new Aseld();
             List<AseldQuery> list = new List<AseldQuery>();
             _iasdMgr = new AseldMgr(mySqlConnectionString);
@@ -187,7 +264,7 @@ namespace Admin.gigade.Controllers
                 m.wust_id = "BSY";
                 m.create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 _iasdMgr.Updwust(m);
-                json = "{success:true,totalCount:"+list.Count+",data:" + JsonConvert.SerializeObject(list, Formatting.Indented) + "}";//返回json數據              
+                json = "{success:true,totalCount:" + list.Count + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented) + "}";//返回json數據              
             }
             catch (Exception ex)
             {
@@ -822,5 +899,43 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
+
+        public HttpResponseBase RFAutoMarketTally()
+        {
+            string json = String.Empty;
+            json = "{success:true}";
+            try
+            {
+                _marketTallyMgr = new MarketTallyMgr(mySqlConnectionString);
+
+                string id = Request.Params["id"];
+                string[] ids = id.Split(',');
+                for (int i = 0; i < ids.Length - 1; i++)
+                {
+                     int seld_id = int.Parse(ids[i].ToString());
+                     bool result = _marketTallyMgr.RFAutoMarketTally(seld_id);
+                     if (!result)
+                     {
+                         json = "{success:false}";
+                         break;
+                     }
+
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json.ToString());
+            this.Response.End();
+            return this.Response;
+
+        }
     }
 }
