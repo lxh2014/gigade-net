@@ -185,25 +185,28 @@ namespace Admin.gigade.Controllers
             {
 
                 string search_type = Request.Params["search_type"].ToString().Trim();
-                if (search_type == "assg_id")
+                if (!string.IsNullOrEmpty(Request.Params["search_con"].ToString().Trim()))
                 {
-                    m.assg_id = Request.Params["search_con"].ToString().Trim();
-                }
-                else if (search_type == "item_id")
-                {
-                    m.item_id = Convert.ToUInt32(Request.Params["search_con"].ToString().Trim());
-                }
-                else if (search_type == "ord_id")
-                {
-                    m.ord_id = Convert.ToInt32(Request.Params["search_con"].ToString().Trim());
-                }
-                else if (search_type == "deliver_code")
-                {
-                    m.deliver_code = Request.Params["search_con"].ToString().Trim();
-                }
-                else
-                {
+                    if (search_type == "assg_id")
+                    {
+                        m.assg_id = Request.Params["search_con"].ToString().Trim();
+                    }
+                    else if (search_type == "item_id")
+                    {
+                        m.item_id = Convert.ToUInt32(Request.Params["search_con"].ToString().Trim());
+                    }
+                    else if (search_type == "ord_id")
+                    {
+                        m.ord_id = Convert.ToInt32(Request.Params["search_con"].ToString().Trim());
+                    }
+                    else if (search_type == "deliver_code")
+                    {
+                        m.deliver_code = Request.Params["search_con"].ToString().Trim();
+                    }
+                    else
+                    {
 
+                    }
                 }
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]))
                 {

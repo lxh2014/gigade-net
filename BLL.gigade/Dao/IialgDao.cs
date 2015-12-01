@@ -379,7 +379,7 @@ CommonFunction.DateTimeToString(q.made_dt),CommonFunction.DateTimeToString(q.cde
                     _dtprod_qty.Rows[0][0]=0;
                 }
                 sql.Clear();
-                sqlstr.AppendFormat("insert into istock_change(sc_trans_id,sc_cd_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_note,sc_istock_why) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')", "", "", q.item_id, 3, Convert.ToInt32(_dtprod_qty.Rows[0][0]), (q.pnum - q.qty_o), Convert.ToInt32(_dtprod_qty.Rows[0][0]) - q.qty_o + q.pnum, CommonFunction.DateTimeToString(DateTime.Now), q.create_user, "理貨庫調", 4);
+                sqlstr.AppendFormat("insert into istock_change(sc_trans_id,sc_cd_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_note,sc_istock_why) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')", q.order_id, "", q.item_id, 3, Convert.ToInt32(_dtprod_qty.Rows[0][0]), (q.pnum - q.qty_o), Convert.ToInt32(_dtprod_qty.Rows[0][0]) - q.qty_o + q.pnum, CommonFunction.DateTimeToString(DateTime.Now), q.create_user, "理貨庫調", 4);
                 mySqlCmd.CommandText = sqlstr.ToString();
 
                 mySqlCmd.ExecuteNonQuery();

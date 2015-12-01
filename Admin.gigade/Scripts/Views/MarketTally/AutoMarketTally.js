@@ -51,7 +51,7 @@ Aseld_Store.on('beforeload', function ()
 {
     search_con = Ext.getCmp("search_con").getValue();
 
-    if (search_con.trim() == "")
+    if (search_con.trim() == "" && Ext.getCmp('start_time').getValue() == null && Ext.getCmp('end_time').getValue() == null)
     {
         Ext.Msg.alert(INFORMATION, '請先輸入查詢條件');
         return false;
@@ -64,7 +64,7 @@ Aseld_Store.on('beforeload', function ()
             end_time: Ext.getCmp('end_time').getValue() == null ? null : Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'),
         });
 });
-//前面選擇框 選擇之後顯示自動結單
+//前面選擇框 選擇之後顯示快速結單
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections)
@@ -248,7 +248,7 @@ Ext.onReady(function ()
         { header: "收件人", dataIndex: "cust_name", width: 150, align: 'center' },
         { header: "細項編號", dataIndex: "item_id", width: 150, align: 'center' },
         {
-            header: "品名",dataIndex: "productname", width: 200, align: 'center',
+            header: "品名",dataIndex: "productname", width: 300, align: 'center',
             renderer: function (value, cellmeta, record, rowIndex, columnIndex, store)
             {
                 var prod = "";
@@ -268,7 +268,7 @@ Ext.onReady(function ()
         ],
         tbar: [
             {
-               xtype: 'button', text: '自動結單', id: 'automarkettally', iconCls: 'icon-user-edit',disabled: true, handler: onAutoMarketTally 
+                xtype: 'button', text: '快速結單', id: 'automarkettally', iconCls: 'icon-user-edit', disabled: true, handler: onAutoMarketTally
             }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
@@ -335,7 +335,7 @@ function onAutoMarketTally()
     else
     {
         //  var id = Ext.getCmp('id').getValue();
-        Ext.Msg.confirm('提示', Ext.String.format("確定將選中的" + row.length + "條數據自動結單?", row.length), function (btn)
+        Ext.Msg.confirm('提示', Ext.String.format("確定將選中的" + row.length + "條數據快速結單?", row.length), function (btn)
         {
             if (btn == 'yes')
             {
@@ -358,20 +358,21 @@ function onAutoMarketTally()
                         var result = Ext.decode(form.responseText);
                         if (result.success)
                         {
-                            Ext.Msg.alert(INFORMATION, "刪除成功!");
+                            Ext.Msg.alert(INFORMATION, "快速結單成功!");
                             // ScheduleStore.loadPage(1);
                             Aseld_Store.load();
                         }
                         else
                         {
-                            Ext.Msg.alert(INFORMATION, "無法刪除!");
+                            Ext.Msg.alert(INFORMATION, "快速結單失敗!");
                             //ScheduleStore.loadPage(1);
                             Aseld_Store.load();
                         }
                     },
                     failure: function ()
                     {
-                        Ext.Msg.alert("刪除失敗!");
+                        Ext.Msg.alert(INFORMATION, "快速結單失敗!");
+                        Aseld_Store.load();
                     }
                 });
             }
