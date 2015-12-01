@@ -108,13 +108,13 @@ namespace BLL.gigade.Dao
             DateTime dtime = DateTime.Parse("2010-01-01");
             try
             {
-                if (q.MailorPhone == 1)
+                if (q.MailorPhone == 2)
                 {
-                    sql.Append(@"SELECT u.user_email,u.user_name,u.user_id FROM  users u ");
+                    sql.Append(@"SELECT u.user_mobile,u.user_name,u.user_id FROM  users u ");
                 }
                 else
                 {
-                    sql.Append(@"SELECT u.user_mobile,u.user_name,u.user_id FROM  users u ");
+                    sql.Append(@"SELECT u.user_email,u.user_name,u.user_id FROM  users u ");
                 }
                 where.Append(@"WHERE 1=1 ");
                 if(q.chkGender)

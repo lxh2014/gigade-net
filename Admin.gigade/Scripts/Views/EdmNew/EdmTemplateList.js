@@ -71,8 +71,7 @@ Ext.onReady(function () {
         frame: true,
         flex: 9.4,
         columns: [
-            new Ext.grid.RowNumberer(),//自動顯示行號
-            { header: "編號", dataIndex: "template_id", align: 'center',hidden:true },
+            { header: "編號", dataIndex: "template_id", align: 'center' },
             { header: "範本名稱", dataIndex: "template_name", width: 200, align: 'center' },
             { header: "內容編輯網址", dataIndex: "edit_url", width: 200, align: 'center' },
             { header: "內容產生網址", dataIndex: "content_url", width: 200, align: 'center' },
