@@ -718,7 +718,7 @@ namespace BLL.gigade.Dao
             try
             {
                 StringBuilder sql = new StringBuilder("SELECT user_name,user_email,user_id,user_mobile,user_phone,user_address,user_gender FROM users ");// add by wwei0216w 添加查詢user_gender 性別列
-                sql.AppendFormat(" WHERE user_name LIKE '{0}%' LIMIT 15 ", condition);
+                sql.AppendFormat(" WHERE user_id = '{0}'", condition);//edit by zhuoqin0830w  修改為使用userid查詢  2015/11/16
                 return _accessMySql.getDataTableForObj<Users>(sql.ToString());
             }
             catch (Exception ex)

@@ -45,6 +45,10 @@ namespace BLL.gigade.Model.Custom
         /// 活動開始時間
         /// </summary>
         public uint event_start { get; set; }
+        /// <summary>
+        /// 商品活動價
+        /// </summary>
+        public int event_price { get; set; }
 
         public OrderComboAddCustom()
         {
@@ -65,6 +69,7 @@ namespace BLL.gigade.Model.Custom
             event_cost = 0;
             event_end = 0;
             event_start = 0;
+            event_price = 0;
         }
     }
 }
