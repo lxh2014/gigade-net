@@ -400,21 +400,6 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductItemMgr->GetWaitLiaoWeiList" + ex.Message);
             }
         }
-        #region 商品建議採購量排程
-        
-       
-        public DataTable GetSugestDatetable(ProductItemQuery query)
-        {
-            try
-            {
-                return _productItemDao.GetSugestDatetable(query);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("ProductItemMgr-->GetSugestDatetable-->" + ex.Message, ex);
-            }
-        }
-        #endregion
 
     }
 }

@@ -4148,6 +4148,9 @@ namespace Admin.gigade.Controllers
             string order_status = string.Empty;
             string detail_status = string.Empty;
             string product_mode = string.Empty;
+            string total_amount = string.Empty;
+            string invoice_number = string.Empty;
+            string invoice_date = string.Empty;
             try
             {
                 _orderMasterMgr = new OrderMasterMgr(mySqlConnectionString);
@@ -4199,49 +4202,21 @@ namespace Admin.gigade.Controllers
                     row["會員姓名"] = _dt.Rows[i]["user_name"];
                     row["購買時間"] = Convert.ToDateTime(_dt.Rows[i]["order_createdate"]).ToString("yyyy-MM-dd HH:mm:ss");
                     row["付款單號"] = _dt.Rows[i]["order_id"];
-                    if (i == 0)
+                    DataTable invoiceDt = _orderMasterMgr.GetInvoiceData(Convert.ToUInt32(_dt.Rows[i]["order_id"])); //根據order_id 進行查詢
+                    if (invoiceDt != null && invoiceDt.Rows.Count > 0)
                     {
-                        DataTable invoiceDt = _orderMasterMgr.GetInvoiceData(Convert.ToUInt32(_dt.Rows[i]["order_id"])); //根據order_id 進行查詢
-                        if (invoiceDt != null && invoiceDt.Rows.Count > 0)
-                        {
-                            row["發票金額"] = invoiceDt.Rows[0]["total_amount"];
-                            row["發票開立日期"] = "1970-01-01 08:00:00";
-                            row["發票號碼"] = "0";
-                        }
-                        else
-                        {
-                            row["發票金額"] = "";
-                            row["發票開立日期"] = "1970-01-01 08:00:00";
-                            row["發票號碼"] = "0";
-                        }
-
+                        row["發票金額"] = invoiceDt.Rows[0]["total_amount"];
+                        total_amount = invoiceDt.Rows[0]["total_amount"].ToString();
                     }
                     else
                     {
-                        if (_dt.Rows[i]["order_id"].ToString() == _dt.Rows[i - 1]["order_id"].ToString())
-                        {
-                            row["發票金額"] = "";
-                            row["發票開立日期"] = "1970-01-01 08:00:00";
-                            row["發票號碼"] = "0";
-                        }
-                        else
-                        {
-                            DataTable invoiceDt = _orderMasterMgr.GetInvoiceData(Convert.ToUInt32(_dt.Rows[i]["order_id"]));//根據order_id 進行查詢
-                            if (invoiceDt != null && invoiceDt.Rows.Count > 0)
-                            {
-                                row["發票金額"] = invoiceDt.Rows[0]["total_amount"];
-                                row["發票開立日期"] = "1970-01-01 08:00:00";
-                                row["發票號碼"] = "0";
-                            }
-                            else
-                            {
-                                row["發票金額"] = "";
-                                row["發票開立日期"] = "1970-01-01 08:00:00";
-                                row["發票號碼"] = "0";
-                            }
-                        }
+                        row["發票金額"] = "";
+                        total_amount = "";
                     }
-
+                    row["發票開立日期"] = "1970-01-01 08:00:00";
+                    row["發票號碼"] = "0";
+                    invoice_date = "1970-01-01 08:00:00";
+                    invoice_number = "0";
                     #region 付款方式
                     if (_dt.Rows[i]["order_payment"] != "")
                     {
@@ -4358,9 +4333,9 @@ namespace Admin.gigade.Controllers
                             rowNormal["付款方式"] = payment;
                             rowNormal["購買金額"] = _dt.Rows[i]["order_amount"];
                             rowNormal["付款狀態"] = order_status;
-                            rowNormal["發票金額"] = "";
-                            rowNormal["發票開立日期"] = "";
-                            rowNormal["發票號碼"] = "";
+                            rowNormal["發票金額"] =total_amount;
+                            rowNormal["發票開立日期"] =invoice_date;
+                            rowNormal["發票號碼"] = invoice_number;
                             rowNormal["商品細項編號"] = "G00001";
                             rowNormal["訂單狀態"] = "";
                             rowNormal["供應商"] = "";
@@ -4400,9 +4375,9 @@ namespace Admin.gigade.Controllers
                             rowLow["付款方式"] = payment;
                             rowLow["購買金額"] = _dt.Rows[i]["order_amount"];
                             rowLow["付款狀態"] = order_status;
-                            rowLow["發票金額"] = "";
-                            rowLow["發票開立日期"] = "";
-                            rowLow["發票號碼"] = "";
+                            rowLow["發票金額"] = total_amount;
+                            rowLow["發票開立日期"] = invoice_date;
+                            rowLow["發票號碼"] = invoice_number;
                             rowLow["商品細項編號"] = "G00002";
                             rowLow["訂單狀態"] = "";
                             rowLow["供應商"] = "";

@@ -202,7 +202,7 @@ namespace BLL.gigade.Mgr
             }
         }
 
-        public bool GetIlocCount(IlocQuery loc)
+        public string GetIlocCount(IlocQuery loc)
         {
             try
             {
@@ -211,6 +211,17 @@ namespace BLL.gigade.Mgr
             catch (Exception ex)
             {
                 throw new Exception("IlocMgr-->GetIlocCount-->" + ex.Message, ex);
+            }
+        }
+        public IlocQuery GetIlocLsta_id(string loc_id)
+        {
+            try
+            {
+                return _IocDao.GetIlocLsta_id(loc_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IlocMgr-->GetIlocLsta_id-->" + ex.Message, ex);
             }
         }
     }

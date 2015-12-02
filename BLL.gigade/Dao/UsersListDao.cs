@@ -95,6 +95,14 @@ namespace BLL.gigade.Dao
                             sqlfrom.AppendFormat(" and user_address like '%{0}%' ", store.content.Trim());
                         }
 
+                        //Edit Start 
+                        //Add by yuwei1015j 2015-12-02
+                        else if (store.serchtype.ToString() == "7")
+                        {
+                            sqlfrom.AppendFormat(" and ml_code like '%{0}%' ", store.content.Trim());
+                        }
+                        //Edit End
+
 
                     }
                     else
@@ -387,6 +395,13 @@ namespace BLL.gigade.Dao
                     {
                         sqlfrom.AppendFormat(" and user_address like '%{0}%' ", store.content.Trim());
                     }
+                    //Edit Start 
+                    //Add by yuwei1015j 2015-12-02
+                    else if (store.serchtype.ToString() == "7")
+                    {
+                        sqlfrom.AppendFormat(" and ml_code like '%{0}%' ", store.content.Trim());
+                    }
+                    //Edit End
                 }
                 if (!string.IsNullOrEmpty(store.types.ToString()))
                 {

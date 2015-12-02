@@ -382,28 +382,45 @@ namespace BLL.gigade.Dao
             }
         }
 
-        public bool GetIlocCount(IlocQuery loc)
+        public string GetIlocCount(IlocQuery loc)
         {
-            StringBuilder sbt = new StringBuilder("SELECT count(row_id) FROM iloc WHERE 1=1");
+            StringBuilder sbt = new StringBuilder("SELECT loc_id FROM iloc WHERE 1=1");
             if (loc.loc_id != "")
             {
-                sbt.AppendFormat(@" and loc_id='{0}'", loc.loc_id);
+                sbt.AppendFormat(@" and (loc_id='{0}' or hash_loc_id='{0}')", loc.loc_id);
             }
             try
             {
-                string num = _access.getDataTable(sbt.ToString()).Rows[0][0].ToString();
-                if(num=="1")
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+              return _access.getDataTable(sbt.ToString()).Rows[0][0].ToString();
             }
             catch (Exception ex)
             {
-                throw new Exception("IlocDao.GetIocList-->" + ex.Message + sbt.ToString(), ex);
+                throw new Exception("IlocDao.GetIlocCount-->" + ex.Message + sbt.ToString(), ex);
+            }
+        }
+
+        public IlocQuery GetIlocLsta_id(string loc_id)//add by yafeng0715j
+        {
+            StringBuilder sbt = new StringBuilder("SELECT lsta_id,row_id FROM iloc WHERE 1=1");
+            IlocQuery query = new IlocQuery();
+            if (loc_id != "")
+            {
+                sbt.AppendFormat(" and loc_id='{0}'",loc_id);
+            }
+            try
+            {
+               DataTable table=_access.getDataTable(sbt.ToString());
+                if(table.Rows.Count>0)
+                {
+                    query.lsta_id = table.Rows[0][0].ToString();
+                    query.row_id = int.Parse(table.Rows[0][1].ToString());
+                    return query;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IlocDao.GetIlocLsta_id-->" + ex.Message + sbt.ToString(), ex);
             }
         }
     }
