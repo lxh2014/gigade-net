@@ -546,16 +546,10 @@ namespace BLL.gigade.Mgr
                             {
                                 url = "<img src='" + _dtUrl.Rows[0][0].ToString() + "?c=" + eslQuery.content_id + "&e=" + email_id + "&l=" + log_id + "'/>";
                             }
-                            else
-                            {
-                                url = "<img src='http://www.gigade100.com/edm.php?c=" + eslQuery.content_id + "&e=" + email_id + "&l=" + log_id + "'/>";
-                            }
                             #endregion
                             #region 獲得電子報整體內容
 
                             #region 是範本還是活動頁面
-                           // if (MRquery.template_id != 0)//不是通過活動頁面，而是選擇了範本
-                            //{
                                 string replaceStr = string.Empty;
                                 string editStr = string.Empty;
                                 string content_url = GetContentUrlByContentId(eslQuery.content_id);
@@ -589,28 +583,14 @@ namespace BLL.gigade.Mgr
                                     }
                                     if (MRquery.body.IndexOf(subscribe) > 0)//找到了埋的那個code，證明是點擊了訂閱電子報
                                     {
-                                        MRquery.bodyData = contentStr.Replace(replaceStr, MRquery.body.Replace(editStr,"").Replace(subscribe,"\n") + RecommendHtml) + subscribe_url;
+                                        MRquery.bodyData = contentStr.Replace(replaceStr, MRquery.body.Replace(editStr, "").Replace(subscribe, "\n") + RecommendHtml) + subscribe_url + url;
                                     }
                                     else
                                     {
-                                        MRquery.bodyData = contentStr.Replace(replaceStr, MRquery.body.Replace(editStr, "") + RecommendHtml);
+                                        MRquery.bodyData = contentStr.Replace(replaceStr, MRquery.body.Replace(editStr, "") + RecommendHtml + url);
                                     }
                                     #endregion
                                 }
-                          //  }
-                            //else//選擇的是活動頁面
-                            //{
-                            //    #region 是否訂閱電子報
-                            //    if (MRquery.body.IndexOf(subscribe) > 0)
-                            //    {
-                            //        MRquery.bodyData = MRquery.body.Replace(subscribe, "\n") + subscribe_url;
-                            //    }
-                            //    else
-                            //    {
-                            //        MRquery.bodyData = MRquery.body;
-                            //    }
-                            //    #endregion
-                            //}
                             #endregion
                             #endregion
                             arrList.Add(_edmContentNewDao.InsertEmailRequest(MRquery));

@@ -244,10 +244,10 @@ Ext.onReady(function () {
                         xtype: 'radiogroup',
                         id: 'stockScope',
                         name: 'stockScope',
-                        fieldLabel: "查詢條件",
+                        fieldLabel: "庫存/需採購",
                         colName: 'stockScope',
                         width: 300,
-                        labelWidth: 60,
+                        labelWidth: 80,
                         defaults: {
                             name: 'scopeValue'
                         },

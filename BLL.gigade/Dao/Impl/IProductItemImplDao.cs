@@ -61,6 +61,5 @@ namespace BLL.gigade.Dao.Impl
         List<ProductItemQuery> GetInventoryQueryList(ProductItemQuery query, out int totalCount);
         string UpdateItemStock(ProductItem query);//料位庫存調整的時候，商品庫存也做相應的調整add chaojie1124j2015/9/17
         List<ProductItemQuery> GetWaitLiaoWeiList(ProductItemQuery query, out int totalCount);
-        DataTable GetSugestDatetable(ProductItemQuery query);//商品建議採購量排程
     }
 }

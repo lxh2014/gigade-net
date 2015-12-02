@@ -795,7 +795,14 @@ LEFT  join vendor_brand v on p.brand_id=v.brand_id  ");
             try
             {
                 sql.AppendFormat("SELECT item_id FROM iplas left join iloc on iplas.loc_id=iloc.loc_id WHERE iloc.loc_id='{0}'  or iloc.hash_loc_id='{0}' ;", loc_id);
-                return _dbAccess.getDataTable(sql.ToString()).Rows[0]["item_id"].ToString();
+                DataTable table=_dbAccess.getDataTable(sql.ToString());
+                if (table.Rows.Count > 0)
+                {
+                    return table.Rows[0]["item_id"].ToString();
+                }
+                else {
+                    return "";
+                }
             }
             catch (Exception ex)
             {
@@ -804,5 +811,25 @@ LEFT  join vendor_brand v on p.brand_id=v.brand_id  ");
             }
         }
         #endregion
+
+        public DataTable GetProduct(string item_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            string result = string.Empty;
+            try
+            {
+                sql.AppendFormat("SELECT p.product_name,CONCAT(ps1.spec_name,'-',ps2.spec_name)AS spec  FROM product_item pi ");
+                sql.Append(" INNER JOIN product p ON p.product_id =pi.product_id");
+                sql.Append(" LEFT JOIN product_spec ps1 ON ps1.spec_id=pi.spec_id_1");
+                sql.Append(" LEFT JOIN product_spec ps2 ON ps2.spec_id=pi.spec_id_2");
+                sql.AppendFormat(" where pi.item_id='{0}'",item_id);
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("IplasDao-->GetProduct-->" + ex.Message + sql.ToString(), ex);
+            }
+        }
     }
 }
