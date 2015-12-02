@@ -5,6 +5,7 @@ Ext.define('GIGADE.Aseld', {
     fields: [
         { name: 'seld_id', type: 'int' }, //流水号
         { name: 'ord_id', type: 'string' }, //訂單號
+        { name: 'deliver_code', type: 'string' }, //出貨單號
         { name: 'cust_name', type: 'string' },//收件人
         { name: "productname", type: "string" },//品名
         { name: "out_qty", type: "int" },//撿貨數量
@@ -238,6 +239,7 @@ Ext.onReady(function ()
             //new Ext.grid.RowNumberer(),//自動顯示行號
          { header: "流水号", dataIndex: "seld_id", width: 80, align: 'center' },
          { header: "訂單號", dataIndex: "ord_id", width: 150, align: 'center' },
+         { header: "出貨單號", dataIndex: "deliver_code", width: 150, align: 'center' },
         { header: "收件人", dataIndex: "cust_name", width: 150, align: 'center' },
         { header: "細項編號", dataIndex: "item_id", width: 150, align: 'center' },
         {
