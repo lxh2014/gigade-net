@@ -880,7 +880,7 @@ ORDER BY loc.loc_id,loc.row_id DESC  ", sbWhere.ToString(), sbjoin.ToString());
                     sbSql.Append("cd.cb_newid, ");
                     sbjoin.AppendFormat(" LEFT JOIN cbjob_detail cd ON nvd.row_id=cd.iinvd_id and cd.cb_jobid='{0}' ", m.cb_jobid);
                 }
-                sbSql.AppendFormat(@" loc.loc_id,loc.lsta_id ,nvd.item_id,nvd.prod_qty ,nvd.made_date,nvd.cde_dt ,CONCAT(v.brand_name,'-',p.product_name) as 'product_name','' as prod_sz,p.prepaid ,ptet.cde_dt_incr,ptet.cde_dt_var ,ptet.cde_dt_shp,ptet.pwy_dte_ctl,p.product_id
+                sbSql.AppendFormat(@" loc.loc_id,nvd.ista_id as lsta_id ,nvd.item_id,nvd.prod_qty ,nvd.made_date,nvd.cde_dt ,CONCAT(v.brand_name,'-',p.product_name) as 'product_name','' as prod_sz,p.prepaid ,ptet.cde_dt_incr,ptet.cde_dt_var ,ptet.cde_dt_shp,ptet.pwy_dte_ctl,p.product_id
 from iloc loc LEFT JOIN iinvd nvd on  loc.loc_id=nvd.plas_loc_id
 LEFT JOIN product_item pi on pi.item_id = nvd.item_id
 LEFT JOIN product p on p.product_id = pi.product_id 	 
