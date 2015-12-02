@@ -1715,7 +1715,8 @@ namespace Admin.gigade.Controllers
 
                         foreach (var item in parentList1)
                         {
-                            productTotal += uint.Parse((item.product_cost * item.buynum).ToString());
+                            var totalPrice = item.Event_Item_Money == 0 ? item.product_cost : item.Event_Item_Money;//add by zhuoqin0830w 2015/12/02  判斷是否使用活動價
+                            productTotal += uint.Parse((totalPrice * item.buynum).ToString());
 
                             productItemMapMgr = new ProductItemMapMgr(connectionString);
                             ProductItemMap pMap = productItemMapMgr.QueryAll(new ProductItemMap { channel_id = uint.Parse(combChannelId.ToString()), channel_detail_id = item.coop_product_id }).FirstOrDefault();
@@ -1805,7 +1806,8 @@ namespace Admin.gigade.Controllers
 
                         foreach (var item in singleList1)
                         {
-                            productTotal += uint.Parse((item.product_cost * item.buynum).ToString());
+                            var totalPrice = item.Event_Item_Money == 0 ? item.product_cost : item.Event_Item_Money;//add by zhuoqin0830w 2015/12/02  判斷是否使用活動價
+                            productTotal += uint.Parse((totalPrice * item.buynum).ToString());
                         }
                         #endregion
                         break;
@@ -1832,7 +1834,8 @@ namespace Admin.gigade.Controllers
                             foreach (var item in singleList)
                             {
                                 //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
-                                productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
+                                var totalPrice = item.Event_Item_Money == 0 ? item.product_cost : item.Event_Item_Money;//add by zhuoqin0830w 2015/12/02  判斷是否使用活動價
+                                productTotal += uint.Parse((totalPrice * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
                                 // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
                                 deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
                                 deduct_welfareTotal += uint.Parse(item.deduct_welfare.ToString());
@@ -1854,7 +1857,8 @@ namespace Admin.gigade.Controllers
                             foreach (var item in priceSelfList)
                             {
                                 //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
-                                productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
+                                var totalPrice = item.Event_Item_Money == 0 ? item.product_cost : item.Event_Item_Money;//add by zhuoqin0830w 2015/12/02  判斷是否使用活動價
+                                productTotal += uint.Parse((totalPrice * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
 
                                 // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
                                 deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
@@ -1890,7 +1894,8 @@ namespace Admin.gigade.Controllers
                                 var TotalPrice = 0.0;
                                 var TotalCost = 0.0;
                                 //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
-                                productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
+                                var totalPrice = item.Event_Item_Money == 0 ? item.product_cost : item.Event_Item_Money;//add by zhuoqin0830w 2015/12/02  判斷是否使用活動價
+                                productTotal += uint.Parse((totalPrice * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
 
                                 // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
                                 deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
@@ -2080,11 +2085,11 @@ namespace Admin.gigade.Controllers
                             foreach (var item in odcList2.FindAll(m => (m.parent_id == 0 && m.Item_Id == 0) || (m.Item_Id != 0 && m.parent_id == 0)))
                             {
                                 //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
-                                productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
+                                var totalPrice = item.Event_Item_Money == 0 ? item.product_cost : item.Event_Item_Money;//add by zhuoqin0830w 2015/12/02  判斷是否使用活動價
+                                productTotal += uint.Parse((totalPrice * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
                                 // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
                                 deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
                                 deduct_welfareTotal += uint.Parse(item.deduct_welfare.ToString());
-
                                 acc_bonusTotal += uint.Parse(item.accumulated_bonus.ToString());
                             }
                         }
@@ -3929,9 +3934,6 @@ namespace Admin.gigade.Controllers
                     System.IO.File.Delete(newExcelName);
                 }
                 ExcelHelperXhf.ExportDTtoExcel(dtHZ, "", newExcelName);
-                //MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "");
-                //Response.AddHeader("Content-Disposition", "attach-ment;filename=" + filename);
-                //Response.BinaryWrite(ms.ToArray());
                 json = "{success:true,ExcelName:\'" + filename + "\'}";
             }
             catch (Exception ex)
@@ -3958,7 +3960,7 @@ namespace Admin.gigade.Controllers
             dt.Columns.Add("付款方式", typeof(String));
             dt.Columns.Add("購買金額", typeof(String));
             dt.Columns.Add("付款狀態", typeof(String));
-            dt.Columns.Add("商品細項編號", typeof(String));
+            dt.Columns.Add("商品細項編號", typeof(int));
             dt.Columns.Add("訂單狀態", typeof(String)); 
             dt.Columns.Add("品名", typeof(String));
             dt.Columns.Add("商品類型", typeof(String));
@@ -4008,14 +4010,7 @@ namespace Admin.gigade.Controllers
                 }            
                 if (!string.IsNullOrEmpty(dr_v["item_id"].ToString()))
                 {
-                    if (dr_v["item_mode"].ToString() == "1")
-                    {
-                        dr[6] = "";
-                    }
-                    else
-                    {
-                        dr[6] = Convert.ToInt32(dr_v["item_id"].ToString());
-                    }
+                    dr[6] = Convert.ToInt32(dr_v["item_id"].ToString());
                 }
                 else
                 {
