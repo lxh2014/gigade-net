@@ -1583,8 +1583,8 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
         },
         edit: function (editor, e) {
             var data = orderStore.getAt(e.rowIdx);
-            var cost = parseFloat(data.get("product_cost"));
-            var event_item_money = parseFloat(data.get("Event_Item_Money"));//add by zhuoqin0830w 2015/12/02 獲取活動價
+            var cost_total = parseFloat(data.get("product_cost"));
+            var event_item_money_total = parseFloat(data.get("Event_Item_Money"));//add by zhuoqin0830w 2015/12/02 獲取活動價
             if (e.colIdx == 1) {//商品編號
                 for (var i = e.rowIdx + 1; i <= orderStore.data.length; i) {
                     if (!orderStore.data.items[i]) {
@@ -1787,7 +1787,7 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                     //edit by xinglu0624w  當前組合商品價格類型為按比例拆分或者當前商品為單一商品時，總價 ＝ 當前商品之定價 * 當前商品數量
                     if (data.get('price_type') == 1 || data.get('price_type') == 0) {
                         //根據活動時間判斷使用定價還是活動價  edit by zhuoqin0830w  2015/12/02
-                        data.set("sumprice", event_item_money == 0 ? parseInt(data.get("buynum")) * cost : parseInt(data.get("buynum")) * event_item_money);
+                        data.set("sumprice", event_item_money_total == 0 ? parseInt(data.get("buynum")) * cost_total : parseInt(data.get("buynum")) * event_item_money_total);
                     }
                     else if (data.get('price_type') == 2) {
                         data.set("sumprice", totalPrice);
