@@ -64,7 +64,7 @@
         }
         onNumberButtonClick = function () {
             var loc_id = document.getElementById("number").value.trim();
-            if (loc_id.length != 8) {
+            if (loc_id.length< 8) {
                 $('#MessageContentId').text(loc_id + "格式錯誤，" + "請輸入正確的料位編號!");
                 $('#alert').show();
                 $("#number").focus();
@@ -84,13 +84,13 @@
                     {
                         document.location.href = "/WareHouse/IinvdCheck?loc_id=" + loc_id;
                     }
-                    else if(result.success=="0")
-                    {
-                        $('#MessageContentId').text("料位編號(" + loc_id + ")無庫存!");
-                        $('#alert').show();
-                        $("#number").focus()
-                        $("#number").val('');
-                    }
+                    //else if(result.success=="0")
+                    //{
+                    //    $('#MessageContentId').text("料位編號(" + loc_id + ")無庫存!");
+                    //    $('#alert').show();
+                    //    $("#number").focus()
+                    //    $("#number").val('');
+                    //}
                     else
                     {
                         $('#MessageContentId').text("料位編號(" + loc_id + ")不存在!");
