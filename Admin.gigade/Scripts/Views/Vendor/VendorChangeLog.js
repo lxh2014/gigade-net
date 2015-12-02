@@ -196,7 +196,7 @@ var searchfrm = Ext.create('Ext.form.Panel', {
             id: 'date_one',
             name: 'date_one',
             editable: false,
-            format: 'Y-m-d',
+            format: 'Y-m-d H:i:s',
             time: { hour: 00, min: 00, sec: 00 },//開始時間00：00：00
             submitValue: true,
             listeners: {
@@ -227,7 +227,7 @@ var searchfrm = Ext.create('Ext.form.Panel', {
 
      {
          xtype: "datetimefield",
-         format: 'Y-m-d',
+         format: 'Y-m-d H:i:s',
          editable: false,
          time: { hour: 23, min: 59, sec: 59 },//開始時間00：00：00
          id: 'date_two',

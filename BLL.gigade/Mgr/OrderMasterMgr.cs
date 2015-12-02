@@ -38,7 +38,7 @@ namespace BLL.gigade.Mgr
         private MySqlDao _mysqlDao;
         private SerialDao _serialDao;
         private OrderReturnStatusDao _orsDao;
-
+        private IParametersrcImplDao _parametersrcDao;
         private string conn;
         public OrderMasterMgr(string connectionStr)
         {
@@ -50,6 +50,7 @@ namespace BLL.gigade.Mgr
             _serialDao = new SerialDao(connectionStr);
             _mysqlDao = new MySqlDao(connectionStr);
             _orsDao = new OrderReturnStatusDao(connectionStr);
+            _parametersrcDao = new ParametersrcDao(connectionStr);
             conn = connectionStr;
         }
 
@@ -1157,15 +1158,194 @@ set ");
                 throw new Exception("OrderMasterMgr-->GetOrderFreight-->" + ex.Message, ex);
             }
         }
+
+        public DataTable CagegoryDetialExportInfo(OrderDetailQuery query)
+        {
+            try
+            {
+                DataTable dt = _orderMasterDao.CagegoryDetialExport(query);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    List<Parametersrc> parameterList = _parametersrcDao.SearchParameters("payment", "order_status", "product_mode");
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        var alist = parameterList.Find(m => m.ParameterType == "payment" && m.ParameterCode == dr["order_payment"].ToString());
+                        var blist = parameterList.Find(m => m.ParameterType == "order_status" && m.ParameterCode == dr["order_status"].ToString());
+                        var clist = parameterList.Find(m => m.ParameterType == "order_status" && m.ParameterCode == dr["slave_status"].ToString());
+                        var dlist = parameterList.Find(m => m.ParameterType == "product_mode" && m.ParameterCode == dr["product_mode"].ToString());
+                        if (alist != null)
+                        {
+                            dr["payment_name"] = alist.parameterName;
+                        }
+                        if (blist != null)
+                        {
+                            dr["order_status_name"] = blist.remark;
+                        }
+                        if (clist != null)
+                        {
+                            dr["slave_status_name"] = clist.remark;
+                        }
+                        if (dlist != null)
+                        {
+                            dr["product_mode_name"] = dlist.remark;
+                        }
+                        if (dr["order_createdate"] != null)
+                        {
+                            dr["order_createdate_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr["order_createdate"].ToString())));
+                        }
+                        if (dr["slave_date_close"] != null)
+                        {
+                            dr["slave_date_close_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr["slave_date_close"].ToString())));
+                        }
+                        if (dr["single_money"] != null && dr["buy_num"] != null)
+                        {
+                            dr["amount"] = Convert.ToInt32(dr["single_money"].ToString()) * Convert.ToInt32(dr["buy_num"]);
+                        }
+                        if (dr["single_cost"] != null && dr["buy_num"] != null)
+                        {
+                            dr["cost_amount"] = Convert.ToInt32(dr["single_cost"].ToString()) * Convert.ToInt32(dr["buy_num"]);
+                        }
+                    }                  
+                }
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->CagegoryDetialExportInfo-->" + ex.Message, ex);
+            }
+        }
+
         public DataTable OrderDetialExportInfo(OrderDetailQuery query)
         {
             try
             {
-                return _orderMasterDao.OrderDetialExportInfo(query);
+                DataTable dt_ids = _orderMasterDao.GetOrderDetialExportOrderid(query);
+                DataTable detial=new DataTable();
+                DataTable all = new DataTable();
+                foreach (DataRow dr in dt_ids.Rows)
+                {
+                    if (!string.IsNullOrEmpty(dr[0].ToString()))
+                    {
+                        int order_id = Convert.ToInt32(dr[0]);
+                        detial = _orderMasterDao.OrderDetialExportInfo(order_id);
+                        if (detial != null && detial.Rows.Count > 0)
+                        {
+                            List<Parametersrc> parameterList = _parametersrcDao.SearchParameters("payment", "order_status", "product_mode");
+                            foreach (DataRow dr_t in detial.Rows)
+                            {
+                                var alist = parameterList.Find(m => m.ParameterType == "payment" && m.ParameterCode == dr_t["order_payment"].ToString());
+                                var blist = parameterList.Find(m => m.ParameterType == "order_status" && m.ParameterCode == dr_t["order_status"].ToString());
+                                var clist = parameterList.Find(m => m.ParameterType == "order_status" && m.ParameterCode == dr_t["slave_status"].ToString());
+                                var dlist = parameterList.Find(m => m.ParameterType == "product_mode" && m.ParameterCode == dr_t["product_mode"].ToString());
+                                if (alist != null)
+                                {
+                                    dr_t["payment_name"] = alist.parameterName;
+                                }
+                                if (blist != null)
+                                {
+                                    dr_t["order_status_name"] = blist.remark;
+                                }
+                                if (clist != null)
+                                {
+                                    dr_t["slave_status_name"] = clist.remark;
+                                }
+                                if (dlist != null)
+                                {
+                                    dr_t["product_mode_name"] = dlist.remark;
+                                }
+                                if (dr_t["order_createdate"] != null)
+                                {
+                                    dr_t["order_createdate_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr_t["order_createdate"].ToString())));
+                                }
+                                if (dr_t["slave_date_close"] != null)
+                                {
+                                    dr_t["slave_date_close_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr_t["slave_date_close"].ToString())));
+                                }
+                                if (dr_t["single_money"] != null && dr_t["buy_num"] != null)
+                                {
+                                    dr_t["amount"] = Convert.ToInt32(dr_t["single_money"].ToString()) * Convert.ToInt32(dr_t["buy_num"]);
+                                }
+                                if (dr_t["single_cost"] != null && dr_t["buy_num"] != null)
+                                {
+                                    dr_t["cost_amount"] = Convert.ToInt32(dr_t["single_cost"].ToString()) * Convert.ToInt32(dr_t["buy_num"]);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                    if (all.Rows.Count == 0)
+                    {
+                        all = detial;
+                    }
+                    else
+                    {
+                        all.Merge(detial, true);
+                    }
+                }
+                return all;
             }
             catch (Exception ex)
             {
                 throw new Exception("OrderMgr-->OrderDetialExportInfo-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable ExcelTitle()
+        {
+            try
+            {
+                DataTable dtNew = new DataTable();
+                string newExcelName = string.Empty;
+                dtNew.Columns.Add("category_id", typeof(int));
+                dtNew.Columns.Add("user_name", typeof(String));
+                dtNew.Columns.Add("order_createdate", typeof(String));
+                dtNew.Columns.Add("order_id", typeof(int));
+                dtNew.Columns.Add("order_payment", typeof(String));
+                dtNew.Columns.Add("order_amount", typeof(int));
+                dtNew.Columns.Add("order_status", typeof(String));
+                dtNew.Columns.Add("item_mode", typeof(String));
+                dtNew.Columns.Add("item_id", typeof(int));
+                dtNew.Columns.Add("slave_status", typeof(String));
+                dtNew.Columns.Add("vendor_name_simple", typeof(String));
+                dtNew.Columns.Add("vendor_code", typeof(String));
+                dtNew.Columns.Add("product_name", typeof(String));
+                dtNew.Columns.Add("buy_num", typeof(int));
+                dtNew.Columns.Add("single_money", typeof(int));
+                dtNew.Columns.Add("deduct_bonus", typeof(int));
+                dtNew.Columns.Add("deduct_welfare", typeof(int));
+                dtNew.Columns.Add("single_money*buy_num", typeof(int));
+                dtNew.Columns.Add("single_cost", typeof(int));
+                dtNew.Columns.Add("bag_check_money", typeof(int));
+                dtNew.Columns.Add("single_cost*od.buy_num", typeof(int));
+                dtNew.Columns.Add("slave_date_close", typeof(String));
+                dtNew.Columns.Add("pm", typeof(String));
+                dtNew.Columns.Add("ID", typeof(String));
+                dtNew.Columns.Add("group_name", typeof(String));
+                dtNew.Columns.Add("product_mode", typeof(String));
+                dtNew.Columns.Add("delivery_name", typeof(String));
+                dtNew.Columns.Add("delivery_address", typeof(String)); 
+                return dtNew;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->CagegoryDetialExportInfo-->" + ex.Message, ex);
+            }
+        }
+
+
+        public DataTable GetInvoiceData(uint order_id)
+        {
+
+            try
+            {
+                return _orderMasterDao.GetInvoiceData(order_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->GetInvoiceData-->" + ex.Message, ex);
             }
         }
     }

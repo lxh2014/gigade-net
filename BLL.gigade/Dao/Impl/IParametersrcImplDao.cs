@@ -50,5 +50,6 @@ namespace BLL.gigade.Dao.Impl
         string Getmail(string p);
         List<Parametersrc> ReturnParametersrcList();
         List<Parametersrc> GetKindTypeByStatus(string types);
+        List<Parametersrc> SearchParameters(params string[] types);
     }
 }

@@ -900,6 +900,51 @@ namespace BLL.gigade.Dao
             }
         }
 
+        /// <summary>
+        /// 商品建議採購量的排程部分-查詢需要採購的（上架的）商品
+        /// </summary>chaojie1124j_2015/11/19 01:47PM
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public DataTable GetSugestDatetable(ProductItemQuery query)
+        {
+            StringBuilder str = new StringBuilder();
+            StringBuilder sqlCount = new StringBuilder();
+            string sumdate = DateTime.Now.AddDays(-query.sumDays).ToString("yyyy-MM-dd 00:00:00");
+            //query.category_ID_IN
+            try
+            {
+                str.Append(@"select v.vendor_id,p.product_id,pi.item_id,p.product_name,pi.item_stock,pi.erp_id,v.vendor_name_full,pm.cost,pm.price ,pi.item_alarm,p.safe_stock_amount,sum_biao.sum_total, p.min_purchase_amount,v.procurement_days,CONCAT_WS(' ',p.spec_title_1,ps1.spec_name) as spec1,");
+                str.Append(" tp1.parameterName as product_status_string,tp2.parameterName as sale_name,subTtotal.iinvd_stock, ");
+                str.Append(" CONCAT_WS(' ',p.spec_title_2,ps2.spec_name) as spec2,FROM_UNIXTIME(p.product_start) as product_start,FROM_UNIXTIME(p.product_end) as product_end from ( ");
+                str.Append("SELECT od.item_id,sum( case item_mode when 0 then od.buy_num when  2 then od.buy_num*od.parent_num end ) as sum_total from order_master om LEFT JOIN order_slave os USING(order_id)LEFT JOIN order_detail od USING(slave_id) ");
+                str.AppendFormat("   where FROM_UNIXTIME( om.order_createdate)>='{0}' and od.item_mode in (0,2) GROUP BY od.item_id ", sumdate);
+                str.Append(")sum_biao ");
+                str.Append(" INNER join  product_item pi on sum_biao.item_id=pi.item_id INNER join product p on p.product_id=pi.product_id INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id ");//
+                str.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=pi.item_id ");
+                str.Append(" left join t_parametersrc tp1 on tp1.parameterCode=p.product_status and tp1.parameterType='product_status' ");
+                str.Append(" left join t_parametersrc tp2 on tp2.parameterCode=p.sale_status and tp2.parameterType='sale_status' ");
+                str.Append(" INNER join price_master pm on pm.product_id=p.product_id and pm.site_id=1  ");
+                str.AppendFormat(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id LEFT JOIN item_ipo_create_log iicl on iicl.item_id=pi.item_id left join product_spec ps1 on ps1.spec_id=pi.spec_id_1 left join product_spec ps2 on ps2.spec_id=pi.spec_id_2");
+                str.Append(" INNER join (SELECT pi.item_id,p.product_id from product_item pi INNER JOIN product p on p.product_id=pi.product_id ");
+                str.Append(" where p.product_id>10000 and ((p.prepaid=1) or (p.prepaid=0 and p.product_mode=2))and( ");
+                str.Append(" p.product_status=5 or( p.product_status <>5 and p.product_id in ");
+                str.Append(" (SELECT pc.product_id from product pc INNER JOIN product_combo pcm on pcm.child_id=pc.product_id ");
+                str.Append(" INNER JOIN product pm on pm.product_id=pcm.parent_id where pm.product_status =5)))) t_tb on t_tb.item_id=sum_biao.item_id ");
+                str.Append(" where 1=1 ");
+                str.AppendFormat(" and  pi.item_stock-(v.procurement_days* sum_biao.sum_total/'{0}'*'{1}')<=pi.item_alarm  ", query.sumDays, query.periodDays);
+                if (!string.IsNullOrEmpty(query.category_ID_IN))
+                {
+                    str.AppendFormat(" and p.product_id NOT in(select product_id from  product_category_set where category_id in({0}))", query.category_ID_IN);
+                }
+                str.Append(" order by sum_biao.item_id desc;");
+
+                return _access.getDataTable(str.ToString());
+            }
+            catch (Exception ex)
+            {
+               throw new Exception("ProductItemDao-->GetSugestDatetable-->" + ex.Message);
+            }
+        }
 
     }
 }

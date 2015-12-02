@@ -1074,8 +1074,8 @@ namespace Admin.gigade.Controllers
             try
             {
                 Iupc iupc = new Iupc();
-                iupc.item_id = uint.Parse(Request.Params["item_id"]);
-                iupc.upc_id = Request.Params["upc_id"];
+                iupc.item_id = uint.Parse(Request.Params["item_id"].Trim());
+                iupc.upc_id = Request.Params["upc_id"].Trim();
                 if (!string.IsNullOrEmpty(Request.Params["upc_type_flg"]))
                 {
                     iupc.upc_type_flg = Request.Params["upc_type_flg"];
@@ -4125,8 +4125,13 @@ namespace Admin.gigade.Controllers
                 {
                     ialg.doc_no = Request.Params["doc_no"];
                 }
+                if (!string.IsNullOrEmpty(Request.Params["gzbh"]))
+                {
+                    ialg.doc_no = Request.Params["gzbh"];
+                }
                 ialg.create_user = userId;
                 invd.change_user = userId;
+               
                 ialg.create_dtim = DateTime.Now;
                 invd.change_dtim = DateTime.Now;
                 invd.row_id = row_id;

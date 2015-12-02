@@ -149,7 +149,8 @@ Ext.onReady(function () {
             }
         },
         {
-            xtype: 'datetimefield', fieldLabel: TIMESTART, editable: false, id: 'timestart', labelWidth: 80,
+            xtype: 'datetimefield', fieldLabel: TIMESTART, editable: false, id: 'timestart', labelWidth: 80, format: 'Y-m-d H:i:s',
+            time: { hour: 00, min: 00, sec: 00 },//開始時間00：00：00
             // value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
             listeners: {
                 select: function (a, b, c) {
@@ -168,11 +169,11 @@ Ext.onReady(function () {
 
                 }
             }
-
         },
         { xtype: 'displayfield', value: "~", margin: '0' },
         {
-            xtype: 'datetimefield', editable: false, id: 'timeend', labelWidth: 60,
+            xtype: 'datetimefield', editable: false, id: 'timeend', labelWidth: 60,format: 'Y-m-d H:i:s',
+            time: { hour: 23, min: 59, sec: 59 },
             //value: Tomorrow(),
             listeners: {
                 select: function (a, b, c) {

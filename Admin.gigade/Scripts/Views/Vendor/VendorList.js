@@ -308,12 +308,13 @@ Ext.onReady(function () {
                       {
                           xtype: "datetimefield",
                           fieldLabel: "合約簽訂日",
-                          width: 200,
+                          width: 240,
                           labelWidth: 80,
                           margin: '5 0 0 5',
                           id: 'dateOne',
                           name: 'dateOne',
-                          format: 'Y-m-d',
+                          format: 'Y-m-d H:i:s',
+                          //time: { hour: 00, min: 00, sec: 00 },
                           submitValue: true,
                           editable: false,
                           listeners: {
@@ -335,17 +336,18 @@ Ext.onReady(function () {
                       },
                      {
                          xtype: 'displayfield',
-                         margin: '5 0 0 0',
+                         margin: '5 5 0 5', 
                          value: "~"
                      }
                      , {
                          xtype: "datetimefield",
-                         format: 'Y-m-d',
+                         format: 'Y-m-d H:i:s',
+                         //time: { hour: 23, min: 59, sec: 59 },
                          id: 'dateTwo',
                          name: 'dateTwo',
                          margin: '5 0 0 0',
                          editable: false,
-                         width: 120,
+                         width: 160,
                          submitValue: true,
                          listeners: {
                              select: function (a, b, c) {
@@ -559,9 +561,16 @@ function SecretLogin(rid) {//secretcopy
 }
 
 function Tomorrow() {
-    var d = new Date();                             // 创建 Date 对象。
-    d.setDate(d.getDate() + 1);
-    return d;                                 // 返回日期。
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate() + 1);
+    return dt;                                 // 返回日期。
 }
 
 
@@ -644,6 +653,7 @@ function VendorFunction(rid) {
         }
     });
 }
+
 setNextMonth = function (source, n) {
     var s = new Date(source);
     s.setMonth(s.getMonth() + n);

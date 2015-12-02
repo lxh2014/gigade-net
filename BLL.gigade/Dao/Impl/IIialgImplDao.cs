@@ -14,5 +14,6 @@ namespace BLL.gigade.Dao.Impl
         List<IialgQuery> GetIialgList(IialgQuery q, out int totalCount);
         List<IialgQuery> GetExportIialgList(IialgQuery q);
         int addIialgIstock(IialgQuery q);
+        int addIialgIstock_AutoMarket(IialgQuery q);
     }
 }

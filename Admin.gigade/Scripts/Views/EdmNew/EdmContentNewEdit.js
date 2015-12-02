@@ -1,4 +1,7 @@
-﻿function selectionChange() {
+﻿//var subscriber = '<p style="text-align:center;"><span style="font-size:small;"><span style="color:#666666;"><a href="https://www.gigade100.com/member/mb_newsletter.php" target="_blank">訂閱/解訂電子報</a></span></span></p>';
+var template_id_glo = 0;
+var subscribe = document.getElementById('subscribe').value;
+function selectionChange() {
     var lis = $('.k-selectable').children();
     for (var i = 0; i < lis.length; i++) {
         var current = $(lis[i]);
@@ -61,6 +64,29 @@ editFunction = function (row, store) {
         }
     });
 
+
+
+    Ext.define('gigade.edm_pm', {
+        extend: 'Ext.data.Model',
+        fields: [
+            { name: 'parameterCode', type: 'string' },
+            { name: 'parameterName', type: 'string' }
+        ]
+    });
+    var EdmPMStore = Ext.create("Ext.data.Store", {
+        autoLoad: true,
+        model: 'gigade.edm_pm',
+        proxy: {
+            type: 'ajax',
+            url: '/EdmNew/GetEdmPMStore',
+            reader: {
+                type: 'json',
+                root: 'data'
+            }
+        }
+    });
+
+
     Ext.define('gigade.edm_template', {
         extend: 'Ext.data.Model',
         fields: [
@@ -106,7 +132,7 @@ editFunction = function (row, store) {
         autoScroll: true,
         layout: 'anchor',
         labelWidth: 45,
-       // height:1000,
+        // height:1000,
         url: '/EdmNew/SaveEdmContentNew',
         defaults: { anchor: "95%", msgTarget: "side" },
         items: [
@@ -166,6 +192,18 @@ editFunction = function (row, store) {
             },
             {
                 xtype: 'combobox',
+                fieldLabel: '需求申請者',
+                store: EdmPMStore,
+                id: 'pm',
+                name: 'pm',
+                allowBlank: false,
+                displayField: 'parameterName',
+                valueField: 'parameterCode',
+                editable: false,
+                lastQuery: '',
+            },
+            {
+                xtype: 'combobox',
                 store: EdmTemplateStore,
                 valueField: 'template_id',
                 displayField: 'template_name',
@@ -180,6 +218,8 @@ editFunction = function (row, store) {
                         var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
                         var template_id_sel = Ext.getCmp('template_id').getValue();
                         var content_id_sel = Ext.getCmp('content_id').getValue();
+                        Ext.getCmp('active').setValue();
+                        Ext.getCmp('active_dis').setValue();
                         if (content_id_sel == "") {
                             NextAjax();
                         }
@@ -218,21 +258,90 @@ editFunction = function (row, store) {
                                 },
                                 failure: function () {
                                     myMask.hide();
-                                    Ext.Msg.alert("提示信息","出現異常");
+                                    Ext.Msg.alert("提示信息", "出現異常");
                                 }
                             });
                         }
-                      
+
                     }
                 }
             },
- 
+                  {
+
+                      xtype: 'fieldcontainer',
+                      layout: 'hbox',
+                      items: [
+                      {
+                          xtype: 'textfield',
+                          name: 'active',
+                          id: 'active',
+                          submitValue: true,
+                          fieldLabel: '活動頁面',
+                          emptyText: '請輸入活動頁面id',
+                          listeners: {
+                              specialkey: function (field, e) {
+                                  if (e.getKey() == e.ENTER) {
+                                   
+                                      LoadEpaperContent();
+                                  }
+                              }
+                          }
+                      },
+                      {
+                          xtype: 'displayfield',
+                          id: 'active_dis',
+                          name: 'active_dis',
+                          submitValue:true,
+                          hidden: true,
+                          value:0,
+                      },
+                      {
+                          xtype: 'button',
+                          text: "載入",
+                          id: 'btn_load',
+                          margin: '0 0 0 5',
+                          handler: LoadEpaperContent
+                      }
+                      ]
+
+                  },
             {
-                xtype: 'textarea',
+                xtype: 'textarea',//520  740
                 html: '<div id="template_area"></div>',
                 frame: true,
                 border: false
-            }
+            },
+                   {
+                       xtype: 'fieldcontainer',
+                       layout: 'hbox',
+                       items: [
+                       {
+                           xtype: 'checkbox',
+                           id: 'check',
+                           margin: '5 0 0 55',
+                           //handler: function () {
+                           //    if (Ext.getCmp('check').checked) {
+                           //        try {
+                           //            $("#editor").data("kendoEditor").value(subscriber);
+                           //        }
+                           //        catch (ex) {
+                           //            var value = Ext.htmlDecode(document.getElementById('editor3').value) + subscriber;
+                           //            $("#editor3").data("kendoEditor").value(value);
+                           //        }
+                           //    }
+                           //    else {
+                           //        var value = Ext.htmlDecode(document.getElementById('editor3').value).replace(subscriber, "");
+                           //        $("#editor3").data("kendoEditor").value(value);
+                           //    }
+                           //}
+                       },
+                       {
+                           xtype: 'displayfield',
+                           margin: '5 0 0 5',
+                           value: '是否添加訂閱',
+                       }
+                       ]
+                   },
         ],
         buttons: [
             {
@@ -240,9 +349,9 @@ editFunction = function (row, store) {
                 disabled: true,
                 text: '保存',
                 handler: function () {
-                        var form = this.up('form').getForm();
-                        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
-                        myMask.show();
+                    var form = this.up('form').getForm();
+                    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                    myMask.show();
                     try {
                         var editor1 = document.getElementById('editor').value;
                         var editor2 = document.getElementById('editor2').value;
@@ -257,43 +366,55 @@ editFunction = function (row, store) {
                             template_data = "";
                         }
                     }
-                        if (form.isValid()) {
-                            this.disable();
-                            form.submit({
-                                params: {
-                                    content_id: Ext.htmlEncode(Ext.getCmp('content_id').getValue()),
-                                    sender_id: Ext.htmlEncode(Ext.getCmp('sender_id').getValue()),
-                                    group_id: Ext.htmlEncode(Ext.getCmp('group_id').getValue()),
-                                    importance: Ext.htmlEncode(Ext.getCmp('importance').getValue()),
-                                    subject: Ext.htmlEncode(Ext.getCmp('subject').getValue()),
-                                    template_id: Ext.htmlEncode(Ext.getCmp('template_id').getValue()),
-                                    template_data: template_data,
-                                },
-                                success: function (form, action) {
+                    if (form.isValid()) {
+                        //this.disable();
+                        form.submit({
+                            params: {
+                                content_id: Ext.htmlEncode(Ext.getCmp('content_id').getValue()),
+                                sender_id: Ext.htmlEncode(Ext.getCmp('sender_id').getValue()),
+                                group_id: Ext.htmlEncode(Ext.getCmp('group_id').getValue()),
+                                importance: Ext.htmlEncode(Ext.getCmp('importance').getValue()),
+                                subject: Ext.htmlEncode(Ext.getCmp('subject').getValue()),
+                                template_id: Ext.htmlEncode(Ext.getCmp('template_id').getValue()),
+                                active:Ext.htmlEncode(Ext.getCmp('active_dis').getValue()),
+                                active_dis: Ext.htmlEncode(Ext.getCmp('active_dis').getValue()),
+                                template_data: template_data,
+                                pm: Ext.htmlEncode(Ext.getCmp('pm').getValue()),
+                                check: Ext.getCmp('check').getValue(),
+                             
+                            },
+                            success: function (form, action) {
+                                myMask.hide();
+                                var result = Ext.decode(action.response.responseText);
+                                if (result.success) {
                                     myMask.hide();
-                                    var result = Ext.decode(action.response.responseText);
-                                    if (result.success) {
-                                        myMask.hide();
-                                        Ext.Msg.alert("提示信息", "保存成功! ");
-                                        store.load();
-                                        editWin.close();
-                                    }
-                                    else {
-                                        myMask.hide();
-                                        Ext.Msg.alert("提示信息", "保存失敗! ");
-                                        store.load();
-                                        editWin.close();
-                                    }
-                                },
-                                failure: function () {
-                                    myMask.hide();
-                                    Ext.Msg.alert("提示信息", "出現異常! ");
+                                    Ext.Msg.alert("提示信息", "保存成功! ");
+                                    store.load();
+                                    editWin.close();
                                 }
-                            });
-                        }
+                                else {
+                                    myMask.hide();
+                                    Ext.Msg.alert("提示信息", "保存失敗! ");
+                                    store.load();
+                                    editWin.close();
+                                }
+                            },
+                            failure: function () {
+                                myMask.hide();
+                                Ext.Msg.alert("提示信息", "出現異常! ");
+                            }
+                        });
+                    }
 
                 }
-            }
+            },
+            {
+                id: 'preview',
+                text: '預覽',
+                handler: function () {
+                    PreviewFun(Ext.getCmp('content_id').getValue(), Ext.getCmp('check').getValue(),Ext.getCmp('template_id').getValue());
+                }
+            },
         ]
     });
 
@@ -301,8 +422,8 @@ editFunction = function (row, store) {
         title: '電子報新增/編輯',
         iconCls: 'icon-user-edit',
         id: 'editWin',
-        height: 520,
-        width: 740,
+        height: 570,
+        width: 793,
         y: 100,
         layout: 'fit',
         items: [editFrm],
@@ -336,9 +457,8 @@ editFunction = function (row, store) {
                     Ext.getCmp('group_id').allowBlank = true;
                     Ext.getCmp('template_id').allowBlank = true;
                     editFrm.getForm().loadRecord(row);
+                    Ext.getCmp('preview').show(true);
                     initRow(row);
-                  
-                    
                 }
                 else {
                     EdmTemplateStore.on('load', function () {
@@ -348,6 +468,7 @@ editFunction = function (row, store) {
                     Ext.getCmp('sender_id').allowBlank = false;
                     Ext.getCmp('group_id').allowBlank = false;
                     Ext.getCmp('template_id').allowBlank = false;
+                    Ext.getCmp('preview').hide(true);
                     editFrm.getForm().reset();
                 }
             }
@@ -355,8 +476,12 @@ editFunction = function (row, store) {
     });
     editWin.show();
     function initRow(row) {
-       
         var result = row.data.template_data;
+        if (result.indexOf(subscribe) > 0)
+        {
+            Ext.getCmp('check').setValue(true);
+        }
+        result = result.replace(subscribe, "");
         var index = result.indexOf(split_str);
         if (index > 0) {
             Query(2);
@@ -371,7 +496,7 @@ editFunction = function (row, store) {
         }
     }
     function Query(x) {
-        var url ;
+        var url;
         if (x == 1) {
             url = "/EdmNew/Editkendo";
         }
@@ -380,7 +505,7 @@ editFunction = function (row, store) {
         }
         $.ajax({
             async: false,
-            url:url,
+            url: url,
         }).success(function (partialView) {
             $('#template_area').empty().append(partialView);
             // 呼叫 API 取得 edm_content.template_data
@@ -441,12 +566,12 @@ editFunction = function (row, store) {
                      //    "exec":
                      //       function (e) {
                      //           var editor = $(this).data("kendoEditor");
-                     //           var htmlsrc = $('.content_editor]').data("kendoEditor");// Ext.getCmp('kendoEditor').getValue();
+                     //           var htmlsrc = Ext.htmlDecode(document.getElementById('editor3').value)  //$('.editor3]').data("kendoEditor");// Ext.getCmp('kendoEditor').getValue();
                      //           var A = 1000;
                      //           var B = 700;
                      //           var C = (document.body.clientWidth - A) / 2;
                      //           var D = window.open('', null, 'toolbar=yes,location=no,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=' + A + ',height=' + B + ',left=' + C);
-                     //           var E = "<html><head><title>預覽</title></head><style>body{line-height:200%;padding:50px;}</style><body><div >" + htmlsrc.body.innerHTML + "</div></body></html>";
+                     //           var E = "<html><head><title>預覽</title></head><style>body{line-height:200%;padding:50px;}</style><body><div >" + htmlsrc + "</div></body></html>";
                      //           D.document.write(E);
                      //           D.document.close();
                      //       }
@@ -494,8 +619,7 @@ editFunction = function (row, store) {
             });
         });
     }
-    function NextAjax()
-    {
+    function NextAjax() {
         var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
         myMask.show();
         Ext.Ajax.request({
@@ -522,7 +646,6 @@ editFunction = function (row, store) {
                         Query(1);
                         $("#editor3").data("kendoEditor").value(result);
                     }
-
                 }
             },
             failure: function () {
@@ -531,4 +654,67 @@ editFunction = function (row, store) {
             }
         });
     }
+     function LoadEpaperContent() {
+        Ext.getCmp('check').setDisabled(false);
+        Ext.getCmp('check').reset();
+        var active = Ext.getCmp("active").getValue();
+        if (active == null || active == "" || active == undefined) {
+            Ext.Msg.alert("提示信息", "請輸入活動頁面id");
+            return;
+        }
+        else {
+            Ext.Ajax.request({
+                url: '/Edm/LoadEpaperContent',
+                method: 'post',
+                params: {
+                    content_id: active
+                },
+                success: function (form, action) {
+                    var result = Ext.decode(form.responseText);
+                    if (result.success) {
+                        Query(1);
+                        Ext.getCmp('active_dis').setValue(active);
+                        $("#editor3").data("kendoEditor").value(Ext.htmlDecode(result.data.epaper_content).replace(/>\s*<map/g, '><map'));
+                         
+                    }
+                    else {
+                        if (result.msg == '0') {
+                            Ext.Msg.alert("提示信息", '該活動頁面狀態為：新建，不可載入');
+                        }
+                        else if (result.msg == '1') {
+                            Ext.Msg.alert("提示信息", '該活動頁面狀態為：隱藏，不可載入');
+                        }
+                        else if (result.msg == '2') {
+                            Ext.Msg.alert("提示信息", '該活動頁面狀態為：下檔，不可載入');
+                        }
+                        else if (result.msg == '3') {
+                            Ext.Msg.alert("提示信息", '該活動頁面不存在');
+                        }
+                        else {
+                            Ext.Msg.alert("提示信息", "失敗！");
+                        }
+                    }
+                },
+                failure: function (form, action) {
+                    var result = Ext.decode(form.responseText);
+                    if (result.msg == '0') {
+                        Ext.Msg.alert("提示信息", '該活動頁面狀態為：新建，不可載入');
+                    }
+                    else if (result.msg == '1') {
+                        Ext.Msg.alert("提示信息", '該活動頁面狀態為：隱藏，不可載入');
+                    }
+                    else if (result.msg == '2') {
+                        Ext.Msg.alert("提示信息", '該活動頁面狀態為：下檔，不可載入');
+                    }
+                    else if (result.msg == '3') {
+                        Ext.Msg.alert("提示信息", '該活動頁面不存在');
+                    }
+                    else {
+                        Ext.Msg.alert("提示信息", "失敗！");
+                    }
+                }
+            })
+        }
+     }
+    
 }

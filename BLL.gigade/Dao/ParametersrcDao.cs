@@ -721,5 +721,19 @@ namespace BLL.gigade.Dao
                 throw new Exception(" ParametersrcDao-->GetParametersrcList()-->" + ex.Message + ",sql:" + sbStr.ToString(), ex);
             }
         }
+
+        public List<Parametersrc> SearchParameters(params string[] types)
+        {
+            try
+            {
+                var sqlStr = string.Format("SELECT parameterName,parameterCode,parameterType,remark from t_parametersrc WHERE parametertype in ('{0}')", string.Join("','", types));
+                return _accessMySql.getDataTableForObj<Parametersrc>(sqlStr);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ParametersrcDao-->SearchParameters" + ex, ex);
+            }
+
+        }
     }
 }

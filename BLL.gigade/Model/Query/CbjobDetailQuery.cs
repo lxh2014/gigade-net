@@ -19,6 +19,10 @@ namespace BLL.gigade.Model.Query
         public string product_name { get; set; }//產品名稱
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public uint spec_id_1 { get; set; }//規格
+        public uint spec_id_2 { get; set; }
+        public string spec_title_1 { get; set; }
+        public string spec_title_2 { get; set; }
         public CbjobDetailQuery()
         {
             searchcontent = string.Empty;
@@ -33,6 +37,10 @@ namespace BLL.gigade.Model.Query
             product_name = string.Empty;
             StartDate = DateTime.MinValue;
             EndDate = DateTime.MinValue;
+            spec_id_1 = 0;
+            spec_id_2=0;
+            spec_title_1 = string.Empty;
+            spec_title_2 = string.Empty;
         }
     }
 }
