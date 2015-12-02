@@ -273,18 +273,18 @@ namespace BLL.gigade.Common
                     {
                         if (j > 0)
                         {
-                            sbValue.Append("," + dt.Rows[i][j].ToString());
+                            sbValue.Append("," + dt.Rows[i][j].ToString().Replace(',', '，').Replace("\r", "").Replace("\n", ""));
                         }
                         else
                         {
                             if (string.IsNullOrEmpty(sbValue.ToString()))
                             {
                                 sbValue.Clear();
-                                sbValue.Append(dt.Rows[i][j].ToString());
+                                sbValue.Append(dt.Rows[i][j].ToString().Replace(',', '，').Replace("\r", "").Replace("\n", ""));
                             }
                             else
                             {
-                                sbValue.Append(Environment.NewLine + dt.Rows[i][j].ToString());
+                                sbValue.Append(Environment.NewLine + dt.Rows[i][j].ToString().Replace(',', '，').Replace("\r", "").Replace("\n", ""));
                             }
                         }
                     }

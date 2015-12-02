@@ -577,6 +577,7 @@
                                      allowBlank: false,
                                      allowBlank: false,
                                      format: 'Y-m-d H:i:s',
+                                     time: { hour: 00, min: 00, sec: 00 },
                                      value: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1),
                                      listeners: {
                                          select: function () {
@@ -585,7 +586,7 @@
                                              var nowDate = Ext.htmlEncode(Ext.Date.format(new Date(), 'Y-m-d H:i:s'));
                                              var sdTime = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('schedule_date').getValue()), 'Y-m-d H:i:s'));
                                              if (sdTime <= nowDate) {
-                                                 var new_time = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1, new Date().getHours(), new Date().getMinutes(), new Date().getMilliseconds());
+                                                 var new_time = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1, 00, 00, 00);
                                                  sd.setValue(new_time);
                                                  if (sd.getValue() >= ed.getValue()) {
                                                      var new_time2 = new Date(sd.getValue().getFullYear(), sd.getValue().getMonth(), sd.getValue().getDate() + 1);

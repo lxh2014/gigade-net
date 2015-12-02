@@ -17,6 +17,7 @@ using gigadeExcel.Comment;
 using System.Data;
 using BLL.gigade.Common;
 using System.Net;
+using System.Collections;
 
 namespace Admin.gigade.Controllers
 {
@@ -1211,42 +1212,26 @@ namespace Admin.gigade.Controllers
                 _iParametersrcImplMgr = new ParameterMgr(Server.MapPath(strXml), ParaSourceType.XML);
                 List<Parametersrc> liparsrc = _iParametersrcImplMgr.QueryUsed(new Parametersrc { ParameterType = "RecommendedExcleSheetName" }).ToList();
                 //導出文件名稱
-                List<string> strPath = new List<string>();
-                List<string> strNewPath = new List<string>();
                 DateTime nowtime = DateTime.Now;
                 //導出EXCLE  分別導出6種
-                List<MemoryStream> msVipUser = _recommendedExcleMgr.GetVipUserInfo(rop, liparsrc[0].parameterName);
-                OutExcleForRecommendedByMs(msVipUser, liparsrc[0].parameterName, out strNewPath, nowtime);
-                strPath = AddstrPath(strPath, strNewPath);
-                List<MemoryStream> msProduct = _recommendedExcleMgr.GetProductInfo(rop, liparsrc[1].parameterName);
-                OutExcleForRecommendedByMs(msProduct, liparsrc[1].parameterName, out strNewPath, nowtime);
-                strPath = AddstrPath(strPath, strNewPath);
-                List<MemoryStream> msOrder = _recommendedExcleMgr.GetOrderInfo(rop, liparsrc[2].parameterName);
-                OutExcleForRecommendedByMs(msOrder, liparsrc[2].parameterName, out strNewPath, nowtime);
-                strPath = AddstrPath(strPath, strNewPath);
-                List<MemoryStream> msOrderDetail = _recommendedExcleMgr.GetOrderDetailInfo(rop, liparsrc[3].parameterName);
-                OutExcleForRecommendedByMs(msOrderDetail, liparsrc[3].parameterName, out strNewPath, nowtime);
-                strPath = AddstrPath(strPath, strNewPath);
-                List<MemoryStream> msCategory = _recommendedExcleMgr.GetCategoryInfo(rop, liparsrc[4].parameterName);
-                OutExcleForRecommendedByMs(msCategory, liparsrc[4].parameterName, out strNewPath, nowtime);
-                strPath = AddstrPath(strPath, strNewPath);
-                List<MemoryStream> msBrand = _recommendedExcleMgr.GetBrandInfo(rop, liparsrc[5].parameterName);
-                OutExcleForRecommendedByMs(msBrand, liparsrc[5].parameterName, out strNewPath, nowtime);
-                strPath = AddstrPath(strPath, strNewPath);
-                #region
-                //打包壓縮文件
-                //string zipfifilename = "吉甲地推薦系統匯出.zip";
-                //string strZipPath = Server.MapPath("../ImportUserIOExcel/" + zipfifilename + "");
-                //string strZipTopDirectoryPath = Server.MapPath("../ImportUserIOExcel/");
-                //int intZipLevel = 6;
-                //string strPassword = "";
-                //SharpZipLibHelp szlh = new SharpZipLibHelp();
-                //szlh.Zip(strZipPath, strZipTopDirectoryPath, intZipLevel, strPassword, strPath);
-                //下載
-                //downLoad(strZipPath, zipfifilename);
-                //下載完後刪除本次的緩存文件
-                DeleteFileByPath(strPath);
-                #endregion
+                DataTable msVipUser = _recommendedExcleMgr.GetVipUserInfo(rop, liparsrc[0].parameterName);
+                OutExcleForRecommendedByMs(msVipUser, liparsrc[0].parameterName, nowtime);
+                
+                DataTable msProduct = _recommendedExcleMgr.GetProductInfo(rop, liparsrc[1].parameterName);
+                OutExcleForRecommendedByMs(msProduct, liparsrc[1].parameterName, nowtime);
+
+                DataTable msOrder = _recommendedExcleMgr.GetOrderInfo(rop, liparsrc[2].parameterName);
+                OutExcleForRecommendedByMs(msOrder, liparsrc[2].parameterName, nowtime);
+
+                DataTable msOrderDetail = _recommendedExcleMgr.GetOrderDetailInfo(rop, liparsrc[3].parameterName);
+                OutExcleForRecommendedByMs(msOrderDetail, liparsrc[3].parameterName, nowtime);
+
+                DataTable msCategory = _recommendedExcleMgr.GetCategoryInfo(rop, liparsrc[4].parameterName);
+                OutExcleForRecommendedByMs(msCategory, liparsrc[4].parameterName, nowtime);
+
+                DataTable msBrand = _recommendedExcleMgr.GetBrandInfo(rop, liparsrc[5].parameterName);
+                OutExcleForRecommendedByMs(msBrand, liparsrc[5].parameterName, nowtime);
+
                 return "{success:true}";
             }
             catch (Exception ex)
@@ -1259,36 +1244,45 @@ namespace Admin.gigade.Controllers
             }
         }
         //導出Exlce
-        public void OutExcleForRecommendedByMs(List<MemoryStream> ms, string exclename, out  List<string> strPath, DateTime dtnow)
+        public void OutExcleForRecommendedByMs(DataTable dt, string exclename, DateTime dtnow)
         {
-
-            strPath = new List<string>();
-            for (int i = 0; i < ms.Count; i++)
+            try
             {
-                string fileName = "吉甲地推薦系統" + exclename + "匯出" + dtnow.ToString("yyyyMMddHHmmss") + ".xls";
-                string serverPath = Server.MapPath("../ImportUserIOExcel/" + fileName);
-                FileStream fs = new FileStream(serverPath, FileMode.OpenOrCreate);
-                BinaryWriter w = new BinaryWriter(fs);
-                w.Write(ms[i].ToArray());
-                w.Flush();
-                w.Close();
-                fs.Close();
-                ms[i].Close();
-                //上傳FTP
-                UploadFTP(ftpliaozhiPath, serverPath, ftpliaozhiuser, ftpliaozhipwd);
-                //記錄本次導出文件
-                strPath.Add(serverPath);
+                string fileName = "吉甲地推薦系統" + exclename + "匯出" + dtnow.ToString("yyyyMMdd_HHmm") + ".csv";
+               // ArrayList al = new ArrayList();
+              
+                string str=string.Empty;
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    if (!string.IsNullOrEmpty(str))
+                    {
+                        str = str + ',' + dt.Columns[i].ColumnName;
+                    }
+                    else
+                    {
+                        str = dt.Columns[i].ColumnName;
+                    }
+                }
+                string[] columnName = new string[] { str};
+                string txtserverPath = Server.MapPath("../ImportUserIOExcel/" + fileName);
+                CsvHelper.ExportDataTableToCsvBySdy(dt, txtserverPath, columnName, true);
+                UploadFTP(ftpliaozhiPath, txtserverPath, ftpliaozhiuser, ftpliaozhipwd);//曜智上傳csv文件
+                FileInfo file = new FileInfo(txtserverPath);//指定文件路径
+                if (file.Exists)//判断文件是否存在
+                {
+                    file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
+                    file.Delete();//删除文件
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
             }
         }
-        //新增導出地址
-        public List<string> AddstrPath(List<string> strPath, List<string> strNewPath)
-        {
-            for (int i = 0; i < strNewPath.Count; i++)
-            {
-                strPath.Add(strNewPath[i]);
-            }
-            return strPath;
-        }
+       
         #region 上传Ftp
         /// <summary>
         /// 上傳FTP方法

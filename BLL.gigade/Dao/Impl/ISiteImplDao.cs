@@ -15,5 +15,6 @@ namespace BLL.gigade.Dao.Impl
         int UpSiteStatus(SiteModel site);
 
         List<Site> GetSite(Site query);
+        Site GetSiteInfo(int ids);
     }
 }

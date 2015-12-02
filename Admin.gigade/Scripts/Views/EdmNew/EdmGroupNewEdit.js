@@ -18,7 +18,7 @@
                 hidden:true,
             }, {
                 xtype: 'textfield',
-                fieldLabel: '群組名稱',
+                fieldLabel: '類型名稱',
                 id: 'group_name',
                 name: 'group_name',
                 allowBlank: false
