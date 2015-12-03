@@ -147,7 +147,6 @@ namespace BLL.gigade.Model.Query
         public string order_status_name { get; set; }
         public string slave_status_name { get; set; }
         public string product_mode_name { get; set; }
-        public string site_name { get; set; }
         public string slave_date_close_format { get; set; }
         public int cost_amount { get; set; }
         public OrderDetailQuery()
@@ -258,7 +257,7 @@ namespace BLL.gigade.Model.Query
             order_status_name = string.Empty;
             slave_status_name = string.Empty;
             product_mode_name = string.Empty;
-            site_name = string.Empty;
+            channel_name_simple = string.Empty;
             slave_date_close_format = string.Empty;
             cost_amount = 0;
         }
