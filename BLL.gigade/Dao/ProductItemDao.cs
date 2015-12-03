@@ -534,7 +534,7 @@ namespace BLL.gigade.Dao
                 foreach (DataRow dr in dtResult.Rows)
                 {
                     _dtloc = GettSuggestPurchaseIloc(dr["item_id"].ToString());
-                    if (string.IsNullOrEmpty(_dtloc.Rows[0]["cde_dt"].ToString()))//沒有主料位
+                    if (string.IsNullOrEmpty(_dtloc.Rows[0]["loc_id"].ToString()))//沒有主料位
                     {
                         if (dr["product_mode"].ToString() == "2")
                         {
@@ -548,7 +548,7 @@ namespace BLL.gigade.Dao
                     {
                         dr["loc_id"] = _dtloc.Rows[0]["loc_id"];
                     }
-                    if (string.IsNullOrEmpty(_dtloc.Rows[0]["cde_dt"].ToString()))//沒有主料位
+                    if (string.IsNullOrEmpty(_dtloc.Rows[0]["cde_dt"].ToString()))//沒有效期控管
                     {
                         dr["cde_dt"] = " ";
                         dr["made_date"] = " ";
