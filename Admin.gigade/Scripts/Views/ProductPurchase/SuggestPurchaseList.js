@@ -65,7 +65,7 @@ var SuggestPurchaseStore = Ext.create('Ext.data.Store', {
 });
 SuggestPurchaseStore.on('beforeload', function () {
     var reg = /^[1-9]\d*$/;
-    if (Ext.getCmp("serchType").getValue() == 1) {
+    if (Ext.getCmp("serchType").getValue() == 1 && Ext.getCmp("serchName").getValue().trim() != "") {
         if (!reg.test(Ext.getCmp("serchName").getValue().trim())) {
             Ext.Msg.alert("提示", "供應商編號格式錯誤!");
             return;
@@ -152,7 +152,7 @@ var TrustSendStore = Ext.create('Ext.data.Store', {
 function Query(x) {
     //
     var reg = /^[1-9]\d*$/;
-    if (Ext.getCmp("serchType").getValue() == 1) {
+    if (Ext.getCmp("serchType").getValue() == 1 && Ext.getCmp("serchName").getValue().trim() != "") {
         if (!reg.test(Ext.getCmp("serchName").getValue().trim())) {
             Ext.Msg.alert("提示", "供應商編號格式錯誤!");
             return;
@@ -579,7 +579,7 @@ function Tomorrow(days) {
 ///匯出EXcel
 ExportExcel = function () {
     var reg = /^[1-9]\d*$/;
-    if (Ext.getCmp("serchType").getValue() == 1) {
+    if (Ext.getCmp("serchType").getValue() == 1 && Ext.getCmp("serchName").getValue().trim()!="") {
         if (!reg.test(Ext.getCmp("serchName").getValue())) {
             Ext.Msg.alert("提示", "供應商編號格式錯誤!");
             return;
