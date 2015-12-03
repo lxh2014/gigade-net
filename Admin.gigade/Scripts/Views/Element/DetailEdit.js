@@ -372,8 +372,8 @@ function editFunction(RowID, Store, i) {
                                     category_id.setValue("");
 
                                     targetImage.hide();
-                                    targetImage2.hide();
-                                    delbig.hide();
+                                    targetImage2.show();
+                                    delbig.show();
                                     targetContent.hide();
                                     imgcateset.hide();
                                     productidset.show();
@@ -481,8 +481,7 @@ function editFunction(RowID, Store, i) {
                     }
                 }
                 ]
-            },
-            
+            },            
             {
                 xtype: 'fieldcontainer',
                 defaults: {
@@ -505,20 +504,28 @@ function editFunction(RowID, Store, i) {
                         submitValue: true,
                         fileUpload: true
                     },
-                    {
-                        xtype: 'button',
-                        text: '刪除元素大圖',
-                        hidden: false,
-                        id: 'delbig',
-                        name: 'delbig',
-                        width: 100,
-                        minValue: 0,
-                        margin: '0 10 0 10',
-                        handler: function () {
-                            var targetImage2 = Ext.getCmp("element_img_big");
-                            targetImage2.setRawValue("");
-                        }
-                    }
+                     {
+                         xtype: 'button', id: 'delbig', margin: '0 0 0 10', iconCls: 'icon-cross',
+                         handler: function () {
+                             var targetImage2 = Ext.getCmp("element_img_big");
+                             targetImage2.setRawValue("");
+                         }
+                     }
+                    // ,
+                    //{
+                    //    xtype: 'button',
+                    //    text: '刪除',
+                    //    hidden: false,
+                    //    id: 'delbig',
+                    //    name: 'delbig',
+                    //    width: 100,
+                    //    minValue: 0,
+                    //    margin: '0 10 0 10',
+                    //    handler: function () {
+                    //        var targetImage2 = Ext.getCmp("element_img_big");
+                    //        targetImage2.setRawValue("");
+                    //    }
+                    //}
                 ]
             },
             {//類別id
@@ -635,6 +642,8 @@ function editFunction(RowID, Store, i) {
             disabled: true,
             handler: function () {
                 var form = this.up('form').getForm();
+                var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                myMask.show();
                 if (form.isValid()) {
                     if (Ext.getCmp("element_type").getValue().element_type == 2 && Ext.htmlEncode(Ext.getCmp("kendoEditor").getValue()) == "") {
                         Ext.Msg.alert(INFORMATION, KENDOTIP);
@@ -646,7 +655,6 @@ function editFunction(RowID, Store, i) {
                     }
                     var isProdValid = true;
                     var msg = 0;
-
                     if (Ext.getCmp("element_type").getValue().element_type == 3) {
                         //驗證product_id是否合法
                         Ext.Ajax.request({
@@ -659,6 +667,7 @@ function editFunction(RowID, Store, i) {
                                 Element_id: Ext.htmlEncode(Ext.getCmp("element_id").getValue())
                             },
                             success: function (form, action) {
+                                myMask.hide();
                                 var result = Ext.decode(form.responseText);
                                 if (!result.success) {
                                     isProdValid = false;
@@ -670,6 +679,7 @@ function editFunction(RowID, Store, i) {
                                 }
                             },
                             failure: function () {
+                                myMask.hide();
                                 isProdValid = false;
                                 Ext.Msg.alert(INFORMATION, PRODTIP);
                             }
@@ -741,6 +751,7 @@ function editFunction(RowID, Store, i) {
                                     element_img_big: Ext.htmlEncode(Ext.getCmp("element_img_big").getValue())
                                 },
                                 success: function (form, action) {
+                                    myMask.hide();
                                     var result = Ext.decode(action.response.responseText);
                                     if (result.success) {
                                         if (result.msg != undefined) {
@@ -756,6 +767,7 @@ function editFunction(RowID, Store, i) {
                                     }
                                 },
                                 failure: function () {
+                                    myMask.hide();
                                     Ext.Msg.alert(INFORMATION, FAILURE);
                                 }
                             });

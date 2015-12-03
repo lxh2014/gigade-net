@@ -50,7 +50,7 @@ namespace Admin.gigade.Controllers
         string imgLocalPath = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.local);//ftp地址
         string imgServerPath = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server);//"http://192.168.71.10:2121"
         string ElementPath = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.elementPath);//圖片保存路徑
-
+        string defaultImg = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server) + "/product/nopic_50.jpg";
         //end 上傳圖片
 
         #region View
@@ -476,7 +476,14 @@ namespace Admin.gigade.Controllers
                         if (item.element_content != "")
                         {
                             item.element_content = imgServerPath + ElementPath + item.element_content;
+                        }
+                        if (item.element_img_big != "")
+                        {
                             item.element_img_big = imgServerPath + ElementPath + item.element_img_big;
+                        }
+                        else
+                        {
+                            item.element_img_big = defaultImg;
                         }
                     }
                     if (item.element_type == 2)
@@ -489,6 +496,14 @@ namespace Admin.gigade.Controllers
                     if (item.category_name != "")
                     {
                         item.category_name = Server.HtmlDecode(Server.HtmlDecode(item.category_name));
+                        if (item.element_img_big != "")
+                        {
+                            item.element_img_big = imgServerPath + ElementPath + item.element_img_big;
+                        }
+                        else
+                        {
+                            item.element_img_big = defaultImg;
+                        }
                     }
 
                 }
