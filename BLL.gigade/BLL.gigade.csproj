@@ -1178,6 +1178,7 @@
     <Compile Include="Mgr\Schedules\SetConfigXmlMgr.cs" />
     <Compile Include="Mgr\Schedules\UserLoginLogMgr.cs" />
     <Compile Include="Mgr\Schedules\CheckUnsafeLoginMgr.cs" />
+    <Compile Include="Mgr\Schedules\ReceiveStatusFromTCatMgr.cs" />
     <Compile Include="Mgr\Schedules\SendOrderInfoToBlackCatFTPMgr.cs" />
     <Compile Include="Mgr\SecretAccountSetMgr.cs" />
     <Compile Include="Mgr\SecretInfoLogMgr.cs" />
@@ -1437,6 +1438,7 @@
     <Compile Include="Model\Query\ItemIpoCreateLogQuery.cs" />
     <Compile Include="Model\Query\IwmsRrecordQuery.cs" />
     <Compile Include="Model\Query\LogisticsDetailQuery.cs" />
+    <Compile Include="Model\Query\LogisticsTcatSodQuery.cs" />
     <Compile Include="Model\Query\LogisticsTcatEodQuery.cs" />
     <Compile Include="Model\Query\MailSendQuery.cs" />
     <Compile Include="Model\Query\ManageLoginQuery.cs" />
@@ -1872,6 +1874,7 @@
     <Compile Include="Model\SchedulePeriod.cs" />
     <Compile Include="Model\ScheduleLog.cs" />
     <Compile Include="Model\DeliverChangeLog.cs" />
+    <Compile Include="Model\LogisticsTcatSod.cs" />
     <Compile Include="Model\LogisticsTcatEod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\TrialPicture.cs" />
