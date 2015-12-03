@@ -13537,12 +13537,13 @@ namespace Admin.gigade.Controllers
                                 iinvd.item_id = uint.Parse(Request.Params["item_id"]);
                             }
                         }
-                        if (Request.Params["iplas"] == "false")
+
+                        _IiplasMgr = new IplasMgr(mySqlConnectionString);
+                        IplasQuery iplasquery = new IplasQuery();
+                        iplasquery.item_id = iinvd.item_id;
+                        if (_IiplasMgr.GetIplasid(iplasquery)==0)
                         {
                             Iplas iplas = new Iplas();
-                            IplasQuery iplasquery = new IplasQuery();
-                            iplasquery.item_id = iinvd.item_id;
-                            _IiplasMgr = new IplasMgr(mySqlConnectionString);
                             if (int.TryParse(Request.Params["item_id"], out temp))
                             {
                                 iplas.item_id = uint.Parse(Request.Params["item_id"]);
