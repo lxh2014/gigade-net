@@ -3963,7 +3963,7 @@ namespace Admin.gigade.Controllers
             dt.Columns.Add("付款方式", typeof(String));
             dt.Columns.Add("購買金額", typeof(String));
             dt.Columns.Add("付款狀態", typeof(String));
-            dt.Columns.Add("商品細項編號", typeof(int));
+            dt.Columns.Add("商品細項編號", typeof(String));
             dt.Columns.Add("商品編號", typeof(String));
             dt.Columns.Add("訂單狀態", typeof(String)); 
             dt.Columns.Add("品名", typeof(String));
@@ -4011,10 +4011,17 @@ namespace Admin.gigade.Controllers
                         dr[4] = 0;
                     }
                     dr[5] = dr_v["order_status_name"].ToString();
-                }            
+                }
                 if (!string.IsNullOrEmpty(dr_v["item_id"].ToString()))
                 {
-                    dr[6] = Convert.ToInt32(dr_v["item_id"].ToString());
+                    if (dr_v["item_mode"].ToString() == "1")
+                    {
+                        dr[6] = "";
+                    }
+                    else
+                    {
+                        dr[6] = Convert.ToInt32(dr_v["item_id"].ToString());
+                    }
                 }
                 else
                 {
@@ -4071,7 +4078,14 @@ namespace Admin.gigade.Controllers
 
                 if (!string.IsNullOrEmpty(dr_v["single_money"].ToString()))
                 {
-                    dr[12] = Convert.ToInt32(dr_v["single_money"].ToString());
+                    if (dr_v["item_mode"].ToString() == "2")//子商品的購買單價=購買單價/數量
+                    {
+                        dr[12] = Convert.ToInt32(dr_v["single_money"].ToString()) / Convert.ToInt32(dr_v["buy_num"].ToString());
+                    }
+                    else
+                    {
+                        dr[12] = Convert.ToInt32(dr_v["single_money"].ToString());
+                    }
                 }
                 else
                 {
@@ -4095,7 +4109,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(dr_v["amount"].ToString()))
                 {
-                    dr[15] = Convert.ToInt32(dr_v["amount"].ToString()) - Convert.ToInt32(dr[13]) - Convert.ToInt32(dr[14]);
+                    dr[15] = Convert.ToInt32(dr[12].ToString()) * Convert.ToInt32(dr[11].ToString()) - Convert.ToInt32(dr[13]) - Convert.ToInt32(dr[14]);
                 }
                 else
                 {
@@ -4106,7 +4120,7 @@ namespace Admin.gigade.Controllers
                 {
                     if (dr[10].ToString() == "子商品")//子商品的成本單價=成本单价/數量
                     {
-                        dr[16] = Convert.ToInt32(dr_v["single_cost"].ToString())/Convert.ToInt32(dr[11].ToString());
+                        dr[16] = Convert.ToInt32(dr_v["single_cost"].ToString()) / Convert.ToInt32(dr_v["buy_num"].ToString());
                     }
                     else
                     {
