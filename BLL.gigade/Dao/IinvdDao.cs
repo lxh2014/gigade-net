@@ -880,7 +880,7 @@ ORDER BY loc.loc_id,loc.row_id DESC  ", sbWhere.ToString(), sbjoin.ToString());
                     sbSql.Append("cd.cb_newid, ");
                     sbjoin.AppendFormat(" LEFT JOIN cbjob_detail cd ON nvd.row_id=cd.iinvd_id and cd.cb_jobid='{0}' ", m.cb_jobid);
                 }
-                sbSql.AppendFormat(@" loc.loc_id,loc.lsta_id ,nvd.item_id,nvd.prod_qty ,nvd.made_date,nvd.cde_dt ,CONCAT(v.brand_name,'-',p.product_name) as 'product_name','' as prod_sz,p.prepaid ,ptet.cde_dt_incr,ptet.cde_dt_var ,ptet.cde_dt_shp,ptet.pwy_dte_ctl,p.product_id
+                sbSql.AppendFormat(@" loc.loc_id,nvd.ista_id as lsta_id ,nvd.item_id,nvd.prod_qty ,nvd.made_date,nvd.cde_dt ,CONCAT(v.brand_name,'-',p.product_name) as 'product_name','' as prod_sz,p.prepaid ,ptet.cde_dt_incr,ptet.cde_dt_var ,ptet.cde_dt_shp,ptet.pwy_dte_ctl,p.product_id
 from iloc loc LEFT JOIN iinvd nvd on  loc.loc_id=nvd.plas_loc_id
 LEFT JOIN product_item pi on pi.item_id = nvd.item_id
 LEFT JOIN product p on p.product_id = pi.product_id 	 
@@ -1406,8 +1406,9 @@ us.user_username as user_name from iinvd ii ");
             StringBuilder sbwhere = new StringBuilder();
             try
             {
-                sql.AppendFormat("SELECT pi.item_id, p.product_name,CONCAT(ps1.spec_name,'-',ps2.spec_name)AS spec, made_date,cde_dt,prod_qty,pe.pwy_dte_ctl,i.row_id  FROM iinvd i ");
-                sql.Append(" INNER  JOIN product_item pi ON i.item_id=pi.item_id");
+                sql.AppendFormat("SELECT pi.item_id, p.product_name,CONCAT(ps1.spec_name,'-',ps2.spec_name)AS spec, made_date,cde_dt,prod_qty,pe.pwy_dte_ctl,i.row_id,ic.lcat_id  FROM iinvd i ");
+                sql.Append(" INNER JOIN iloc ic ON ic.loc_id=i.plas_loc_id");
+                sql.Append(" INNER JOIN product_item pi ON i.item_id=pi.item_id");
                 sql.Append(" INNER JOIN product p ON p.product_id =pi.product_id");
                 sql.Append(" LEFT JOIN product_ext pe ON pe.item_id=pi.item_id");
                 sql.Append(" LEFT JOIN product_spec ps1 ON ps1.spec_id=pi.spec_id_1");
@@ -1455,15 +1456,35 @@ us.user_username as user_name from iinvd ii ");
         public int SaveIinvd(IinvdQuery query)
         {
             query.Replace4MySQL();
+            int falg = 0;
             StringBuilder sql = new StringBuilder();
             try
             {
-                if (query.pwy_dte_ctl == "N")
+                if (query.pwy_dte_ctl == "Y")
+                {
+                    if (query.row_id != 0)
+                    {
+                        if (query.prod_qty == 0)
+                        {
+                            sql.AppendFormat("DELETE FROM iinvd WHERE row_id={0};", query.row_id);
+                        }
+                        else
+                        {
+                            sql.AppendFormat("UPDATE iinvd  SET prod_qty={0},change_user={2},change_dtim='{3}' WHERE row_id={1};", query.prod_qty, query.row_id, query.change_user, CommonFunction.DateTimeToString(query.change_dtim));
+                        }
+                    }
+                    else
+                    {
+                        sql.AppendFormat("UPDATE iinvd  SET prod_qty=prod_qty+{0},change_user={2},change_dtim='{3}' WHERE plas_loc_id='{1}';", query.prod_qty, query.plas_loc_id, query.change_user, CommonFunction.DateTimeToString(query.change_dtim));
+                    }
+                    _access.execCommand(sql.ToString()); falg = 1;
+                }
+                else
                 {
                     if (query.row_id != 0)
                     {
                         sql.Append("update iinvd set prod_qty=" + query.prod_qty + ",change_user=" + query.change_user + ",change_dtim='" + CommonFunction.DateTimeToString(query.change_dtim) + "' where row_id =" + query.row_id);
-                        return  _access.execCommand(sql.ToString());
+                        return _access.execCommand(sql.ToString());
                     }
                     else
                     {
@@ -1473,7 +1494,7 @@ us.user_username as user_name from iinvd ii ");
                         string row_idend = "";
                         int row_id_end_prod_pty = 0;
                         int prod_qty = query.prod_qtys - query.prod_qty;
-                        int i = 0; 
+                        int i = 0;
                         for (i = 0; i < table.Rows.Count; i++)
                         {
                             if ((int)table.Rows[i][1] <= prod_qty || (int)table.Rows[i][1] == 0)
@@ -1491,36 +1512,20 @@ us.user_username as user_name from iinvd ii ");
                         if (row_id != "")
                         {
                             _access.execCommand("DELETE FROM iinvd WHERE row_id IN(" + row_id.TrimEnd(',') + ")");
+                            falg = 1;
                         }
-                        if(i!=table.Rows.Count){
-                            return _access.execCommand("update iinvd set prod_qty=prod_qty-" + row_id_end_prod_pty + ",change_user=" + query.change_user + ",change_dtim='" + CommonFunction.DateTimeToString(query.change_dtim) + "' where row_id =" + row_idend);
-                        } 
-                    }
-                }
-                else
-                {
-                    if (query.row_id != 0)
-                    {
-                        if (query.prod_qty == 0)
+                        if (i != table.Rows.Count)
                         {
-                            sql.AppendFormat("DELETE FROM iinvd WHERE row_id={0};", query.row_id);
+                            return _access.execCommand("update iinvd set prod_qty=prod_qty-" + row_id_end_prod_pty + ",change_user=" + query.change_user + ",change_dtim='" + CommonFunction.DateTimeToString(query.change_dtim) + "' where row_id =" + row_idend);
                         }
-                        else {
-                            sql.AppendFormat("UPDATE iinvd  SET prod_qty={0},change_user={2},change_dtim='{3}' WHERE row_id={1};", query.prod_qty, query.row_id, query.change_user, CommonFunction.DateTimeToString(query.change_dtim));
-                        }  
-                    }
-                    else
-                    {
-                        sql.AppendFormat("UPDATE iinvd  SET prod_qty=prod_qty+{0},change_user={2},change_dtim='{3}' WHERE plas_loc_id='{1}';", query.prod_qty, query.plas_loc_id, query.change_user, CommonFunction.DateTimeToString(query.change_dtim));
                     }
                 }
-
-                return _access.execCommand(sql.ToString());
             }
             catch (Exception ex)
             {
                 throw new Exception("IinvdDao-->SaveIinvd-->" + ex.Message + sql.ToString(), ex);
             }
+            return falg;
         }
 
         public DateTime GetCde_dt(int row_id)
@@ -1553,7 +1558,7 @@ us.user_username as user_name from iinvd ii ");
                 int prod_qty = 0;
                 if (table.Rows.Count > 0)
                 {
-                    prod_qty = int.Parse(table.Rows[0][0].ToString());
+                    int.TryParse(table.Rows[0][0].ToString(), out prod_qty);
                 }
                 return prod_qty;
             }

@@ -66,7 +66,7 @@ namespace BLL.gigade.Mgr
                 if (stocksum < out_qty)
                 {
                     //庫調
-                    int result = RFKT(ase[0], store_ivd[0], out_qty - stocksum);
+                    int result = RFKT(ase[0], store_ivd[0], out_qty - stocksum + store_ivd[0].prod_qty);
                     if (result == 100)
                     {
                         //刷新庫存信息
@@ -178,7 +178,8 @@ namespace BLL.gigade.Mgr
                 }
                 // (DateTime.TryParse(Request.Params["made_date"].ToString(), out dt))
                 {//商品製造日期
-                    q.made_dt = ivd.made_date;
+                    //q.made_dt = ivd.made_date;
+                    q.made_dt = new DateTime(3000,1,1);
                 }
                 //if (int.TryParse(Request.Params["prod_qty"].ToString(), out sun))
                 {//商品原有數量
@@ -210,14 +211,14 @@ namespace BLL.gigade.Mgr
                 else
                 {
                     Proitems.Item_Stock = q.pnum - q.qty_o;
-                    result = _iagDao.addIialgIstock(q);
+                    result = _iagDao.addIialgIstock_AutoMarket(q);
                     if (result == 2)
                     {
                         json = "{success:true,msg:2}";
                     }
                     if (result == 100)
                     {
-                        _proditemMgr.UpdateItemStock(Proitems, path, call);
+                        //_proditemMgr.UpdateItemStock(Proitems, path, call);
                         json = "{success:true,msg:100}";
                     }
                 }

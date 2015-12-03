@@ -238,7 +238,7 @@ Ext.onReady(function () {
             { header: "創建時間", dataIndex: 'create_dtim', width: 120, align: 'center' }
         ],
         tbar: [
-           { xtype: 'button', text: "待撿貨商品匯出PDF", id: 'outExcel', icon: '../../../Content/img/icons/excel.gif', handler: outExcel }
+           { xtype: 'button', text: "總量撿貨報表匯出PDF", id: 'outExcel', icon: '../../../Content/img/icons/excel.gif', handler: outExcel }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: AseldStore,

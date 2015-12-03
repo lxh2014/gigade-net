@@ -152,16 +152,5 @@ namespace BLL.gigade.Mgr
               throw new Exception("ArrivalNoticeMgr-->UpArrivaleNoticeStatus-->" + ex.Message, ex);
           }
       }
-      public Dictionary<int, int> GetNoticeGoods(ArrivalNotice query)
-      {
-          try
-          {
-               return _IArrivalNoticeDao.GetNoticeGoods(query);
-          }
-          catch (Exception ex)
-          {
-             throw new Exception("ArrivalNoticeMgr-->GetNoticeGoods-->" + ex.Message, ex);
-          }
-      }
     }
 }
