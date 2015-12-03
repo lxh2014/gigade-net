@@ -1,4 +1,4 @@
-﻿pageSize = 18;
+﻿pageSize = 20;
 Ext.define('gigade.OrderDetial', {
     extend: 'Ext.data.Model',
     fields: [
@@ -161,6 +161,17 @@ Ext.onReady(function () {
 })
 
 OnCategoryDetialExport = function () {
+    //var category_id = document.getElementById('category_id').value;
+    //var category_name = document.getElementById('category_name').value;
+    //var category_status = document.getElementById('category_status').value;
+    //var date_stauts = document.getElementById('date_stauts').value;
+    //var date_start = document.getElementById('date_start').value;
+    //var date_end = document.getElementById('date_end').value;
+    //window.open("/Order/CategoryDetialExport?category_id=" + category_id + "&category_name=" + category_name
+    //    + "&category_status=" + category_status
+    //    + "&date_stauts=" + date_stauts
+    //    + "&date_start=" + date_start
+    //    + "&date_end=" + date_end);
     Ext.MessageBox.show({
         msg: 'Loading....',
         wait: true
@@ -189,6 +200,17 @@ OnCategoryDetialExport = function () {
     });
 }
 OnOrderDetialExport = function () {
+   //var category_id = document.getElementById('category_id').value;
+   //var category_name = document.getElementById('category_name').value;
+   //var category_status = document.getElementById('category_status').value;
+   //var date_stauts = document.getElementById('date_stauts').value;
+   //var date_start = document.getElementById('date_start').value;
+   //var date_end = document.getElementById('date_end').value;
+   //window.open("/Order/OrderDetialExport?category_id=" + category_id + "&category_name=" + category_name
+   //    + "&category_status=" + category_status
+   //    + "&date_stauts=" + date_stauts
+   //    + "&date_start=" + date_start
+   //    + "&date_end=" + date_end);
     Ext.MessageBox.show({
         msg: 'Loading....',
         wait: true
@@ -220,7 +242,15 @@ OnOrderDetialExport = function () {
 function change(value) {
     value = value.toString();
     if (/^\d+$/.test(value)) {
-        value = value.replace(/^(\d+)(\d{3})$/, "$1,$2");
+        if (value.length > 9) {
+            value = value.replace(/^(\d+)(\d{3})(\d{3})(\d{3})$/, "$1,$2,$3,$4");
+        }
+        else if (value.length > 6) {
+            value = value.replace(/^(\d+)(\d{3})(\d{3})$/, "$1,$2,$3");
+        }
+        else {
+            value = value.replace(/^(\d+)(\d{3})$/, "$1,$2");
+        }
     }
     return value;
 }

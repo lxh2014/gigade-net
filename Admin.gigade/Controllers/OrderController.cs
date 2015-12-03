@@ -1715,7 +1715,8 @@ namespace Admin.gigade.Controllers
 
                         foreach (var item in parentList1)
                         {
-                            productTotal += uint.Parse((item.product_cost * item.buynum).ToString());
+                            var totalPrice = item.Event_Item_Money == 0 ? item.product_cost : item.Event_Item_Money;//add by zhuoqin0830w 2015/12/02  判斷是否使用活動價
+                            productTotal += uint.Parse((totalPrice * item.buynum).ToString());
 
                             productItemMapMgr = new ProductItemMapMgr(connectionString);
                             ProductItemMap pMap = productItemMapMgr.QueryAll(new ProductItemMap { channel_id = uint.Parse(combChannelId.ToString()), channel_detail_id = item.coop_product_id }).FirstOrDefault();
@@ -1805,7 +1806,8 @@ namespace Admin.gigade.Controllers
 
                         foreach (var item in singleList1)
                         {
-                            productTotal += uint.Parse((item.product_cost * item.buynum).ToString());
+                            var totalPrice = item.Event_Item_Money == 0 ? item.product_cost : item.Event_Item_Money;//add by zhuoqin0830w 2015/12/02  判斷是否使用活動價
+                            productTotal += uint.Parse((totalPrice * item.buynum).ToString());
                         }
                         #endregion
                         break;
@@ -1832,7 +1834,8 @@ namespace Admin.gigade.Controllers
                             foreach (var item in singleList)
                             {
                                 //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
-                                productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
+                                var totalPrice = item.Event_Item_Money == 0 ? item.product_cost : item.Event_Item_Money;//add by zhuoqin0830w 2015/12/02  判斷是否使用活動價
+                                productTotal += uint.Parse((totalPrice * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
                                 // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
                                 deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
                                 deduct_welfareTotal += uint.Parse(item.deduct_welfare.ToString());
@@ -1854,7 +1857,8 @@ namespace Admin.gigade.Controllers
                             foreach (var item in priceSelfList)
                             {
                                 //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
-                                productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
+                                var totalPrice = item.Event_Item_Money == 0 ? item.product_cost : item.Event_Item_Money;//add by zhuoqin0830w 2015/12/02  判斷是否使用活動價
+                                productTotal += uint.Parse((totalPrice * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
 
                                 // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
                                 deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
@@ -1890,7 +1894,8 @@ namespace Admin.gigade.Controllers
                                 var TotalPrice = 0.0;
                                 var TotalCost = 0.0;
                                 //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
-                                productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
+                                var totalPrice = item.Event_Item_Money == 0 ? item.product_cost : item.Event_Item_Money;//add by zhuoqin0830w 2015/12/02  判斷是否使用活動價
+                                productTotal += uint.Parse((totalPrice * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
 
                                 // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
                                 deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
@@ -2080,11 +2085,11 @@ namespace Admin.gigade.Controllers
                             foreach (var item in odcList2.FindAll(m => (m.parent_id == 0 && m.Item_Id == 0) || (m.Item_Id != 0 && m.parent_id == 0)))
                             {
                                 //使 總價  減去 抵用金 和 購物金  edit by zhuoqin0830w  2015/05/14
-                                productTotal += uint.Parse((item.product_cost * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
+                                var totalPrice = item.Event_Item_Money == 0 ? item.product_cost : item.Event_Item_Money;//add by zhuoqin0830w 2015/12/02  判斷是否使用活動價
+                                productTotal += uint.Parse((totalPrice * item.buynum - item.deduct_bonus - item.deduct_welfare).ToString());
                                 // 計算 購物金 和 抵用金  的 總和  add by zhuoqin0830w  2015/05/14
                                 deduct_bonusTotal += uint.Parse(item.deduct_bonus.ToString());
                                 deduct_welfareTotal += uint.Parse(item.deduct_welfare.ToString());
-
                                 acc_bonusTotal += uint.Parse(item.accumulated_bonus.ToString());
                             }
                         }
@@ -3847,6 +3852,9 @@ namespace Admin.gigade.Controllers
                 DataTable dtHZ = GetTableHead(store);
                 string[] colname = new string[dtHZ.Columns.Count];
                 string filename = query.category_id + query.category_name + "-訂單明細" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                //MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "");
+                //Response.AddHeader("Content-Disposition", "attach-ment;filename=" + filename);
+                //Response.BinaryWrite(ms.ToArray());
                 newExcelName = Server.MapPath(excelPath_export) + filename;
                 for (int i = 0; i < dtHZ.Columns.Count; i++)
                 {
@@ -3929,9 +3937,6 @@ namespace Admin.gigade.Controllers
                     System.IO.File.Delete(newExcelName);
                 }
                 ExcelHelperXhf.ExportDTtoExcel(dtHZ, "", newExcelName);
-                //MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "");
-                //Response.AddHeader("Content-Disposition", "attach-ment;filename=" + filename);
-                //Response.BinaryWrite(ms.ToArray());
                 json = "{success:true,ExcelName:\'" + filename + "\'}";
             }
             catch (Exception ex)
@@ -3958,7 +3963,8 @@ namespace Admin.gigade.Controllers
             dt.Columns.Add("付款方式", typeof(String));
             dt.Columns.Add("購買金額", typeof(String));
             dt.Columns.Add("付款狀態", typeof(String));
-            dt.Columns.Add("商品細項編號", typeof(String));
+            dt.Columns.Add("商品細項編號", typeof(int));
+            dt.Columns.Add("商品編號", typeof(String));
             dt.Columns.Add("訂單狀態", typeof(String)); 
             dt.Columns.Add("品名", typeof(String));
             dt.Columns.Add("商品類型", typeof(String));
@@ -4008,22 +4014,17 @@ namespace Admin.gigade.Controllers
                 }            
                 if (!string.IsNullOrEmpty(dr_v["item_id"].ToString()))
                 {
-                    if (dr_v["item_mode"].ToString() == "1")
-                    {
-                        dr[6] = "";
-                    }
-                    else
-                    {
-                        dr[6] = Convert.ToInt32(dr_v["item_id"].ToString());
-                    }
+                    dr[6] = Convert.ToInt32(dr_v["item_id"].ToString());
                 }
                 else
                 {
                     dr[6] = 0;
                 }
-                dr[7] = dr_v["slave_status_name"].ToString();
+                dr[7] = dr_v["product_id"].ToString();
+
+                dr[8] = dr_v["slave_status_name"].ToString();
                
-                dr[8] = dr_v["product_name"].ToString();
+                dr[9] = dr_v["product_name"].ToString();
                 string item_mode;
                 switch (dr_v["item_mode"].ToString())
                 { 
@@ -4040,107 +4041,121 @@ namespace Admin.gigade.Controllers
                         item_mode = "";
                         break;
                 }
-                dr[9] = item_mode;
+                dr[10] = item_mode;
                 if (!string.IsNullOrEmpty(dr_v["buy_num"].ToString()))
                 {
-                    if (dr[9].ToString() == "父商品" || dr[9].ToString() == "單一商品")
+                    if (dr[10].ToString() == "父商品" || dr[10].ToString() == "單一商品")
                     {
-                        dr[10] = Convert.ToInt32(dr_v["buy_num"].ToString());
+                        dr[11] = Convert.ToInt32(dr_v["buy_num"].ToString());
                     }
                     else
                     {
-                        for (int j = 1; j < i; j++)
+                        for (int j = 1; j <= i; j++)
                         {
-                            if (dt.Rows[i - j][9].ToString() == "父商品" && store.Rows[i - j]["order_id"].ToString() == dr_v["order_id"].ToString())
+                            if (dt.Rows[i - j][10].ToString() == "父商品" && store.Rows[i - j]["order_id"].ToString() == dr_v["order_id"].ToString())
                             {
-                                dr[10] = Convert.ToInt32(dt.Rows[i - j][10].ToString()) * Convert.ToInt32(dr_v["buy_num"].ToString());
+                                dr[11] = Convert.ToInt32(dt.Rows[i - j][11].ToString()) * Convert.ToInt32(dr_v["buy_num"].ToString());
                                 break;
                             }
                             else
                             {
-                                dr[10] = Convert.ToInt32(dr_v["buy_num"].ToString());
+                                dr[11] = Convert.ToInt32(dr_v["buy_num"].ToString());
                             }
                         }
                     }
                 }
                 else
                 {
-                    dr[10] = 0;
+                    dr[11] = 0;
                 }
 
                 if (!string.IsNullOrEmpty(dr_v["single_money"].ToString()))
                 {
-                    dr[11] = Convert.ToInt32(dr_v["single_money"].ToString());
-                }
-                else
-                {
-                    dr[11] = 0;
-                }
-                if (!string.IsNullOrEmpty(dr_v["deduct_bonus"].ToString()))
-                {
-                    dr[12] = Convert.ToInt32(dr_v["deduct_bonus"].ToString());
+                    dr[12] = Convert.ToInt32(dr_v["single_money"].ToString());
                 }
                 else
                 {
                     dr[12] = 0;
                 }
-                if (!string.IsNullOrEmpty(dr_v["deduct_welfare"].ToString()))
+                if (!string.IsNullOrEmpty(dr_v["deduct_bonus"].ToString()))
                 {
-                    dr[13] = Convert.ToInt32(dr_v["deduct_welfare"].ToString());
+                    dr[13] = Convert.ToInt32(dr_v["deduct_bonus"].ToString());
                 }
                 else
                 {
                     dr[13] = 0;
                 }
-                if (!string.IsNullOrEmpty(dr_v["amount"].ToString()))
+                if (!string.IsNullOrEmpty(dr_v["deduct_welfare"].ToString()))
                 {
-                    dr[14] = Convert.ToInt32(dr_v["amount"].ToString()) - Convert.ToInt32(dr[12]) - Convert.ToInt32(dr[13]);
+                    dr[14] = Convert.ToInt32(dr_v["deduct_welfare"].ToString());
                 }
                 else
                 {
                     dr[14] = 0;
                 }
-               
-                if (!string.IsNullOrEmpty(dr_v["single_cost"].ToString()))
+                if (!string.IsNullOrEmpty(dr_v["amount"].ToString()))
                 {
-                    dr[15] = Convert.ToInt32(dr_v["single_cost"].ToString());
+                    dr[15] = Convert.ToInt32(dr_v["amount"].ToString()) - Convert.ToInt32(dr[13]) - Convert.ToInt32(dr[14]);
                 }
                 else
                 {
                     dr[15] = 0;
                 }
-                if (!string.IsNullOrEmpty(dr_v["event_cost"].ToString()))
+
+                if (!string.IsNullOrEmpty(dr_v["single_cost"].ToString()))
                 {
-                    dr[16] = Convert.ToInt32(dr_v["event_cost"].ToString());
+                    if (dr[10].ToString() == "子商品")//子商品的成本單價=成本单价/數量
+                    {
+                        dr[16] = Convert.ToInt32(dr_v["single_cost"].ToString())/Convert.ToInt32(dr[11].ToString());
+                    }
+                    else
+                    {
+                        dr[16] = Convert.ToInt32(dr_v["single_cost"].ToString());
+                    }
                 }
                 else
                 {
                     dr[16] = 0;
                 }
-                if (!string.IsNullOrEmpty(dr_v["bag_check_money"].ToString()))
+                if (!string.IsNullOrEmpty(dr_v["event_cost"].ToString()))
                 {
-                    dr[17] = Convert.ToInt32(dr_v["bag_check_money"].ToString());
+                    dr[17] = Convert.ToInt32(dr_v["event_cost"].ToString());
                 }
                 else
                 {
                     dr[17] = 0;
                 }
-                if (!string.IsNullOrEmpty(dr_v["cost_amount"].ToString()))
+                if (!string.IsNullOrEmpty(dr_v["bag_check_money"].ToString()))
                 {
-                    dr[18] = Convert.ToInt32(dr_v["cost_amount"].ToString());
+                    dr[18] = Convert.ToInt32(dr_v["bag_check_money"].ToString());
                 }
                 else
                 {
                     dr[18] = 0;
                 }
+                if (!string.IsNullOrEmpty(dr_v["cost_amount"].ToString()))
+                {
+                    if (dr[10].ToString() == "子商品")//子商品的成本總額=成本單價*購買數量
+                    {
+                        dr[19] = Convert.ToInt32(dr[16].ToString()) * Convert.ToInt32(dr[11].ToString());
+                    }
+                    else
+                    {
+                        dr[19] = Convert.ToInt32(dr_v["cost_amount"].ToString());
+                    }
+                }
+                else
+                {
+                    dr[19] = 0;
+                }
                 if (!string.IsNullOrEmpty(dr_v["slave_date_close_format"].ToString()))
                 {
                     DateTime slave_date_close = Convert.ToDateTime(dr_v["slave_date_close_format"].ToString());
-                    dr[19] = slave_date_close == Convert.ToDateTime("1/1/1970 8:00:00 AM") ? "未歸檔" : CommonFunction.DateTimeToString(slave_date_close);
+                    dr[20] = slave_date_close == Convert.ToDateTime("1/1/1970 8:00:00 AM") ? "未歸檔" : CommonFunction.DateTimeToString(slave_date_close);
                 }
-                dr[20] = dr_v["product_mode_name"].ToString();
-                dr[21] = dr_v["delivery_name"].ToString();
-                dr[22] = dr_v["delivery_address"].ToString();
+                dr[21] = dr_v["product_mode_name"].ToString();
+                dr[22] = dr_v["delivery_name"].ToString();
+                dr[23] = dr_v["delivery_address"].ToString();
                 dt.Rows.Add(dr);
             }
             return dt;

@@ -79,7 +79,7 @@ namespace Admin.gigade.Controllers
                 if(!string.IsNullOrEmpty(Request.Params["serchType"] ))
                 {
                     int serchType=int.Parse(Request.Params["serchType"]);
-                    if (!string.IsNullOrEmpty(Request.Params["serchName"]))
+                    if (!string.IsNullOrEmpty(Request.Params["serchName"].Trim()))
                     {
                         switch (serchType)
                         {

@@ -151,7 +151,11 @@ var DDLStore = Ext.create('Ext.data.Store', {
     { "txt": "手機號碼", "value": "3" },
     { "txt": "會員編號", "value": "4" },
     { "txt": "市話", "value": "5" },
-    { "txt": "地址", "value": "6" }
+    { "txt": "地址", "value": "6" },
+    //Edit Start
+    //Add by yuwei1015j 2015-12-02
+    { "txt": "會員等級", "value": "7" }
+    //Edit End
     ]
 });
 

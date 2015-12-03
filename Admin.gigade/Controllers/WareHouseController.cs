@@ -12390,7 +12390,7 @@ namespace Admin.gigade.Controllers
             BaseFont bf = BaseFont.CreateFont("C:\\WINDOWS\\Fonts\\simsun.ttc,1", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
             iTextSharp.text.Font fontChinese = new iTextSharp.text.Font(bf, 8, iTextSharp.text.Font.UNDERLINE, iTextSharp.text.BaseColor.RED);
             iTextSharp.text.Font font = new iTextSharp.text.Font(bf, 12, iTextSharp.text.Font.BOLD, new iTextSharp.text.BaseColor(0, 0, 0));//黑  
-            string filename = "待撿貨商品報表" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            string filename = "總量撿貨報表" + DateTime.Now.ToString("yyyyMMddHHmmss");
             Document document = new Document(PageSize.A4.Rotate());
             string newPDFName = Server.MapPath(excelPath) + filename;
             PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(newPDFName, FileMode.Create));
@@ -12690,18 +12690,32 @@ namespace Admin.gigade.Controllers
 
                         if (Store.Count > 0)
                         {
+                            int crorow = 0;
                             for (int i = 0; i < Store.Count; i++)
                             {
                                 DataRow row = _dtBody.NewRow();
                                 if (Store[i].prod_qty > P_num)
                                 {
-                                    row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
-                                    row["條碼"] = upc_id;
-                                   // row["規格"] = rows["spec"];
-                                    row["訂貨量"] = rows["ord_qty"];
-                                    row["已檢貨量"] = rows["act_pick_qty"];
-                                    row["待檢貨量"] = rows["out_qty"];
-                                    row["料位編號"] = rows["loc_id"]; 
+                                    if (crorow != 0)
+                                    {
+                                        row["商品名稱"] = "";
+                                        row["條碼"] = "";
+                                        // row["規格"] = rows["spec"];
+                                        row["訂貨量"] = "";
+                                        row["已檢貨量"] = "";
+                                        row["待檢貨量"] = "";
+                                        row["料位編號"] = "";
+                                    }
+                                    else
+                                    {
+                                        row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
+                                        row["條碼"] = upc_id;
+                                        // row["規格"] = rows["spec"];
+                                        row["訂貨量"] = rows["ord_qty"];
+                                        row["已檢貨量"] = rows["act_pick_qty"];
+                                        row["待檢貨量"] = rows["out_qty"];
+                                        row["料位編號"] = rows["loc_id"];
+                                    }
                                     row["製造日期"] = string.IsNullOrEmpty(Store[i].made_date.ToString()) ? " " : Store[i].made_date.ToString("yyyy/MM/dd");
                                     row["有效日期"] = string.IsNullOrEmpty(Store[i].cde_dt.ToString()) ? " " : Store[i].cde_dt.ToString("yyyy/MM/dd");
                                     row["檢貨庫存"] = P_num;
@@ -12717,13 +12731,26 @@ namespace Admin.gigade.Controllers
                                 }
                                 else
                                 {
-                                    row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
-                                    row["條碼"] = upc_id;
-                                    //row["規格"] = rows["spec"];
-                                    row["訂貨量"] = rows["ord_qty"];
-                                    row["已檢貨量"] = rows["act_pick_qty"];
-                                    row["待檢貨量"] = rows["out_qty"];
-                                    row["料位編號"] = rows["loc_id"];
+                                    if (crorow != 0)
+                                    {
+                                        row["商品名稱"] = "";
+                                        row["條碼"] = "";
+                                        // row["規格"] = rows["spec"];
+                                        row["訂貨量"] = "";
+                                        row["已檢貨量"] = "";
+                                        row["待檢貨量"] = "";
+                                        row["料位編號"] = "";
+                                    }
+                                    else
+                                    {
+                                        row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
+                                        row["條碼"] = upc_id;
+                                        //row["規格"] = rows["spec"];
+                                        row["訂貨量"] = rows["ord_qty"];
+                                        row["已檢貨量"] = rows["act_pick_qty"];
+                                        row["待檢貨量"] = rows["out_qty"];
+                                        row["料位編號"] = rows["loc_id"];
+                                    }
                                     row["製造日期"] = string.IsNullOrEmpty(Store[i].made_date.ToString()) ? " " : Store[i].made_date.ToString("yyyy/MM/dd");
                                     row["有效日期"] = string.IsNullOrEmpty(Store[i].cde_dt.ToString()) ? " " : Store[i].cde_dt.ToString("yyyy/MM/dd");
                                     row["檢貨庫存"] = Store[i].prod_qty;
@@ -12734,6 +12761,7 @@ namespace Admin.gigade.Controllers
                                     row["備註"] = " ";
                                     _dtBody.Rows.Add(row);
                                     P_num -= Store[i].prod_qty;
+                                    crorow++;
                                     if (P_num == 0)
                                         break;
                                 }
@@ -13008,18 +13036,32 @@ namespace Admin.gigade.Controllers
 
                             if (Store.Count > 0)
                             {
+                                int crorow = 0;
                                 for (int i = 0; i < Store.Count; i++)
                                 {
                                     DataRow row = _dtBody.NewRow();
                                     if (Store[i].prod_qty > P_num)
                                     {
-                                        row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
-                                        row["條碼"] = upc_id;
-                                        // row["規格"] = rows["spec"];
-                                        row["訂貨量"] = rows["ord_qty"];
-                                        row["已檢貨量"] = rows["act_pick_qty"];
-                                        row["待檢貨量"] = rows["out_qty"];
-                                        row["料位編號"] = rows["loc_id"];
+                                        if (crorow != 0)
+                                        {
+                                            row["商品名稱"] = "";
+                                            row["條碼"] = "";
+                                            // row["規格"] = rows["spec"];
+                                            row["訂貨量"] = "";
+                                            row["已檢貨量"] = "";
+                                            row["待檢貨量"] = "";
+                                            row["料位編號"] = "";
+                                        }
+                                        else
+                                        {
+                                            row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
+                                            row["條碼"] = upc_id;
+                                            // row["規格"] = rows["spec"];
+                                            row["訂貨量"] = rows["ord_qty"];
+                                            row["已檢貨量"] = rows["act_pick_qty"];
+                                            row["待檢貨量"] = rows["out_qty"];
+                                            row["料位編號"] = rows["loc_id"];
+                                        }
                                         row["製造日期"] = string.IsNullOrEmpty(Store[i].made_date.ToString()) ? " " : Store[i].made_date.ToString("yyyy/MM/dd");
                                         row["有效日期"] = string.IsNullOrEmpty(Store[i].cde_dt.ToString()) ? " " : Store[i].cde_dt.ToString("yyyy/MM/dd");
                                         row["檢貨庫存"] = P_num;
@@ -13030,13 +13072,26 @@ namespace Admin.gigade.Controllers
                                     }
                                     else
                                     {
-                                        row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
-                                        row["條碼"] = upc_id;
-                                        //row["規格"] = rows["spec"];
-                                        row["訂貨量"] = rows["ord_qty"];
-                                        row["已檢貨量"] = rows["act_pick_qty"];
-                                        row["待檢貨量"] = rows["out_qty"];
-                                        row["料位編號"] = rows["loc_id"];
+                                        if (crorow != 0)
+                                        {
+                                            row["商品名稱"] = "";
+                                            row["條碼"] = "";
+                                            // row["規格"] = rows["spec"];
+                                            row["訂貨量"] = "";
+                                            row["已檢貨量"] = "";
+                                            row["待檢貨量"] = "";
+                                            row["料位編號"] = "";
+                                        }
+                                        else
+                                        {
+                                            row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
+                                            row["條碼"] = upc_id;
+                                            //row["規格"] = rows["spec"];
+                                            row["訂貨量"] = rows["ord_qty"];
+                                            row["已檢貨量"] = rows["act_pick_qty"];
+                                            row["待檢貨量"] = rows["out_qty"];
+                                            row["料位編號"] = rows["loc_id"];
+                                        }
                                         row["製造日期"] = string.IsNullOrEmpty(Store[i].made_date.ToString()) ? " " : Store[i].made_date.ToString("yyyy/MM/dd");
                                         row["有效日期"] = string.IsNullOrEmpty(Store[i].cde_dt.ToString()) ? " " : Store[i].cde_dt.ToString("yyyy/MM/dd");
                                         row["檢貨庫存"] = Store[i].prod_qty;
@@ -13046,6 +13101,7 @@ namespace Admin.gigade.Controllers
                                         //  row["創建時間"] = rows["create_dtim"];
                                         row["備註"] = " ";
                                         _dtBody.Rows.Add(row);
+                                        crorow++;
                                         P_num -= Store[i].prod_qty;
                                         if (P_num == 0)
                                             break;
@@ -13117,7 +13173,7 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("待撿貨商品報表", new iTextSharp.text.Font(bf, 18)));
+                cell = new PdfPCell(new Phrase("總量檢貨報表", new iTextSharp.text.Font(bf, 18)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;
                 cell.Colspan = 5;
                 cell.DisableBorderSide(1);

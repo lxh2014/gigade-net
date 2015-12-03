@@ -21,7 +21,7 @@ namespace Admin.gigade.Controllers
         private static readonly string mySqlConnectionString = System.Configuration.ConfigurationManager.AppSettings["MySqlConnectionString"].ToString();
         public EdmContentNewMgr _edmcontentMgr;
         public IProductItemImplMgr _productItemMgr;
-        public IArrivalNoticeImplMgr _arrivalMgr;
+        BLL.gigade.Mgr.ProductItemMgr productItemMgr = new BLL.gigade.Mgr.ProductItemMgr(mySqlConnectionString);
         IParametersrcImplMgr _paraMgr;
         public ActionResult Index()
         {
@@ -249,7 +249,6 @@ namespace Admin.gigade.Controllers
         {
             bool result = false;
             _productItemMgr = new ProductItemMgr(mySqlConnectionString);
-            _arrivalMgr = new ArrivalNoticeMgr(mySqlConnectionString);
             _paraMgr = new ParameterMgr(mySqlConnectionString);
             ProductItemQuery query = new ProductItemQuery();
             ArrivalNotice arriva = new ArrivalNotice();
@@ -369,133 +368,131 @@ namespace Admin.gigade.Controllers
                 query.sumDays = int.Parse(sumDays);
                 query.periodDays = int.Parse(periodDays);
                 query.category_ID_IN = query.category_ID_IN.TrimEnd(',');
-                DataTable _dt = _productItemMgr.GetSugestDatetable(query);
-                Dictionary<int, int> NoticeGoods = new Dictionary<int, int>();
+                query.sale_status = 100;
+                query.Is_pod = 0;
+                query.stockScope = 2;
+                query.prepaid = -1;
+                query.IsPage = false;
+                int totalCount = 0;
+
+                DataTable dt = productItemMgr.GetSuggestPurchaseInfo(query, out totalCount);
                 MailHelper mail = new MailHelper(mailModel);
-                arriva.coming_time = query.sumDays;
-                NoticeGoods = _arrivalMgr.GetNoticeGoods(arriva);
-                if (_dt.Rows.Count > 0)
+                if (dt.Rows.Count > 0)
                 {
-                    #region 把數據轉換成Html的內容
-                        DataTable dtExcel = new DataTable();
-                        dtExcel.Columns.Add("行號", typeof(String));
-                        dtExcel.Columns.Add("供應商編號", typeof(String));
-                        dtExcel.Columns.Add("供應商名稱", typeof(String));//
-                        dtExcel.Columns.Add("商品編號", typeof(String));
-                        dtExcel.Columns.Add("商品細項編號", typeof(String));
-                        dtExcel.Columns.Add("商品ERP編號", typeof(String));
-                        dtExcel.Columns.Add("商品名稱", typeof(String));
-                        dtExcel.Columns.Add("商品狀態", typeof(String));
-                        dtExcel.Columns.Add("販售狀態", typeof(String));
-                        dtExcel.Columns.Add("規格", typeof(String));
-                        // dtExcel.Columns.Add("規格二", typeof(String));
-                        dtExcel.Columns.Add("庫存量", typeof(String));
-                        dtExcel.Columns.Add("後台庫存量", typeof(String));
-                        dtExcel.Columns.Add("安全存量", typeof(String));
-                        dtExcel.Columns.Add("建議採購量", typeof(String));
-                        dtExcel.Columns.Add("補貨通知人數", typeof(String));
-                        dtExcel.Columns.Add("成本", typeof(String));
-                        dtExcel.Columns.Add("價格", typeof(String));
-                        dtExcel.Columns.Add("上架時間", typeof(String));
-                        dtExcel.Columns.Add("下架時間", typeof(String));
-                        for (int i = 0; i < _dt.Rows.Count; i++)
+                    #region 數據
+		 
+	
+                    DataTable dtExcel = new DataTable();
+                    dtExcel.Columns.Add("行號", typeof(String));
+                    dtExcel.Columns.Add("供應商編號", typeof(String));
+                    dtExcel.Columns.Add("供應商名稱", typeof(String));//
+                    dtExcel.Columns.Add("商品編號", typeof(String));
+                    dtExcel.Columns.Add("商品細項編號", typeof(String));
+                    dtExcel.Columns.Add("商品ERP編號", typeof(String));
+                    dtExcel.Columns.Add("商品名稱", typeof(String));
+                    dtExcel.Columns.Add("商品狀態", typeof(String));
+                    dtExcel.Columns.Add("販售狀態", typeof(String));
+                    dtExcel.Columns.Add("規格", typeof(String));
+                    // dtExcel.Columns.Add("規格二", typeof(String));
+                    dtExcel.Columns.Add("庫存量", typeof(String));
+                    dtExcel.Columns.Add("後台庫存量", typeof(String));
+                    dtExcel.Columns.Add("安全存量", typeof(String));
+                    dtExcel.Columns.Add("建議採購量", typeof(String));
+                    dtExcel.Columns.Add("補貨通知人數", typeof(String));
+                    dtExcel.Columns.Add("成本", typeof(String));
+                    dtExcel.Columns.Add("價格", typeof(String));
+                    dtExcel.Columns.Add("上架時間", typeof(String));
+                    dtExcel.Columns.Add("下架時間", typeof(String));
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow newRow = dtExcel.NewRow();
+                        newRow[0] = i + 1;
+                        newRow[1] = Convert.ToInt64(dt.Rows[i]["vendor_id"]);
+                        newRow[2] = dt.Rows[i]["vendor_name_full"];
+                        newRow[3] = dt.Rows[i]["product_id"];
+                        newRow[4] = dt.Rows[i]["item_id"];
+                        newRow[5] = dt.Rows[i]["erp_id"];
+                        newRow[6] = dt.Rows[i]["product_name"];
+                        newRow[7] = dt.Rows[i]["product_status_string"];
+                        newRow[8] = dt.Rows[i]["sale_name"];
+                        newRow[9] = dt.Rows[i]["spec_title_1"];
+                       
+                        newRow[10] = dt.Rows[i]["item_stock"];
+                        newRow[11] = dt.Rows[i]["iinvd_stock"];
+                        newRow[12] = dt.Rows[i]["item_alarm"];
+                        if (string.IsNullOrEmpty(dt.Rows[i]["sum_total"].ToString()))
                         {
-                            DataRow newRow = dtExcel.NewRow();
-                            newRow[0] = i + 1;
-                            newRow[1] = Convert.ToInt64(_dt.Rows[i]["vendor_id"]);
-                            newRow[2] = _dt.Rows[i]["vendor_name_full"];
-                            newRow[3] = _dt.Rows[i]["product_id"];
-                            newRow[4] = _dt.Rows[i]["item_id"];
-                            newRow[5] = _dt.Rows[i]["erp_id"];
-                            newRow[6] = _dt.Rows[i]["product_name"];
-                            newRow[7] = _dt.Rows[i]["product_status_string"];
-                            newRow[8] = _dt.Rows[i]["sale_name"];
-                            newRow[9] = string.IsNullOrEmpty(_dt.Rows[i]["spec1"].ToString()) ? "" : _dt.Rows[i]["spec1"].ToString();
-                            newRow[10] = string.IsNullOrEmpty(_dt.Rows[i]["spec1"].ToString()) ? newRow[8] : newRow[8] + " " + _dt.Rows[i]["spec2"].ToString();
-                            //  newRow[9] = dt.Rows[i]["spec2"];
-                            newRow[10] = _dt.Rows[i]["item_stock"];
-                            newRow[11] = _dt.Rows[i]["iinvd_stock"];
-                            newRow[12] = _dt.Rows[i]["item_alarm"];
-                            if (string.IsNullOrEmpty(_dt.Rows[i]["sum_total"].ToString()))
+                            newRow[13] = 0;
+                        }
+                        else
+                        {
+                            double sum_total = 0;
+                            int safe_stock_amount = 0;
+                            int item_stock = 0;
+                            int item_alarm = 0;
+                            int procurement_days = 0;
+                            if (double.TryParse(dt.Rows[i]["sum_total"].ToString(), out sum_total))
                             {
-                                newRow[13] = 0;
+                                sum_total = Convert.ToDouble(dt.Rows[i]["sum_total"]);
                             }
-                            else
+                            if (int.TryParse(dt.Rows[i]["safe_stock_amount"].ToString(), out safe_stock_amount))
                             {
-                                double sum_total = 0;
-                                int safe_stock_amount = 0;
-                                int item_stock = 0;
-                                int item_alarm = 0;
-                                int procurement_days = 0;
-                                if (double.TryParse(_dt.Rows[i]["sum_total"].ToString(), out sum_total))
-                                {
-                                    sum_total = Convert.ToDouble(_dt.Rows[i]["sum_total"]);
-                                }
-                                if (int.TryParse(_dt.Rows[i]["safe_stock_amount"].ToString(), out safe_stock_amount))
-                                {
-                                    safe_stock_amount = Convert.ToInt32(_dt.Rows[i]["safe_stock_amount"]);
-                                }
-                                if (int.TryParse(_dt.Rows[i]["item_stock"].ToString(), out item_stock))
-                                {
-                                    item_stock = Convert.ToInt32(_dt.Rows[i]["item_stock"]);
-                                }
-                                if (int.TryParse(_dt.Rows[i]["item_alarm"].ToString(), out item_alarm))
-                                {
-                                    item_alarm = Convert.ToInt32(_dt.Rows[i]["item_alarm"]);
-                                }
-                                if (int.TryParse(_dt.Rows[i]["procurement_days"].ToString(), out procurement_days))
-                                {
-                                    procurement_days = Convert.ToInt32(_dt.Rows[i]["procurement_days"]);
-                                }
-                                if (item_stock - procurement_days * sum_total / query.sumDays * query.periodDays <= item_alarm)
-                                {
-                                    //建議採購量:供應商的進貨天數*採購調整系數*近3個月的平均每周銷售數量(最小值為1)
+                                safe_stock_amount = Convert.ToInt32(dt.Rows[i]["safe_stock_amount"]);
+                            }
+                            if (int.TryParse(dt.Rows[i]["item_stock"].ToString(), out item_stock))
+                            {
+                                item_stock = Convert.ToInt32(dt.Rows[i]["item_stock"]);
+                            }
+                            if (int.TryParse(dt.Rows[i]["item_alarm"].ToString(), out item_alarm))
+                            {
+                                item_alarm = Convert.ToInt32(dt.Rows[i]["item_alarm"]);
+                            }
+                            if (int.TryParse(dt.Rows[i]["procurement_days"].ToString(), out procurement_days))
+                            {
+                                procurement_days = Convert.ToInt32(dt.Rows[i]["procurement_days"]);
+                            }
+                            if (item_stock - procurement_days * sum_total / query.sumDays * query.periodDays <= item_alarm)
+                            {
+                                //建議採購量:供應商的進貨天數*採購調整系數*近3個月的平均每周銷售數量(最小值為1)
 
-                                    double suggestPurchaseTemp = (procurement_days + safe_stock_amount) * (sum_total / query.sumDays) * query.periodDays + ((item_alarm - item_stock) > 0 ? (item_alarm - item_stock) : 0);
+                                double suggestPurchaseTemp = (procurement_days + safe_stock_amount) * (sum_total / query.sumDays) * query.periodDays + ((item_alarm - item_stock) > 0 ? (item_alarm - item_stock) : 0);
 
-                                    if (suggestPurchaseTemp <= int.Parse(_dt.Rows[i]["min_purchase_amount"].ToString()))   //最小值為1
+                                if (suggestPurchaseTemp <= int.Parse(dt.Rows[i]["min_purchase_amount"].ToString()))   //最小值為1
+                                {
+                                    newRow[13] = dt.Rows[i]["min_purchase_amount"];
+                                }
+                                else
+                                {
+                                    int suggestPurchase = Convert.ToInt32(suggestPurchaseTemp);
+                                    if (suggestPurchase < suggestPurchaseTemp)
                                     {
-                                        newRow[13] = _dt.Rows[i]["min_purchase_amount"];
+                                        newRow[13] = Convert.ToInt32(suggestPurchaseTemp) + 1;
                                     }
                                     else
                                     {
-                                        int suggestPurchase = Convert.ToInt32(suggestPurchaseTemp);
-                                        if (suggestPurchase < suggestPurchaseTemp)
-                                        {
-                                            newRow[13] = Convert.ToInt32(suggestPurchaseTemp) + 1;
-                                        }
-                                        else
-                                        {
-                                            newRow[13] = Convert.ToInt32(suggestPurchaseTemp);
-                                        }
+                                        newRow[13] = Convert.ToInt32(suggestPurchaseTemp);
                                     }
                                 }
+                            }
 
-                            }
-                            newRow[14] = 0;
-                            if (NoticeGoods.Keys.Contains(Convert.ToInt32(_dt.Rows[i]["item_id"])))
-                            {
-                                newRow[14] = NoticeGoods[Convert.ToInt32(_dt.Rows[i]["item_id"])];
-                            }
-                            newRow[15] = _dt.Rows[i]["cost"];
-                            newRow[16] = _dt.Rows[i]["price"];
-                            newRow[17] = string.IsNullOrEmpty(_dt.Rows[i]["product_start"].ToString()) ? _dt.Rows[i]["product_start"]:DateTime.Parse(_dt.Rows[i]["product_start"].ToString()).ToString("yyyy-MM-dd hh:mm:ss");
-                            newRow[18] = string.IsNullOrEmpty(_dt.Rows[i]["product_end"].ToString()) ? _dt.Rows[i]["product_end"] : DateTime.Parse(_dt.Rows[i]["product_end"].ToString()).ToString("yyyy-MM-dd hh:mm:ss");
-                            dtExcel.Rows.Add(newRow);
-                          
                         }
-                        
+                        newRow[14] = dt.Rows[i]["NoticeGoods"];
 
+                        newRow[15] = dt.Rows[i]["item_cost"];
+                        newRow[16] = dt.Rows[i]["item_money"];
+                        newRow[17] = string.IsNullOrEmpty(dt.Rows[i]["product_start"].ToString()) ? " " : DateTime.Parse(dt.Rows[i]["product_start"].ToString()).ToString("yyyy-MM-dd hh:mm:ss");
+                        newRow[18] = string.IsNullOrEmpty(dt.Rows[i]["product_end"].ToString()) ? "" : DateTime.Parse(dt.Rows[i]["product_end"].ToString()).ToString("yyyy-MM-dd hh:mm:ss");
+                        dtExcel.Rows.Add(newRow);
+
+                    }
                     #endregion
                     string EmailContent = GetMail(dtExcel);
                     mail.SendToGroup(GroupCode, MailTitle, EmailContent, true, true);//發送郵件給群組
-                   
-                }
-                else
+                }else
                 {
                     mail.SendToGroup(GroupCode, MailTitle,NOSuggestCountMsg, true, true);//發送郵件給群組 
                 }
-                result = true;
+                 result = true;
             }
             catch (Exception ex)
             {
@@ -600,6 +597,63 @@ namespace Admin.gigade.Controllers
             }
             return result;
         } 
+        #endregion
+
+        #region 拋出訂單資料給黑貓FTP add by zhaozhi0623j 20151127PM
+        /// <summary>
+        /// 拋出訂單資料給黑貓FTP
+        /// </summary>
+        /// <returns></returns>
+        public bool SendOrderInfoToBlackCatFTP() 
+        {
+            bool result = false;
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+                BLL.gigade.Mgr.Schedules.SendOrderInfoToBlackCatFTPMgr SendOrderInfoToBlackCatFTPMgr = new BLL.gigade.Mgr.Schedules.SendOrderInfoToBlackCatFTPMgr(mySqlConnectionString);
+                result = SendOrderInfoToBlackCatFTPMgr.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return result;
+        }
+
+        #endregion
+
+        #region 接收黑貓拋回之狀態
+         /// <summary>
+        /// 接收黑貓拋回之狀態//add by zhaozhi0623j 20151201PM
+        /// </summary>
+        /// <returns></returns>
+        public bool ReceiveStatusFromTCat() 
+        {
+            bool result = false;
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+                BLL.gigade.Mgr.Schedules.ReceiveStatusFromTCatMgr ReceiveStatusFromTCatMgr = new BLL.gigade.Mgr.Schedules.ReceiveStatusFromTCatMgr(mySqlConnectionString);
+                result = ReceiveStatusFromTCatMgr.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return result;
+        }
         #endregion
     }
 }
