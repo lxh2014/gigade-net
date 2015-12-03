@@ -13450,7 +13450,7 @@ namespace Admin.gigade.Controllers
                     List<IlocQuery> listiloc = ilocMgr.GetIocList(ilocquery, out total);
                     if (list.Count > 0)
                     {
-                        string lcat_id = listiloc[0].lcat_id;
+                        string lcat_id =listiloc.Count==0?"": listiloc[0].lcat_id;
                         if (lcat_id == "S")
                         {
                             string item_id = iplas.Getlocid(loc_id);
@@ -13503,7 +13503,8 @@ namespace Admin.gigade.Controllers
                                     iloc.change_user = (Session["caller"] as Caller).user_id;
                                     _IlocMgr.UpdateIlocLock(iloc);
                                 }
-                            } 
+                            }
+                            ViewBag.pwy_dte_ctl = "N";
                         }
                     }
                 }
@@ -13909,7 +13910,7 @@ namespace Admin.gigade.Controllers
                 query.loc_id = Request.Params["loc_id"].ToUpper();
                 List<IlocQuery> ilocList = new List<IlocQuery>();
                 _IlocMgr = new IlocMgr(mySqlConnectionString);
-                _iinvd = new IinvdMgr(mySqlConnectionString);
+                //_iinvd = new IinvdMgr(mySqlConnectionString);
                 if (_IlocMgr.GetIlocCount(query)!="")
                 {
                     //if (_iinvd.GetIinvdList(query.loc_id).Count > 0)
@@ -13941,10 +13942,13 @@ namespace Admin.gigade.Controllers
             string ReturnDate = "";
             try
             {
+                int item_id = 0;
                 DateTime returnDate;
                 DateTime date =Convert.ToDateTime(Request.Params["date"]);
                 string dateType = Request.Params["dateType"];
-                int item_id = int.Parse(Request.Params["item_id"]);
+                if(!int.TryParse(Request.Params["item_id"],out item_id)){
+                    return Json(new { success = result, date = ReturnDate });
+                }
                 IProductExtImplMgr productExt = new ProductExtMgr(mySqlConnectionString);
                 int Cde_dt_incr = productExt.GetCde_dt_incr(item_id);
                 if (dateType == "made")
