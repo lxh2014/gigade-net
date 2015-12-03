@@ -89,6 +89,8 @@ namespace BLL.gigade.Mgr.Impl
         string GetPara(string type, int order_status);
         string GetParaByPayment(int payment);
         DataTable GetOrderFreight(uint order_id);
+        DataTable CagegoryDetialExportInfo(OrderDetailQuery query);
         DataTable OrderDetialExportInfo(OrderDetailQuery query);
+        DataTable GetInvoiceData(uint order_id);
     }
 }

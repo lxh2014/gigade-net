@@ -824,7 +824,7 @@ namespace BLL.gigade.Mgr
                            product_id = p.parent_id == 0 ? p.Product_Id : uint.Parse(p.parent_id.ToString()),
                            user_id = 0,
                            user_level = 1,
-                           site_id = 1,
+                           site_id = p.Site_Id,//edit by zhuoqin0830w  2015/11/16  添加站台欄位詳細查詢是哪一個站台下的價格
                            child_id = int.Parse(p.Product_Id.ToString())
                        });
                     }
@@ -835,7 +835,7 @@ namespace BLL.gigade.Mgr
                             product_id = p.Product_Id,
                             user_id = 0,
                             user_level = 1,
-                            site_id = 1,
+                            site_id = p.Site_Id,//edit by zhuoqin0830w  2015/11/16  添加站台欄位詳細查詢是哪一個站台下的價格
                             child_id = (p.parent_id == 0 && p.Item_Id == 0) ? int.Parse(p.Product_Id.ToString()) : 0
                         });
                     }
@@ -1017,7 +1017,7 @@ namespace BLL.gigade.Mgr
                                 }
                             }
                         }
-                        newDetail.Single_Money = p.product_cost; // 定價
+                        newDetail.Single_Money = p.Event_Item_Money == 0 ? p.product_cost : p.Event_Item_Money; //edit by zhuoqin0830w  2015/12/02  判斷活動價是否為0  如果為0 則 使用定價  如果不為0 則使用活動價
                         newDetail.price_master_id = p.price_master_id;
                         if (p.parent_id == 0 && p.Item_Id == 0)
                         {
@@ -1037,7 +1037,7 @@ namespace BLL.gigade.Mgr
                             newDetail.parent_num = p.buynum;
                             //單一商品會進入此方法  所以在 價格方面 不必乘以 必買數量  edit by zhuoqin0830w  2015/06/23
                             newDetail.Single_Price = (uint)pM.price;
-                            newDetail.Single_Money = (uint)p.product_cost;
+                            newDetail.Single_Money = (uint)p.Event_Item_Money == 0 ? (uint)p.product_cost : (uint)p.Event_Item_Money; // 定價
                             newDetail.Single_Cost = (uint)p.Item_Cost;
                             newDetail.Event_Cost = (uint)p.Event_Item_Cost;
                         }
@@ -1047,7 +1047,7 @@ namespace BLL.gigade.Mgr
                             newDetail.parent_num = uint.Parse((p.buynum / p.s_must_buy).ToString());
                             newDetail.Buy_Num = uint.Parse(p.s_must_buy.ToString());
                             newDetail.Single_Price = (uint)(prItem.Item_Money * p.s_must_buy);
-                            newDetail.Single_Money = (uint)(p.product_cost * p.s_must_buy);
+                            newDetail.Single_Money = (uint)p.Event_Item_Money == 0 ? (uint)(p.product_cost * p.s_must_buy) : (uint)(p.Event_Item_Money * p.s_must_buy);
                             newDetail.Single_Cost = (uint)(p.Item_Cost * p.s_must_buy);
                             newDetail.Event_Cost = (uint)(p.Event_Item_Cost * p.s_must_buy);
                         }

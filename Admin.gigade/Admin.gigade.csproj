@@ -1925,6 +1925,7 @@
     <Content Include="Scripts\Views\Manage\ManageUserAdd.js" />
     <Content Include="Scripts\Views\Manage\ManageUserEdit.js" />
     <Content Include="Scripts\Views\Manage\ManageUserList.js" />
+    <Content Include="Scripts\Views\MarketTally\AutoMarketTally.js" />
     <Content Include="Scripts\Views\MemberEvent\MemberEventEdit.js" />
     <Content Include="Scripts\Views\MemberEvent\MemberEventList.js" />
     <Content Include="Scripts\Views\MemberEvent\MemberLevelEdit.js" />
@@ -4485,6 +4486,7 @@
     <Content Include="Views\SendProduct\DeliverExpectArrival.cshtml" />
     <Content Include="Views\SendProduct\ExpectArrivalChangeLog.cshtml" />
     <Content Include="Views\Order\OrderAmountDetial.cshtml" />
+    <Content Include="Views\MarketTally\AutoMarketTally.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4699,7 +4701,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>37011</DevelopmentServerPort>
+          <DevelopmentServerPort>59673</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

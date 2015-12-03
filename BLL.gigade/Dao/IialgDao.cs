@@ -245,7 +245,7 @@ CommonFunction.DateTimeToString(q.made_dt),CommonFunction.DateTimeToString(q.cde
         }
 
         /**
-         *chaojie1124j添加于2515/08/17
+         *chaojie1124j添加于2015/08/17
          *實現RF理貨庫存不足而進行調整的功能  
          */
         public int addIialgIstock(IialgQuery q)
@@ -379,7 +379,7 @@ CommonFunction.DateTimeToString(q.made_dt),CommonFunction.DateTimeToString(q.cde
                     _dtprod_qty.Rows[0][0]=0;
                 }
                 sql.Clear();
-                sqlstr.AppendFormat("insert into istock_change(sc_trans_id,sc_cd_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_note,sc_istock_why) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')", "", "", q.item_id, 3, Convert.ToInt32(_dtprod_qty.Rows[0][0]), (q.pnum - q.qty_o), Convert.ToInt32(_dtprod_qty.Rows[0][0]) - q.qty_o + q.pnum, CommonFunction.DateTimeToString(DateTime.Now), q.create_user, "理貨庫調", 4);
+                sqlstr.AppendFormat("insert into istock_change(sc_trans_id,sc_cd_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_note,sc_istock_why) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')", q.order_id, "", q.item_id, 3, Convert.ToInt32(_dtprod_qty.Rows[0][0]), (q.pnum - q.qty_o), Convert.ToInt32(_dtprod_qty.Rows[0][0]) - q.qty_o + q.pnum, CommonFunction.DateTimeToString(DateTime.Now), q.create_user, "理貨庫調", 4);
                 mySqlCmd.CommandText = sqlstr.ToString();
 
                 mySqlCmd.ExecuteNonQuery();
@@ -394,5 +394,157 @@ CommonFunction.DateTimeToString(q.made_dt),CommonFunction.DateTimeToString(q.cde
             }
 
         }
+
+        /**
+         *僅用於快速結單  
+         */
+        public int addIialgIstock_AutoMarket(IialgQuery q)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sqlstr = new StringBuilder();
+
+            MySqlCommand mySqlCmd = new MySqlCommand();
+            MySqlConnection mySqlConn = new MySqlConnection(connStr);
+            try
+            {
+                if (mySqlConn != null && mySqlConn.State == System.Data.ConnectionState.Closed)
+                {
+                    mySqlConn.Open();
+                }
+                mySqlCmd.Connection = mySqlConn;
+                mySqlCmd.Transaction = mySqlConn.BeginTransaction();
+                mySqlCmd.CommandType = System.Data.CommandType.Text;
+                sql.AppendFormat("select pwy_dte_ctl,cde_dt_incr from product_ext where item_id='{0}';", q.item_id);//查看是否是有效期控管的商品
+                DataTable _dtProExt = _access.getDataTable(sql.ToString());
+                sql.Clear();
+                DateTime cde_dt = q.made_dt;
+                sql.AppendFormat("select iinvd.row_id from iinvd  left join iloc on iloc.loc_id=iinvd.plas_loc_id  where iinvd.item_id='{0}' and iinvd.made_date ='{1}' and iloc.lcat_id='S' and iinvd.ista_id='A' ; ", q.item_id, CommonFunction.DateTimeToString(q.made_dt).Substring(0, 10));//查詢此數據未鎖定的
+
+                DataTable _dtIinvd = _access.getDataTable(sql.ToString());
+                sql.Clear();
+                sql.AppendFormat("select iinvd.row_id from iinvd  left join iloc on iloc.loc_id=iinvd.plas_loc_id  where iinvd.item_id='{0}' and iinvd.made_date ='{1}' and iloc.lcat_id='S' and iinvd.ista_id='H' ; ", q.item_id, CommonFunction.DateTimeToString(q.made_dt).Substring(0, 10));//查詢此數據已鎖定的
+                DataTable _Iinvd = _access.getDataTable(sql.ToString());
+                sql.Clear();
+                sql.AppendFormat("select iinvd.row_id from iinvd left join iloc on iloc.loc_id=iinvd.plas_loc_id where iinvd.item_id='{0}' and iinvd.made_date ='{1}' and iloc.lcat_id='S' and iinvd.ista_id='H' ; ", q.item_id, CommonFunction.DateTimeToString(cde_dt).Substring(0, 10));//查詢今日庫存是否已鎖
+                DataTable _TodayIinvd = _access.getDataTable(sql.ToString());
+                sql.Clear();
+                sql.AppendFormat("select iinvd.row_id from iinvd left join iloc on iloc.loc_id=iinvd.plas_loc_id  where iinvd.item_id='{0}' and iinvd.made_date ='{1}' and iloc.lcat_id='S' and iinvd.ista_id='A' ; ", q.item_id, CommonFunction.DateTimeToString(cde_dt).Substring(0, 10));//查詢今日庫存是否已鎖
+                DataTable _dtTodayIinvd = _access.getDataTable(sql.ToString());
+                sql.Clear();
+                int qty_o = q.qty_o;
+                #region 新改
+                if (_dtProExt.Rows.Count > 0)//判斷是否有效期控管
+                {
+                    if (_dtProExt.Rows[0]["pwy_dte_ctl"].ToString().ToUpper().Equals("Y"))/*查询是否是有效期控管的商品*/
+                    {
+                        cde_dt = q.made_dt.AddDays(Convert.ToInt32(_dtProExt.Rows[0]["cde_dt_incr"]));//有效日期是製造日期加上有效期天數
+                    }
+                    if (_Iinvd.Rows.Count > 0)//查詢此數據已鎖定的
+                    {
+                        return 2;//進入的庫存已鎖，不能庫調
+                    }
+                    else //庫存未鎖
+                    {
+                        if (_dtIinvd.Rows.Count > 0)//存在此數據
+                        {
+                            sqlstr.AppendFormat(" update iinvd set prod_qty='{0}',change_user='{1}',change_dtim='{2}' where row_id='{3}';", q.pnum, q.create_user, CommonFunction.DateTimeToString(DateTime.Now), _dtIinvd.Rows[0][0]);//RF理貨需要的庫存
+                            mySqlCmd.CommandText = sqlstr.ToString();
+                            mySqlCmd.ExecuteNonQuery();
+                            sqlstr.Clear();
+                        }
+                        else //不存在此數據
+                        {
+                            qty_o = 0;
+                            IinvdQuery ivd = new IinvdQuery();
+                            sqlstr.AppendLine(@"insert into iinvd (lic_plt_id,dc_id,whse_id,po_id,plas_id,prod_qty,");
+                            sqlstr.AppendLine(@"rcpt_id,lot_no,hgt_used,create_user,create_dtim,");
+                            sqlstr.AppendLine(@"change_user,change_dtim,cde_dt,ista_id,receipt_dtim,");
+                            sqlstr.AppendLine(@"stor_ti,stor_hi,inv_pos_cat,qity_id,");
+                            sqlstr.AppendLine(@"plas_loc_id,item_id,plas_prdd_id,made_date) VALUES (");
+                            sqlstr.AppendFormat(@"'{0}','{1}','{2}','{3}',", ivd.lic_plt_id, ivd.dc_id, ivd.whse_id, ivd.po_id);
+                            sqlstr.AppendFormat(@"'{0}','{1}','{2}','{3}',", ivd.plas_id, q.pnum - q.qty_o, ivd.rcpt_id, ivd.lot_no);
+                            sqlstr.AppendFormat(@"'{0}','{1}','{2}','{3}',", ivd.hgt_used, q.create_user, CommonFunction.DateTimeToString(DateTime.Now), q.create_user);
+                            sqlstr.AppendFormat(@"'{0}','{1}','{2}','{3}',", CommonFunction.DateTimeToString(DateTime.Now), CommonFunction.DateTimeToString(cde_dt), "A", CommonFunction.DateTimeToString(ivd.receipt_dtim));
+                            sqlstr.AppendFormat(@"'{0}','{1}','{2}','{3}',", ivd.stor_ti, ivd.stor_hi, ivd.inv_pos_cat, ivd.qity_id);
+                            sqlstr.AppendFormat(@"'{0}','{1}','{2}','{3}');", q.loc_id.ToString().ToUpper(), q.item_id, ivd.plas_prdd_id, CommonFunction.DateTimeToString(DateTime.Now));
+                            mySqlCmd.CommandText = sqlstr.ToString();
+                            mySqlCmd.ExecuteNonQuery();
+                            sqlstr.Clear();
+                        }
+                    }
+                }
+                else //非有效期控管的商品
+                {
+                    //q.made_dt = DateTime.Now;
+                    if (_TodayIinvd.Rows.Count > 0)//非有效期控管的今天的是否鎖上
+                    {
+                        return 2;
+                    }
+                    else
+                    {
+                        if (_dtTodayIinvd.Rows.Count > 0)//有今天上架的了，那就更改
+                        {
+                            sqlstr.AppendFormat(" update iinvd set prod_qty='{0}',change_user='{1}',change_dtim='{2}' where row_id='{3}';", q.pnum, q.create_user, CommonFunction.DateTimeToString(DateTime.Now), _dtTodayIinvd.Rows[0][0]);//RF理貨需要的庫存
+                            mySqlCmd.CommandText = sqlstr.ToString();
+                            mySqlCmd.ExecuteNonQuery();
+                            sqlstr.Clear();
+                        }
+                        else
+                        {
+                            qty_o = 0;
+                            IinvdQuery ivd = new IinvdQuery();
+                            sqlstr.AppendLine(@"insert into iinvd (lic_plt_id,dc_id,whse_id,po_id,plas_id,prod_qty,");
+                            sqlstr.AppendLine(@"rcpt_id,lot_no,hgt_used,create_user,create_dtim,");
+                            sqlstr.AppendLine(@"change_user,change_dtim,cde_dt,ista_id,receipt_dtim,");
+                            sqlstr.AppendLine(@"stor_ti,stor_hi,inv_pos_cat,qity_id,");
+                            sqlstr.AppendLine(@"plas_loc_id,item_id,plas_prdd_id,made_date) VALUES (");
+                            sqlstr.AppendFormat(@"'{0}','{1}','{2}','{3}',", ivd.lic_plt_id, ivd.dc_id, ivd.whse_id, ivd.po_id);
+                            sqlstr.AppendFormat(@"'{0}','{1}','{2}','{3}',", ivd.plas_id, q.pnum - q.qty_o, ivd.rcpt_id, ivd.lot_no);
+                            sqlstr.AppendFormat(@"'{0}','{1}','{2}','{3}',", ivd.hgt_used, q.create_user, CommonFunction.DateTimeToString(DateTime.Now), q.create_user);
+                            sqlstr.AppendFormat(@"'{0}','{1}','{2}','{3}',", CommonFunction.DateTimeToString(DateTime.Now), CommonFunction.DateTimeToString(cde_dt), "A", CommonFunction.DateTimeToString(ivd.receipt_dtim));
+                            sqlstr.AppendFormat(@"'{0}','{1}','{2}','{3}',", ivd.stor_ti, ivd.stor_hi, ivd.inv_pos_cat, ivd.qity_id);
+                            sqlstr.AppendFormat(@"'{0}','{1}','{2}','{3}');", q.loc_id.ToString().ToUpper(), q.item_id, ivd.plas_prdd_id, CommonFunction.DateTimeToString(DateTime.Now));
+                            mySqlCmd.CommandText = sqlstr.ToString();
+                            mySqlCmd.ExecuteNonQuery();
+                            sqlstr.Clear();
+                        }
+                    }
+
+                }
+
+                #endregion
+                sqlstr.Append(@"insert into iialg (loc_id,item_id,iarc_id,qty_o,create_dtim,create_user,doc_no,po_id,made_dt,cde_dt,adj_qty,remarks,c_made_dt,c_cde_dt )values (");
+                sqlstr.AppendFormat(" '{0}','{1}','{2}','{3}' ", q.loc_id.ToString().ToUpper(), q.item_id, "PC", qty_o);//qty_o=0;新增的時候
+                sqlstr.AppendFormat(" ,'{0}','{1}', '{2}','{3}' ", CommonFunction.DateTimeToString(DateTime.Now), q.create_user, "", "");
+                sqlstr.AppendFormat(" ,'{0}','{1}','{2}','{3}'", CommonFunction.DateTimeToString(q.made_dt), CommonFunction.DateTimeToString(cde_dt), q.pnum - q.qty_o, "庫調:" + q.order_id);
+                sqlstr.AppendFormat(" ,'{0}','{1}');", CommonFunction.DateTimeToString(q.c_made_dt), CommonFunction.DateTimeToString(q.c_cde_dt));
+                mySqlCmd.CommandText = sqlstr.ToString();
+
+                mySqlCmd.ExecuteNonQuery();
+                sqlstr.Clear();
+                sql.AppendFormat("select sum(prod_qty) as prod_qty from iinvd where item_id='{0}' and ista_id='A'", q.item_id);
+                DataTable _dtprod_qty = _access.getDataTable(sql.ToString());
+                if (string.IsNullOrEmpty(_dtprod_qty.Rows[0][0].ToString()))
+                {
+                    _dtprod_qty.Rows[0][0] = 0;
+                }
+                sql.Clear();
+                sqlstr.AppendFormat("insert into istock_change(sc_trans_id,sc_cd_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_note,sc_istock_why) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')", q.order_id, "", q.item_id, 3, Convert.ToInt32(_dtprod_qty.Rows[0][0]), (q.pnum - q.qty_o), Convert.ToInt32(_dtprod_qty.Rows[0][0]) - q.qty_o + q.pnum, CommonFunction.DateTimeToString(DateTime.Now), q.create_user, "理貨庫調", 4);
+                mySqlCmd.CommandText = sqlstr.ToString();
+
+                mySqlCmd.ExecuteNonQuery();
+                sqlstr.Clear();
+                mySqlCmd.Transaction.Commit();
+                return 100;
+            }
+            catch (Exception ex)
+            {
+                mySqlCmd.Transaction.Rollback();
+                throw new Exception(" IialgDao-->addIialgIstock-->" + ex.Message + sql.ToString(), ex);
+            }
+
+        }
+
+
     }
 }

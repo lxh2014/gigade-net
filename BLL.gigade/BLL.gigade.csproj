@@ -801,6 +801,7 @@
     <Compile Include="Mgr\IwmsRrecordMgr.cs" />
     <Compile Include="Mgr\MailSendMgr.cs" />
     <Compile Include="Mgr\ManageLoginMgr.cs" />
+    <Compile Include="Mgr\MarketTallyMgr.cs" />
     <Compile Include="Mgr\MemberEventMgr.cs" />
     <Compile Include="Mgr\MemberLevelMgr.cs" />
     <Compile Include="Mgr\OrderAccumAmountMgr.cs" />

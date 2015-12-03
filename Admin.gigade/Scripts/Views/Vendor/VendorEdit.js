@@ -1712,10 +1712,12 @@ function editFunction(rowID) {
                 ]
             },
             {
-                xtype: "datefield",
+                xtype: "datetimefield",
                 id: 'agreement_createdate',
                 name: 'agreement_createdate',
-                format: 'Y-m-d',
+                format: 'Y-m-d H:i:s',
+                time: { hour: 00, min: 00, sec: 00 },
+                editable: false,
                 labelWidth: 120,
                 fieldLabel: '合約簽訂日期',
                 allowBlank: false,
@@ -1730,20 +1732,22 @@ function editFunction(rowID) {
                 fieldLabel: '合約期間',
                 items: [
                     {
-                        xtype: "datefield",
+                        xtype: "datetimefield",
                         id: 'agreement_start',
                         name: 'agreement_start',
-                        format: 'Y-m-d',
+                        format: 'Y-m-d H:i:s',                      
                         allowBlank: false,
-                        //editable: false,
+                        editable: false,
                         submitValue: true,
                         value: Tomorrow(),
+                        time: { hour: 00, min: 00, sec: 00 },//開始時間00：00：00
                         listeners: {
                             select: function (a, b, c) {
                                 var start = Ext.getCmp("agreement_start");
                                 var end = Ext.getCmp("agreement_end");
-                                var s_date = new Date(start.getValue());
-                                end.setValue(new Date(s_date.setFullYear(s_date.getFullYear() + 1)));
+                                if (start.getValue() > end.getValue()) {
+                                    end.setValue(setNextMonth(start.getValue(), 1));
+                                }
                             }
                         }
                     },
@@ -1752,22 +1756,23 @@ function editFunction(rowID) {
                         value: '~'
                     },
                     {
-                        xtype: "datefield",
-                        format: 'Y-m-d',
+                        xtype: "datetimefield",
+                        format: 'Y-m-d H:i:s',
+                        time: { hour: 23, min: 59, sec: 59 },
                         id: 'agreement_end',
                         // editable: false,
                         name: 'agreement_end',
                         allowBlank: false,
                         submitValue: true,
-                        value: new Date(Tomorrow().setFullYear(Tomorrow().getFullYear() + 1)),
+                        editable: false,
+                        value: setNextMonth(Tomorrow(), 1),
                         listeners: {
                             select: function (a, b, c) {
                                 var start = Ext.getCmp("agreement_start");
                                 var end = Ext.getCmp("agreement_end");
-                                if (end.getValue() < start.getValue()) {
-                                    Ext.Msg.alert(INFORMATION, '開始時間不能大於結束時間');
-                                    end.setValue(new Date(Tomorrow().setFullYear(Tomorrow().getFullYear() + 1)));
-                                }
+                                if (end.getValue() < start.getValue()) {                                   
+                                    start.setValue(setNextMonth(end.getValue(), -1));
+                                }                             
                             }
                         }
                     }
@@ -2586,13 +2591,13 @@ function editFunction(rowID) {
 
         //secondPanel
         if (row.data.agr_date !== "undefined") {
-            Ext.getCmp("agreement_createdate").setValue(row.data.agr_date.substring(0, 10));
+            Ext.getCmp("agreement_createdate").setValue(row.data.agr_date);//.substring(0, 10)
         }
         if (row.data.agr_start !== "undefined") {
-            Ext.getCmp("agreement_start").setValue(row.data.agr_start.substring(0, 10));
+            Ext.getCmp("agreement_start").setValue(row.data.agr_start);
         }
         if (row.data.agr_end !== "undefined") {
-            Ext.getCmp("agreement_end").setValue(row.data.agr_end.substring(0, 10));
+            Ext.getCmp("agreement_end").setValue(row.data.agr_end);
         }
 
         switch (row.data.checkout_type) {

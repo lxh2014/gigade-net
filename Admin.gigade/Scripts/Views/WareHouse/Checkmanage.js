@@ -63,22 +63,22 @@ Ext.onReady(function () {
             { header: "工作編號", dataIndex: 'cb_jobid', width: 150, align: 'center' },
             { header: "商品名稱", dataIndex: 'product_name', width: 180, align: 'center' },
             {
-                header: "創造日期", dataIndex: 'made_dt', width: 120, align: 'center',
-                renderer: Ext.util.Format.dateRenderer('Y-m-d'),
-                editor: {
-                    xtype: 'datefield',
-                    format: 'Y-m-d',
-                    allowBlank: false
-                }
+                header: "製造日期", dataIndex: 'made_dt', width: 120, align: 'center'//,
+                //renderer: Ext.util.Format.dateRenderer('Y-m-d'),
+                //editor: {
+                //    xtype: 'datefield',
+                //    format: 'Y-m-d',
+                //    allowBlank: false
+                //}
             },
             {
-                header: "有效日期", dataIndex: 'cde_dt', width: 120, align: 'center',
-                renderer: Ext.util.Format.dateRenderer('Y-m-d'),
-                editor: {
-                    xtype: 'datefield',
-                    format: 'Y-m-d',
-                    allowBlank: false
-                }
+                header: "有效日期", dataIndex: 'cde_dt', width: 120, align: 'center'//,
+                //renderer: Ext.util.Format.dateRenderer('Y-m-d'),
+                //editor: {
+                //    xtype: 'datefield',
+                //    format: 'Y-m-d',
+                //    allowBlank: false
+                //}
             },
             {
                 header: "庫存數量", dataIndex: 'prod_qty', width: 150, align: 'center'
@@ -188,7 +188,7 @@ Ext.onReady(function () {
                 if (e.field == "made_dt" || e.field == "cde_dt") {
                     //如果有效日期更改的話，就更新有效時間
                     if (e.record.data.sta_id == "COM" || e.record.data.sta_id == "END") {//如果已經完成盤點將不能夠再進行編輯修改
-                        Ext.Msg.alert(INFORMATION, "改行數據已經完成盤點,不能再進行編輯!");
+                        Ext.Msg.alert(INFORMATION, "該行數據已經完成盤點,不能再進行編輯!");
                         CheckmanageStore.load();
                     }
                     else {
@@ -226,7 +226,8 @@ Ext.onReady(function () {
                                                 type_id: i,
                                                 datetimeday: datetimes,
                                                 sloc_id: e.record.data.loc_id,
-                                                prod_id: e.record.data.item_id
+                                                prod_id: e.record.data.item_id,
+                                                gzbh: e.record.data.cb_jobid
                                             },
                                             success: function (response) {
                                                 var result = Ext.decode(response.responseText);

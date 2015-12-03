@@ -64,7 +64,7 @@ SPEC2 = "規格二";
 COST = "成本";
 PRICE = "定價";
 EVENT_COST = "活動成本";
-//EVENT_PRICE = "活動價";
+EVENT_PRICE = "活動售價";
 STOCK = "庫存";
 BUY_NUM = "數量";
 SUM_PRICE = "金額小計";
@@ -73,7 +73,7 @@ NORMAL_FREIGHT = "常溫運費";
 LOW_FREIGHT = "低溫運費";
 FREIGHT_FORMAT_WRONG = "運費格式不正確";
 SET_FREIGHT = "請設置運費";
-SET_CHANNEL = "請設置賣場";
+SET_CHANNEL_AND_SITE_AND_ORDER_DATE = "請設置賣場、站臺、訂單日期";
 PRODUCT_ID_WRONG = "賣場商品編號錯誤";
 INFORMATION = "提示消息";
 ADDORDER_SUCCESS = "成功生成訂單";
@@ -130,3 +130,7 @@ TOTAL_PRICE_ISNULL = "總價必須為正數！";
 //add by zhuoqin0830w  2015/09/08
 ONLYONE_BONUS_OR_WELFARE = "購物金和抵用券只能擇一使用!";
 BOUNS_OR_WELFARE_IS_NO_PRICE = "不能大於該商品的售價！";
+
+//add by zhuoqin0830w  2015/11/12
+USERID = "會員編號";
+USEREMAIL = "會員郵箱";

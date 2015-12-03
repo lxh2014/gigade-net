@@ -148,7 +148,8 @@
                 name: 'prod_qty',
                 id: 'prod_qty',
                 labelWidth: 120,
-                hidden:true,
+                hidden: true,
+                allowDecimals: false,
                 minValue: 1,
                 allowBlank:false
             },

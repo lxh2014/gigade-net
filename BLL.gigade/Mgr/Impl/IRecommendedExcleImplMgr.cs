@@ -12,17 +12,17 @@ namespace BLL.gigade.Mgr.Impl
     public interface IRecommendedExcleImplMgr
     {
         //導出會員
-        List<MemoryStream> GetVipUserInfo(RecommendedOutPra rop, string sheetname);
+        DataTable GetVipUserInfo(RecommendedOutPra rop, string sheetname);
         //導出商品
-        List<MemoryStream> GetProductInfo(RecommendedOutPra rop, string sheetname);
+        DataTable GetProductInfo(RecommendedOutPra rop, string sheetname);
         //導出訂單
-        List<MemoryStream> GetOrderInfo(RecommendedOutPra rop, string sheetname);
+        DataTable GetOrderInfo(RecommendedOutPra rop, string sheetname);
         //導出訂單內容
-        List<MemoryStream> GetOrderDetailInfo(RecommendedOutPra rop, string sheetname);
+        DataTable GetOrderDetailInfo(RecommendedOutPra rop, string sheetname);
         //導出類別
-        List<MemoryStream> GetCategoryInfo(RecommendedOutPra rop, string sheetname);
+        DataTable GetCategoryInfo(RecommendedOutPra rop, string sheetname);
         //導出品牌
-        List<MemoryStream> GetBrandInfo(RecommendedOutPra rop, string sheetname);
+        DataTable GetBrandInfo(RecommendedOutPra rop, string sheetname);
         //構造Excle大於60000條數據處理
         List<MemoryStream> BuildRecommendedExcleOutBigInfo(DataTable dt, string NameListStr);
         //構造Excle

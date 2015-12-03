@@ -12,6 +12,7 @@ using BLL.gigade.Common;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using DBAccess;
+using System.Data;
 
 namespace BLL.gigade.Mgr
 {
@@ -81,15 +82,24 @@ namespace BLL.gigade.Mgr
        //判断是新增 还是 编辑 
        public int SaveEdmGroupNewAdd(EdmGroupNewQuery query)
        {
-           if (query.group_id == 0)//新增
+           try
            {
-               return _edmgroupdao.EdmGroupNewInsert(query);
+               if (query.group_id == 0)//新增
+               {
+                   return _edmgroupdao.EdmGroupNewInsert(query);
+               }
+               else//編輯
+               {
+                   return _edmgroupdao.EdmGroupNewUpdate(query);
+               }
            }
-           else//編輯
+           catch (Exception ex)
            {
-               return _edmgroupdao.EdmGroupNewUpdate(query);
+               throw new Exception("EdmGroupNewMgr-->SaveEdmGroupNewAdd-->" + ex.Message);
            }
        }
+
+     
   
     }
 }

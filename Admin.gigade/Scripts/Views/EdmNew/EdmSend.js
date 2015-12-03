@@ -19,7 +19,6 @@
         }
     });
 
-
     Ext.define('gigade.email_group', {
         extend: 'Ext.data.Model',
         fields: [
@@ -39,10 +38,6 @@
             }
         }
     });
-
-
-
-
     var importanceStore = Ext.create('Ext.data.Store', {
         fields: ['txt', 'value'],
         data: [
@@ -487,6 +482,14 @@
                                                         fieldLabel: 'template_data',
                                                         hidden: true,
                                            },
+                                             {
+                                                 xtype: 'displayfield',
+                                                 id: 'template_id',
+                                                 name: 'template_id',
+                                                 fieldLabel: '模板編號',
+                                                 hidden: true,
+                                             },
+                                           
 
                                              {
                                                  xtype: 'displayfield',
@@ -535,7 +538,7 @@
                                                           subject: Ext.getCmp('subject').getValue(),
                                                           body: Ext.getCmp('template_data_send').getValue(),
                                                           test_send_list: Ext.getCmp('test_send_list').getValue(),
-
+                                                          template_id: Ext.getCmp('template_id').getValue(),
                                                       },
                                                       success: function (form, action) {
                                                           myMask.hide();
@@ -574,6 +577,7 @@
                                      allowBlank: false,
                                      allowBlank: false,
                                      format: 'Y-m-d H:i:s',
+                                     time: { hour: 00, min: 00, sec: 00 },
                                      value: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1),
                                      listeners: {
                                          select: function () {
@@ -582,7 +586,7 @@
                                              var nowDate = Ext.htmlEncode(Ext.Date.format(new Date(), 'Y-m-d H:i:s'));
                                              var sdTime = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('schedule_date').getValue()), 'Y-m-d H:i:s'));
                                              if (sdTime <= nowDate) {
-                                                 var new_time = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1, new Date().getHours(), new Date().getMinutes(), new Date().getMilliseconds());
+                                                 var new_time = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1, 00, 00, 00);
                                                  sd.setValue(new_time);
                                                  if (sd.getValue() >= ed.getValue()) {
                                                      var new_time2 = new Date(sd.getValue().getFullYear(), sd.getValue().getMonth(), sd.getValue().getDate() + 1);
@@ -754,6 +758,7 @@
                                                   extra_no_send: Ext.getCmp('extra_no_send').getValue(),
                                                   is_outer: Ext.getCmp('checkbox1').getValue(),
                                                   email_group_id: Ext.getCmp('email_group_id').getValue(),
+                                                  template_id: Ext.getCmp('template_id').getValue(),
                                               },
                                               success: function (form, action) {
                                                   myMask.hide();
@@ -823,6 +828,8 @@
                 Ext.getCmp('group_id').setValue(row.data.group_id);
                 Ext.getCmp('subject').setValue(row.data.subject);
                 Ext.getCmp('template_data_send').setValue(row.data.template_data_send);
+                Ext.getCmp('template_id').setValue(row.data.template_id);
+                
             }
         }
     });

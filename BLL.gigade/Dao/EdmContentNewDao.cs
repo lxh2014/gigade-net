@@ -31,7 +31,7 @@ namespace BLL.gigade.Dao
                 sqlCount.AppendFormat("select count(edn.content_id) as countTotal ");
                 sql.AppendFormat("select edn.content_id,edn.group_id,`subject`,esl.count,esl.date,edn.sender_id,ms.sender_email,ms.sender_name,edn.importance,edn.template_id,edn.template_data,'' as 'template_data_send', et.edit_url,et.content_url , edn.pm,  para.parameterName 'edm_pm'  ");
                 sqlFrom.AppendFormat("from edm_content_new edn LEFT JOIN  (SELECT content_id,COUNT(content_id) as count,MAX(schedule_date) as date from edm_send_log WHERE test_send=0 GROUP BY content_id)  esl ON edn.content_id=esl.content_id LEFT JOIN mail_sender ms on edn.sender_id=ms.sender_id LEFT JOIN edm_template et on et.template_id=edn.template_id ");
-                sqlFrom.Append(" left join (select  parameterCode,parameterName from t_parametersrc where parameterType='edm_pm_name') para on edn.pm=para.parameterCode    ");
+                sqlFrom.Append(" left join (select  parameterCode,parameterName from t_parametersrc where parameterType='edm_pm_name' and used=1) para on edn.pm=para.parameterCode    ");
                 sqlWhere.AppendFormat(" where 1=1 ");
                 sqlWhere.AppendFormat(" and edn.content_createdate between '{0}' and '{1}' ", CommonFunction.DateTimeToString(DateTime.Now.AddDays(-5)), CommonFunction.DateTimeToString(DateTime.Now));
                 if (query.group_id != 0)
@@ -76,7 +76,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.Append("select group_id,group_name from edm_group_new;");
+                sql.Append("select group_id,group_name from edm_group_new where enabled=1 order by  is_member_edm  desc, sort_order  ;");
                 return _access.getDataTableForObj<EdmGroupNew>(sql.ToString());
             }
             catch (Exception ex)
@@ -90,7 +90,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.Append("select template_id,template_name,edit_url,content_url from edm_template where enabled=1 order by  template_createdate asc;");
+                sql.Append("select template_id,template_name,edit_url,content_url from edm_template where enabled=1 order by  template_id asc;");
                 return _access.getDataTableForObj<EdmTemplate>(sql.ToString());
             }
             catch (Exception ex)
@@ -658,12 +658,57 @@ WHERE content_id='{0}'  and log_id='{1}'   AND edm_trace.count>0;", content_id, 
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("select  parameterType,parameterCode,parameterName from t_parametersrc where parameterType='{0}';", paraType);
+                sql.AppendFormat("select  parameterType,parameterCode,parameterName from t_parametersrc where parameterType='{0}' and used=1;", paraType);
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)
             {
                 throw new Exception("EdmContentNewDao-->GetParaStore-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetContentUrlByContentId(int content_id)
+        {
+            DataTable _dt = new DataTable();
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("select et.content_url  from edm_content_new ecn LEFT JOIN edm_template et on ecn.template_id=et.template_id where ecn.content_id='{0}';",content_id);
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetContentUrlByContentId-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetContentIDAndUrl(int group_id)
+        {
+            DataTable _dt = new DataTable();
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("select edm_template.content_url, edm_content_new.content_id,edm_content_new.template_id,edm_content_new.template_data  from edm_group_new inner join edm_content_new	on edm_group_new.group_id=edm_content_new.group_id inner join edm_send_log on edm_send_log.content_id=edm_content_new.content_id inner join edm_template on edm_content_new.template_id=edm_template.template_id where edm_group_new.group_id='{0}' order by edm_send_log.createdate desc limit 1;", group_id);
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->GetContentIDAndUrl-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+
+        public DataTable AdvanceTemplate()
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" select template_id from edm_template where template_name='預設'; ");
+                return _access.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewDao-->AdvanceTemplate-->" + sql.ToString() + ex.Message, ex);
             }
         }
     }

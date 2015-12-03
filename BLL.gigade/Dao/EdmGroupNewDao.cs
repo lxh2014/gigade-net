@@ -102,5 +102,33 @@ namespace BLL.gigade.Dao
                throw new Exception("EdmGroupNewDao-->EdmGroupNewUpdate-->" + sql.ToString() + ex.Message);
            }
        }
+
+       public DataTable GetContentId(int group_id)
+       {
+           StringBuilder sql = new StringBuilder();
+           try
+           {
+               sql.AppendFormat(" select content_id from edm_content_new where group_id='{0}' order by content_createdate DESC; ", group_id);
+               return _access.getDataTable(sql.ToString());
+           }
+           catch (Exception ex)
+           {
+               throw new Exception("EdmGroupNewDao-->GetContentId-->" + sql.ToString() + ex.Message); 
+           }
+       }
+
+       public DataTable ESLContentId(int content_id)
+       {
+           StringBuilder sql = new StringBuilder();
+           try
+           {
+               sql.AppendFormat(" select content_id from edm_send_log where content_id='{0}'; ", content_id);
+               return _access.getDataTable(sql.ToString());
+           }
+           catch (Exception ex)
+           {
+               throw new Exception("EdmGroupNewDao-->ESLContentId-->" + sql.ToString() + ex.Message); 
+           }
+       }
     }
 }

@@ -143,6 +143,11 @@ FROM price_master pm WHERE pm.price_master_id IN({0})", master_Ids);
                 {
                     stb.AppendFormat(" and product_id={0}", pM.product_id);
                 }
+                //添加站台查詢欄位  add by zhuoqin0830w 2015/11/16
+                if (pM.site_id != 0)
+                {
+                    stb.AppendFormat(" and site_id={0}", pM.site_id);
+                }
                 return _dbAccess.getSinggleObj<Model.PriceMaster>(stb.ToString());
             }
             catch (Exception ex)
