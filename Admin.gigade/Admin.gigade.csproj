@@ -2045,12 +2045,12 @@
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\ext-theme-classic-all-rtl-debug.scss" />
     <Content Include="Scripts\ext-5.1.0\packages\ext-theme-classic\build\resources\Readme.md" />
-    <None Include="Properties\PublishProfiles\Gigadb.pubxml" />
     <None Include="Properties\PublishProfiles\gigade.pubxml" />
     <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.ttf" />
     <None Include="Properties\PublishProfiles\giagade-web.pubxml" />
+    <None Include="Properties\PublishProfiles\zz.pubxml" />
     <None Include="Properties\PublishProfiles\zz125.pubxml" />
     <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.woff2" />
@@ -4702,7 +4702,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>33730</DevelopmentServerPort>
+          <DevelopmentServerPort>59673</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

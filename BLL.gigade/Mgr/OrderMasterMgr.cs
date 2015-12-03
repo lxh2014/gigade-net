@@ -1269,6 +1269,17 @@ set ");
                                 {
                                     dr_t["cost_amount"] = Convert.ToInt32(dr_t["single_cost"].ToString()) * Convert.ToInt32(dr_t["buy_num"]);
                                 }
+                                if (dr_t["parent_id"] != null && dr_t["product_id"] != null)
+                                {
+                                    if (dr_t["item_mode"].ToString() == "0")//單一商品編號是pi.product_id
+                                    {
+                                        dr_t["product_id"] = Convert.ToInt32(dr_t["product_id"].ToString());
+                                    }
+                                    else//組合商品編號是od.parent_id
+                                    {
+                                        dr_t["product_id"] = Convert.ToInt32(dr_t["parent_id"].ToString());
+                                    }
+                                }
                             }
                         }
                     }

@@ -598,5 +598,62 @@ namespace Admin.gigade.Controllers
             return result;
         } 
         #endregion
+
+        #region 拋出訂單資料給黑貓FTP add by zhaozhi0623j 20151127PM
+        /// <summary>
+        /// 拋出訂單資料給黑貓FTP
+        /// </summary>
+        /// <returns></returns>
+        public bool SendOrderInfoToBlackCatFTP() 
+        {
+            bool result = false;
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+                BLL.gigade.Mgr.Schedules.SendOrderInfoToBlackCatFTPMgr SendOrderInfoToBlackCatFTPMgr = new BLL.gigade.Mgr.Schedules.SendOrderInfoToBlackCatFTPMgr(mySqlConnectionString);
+                result = SendOrderInfoToBlackCatFTPMgr.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return result;
+        }
+
+        #endregion
+
+        #region 接收黑貓拋回之狀態
+         /// <summary>
+        /// 接收黑貓拋回之狀態//add by zhaozhi0623j 20151201PM
+        /// </summary>
+        /// <returns></returns>
+        public bool ReceiveStatusFromTCat() 
+        {
+            bool result = false;
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+                BLL.gigade.Mgr.Schedules.ReceiveStatusFromTCatMgr ReceiveStatusFromTCatMgr = new BLL.gigade.Mgr.Schedules.ReceiveStatusFromTCatMgr(mySqlConnectionString);
+                result = ReceiveStatusFromTCatMgr.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return result;
+        }
+        #endregion
     }
 }
