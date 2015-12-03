@@ -2393,7 +2393,7 @@ namespace BLL.gigade.Dao
                                 LEFT JOIN order_slave os ON  om.order_id=os.order_id
                                 LEFT JOIN order_detail od ON os.slave_id=od.slave_id                              
                                 INNER JOIN product_item pi ON od.item_id=pi.item_id                   
-                                WHERE om.order_id='{0}' AND od.detail_status NOT IN (89,90,91); ", order_id);
+                                WHERE om.order_id='{0}' AND od.detail_status NOT IN (89,90,91) ORDER BY detail_id; ", order_id);
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)
