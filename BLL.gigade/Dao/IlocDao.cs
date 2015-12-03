@@ -391,7 +391,12 @@ namespace BLL.gigade.Dao
             }
             try
             {
-              return _access.getDataTable(sbt.ToString()).Rows[0][0].ToString();
+                DataTable table = _access.getDataTable(sbt.ToString());
+                if(table.Rows.Count>0)
+                {
+                    return table.Rows[0][0].ToString();
+                }
+                return "";
             }
             catch (Exception ex)
             {

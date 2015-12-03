@@ -372,6 +372,12 @@ Query = function () {
         Ext.Msg.alert("提示信息", "請輸入查詢內容!");
         return;
     }
+    var brand = Ext.getCmp('Brand_Id').getValue();
+    if (brand == 0 && brand == "")
+    {
+        Ext.Msg.alert("提示", "請選擇品牌列表!");
+        return;
+    }
     var myMask = new Ext.LoadMask(Ext.getBody(), { msg: 'Loading...' });
     myMask.show();
     Ext.Ajax.request({
