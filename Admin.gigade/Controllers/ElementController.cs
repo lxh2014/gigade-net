@@ -476,6 +476,7 @@ namespace Admin.gigade.Controllers
                         if (item.element_content != "")
                         {
                             item.element_content = imgServerPath + ElementPath + item.element_content;
+                            item.element_img_big = imgServerPath + ElementPath + item.element_img_big;
                         }
                     }
                     if (item.element_type == 2)
@@ -571,29 +572,24 @@ namespace Admin.gigade.Controllers
 
                     FileManagement fileLoad = new FileManagement();
 
-                    //for (int iFile = 0; iFile < Request.Files.Count; iFile++)
-                    if (Request.Files.Count > 0)//單個圖片上傳
+                    //if (Request.Files.Count > 0)//單個圖片上傳
+                    for (int iFile = 0; iFile < Request.Files.Count; iFile++)//多個上傳圖片
                     {
-                        HttpPostedFileBase file = Request.Files[0];
+                        HttpPostedFileBase file = Request.Files[iFile];//單個Request.Files[0]
                         string fileName = string.Empty;//當前文件名
-
                         string fileExtention = string.Empty;//當前文件的擴展名
                         //獲取圖片名稱
                         fileName = fileLoad.NewFileName(file.FileName);
-                        if (fileName != "")
+                        if ((iFile==0 && !String.IsNullOrEmpty(fileName)) || (iFile == 1 && !String.IsNullOrEmpty(Request.Params["element_img_big"].ToString())))
                         {
                             fileName = fileName.Substring(0, fileName.LastIndexOf("."));
                             fileExtention = file.FileName.Substring(file.FileName.LastIndexOf('.')).ToLower().ToString();
-
                             string NewFileName = string.Empty;
-
                             BLL.gigade.Common.HashEncrypt hash = new BLL.gigade.Common.HashEncrypt();
                             NewFileName = hash.Md5Encrypt(fileName, "32");
-
                             string ServerPath = string.Empty;
                             //判斷目錄是否存在，不存在則創建
                             FTP f_cf = new FTP();
-
                             f_cf.MakeMultiDirectory(localBannerPath.Substring(0, localBannerPath.Length - ElementPath.Length + 1), ElementPath.Substring(1, ElementPath.Length - 2).Split('/'), ftpuser, ftppwd);
 
                             fileName = NewFileName + fileExtention;
@@ -621,7 +617,14 @@ namespace Admin.gigade.Controllers
                                 bool result = fileLoad.UpLoadFile(file, ServerPath, NewFileName, extention, int.Parse(maxValue), int.Parse(minValue), ref ErrorMsg, ftpuser, ftppwd);
                                 if (result)//上傳成功
                                 {
-                                    model.element_content = fileName;
+                                    if (iFile == 0)
+                                    {
+                                        model.element_content = fileName;
+                                    }
+                                    else 
+                                    {
+                                        model.element_img_big = fileName; 
+                                    }
                                 }
                             }
                             catch (Exception ex)
@@ -641,11 +644,17 @@ namespace Admin.gigade.Controllers
                                 this.Response.End();
                                 return this.Response;
                             }
-
                         }
                         else
                         {
-                            model.element_content = oldModel.element_content;
+                            if (iFile == 0)
+                            {
+                                model.element_content = oldModel.element_content;
+                            }
+                            else 
+                            {
+                                model.element_img_big = oldModel.element_img_big;
+                            }
                         }
 
                     }

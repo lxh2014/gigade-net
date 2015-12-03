@@ -29,7 +29,8 @@ Ext.define('gigade.ElementDetailModel', {
         { name: 'packet_status', type: 'int' },
         { name: 'category_id', type: 'int' },
         { name: 'category_name', type: 'string' },
-          { name: 'kendo_editor', type: 'string' }
+        { name: 'kendo_editor', type: 'string' },
+        { name: 'element_img_big', type: 'string' }
     ]
 });
 
@@ -169,6 +170,17 @@ Ext.onReady(function () {
                         return null;
                     }
                 }
+            },
+            {
+                header: "元素圖(大)", id: 'element_img_big', colName: 'element_img_big',
+                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                    if (record.data.element_type == 1) {
+                        return '<div style="width:50px;height:50px"><a target="_blank", href="' + record.data.element_img_big + '"><img width="50px" height="50px" src="' + record.data.element_img_big + '" /></a><div>'
+                    } else {
+                        return null;
+                    }
+                },
+                width: 60, align: 'center', sortable: false, menuDisabled: true
             },
             { header: CATEGORYNAME, dataIndex: 'category_name', width: 150, align: 'center' },
             { header: BANNERLINKURL, dataIndex: 'element_link_url', width: 100, align: 'center' },
