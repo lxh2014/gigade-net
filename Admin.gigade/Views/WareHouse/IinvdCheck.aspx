@@ -393,6 +393,7 @@
         var loc_id = $('#loc_id').text();
         var item_id = $('#item_id').text();
         if (changeStore.trim() == "") return false;
+        $('#' + id).val('');
         $.ajax({
             url: "/WareHouse/IinvdSave",
             type: "POST",
@@ -479,7 +480,7 @@
             var productname = $('#productname').text();
             if (productname == "" || productname == "沒有該商品信息！") return false;
         }
-
+        $('#prod_qty').val('');
         $.ajax({
             url: "/WareHouse/SaveIinvd",
             type: "POST",

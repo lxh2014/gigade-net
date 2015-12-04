@@ -11,7 +11,7 @@ Ext.define('gigade.OrderDetial', {
     { name: 'payment_name', type: 'string' },
     { name: 'slave_status_name', type: 'string' },
     { name: 'order_createdate_format', type: 'string' },
-    { name: 'site_name', type: 'string' },
+    { name: 'channel_name_simple', type: 'string' },
     { name: 'deducts', type: 'int' },
     ]
 });
@@ -123,7 +123,7 @@ Ext.onReady(function () {
         { header: "付款方式", dataIndex: 'payment_name', flex: 1.5, align: 'center' },
         { header: "訂單狀態", dataIndex: 'slave_status_name', flex: 1, align: 'center' },
         { header: "訂單日期", dataIndex: 'order_createdate_format', flex: 1, align: 'center' },
-        { header: "賣場", dataIndex: 'site_name', flex: 1, align: 'center', }
+        { header: "賣場", dataIndex: 'channel_name_simple', flex: 1, align: 'center', }
         ],
         tbar: [
         { xtype: 'button', id: 'category_detialExport', text: '類別訂單明細匯出', icon: '../../../Content/img/icons/excel.gif', handler: OnCategoryDetialExport },

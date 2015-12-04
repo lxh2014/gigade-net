@@ -4769,7 +4769,7 @@ namespace Admin.gigade.Controllers
                 {
                     #region 調度--對庫存進行操作
                     m.change_user = int.Parse((Session["caller"] as Caller).user_id.ToString());//操作iwms_record 需要插入create_uaer_id。对aseld中的change_user未做任何改变
-                    m.act_pick_qty = Int32.Parse(Request.Params["act_pick_qty"]);//下一步插入檢貨記錄表，每檢一次記錄一次，實際撿貨量以傳過來的值為標準
+                    m.act_pick_qty = Int32.Parse(Request.Params["act_pick_qty"]);//下一步插入撿貨記錄表，每檢一次記錄一次，實際撿貨量以傳過來的值為標準
                     if (_iasdMgr.getTime(m).Rows.Count > 0)
                     {//獲取到有效期控管商品的保質期
                         m.cde_dt_incr = int.Parse(_iasdMgr.getTime(m).Rows[0]["cde_dt_incr"].ToString());
@@ -4940,7 +4940,7 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
 
-        //寄倉-庫存-輸入檢貨量
+        //寄倉-庫存-輸入撿貨量
         public HttpResponseBase GetSum()
         {
             string json = string.Empty;
@@ -12279,7 +12279,7 @@ namespace Admin.gigade.Controllers
 
             }
         }
-        #region  待撿貨商品報表 add by yafeng0715j 201510260934
+        #region  總量撿貨報表 add by yafeng0715j 201510260934
 
         public ActionResult Aseld()
         {
@@ -12440,15 +12440,15 @@ namespace Admin.gigade.Controllers
             _dtBody.Columns.Add("條碼", typeof(string));
            // _dtBody.Columns.Add("規格", typeof(string));
             _dtBody.Columns.Add("訂貨量", typeof(string));
-            _dtBody.Columns.Add("已檢貨量", typeof(string));
-            _dtBody.Columns.Add("待檢貨量", typeof(string));
+            _dtBody.Columns.Add("已撿貨量", typeof(string));
+            _dtBody.Columns.Add("待撿貨量", typeof(string));
             _dtBody.Columns.Add("料位編號", typeof(string));
             _dtBody.Columns.Add("製造日期", typeof(string)); 
             _dtBody.Columns.Add("有效日期", typeof(string));
-            
-           // _dtBody.Columns.Add("檢貨料位編號", typeof(string));
-            _dtBody.Columns.Add("檢貨庫存", typeof(string)); 
-            _dtBody.Columns.Add("本次檢貨量", typeof(string));
+
+            // _dtBody.Columns.Add("撿貨料位編號", typeof(string));
+            _dtBody.Columns.Add("撿貨庫存", typeof(string));
+            _dtBody.Columns.Add("本次撿貨量", typeof(string));
            
            // _dtBody.Columns.Add("創建時間", typeof(string));
             _dtBody.Columns.Add("備註", typeof(string));
@@ -12488,7 +12488,7 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("待撿貨商品報表", new iTextSharp.text.Font(bf, 18)));
+                cell = new PdfPCell(new Phrase("總量撿貨報表", new iTextSharp.text.Font(bf, 18)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;
                 cell.Colspan = 5;
                 cell.DisableBorderSide(1);
@@ -12589,12 +12589,12 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("已檢貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("已撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("待檢貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("待撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -12606,7 +12606,7 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                //cell = new PdfPCell(new Phrase("檢貨料位編號", new iTextSharp.text.Font(bf, 8)));
+                //cell = new PdfPCell(new Phrase("撿貨料位編號", new iTextSharp.text.Font(bf, 8)));
                 //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 //cell.DisableBorderSide(8);
                 //ptable.AddCell(cell);
@@ -12614,12 +12614,12 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("檢貨庫存", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("本次檢貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -12646,7 +12646,7 @@ namespace Admin.gigade.Controllers
                         IinvdQuery.ista_id = "A";
                         List<IinvdQuery> Store = new List<IinvdQuery>();
                         Store = _iinvd.GetPlasIinvd(IinvdQuery);
-                        int P_num = string.IsNullOrEmpty(rows["out_qty"].ToString()) ? 0 : int.Parse(rows["out_qty"].ToString()); /*要檢貨的數量*/
+                        int P_num = string.IsNullOrEmpty(rows["out_qty"].ToString()) ? 0 : int.Parse(rows["out_qty"].ToString()); /*要撿貨的數量*/
                         string upc_id = string.Empty;
                         #region 取條碼
 
@@ -12702,8 +12702,8 @@ namespace Admin.gigade.Controllers
                                         row["條碼"] = "";
                                         // row["規格"] = rows["spec"];
                                         row["訂貨量"] = "";
-                                        row["已檢貨量"] = "";
-                                        row["待檢貨量"] = "";
+                                        row["已撿貨量"] = "";
+                                        row["待撿貨量"] = "";
                                         row["料位編號"] = "";
                                     }
                                     else
@@ -12712,16 +12712,16 @@ namespace Admin.gigade.Controllers
                                         row["條碼"] = upc_id;
                                         // row["規格"] = rows["spec"];
                                         row["訂貨量"] = rows["ord_qty"];
-                                        row["已檢貨量"] = rows["act_pick_qty"];
-                                        row["待檢貨量"] = rows["out_qty"];
+                                        row["已撿貨量"] = rows["act_pick_qty"];
+                                        row["待撿貨量"] = rows["out_qty"];
                                         row["料位編號"] = rows["loc_id"];
                                     }
                                     row["製造日期"] = string.IsNullOrEmpty(Store[i].made_date.ToString()) ? " " : Store[i].made_date.ToString("yyyy/MM/dd");
                                     row["有效日期"] = string.IsNullOrEmpty(Store[i].cde_dt.ToString()) ? " " : Store[i].cde_dt.ToString("yyyy/MM/dd");
-                                    row["檢貨庫存"] = P_num;
-                                    row["本次檢貨量"] = " ";
+                                    row["撿貨庫存"] = P_num;
+                                    row["本次撿貨量"] = " ";
                                     row["備註"] = " ";
-                                   // row["檢貨料位編號"] = Store[i].plas_loc_id;
+                                    // row["撿貨料位編號"] = Store[i].plas_loc_id;
                                    
                                    
                                   //  row["創建時間"] = rows["create_dtim"];
@@ -12737,8 +12737,8 @@ namespace Admin.gigade.Controllers
                                         row["條碼"] = "";
                                         // row["規格"] = rows["spec"];
                                         row["訂貨量"] = "";
-                                        row["已檢貨量"] = "";
-                                        row["待檢貨量"] = "";
+                                        row["已撿貨量"] = "";
+                                        row["待撿貨量"] = "";
                                         row["料位編號"] = "";
                                     }
                                     else
@@ -12747,16 +12747,16 @@ namespace Admin.gigade.Controllers
                                         row["條碼"] = upc_id;
                                         //row["規格"] = rows["spec"];
                                         row["訂貨量"] = rows["ord_qty"];
-                                        row["已檢貨量"] = rows["act_pick_qty"];
-                                        row["待檢貨量"] = rows["out_qty"];
+                                        row["已撿貨量"] = rows["act_pick_qty"];
+                                        row["待撿貨量"] = rows["out_qty"];
                                         row["料位編號"] = rows["loc_id"];
                                     }
                                     row["製造日期"] = string.IsNullOrEmpty(Store[i].made_date.ToString()) ? " " : Store[i].made_date.ToString("yyyy/MM/dd");
                                     row["有效日期"] = string.IsNullOrEmpty(Store[i].cde_dt.ToString()) ? " " : Store[i].cde_dt.ToString("yyyy/MM/dd");
-                                    row["檢貨庫存"] = Store[i].prod_qty;
-                                    row["本次檢貨量"] = " ";
-                                   
-                                    //row["檢貨料位編號"] = Store[i].plas_loc_id;
+                                    row["撿貨庫存"] = Store[i].prod_qty;
+                                    row["本次撿貨量"] = " ";
+
+                                    //row["撿貨料位編號"] = Store[i].plas_loc_id;
                                   //  row["創建時間"] = rows["create_dtim"];
                                     row["備註"] = " ";
                                     _dtBody.Rows.Add(row);
@@ -12776,12 +12776,12 @@ namespace Admin.gigade.Controllers
                             row["條碼"] = upc_id;
                            // row["規格"] = rows["spec"];
                             row["訂貨量"] = rows["ord_qty"];
-                            row["已檢貨量"] = rows["act_pick_qty"];
-                            row["待檢貨量"] = rows["out_qty"];
-                            row["本次檢貨量"] = " ";
+                            row["已撿貨量"] = rows["act_pick_qty"];
+                            row["待撿貨量"] = rows["out_qty"];
+                            row["本次撿貨量"] = " ";
                             row["料位編號"] = rows["loc_id"];
-                            //row["檢貨料位編號"] = " ";
-                            row["檢貨庫存"] = 0;
+                            //row["撿貨料位編號"] = " ";
+                            row["撿貨庫存"] = 0;
                             row["製造日期"] = " ";
                             row["有效日期"] = " ";
                          //   row["創建時間"] = rows["create_dtim"];
@@ -12833,7 +12833,7 @@ namespace Admin.gigade.Controllers
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
 
-                    cell = new PdfPCell(new Phrase("待撿貨商品報表", new iTextSharp.text.Font(bf, 18)));
+                    cell = new PdfPCell(new Phrase("總量撿貨報表", new iTextSharp.text.Font(bf, 18)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;
                     cell.Colspan = 5;
                     cell.DisableBorderSide(1);
@@ -12934,12 +12934,12 @@ namespace Admin.gigade.Controllers
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
 
-                    cell = new PdfPCell(new Phrase("已檢貨量", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("已撿貨量", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
 
-                    cell = new PdfPCell(new Phrase("待檢貨量", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("待撿貨量", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
@@ -12951,7 +12951,7 @@ namespace Admin.gigade.Controllers
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
-                    //cell = new PdfPCell(new Phrase("檢貨料位編號", new iTextSharp.text.Font(bf, 8)));
+                    //cell = new PdfPCell(new Phrase("撿貨料位編號", new iTextSharp.text.Font(bf, 8)));
                     //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     //cell.DisableBorderSide(8);
                     //ptable.AddCell(cell);
@@ -12959,12 +12959,12 @@ namespace Admin.gigade.Controllers
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
-                    cell = new PdfPCell(new Phrase("檢貨庫存", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
 
-                    cell = new PdfPCell(new Phrase("本次檢貨量", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
@@ -12993,7 +12993,7 @@ namespace Admin.gigade.Controllers
                             IinvdQuery.ista_id = "A";
                             List<IinvdQuery> Store = new List<IinvdQuery>();
                             Store = _iinvd.GetPlasIinvd(IinvdQuery);
-                            int P_num = string.IsNullOrEmpty(rows["out_qty"].ToString()) ? 0 : int.Parse(rows["out_qty"].ToString()); /*要檢貨的數量*/
+                            int P_num = string.IsNullOrEmpty(rows["out_qty"].ToString()) ? 0 : int.Parse(rows["out_qty"].ToString()); /*要撿貨的數量*/
                             string upc_id = string.Empty;
                             #region 取條碼
 
@@ -13048,8 +13048,8 @@ namespace Admin.gigade.Controllers
                                             row["條碼"] = "";
                                             // row["規格"] = rows["spec"];
                                             row["訂貨量"] = "";
-                                            row["已檢貨量"] = "";
-                                            row["待檢貨量"] = "";
+                                            row["已撿貨量"] = "";
+                                            row["待撿貨量"] = "";
                                             row["料位編號"] = "";
                                         }
                                         else
@@ -13058,14 +13058,14 @@ namespace Admin.gigade.Controllers
                                             row["條碼"] = upc_id;
                                             // row["規格"] = rows["spec"];
                                             row["訂貨量"] = rows["ord_qty"];
-                                            row["已檢貨量"] = rows["act_pick_qty"];
-                                            row["待檢貨量"] = rows["out_qty"];
+                                            row["已撿貨量"] = rows["act_pick_qty"];
+                                            row["待撿貨量"] = rows["out_qty"];
                                             row["料位編號"] = rows["loc_id"];
                                         }
                                         row["製造日期"] = string.IsNullOrEmpty(Store[i].made_date.ToString()) ? " " : Store[i].made_date.ToString("yyyy/MM/dd");
                                         row["有效日期"] = string.IsNullOrEmpty(Store[i].cde_dt.ToString()) ? " " : Store[i].cde_dt.ToString("yyyy/MM/dd");
-                                        row["檢貨庫存"] = P_num;
-                                        row["本次檢貨量"] = " ";
+                                        row["撿貨庫存"] = P_num;
+                                        row["本次撿貨量"] = " ";
                                         row["備註"] = " ";
                                         _dtBody.Rows.Add(row);
                                         break;
@@ -13078,8 +13078,8 @@ namespace Admin.gigade.Controllers
                                             row["條碼"] = "";
                                             // row["規格"] = rows["spec"];
                                             row["訂貨量"] = "";
-                                            row["已檢貨量"] = "";
-                                            row["待檢貨量"] = "";
+                                            row["已撿貨量"] = "";
+                                            row["待撿貨量"] = "";
                                             row["料位編號"] = "";
                                         }
                                         else
@@ -13088,16 +13088,16 @@ namespace Admin.gigade.Controllers
                                             row["條碼"] = upc_id;
                                             //row["規格"] = rows["spec"];
                                             row["訂貨量"] = rows["ord_qty"];
-                                            row["已檢貨量"] = rows["act_pick_qty"];
-                                            row["待檢貨量"] = rows["out_qty"];
+                                            row["已撿貨量"] = rows["act_pick_qty"];
+                                            row["待撿貨量"] = rows["out_qty"];
                                             row["料位編號"] = rows["loc_id"];
                                         }
                                         row["製造日期"] = string.IsNullOrEmpty(Store[i].made_date.ToString()) ? " " : Store[i].made_date.ToString("yyyy/MM/dd");
                                         row["有效日期"] = string.IsNullOrEmpty(Store[i].cde_dt.ToString()) ? " " : Store[i].cde_dt.ToString("yyyy/MM/dd");
-                                        row["檢貨庫存"] = Store[i].prod_qty;
-                                        row["本次檢貨量"] = " ";
+                                        row["撿貨庫存"] = Store[i].prod_qty;
+                                        row["本次撿貨量"] = " ";
 
-                                        //row["檢貨料位編號"] = Store[i].plas_loc_id;
+                                        //row["撿貨料位編號"] = Store[i].plas_loc_id;
                                         //  row["創建時間"] = rows["create_dtim"];
                                         row["備註"] = " ";
                                         _dtBody.Rows.Add(row);
@@ -13117,11 +13117,11 @@ namespace Admin.gigade.Controllers
                                 row["條碼"] = upc_id;
                                // row["規格"] = rows["spec"];
                                 row["訂貨量"] = rows["ord_qty"];
-                                row["已檢貨量"] = rows["act_pick_qty"];
-                                row["待檢貨量"] = rows["out_qty"];
-                                row["本次檢貨量"] = " ";
-                                //row["檢貨料位編號"] = " ";
-                                row["檢貨庫存"] = 0;
+                                row["已撿貨量"] = rows["act_pick_qty"];
+                                row["待撿貨量"] = rows["out_qty"];
+                                row["本次撿貨量"] = " ";
+                                //row["撿貨料位編號"] = " ";
+                                row["撿貨庫存"] = 0;
                                 row["製造日期"] = " ";
                                 row["有效日期"] = " ";
                               //  row["創建時間"] = rows["create_dtim"];
@@ -13173,7 +13173,7 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("總量檢貨報表", new iTextSharp.text.Font(bf, 18)));
+                cell = new PdfPCell(new Phrase("總量撿貨報表", new iTextSharp.text.Font(bf, 18)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;
                 cell.Colspan = 5;
                 cell.DisableBorderSide(1);
@@ -13274,12 +13274,12 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("已檢貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("已撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("待檢貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("待撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -13291,7 +13291,7 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                //cell = new PdfPCell(new Phrase("檢貨料位編號", new iTextSharp.text.Font(bf, 8)));
+                //cell = new PdfPCell(new Phrase("撿貨料位編號", new iTextSharp.text.Font(bf, 8)));
                 //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 //cell.DisableBorderSide(8);
                 //ptable.AddCell(cell);
@@ -13299,12 +13299,12 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("檢貨庫存", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("本次檢貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -13537,12 +13537,13 @@ namespace Admin.gigade.Controllers
                                 iinvd.item_id = uint.Parse(Request.Params["item_id"]);
                             }
                         }
-                        if (Request.Params["iplas"] == "false")
+
+                        _IiplasMgr = new IplasMgr(mySqlConnectionString);
+                        IplasQuery iplasquery = new IplasQuery();
+                        iplasquery.item_id = iinvd.item_id;
+                        if (_IiplasMgr.GetIplasid(iplasquery)==0)
                         {
                             Iplas iplas = new Iplas();
-                            IplasQuery iplasquery = new IplasQuery();
-                            iplasquery.item_id = iinvd.item_id;
-                            _IiplasMgr = new IplasMgr(mySqlConnectionString);
                             if (int.TryParse(Request.Params["item_id"], out temp))
                             {
                                 iplas.item_id = uint.Parse(Request.Params["item_id"]);
