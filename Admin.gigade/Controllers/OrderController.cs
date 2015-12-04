@@ -4162,6 +4162,10 @@ namespace Admin.gigade.Controllers
                     {
                         dr[19] = Convert.ToInt32(dr[16].ToString()) * Convert.ToInt32(dr[11].ToString());
                     }
+                    else if (dr[17].ToString() != "0")
+                    {
+                        dr[19] = Convert.ToInt32(dr[17].ToString()) * Convert.ToInt32(dr[11].ToString());
+                    }
                     else
                     {
                         dr[19] = Convert.ToInt32(dr_v["cost_amount"].ToString());
