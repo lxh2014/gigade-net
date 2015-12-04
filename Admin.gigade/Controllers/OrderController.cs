@@ -3706,7 +3706,16 @@ namespace Admin.gigade.Controllers
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
                 if (!string.IsNullOrEmpty(Request.Params["chooseCategory"]))
                 {
-                    query.category_id = Convert.ToUInt32(Request.Params["chooseCategory"]);
+                    uint category_id = 0;
+                    if (uint.TryParse(Request.Params["chooseCategory"], out category_id))
+                    {
+                        query.category_id = category_id;
+                    }
+                    else
+                    {
+                        string[] cate = Request.Params["chooseCategory"].ToString().Split('-');
+                        query.category_id = Convert.ToUInt32(cate[0].ToString());
+                    }
                 }
                 if (!string.IsNullOrEmpty(Request.Params["receiptStatus"]))
                 {
