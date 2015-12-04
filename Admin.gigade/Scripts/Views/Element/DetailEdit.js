@@ -585,7 +585,9 @@ function editFunction(RowID, Store, i) {
                 name: 'element_sort',
                 id: 'element_sort',
                 fieldLabel: '排序',
-                minValue: 0
+                allowDecimals:false,
+                minValue: 0,
+                maxValue:9999
             },
             {
                 xtype: "datetimefield",
@@ -666,8 +668,7 @@ function editFunction(RowID, Store, i) {
                                 Packet_id: Ext.htmlEncode(Ext.getCmp("packet_id").getValue()),
                                 Element_id: Ext.htmlEncode(Ext.getCmp("element_id").getValue())
                             },
-                            success: function (form, action) {
-                                myMask.hide();
+                            success: function (form, action) {                            
                                 var result = Ext.decode(form.responseText);
                                 if (!result.success) {
                                     isProdValid = false;
@@ -679,7 +680,6 @@ function editFunction(RowID, Store, i) {
                                 }
                             },
                             failure: function () {
-                                myMask.hide();
                                 isProdValid = false;
                                 Ext.Msg.alert(INFORMATION, PRODTIP);
                             }
@@ -711,6 +711,7 @@ function editFunction(RowID, Store, i) {
                                             
                                         },
                                         success: function (form, action) {
+                                                myMask.hide();
                                             var result = Ext.decode(action.response.responseText);
                                             if (result.success) {
                                                 if (result.msg != undefined) {
@@ -726,6 +727,7 @@ function editFunction(RowID, Store, i) {
                                             }
                                         },
                                         failure: function () {
+                                            myMask.hide();
                                             Ext.Msg.alert(INFORMATION, FAILURE);
                                         }
                                     });
@@ -907,6 +909,9 @@ function editFunction(RowID, Store, i) {
                 Ext.getCmp("isImage").setValue(false);
                 Ext.getCmp("isContent").setValue(false);
                 Ext.getCmp("element_type").setReadOnly(true);
+                var img1 = Row.data.element_img_big.toString();
+                var imgUrl1 = img1.substring(img1.lastIndexOf("\/") + 1);
+                Ext.getCmp('element_img_big').setRawValue(imgUrl1);
                 Ext.getCmp("product_id").setValue(Row.data.product_id);
                 Ext.getCmp("category_id").setValue(Row.data.category_id);
                 Ext.getCmp("category_name").setValue(Row.data.category_name)

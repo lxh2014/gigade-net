@@ -179,7 +179,7 @@ namespace BLL.gigade.Dao
                 query.Replace4MySQL();
                 sqlStr.Append(@"SELECT element_id,packet_id,category_id,category_name,element_content,element_name,");
                 sqlStr.Append(@"element_link_url,element_link_mode,element_sort,element_status,element_start,element_end,");
-                sqlStr.Append(@"element_createdate,element_updatedate,create_userid,update_userid,element_remark  ");
+                sqlStr.Append(@"element_createdate,element_updatedate,create_userid,update_userid,element_remark,element_img_big  ");
                 sqlStr.AppendFormat(@"from element_detail where element_id={0};", query.element_id);
                 return _access.getSinggleObj<ElementDetail>(sqlStr.ToString());
             }

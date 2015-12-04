@@ -174,7 +174,7 @@ Ext.onReady(function () {
             {
                 header: "元素圖(大)", id: 'element_img_big', colName: 'element_img_big',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    if (record.data.element_type == 1) {
+                    if (record.data.element_type == 1 || record.data.element_type == 3) {
                         return '<div style="width:50px;height:50px"><a target="_blank", href="' + record.data.element_img_big + '"><img width="50px" height="50px" src="' + record.data.element_img_big + '" /></a><div>'
                     } else {
                         return null;
