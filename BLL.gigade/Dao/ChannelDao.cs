@@ -295,5 +295,19 @@ namespace BLL.gigade.Dao
            
         }
         #endregion
+
+        public Channel getSingleObj(int id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT channel_name_simple from channel WHERE channel_id={0}", id);
+                return _accessMySql.getSinggleObj<Channel>(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ChannelDao-->getSingleObj-->" + ex.Message, ex);
+            }
+        }
     }
 }

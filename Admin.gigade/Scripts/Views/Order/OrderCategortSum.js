@@ -87,7 +87,11 @@ Ext.onReady(function () {
                 valueField: 'category_id',
                 forceSelection: false,
                 lastQuery: '',
-                value: '5'
+                value: '5',
+                listeners: {
+                    focus: function ()
+                    { this.setValue(''); }
+                }
             },
             {
                 xtype: 'combobox',

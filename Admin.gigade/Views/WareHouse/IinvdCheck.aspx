@@ -136,6 +136,12 @@
                         <span style="font-size: large;">商品名稱：</span><span style="font-size: large;" id="productname"></span>
                         <br /><br />
                         <%} %>
+                        <span class="date1" style="font-size: large;">製造日期：</span><input class="form-control" style="width:157px;float:right;margin-right:320px;" size="21" type="text" id="datetimepicker3" readonly="readonly" onchange="GetDate('datetimepicker3')" hidden="hidden">
+                        <br class="date1" />
+                        <br class="date1"/>
+                        <span style="font-size: large;" class="date1">有效日期：</span><input class="form-control" style="width:157px;float:right;margin-right:320px;" size="21" type="text" id="datetimepicker4" readonly="readonly" onchange="GetDate('datetimepicker4')" hidden="hidden">
+                        <br class="date1"/>
+                        <br class="date1"/>
                         <span style="font-size: large;">現有庫存：</span><input class="span2" size="16" type="number" id="prod_qty" min="0" onkeydown="return check(event);">
                         <br /><br />
                         <div id="myAlert" class="alert alert-warning" hidden="hidden">
@@ -217,6 +223,7 @@
     }
     function CheckItem(id)
     {
+        $("#myAlert").hide();
         var item_id = $('#' + id).val();
         if(item_id.trim()!='')
         {
@@ -230,6 +237,19 @@
                     if (result.success) {
                         msg = result.msg;
                         $('#productname').text(msg);
+                        pwy_dte_ctl = result.pwy_dte_ctl;
+                        if (pwy_dte_ctl == "Y") {
+                            $('#pwy_dte_ctl').text('Y');
+                            $('#datetimepicker3').show();
+                            $('#datetimepicker4').show();
+                            $('.date1').show();
+                        }
+                        else {
+                            $('#pwy_dte_ctl').text('');
+                            $('#datetimepicker3').hide();
+                            $('#datetimepicker4').hide();
+                            $('.date1').hide();
+                        }
                     }
                     else {
                         $('#productname').text("沒有該商品信息！");
@@ -242,8 +262,17 @@
     {
         var date = $('#' + id).val();
         var dateType = 'cde';
-        var item_id = $('#item_id').text();
-        if (id == 'datetimepicker1')
+        var item_id = $('#item_id').text(); 
+
+        if (item_id.trim() == "此料位暫無商品") {
+            item_id = $('#itemid').val();
+            if(item_id.length<6)
+            {
+                return false;
+            }
+        }
+
+        if (id == 'datetimepicker1'|| id=='datetimepicker3')
         {
             dateType = 'made';
         }
@@ -256,10 +285,20 @@
                 var result = eval("(" + data + ")");
                 if (result.success) {
                     if (dateType == 'made') {
-                        $('#datetimepicker2').val(result.date);
+                        if (id == 'datetimepicker1') {
+                            $('#datetimepicker2').val(result.date);
+                        }
+                        else {
+                            $('#datetimepicker4').val(result.date);
+                        } 
                     }
                     else {
-                        $('#datetimepicker1').val(result.date);
+                        if (id == 'datetimepicker2') {
+                            $('#datetimepicker1').val(result.date);
+                        }
+                        else {
+                            $('#datetimepicker3').val(result.date);
+                        }
                     }
                 }
             }
@@ -289,12 +328,38 @@
         forceParse: 0,
         showMeridian: 1
     });
+    $('#datetimepicker3').datetimepicker({
+        language: 'zh-TW',
+        format: "yyyy - mm - dd",
+        weekStart: 1,
+        todayBtn: 1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        minView: 2,
+        forceParse: 0,
+        showMeridian: 1
+    });
+    $('#datetimepicker4').datetimepicker({
+        language: 'zh-TW',
+        format: "yyyy - mm - dd",
+        weekStart: 1,
+        todayBtn: 1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        minView: 2,
+        forceParse: 0,
+        showMeridian: 1
+    });
     var date = new Date();
     var year = date.getFullYear();
     var month = date.getMonth() + 1;
     var day = date.getDate();
     $('#datetimepicker1').datetimepicker('setEndDate', year + '-' + month + '-' + day);
     $('#datetimepicker2').datetimepicker('setStartDate', year + '-' + month + '-' + day);
+    $('#datetimepicker3').datetimepicker('setEndDate', year + '-' + month + '-' + day);
+    $('#datetimepicker4').datetimepicker('setStartDate', year + '-' + month + '-' + day);
     function check(e) {
         var keynum
         var keychar
@@ -328,6 +393,7 @@
         var loc_id = $('#loc_id').text();
         var item_id = $('#item_id').text();
         if (changeStore.trim() == "") return false;
+        $('#' + id).val('');
         $.ajax({
             url: "/WareHouse/IinvdSave",
             type: "POST",
@@ -338,7 +404,7 @@
                 if (result.success) {
                     $('#' + id).val(''); 
                     $('#alertsuccess').modal('toggle');
-                    location.href = "/WareHouse/IinvdCheck?pwy_dte_ctl=" + pwy_dte_ctl + "&loc_id="+loc_id;
+                    setTimeout(location.href = "/WareHouse/IinvdCheck?pwy_dte_ctl=" + pwy_dte_ctl + "&loc_id=" + loc_id, 500);
                 }
                 else {
                     $("#alertmessage").text(result.message);
@@ -353,11 +419,19 @@
         $('#prod_qty').val(''); 
         $('#itemid').val('');
         $('#productname').text('');
+        $('#datetimepicker3').hide();
+        $('#datetimepicker4').hide();
+        $('.date1').hide();
     }
     function SaveIinvd() {
         var pwy_dte_ctl = $('#pwy_dte_ctl').text();
         var datetimepicker1 = $('#datetimepicker1').val();
         var datetimepicker2 = $('#datetimepicker2').val();
+        if (datetimepicker1==null)
+        {
+            datetimepicker1 = $('#datetimepicker3').val();
+            datetimepicker2 = $('#datetimepicker4').val();
+        }
         var prod_qty = $('#prod_qty').val();
         var st_qty = $('#st_qty').val();
         var loc_id = $('#loc_id').text();
@@ -365,8 +439,29 @@
         var itemid = $('#itemid').val();
         var iplas = $('#iplas').text();
         if (pwy_dte_ctl == "Y") {
-            if (datetimepicker1.trim() == "" || prod_qty.trim() == "" || datetimepicker2.trim() == "")
+            if (datetimepicker1.trim() == "" || prod_qty.trim() == "" || datetimepicker2.trim() == "") return false;
+            var date = new Date();
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if(month<10)
+            {
+                month = '0' + month;
+            }
+            if (day<10) {
+                day = '0' + day;
+            }
+            var datetime = year + ' - ' + month + ' - ' + day;
+            if (datetimepicker1 > datetime) {
+                $("#alertdate").text('製造日期不能大於當前日期');
+                $('#alertdatediv').modal('toggle');
                 return false;
+            }
+            if (datetimepicker2 < datetime) {
+                $("#alertdate").text('有效日期不能小於當前日期');
+                $('#alertdatediv').modal('toggle');
+                return false;
+            }
         }
         else {
             if (prod_qty.trim() == "")
@@ -385,24 +480,7 @@
             var productname = $('#productname').text();
             if (productname == "" || productname == "沒有該商品信息！") return false;
         }
-        var date = new Date();
-        var year = date.getFullYear();
-        var month = date.getMonth() + 1;
-        var day = date.getDate();
-        var datetime = year + ' - ' + month + ' - ' + day;
-
-        if (datetimepicker1>datetime)
-        {
-            $("#alertdate").text('製造日期不能大於當前日期');
-            $('#alertdatediv').modal('toggle');
-            return false;
-        }
-        if (datetimepicker2 <datetime)
-        {
-            $("#alertdate").text('有效日期不能小於當前日期');
-            $('#alertdatediv').modal('toggle');
-            return false;
-        }
+        $('#prod_qty').val('');
         $.ajax({
             url: "/WareHouse/SaveIinvd",
             type: "POST",
@@ -414,7 +492,7 @@
                     $('#datetimepicker1').val('');
                     $('#prod_qty').val('');
                     $('#alertsuccess').modal('toggle');
-                    location.reload();
+                    setTimeout(location.reload(),500);
                 }
                 else {
                     $("#message").text(result.message);
