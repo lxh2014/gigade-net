@@ -202,40 +202,38 @@ where lte.upload_time is null ");
                             if (!Directory.Exists(localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd")))
                             {
                                 Directory.CreateDirectory(localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd"));
-                            }
-                            if (!File.Exists(localFilePath_2))//本地文件（要上傳的文件）存在
+                            }                           
+                            if (File.Exists(localFilePath_1))
                             {
-                                FileStream fs2 = new FileStream(localFilePath_2, FileMode.Create, FileAccess.Write);//创建写入文件 
-                                FileStream fs1 = new FileStream(localFilePath_1, FileMode.Open);
-                                StreamReader sr = new StreamReader(fs1, Encoding.GetEncoding("big5"));
-                                StreamWriter sw = new StreamWriter(fs2, Encoding.GetEncoding("big5"));
-                                sw.Write(sr.ReadToEnd());//开始写入值
-                                sw.Close();
-                                fs1.Close();
+                                File.Move(localFilePath_1, localFilePath_2);
                             }
-                            else
-                            {
-                                FileStream fs2 = new FileStream(localFilePath_2, FileMode.Truncate, FileAccess.Write);//创建写入文件 
-                                FileStream fs1 = new FileStream(localFilePath_1, FileMode.Open);
-                                StreamReader sr = new StreamReader(fs1, Encoding.GetEncoding("big5"));
-                                StreamWriter sw = new StreamWriter(fs2, Encoding.GetEncoding("big5"));//Big5
-                                sw.Write(sr.ReadToEnd());//开始写入值
-                                sw.Close();
-                                fs1.Close();
-                            }
+                            //if (!File.Exists(localFilePath_2))//本地文件（要上傳的文件）存在
+                            //{
+                            //    FileStream fs2 = new FileStream(localFilePath_2, FileMode.Create, FileAccess.Write);//创建写入文件 
+                            //    FileStream fs1 = new FileStream(localFilePath_1, FileMode.Open);
+                            //    StreamReader sr = new StreamReader(fs1, Encoding.GetEncoding("big5"));
+                            //    StreamWriter sw = new StreamWriter(fs2, Encoding.GetEncoding("big5"));
+                            //    sw.Write(sr.ReadToEnd());//开始写入值
+                            //    sw.Close();
+                            //    fs1.Close();
+                            //}
+                            //else
+                            //{
+                            //    FileStream fs2 = new FileStream(localFilePath_2, FileMode.Truncate, FileAccess.Write);//创建写入文件 
+                            //    FileStream fs1 = new FileStream(localFilePath_1, FileMode.Open);
+                            //    StreamReader sr = new StreamReader(fs1, Encoding.GetEncoding("big5"));
+                            //    StreamWriter sw = new StreamWriter(fs2, Encoding.GetEncoding("big5"));//Big5
+                            //    sw.Write(sr.ReadToEnd());//开始写入值
+                            //    sw.Close();
+                            //    fs1.Close();
+                            //}
                         }
                         catch (Exception ex)
                         {
                             string str1 =  newfilename + " 文件上傳成功。"+"數據庫upload_time欄位更新成功，但是該文件在本地保存失敗，失敗的原因：" + ex.Message;
                             SendMail(schedule_code, str1);
                             throw new Exception(ex.Message);
-                        }
-
-                        //文件轉移過後，刪除文件
-                        if (File.Exists(localFilePath_1))
-                        {
-                            File.Delete(localFilePath_1);
-                        }
+                        }                                         
 
                         string str = newfilename + " 文件上傳成功，全部操作執行成功";//全部執行成功
                         SendMail(schedule_code, str);
