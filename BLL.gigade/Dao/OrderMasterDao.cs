@@ -2387,7 +2387,7 @@ namespace BLL.gigade.Dao
             {
                 sql.AppendFormat(@"SELECT DISTINCT od.detail_id,om.order_name,om.order_createdate,'' as order_createdate_format,om.order_id,om.order_payment,'' as  payment_name,
                                 om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,'' as slave_status_name,od.product_name,
-                                od.deduct_bonus,od.deduct_welfare,od.single_money,od.buy_num,od.single_cost,od.bag_check_money,od.single_cost,os.slave_date_close,'' as slave_date_close_format,
+                                od.deduct_bonus,od.deduct_welfare,od.single_money,od.buy_num,od.parent_num,od.single_cost,od.bag_check_money,od.single_cost,os.slave_date_close,'' as slave_date_close_format,
                                 od.product_mode ,'' as product_mode_name,od.item_mode,om.delivery_name,om.delivery_address,'' as amount,'' as cost_amount,od.event_cost,od.parent_id,pi.product_id
                                 FROM order_master om
                                 LEFT JOIN order_slave os ON  om.order_id=os.order_id
@@ -2413,13 +2413,13 @@ namespace BLL.gigade.Dao
             {
                 sqlSingle.AppendFormat(@"( SELECT pcs.category_id,om.order_name,om.order_createdate,'' as order_createdate_format,
                                     om.order_id,om.order_payment,'' as  payment_name,om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,
-                                    '' as slave_status_name,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,
+                                    '' as slave_status_name,od.product_name,od.buy_num,od.parent_num,od.single_money,od.deduct_bonus,od.deduct_welfare,
                                     od.single_cost,od.bag_check_money,od.single_cost,os.slave_date_close,'' as slave_date_close_format,'' as amount,'' as cost_amount,
                                     od.product_mode,'' as product_mode_name,od.item_mode,om.delivery_name,om.delivery_address ,od.detail_id,od.event_cost,pi.product_id   FROM order_master om ");
 
                 sqlFather.AppendFormat(@"( SELECT pcs.category_id,om.order_name,om.order_createdate,'' as order_createdate_format,
                                     om.order_id,om.order_payment,'' as  payment_name,om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,
-                                    '' as slave_status_name,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,
+                                    '' as slave_status_name,od.product_name,od.buy_num,od.parent_num,od.single_money,od.deduct_bonus,od.deduct_welfare,
                                     od.single_cost,od.bag_check_money,od.single_cost,os.slave_date_close,'' as slave_date_close_format,'' as amount,'' as cost_amount,
                                     od.product_mode,'' as product_mode_name,od.item_mode,om.delivery_name,om.delivery_address ,od.detail_id,od.event_cost,od.parent_id as product_id   FROM order_master om ");
                 sqlJoin1.AppendFormat(@" LEFT JOIN order_slave os ON om.order_id=os.order_id
