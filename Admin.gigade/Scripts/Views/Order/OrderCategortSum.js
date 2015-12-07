@@ -1,4 +1,4 @@
-﻿pageSize = 25;
+﻿pageSize = 20;
 // 類別下拉框store
 Ext.define('gigade.ProductCategory', {
     extend: 'Ext.data.Model',
@@ -87,7 +87,11 @@ Ext.onReady(function () {
                 valueField: 'category_id',
                 forceSelection: false,
                 lastQuery: '',
-                value: '5'
+                value: '5',
+                listeners: {
+                    focus: function ()
+                    { this.setValue(''); }
+                }
             },
             {
                 xtype: 'combobox',
@@ -190,6 +194,7 @@ Ext.onReady(function () {
                 listeners: {
                     click: function () {
                         Ext.getCmp("searchForm").getForm().reset();
+                        Ext.getCmp("chooseCategory").setValue('');
                         Ext.getCmp("gdList").store.removeAll();
                     }
                 }
@@ -336,7 +341,15 @@ function openAmountDetial(index) {
 function change(value) {
     value = value.toString();
     if (/^\d+$/.test(value)) {
-        value = value.replace(/^(\d+)(\d{3})$/, "$1,$2");
+        if (value.length > 9) {
+            value = value.replace(/^(\d+)(\d{3})(\d{3})(\d{3})$/, "$1,$2,$3,$4");
+        }
+        else if (value.length > 6) {
+            value = value.replace(/^(\d+)(\d{3})(\d{3})$/, "$1,$2,$3");
+        }
+        else {
+            value = value.replace(/^(\d+)(\d{3})$/, "$1,$2");
+        }
     }
     return value;
 }

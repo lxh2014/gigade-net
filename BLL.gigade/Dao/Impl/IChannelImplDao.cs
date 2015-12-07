@@ -84,6 +84,7 @@ namespace BLL.gigade.Dao.Impl
 
         int GetUserIdByChannelId(int channelId);
 
+        Channel getSingleObj(int id);
         
     }
 }

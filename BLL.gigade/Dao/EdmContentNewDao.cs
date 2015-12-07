@@ -31,7 +31,7 @@ namespace BLL.gigade.Dao
                 sqlCount.AppendFormat("select count(edn.content_id) as countTotal ");
                 sql.AppendFormat("select edn.content_id,edn.group_id,`subject`,esl.count,esl.date,edn.sender_id,ms.sender_email,ms.sender_name,edn.importance,edn.template_id,edn.template_data,'' as 'template_data_send', et.edit_url,et.content_url , edn.pm,  para.parameterName 'edm_pm'  ");
                 sqlFrom.AppendFormat("from edm_content_new edn LEFT JOIN  (SELECT content_id,COUNT(content_id) as count,MAX(schedule_date) as date from edm_send_log WHERE test_send=0 GROUP BY content_id)  esl ON edn.content_id=esl.content_id LEFT JOIN mail_sender ms on edn.sender_id=ms.sender_id LEFT JOIN edm_template et on et.template_id=edn.template_id ");
-                sqlFrom.Append(" left join (select  parameterCode,parameterName from t_parametersrc where parameterType='edm_pm_name') para on edn.pm=para.parameterCode    ");
+                sqlFrom.Append(" left join (select  parameterCode,parameterName from t_parametersrc where parameterType='edm_pm_name' and used=1) para on edn.pm=para.parameterCode    ");
                 sqlWhere.AppendFormat(" where 1=1 ");
                 sqlWhere.AppendFormat(" and edn.content_createdate between '{0}' and '{1}' ", CommonFunction.DateTimeToString(DateTime.Now.AddDays(-5)), CommonFunction.DateTimeToString(DateTime.Now));
                 if (query.group_id != 0)
@@ -76,7 +76,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.Append("select group_id,group_name from edm_group_new;");
+                sql.Append("select group_id,group_name from edm_group_new where enabled=1 order by  is_member_edm  desc, sort_order  ;");
                 return _access.getDataTableForObj<EdmGroupNew>(sql.ToString());
             }
             catch (Exception ex)
@@ -90,7 +90,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.Append("select template_id,template_name,edit_url,content_url from edm_template where enabled=1 order by  template_createdate asc;");
+                sql.Append("select template_id,template_name,edit_url,content_url from edm_template where enabled=1 order by  template_id asc;");
                 return _access.getDataTableForObj<EdmTemplate>(sql.ToString());
             }
             catch (Exception ex)
@@ -658,7 +658,7 @@ WHERE content_id='{0}'  and log_id='{1}'   AND edm_trace.count>0;", content_id, 
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("select  parameterType,parameterCode,parameterName from t_parametersrc where parameterType='{0}';", paraType);
+                sql.AppendFormat("select  parameterType,parameterCode,parameterName from t_parametersrc where parameterType='{0}' and used=1;", paraType);
                 return _access.getDataTable(sql.ToString());
             }
             catch (Exception ex)

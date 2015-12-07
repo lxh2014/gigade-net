@@ -63,22 +63,22 @@ Ext.onReady(function () {
             { header: "工作編號", dataIndex: 'cb_jobid', width: 150, align: 'center' },
             { header: "商品名稱", dataIndex: 'product_name', width: 180, align: 'center' },
             {
-                header: "製造日期", dataIndex: 'made_dt', width: 120, align: 'center',
-                renderer: Ext.util.Format.dateRenderer('Y-m-d'),
-                editor: {
-                    xtype: 'datefield',
-                    format: 'Y-m-d',
-                    allowBlank: false
-                }
+                header: "製造日期", dataIndex: 'made_dt', width: 120, align: 'center'//,
+                //renderer: Ext.util.Format.dateRenderer('Y-m-d'),
+                //editor: {
+                //    xtype: 'datefield',
+                //    format: 'Y-m-d',
+                //    allowBlank: false
+                //}
             },
             {
-                header: "有效日期", dataIndex: 'cde_dt', width: 120, align: 'center',
-                renderer: Ext.util.Format.dateRenderer('Y-m-d'),
-                editor: {
-                    xtype: 'datefield',
-                    format: 'Y-m-d',
-                    allowBlank: false
-                }
+                header: "有效日期", dataIndex: 'cde_dt', width: 120, align: 'center'//,
+                //renderer: Ext.util.Format.dateRenderer('Y-m-d'),
+                //editor: {
+                //    xtype: 'datefield',
+                //    format: 'Y-m-d',
+                //    allowBlank: false
+                //}
             },
             {
                 header: "庫存數量", dataIndex: 'prod_qty', width: 150, align: 'center'

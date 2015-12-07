@@ -114,5 +114,6 @@ namespace BLL.gigade.Dao.Impl
         DataTable CagegoryDetialExport(OrderDetailQuery query);
         DataTable GetOrderDetialExportOrderid(OrderDetailQuery query);
         DataTable GetInvoiceData(uint order_id);
+        DataTable GetInvoice(uint order_id, uint pid);
     }
 }

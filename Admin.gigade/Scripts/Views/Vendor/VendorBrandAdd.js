@@ -208,7 +208,9 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                         id: 'Brand_Msg_Start_Time',
                         name: 'Brand_Msg_Start_Time',
                         format: 'Y-m-d H:i:s',
+                        time: { hour: 00, min: 00, sec: 00 },
                         anchor: '80%',
+                        editable: false,
                         submitValue: true,
                         enable: false,
                         value: Tomorrow(),
@@ -217,7 +219,10 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                                 var start = Ext.getCmp("Brand_Msg_Start_Time");
                                 var end = Ext.getCmp("Brand_Msg_End_Time");
                                 var s_date = new Date(start.getValue());
-                                end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                if (start.getValue() > end.getValue()) {
+                                    Ext.Msg.alert(INFORMATION, '開始時間不能大於結束時間');
+                                    end.setValue(setNextMonth(start.getValue(), 1));
+                                }
                             }
                         }
                     },
@@ -226,17 +231,19 @@ function addFunction(RowID, VendorBrandsetaddStore) {
                         id: 'Brand_Msg_End_Time',
                         name: 'Brand_Msg_End_Time',
                         format: 'Y-m-d H:i:s',
+                        editable: false,
+                        time: { hour: 23, min: 59, sec: 59 },
                         fieldLabel: '顯示結束時間',
                         anchor: '80%',
                         submitValue: true,
-                        value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+                        value: setNextMonth(Tomorrow(), 1),
                         listeners: {
                             select: function (a, b, c) {
                                 var start = Ext.getCmp("Brand_Msg_Start_Time");
                                 var end = Ext.getCmp("Brand_Msg_End_Time");
                                 if (end.getValue() < start.getValue()) {
-                                    Ext.Msg.alert(INFORMATION, '開始時間不能大於結束時間');
-                                    end.setValue(new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)));
+                                    Ext.Msg.alert(INFORMATION, '結束時間不能小於開始時間');
+                                    start.setValue(setNextMonth(end.getValue(), -1));
                                 }
                             }
                         }
@@ -439,15 +446,19 @@ function addFunction(RowID, VendorBrandsetaddStore) {
 
         ]
     });
-    function tomorrow() {
+    function Tomorrow() {
         var d;
+        var dt;
         var s = "";
         d = new Date();                             // 创建 Date 对象。
         s += d.getFullYear() + "/";                     // 获取年份。
         s += (d.getMonth() + 1) + "/";              // 获取月份。
-        s += d.getDate();                          // 获取日。
-        return (new Date(s));                                 // 返回日期。
-    };
+        s += d.getDate();
+        dt = new Date(s);
+        dt.setDate(dt.getDate() + 1);
+        return dt;                                 // 返回日期。
+    }
+
     var editWin = Ext.create('Ext.window.Window', {
         title: '品牌列表',
         id: 'editWin',
@@ -505,5 +516,15 @@ function addFunction(RowID, VendorBrandsetaddStore) {
         }
 
     }
-
+}
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

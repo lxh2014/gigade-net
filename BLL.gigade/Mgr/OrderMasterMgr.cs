@@ -1166,13 +1166,15 @@ set ");
                 DataTable dt = _orderMasterDao.CagegoryDetialExport(query);
                 if (dt != null && dt.Rows.Count > 0)
                 {
-                    List<Parametersrc> parameterList = _parametersrcDao.SearchParameters("payment", "order_status", "product_mode");
+                    List<Parametersrc> parameterList = _parametersrcDao.SearchParameters("payment", "order_status", "product_mode", "Deliver_Store");
                     foreach (DataRow dr in dt.Rows)
                     {
                         var alist = parameterList.Find(m => m.ParameterType == "payment" && m.ParameterCode == dr["order_payment"].ToString());
                         var blist = parameterList.Find(m => m.ParameterType == "order_status" && m.ParameterCode == dr["order_status"].ToString());
                         var clist = parameterList.Find(m => m.ParameterType == "order_status" && m.ParameterCode == dr["slave_status"].ToString());
                         var dlist = parameterList.Find(m => m.ParameterType == "product_mode" && m.ParameterCode == dr["product_mode"].ToString());
+                        var delist = parameterList.Find(m => m.ParameterType == "Deliver_Store" && m.ParameterCode == dr["delivery_store"].ToString());
+
                         if (alist != null)
                         {
                             dr["payment_name"] = alist.parameterName;
@@ -1188,6 +1190,10 @@ set ");
                         if (dlist != null)
                         {
                             dr["product_mode_name"] = dlist.remark;
+                        }
+                        if (delist != null)
+                        {
+                            dr["deliver_name"] = delist.parameterName;
                         }
                         if (dr["order_createdate"] != null)
                         {
@@ -1205,7 +1211,7 @@ set ");
                         {
                             dr["cost_amount"] = Convert.ToInt32(dr["single_cost"].ToString()) * Convert.ToInt32(dr["buy_num"]);
                         }
-                    }                  
+                    }
                 }
                 return dt;
             }
@@ -1268,6 +1274,17 @@ set ");
                                 if (dr_t["single_cost"] != null && dr_t["buy_num"] != null)
                                 {
                                     dr_t["cost_amount"] = Convert.ToInt32(dr_t["single_cost"].ToString()) * Convert.ToInt32(dr_t["buy_num"]);
+                                }
+                                if (dr_t["parent_id"] != null && dr_t["product_id"] != null)
+                                {
+                                    if (dr_t["item_mode"].ToString() == "0")//單一商品編號是pi.product_id
+                                    {
+                                        dr_t["product_id"] = Convert.ToInt32(dr_t["product_id"].ToString());
+                                    }
+                                    else//組合商品編號是od.parent_id
+                                    {
+                                        dr_t["product_id"] = Convert.ToInt32(dr_t["parent_id"].ToString());
+                                    }
                                 }
                             }
                         }
@@ -1346,6 +1363,18 @@ set ");
             catch (Exception ex)
             {
                 throw new Exception("OrderMgr-->GetInvoiceData-->" + ex.Message, ex);
+            }
+        }
+
+        public DataTable GetInvoice(uint order_id, uint pid)
+        {
+            try
+            {
+                return _orderMasterDao.GetInvoice(order_id, pid);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->GetInvoice-->" + ex.Message, ex);
             }
         }
     }

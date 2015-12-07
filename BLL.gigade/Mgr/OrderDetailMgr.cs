@@ -37,8 +37,9 @@ namespace BLL.gigade.Mgr
         private IProductCategoryImplDao _productCategoryDao;
         private OrderMasterStatusDao _orderMaterStatusDao;
         private IParametersrcImplDao _parametersrcDao;
-        private ISiteImplDao _siteDao;
+       // private ISiteImplDao _siteDao;
         //private OrderDetailDao _orderDetailDao;
+        private IChannelImplDao _channelDao;
         public OrderDetailMgr(string connectionStr)
         {
             _orderDetailDao = new OrderDetailDao(connectionStr);
@@ -49,7 +50,8 @@ namespace BLL.gigade.Mgr
             _mySqlDao = new MySqlDao(connectionStr);
             _productCategoryDao = new ProductCategoryDao(connectionStr);
             _parametersrcDao = new ParametersrcDao(connectionStr);
-            _siteDao = new SiteDao(connectionStr);
+            //_siteDao = new SiteDao(connectionStr);
+            _channelDao = new ChannelDao(connectionStr);
         }
 
         #region 開發用
@@ -423,19 +425,19 @@ namespace BLL.gigade.Mgr
                         {
                             dr["slave_status_name"] = blist.remark;
                         }
-                        int site_id = dr["site_id"].ToString() == "" ? 0 : Convert.ToInt32(dr["site_id"].ToString());
-                        Site clist = new Site();
-                        if (site_id == 0)
+                        int channel = dr["channel"].ToString() == "" ? 0 : Convert.ToInt32(dr["channel"].ToString());
+                        Channel clist = new Channel();
+                        if (channel == 0)
                         {
-                            dr["site_name"] = "";
+                            dr["channel_name_simple"] = "";
                         }
                         else
                         {
-                            clist = _siteDao.GetSiteInfo(site_id);
+                            clist = _channelDao.getSingleObj(channel);
                         }
                         if (clist != null)
                         {
-                            dr["site_name"] = clist.Site_Name;
+                            dr["channel_name_simple"] = clist.channel_name_simple;
                         }
                         if (dr["order_createdate"] != null)
                         {

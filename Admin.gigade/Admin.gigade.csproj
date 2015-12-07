@@ -279,12 +279,55 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="aimg.gigade100.com\element\d5a50ab7a0e45367a137502e6928aa1a.jpg" />
     <Content Include="aimg.gigade100.com\health\116ebb3d89fc7fe11ccc5c29bcd7d21f.png" />
     <Content Include="aimg.gigade100.com\health\31f986e9a55264d1d9c692ef0ceb47df.png" />
     <Content Include="aimg.gigade100.com\health\6c4590fe67df5fe58c9535dc5938e5e2.png" />
     <Content Include="aimg.gigade100.com\health\83907f4df2b6a1dd10db6c1ecc163d9b.png" />
     <Content Include="aimg.gigade100.com\health\b6da5967d0ec951ccf661cc536fe7f85.png" />
     <Content Include="aimg.gigade100.com\health\ed6e74074949804b333fa9cb38c2f8b1.png" />
+    <Content Include="aimg.gigade100.com\product\nopic_150.jpg" />
+    <Content Include="aimg.gigade100.com\product\nopic_280.jpg" />
+    <Content Include="aimg.gigade100.com\product\nopic_50.jpg" />
+    <Content Include="aimg.gigade100.com\product\nopic_600.jpg" />
+    <Content Include="aimg.gigade100.com\product_notice\400x400\41\76\4176ca077d38da5a496df15029bd5b43.jpg" />
+    <Content Include="aimg.gigade100.com\product_notice\400x400\e4\37\e437c764ae00819745be4b0bf225016b.jpg" />
+    <Content Include="aimg.gigade100.com\product_notice\400x400\e7\47\e7472363280d227243f4dbd85c87462d.jpg" />
+    <Content Include="aimg.gigade100.com\product_notice\a\41\76\4176ca077d38da5a496df15029bd5b43.jpg" />
+    <Content Include="aimg.gigade100.com\product_notice\a\e4\37\e437c764ae00819745be4b0bf225016b.jpg" />
+    <Content Include="aimg.gigade100.com\product_notice\a\e7\47\e7472363280d227243f4dbd85c87462d.jpg" />
+    <Content Include="aimg.gigade100.com\product_tag\a\21\d9\21d99bd23dadbbe9fe5038fc491eab60.gif" />
+    <Content Include="aimg.gigade100.com\product_tag\a\2e\71\2e71e6a95ba1581de9867a6edae41dbd.gif" />
+    <Content Include="aimg.gigade100.com\product_tag\a\3a\1a\3a1a9ff333c94692e6058aaacfff66f8.gif" />
+    <Content Include="aimg.gigade100.com\product_tag\a\4e\74\4e7400b9fe6d63b8c0ea5a5fb1917965.gif" />
+    <Content Include="aimg.gigade100.com\product_tag\a\52\7b\527b540a002af6d26b452998faaefcd2.gif" />
+    <Content Include="aimg.gigade100.com\product_tag\a\54\2a\542a50c8be478931cdf239eff4e8d030.gif" />
+    <Content Include="aimg.gigade100.com\product_tag\a\59\ad\59ad27d5ad4011dd30f39e9d2f3d930c.gif" />
+    <Content Include="aimg.gigade100.com\product_tag\a\64\ee\64ee69d182a67785d8a77a74d2033df7.gif" />
+    <Content Include="aimg.gigade100.com\product_tag\a\ad\f0\adf07821e6e7e3476667e2db3e501f5c.gif" />
+    <Content Include="aimg.gigade100.com\product_tag\a\cc\94\cc94c7357ae8c30d77733c95d7224b9b.gif" />
+    <Content Include="aimg.gigade100.com\promotion\dev\03c874ab55baa3c1f835d108415fac44.gif" />
+    <Content Include="aimg.gigade100.com\promotion\dev\0ea711391df8d060f4f81141e192814e.jpg" />
+    <Content Include="aimg.gigade100.com\promotion\dev\1896a3bf730516dd643ba67b4c447d36.jpg" />
+    <Content Include="aimg.gigade100.com\promotion\dev\1e8c391abfde9abea82d75a2d60278d4.gif" />
+    <Content Include="aimg.gigade100.com\promotion\dev\28f7241796510e838db4a1384ae1279d.gif" />
+    <Content Include="aimg.gigade100.com\promotion\dev\333222170ab9edca4785c39f55221fe7.gif" />
+    <Content Include="aimg.gigade100.com\promotion\dev\394868456436dbe743e4380554c0493a.gif" />
+    <Content Include="aimg.gigade100.com\promotion\dev\47a3893cc405396a5c30d91320572d6d.jpg" />
+    <Content Include="aimg.gigade100.com\promotion\dev\56c51a39a7c77d8084838cc920585bd0.gif" />
+    <Content Include="aimg.gigade100.com\promotion\dev\6754e06e46dfa419d5afe3c9781cecad.jpg" />
+    <Content Include="aimg.gigade100.com\promotion\dev\6c340f25839e6acdc73414517203f5f0.gif" />
+    <Content Include="aimg.gigade100.com\promotion\dev\75455e062929d32a333868084286bb68.gif" />
+    <Content Include="aimg.gigade100.com\promotion\dev\8091588a3968da46e3e43a76bf3b3a98.jpg" />
+    <Content Include="aimg.gigade100.com\promotion\dev\831c2f88a604a07ca94314b56a4921b8.jpg" />
+    <Content Include="aimg.gigade100.com\promotion\dev\98b17f068d5d9b7668e19fb8ae470841.jpg" />
+    <Content Include="aimg.gigade100.com\promotion\dev\9e95248d9b714a96f47fd159b4c6e911.gif" />
+    <Content Include="aimg.gigade100.com\promotion\dev\9ec0cfdc84044494e10582436e013e64.jpg" />
+    <Content Include="aimg.gigade100.com\promotion\dev\9fe97fff97f089661135d0487843108e.gif" />
+    <Content Include="aimg.gigade100.com\promotion\dev\b63826f7edd2fc3ad8449add0c04fceb.gif" />
+    <Content Include="aimg.gigade100.com\promotion\dev\c929f2210333206f417e3862f431776d.jpg" />
+    <Content Include="aimg.gigade100.com\promotion\dev\d367eef13f90793bd8121e2f675f0dc2.gif" />
+    <Content Include="aimg.gigade100.com\promotion\dev\f708f064faaf32a43e4d3c784e6af9ea.jpg" />
     <Content Include="aimg.gigade100.com\promotion\m10001029902.png" />
     <Content Include="aimg.gigade100.com\promotion\m20001012884.jpg" />
     <Content Include="aimg.gigade100.com\promotion\m20001039937.jpg" />
@@ -631,26 +674,6 @@
     <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
     <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
     <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
-    <Content Include="aimg.gigade100.com\product\nopic_150.jpg" />
-    <Content Include="aimg.gigade100.com\product\nopic_280.jpg" />
-    <Content Include="aimg.gigade100.com\product\nopic_50.jpg" />
-    <Content Include="aimg.gigade100.com\product\nopic_600.jpg" />
-    <Content Include="aimg.gigade100.com\product_notice\400x400\41\76\4176ca077d38da5a496df15029bd5b43.jpg" />
-    <Content Include="aimg.gigade100.com\product_notice\400x400\e4\37\e437c764ae00819745be4b0bf225016b.jpg" />
-    <Content Include="aimg.gigade100.com\product_notice\400x400\e7\47\e7472363280d227243f4dbd85c87462d.jpg" />
-    <Content Include="aimg.gigade100.com\product_notice\a\41\76\4176ca077d38da5a496df15029bd5b43.jpg" />
-    <Content Include="aimg.gigade100.com\product_notice\a\e4\37\e437c764ae00819745be4b0bf225016b.jpg" />
-    <Content Include="aimg.gigade100.com\product_notice\a\e7\47\e7472363280d227243f4dbd85c87462d.jpg" />
-    <Content Include="aimg.gigade100.com\product_tag\a\21\d9\21d99bd23dadbbe9fe5038fc491eab60.gif" />
-    <Content Include="aimg.gigade100.com\product_tag\a\2e\71\2e71e6a95ba1581de9867a6edae41dbd.gif" />
-    <Content Include="aimg.gigade100.com\product_tag\a\3a\1a\3a1a9ff333c94692e6058aaacfff66f8.gif" />
-    <Content Include="aimg.gigade100.com\product_tag\a\4e\74\4e7400b9fe6d63b8c0ea5a5fb1917965.gif" />
-    <Content Include="aimg.gigade100.com\product_tag\a\52\7b\527b540a002af6d26b452998faaefcd2.gif" />
-    <Content Include="aimg.gigade100.com\product_tag\a\54\2a\542a50c8be478931cdf239eff4e8d030.gif" />
-    <Content Include="aimg.gigade100.com\product_tag\a\59\ad\59ad27d5ad4011dd30f39e9d2f3d930c.gif" />
-    <Content Include="aimg.gigade100.com\product_tag\a\64\ee\64ee69d182a67785d8a77a74d2033df7.gif" />
-    <Content Include="aimg.gigade100.com\product_tag\a\ad\f0\adf07821e6e7e3476667e2db3e501f5c.gif" />
-    <Content Include="aimg.gigade100.com\product_tag\a\cc\94\cc94c7357ae8c30d77733c95d7224b9b.gif" />
     <Content Include="ImportUserIOExcel\901.html" />
     <Content Include="ImportUserIOExcel\CommentReplay.html" />
     <Content Include="ImportUserIOExcel\ContactUsQuestionResponse.html" />
@@ -2050,6 +2073,7 @@
     <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.ttf" />
     <None Include="Properties\PublishProfiles\giagade-web.pubxml" />
+    <None Include="Properties\PublishProfiles\zz.pubxml" />
     <None Include="Properties\PublishProfiles\zz125.pubxml" />
     <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Scripts\Bootstrap\fonts\glyphicons-halflings-regular.woff2" />
@@ -4495,16 +4519,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="aimg.gigade100.com\product\150x150\" />
-    <Folder Include="aimg.gigade100.com\product\280x280\" />
-    <Folder Include="aimg.gigade100.com\product\50x50\" />
-    <Folder Include="aimg.gigade100.com\product\a\" />
-    <Folder Include="aimg.gigade100.com\product_picture\400x400\" />
-    <Folder Include="aimg.gigade100.com\product_picture\a\" />
-    <Folder Include="aimg.gigade100.com\product_spec\100x100\" />
-    <Folder Include="aimg.gigade100.com\product_spec\280x280\" />
-    <Folder Include="aimg.gigade100.com\product_spec\a\" />
-    <Folder Include="aimg.gigade100.com\product_tag\a\4e\e9\" />
     <Folder Include="ImgUpLoad\desc\" />
     <Folder Include="ImgUpLoad\prod\" />
     <Folder Include="ImgUpLoad\spec\" />
@@ -4701,7 +4715,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>59673</DevelopmentServerPort>
+          <DevelopmentServerPort>5126</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

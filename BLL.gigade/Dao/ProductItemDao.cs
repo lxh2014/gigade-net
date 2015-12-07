@@ -343,6 +343,9 @@ namespace BLL.gigade.Dao
             }
         }
 
+        #region 商品建議採購量
+        
+        
         /// <summary>
         /// 獲取商品建議採購量信息
         /// </summary>
@@ -366,55 +369,97 @@ namespace BLL.gigade.Dao
             sb.AppendFormat(" where pi.item_stock-(v.procurement_days* sum_biao.sum_total/'{0}'*'{1}')>pi.item_alarm); set sql_safe_updates = 1; ", query.sumDays, query.periodDays);
             _dbAccess.execCommand(sb.ToString());
 
-            sbSqlColumn.Append("select v.vendor_id,p.spec_title_2,p.spec_title_1,p.product_id,p.product_name,(select max(create_time) from item_ipo_create_log where item_id=pi.item_id ) as create_datetime, p.sale_status ,'' as sale_name,p.product_mode ,'' as product_mode_name, p.prepaid,pi.erp_id,pi.item_id,pi.item_stock, pi.item_alarm,p.safe_stock_amount,  ");
-            sbSqlColumn.Append("pm.price as item_money,pm.cost as item_cost,sum_biao.sum_total, subTtotal.iinvd_stock, p.min_purchase_amount,v.vendor_name_simple, v.procurement_days,p.product_status,'' as product_status_string, ");
-            sbSqlColumn.Append("  pi.product_id,pi.spec_id_1 ,pi.spec_id_2,''as NoticeGoods ");
-            sbSqlTable.Append(" from (SELECT  od.item_id,sum( case item_mode when 0 then od.buy_num when  2 then od.buy_num*od.parent_num end ) as sum_total from order_master om INNER JOIN order_slave os USING(order_id)INNER JOIN order_detail od USING(slave_id)  ");
-            sbSqlTable.AppendFormat(" where FROM_UNIXTIME( om.order_createdate)>='{0}' and od.item_mode in (0,2) GROUP BY od.item_id) sum_biao ", sumdate);
-            sbSqlTable.Append(" INNER join  product_item pi on sum_biao.item_id=pi.item_id");
-            sbSqlTable.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=pi.item_id ");
-            sbSqlTable.Append(" INNER join product p on p.product_id=pi.product_id ");
-            sbSqlTable.Append(" INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id");
-            sbSqlTable.Append(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id ");
-            sbSqlTable.Append(" LEFT JOIN item_ipo_create_log iicl on iicl.item_id=pi.item_id ");
-            sbSqlTable.Append(" INNER join price_master pm on pm.product_id=p.product_id and pm.site_id=1 ");
-            sbSqlTable.Append(" INNER join (SELECT pi.item_id,p.product_id from product_item pi INNER JOIN product p on p.product_id=pi.product_id ");
-            sbSqlTable.Append(" where p.product_id>10000 and ((p.prepaid=1) or (p.prepaid=0 and p.product_mode=2))and( ");
-            sbSqlTable.Append(" p.product_status=5 or( p.product_status <>5 and p.product_id in ");
-            sbSqlTable.Append(" (SELECT pc.product_id from product pc INNER JOIN product_combo pcm on pcm.child_id=pc.product_id ");
-            sbSqlTable.Append(" INNER JOIN product pm on pm.product_id=pcm.parent_id where pm.product_status =5)))) t_tb on t_tb.item_id=sum_biao.item_id ");
-            sbSqlTable.Append(" where 1=1 ");
+            #region MyRegion
+            // sbSqlColumn.Append("  SELECT v.vendor_id,p.spec_title_2,p.spec_title_1,p.product_id,p.product_name,(select max(create_time) from item_ipo_create_log where item_id=pi.item_id ) as create_datetime, ");
+            //sbSqlColumn.Append("  p.sale_status ,'' as sale_name,p.product_mode ,'' as product_mode_name, p.prepaid,pi.erp_id,pi.item_id,pi.item_stock, pi.item_alarm,p.safe_stock_amount,ip.item_money,ip.item_cost, ");
+            //sbSqlColumn.Append(" sum( case item_mode when 0 then od.buy_num when  2 then od.buy_num*od.parent_num end ) as sum_total,subTtotal.iinvd_stock, p.min_purchase_amount, ");
+            //sbSqlColumn.Append(" v.vendor_name_simple,v.procurement_days,p.product_status,'' as product_status_string,pi.spec_id_1 ,pi.spec_id_2,''as NoticeGoods ");
+            //sbSqlTable.Append(" from product_item pi  ");
+            //sbSqlTable.Append(" INNER JOIN product p on p.product_id=pi.product_id ");
+            //sbSqlTable.Append(" JOIN order_detail od on od.item_id=pi.item_id and od.item_mode in (0,2) ");
+            //sbSqlTable.Append(" INNER JOIN order_slave os on os.slave_id=od.slave_id ");
+            //sbSqlTable.Append(" INNER JOIN order_master om on om.order_id=os.order_id ");
+            //sbSqlTable.Append(" INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id  ");
+            //sbSqlTable.Append(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id  ");
+            //sbSqlTable.Append(" INNER JOIN item_price ip on ip.item_id=pi.item_id  ");
+            //sbSqlTable.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=pi.item_id  ");
+            //sbSqlTable.Append(" LEFT JOIN item_ipo_create_log iicl on iicl.item_id=pi.item_id   ");
+            //sbSqlTable.Append(" where 1=1 ");
+            //sbSqlCondition.AppendFormat(" and p.product_id>10000  and ((p.prepaid=1) or (p.prepaid=0 and p.product_mode=2)) and FROM_UNIXTIME( om.order_createdate)>='{0}'  ", sumdate);
+            //sbSqlCondition.Append(" and(  p.product_status=5 or( p.product_status <>5 and p.product_id in  ");
+            //sbSqlCondition.Append(" (SELECT pc.product_id from product pc INNER JOIN product_combo pcm on pcm.child_id=pc.product_id  INNER JOIN product pm on pm.product_id=pcm.parent_id where pm.product_status =5)))  "); 
+            #endregion
 
+            sbSqlColumn.Append("select vendor_id,spec_title_2,spec_title_1,''as loc_id,'' as cde_dt,''as made_date,'' as pwy_dte_ctl,''as cde_dt_incr,v_product_onsale.product_id,v_product_onsale.product_name,(select max(create_time) from item_ipo_create_log where item_id=sum_biao.item_id ) as create_datetime, sale_status ,'' as sale_name,product_mode ,'' as product_mode_name, prepaid,erp_id,sum_biao.item_id,item_stock, item_alarm,safe_stock_amount,  ");
+            sbSqlColumn.Append(" '' as item_money,'' as item_cost,sum_biao.sum_total, subTtotal.iinvd_stock,v_product_onsale.product_start,v_product_onsale.product_end, min_purchase_amount,vendor_name_simple,vendor_name_full, procurement_days,product_status,'' as product_status_string, ");
+            sbSqlColumn.Append(" spec_id_1 ,spec_id_2,''as NoticeGoods ");
+
+            sbSqlTable.Append(" from (SELECT  od.item_id,sum( case dt1.item_mode when 0 then dt1.buy_num when  2 then dt1.buy_num*dt1.parent_num end ) as sum_total from order_master om INNER JOIN order_slave os USING(order_id)INNER JOIN order_detail od USING(slave_id)  ");
+            sbSqlTable.AppendFormat(" left join order_detail dt1 on dt1.detail_id=od.detail_id and dt1.detail_status=4 where FROM_UNIXTIME( om.order_createdate)>='{0}' and od.item_mode in (0,2) GROUP BY od.item_id) sum_biao ", sumdate);
+            sbSqlTable.Append(" INNER JOIN  v_product_onsale  on v_product_onsale.item_id=sum_biao.item_id ");
+            sbSqlTable.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=sum_biao.item_id ");
+
+            sbSqlTable.Append(" LEFT JOIN item_ipo_create_log iicl on iicl.item_id=sum_biao.item_id ");
+           // sbSqlTable.Append(" INNER join price_master pm on pm.product_id=v_product_onsale.product_id and pm.site_id=1 ");//and ((prepaid=1) or (prepaid=0 and product_mode=2))
+            sbSqlCondition.Append("  where 1=1 and ((prepaid=1) or (prepaid=0 and product_mode=2)) ");
+            #region 視圖
+            //sbSqlTable.AppendFormat(" from (select sum(buy_num) as sum_total ,item_id from v_product_order where FROM_UNIXTIME(order_createdate)>='{0}' group by item_id) sum_biao ", sumdate);
+
+            //sbSqlTable.Append(" INNER JOIN  v_product_onsale  on v_product_onsale.item_id=sum_biao.item_id ");
+            //sbSqlTable.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=sum_biao.item_id ");
+
+            //sbSqlTable.Append(" LEFT JOIN item_ipo_create_log iicl on iicl.item_id=sum_biao.item_id ");
+            //sbSqlTable.Append(" INNER join price_master pm on pm.product_id=v_product_onsale.product_id and pm.site_id=1 ");//and ((prepaid=1) or (prepaid=0 and product_mode=2))
+            //sbSqlCondition.Append("  where 1=1 and ((prepaid=1) or (prepaid=0 and product_mode=2)) ");
+            #endregion
+            //sbSqlColumn.Append("select v.vendor_id,p.spec_title_2,p.spec_title_1,p.product_id,p.product_name,(select max(create_time) from item_ipo_create_log where item_id=pi.item_id ) as create_datetime, p.sale_status ,'' as sale_name,p.product_mode ,'' as product_mode_name, p.prepaid,pi.erp_id,pi.item_id,pi.item_stock, pi.item_alarm,p.safe_stock_amount,  ");
+            //sbSqlColumn.Append("pm.price as item_money,pm.cost as item_cost,sum_biao.sum_total, subTtotal.iinvd_stock, p.min_purchase_amount,v.vendor_name_simple, v.procurement_days,p.product_status,'' as product_status_string, ");
+            //sbSqlColumn.Append("  pi.product_id,pi.spec_id_1 ,pi.spec_id_2,''as NoticeGoods ");
+            //sbSqlTable.Append(" from (SELECT  od.item_id,sum( case item_mode when 0 then od.buy_num when  2 then od.buy_num*od.parent_num end ) as sum_total from order_master om INNER JOIN order_slave os USING(order_id)INNER JOIN order_detail od USING(slave_id)  ");
+            //sbSqlTable.AppendFormat(" where FROM_UNIXTIME( om.order_createdate)>='{0}' and od.item_mode in (0,2) GROUP BY od.item_id) sum_biao ", sumdate);
+            //sbSqlTable.Append(" INNER join  product_item pi on sum_biao.item_id=pi.item_id");
+            //sbSqlTable.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=pi.item_id ");
+            //sbSqlTable.Append(" INNER join product p on p.product_id=pi.product_id ");
+            //sbSqlTable.Append(" INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id");
+            //sbSqlTable.Append(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id ");
+            //sbSqlTable.Append(" LEFT JOIN item_ipo_create_log iicl on iicl.item_id=pi.item_id ");
+            //sbSqlTable.Append(" INNER join price_master pm on pm.product_id=p.product_id and pm.site_id=1 ");
+            //sbSqlTable.Append(" INNER join (SELECT pi.item_id,p.product_id from product_item pi INNER JOIN product p on p.product_id=pi.product_id ");
+            //sbSqlTable.Append(" where p.product_id>10000 and ((p.prepaid=1) or (p.prepaid=0 and p.product_mode=2))and( ");
+            //sbSqlTable.Append(" p.product_status=5 or( p.product_status <>5 and p.product_id in ");
+            //sbSqlTable.Append(" (SELECT pc.product_id from product pc INNER JOIN product_combo pcm on pcm.child_id=pc.product_id ");
+            //sbSqlTable.Append(" INNER JOIN product pm on pm.product_id=pcm.parent_id where pm.product_status =5)))) t_tb on t_tb.item_id=sum_biao.item_id ");
+           
             //sbSqlCondition.Append(" WHERE  p.product_status =5  ");  //現在只要上架的
             //sbSqlCondition.Append(" and ((p.prepaid=1) or (p.prepaid=0 and p.product_mode=2)) ");  //如果商品為買斷商品（product.prepaid=1）,則全部顯示.如果商品為非買斷商品（product.prepaid=0）,則只要寄倉的
 
             if (query.prepaid != -1)
             {
-                sbSqlCondition.AppendFormat(" and p.prepaid='{0}' ", query.prepaid);
+                sbSqlCondition.AppendFormat(" and v_product_onsale.prepaid='{0}' ", query.prepaid);
             }
             if (!string.IsNullOrEmpty(query.category_ID_IN))
             {
-                sbSqlCondition.AppendFormat(" and p.product_id NOT in(select product_id from  product_category_set where category_id in({0}))", query.category_ID_IN);
+                sbSqlCondition.AppendFormat(" and v_product_onsale.product_id NOT in(select product_id from  product_category_set where category_id in({0}))", query.category_ID_IN);
             }
             if (query.vendor_id != 0)
             {
-                sbSqlCondition.AppendFormat(" and v.vendor_id ='{0}' ", query.vendor_id);
+                sbSqlCondition.AppendFormat(" and v_product_onsale.vendor_id ='{0}' ", query.vendor_id);
             }
             if (!string.IsNullOrEmpty(query.vendor_name_full))
             {
-                sbSqlCondition.AppendFormat(" and v.vendor_name_full like '%{0}%'  ", query.vendor_name_full);
+                sbSqlCondition.AppendFormat(" and v_product_onsale.vendor_name_full like '%{0}%'  ", query.vendor_name_full);
             }
             if (!string.IsNullOrEmpty(query.vendor_name))
             {
-                sbSqlCondition.AppendFormat(" and v.vendor_name_simple like '%{0}%' ", query.vendor_name);
+                sbSqlCondition.AppendFormat(" and v_product_onsale.vendor_name_simple like '%{0}%' ", query.vendor_name);
             }
             if (!string.IsNullOrEmpty(query.Erp_Id))
             {
-                sbSqlCondition.AppendFormat(" and pi.erp_id = '{0}' ", query.Erp_Id);
+                sbSqlCondition.AppendFormat(" and v_product_onsale.erp_id = '{0}' ", query.Erp_Id);
             }
             if (query.sale_status!=100)
             {
-                sbSqlCondition.AppendFormat(" and p.sale_status = '{0}' ", query.sale_status);
+                sbSqlCondition.AppendFormat(" and v_product_onsale.sale_status = '{0}' ", query.sale_status);
             }
             //if (!string.IsNullOrEmpty(query.vendor_name))
             //{
@@ -440,9 +485,11 @@ namespace BLL.gigade.Dao
             {
                 case 0://所有庫存，不加條件的
                     //當(庫存數量-安全存量)<(供應商的進貨天數*近3個月的平均每周銷售數量(最小值為1))時,就需要採購
+                  
                     break;
                 case 1:
-                    sbSqlCondition.Append(" and pi.item_stock<=0 ");//庫存數量在0或者0以下
+                    sbSqlCondition.Append(" and v_product_onsale.item_stock<=0 ");//庫存數量在0或者0以下
+                   
                     break;
                 //case 2:
                 //    sbSqlCondition.Append(" and (pi.item_stock<=5 and pi.item_stock>0) ");//庫存數量在0到5之間
@@ -453,17 +500,19 @@ namespace BLL.gigade.Dao
                 case 2:
                     //sbSqlCondition.Append(" and (pi.item_stock<pi.item_alarm) ");//庫存數量小於安全存量
                     //當前庫存量-供應商的採購天數*平均銷售數量(最小值為1))<=安全存量時,就需要採購
-                    sbSqlCondition.AppendFormat(" and  pi.item_stock-(v.procurement_days* sum_biao.sum_total/'{0}'*'{1}')<=pi.item_alarm ", query.sumDays, query.periodDays);
+
+                    sbSqlCondition.AppendFormat(" and v_product_onsale.item_stock-(v_product_onsale.procurement_days* sum_total/'{0}'*'{1}')<=v_product_onsale.item_alarm", query.sumDays, query.periodDays);
                     break;
                 default:
                     break;
             }
+            sbSqlCondition.AppendFormat(" order by sum_biao.item_id desc ");
             try
             {
-                sbSqlCondition.Append(" order by sum_biao.item_id desc ");
-                if (query.IsPage)
+
+                if (query.IsPage)//
                 {
-                    DataTable dt = _dbAccess.getDataTable("select count(pi.item_id) as totalCount " + sbSqlTable.ToString() + sbSqlCondition.ToString());
+                    DataTable dt = _dbAccess.getDataTable("select count(sum_biao.item_id) as totalCount  " + sbSqlTable.ToString() + sbSqlCondition.ToString());
                     if (dt != null && dt.Rows.Count > 0)
                     {
                         TotalCount = Convert.ToInt32(dt.Rows[0]["totalCount"]);
@@ -473,12 +522,63 @@ namespace BLL.gigade.Dao
                 }
                 Dictionary<int, int>NoticeGoods= GetNoticeGoods(query);
                 IParametersrcImplDao _parameterDao = new ParametersrcDao(connStr);
+                IPriceMasterImplDao _priceMasterDao=new PriceMasterDao(connStr);
                 IProductSpecImplDao _specDao = new ProductSpecDao(connStr);
                 List<Parametersrc> parameterList = _parameterDao.QueryParametersrcByTypes("product_mode", "sale_status");
                 DataTable dtResult = _dbAccess.getDataTable(sbSqlColumn.ToString() + sbSqlTable.ToString() + sbSqlCondition.ToString());
                 List<Parametersrc> parameterStatus = _parameterDao.QueryParametersrcByTypes("product_status");
+                List<PriceMaster> pmster=new List<PriceMaster>();
+                DataTable _dtloc=new DataTable();
+                //select iin.cde_dt,iin.made_date,pe.pwy_dte_ctl,cde_dt_incr from iinvd iin left join product_ext pe on pe.item_id=iin.item_id
+//where 1=1 and iin.ista_id='A' order by cde_dt asc  
                 foreach (DataRow dr in dtResult.Rows)
                 {
+                    if (string.IsNullOrEmpty(dr["sum_total"].ToString()))
+                    {
+                        dr["sum_total"] = 0;
+                    }
+                    _dtloc = GettSuggestPurchaseIloc(dr["item_id"].ToString());
+                    if (string.IsNullOrEmpty(_dtloc.Rows[0]["loc_id"].ToString()))//沒有主料位
+                    {
+                        if (dr["product_mode"].ToString() == "2")
+                        {
+                            dr["loc_id"] = "YY999999";
+                        }
+                        if (dr["product_mode"].ToString() == "3")
+                        {
+                            dr["loc_id"] = "ZZ999999";
+                        }
+                    }else
+                    {
+                        dr["loc_id"] = _dtloc.Rows[0]["loc_id"];
+                    }
+                    if (string.IsNullOrEmpty(_dtloc.Rows[0]["cde_dt"].ToString()))//沒有效期控管
+                    {
+                        dr["cde_dt"] = " ";
+                        dr["made_date"] = " ";
+                    }
+                    else 
+                    {
+                        dr["cde_dt"] = _dtloc.Rows[0]["cde_dt"];
+                        dr["made_date"] = _dtloc.Rows[0]["made_date"];
+                    }
+                    dr["pwy_dte_ctl"] = _dtloc.Rows[0]["pwy_dte_ctl"];
+                    dr["cde_dt_incr"] = _dtloc.Rows[0]["cde_dt_incr"];
+
+                    //計算商品的單價和商品的成本
+                    pmster= _priceMasterDao.GetPriceMasterInfoByID2(dr["product_id"].ToString());
+                    if (pmster.Count > 0)
+                    {
+                        dr["item_money"] = pmster[pmster.Count - 1].price;
+                        dr["item_cost"] = pmster[pmster.Count - 1].cost;
+                    }
+                    else 
+                    {
+                        dr["item_money"] = 0;
+                        dr["item_cost"] = 0;
+
+                    }
+
                     dr["NoticeGoods"] = 0;
                     if (NoticeGoods.Keys.Contains(Convert.ToInt32(dr["item_id"])))
                     {
@@ -520,6 +620,26 @@ namespace BLL.gigade.Dao
             }
         }
 
+        public DataTable GettSuggestPurchaseIloc(string item_id)
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                sb.Append(" select pi.item_id,ip.loc_id,iin.cde_dt,iin.made_date,pe.pwy_dte_ctl,cde_dt_incr ");
+                sb.Append(" from product_item pi  ");
+                sb.Append(" left join iplas ip on pi.item_id=ip.item_id  ");
+                sb.AppendFormat(" left join (select item_id,cde_dt,made_date from  iinvd where ista_id='A' and item_id='{0}' group by cde_dt limit 1) as iin on iin.item_id=pi.item_id  ",item_id);
+               // sb.AppendFormat(" left join (select item_id,sum(prod_qty) as qty from  iinvd where ista_id='A' and item_id='{0}' ) as iinv on iin.item_id=pi.item_id  ", item_id);
+                sb.Append(" left join product_ext pe on pe.item_id=pi.item_id  ");
+                sb.AppendFormat(" where 1=1  and pi.item_id='{0}' ", item_id);
+                return _access.getDataTable(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao.GettSuggestPurchaseIloc-->" + sb.ToString() + ex.Message, ex);
+            }
+        }
+        #endregion
         ///查詢和運達天數相關的信息
         public ProductItemCustom GetProductArriveDay(ProductItem pi, string type)
         {
@@ -897,52 +1017,6 @@ namespace BLL.gigade.Dao
             catch (Exception ex)
             {
                 throw new Exception("ProductItemDao-->GetStatusListLowerShelf-->" + ex.Message + "", ex);
-            }
-        }
-
-        /// <summary>
-        /// 商品建議採購量的排程部分-查詢需要採購的（上架的）商品
-        /// </summary>chaojie1124j_2015/11/19 01:47PM
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public DataTable GetSugestDatetable(ProductItemQuery query)
-        {
-            StringBuilder str = new StringBuilder();
-            StringBuilder sqlCount = new StringBuilder();
-            string sumdate = DateTime.Now.AddDays(-query.sumDays).ToString("yyyy-MM-dd 00:00:00");
-            //query.category_ID_IN
-            try
-            {
-                str.Append(@"select v.vendor_id,p.product_id,pi.item_id,p.product_name,pi.item_stock,pi.erp_id,v.vendor_name_full,pm.cost,pm.price ,pi.item_alarm,p.safe_stock_amount,sum_biao.sum_total, p.min_purchase_amount,v.procurement_days,CONCAT_WS(' ',p.spec_title_1,ps1.spec_name) as spec1,");
-                str.Append(" tp1.parameterName as product_status_string,tp2.parameterName as sale_name,subTtotal.iinvd_stock, ");
-                str.Append(" CONCAT_WS(' ',p.spec_title_2,ps2.spec_name) as spec2,FROM_UNIXTIME(p.product_start) as product_start,FROM_UNIXTIME(p.product_end) as product_end from ( ");
-                str.Append("SELECT od.item_id,sum( case item_mode when 0 then od.buy_num when  2 then od.buy_num*od.parent_num end ) as sum_total from order_master om LEFT JOIN order_slave os USING(order_id)LEFT JOIN order_detail od USING(slave_id) ");
-                str.AppendFormat("   where FROM_UNIXTIME( om.order_createdate)>='{0}' and od.item_mode in (0,2) GROUP BY od.item_id ", sumdate);
-                str.Append(")sum_biao ");
-                str.Append(" INNER join  product_item pi on sum_biao.item_id=pi.item_id INNER join product p on p.product_id=pi.product_id INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id ");//
-                str.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=pi.item_id ");
-                str.Append(" left join t_parametersrc tp1 on tp1.parameterCode=p.product_status and tp1.parameterType='product_status' ");
-                str.Append(" left join t_parametersrc tp2 on tp2.parameterCode=p.sale_status and tp2.parameterType='sale_status' ");
-                str.Append(" INNER join price_master pm on pm.product_id=p.product_id and pm.site_id=1  ");
-                str.AppendFormat(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id LEFT JOIN item_ipo_create_log iicl on iicl.item_id=pi.item_id left join product_spec ps1 on ps1.spec_id=pi.spec_id_1 left join product_spec ps2 on ps2.spec_id=pi.spec_id_2");
-                str.Append(" INNER join (SELECT pi.item_id,p.product_id from product_item pi INNER JOIN product p on p.product_id=pi.product_id ");
-                str.Append(" where p.product_id>10000 and ((p.prepaid=1) or (p.prepaid=0 and p.product_mode=2))and( ");
-                str.Append(" p.product_status=5 or( p.product_status <>5 and p.product_id in ");
-                str.Append(" (SELECT pc.product_id from product pc INNER JOIN product_combo pcm on pcm.child_id=pc.product_id ");
-                str.Append(" INNER JOIN product pm on pm.product_id=pcm.parent_id where pm.product_status =5)))) t_tb on t_tb.item_id=sum_biao.item_id ");
-                str.Append(" where 1=1 ");
-                str.AppendFormat(" and  pi.item_stock-(v.procurement_days* sum_biao.sum_total/'{0}'*'{1}')<=pi.item_alarm  ", query.sumDays, query.periodDays);
-                if (!string.IsNullOrEmpty(query.category_ID_IN))
-                {
-                    str.AppendFormat(" and p.product_id NOT in(select product_id from  product_category_set where category_id in({0}))", query.category_ID_IN);
-                }
-                str.Append(" order by sum_biao.item_id desc;");
-
-                return _access.getDataTable(str.ToString());
-            }
-            catch (Exception ex)
-            {
-               throw new Exception("ProductItemDao-->GetSugestDatetable-->" + ex.Message);
             }
         }
 

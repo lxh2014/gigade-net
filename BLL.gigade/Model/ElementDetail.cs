@@ -32,6 +32,8 @@ namespace BLL.gigade.Model
         public int packet_status { get; set; }
         public uint category_id { get; set; }
         public string category_name { get; set; }
+        public string element_img_big { get; set; }
+
         public ElementDetail()
         {
             element_id = 0;

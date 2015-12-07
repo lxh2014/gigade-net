@@ -646,6 +646,7 @@ function VendorFunction(rid) {
         }
     });
 }
+
 setNextMonth = function (source, n) {
     var s = new Date(source);
     s.setMonth(s.getMonth() + n);

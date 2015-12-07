@@ -2286,11 +2286,11 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.Append("SELECT u.user_name,FROM_UNIXTIME(om.order_createdate) 'order_createdate',om.order_id,om.order_payment, om.order_amount,om.order_status,imr.invoice_number,imr.total_amount,FROM_UNIXTIME(invoice_date) 'invoice_date' ,od.item_id,");
+                sql.Append("SELECT u.user_name,FROM_UNIXTIME(om.order_createdate) 'order_createdate',om.order_id,om.order_payment, om.order_amount,om.order_status, od.item_id,");
                 sql.Append(" od.detail_status,v.vendor_name_simple,v.vendor_code,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,od.single_money*buy_num 'total_money' ,od.item_mode,od.parent_num, ");
                 sql.Append(" od.single_cost,od.bag_check_money,od.single_cost*od.buy_num 'total_cost' , FROM_UNIXTIME(os.slave_date_close) 'slave_date_close',mu.user_username as 'pm',om.source_trace as 'ID',redirect_name, od.product_mode   ");
                 sql.Append(" from order_master om LEFT JOIN order_slave os ON om.order_id=os.order_id  ");
-                sql.Append(" LEFT JOIN order_detail od ON os.slave_id=od.slave_id LEFT JOIN invoice_master_record imr ON om.order_id=imr.order_id  ");
+                sql.Append(" LEFT JOIN order_detail od ON os.slave_id=od.slave_id  ");
                 sql.Append("LEFT JOIN vendor v ON v.vendor_id = od.item_vendor_id left join redirect r on r.redirect_id=om.source_trace  ");
                 sql.Append(" LEFT JOIN redirect_group rg  ON r.group_id = rg.group_id  LEFT JOIN manage_user mu on mu.user_id=v.product_manage LEFT JOIN users u on u.user_id=om.user_id ");
                 sql.AppendFormat(" where  od.item_mode in (0,2) and om.order_date_pay<>0 and om.order_createdate>='{0}' and  om.order_createdate<='{1}'; ", CommonFunction.GetPHPTime(query.datestart.ToString()), CommonFunction.GetPHPTime(query.dateend.ToString()));
@@ -2387,13 +2387,13 @@ namespace BLL.gigade.Dao
             {
                 sql.AppendFormat(@"SELECT DISTINCT od.detail_id,om.order_name,om.order_createdate,'' as order_createdate_format,om.order_id,om.order_payment,'' as  payment_name,
                                 om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,'' as slave_status_name,od.product_name,
-                                od.deduct_bonus,od.deduct_welfare,od.single_money,od.buy_num,od.single_cost,od.bag_check_money,od.single_cost,os.slave_date_close,'' as slave_date_close_format,
-                                od.product_mode ,'' as product_mode_name,od.item_mode,om.delivery_name,om.delivery_address,'' as amount,'' as cost_amount,od.event_cost
+                                od.deduct_bonus,od.deduct_welfare,od.single_money,od.buy_num,od.parent_num,od.single_cost,od.bag_check_money,od.single_cost,os.slave_date_close,'' as slave_date_close_format,
+                                od.product_mode ,'' as product_mode_name,od.item_mode,om.delivery_name,om.delivery_address,'' as amount,'' as cost_amount,od.event_cost,od.parent_id,pi.product_id
                                 FROM order_master om
                                 LEFT JOIN order_slave os ON  om.order_id=os.order_id
                                 LEFT JOIN order_detail od ON os.slave_id=od.slave_id                              
                                 INNER JOIN product_item pi ON od.item_id=pi.item_id                   
-                                WHERE om.order_id='{0}' AND od.detail_status NOT IN (89,90,91) ; ", order_id);
+                                WHERE om.order_id='{0}' AND od.detail_status NOT IN (89,90,91) ORDER BY detail_id; ", order_id);
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)
@@ -2404,27 +2404,39 @@ namespace BLL.gigade.Dao
 
         public DataTable CagegoryDetialExport(OrderDetailQuery query)
         {
-            StringBuilder sql = new StringBuilder();
+            StringBuilder sqlSingle = new StringBuilder();
+            StringBuilder sqlFather = new StringBuilder();
             StringBuilder sqlJoin1 = new StringBuilder();
             StringBuilder sqlJoin2 = new StringBuilder();
             StringBuilder sqlWhere = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"( SELECT pcs.category_id,om.order_name,om.order_createdate,'' as order_createdate_format,
+                sqlSingle.AppendFormat(@"( SELECT pcs.category_id,om.order_name,om.order_createdate,'' as order_createdate_format,
                                     om.order_id,om.order_payment,'' as  payment_name,om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,
                                     '' as slave_status_name,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,
                                     od.single_cost,od.bag_check_money,od.single_cost,os.slave_date_close,'' as slave_date_close_format,'' as amount,'' as cost_amount,
-                                    od.product_mode,'' as product_mode_name,od.item_mode,om.delivery_name,om.delivery_address ,od.detail_id,od.event_cost   FROM order_master om ");
+                                    od.product_mode,'' as product_mode_name,od.item_mode,om.delivery_name,om.delivery_address ,od.detail_id,od.event_cost,pi.product_id,dd.deliver_id,dm.delivery_code,dm.delivery_store,'' as deliver_name   FROM order_master om ");
+
+                sqlFather.AppendFormat(@"( SELECT pcs.category_id,om.order_name,om.order_createdate,'' as order_createdate_format,om.order_id,om.order_payment,
+'' as  payment_name,om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,'' as slave_status_name,od.product_name,
+od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,od.single_cost,od.bag_check_money,od.single_cost,os.slave_date_close,'' as slave_date_close_format,
+'' as amount,'' as cost_amount,od.product_mode,'' as product_mode_name,od.item_mode,om.delivery_name,om.delivery_address,
+od.detail_id,od.event_cost,od.parent_id as product_id,dd.deliver_id,dm.delivery_code,dm.delivery_store,'' as deliver_name FROM order_master om ");
                 sqlJoin1.AppendFormat(@" LEFT JOIN order_slave os ON om.order_id=os.order_id
                                         LEFT JOIN order_detail od ON os.slave_id=od.slave_id                                       
                                         INNER JOIN product_item pi ON od.item_id=pi.item_id
                                         INNER JOIN product_category_set pcs ON pi.product_id=pcs.product_id
+                                        LEFT JOIN deliver_detail dd ON od.detail_id=dd.detail_id
+                                        LEFT JOIN deliver_master dm ON dd.deliver_id=dm.deliver_id
+
                                         WHERE od.item_mode=0  AND pcs.category_id={0}
                                         AND od.detail_status NOT IN(89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
 
                 sqlJoin2.AppendFormat(@"LEFT JOIN order_slave os ON om.order_id=os.order_id
                                         LEFT JOIN order_detail od ON os.slave_id=od.slave_id
                                         INNER JOIN product_category_set pcs ON od.parent_id=pcs.product_id
+                                        LEFT JOIN deliver_detail dd ON od.detail_id=dd.detail_id
+                                        LEFT JOIN deliver_master dm ON dd.deliver_id=dm.deliver_id
                                         WHERE od.item_mode=1  AND pcs.category_id={0}
                                         AND od.detail_status NOT IN(89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
 
@@ -2440,21 +2452,32 @@ namespace BLL.gigade.Dao
                     }
                 }
                 sqlWhere.AppendFormat(" GROUP BY  od.detail_id ");
-                return _dbAccess.getDataTable(sql.ToString() + sqlJoin1.ToString() + sqlWhere.ToString() + ")UNION" + sql.ToString() + sqlJoin2.ToString() + sqlWhere.ToString() + ") ORDER BY order_id");
+                return _dbAccess.getDataTable(sqlSingle.ToString() + sqlJoin1.ToString() + sqlWhere.ToString() + ")UNION" + sqlFather.ToString() + sqlJoin2.ToString() + sqlWhere.ToString() + ") ORDER BY order_id");
             }
             catch (Exception ex)
             {
-                throw new Exception("OrderMasterDao-->CategoryDetialExportInfo-->" + sql.ToString() + ex.Message, ex);
+                throw new Exception("OrderMasterDao-->CategoryDetialExportInfo-->" + sqlSingle.ToString() + ex.Message, ex);
             }
         }
-
-
         public DataTable GetInvoiceData(uint order_id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(" select invoice_number,total_amount,invoice_date from invoice_master_record where order_id='{0}' order by invoice_id DESC limit 1;",order_id);
+                sql.AppendFormat(" select invoice_number,total_amount,invoice_date from invoice_master_record where order_id='{0}' order by invoice_id DESC limit 1;", order_id);
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetInvoiceData-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+        public DataTable GetInvoice(uint order_id, uint pid)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("SELECT invoice_number,invoice_date,imr.tax_type,order_id from product p LEFT JOIN invoice_master_record  imr ON p.tax_type=imr.tax_type WHERE  imr.tax_type IN (1,3) AND p.product_id='{0}' and imr.order_id='{1}' ;", pid, order_id);
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)

@@ -14,5 +14,6 @@ namespace BLL.gigade.Mgr.Impl
         List<DeliverChangeLogQuery> GetDeliverChangeLogList(DeliverChangeLogQuery Query, out int totalCount);
         bool Start(string schedule_code);
         string GetHtmlByDataTable(DataTable _dtmyMonth);
+        bool isCanModifyExpertArriveDate(string apiServer, long deliver_id);
     }
 }
