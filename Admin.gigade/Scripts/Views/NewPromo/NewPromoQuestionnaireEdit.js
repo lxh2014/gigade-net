@@ -76,12 +76,14 @@ function editFunction(row, store) {
                     editable: false,
                     format: 'Y-m-d H:i:s',
                     value: Tomorrow(),
+                    time: { hour: 00, min: 00, sec: 00 },//開始時間00：00：00
                     listeners: {
                         select: function (a, b, c) {
                         var start = Ext.getCmp("start");
                         var end = Ext.getCmp("end");
-                            if (end.getValue() < start.getValue()) {
-                                Ext.Msg.alert(INFORMATION, TIMETIP);
+                        if (end.getValue() < start.getValue()) {
+                            var start_date = start.getValue();
+                            Ext.getCmp('end').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(),23,59,59));
                             }
                         }
                     }
@@ -93,23 +95,17 @@ function editFunction(row, store) {
                                    name: 'end',
                     format: 'Y-m-d H:i:s',
                     allowBlank: false,
-                                   editable: false,
-                    value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+                    editable: false,
+                    time: { hour: 23, min: 59, sec: 59 },
+                    value: setNextMonth(Tomorrow(), 1),
                     listeners: {
                         select: function (a, b, c) {
                                            var start = Ext.getCmp("start");
                                            var end = Ext.getCmp("end");
-                            var s_date = new Date(start.getValue());
-                            var now_date = new Date(end.getValue());
-                            if (end.getValue() < start.getValue()) {
-                                Ext.Msg.alert(INFORMATION, TIMETIP);
+                                           if (end.getValue() < start.getValue()) {
+                                               var end_date = end.getValue();
+                                Ext.getCmp('start').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                             }
-                            var endTime = now_date;
-                            endTime = new Date(endTime.setMonth(now_date.getMonth()));
-                            endTime = new Date(endTime.setMinutes(59));
-                            endTime = new Date(endTime.setSeconds(59));
-                            endTime = new Date(endTime.setHours(23));
-                            end.setValue(endTime);
                         }
                     }
 
@@ -236,7 +232,8 @@ function editFunction(row, store) {
                          name: 'new_user_date',
                          allowBlank: false,
                          editable: false,
-                format: 'Y-m-d H:i:s',
+                         format: 'Y-m-d H:i:s',
+                         time: { hour: 00, min: 00, sec: 00 },
                 value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1))
                      },
                      {
@@ -523,6 +520,28 @@ function Tomorrow() {
     dt = new Date(s);
     dt.setDate(dt.getDate() + 1);
     return dt;                                 // 返回日期。
+}
+//setNextMonth = function (source, n) {
+//    var s = new Date(source);
+//    s.setMonth(s.getMonth() + n);
+//    if (n < 0) {
+//        s.setHours(0, 0, 0);
+//    }
+//    else if (n > 0) {
+//        s.setHours(23, 59, 59);
+//    }
+//    return s;
+    //}
+function setNextMonth(source, n) {
+        var s = new Date(source);
+        s.setMonth(s.getMonth() + n);
+        if (n < 0) {
+            s.setHours(0, 0, 0);
+        }
+        else if (n > 0) {
+            s.setHours(23, 59, 59);
+        }
+        return s;
 }
 
 }

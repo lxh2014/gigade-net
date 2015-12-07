@@ -73,7 +73,8 @@
                   format: 'Y-m-d',
                   allowBlank: false,
                   submitValue: true,
-                  value:new Date(),
+                  value: new Date(),
+                  editable:false,
                   //vtype: 'daterange',//daterange类型为上代码定义的类型
                   //endDateField: 'paperEnd'//必须跟endDate的id名相同
                   //value: sformatDate(new Date()),
@@ -96,6 +97,7 @@
                    id: 'paperEnd',
                    name: 'paperEnd',
                    format: 'Y-m-d',
+                   editable: false,
                    allowBlank: false,
                    submitValue: true,
                    value: eformatDate(new Date()),

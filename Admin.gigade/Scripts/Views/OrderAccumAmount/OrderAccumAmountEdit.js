@@ -41,14 +41,19 @@
                 name: 'event_desc_start',
                 allowBlank: false,
                 editable: false,
-                format: 'Y-m-d 00:00:00',
-                value: Tomorrow(0),
+                format: 'Y-m-d H:i:s',
+                value: Tomorrow(),
+                time: { hour: 00, min: 00, sec: 00 },
                 listeners: {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("event_desc_start");
                         var end = Ext.getCmp("event_desc_end");
-                        var s_date = new Date(start.getValue());
-                        end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                        if (end.getValue() < start.getValue()) {
+                            var start_date = start.getValue();
+                            Ext.getCmp('event_desc_end').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                        }
+                       
+                        
                     }
                 }
             },
@@ -57,18 +62,18 @@
                 xtype: 'datetimefield',
                 id: 'event_desc_end',
                 name: 'event_desc_end',
-                format: 'Y-m-d 23:59:59',
+                time: { hour: 23, min: 59, sec: 59 },
+                format: 'Y-m-d H:i:s',
                 allowBlank: false,
                 editable: false,
-                value: new Date(Tomorrow(0).setMonth(Tomorrow(0).getMonth() + 1)),
+                value: setNextMonth(Tomorrow(), 1),
                 listeners: {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("event_desc_start");
                         var end = Ext.getCmp("event_desc_end");
-                        var s_date = new Date(start.getValue());
                         if (end.getValue() < start.getValue()) {
-                            Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間！");
-                            end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                            var end_date = end.getValue();
+                            Ext.getCmp('event_desc_start').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                         }
                     }
                 }
@@ -81,15 +86,19 @@
                  name: 'event_start_time',
                  allowBlank: false,
                  editable: false,
-                 format: 'Y-m-d 00:00:00',
-                 value: Tomorrow(0),
+                 format: 'Y-m-d H:i:s',
+                 value: Tomorrow(),
+                 time: { hour: 00, min: 00, sec: 00 },
                  listeners: {
                      select: function (a, b, c) {
                          var start = Ext.getCmp("event_start_time");
                          var end = Ext.getCmp("event_end_time");
-                     
-                         var s_date = new Date(start.getValue());
-                         end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                         if (end.getValue() < start.getValue()) {
+                             var start_date = start.getValue();
+                             Ext.getCmp('event_end_time').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                         }
+
+
                      }
                  }
              },
@@ -98,18 +107,18 @@
                 xtype: 'datetimefield',
                 id: 'event_end_time',
                 name: 'event_end_time',
-                format: 'Y-m-d 23:59:59',
+                time: { hour: 23, min: 59, sec: 59 },
+                format: 'Y-m-d H:i:s',
                 allowBlank: false,
                 editable: false,
-                value: new Date(Tomorrow(0).setMonth(Tomorrow(0).getMonth() + 1)),
+                value: setNextMonth(Tomorrow(), 1),
                 listeners: {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("event_start_time");
                         var end = Ext.getCmp("event_end_time");
-                        var s_date = new Date(start.getValue());
                         if (end.getValue() < start.getValue()) {
-                            Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
-                            end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                            var end_date = end.getValue();
+                            Ext.getCmp('event_start_time').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                         }
                     }
                 }
@@ -250,4 +259,29 @@
         }
     }
     editUserWin.show();
+}
+
+function Tomorrow() {
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate() + 1);
+    return dt;                                 // 返回日期。
+}
+
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }
