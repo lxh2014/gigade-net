@@ -209,7 +209,7 @@ namespace BLL.gigade.Mgr.Schedules
                             }
                             catch (Exception ex)
                             {
-                                string str1 = " sod文件下載成功，數據庫更新成功。" + "但參數 localPath_2 有問題，創建路徑（保存下載成功文件）失敗，失敗的原因：" + ex.Message;                                
+                                string str1 = " sod文件下載成功，數據庫更新成功。" + "但是該文件在本地保存失敗，失敗的原因：" + ex.Message;                                
                                 SendMail(schedule_code, str1);
                                 throw new Exception(ex.Message);
                             }
