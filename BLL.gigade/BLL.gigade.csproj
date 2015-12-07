@@ -1266,6 +1266,9 @@
     <Compile Include="Mgr\ZipMgr.cs" />
     <Compile Include="Mgr\DeliverChangeLogMgr.cs" />
     <Compile Include="Model\Announce.cs" />
+    <Compile Include="Model\APIModels\DeliverIdViewModel.cs" />
+    <Compile Include="Model\APIModels\ExpectArrivePeriod.cs" />
+    <Compile Include="Model\APIModels\ModifyExpertArriveDateViewModel.cs" />
     <Compile Include="Model\APIModels\SuppliersLoginResult.cs" />
     <Compile Include="Model\APIModels\SuppliersLoginViewModel.cs" />
     <Compile Include="Model\Appcategory.cs" />
