@@ -300,6 +300,76 @@ LEFT JOIN order_master o ON a.ord_id=o.order_id
         }
         #endregion
 
+        #region 根據工作代號、產品條碼查找數據
+        public List<AseldQuery> GetAllAseldList(AseldQuery a, out int totalCount)
+        {
+            StringBuilder sql = new StringBuilder();//left join iloc ic on i.plas_loc_id=ic.loc_id 
+            StringBuilder sqlCount = new StringBuilder();
+            StringBuilder sqlWhere = new StringBuilder();
+            try
+            {
+                sqlCount.AppendFormat(@"SELECT count(seld_id) as totalCount ");
+                sql.AppendFormat(@"SELECT seld_id,assg_id,case when ip.loc_id is null then 'YY999999' else ip.loc_id end as sel_loc,CONCAT('(',a.item_id,')',v.brand_name,'-',p.product_name) as description,concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz,ord_qty,out_qty,ord_id,cust_name,a.item_id,ordd_id,upc_id,pe.cde_dt_shp,deliver_id,deliver_code,o.note_order,ic.hash_loc_id ");
+                //LEFT JOIN iinvd i ON a.item_id=i.item_id i.cde_dt,
+                sqlWhere.AppendFormat(@" FROM aseld a  
+LEFT JOIN product_ext pe ON a.item_id = pe.item_id 
+LEFT JOIN iplas ip on a.item_id=ip.item_id 
+left join iloc ic on ip.loc_id=ic.loc_id  
+LEFT JOIN product_item pi ON a.item_id = pi.item_id 
+LEFT JOIN product_spec ps1 ON pi.spec_id_1 = ps1.spec_id
+LEFT JOIN product_spec ps2 ON pi.spec_id_2 = ps2.spec_id
+LEFT JOIN product p ON pi.product_id=p.product_id 
+LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id
+LEFT JOIN order_master o ON a.ord_id=o.order_id
+            WHERE wust_id<>'COM' AND commodity_type='2'");// and scaned='0' 
+                if (a.seld_id != 0)
+                {
+                    sqlWhere.AppendFormat(" and a.seld_id='{0}' ", a.seld_id);
+                }
+                if (!string.IsNullOrEmpty(a.assg_id))
+                {
+                    sqlWhere.AppendFormat(" and a.assg_id='{0}' ", a.assg_id);
+                }
+                if (a.item_id != 0)
+                {
+                    sqlWhere.AppendFormat(" and a.item_id='{0}' ", a.item_id);
+                }
+                if (a.ord_id != 0)
+                {
+                    sqlWhere.AppendFormat(" and a.ord_id='{0}' ", a.ord_id);
+                }
+                if (!string.IsNullOrEmpty(a.deliver_code))
+                {
+                    sqlWhere.AppendFormat(" and a.deliver_code='{0}' ", a.deliver_code);
+                }
+                if (a.start_time != DateTime.MinValue && a.end_time != DateTime.MinValue)
+                {
+                    sqlWhere.AppendFormat(" and a.create_dtim between '{0}' and '{1}'",
+                      CommonFunction.DateTimeToString(a.start_time), CommonFunction.DateTimeToString(a.end_time));
+
+                }
+                sqlWhere.AppendFormat(" ORDER BY sel_loc,seld_id ");
+                totalCount = 0;
+                if (a.IsPage)
+                {
+                    DataTable _dt = _access.getDataTable(sqlCount.ToString() + sqlWhere.ToString());
+                    if (_dt.Rows.Count > 0)
+                    {
+                        totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
+                        sqlWhere.AppendFormat(" limit {0},{1};", a.Start, a.Limit);
+                    }
+                }
+                return _access.getDataTableForObj<AseldQuery>(sql.ToString() + sqlWhere.ToString());
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldDao.GetAllAseldList-->" + ex.Message + sql.ToString() + sqlWhere.ToString(), ex);
+            }
+            
+        }
+        #endregion
+
         /// <summary>
         /// 調度頁面數據
         /// </summary>
@@ -537,13 +607,13 @@ LEFT JOIN order_detail od ON os.slave_id=od.slave_id AND a.item_id=od.item_id
         /// 缺貨明細報表
         /// </summary>
         /// <returns></returns>
-        public DataTable GetNComJobDetail(string jobNumbers)
+        public DataTable GetNComJobDetail(string jobNumbers,AseldQuery query=null)
         {
             StringBuilder sql = new StringBuilder();
             sql.AppendLine(@"SELECT assg_id as '工作代號',deliver_code as '出貨單號',CASE when assg_id LIKE 'N%' THEN '常溫' when assg_id LIKE 'F%' THEN '冷凍' END AS '溫層',");
             sql.AppendLine(@"ord_id as '訂單號',aseld.item_id as '品號',CONCAT(v.brand_name,'-',p.product_name) as '品名',concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as '規格',");
             sql.AppendLine(@"CASE when plas.loc_id IS NULL THEN CASE(commodity_type) when 2 THEN 'YY999999' when 3 then 'ZZ999999' END  ELSE plas.loc_id END as '料位'  ,ord_qty as '訂貨量',act_pick_qty as '已撿數量',out_qty as '缺貨數量', ");
-            sql.AppendLine(@"CASE(commodity_type) when 2 THEN '寄倉' WHEN 3 THEN '調度' END AS '寄倉/調度' ");
+            sql.AppendLine(@"CASE(commodity_type) when 2 THEN '寄倉' WHEN 3 THEN '調度' END AS '寄倉/調度',aseld.create_dtim as '生成理貨單時間' ");
             sql.AppendLine(@" from aseld LEFT JOIN  iplas plas ON plas.item_id=aseld.item_id ");
             sql.AppendFormat(@" LEFT JOIN product_item pi ON pi.item_id=aseld.item_id
 LEFT JOIN product_spec ps1 ON pi.spec_id_1 = ps1.spec_id
@@ -556,6 +626,17 @@ LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id
             if (!string.IsNullOrEmpty(jobNumbers))
             {
                 sql.AppendFormat(" AND assg_id in({0})", jobNumbers);
+            }
+            if (query != null)
+            {
+                if (query.create_dtim > DateTime.MinValue)
+                {
+                    sql.AppendFormat(@" and aseld.create_dtim >='{0}'", query.create_dtim.ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (query.create_dtim2 > DateTime.MinValue)
+                {
+                    sql.AppendFormat(@" and aseld.create_dtim <='{0}'", query.create_dtim2.ToString("yyyy-MM-dd 23:59:59"));
+                }
             }
             try
             {
@@ -570,16 +651,30 @@ LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id
         /// 缺貨總報表
         /// </summary>
         /// <returns></returns>
-        public DataTable GetNComJobSimple()
+        public DataTable GetNComJobSimple(AseldQuery query=null)
         {
             StringBuilder sql = new StringBuilder();
+            StringBuilder sqlwhere = new StringBuilder();
             sql.AppendLine(@"SELECT ase.assg_id as '工作代號',CASE when ase.assg_id LIKE 'N%' THEN '常溫' WHEN ase.assg_id LIKE 'F%' THEN '冷凍' END AS '溫層',");
-            sql.AppendLine(@"SUM(out_qty) as'缺貨數量' ,CASE(commodity_type) when 2 THEN '寄倉' WHEN 3 THEN '調度' END AS '寄倉/調度',SUBSTRING(am.create_time,1,10 )as '產生時間'");
+            sql.AppendLine(@"SUM(out_qty) as'缺貨數量' ,CASE(commodity_type) when 2 THEN '寄倉' WHEN 3 THEN '調度' END AS '寄倉/調度',ase.create_dtim as '生成理貨單時間' ");
             sql.AppendLine(@" from aseld_master am INNER JOIN aseld ase on am.assg_id =ase.assg_id");
-            sql.AppendLine(@" where wust_id <>'COM'  GROUP BY ase.assg_id, commodity_type");
+            sqlwhere.AppendLine(@" where 1=1  ");
+            if (query != null)
+            {
+                if (query.create_dtim > DateTime.MinValue)
+                {
+                    sqlwhere.AppendFormat(@" and ase.create_dtim >='{0}'", query.create_dtim.ToString("yyyy-MM-dd 00:00:00"));
+                }
+                if (query.create_dtim2 > DateTime.MinValue)
+                {
+                    sqlwhere.AppendFormat(@" and ase.create_dtim <='{0}'", query.create_dtim2.ToString("yyyy-MM-dd 23:59:59"));
+                }
+            }
+
+            sqlwhere.Append(" and wust_id <>'COM'  GROUP BY ase.assg_id, commodity_type");
             try
             {
-                return _access.getDataTable(sql.ToString());
+                return _access.getDataTable(sql.ToString() + sqlwhere.ToString());
             }
             catch (Exception ex)
             {

@@ -66,15 +66,27 @@ Ext.onReady(function () {
         frame: true,
         flex: 9.4,
         columns: [
-            new Ext.grid.RowNumberer(),//自動顯示行號
+           
             { header: "編號", dataIndex: "group_id", align: 'center' },
-            { header: "群組名稱", dataIndex: "group_name", width: 300, align: 'center' },
-            { header: "會員電子報", dataIndex: "is_member_edm_string", width: 200, align: 'center' },
+            { header: "類型名稱", dataIndex: "group_name", width: 300, align: 'center' },
+            {
+                header: "可自由訂閱", dataIndex: "is_member_edm", width: 200, align: 'center',
+                renderer: function (value) {
+                    if (value == 1) {
+                        return "是";
+                    }
+                    else {
+                        return "否";
+                    }
+                }
+
+            },
             {
                 header: "試閱", dataIndex: "trial_url", align: 'center', width: 150,
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
-                    //return "<a href='#'>" + value + "</a>";
-                    return Ext.String.format('<a href="{0}" target="_blank">{0}</a>', value);
+                    //return "<a href='javascript:void(0)' onclick='AdvanceContent(" + record.data.group_id + ")' > " + 點擊試閱 + "</a>";
+                    return "<a href='javascript:void(0)' onclick='AdvanceContent(" + record.data.group_id + ")'  >點擊試閱<a/>";
+                    //return Ext.String.format('<a href="{0}" target="_blank">{0}</a>', value);
                 }
             },
             {
@@ -104,48 +116,6 @@ Ext.onReady(function () {
                handler: onedit
            },
            '->',
-            //{
-            //    xtype: 'textfield',
-            //    fieldLabel: '群組名稱',
-            //    labelWidth: 70,
-            //    width: 180,
-            //    id: 'group_name_list',
-            //    name: 'group_name_list',
-            //    allowBlank: false,
-            //    submitValue: true,
-            //    hideen:true,
-            //    emptyText:'群組名稱',
-            //    listeners: {
-            //        specialkey: function (field, e) {
-            //            if (e.getKey() == e.ENTER) {
-            //                Query();
-            //            }
-            //        }
-            //    }
-            //},
-            //{
-            //    text: '查詢',
-            //    margin: '0 10 0 10',
-            //    iconCls: 'icon-search',
-            //    hidden:true,
-            //    handler: function () {
-            //        Query(); 
-            //    },
-            //    listeners: {
-            //        onClick: function () {
-            //            if (Ext.getCmp('group_name_list') == '') {
-            //                Ext.Msg.alert('提示信息', '請輸入查詢條件')
-            //            }
-            //        }
-            //    }
-            //},
-            //{
-            //    text: '重置',
-            //    iconCls: 'ui-icon ui-icon-reset',
-            //    handler: function () {
-            //        Ext.getCmp('group_name_list').setValue('');//重置為空
-            //    }
-            //},
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: EdmGroupNewStore,
@@ -179,47 +149,75 @@ Ext.onReady(function () {
     });
 
 })
-/*************************************************************************************查询信息*************************************************************************************************/
 
-function Query(x) {
-    if (Ext.getCmp('group_name_list').getValue() == '') {
-        Ext.Msg.alert('提示信息', '請輸入查詢條件');
-    }
-    else {
-        Ext.getCmp('EdmGroupNewGrid').store.loadPage(1, {
-            params: {
-                group_name: Ext.getCmp('group_name_list').getValue(),
-            }
-        });
-    }
-
-}
 
 /*********************啟用/禁用**********************/
 function UpdateActive(id) {
     var activeValue = $("#img" + id).attr("hidValue");
-    $.ajax({
-        url: "/EdmNew/UpdateStats",
-        data: {
-            "id": id,
-            "active": activeValue
-        },
-        type: "post",
-        type: 'text',
-        success: function (msg) {
-            EdmGroupNewStore.load();
-            if (activeValue == 1) {
-                $("#img" + id).attr("hidValue", 0);
-                $("#img" + id).attr("src", "../../../Content/img/icons/drop-no.gif");
-            } else {
-                $("#img" + id).attr("hidValue", 1);
-                $("#img" + id).attr("src", "../../../Content/img/icons/accept.gif");
+    if (activeValue == 1) {
+        Ext.MessageBox.confirm("提示信息", "是否禁用數據", function (btn) {
+            if (btn == "yes") {
+                $.ajax({
+                    url: "/EdmNew/UpdateStats",
+                    data: {
+                        "id": id,
+                        "active": activeValue
+                    },
+                    type: "post",
+                    type: 'text',
+                    success: function (msg) {
+                        EdmGroupNewStore.load();
+                        if (activeValue == 1) {
+                            $("#img" + id).attr("hidValue", 0);
+                            $("#img" + id).attr("src", "../../../Content/img/icons/drop-no.gif");
+                        } else {
+                            $("#img" + id).attr("hidValue", 1);
+                            $("#img" + id).attr("src", "../../../Content/img/icons/accept.gif");
+                        }
+                    },
+                    error: function (msg) {
+                        Ext.Msg.alert(INFORMATION, FAILURE);
+                    }
+                });
             }
-        },
-        error: function (msg) {
-            Ext.Msg.alert(INFORMATION, FAILURE);
-        }
-    });
+            else {
+                return false;
+            }
+        });
+    }
+    else {
+        Ext.MessageBox.confirm("提示信息", "是否啟用數據", function (btn) {
+            if (btn == "yes") {
+                {
+                    $.ajax({
+                        url: "/EdmNew/UpdateStats",
+                        data: {
+                            "id": id,
+                            "active": activeValue
+                        },
+                        type: "post",
+                        type: 'text',
+                        success: function (msg) {
+                            EdmGroupNewStore.load();
+                            if (activeValue == 1) {
+                                $("#img" + id).attr("hidValue", 0);
+                                $("#img" + id).attr("src", "../../../Content/img/icons/drop-no.gif");
+                            } else {
+                                $("#img" + id).attr("hidValue", 1);
+                                $("#img" + id).attr("src", "../../../Content/img/icons/accept.gif");
+                            }
+                        },
+                        error: function (msg) {
+                            Ext.Msg.alert(INFORMATION, FAILURE);
+                        }
+                    });
+                }
+            }
+            else {
+                return false;
+            }
+        });
+    }
 }
 
 /*******************添加信息*****************************************/
@@ -240,4 +238,31 @@ onedit = function () {
         //Ext.Msg.alert(row[0].data.name);
         editFunction(row[0], EdmGroupNewStore);
     }
+}
+
+AdvanceContent = function (group_id) {
+    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+    myMask.show();
+    Ext.Ajax.request({
+        url: '/EdmNew/AdvanceContent',
+        params: {
+            group_id:group_id
+        },
+        success: function (data) {
+            myMask.hide();
+            var result = data.responseText;
+            if (result == "") {
+                Ext.Msg.alert("提示信息", "此類型下無發送電子報");
+            }
+            else {
+                var A = 1000;
+                var B = 700;
+                var C = (document.body.clientWidth - A) / 2;
+                var D = window.open('', null, 'toolbar=yes,location=no,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=' + A + ',height=' + B + ',left=' + C);
+                var E = "<html><head><title>預覽</title></head><style>body{line-height:200%;padding:50px;}</style><body><div >" + result + "</div></body></html>";
+                D.document.write(E);
+                D.document.close();
+            }
+        }
+    });
 }

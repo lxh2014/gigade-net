@@ -1,0 +1,109 @@
+﻿@{
+    ViewBag.Title = "IlocCheck";
+}
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes " />
+
+<script src="../../Scripts/jquery-2.1.4.min.js"></script>
+<link href="../../Scripts/Bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<script src="../../Scripts/Bootstrap/bootstrap.min.js"></script>
+    <title></title>
+</head>
+
+<div class="container">
+    <h1 >提示：請輸入料位編號!</h1>
+    <br />
+    <br />
+    <br />
+<div class="row">
+  <div class="col-lg-8">
+    <div class="alert alert-danger" id="alert" hidden="hidden" role="alert">
+    <h4 class="glyphicon glyphicon-exclamation-sign"  id="MessageContentId">提示</h4>
+  </div>
+  </div><!-- /.col-lg-8 -->
+  <div class="col-lg-8">
+    <div class="input-group">
+      <span class="input-group-btn">
+        <button class="btn btn-default btn-lg" type="button">料位編號</button>
+      </span>
+      <input type="text" class="form-control input-lg" id="number" onKeypress= "javascript:if(event.keyCode==13) onNumberButtonClick();" placeholder="例如 AA023A12">
+      <span class="input-group-btn">
+        <button class="btn btn-default btn-lg " id="numberbutton" onClick="onNumberButtonClick()" type="button">確定</button>
+      </span>
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-8 -->
+    
+</div><!-- /.row -->
+</div>
+
+<div class="modal fade MarketTally-modal-alert" role="dialog" aria-labelledby="gridSystemModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 class="modal-title" >提示</h3>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">         
+          <h4 id="MessageContentId2" class="text-center">錯誤提示</h4>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="modal-dialog-close" data-dismiss="modal">關閉</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        {
+            $("#number").focus()
+        }
+        onNumberButtonClick = function () {
+            var loc_id = document.getElementById("number").value.trim();
+            if (loc_id.length< 8) {
+                $('#MessageContentId').text(loc_id + "格式錯誤，" + "請輸入正確的料位編號!");
+                $('#alert').show();
+                $("#number").focus();
+                return false;
+            }
+            $.ajax({
+                url: "/WareHouse/GetIlocCount",
+                data: {
+                    "loc_id": loc_id
+                },
+                type: "POST",
+                dataType: "text",
+                success: function (msg)
+                {
+                    var result = eval("(" + msg + ")");
+                    if (result.success == "true")
+                    {
+                        document.location.href = "/WareHouse/IinvdCheck?loc_id=" + loc_id;
+                    }
+                    //else if(result.success=="0")
+                    //{
+                    //    $('#MessageContentId').text("料位編號(" + loc_id + ")無庫存!");
+                    //    $('#alert').show();
+                    //    $("#number").focus()
+                    //    $("#number").val('');
+                    //}
+                    else
+                    {
+                        $('#MessageContentId').text("料位編號(" + loc_id + ")不存在!");
+                        $('#alert').show();
+                        $("#number").focus();
+                        $("#number").val('');
+                    }
+                },
+                error: function (msg)
+                {
+                    alert("服务器异常")
+                }
+            });
+        }
+    });
+</script>

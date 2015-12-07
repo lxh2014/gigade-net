@@ -1074,8 +1074,8 @@ namespace Admin.gigade.Controllers
             try
             {
                 Iupc iupc = new Iupc();
-                iupc.item_id = uint.Parse(Request.Params["item_id"]);
-                iupc.upc_id = Request.Params["upc_id"];
+                iupc.item_id = uint.Parse(Request.Params["item_id"].Trim());
+                iupc.upc_id = Request.Params["upc_id"].Trim();
                 if (!string.IsNullOrEmpty(Request.Params["upc_type_flg"]))
                 {
                     iupc.upc_type_flg = Request.Params["upc_type_flg"];
@@ -1251,11 +1251,8 @@ namespace Admin.gigade.Controllers
                     if (dt.Rows.Count > 0)
                     {
                         _IiupcMgr = new IupcMgr(mySqlConnectionString);
-                        //_IparasrcMgr = new ParameterMgr(mySqlConnectionString);
                         #region 循環Excel的數據
-
-                        //List<BLL.gigade.Model.Parametersrc> codeTypeList = _IparasrcMgr.GetElementType("iupc_type");
-
+                        
                         int i = 0;
                         for (int k = 0; k < dt.Rows.Count; k++)
                         {
@@ -3452,7 +3449,7 @@ namespace Admin.gigade.Controllers
                         q.iarc_id = "KS";
                         q.qty_o = store.prod_qty;
                         q.type = 1;
-                        q.adj_qty = 0;
+                        q.adj_qty = -store.prod_qty;
                         q.create_dtim = DateTime.Now;
                         q.create_user = int.Parse((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString());
                         q.made_dt = store.made_date;
@@ -3479,16 +3476,34 @@ namespace Admin.gigade.Controllers
                     else
                     {
                         Iinvd store = _iinvd.GetIinvd(nvd).FirstOrDefault();
-                        Caller call = new Caller();
-                        call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
-                        ProductItem proitem = new ProductItem();
-                        _proditemMgr = new ProductItemMgr(mySqlConnectionString);
-                        int item_stock = store.prod_qty;
-                        proitem.Item_Stock = item_stock;
-                        proitem.Item_Id = store.item_id;
-                        string path = "/WareHouse/KutiaoAddorReduce";
-                        _proditemMgr.UpdateItemStock(proitem, path, call);
-                        return Json(new { success = "true" });
+                        q.loc_id = store.plas_loc_id;
+                        q.item_id = store.item_id;
+                        q.iarc_id = "KS";
+                        q.qty_o = 0;
+                        q.type = 1;
+                        q.adj_qty = store.prod_qty;
+                        q.create_dtim = DateTime.Now;
+                        q.create_user = int.Parse((System.Web.HttpContext.Current.Session["caller"] as Caller).user_id.ToString());
+                        q.made_dt = store.made_date;
+                        q.cde_dt = store.cde_dt;
+                        if (_iagMgr.insertiialg(q) > 0)
+                        {
+                            Caller call = new Caller();
+                            call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
+                            ProductItem proitem = new ProductItem();
+                            _proditemMgr = new ProductItemMgr(mySqlConnectionString);
+                            int item_stock = store.prod_qty;
+                            proitem.Item_Stock = item_stock;
+                            proitem.Item_Id = store.item_id;
+                            string path = "/WareHouse/KutiaoAddorReduce";
+                            _proditemMgr.UpdateItemStock(proitem, path, call);
+                            return Json(new { success = "true" });
+                        }
+                        else
+                        {
+
+                            return Json(new { success = "false" });
+                        }
                     }
                 }
                 else
@@ -3605,7 +3620,7 @@ namespace Admin.gigade.Controllers
                 _iinvd = new IinvdMgr(mySqlConnectionString);
                 store = _iinvd.GetIinvdExprotList(iivd);
                 #region 列名
-                dtIinvdExcel.Columns.Add("商品編號", typeof(String));
+                dtIinvdExcel.Columns.Add("商品細項編號", typeof(String));
                 dtIinvdExcel.Columns.Add("商品名稱", typeof(String));
                 dtIinvdExcel.Columns.Add("數量", typeof(String));
                 dtIinvdExcel.Columns.Add("有效日期", typeof(String));
@@ -4110,8 +4125,13 @@ namespace Admin.gigade.Controllers
                 {
                     ialg.doc_no = Request.Params["doc_no"];
                 }
+                if (!string.IsNullOrEmpty(Request.Params["gzbh"]))
+                {
+                    ialg.doc_no = Request.Params["gzbh"];
+                }
                 ialg.create_user = userId;
                 invd.change_user = userId;
+               
                 ialg.create_dtim = DateTime.Now;
                 invd.change_dtim = DateTime.Now;
                 invd.row_id = row_id;
@@ -4749,7 +4769,7 @@ namespace Admin.gigade.Controllers
                 {
                     #region 調度--對庫存進行操作
                     m.change_user = int.Parse((Session["caller"] as Caller).user_id.ToString());//操作iwms_record 需要插入create_uaer_id。对aseld中的change_user未做任何改变
-                    m.act_pick_qty = Int32.Parse(Request.Params["act_pick_qty"]);//下一步插入檢貨記錄表，每檢一次記錄一次，實際撿貨量以傳過來的值為標準
+                    m.act_pick_qty = Int32.Parse(Request.Params["act_pick_qty"]);//下一步插入撿貨記錄表，每檢一次記錄一次，實際撿貨量以傳過來的值為標準
                     if (_iasdMgr.getTime(m).Rows.Count > 0)
                     {//獲取到有效期控管商品的保質期
                         m.cde_dt_incr = int.Parse(_iasdMgr.getTime(m).Rows[0]["cde_dt_incr"].ToString());
@@ -4920,7 +4940,7 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
 
-        //寄倉-庫存-輸入檢貨量
+        //寄倉-庫存-輸入撿貨量
         public HttpResponseBase GetSum()
         {
             string json = string.Empty;
@@ -4972,11 +4992,14 @@ namespace Admin.gigade.Controllers
             string json = string.Empty;
             IialgQuery q = new IialgQuery();
             uint id = 0; DateTime dt = new DateTime(); int sun = 0;
+            _proditemMgr = new ProductItemMgr(mySqlConnectionString);
+            ProductItem Proitems = new ProductItem();
             try
             {
                 if (uint.TryParse(Request.Params["item_id"].ToString(), out id))
                 {//商品id
                     q.item_id = id;
+                    Proitems.Item_Id = id;
                 }
                 if (DateTime.TryParse(Request.Params["made_date"].ToString(), out dt))
                 {//商品製造日期
@@ -5001,12 +5024,16 @@ namespace Admin.gigade.Controllers
                 q.create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 //進行庫調
                 _iagMgr = new IialgMgr(mySqlConnectionString);
+                Caller call = new Caller();
+                call = (System.Web.HttpContext.Current.Session["caller"] as Caller);
+                string path = "/WareHouse/KutiaoAddorReduce";
                 if (q.loc_id == "YY999999")
                 {
                     json = "{success:false}";
                 }
                 else
                 {
+                    Proitems.Item_Stock = q.pnum - q.qty_o;
                     int result = _iagMgr.addIialgIstock(q);
                     if (result == 2)
                     {
@@ -5014,6 +5041,7 @@ namespace Admin.gigade.Controllers
                     }
                     if (result == 100)
                     {
+                        _proditemMgr.UpdateItemStock(Proitems, path, call);
                         json = "{success:true,msg:100}";
                     }
                 }
@@ -6732,18 +6760,29 @@ namespace Admin.gigade.Controllers
                         }
                     }
                 }
+                DateTime time;
+                asd.create_dtim = DateTime.MinValue;
+                if (DateTime.TryParse(Request.Params["starttime"].ToString(), out time) && Request.Params["starttime"].Substring(0, 10) != "1970-01-01")
+                {
+
+                    asd.create_dtim = DateTime.Parse(Request.Params["starttime"]).ToString("yyyy-MM-dd") == "1970-01-01" ? DateTime.MinValue : DateTime.Parse(Request.Params["starttime"]);
+                }
+                if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time) && Request.Params["endtime"].Substring(0, 10) != "1970-01-01")
+                {
+                    asd.create_dtim2 = DateTime.Parse(Request.Params["endtime"]).ToString("yyyy-MM-dd") == "1970-01-01" ? DateTime.MinValue : DateTime.Parse(Request.Params["endtime"]);
+                }
                 string jobNumbers = sbJobsNumber.ToString().TrimEnd(',');
                 string fileName = string.Empty;
                 MemoryStream ms = new MemoryStream();
                 if (type == "0")
                 {
                     fileName = "缺貨總報表_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
-                    ms = ExcelHelperXhf.ExportDT(_iasdMgr.GetDetailOrSimple(type, jobNumbers), "總表~未完成理貨工作_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
+                    ms = ExcelHelperXhf.ExportDT(_iasdMgr.GetDetailOrSimple(type, jobNumbers, asd), "總表~未完成理貨工作_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
                 }
                 else if (type == "1")
                 {
                     fileName = "缺貨明細報表_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
-                    ms = ExcelHelperXhf.ExportDT(_iasdMgr.GetDetailOrSimple(type, jobNumbers), "缺貨明細~未完成理貨工作_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
+                    ms = ExcelHelperXhf.ExportDT(_iasdMgr.GetDetailOrSimple(type, jobNumbers, asd), "缺貨明細~未完成理貨工作_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
                 }
 
                 Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
@@ -7268,6 +7307,10 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["vender"]))
                 {//vender
                     m.vender = Request.Params["vender"].ToString().ToUpper();
+                }
+                if (!string.IsNullOrEmpty(Request.Params["prepaid"]))
+                {
+                    m.prepaid = int.Parse(Request.Params["prepaid"]);
                 }
                 #endregion
                 DataTable dt = iinvdMgr.getproduct(m);
@@ -12236,7 +12279,7 @@ namespace Admin.gigade.Controllers
 
             }
         }
-        #region  待撿貨商品報表 add by yafeng0715j 201510260934
+        #region  總量撿貨報表 add by yafeng0715j 201510260934
 
         public ActionResult Aseld()
         {
@@ -12333,690 +12376,7 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return Response;
         }
-        //public static DataTable AseldPDF(DataTable aseldTable)
-        //{
-        //    DataTable table = new DataTable();
-        //    table.Columns.Add("商品編號", typeof(string));
-        //    table.Columns.Add("商品名稱", typeof(string));
-        //    table.Columns.Add("細項編號", typeof(string));
-        //    table.Columns.Add("規格", typeof(string));
-        //    table.Columns.Add("待檢貨量", typeof(string));
-        //    table.Columns.Add("已檢貨量", typeof(string));
-        //    table.Columns.Add("創建時間", typeof(string));
-        //    for (int i = 0; i < aseldTable.Rows.Count; i++)
-        //    {
-        //        DataRow row = table.NewRow();
-        //        row["商品編號"] = aseldTable.Rows[i]["product_id"];
-        //        row["商品名稱"] = aseldTable.Rows[i]["product_name"];
-        //        row["細項編號"] = aseldTable.Rows[i]["item_id"];
-        //        row["規格"] = aseldTable.Rows[i]["spec"];
-        //        row["待檢貨量"] = aseldTable.Rows[i]["out_qty"];
-        //        row["已檢貨量"] = aseldTable.Rows[i]["act_pick_qty"];
-        //        row["創建時間"] = aseldTable.Rows[i]["create_dtim"];
-        //        table.Rows.Add(row);
-        //    }
-        //    return table;
-        //}
-        //public string MakePDF(DataTable aseldTable, string assg_id, string user_username, string newPDFName, int index)
-        //{
-        //    int columnNum = 10;
-        //    string dateNow = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        //    PdfHelper pdf = new PdfHelper();
-        //    float[] arrColWidth = new float[] { 150, 60, 60, 30, 35, 35, 45, 45, 60, 35 };
-        //    Document document = new Document(PageSize.A4);
-        //    BaseFont bf = BaseFont.CreateFont("C:\\WINDOWS\\Fonts\\simsun.ttc,1", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-        //    iTextSharp.text.Font fontChinese = new iTextSharp.text.Font(bf, 8, iTextSharp.text.Font.UNDERLINE, iTextSharp.text.BaseColor.RED);
-        //    iTextSharp.text.Font font = new iTextSharp.text.Font(bf, 12, iTextSharp.text.Font.BOLD, new iTextSharp.text.BaseColor(0, 0, 0));//黑  
-
-        //    string newfilename = "";
-        //    PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(newPDFName + index, FileMode.Create));
-        //    document.Open();
-
-        //    PdfPTable ptable = new PdfPTable(columnNum);
-        //    ptable.WidthPercentage = 100;//表格寬度
-        //    font = new iTextSharp.text.Font(bf, 10, iTextSharp.text.Font.NORMAL, new iTextSharp.text.BaseColor(0, 0, 0));//黑  
-        //    ptable.SetTotalWidth(arrColWidth);
-        //    PdfPCell cell = new PdfPCell();
-        //    int pagesize = 1;
-        //    if (aseldTable.Rows.Count > 35)
-        //    {
-        //        if (aseldTable.Rows.Count % 35 == 0)
-        //        {
-        //            pagesize = aseldTable.Rows.Count / 35;
-        //        }
-        //        else
-        //        {
-        //            pagesize = aseldTable.Rows.Count / 35 + 1;
-        //        }
-        //    }
-        //    for (int j = 0; j < pagesize; j++)
-        //    {
-        //        #region 表頭
-        //        cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.Colspan = columnNum;
-        //        cell.DisableBorderSide(1);
-        //        cell.DisableBorderSide(2);
-        //        cell.DisableBorderSide(4);
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.Colspan = 2;
-        //        cell.DisableBorderSide(1);
-        //        cell.DisableBorderSide(2);
-        //        cell.DisableBorderSide(4);
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("待撿貨商品報表", new iTextSharp.text.Font(bf, 12)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;
-        //        cell.Colspan = 4;
-        //        cell.DisableBorderSide(1);
-        //        cell.DisableBorderSide(2);
-        //        cell.DisableBorderSide(4);
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.Colspan = 3;
-        //        cell.DisableBorderSide(1);
-        //        cell.DisableBorderSide(2);
-        //        cell.DisableBorderSide(4);
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.Colspan = columnNum;
-        //        cell.DisableBorderSide(1);
-        //        cell.DisableBorderSide(2);
-        //        cell.DisableBorderSide(4);
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("印表人：" + user_username, new iTextSharp.text.Font(bf, 8)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.Colspan = 2;
-        //        cell.DisableBorderSide(1);
-        //        cell.DisableBorderSide(2);
-        //        cell.DisableBorderSide(4);
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-        //        cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.Colspan = 5;
-        //        cell.DisableBorderSide(1);
-        //        cell.DisableBorderSide(2);
-        //        cell.DisableBorderSide(4);
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("印表時間：" + dateNow, new iTextSharp.text.Font(bf, 8)));
-        //        cell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
-        //        cell.Colspan = 3;
-        //        cell.DisableBorderSide(1);
-        //        cell.DisableBorderSide(2);
-        //        cell.DisableBorderSide(4);
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 1)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.Colspan = columnNum;
-        //        cell.DisableBorderSide(1);
-        //        cell.DisableBorderSide(2);
-        //        cell.DisableBorderSide(4);
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-        //        #endregion
-
-        //        cell = new PdfPCell(new Phrase("                                       工作代號:" + assg_id, new iTextSharp.text.Font(bf, 10)));
-        //        cell.VerticalAlignment = Element.ALIGN_CENTER;
-        //        cell.Colspan = columnNum;
-        //        cell.DisableBorderSide(2);
-        //        ptable.AddCell(cell);
-
-        //        //cell = new PdfPCell(new Phrase("商品編號", new iTextSharp.text.Font(bf, 8)));
-        //        //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        //cell.DisableBorderSide(8);
-        //        //ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("商品名稱", new iTextSharp.text.Font(bf, 8)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 8)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("規格", new iTextSharp.text.Font(bf, 8)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("訂貨量", new iTextSharp.text.Font(bf, 8)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("已檢貨量", new iTextSharp.text.Font(bf, 8)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("待檢貨量", new iTextSharp.text.Font(bf, 8)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("本次檢貨量", new iTextSharp.text.Font(bf, 8)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("料位編號", new iTextSharp.text.Font(bf, 8)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        cell.DisableBorderSide(8);
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("創建時間", new iTextSharp.text.Font(bf, 8)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        ptable.AddCell(cell);
-
-        //        cell = new PdfPCell(new Phrase("備註", new iTextSharp.text.Font(bf, 8)));
-        //        cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //        ptable.AddCell(cell);
-
-        //        if (0 < aseldTable.Rows.Count)
-        //        {
-        //            int k = 0;
-        //            if (aseldTable.Rows.Count > 35)
-        //            {
-        //                k = (j + 1) * 35;
-        //                if (j != 0)
-        //                {
-        //                    if ((aseldTable.Rows.Count - j * 35) < 35)
-        //                    {
-        //                        k = aseldTable.Rows.Count;
-        //                    }
-        //                    else
-        //                    {
-        //                        k = (j + 1) * 35;
-        //                    }
-        //                }
-        //            }
-        //            else if (0 < aseldTable.Rows.Count)
-        //            {
-        //                k = aseldTable.Rows.Count;
-        //            }
-        //            _IiupcMgr = new IupcMgr(mySqlConnectionString);
-        //            IupcQuery query = new IupcQuery();
-        //            for (int i = j * 35; i < k; i++)
-        //            {
-        //                //cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["product_id"].ToString(), new iTextSharp.text.Font(bf, 8)));
-        //                //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //                //cell.DisableBorderSide(8);
-        //                //ptable.AddCell(cell);
-
-        //                cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["product_name"].ToString(), new iTextSharp.text.Font(bf, 8)));
-        //                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //                cell.DisableBorderSide(8);
-        //                ptable.AddCell(cell);
-
-        //                string upc_id = string.Empty;
-        //                List<IupcQuery> list = new List<IupcQuery>();
-        //                if (!string.IsNullOrEmpty(aseldTable.Rows[i]["item_id"].ToString()))
-        //                {
-        //                    uint item_id = uint.Parse(aseldTable.Rows[i]["item_id"].ToString());
-        //                    query.item_id = item_id;
-        //                    query.upc_type_flg = "1";
-        //                    list = _IiupcMgr.GetIupcByType(query);
-        //                    if (list.Count > 0)
-        //                    {
-        //                        upc_id = list[0].upc_id;
-        //                    }
-        //                    else
-        //                    {
-        //                        query.upc_type_flg = "3";
-        //                        list = _IiupcMgr.GetIupcByType(query);
-        //                        if (list.Count > 0)
-        //                        {
-        //                            upc_id = list[0].upc_id;
-        //                        }
-        //                        else
-        //                        {
-        //                            query.upc_type_flg = "2";
-        //                            list = _IiupcMgr.GetIupcByType(query);
-        //                            if (list.Count > 0)
-        //                            {
-        //                                upc_id = list[0].upc_id;
-        //                            }
-        //                        }
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    upc_id = " ";
-        //                }
-        //                cell = new PdfPCell(new Phrase(upc_id, new iTextSharp.text.Font(bf, 8)));
-        //                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //                cell.DisableBorderSide(8);
-        //                ptable.AddCell(cell);
-
-        //                cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["spec"].ToString(), new iTextSharp.text.Font(bf, 8)));
-        //                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //                cell.DisableBorderSide(8);
-        //                ptable.AddCell(cell);
-
-        //                cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["ord_qty"].ToString(), new iTextSharp.text.Font(bf, 8)));
-        //                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //                cell.DisableBorderSide(8);
-        //                ptable.AddCell(cell);
-
-        //                cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["act_pick_qty"].ToString(), new iTextSharp.text.Font(bf, 8)));
-        //                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //                cell.DisableBorderSide(8);
-        //                ptable.AddCell(cell);
-
-        //                cell = new PdfPCell(new Phrase(aseldTable.Rows[i]["out_qty"].ToString(), new iTextSharp.text.Font(bf, 8)));
-        //                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //                cell.DisableBorderSide(8);
-        //                ptable.AddCell(cell);
-
-        //                cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 8)));
-        //                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //                cell.DisableBorderSide(8);
-        //                ptable.AddCell(cell);
-
-        //                string loc_id = aseldTable.Rows[i]["loc_id"].ToString();
-        //                string lcat_id = aseldTable.Rows[i]["lcat_id"].ToString();
-        //                if (lcat_id != "S")
-        //                {
-        //                    string parameterName = aseldTable.Rows[i]["parameterName"].ToString();
-        //                    if (parameterName == "寄倉")
-        //                    {
-        //                        loc_id = "YY999999";
-        //                    }
-        //                    else if (parameterName == "調度")
-        //                    {
-        //                        loc_id = "ZZ999999";
-        //                    }
-        //                }
-        //                cell = new PdfPCell(new Phrase(loc_id, new iTextSharp.text.Font(bf, 8)));
-        //                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //                cell.DisableBorderSide(8);
-        //                ptable.AddCell(cell);
-
-        //                string dateStr = string.Empty;
-        //                DateTime dateCreate = DateTime.MinValue;
-        //                if (DateTime.TryParse(aseldTable.Rows[i]["create_dtim"].ToString(), out dateCreate))
-        //                {
-        //                    dateStr = dateCreate.ToString("yyyy-MM-dd HH:mm:ss");
-        //                }
-        //                cell = new PdfPCell(new Phrase(dateStr, new iTextSharp.text.Font(bf, 8)));
-        //                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //                //cell.DisableBorderSide(8);
-        //                ptable.AddCell(cell);
-
-        //                cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 8)));
-        //                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //                ptable.AddCell(cell);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            cell = new PdfPCell(new Phrase("此工作代號無數據", new iTextSharp.text.Font(bf, 12)));
-        //            cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-        //            cell.Colspan = columnNum;
-        //            cell.DisableBorderSide(1);
-        //            cell.DisableBorderSide(2);
-        //            cell.DisableBorderSide(4);
-        //            cell.DisableBorderSide(8);
-        //            ptable.AddCell(cell);
-        //        }
-        //    }
-        //    newfilename = newPDFName + "_part" + index + "." + "pdf";
-        //    // pdf.ExportDataTableToPDF(aseldTable, false, newfilename, arrColWidth, ptable, comTable, "", "", 7, uint.Parse(table.Rows.Count.ToString()));/*第一7是列，第二個是行*/
-        //    pdf.ExportDataTableToPDF(newfilename, ptable, "", "");
-
-        //    return newfilename;
-        //}
-        //public void AseldPDF()
-        //{
-        //    string user_username = (Session["caller"] as Caller).user_username;
-        //    DataTable aseldTable = new DataTable();
-        //    DataTable assg_idTable = new DataTable();
-        //    AseldQuery ase_query = new AseldQuery();
-        //    ase_query.IsPage = false;
-        //    ase_query.assg_id = string.Empty;
-        //    ase_query.start_dtim = DateTime.MinValue;
-        //    ase_query.change_dtim = DateTime.MinValue;
-        //    int total = 0;
-
-        //    PdfHelper pdf = new PdfHelper();
-        //    List<string> pdfList = new List<string>();
-        //    string newfilename = string.Empty;
-        //    string filename = "待撿貨商品報表" + DateTime.Now.ToString("yyyyMMddHHmmss");
-        //    string newPDFName = Server.MapPath(excelPath) + filename;
-        //    int index = 0;
-        //    int serchWhr = 0;
-
-        //    if (!string.IsNullOrEmpty(Request.Params["assg_id"]))
-        //    {
-        //        ase_query.assg_id = Request.Params["assg_id"];
-        //        serchWhr++;
-        //    }
-        //    DateTime date = DateTime.MinValue;
-        //    if (Request.Params["start_time"] != "null" && Request.Params["end_time"] != "null")
-        //    {
-        //        if (DateTime.TryParse(Request.Params["start_time"], out date))
-        //        {
-        //            ase_query.start_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd 00:00:00"));
-        //        }
-        //        if (DateTime.TryParse(Request.Params["end_time"], out date))
-        //        {
-        //            ase_query.change_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd 23:59:59"));
-        //        }
-        //        serchWhr++;
-        //    }
-        //    IAseldImplMgr aseldMgr = new AseldMgr(mySqlConnectionString);
-
-        //    DataTable _dtBody = new DataTable();
-        //    _dtBody.Columns.Add("商品名稱", typeof(string));
-        //    _dtBody.Columns.Add("條碼", typeof(string));
-        //    _dtBody.Columns.Add("規格", typeof(string));
-        //    _dtBody.Columns.Add("訂貨量", typeof(string));
-        //    _dtBody.Columns.Add("已檢貨量", typeof(string));
-        //    _dtBody.Columns.Add("待檢貨量", typeof(string));
-        //    _dtBody.Columns.Add("本次檢貨量", typeof(string));
-        //    _dtBody.Columns.Add("檢貨料位編號", typeof(string));
-        //    _dtBody.Columns.Add("檢貨庫存", typeof(string));
-        //    _dtBody.Columns.Add("製造日期", typeof(string));
-        //    _dtBody.Columns.Add("有效日期", typeof(string));
-        //    _dtBody.Columns.Add("創建時間", typeof(string));
-        //    _dtBody.Columns.Add("備註", typeof(string));
-
-        //    if (ase_query.assg_id != string.Empty)
-        //    {
-        //        aseldTable = aseldMgr.GetAseldTable(ase_query, out total);
-        //        #region 新增功能
-
-
-        //        if (aseldTable.Rows.Count > 0)
-        //        {
-        //            _iinvd = new IinvdMgr(mySqlConnectionString);//  GetSearchIinvd
-        //            _IiupcMgr = new IupcMgr(mySqlConnectionString);
-        //            foreach (DataRow rows in aseldTable.Rows)
-        //            {
-        //                IinvdQuery IinvdQuery = new IinvdQuery();
-        //                IinvdQuery.item_id = uint.Parse(rows["item_id"].ToString());
-        //                IinvdQuery.ista_id = "A";
-        //                List<IinvdQuery> Store = new List<IinvdQuery>();
-        //                Store = _iinvd.GetPlasIinvd(IinvdQuery);
-        //                int P_num = string.IsNullOrEmpty(rows["out_qty"].ToString()) ? 0 : int.Parse(rows["out_qty"].ToString()); /*要檢貨的數量*/
-        //                string upc_id = string.Empty;
-        //                #region 取條碼
-
-        //                List<IupcQuery> list = new List<IupcQuery>();
-        //                IupcQuery iupc_query = new IupcQuery();
-        //                if (!string.IsNullOrEmpty(rows["item_id"].ToString()))
-        //                {
-        //                    uint item_id = uint.Parse(rows["item_id"].ToString());
-        //                    iupc_query.item_id = item_id;
-        //                    iupc_query.upc_type_flg = "1";
-        //                    list = _IiupcMgr.GetIupcByType(iupc_query);
-        //                    if (list.Count > 0)
-        //                    {
-        //                        upc_id = list[0].upc_id;
-        //                    }
-        //                    else
-        //                    {
-        //                        iupc_query.upc_type_flg = "3";
-        //                        list = _IiupcMgr.GetIupcByType(iupc_query);
-        //                        if (list.Count > 0)
-        //                        {
-        //                            upc_id = list[0].upc_id;
-        //                        }
-        //                        else
-        //                        {
-        //                            iupc_query.upc_type_flg = "2";
-        //                            list = _IiupcMgr.GetIupcByType(iupc_query);
-        //                            if (list.Count > 0)
-        //                            {
-        //                                upc_id = list[0].upc_id;
-        //                            }
-        //                        }
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    upc_id = " ";
-        //                }
-        //                #endregion
-
-        //                if (Store.Count > 0)
-        //                {
-        //                    for (int i = 0; i < Store.Count; i++)
-        //                    {
-        //                        DataRow row = _dtBody.NewRow();
-        //                        if (Store[i].prod_qty > P_num)
-        //                        {
-        //                            row["商品名稱"] = rows["product_name"];
-        //                            row["條碼"] = upc_id;
-        //                            row["規格"] = rows["spec"];
-        //                            row["訂貨量"] = rows["ord_qty"];
-        //                            row["已檢貨量"] = rows["act_pick_qty"];
-        //                            row["待檢貨量"] = rows["out_qty"];
-        //                            row["本次檢貨量"] = " ";
-        //                            row["檢貨料位編號"] = Store[i].plas_loc_id;
-        //                            row["檢貨庫存"] = P_num;
-        //                            row["製造日期"] = Store[i].made_date;
-        //                            row["有效日期"] = Store[i].cde_dt;
-        //                            row["創建時間"] = rows["create_dtim"];
-        //                            row["備註"] = " ";
-        //                            _dtBody.Rows.Add(row);
-        //                            break;
-        //                        }
-        //                        else
-        //                        {
-        //                            row["商品名稱"] = rows["product_name"];
-        //                            row["條碼"] = upc_id;
-        //                            row["規格"] = rows["spec"];
-        //                            row["訂貨量"] = rows["ord_qty"];
-        //                            row["已檢貨量"] = rows["act_pick_qty"];
-        //                            row["待檢貨量"] = rows["out_qty"];
-        //                            row["本次檢貨量"] = " ";
-        //                            row["檢貨料位編號"] = Store[i].plas_loc_id;
-        //                            row["檢貨庫存"] = Store[i].prod_qty;
-        //                            row["製造日期"] = Store[i].made_date;
-        //                            row["有效日期"] = Store[i].cde_dt;
-        //                            row["創建時間"] = rows["create_dtim"];
-        //                            row["備註"] = " ";
-        //                            _dtBody.Rows.Add(row);
-        //                            P_num -= Store[i].prod_qty;
-        //                        }
-
-        //                    }
-        //                    // _dtBody.Rows.Add(row);
-        //                }
-        //                else
-        //                {
-        //                    DataRow row = _dtBody.NewRow();
-        //                    row["商品名稱"] = rows["product_name"];
-        //                    row["條碼"] = upc_id;
-        //                    row["規格"] = rows["spec"];
-        //                    row["訂貨量"] = rows["ord_qty"];
-        //                    row["已檢貨量"] = rows["act_pick_qty"];
-        //                    row["待檢貨量"] = rows["out_qty"];
-        //                    row["本次檢貨量"] = " ";
-        //                    row["檢貨料位編號"] = " ";
-        //                    row["檢貨庫存"] = 0;
-        //                    row["製造日期"] = " ";
-        //                    row["有效日期"] = " ";
-        //                    row["創建時間"] = rows["create_dtim"];
-        //                    row["備註"] = " ";
-        //                    _dtBody.Rows.Add(row);
-        //                }
-
-
-        //            }
-        //        }
-        //        #endregion
-
-        //        pdfList.Add(MakePDF(aseldTable, ase_query.assg_id, user_username, newPDFName, index++));
-        //    }
-        //    else if (ase_query.start_dtim != DateTime.MinValue && ase_query.change_dtim != DateTime.MinValue || serchWhr == 0)
-        //    {
-        //        assg_idTable = aseldMgr.GetAseldTablePDF(ase_query);
-        //        for (int a = 0; a < assg_idTable.Rows.Count; a++)
-        //        {
-        //            ase_query.assg_id = assg_idTable.Rows[a]["assg_id"].ToString();
-        //            aseldTable = aseldMgr.GetAseldTable(ase_query, out total);
-        //            #region 新增功能
-
-
-        //            if (aseldTable.Rows.Count > 0)
-        //            {
-        //                _iinvd = new IinvdMgr(mySqlConnectionString);//  GetSearchIinvd
-        //                _IiupcMgr = new IupcMgr(mySqlConnectionString);
-        //                foreach (DataRow rows in aseldTable.Rows)
-        //                {
-        //                    IinvdQuery IinvdQuery = new IinvdQuery();
-        //                    IinvdQuery.item_id = uint.Parse(rows["item_id"].ToString());
-        //                    IinvdQuery.ista_id = "A";
-        //                    List<IinvdQuery> Store = new List<IinvdQuery>();
-        //                    Store = _iinvd.GetPlasIinvd(IinvdQuery);
-        //                    int P_num = string.IsNullOrEmpty(rows["out_qty"].ToString()) ? 0 : int.Parse(rows["out_qty"].ToString()); /*要檢貨的數量*/
-        //                    string upc_id = string.Empty;
-        //                    #region 取條碼
-
-        //                    List<IupcQuery> list = new List<IupcQuery>();
-        //                    IupcQuery iupc_query = new IupcQuery();
-        //                    if (!string.IsNullOrEmpty(rows["item_id"].ToString()))
-        //                    {
-        //                        uint item_id = uint.Parse(rows["item_id"].ToString());
-        //                        iupc_query.item_id = item_id;
-        //                        iupc_query.upc_type_flg = "1";
-        //                        list = _IiupcMgr.GetIupcByType(iupc_query);
-        //                        if (list.Count > 0)
-        //                        {
-        //                            upc_id = list[0].upc_id;
-        //                        }
-        //                        else
-        //                        {
-        //                            iupc_query.upc_type_flg = "3";
-        //                            list = _IiupcMgr.GetIupcByType(iupc_query);
-        //                            if (list.Count > 0)
-        //                            {
-        //                                upc_id = list[0].upc_id;
-        //                            }
-        //                            else
-        //                            {
-        //                                iupc_query.upc_type_flg = "2";
-        //                                list = _IiupcMgr.GetIupcByType(iupc_query);
-        //                                if (list.Count > 0)
-        //                                {
-        //                                    upc_id = list[0].upc_id;
-        //                                }
-        //                            }
-        //                        }
-        //                    }
-        //                    else
-        //                    {
-        //                        upc_id = " ";
-        //                    }
-        //                    #endregion
-
-        //                    if (Store.Count > 0)
-        //                    {
-        //                        for (int i = 0; i < Store.Count; i++)
-        //                        {
-        //                            DataRow row = _dtBody.NewRow();
-        //                            if (Store[i].prod_qty > P_num)
-        //                            {
-        //                                row["商品名稱"] = rows["product_name"];
-        //                                row["條碼"] = upc_id;
-        //                                row["規格"] = rows["spec"];
-        //                                row["訂貨量"] = rows["ord_qty"];
-        //                                row["已檢貨量"] = rows["act_pick_qty"];
-        //                                row["待檢貨量"] = rows["out_qty"];
-        //                                row["本次檢貨量"] = " ";
-        //                                row["檢貨料位編號"] = Store[i].plas_loc_id;
-        //                                row["檢貨庫存"] = P_num;
-        //                                row["製造日期"] = Store[i].made_date;
-        //                                row["有效日期"] = Store[i].cde_dt;
-        //                                row["創建時間"] = rows["create_dtim"];
-        //                                row["備註"] = " ";
-        //                                _dtBody.Rows.Add(row);
-        //                                break;
-        //                            }
-        //                            else
-        //                            {
-        //                                row["商品名稱"] = rows["product_name"];
-        //                                row["條碼"] = upc_id;
-        //                                row["規格"] = rows["spec"];
-        //                                row["訂貨量"] = rows["ord_qty"];
-        //                                row["已檢貨量"] = rows["act_pick_qty"];
-        //                                row["待檢貨量"] = rows["out_qty"];
-        //                                row["本次檢貨量"] = " ";
-        //                                row["檢貨料位編號"] = Store[i].plas_loc_id;
-        //                                row["檢貨庫存"] = Store[i].prod_qty;
-        //                                row["製造日期"] = Store[i].made_date;
-        //                                row["有效日期"] = Store[i].cde_dt;
-        //                                row["創建時間"] = rows["create_dtim"];
-        //                                row["備註"] = " ";
-        //                                _dtBody.Rows.Add(row);
-        //                                P_num -= Store[i].prod_qty;
-        //                            }
-
-        //                        }
-        //                        // _dtBody.Rows.Add(row);
-        //                    }
-        //                    else
-        //                    {
-        //                        DataRow row = _dtBody.NewRow();
-        //                        row["商品名稱"] = rows["product_name"];
-        //                        row["條碼"] = upc_id;
-        //                        row["規格"] = rows["spec"];
-        //                        row["訂貨量"] = rows["ord_qty"];
-        //                        row["已檢貨量"] = rows["act_pick_qty"];
-        //                        row["待檢貨量"] = rows["out_qty"];
-        //                        row["本次檢貨量"] = " ";
-        //                        row["檢貨料位編號"] = " ";
-        //                        row["檢貨庫存"] = 0;
-        //                        row["製造日期"] = " ";
-        //                        row["有效日期"] = " ";
-        //                        row["創建時間"] = rows["create_dtim"];
-        //                        row["備註"] = " ";
-        //                        _dtBody.Rows.Add(row);
-        //                    }
-
-
-        //                }
-        //            }
-        //            #endregion
-
-        //            pdfList.Add(MakePDF(aseldTable, ase_query.assg_id, user_username, newPDFName, index++));
-        //        }
-        //    }
-
-
-
-        //    newfilename = newPDFName + "." + "pdf";
-        //    pdf.MergePDF(pdfList, newfilename);
-
-        //    Response.Clear();
-        //    Response.Charset = "gb2312";
-        //    Response.ContentEncoding = System.Text.Encoding.UTF8;
-        //    Response.AddHeader("Content-Disposition", "attach-ment;filename=" + filename + ".pdf");
-        //    Response.WriteFile(newfilename);
-
-        //}
+        
 
         public void AseldPDFS()
         {
@@ -13030,7 +12390,7 @@ namespace Admin.gigade.Controllers
             BaseFont bf = BaseFont.CreateFont("C:\\WINDOWS\\Fonts\\simsun.ttc,1", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
             iTextSharp.text.Font fontChinese = new iTextSharp.text.Font(bf, 8, iTextSharp.text.Font.UNDERLINE, iTextSharp.text.BaseColor.RED);
             iTextSharp.text.Font font = new iTextSharp.text.Font(bf, 12, iTextSharp.text.Font.BOLD, new iTextSharp.text.BaseColor(0, 0, 0));//黑  
-            string filename = "待撿貨商品報表" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            string filename = "總量撿貨報表" + DateTime.Now.ToString("yyyyMMddHHmmss");
             Document document = new Document(PageSize.A4.Rotate());
             string newPDFName = Server.MapPath(excelPath) + filename;
             PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(newPDFName, FileMode.Create));
@@ -13080,15 +12440,15 @@ namespace Admin.gigade.Controllers
             _dtBody.Columns.Add("條碼", typeof(string));
            // _dtBody.Columns.Add("規格", typeof(string));
             _dtBody.Columns.Add("訂貨量", typeof(string));
-            _dtBody.Columns.Add("已檢貨量", typeof(string));
-            _dtBody.Columns.Add("待檢貨量", typeof(string));
+            _dtBody.Columns.Add("已撿貨量", typeof(string));
+            _dtBody.Columns.Add("待撿貨量", typeof(string));
             _dtBody.Columns.Add("料位編號", typeof(string));
             _dtBody.Columns.Add("製造日期", typeof(string)); 
             _dtBody.Columns.Add("有效日期", typeof(string));
-            
-           // _dtBody.Columns.Add("檢貨料位編號", typeof(string));
-            _dtBody.Columns.Add("檢貨庫存", typeof(string)); 
-            _dtBody.Columns.Add("本次檢貨量", typeof(string));
+
+            // _dtBody.Columns.Add("撿貨料位編號", typeof(string));
+            _dtBody.Columns.Add("撿貨庫存", typeof(string));
+            _dtBody.Columns.Add("本次撿貨量", typeof(string));
            
            // _dtBody.Columns.Add("創建時間", typeof(string));
             _dtBody.Columns.Add("備註", typeof(string));
@@ -13128,7 +12488,7 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("待撿貨商品報表", new iTextSharp.text.Font(bf, 18)));
+                cell = new PdfPCell(new Phrase("總量撿貨報表", new iTextSharp.text.Font(bf, 18)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;
                 cell.Colspan = 5;
                 cell.DisableBorderSide(1);
@@ -13229,12 +12589,12 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("已檢貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("已撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("待檢貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("待撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -13246,7 +12606,7 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                //cell = new PdfPCell(new Phrase("檢貨料位編號", new iTextSharp.text.Font(bf, 8)));
+                //cell = new PdfPCell(new Phrase("撿貨料位編號", new iTextSharp.text.Font(bf, 8)));
                 //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 //cell.DisableBorderSide(8);
                 //ptable.AddCell(cell);
@@ -13254,12 +12614,12 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("檢貨庫存", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("本次檢貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -13286,7 +12646,7 @@ namespace Admin.gigade.Controllers
                         IinvdQuery.ista_id = "A";
                         List<IinvdQuery> Store = new List<IinvdQuery>();
                         Store = _iinvd.GetPlasIinvd(IinvdQuery);
-                        int P_num = string.IsNullOrEmpty(rows["out_qty"].ToString()) ? 0 : int.Parse(rows["out_qty"].ToString()); /*要檢貨的數量*/
+                        int P_num = string.IsNullOrEmpty(rows["out_qty"].ToString()) ? 0 : int.Parse(rows["out_qty"].ToString()); /*要撿貨的數量*/
                         string upc_id = string.Empty;
                         #region 取條碼
 
@@ -13321,6 +12681,7 @@ namespace Admin.gigade.Controllers
                                 }
                             }
                         }
+                        
                         else
                         {
                             upc_id = " ";
@@ -13329,24 +12690,38 @@ namespace Admin.gigade.Controllers
 
                         if (Store.Count > 0)
                         {
+                            int crorow = 0;
                             for (int i = 0; i < Store.Count; i++)
                             {
                                 DataRow row = _dtBody.NewRow();
                                 if (Store[i].prod_qty > P_num)
                                 {
-                                    row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
-                                    row["條碼"] = upc_id;
-                                   // row["規格"] = rows["spec"];
-                                    row["訂貨量"] = rows["ord_qty"];
-                                    row["已檢貨量"] = rows["act_pick_qty"];
-                                    row["待檢貨量"] = rows["out_qty"];
-                                    row["料位編號"] = rows["loc_id"]; 
+                                    if (crorow != 0)
+                                    {
+                                        row["商品名稱"] = "";
+                                        row["條碼"] = "";
+                                        // row["規格"] = rows["spec"];
+                                        row["訂貨量"] = "";
+                                        row["已撿貨量"] = "";
+                                        row["待撿貨量"] = "";
+                                        row["料位編號"] = "";
+                                    }
+                                    else
+                                    {
+                                        row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
+                                        row["條碼"] = upc_id;
+                                        // row["規格"] = rows["spec"];
+                                        row["訂貨量"] = rows["ord_qty"];
+                                        row["已撿貨量"] = rows["act_pick_qty"];
+                                        row["待撿貨量"] = rows["out_qty"];
+                                        row["料位編號"] = rows["loc_id"];
+                                    }
                                     row["製造日期"] = string.IsNullOrEmpty(Store[i].made_date.ToString()) ? " " : Store[i].made_date.ToString("yyyy/MM/dd");
                                     row["有效日期"] = string.IsNullOrEmpty(Store[i].cde_dt.ToString()) ? " " : Store[i].cde_dt.ToString("yyyy/MM/dd");
-                                    row["檢貨庫存"] = P_num;
-                                    row["本次檢貨量"] = " ";
+                                    row["撿貨庫存"] = P_num;
+                                    row["本次撿貨量"] = " ";
                                     row["備註"] = " ";
-                                   // row["檢貨料位編號"] = Store[i].plas_loc_id;
+                                    // row["撿貨料位編號"] = Store[i].plas_loc_id;
                                    
                                    
                                   //  row["創建時間"] = rows["create_dtim"];
@@ -13356,23 +12731,37 @@ namespace Admin.gigade.Controllers
                                 }
                                 else
                                 {
-                                    row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
-                                    row["條碼"] = upc_id;
-                                    //row["規格"] = rows["spec"];
-                                    row["訂貨量"] = rows["ord_qty"];
-                                    row["已檢貨量"] = rows["act_pick_qty"];
-                                    row["待檢貨量"] = rows["out_qty"];
-                                    row["料位編號"] = rows["loc_id"];
+                                    if (crorow != 0)
+                                    {
+                                        row["商品名稱"] = "";
+                                        row["條碼"] = "";
+                                        // row["規格"] = rows["spec"];
+                                        row["訂貨量"] = "";
+                                        row["已撿貨量"] = "";
+                                        row["待撿貨量"] = "";
+                                        row["料位編號"] = "";
+                                    }
+                                    else
+                                    {
+                                        row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
+                                        row["條碼"] = upc_id;
+                                        //row["規格"] = rows["spec"];
+                                        row["訂貨量"] = rows["ord_qty"];
+                                        row["已撿貨量"] = rows["act_pick_qty"];
+                                        row["待撿貨量"] = rows["out_qty"];
+                                        row["料位編號"] = rows["loc_id"];
+                                    }
                                     row["製造日期"] = string.IsNullOrEmpty(Store[i].made_date.ToString()) ? " " : Store[i].made_date.ToString("yyyy/MM/dd");
                                     row["有效日期"] = string.IsNullOrEmpty(Store[i].cde_dt.ToString()) ? " " : Store[i].cde_dt.ToString("yyyy/MM/dd");
-                                    row["檢貨庫存"] = Store[i].prod_qty;
-                                    row["本次檢貨量"] = " ";
-                                   
-                                    //row["檢貨料位編號"] = Store[i].plas_loc_id;
+                                    row["撿貨庫存"] = Store[i].prod_qty;
+                                    row["本次撿貨量"] = " ";
+
+                                    //row["撿貨料位編號"] = Store[i].plas_loc_id;
                                   //  row["創建時間"] = rows["create_dtim"];
                                     row["備註"] = " ";
                                     _dtBody.Rows.Add(row);
                                     P_num -= Store[i].prod_qty;
+                                    crorow++;
                                     if (P_num == 0)
                                         break;
                                 }
@@ -13387,12 +12776,12 @@ namespace Admin.gigade.Controllers
                             row["條碼"] = upc_id;
                            // row["規格"] = rows["spec"];
                             row["訂貨量"] = rows["ord_qty"];
-                            row["已檢貨量"] = rows["act_pick_qty"];
-                            row["待檢貨量"] = rows["out_qty"];
-                            row["本次檢貨量"] = " ";
+                            row["已撿貨量"] = rows["act_pick_qty"];
+                            row["待撿貨量"] = rows["out_qty"];
+                            row["本次撿貨量"] = " ";
                             row["料位編號"] = rows["loc_id"];
-                            //row["檢貨料位編號"] = " ";
-                            row["檢貨庫存"] = 0;
+                            //row["撿貨料位編號"] = " ";
+                            row["撿貨庫存"] = 0;
                             row["製造日期"] = " ";
                             row["有效日期"] = " ";
                          //   row["創建時間"] = rows["create_dtim"];
@@ -13444,7 +12833,7 @@ namespace Admin.gigade.Controllers
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
 
-                    cell = new PdfPCell(new Phrase("待撿貨商品報表", new iTextSharp.text.Font(bf, 18)));
+                    cell = new PdfPCell(new Phrase("總量撿貨報表", new iTextSharp.text.Font(bf, 18)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;
                     cell.Colspan = 5;
                     cell.DisableBorderSide(1);
@@ -13545,12 +12934,12 @@ namespace Admin.gigade.Controllers
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
 
-                    cell = new PdfPCell(new Phrase("已檢貨量", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("已撿貨量", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
 
-                    cell = new PdfPCell(new Phrase("待檢貨量", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("待撿貨量", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
@@ -13562,7 +12951,7 @@ namespace Admin.gigade.Controllers
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
-                    //cell = new PdfPCell(new Phrase("檢貨料位編號", new iTextSharp.text.Font(bf, 8)));
+                    //cell = new PdfPCell(new Phrase("撿貨料位編號", new iTextSharp.text.Font(bf, 8)));
                     //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     //cell.DisableBorderSide(8);
                     //ptable.AddCell(cell);
@@ -13570,12 +12959,12 @@ namespace Admin.gigade.Controllers
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
-                    cell = new PdfPCell(new Phrase("檢貨庫存", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
 
-                    cell = new PdfPCell(new Phrase("本次檢貨量", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
@@ -13604,7 +12993,7 @@ namespace Admin.gigade.Controllers
                             IinvdQuery.ista_id = "A";
                             List<IinvdQuery> Store = new List<IinvdQuery>();
                             Store = _iinvd.GetPlasIinvd(IinvdQuery);
-                            int P_num = string.IsNullOrEmpty(rows["out_qty"].ToString()) ? 0 : int.Parse(rows["out_qty"].ToString()); /*要檢貨的數量*/
+                            int P_num = string.IsNullOrEmpty(rows["out_qty"].ToString()) ? 0 : int.Parse(rows["out_qty"].ToString()); /*要撿貨的數量*/
                             string upc_id = string.Empty;
                             #region 取條碼
 
@@ -13647,44 +13036,72 @@ namespace Admin.gigade.Controllers
 
                             if (Store.Count > 0)
                             {
+                                int crorow = 0;
                                 for (int i = 0; i < Store.Count; i++)
                                 {
                                     DataRow row = _dtBody.NewRow();
                                     if (Store[i].prod_qty > P_num)
                                     {
-                                        row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
-                                        row["條碼"] = upc_id;
-                                        // row["規格"] = rows["spec"];
-                                        row["訂貨量"] = rows["ord_qty"];
-                                        row["已檢貨量"] = rows["act_pick_qty"];
-                                        row["待檢貨量"] = rows["out_qty"];
-                                        row["料位編號"] = rows["loc_id"];
+                                        if (crorow != 0)
+                                        {
+                                            row["商品名稱"] = "";
+                                            row["條碼"] = "";
+                                            // row["規格"] = rows["spec"];
+                                            row["訂貨量"] = "";
+                                            row["已撿貨量"] = "";
+                                            row["待撿貨量"] = "";
+                                            row["料位編號"] = "";
+                                        }
+                                        else
+                                        {
+                                            row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
+                                            row["條碼"] = upc_id;
+                                            // row["規格"] = rows["spec"];
+                                            row["訂貨量"] = rows["ord_qty"];
+                                            row["已撿貨量"] = rows["act_pick_qty"];
+                                            row["待撿貨量"] = rows["out_qty"];
+                                            row["料位編號"] = rows["loc_id"];
+                                        }
                                         row["製造日期"] = string.IsNullOrEmpty(Store[i].made_date.ToString()) ? " " : Store[i].made_date.ToString("yyyy/MM/dd");
                                         row["有效日期"] = string.IsNullOrEmpty(Store[i].cde_dt.ToString()) ? " " : Store[i].cde_dt.ToString("yyyy/MM/dd");
-                                        row["檢貨庫存"] = P_num;
-                                        row["本次檢貨量"] = " ";
+                                        row["撿貨庫存"] = P_num;
+                                        row["本次撿貨量"] = " ";
                                         row["備註"] = " ";
                                         _dtBody.Rows.Add(row);
                                         break;
                                     }
                                     else
                                     {
-                                        row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
-                                        row["條碼"] = upc_id;
-                                        //row["規格"] = rows["spec"];
-                                        row["訂貨量"] = rows["ord_qty"];
-                                        row["已檢貨量"] = rows["act_pick_qty"];
-                                        row["待檢貨量"] = rows["out_qty"];
-                                        row["料位編號"] = rows["loc_id"];
+                                        if (crorow != 0)
+                                        {
+                                            row["商品名稱"] = "";
+                                            row["條碼"] = "";
+                                            // row["規格"] = rows["spec"];
+                                            row["訂貨量"] = "";
+                                            row["已撿貨量"] = "";
+                                            row["待撿貨量"] = "";
+                                            row["料位編號"] = "";
+                                        }
+                                        else
+                                        {
+                                            row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
+                                            row["條碼"] = upc_id;
+                                            //row["規格"] = rows["spec"];
+                                            row["訂貨量"] = rows["ord_qty"];
+                                            row["已撿貨量"] = rows["act_pick_qty"];
+                                            row["待撿貨量"] = rows["out_qty"];
+                                            row["料位編號"] = rows["loc_id"];
+                                        }
                                         row["製造日期"] = string.IsNullOrEmpty(Store[i].made_date.ToString()) ? " " : Store[i].made_date.ToString("yyyy/MM/dd");
                                         row["有效日期"] = string.IsNullOrEmpty(Store[i].cde_dt.ToString()) ? " " : Store[i].cde_dt.ToString("yyyy/MM/dd");
-                                        row["檢貨庫存"] = Store[i].prod_qty;
-                                        row["本次檢貨量"] = " ";
+                                        row["撿貨庫存"] = Store[i].prod_qty;
+                                        row["本次撿貨量"] = " ";
 
-                                        //row["檢貨料位編號"] = Store[i].plas_loc_id;
+                                        //row["撿貨料位編號"] = Store[i].plas_loc_id;
                                         //  row["創建時間"] = rows["create_dtim"];
                                         row["備註"] = " ";
                                         _dtBody.Rows.Add(row);
+                                        crorow++;
                                         P_num -= Store[i].prod_qty;
                                         if (P_num == 0)
                                             break;
@@ -13700,11 +13117,11 @@ namespace Admin.gigade.Controllers
                                 row["條碼"] = upc_id;
                                // row["規格"] = rows["spec"];
                                 row["訂貨量"] = rows["ord_qty"];
-                                row["已檢貨量"] = rows["act_pick_qty"];
-                                row["待檢貨量"] = rows["out_qty"];
-                                row["本次檢貨量"] = " ";
-                                //row["檢貨料位編號"] = " ";
-                                row["檢貨庫存"] = 0;
+                                row["已撿貨量"] = rows["act_pick_qty"];
+                                row["待撿貨量"] = rows["out_qty"];
+                                row["本次撿貨量"] = " ";
+                                //row["撿貨料位編號"] = " ";
+                                row["撿貨庫存"] = 0;
                                 row["製造日期"] = " ";
                                 row["有效日期"] = " ";
                               //  row["創建時間"] = rows["create_dtim"];
@@ -13756,7 +13173,7 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("待撿貨商品報表", new iTextSharp.text.Font(bf, 18)));
+                cell = new PdfPCell(new Phrase("總量撿貨報表", new iTextSharp.text.Font(bf, 18)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;
                 cell.Colspan = 5;
                 cell.DisableBorderSide(1);
@@ -13857,12 +13274,12 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("已檢貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("已撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("待檢貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("待撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -13874,7 +13291,7 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                //cell = new PdfPCell(new Phrase("檢貨料位編號", new iTextSharp.text.Font(bf, 8)));
+                //cell = new PdfPCell(new Phrase("撿貨料位編號", new iTextSharp.text.Font(bf, 8)));
                 //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 //cell.DisableBorderSide(8);
                 //ptable.AddCell(cell);
@@ -13882,12 +13299,12 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("檢貨庫存", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("本次檢貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -13943,6 +13360,616 @@ namespace Admin.gigade.Controllers
             Response.AddHeader("Content-Disposition", "attach-ment;filename=" + filename + ".pdf");
             Response.WriteFile(newFileName);
 
+        }
+        #endregion
+
+        #region 料位循環盤點 add by yafeng0715j 201511041019
+        public ActionResult IlocCheck()
+        {
+            return View();
+        }
+        public ActionResult IinvdCheck()
+        {
+            _IlocMgr = new IlocMgr(mySqlConnectionString);
+            StringBuilder strHtml = new StringBuilder();
+            string loc_id = Request.Params["loc_id"];
+            IlocQuery ilocquery=new IlocQuery();
+            ilocquery.loc_id = loc_id;
+            loc_id = _IlocMgr.GetIlocCount(ilocquery);
+            ViewBag.loc_id = loc_id;
+            ViewBag.lcat_id = "";
+            ViewBag.upc_id = "";
+            ViewBag.iplas = "";
+            _iinvd = new IinvdMgr(mySqlConnectionString);
+            if (loc_id != "")
+            {
+                List<IinvdQuery> list = _iinvd.GetIinvdList(loc_id);
+                IupcQuery iupc = new IupcQuery();
+                _IiupcMgr = new IupcMgr(mySqlConnectionString);
+                if (list.Count > 0)
+                {
+                    ViewBag.product_name = list[0].product_name;
+                    ViewBag.spec = list[0].spec;
+                    ViewBag.item_id = list[0].item_id.ToString()                                        ;
+                    ViewBag.pwy_dte_ctl = list[0].pwy_dte_ctl;
+                    iupc.item_id=uint.Parse(ViewBag.item_id);
+                    List<IupcQuery> listiupc = _IiupcMgr.GetIupcByItemID(iupc);
+                    if (listiupc.Count > 0)
+                    {
+                        ViewBag.upc_id = listiupc[0].upc_id;
+                    }
+
+                    if (list[0].pwy_dte_ctl == "Y")
+                    {
+                        ViewBag.count = list.Count;
+                    }
+                    else
+                    {
+                        int prod_qty = 0;
+                        for (int i = 0; i < list.Count; i++)
+                        {
+                            prod_qty += list[i].prod_qty;
+                        }
+                        list[0].prod_qty = prod_qty;
+                        ViewBag.count = 1;
+                    }
+                    ViewBag.data = list;
+
+                    IlocQuery lsta_id = _IlocMgr.GetIlocLsta_id(loc_id);
+                    Iloc iloc = new Iloc();
+                    if (lsta_id != null)
+                    {
+                        if (lsta_id.lsta_id == "F")
+                        {
+                            iloc.row_id = lsta_id.row_id;
+                            iloc.lsta_id = "A";
+                            iloc.change_dtim = DateTime.Now;
+                            iloc.change_user = (Session["caller"] as Caller).user_id;
+                            _IlocMgr.UpdateIlocLock(iloc);
+                        }
+                    } 
+                }
+                else {
+                    ViewBag.product_name ="";
+                    ViewBag.spec = "";
+                    ViewBag.item_id = "此料位暫無商品";
+                    IinvdQuery iinvd = new IinvdQuery();
+                    iinvd.prod_qty = 0;
+                    list.Add(iinvd);
+                    ViewBag.pwy_dte_ctl = Request.Params["pwy_dte_ctl"]; ;
+                    ViewBag.count = 0;
+                    ViewBag.data = list;
+
+                    IIlocImplMgr ilocMgr = new IlocMgr(mySqlConnectionString);
+                    IplasDao iplas = new IplasDao(mySqlConnectionString);
+                    int total = 0;
+                    ilocquery.loc_id = loc_id;
+                    ilocquery.lcat_id = "0";
+                    ilocquery.lsta_id = "";
+                    ilocquery.IsPage = false;
+                    List<IlocQuery> listiloc = ilocMgr.GetIocList(ilocquery, out total);
+                    if (list.Count > 0)
+                    {
+                        string lcat_id =listiloc.Count==0?"": listiloc[0].lcat_id;
+                        if (lcat_id == "S")
+                        {
+                            string item_id = iplas.Getlocid(loc_id);
+                            if (item_id != "")
+                            {
+                                ViewBag.item_id = item_id;
+                                iupc.item_id = uint.Parse(ViewBag.item_id);
+                                List<IupcQuery> listiupc = _IiupcMgr.GetIupcByItemID(iupc);
+                                if (listiupc.Count > 0)
+                                {
+                                    ViewBag.upc_id = listiupc[0].upc_id;
+                                }
+                                DataTable table = iplas.GetProduct(item_id);
+                                if (table.Rows.Count > 0)
+                                {
+                                    ViewBag.product_name = table.Rows[0]["product_name"];
+                                    ViewBag.spec = table.Rows[0]["spec"];
+                                    ViewBag.lcat_id = lcat_id;
+                                }
+                            }
+                            else
+                            {
+                                IlocQuery lsta_id = _IlocMgr.GetIlocLsta_id(loc_id);
+                                Iloc iloc = new Iloc();
+                                if (lsta_id != null)
+                                {
+                                    if (lsta_id.lsta_id != "H")
+                                    {
+                                        iloc.row_id = lsta_id.row_id;
+                                        iloc.lsta_id = "F";
+                                        iloc.change_dtim = DateTime.Now;
+                                        iloc.change_user = (Session["caller"] as Caller).user_id;
+                                        _IlocMgr.UpdateIlocLock(iloc);
+                                    }
+                                } 
+                                ViewBag.iplas = "false";
+                                ViewBag.pwy_dte_ctl = "N";
+                            }
+                        }
+                        else {
+                            IlocQuery lsta_id = _IlocMgr.GetIlocLsta_id(loc_id);
+                            Iloc iloc = new Iloc();
+                            if(lsta_id!=null)
+                            {
+                                if(lsta_id.lsta_id!="H")
+                                {
+                                    iloc.row_id=lsta_id.row_id;
+                                    iloc.lsta_id = "F";
+                                    iloc.change_dtim = DateTime.Now;
+                                    iloc.change_user = (Session["caller"] as Caller).user_id;
+                                    _IlocMgr.UpdateIlocLock(iloc);
+                                }
+                            }
+                            ViewBag.pwy_dte_ctl = "N";
+                        }
+                    }
+                }
+                if (ViewBag.pwy_dte_ctl==null)
+                {
+                    ViewBag.pwy_dte_ctl = "";
+                }
+            }
+            return View();
+        }
+        public HttpResponseBase SaveIinvd()
+        {
+            string json = "{success:false,message:'系統異常'}";
+            try
+            {
+                int temp = 0;
+                if (int.TryParse(Request.Params["prod_qty"], out temp))
+                {
+                    if (temp > 0)
+                    {
+                        IinvdQuery iinvd = new IinvdQuery();
+                        if (!string.IsNullOrEmpty(Request.Params["loc_id"]))
+                        {
+                            iinvd.plas_loc_id = Request.Params["loc_id"];
+                        }
+                        if (!string.IsNullOrEmpty(Request.Params["item_id"]))
+                        {
+                            if (int.TryParse(Request.Params["item_id"], out temp))
+                            {
+                                iinvd.item_id = uint.Parse(Request.Params["item_id"]);
+                            }
+                        }
+
+                        _IiplasMgr = new IplasMgr(mySqlConnectionString);
+                        IplasQuery iplasquery = new IplasQuery();
+                        iplasquery.item_id = iinvd.item_id;
+                        if (_IiplasMgr.GetIplasid(iplasquery)==0)
+                        {
+                            Iplas iplas = new Iplas();
+                            if (int.TryParse(Request.Params["item_id"], out temp))
+                            {
+                                iplas.item_id = uint.Parse(Request.Params["item_id"]);
+                                if (_IiplasMgr.IsTrue(iplas) == "false")
+                                {
+                                    json = "{success:false,message:'不存在該商品編號'}";
+                                    this.Response.Clear();
+                                    this.Response.Write(json);
+                                    this.Response.End();
+                                    return this.Response;    
+                                }
+                                if (_IiplasMgr.GetIplasid(iplasquery) >0)
+                                {
+                                    json = "{success:false,message:'此商品主料位非該料位'}";
+                                    this.Response.Clear();
+                                    this.Response.Write(json);
+                                    this.Response.End();
+                                    return this.Response;         
+                                }
+                                Iloc iloc = new Iloc();
+                                iloc.loc_id = iinvd.plas_loc_id;
+                                if (_IiplasMgr.GetLocCount(iloc) <= 0)
+                                {
+                                    json = "{success:false,message:'該料位已鎖定或被指派'}";
+                                    this.Response.Clear();
+                                    this.Response.Write(json);
+                                    this.Response.End();
+                                    return this.Response; 
+                                }
+                                iplas.loc_id = iloc.loc_id;
+                                iplas.loc_stor_cse_cap = 100;
+                                iplas.create_user = (Session["caller"] as Caller).user_id;
+                                iplas.create_dtim = DateTime.Now;
+                                iplas.change_user = (Session["caller"] as Caller).user_id;
+                                iplas.change_dtim = DateTime.Now;
+                                _IiplasMgr.InsertIplas(iplas);
+                            }
+                        }
+
+                        iinvd.create_user = (Session["caller"] as Caller).user_id;
+                        iinvd.create_dtim = DateTime.Now;
+                        iinvd.change_user = iinvd.create_user;
+                        iinvd.change_dtim = iinvd.create_dtim;
+                        iinvd.ista_id = "A";
+                        if (!string.IsNullOrEmpty(Request.Params["loc_id"]))
+                        {
+                            iinvd.plas_loc_id = Request.Params["loc_id"];
+                        }
+                        int change_prod_qty = int.Parse(Request.Params["prod_qty"]);
+                        iinvd.prod_qty = change_prod_qty;
+                        if (!string.IsNullOrEmpty(Request.Params["st_qty"]))
+                        {
+                            if (int.TryParse(Request.Params["st_qty"], out temp))
+                            {
+                                iinvd.st_qty = int.Parse(Request.Params["st_qty"]);
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(Request.Params["item_id"]))
+                        {
+                            if (int.TryParse(Request.Params["item_id"], out temp))
+                            {
+                                iinvd.item_id = uint.Parse(Request.Params["item_id"]);
+                            }
+                        }
+                        //else
+                        //{
+                        //    IIlocImplMgr ilocMgr = new IlocMgr(mySqlConnectionString);
+                        //    int total = 0;
+                        //    IlocQuery iloc = new IlocQuery();
+                        //    iloc.loc_id = iinvd.plas_loc_id;
+                        //    iloc.IsPage = false;
+                        //    List<IlocQuery> list = ilocMgr.GetIocList(iloc, out total);
+                        //    if(list.Count>0)
+                        //    {
+                        //        string lcat_id = list[0].lcat_id;
+                        //        if(lcat_id=="S")
+                        //        {
+                        //        }
+                        //    }
+                        //}
+                        DateTime date = DateTime.Now;
+                        string sq = Request.Params["datetimepicker1"];
+                        if (DateTime.TryParse(Request.Params["datetimepicker1"], out date))
+                        {
+                            iinvd.made_date = date;
+                        }
+                        else
+                        {
+                            iinvd.made_date = DateTime.Now;
+                        }
+                        _iinvd = new IinvdMgr(mySqlConnectionString);
+                        if (Request.Params["pwy_dte_ctl"] == "Y")
+                        {
+                            IProductExtImplMgr productExt = new ProductExtMgr(mySqlConnectionString);
+                            int Cde_dt_incr = productExt.GetCde_dt_incr((int)iinvd.item_id);
+                            iinvd.cde_dt = date.AddDays(Cde_dt_incr);
+                        }
+                        IialgQuery iialg = new IialgQuery();
+                        iialg.cde_dt = iinvd.cde_dt;
+                        int prod_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
+                        if (Request.Params["pwy_dte_ctl"] == "Y")
+                        {
+                            iinvd.pwy_dte_ctl = "Y";
+                            if (_iinvd.GetIinvdCount(iinvd) == 1)
+                            {
+                                json = "{success:true}";
+                            }
+                            else
+                            {
+                                if (_iinvd.Insert(iinvd) == 1)
+                                {
+                                    json = "{success:true}";
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            iinvd.cde_dt = DateTime.Now;
+                            if (_iinvd.GetIinvdCount(iinvd) == 1)
+                            {
+                                json = "{success:true}";
+                            }
+                            else
+                            {
+                                if (_iinvd.Insert(iinvd) == 1)
+                                {
+                                    json = "{success:true}";
+                                }
+                            }
+                        }
+                        iialg.qty_o = prod_qty;
+                        iialg.loc_id = iinvd.plas_loc_id;
+                        iialg.item_id = iinvd.item_id;
+                        iialg.iarc_id = "循環盤點";
+                        iialg.adj_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id) - prod_qty;
+                        iialg.create_dtim = DateTime.Now;
+                        iialg.create_user = iinvd.create_user;
+                        iialg.type = 2;
+                        iialg.doc_no = "C" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                        iialg.made_dt = iinvd.made_date;
+                        iialg.cde_dt = iinvd.cde_dt;
+                        iialg.c_made_dt = iinvd.made_date;
+                        iialg.c_cde_dt = iinvd.cde_dt;
+                        _iialgMgr = new IialgMgr(mySqlConnectionString);
+                        _iialgMgr.insertiialg(iialg);
+
+                        IstockChangeQuery istock = new IstockChangeQuery();
+                        istock.sc_trans_id = iialg.doc_no;
+                        istock.item_id = iinvd.item_id;
+                        istock.sc_istock_why = 2;
+                        istock.sc_trans_type = 2;
+                        istock.sc_num_old = prod_qty;
+                        istock.sc_num_chg = iialg.adj_qty;
+                        istock.sc_num_new = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
+                        istock.sc_time = iinvd.create_dtim;
+                        istock.sc_user = iinvd.create_user;
+                        istock.sc_note = "循環盤點";
+                        IstockChangeMgr istockMgr = new IstockChangeMgr(mySqlConnectionString);
+                        istockMgr.insert(istock);
+                    }
+                    else
+                    {
+                        json = "{success:false,message:'庫存不能小於1'}";
+                    }
+                }
+                else
+                {                  
+                    json = "{success:false,message:'庫存請輸入數字'}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false}";
+
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;
+        }
+        public JsonResult IinvdSave()
+        {
+            bool falg = false;
+            string message ="保存失敗";
+            try
+            {
+                string row_id = "";
+                int prod_qty = 0;
+                if (Request.Params["rowid"].Length > 5)
+                {
+                    row_id = Request.Params["rowid"].Substring(5);
+                }
+                string changeStore = Request.Params["changeStore"];
+                int temp1=0;
+                if (int.TryParse(changeStore, out temp1))
+                {
+                    if (temp1 < 0)
+                    {
+                        falg = false;
+                        message = "庫存不能小於1";
+                    }
+                    else
+                    {
+                        IinvdQuery iinvd = new IinvdQuery();
+                        iinvd.pwy_dte_ctl = Request.Params["pwy_dte_ctl"];
+                        iinvd.prod_qtys = int.Parse(Request.Params["prod_qtys"]);
+                        int id = 0;
+                        if (int.TryParse(row_id, out id))
+                        {
+                            iinvd.row_id = id;
+                        }
+                        if (int.TryParse(changeStore, out id))
+                        {
+                            iinvd.prod_qty = id;
+                        }
+                        if (!string.IsNullOrEmpty(Request.Params["loc_id"]))
+                        {
+                            iinvd.plas_loc_id = Request.Params["loc_id"];
+                        }
+                        int temp = 0;
+                        if (!string.IsNullOrEmpty(Request.Params["item_id"]))
+                        {
+                            if (int.TryParse(Request.Params["item_id"], out temp))
+                            {
+                                iinvd.item_id = uint.Parse(Request.Params["item_id"]);
+                            }
+                        }
+                        iinvd.create_user = (Session["caller"] as Caller).user_id;
+                        iinvd.create_dtim = DateTime.Now;
+                        iinvd.change_user = iinvd.create_user;
+                        iinvd.change_dtim = iinvd.create_dtim;
+                        _iinvd = new IinvdMgr(mySqlConnectionString);
+                        if (iinvd.pwy_dte_ctl == "Y")
+                        {
+                            iinvd.cde_dt = _iinvd.GetCde_dt(iinvd.row_id);
+                            IProductExtImplMgr productExt = new ProductExtMgr(mySqlConnectionString);
+                            int Cde_dt_incr = productExt.GetCde_dt_incr((int)iinvd.item_id);
+                            iinvd.made_date = iinvd.cde_dt.AddDays(-Cde_dt_incr);
+                        }
+                        else
+                        {
+                            iinvd.made_date = iinvd.create_dtim;
+                            iinvd.cde_dt = iinvd.create_dtim;
+                        }
+                        if (iinvd.row_id != 0)
+                        {
+                            if (iinvd.pwy_dte_ctl == "Y")
+                            {
+                                prod_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
+                            }
+                            else
+                            {
+                                prod_qty = iinvd.prod_qtys;
+                            }
+                            if (iinvd.pwy_dte_ctl == "N" || iinvd.pwy_dte_ctl == "")
+                            {
+                                iinvd.row_id = 0;
+                                if (iinvd.prod_qtys < iinvd.prod_qty)
+                                {
+                                    iinvd.ista_id = "A";
+                                    iinvd.prod_qty = iinvd.prod_qty - iinvd.prod_qtys;
+                                    iinvd.cde_dt = DateTime.Now;
+                                    if (_iinvd.GetIinvdCount(iinvd) == 1)
+                                    {
+                                        falg = true;
+                                    }
+                                    else
+                                    {
+                                        if (_iinvd.Insert(iinvd) == 1)
+                                        {
+                                            falg = true;
+                                        }
+                                    }
+                                }
+                                else if (iinvd.prod_qtys > iinvd.prod_qty)
+                                {
+                                    if (_iinvd.SaveIinvd(iinvd) == 1)
+                                    {
+                                        falg = true;
+                                    }
+                                }
+                                else if (iinvd.prod_qtys == iinvd.prod_qty)
+                                {
+                                    falg = true;
+                                }
+                            }
+                            else
+                            {
+                                if (_iinvd.SaveIinvd(iinvd) == 1)
+                                {
+                                    falg = true;
+                                }
+                            }
+
+                            IialgQuery iialg = new IialgQuery();
+
+                            iialg.cde_dt = iinvd.cde_dt;
+                            iialg.qty_o = prod_qty;
+                            iialg.loc_id = iinvd.plas_loc_id;
+                            iialg.item_id = iinvd.item_id;
+                            iialg.iarc_id = "循環盤點";
+                            if (iinvd.pwy_dte_ctl == "Y")
+                            {
+                                iialg.adj_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id) - prod_qty;
+                            }
+                            else
+                            {
+                                iialg.adj_qty = int.Parse(changeStore) - prod_qty;
+                            }
+                            iialg.create_dtim = DateTime.Now;
+                            iialg.create_user = iinvd.create_user;
+                            iialg.type = 2;
+                            iialg.doc_no = "C" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                            iialg.made_dt = iinvd.made_date;
+                            iialg.cde_dt = iinvd.cde_dt;
+                            iialg.c_made_dt = iinvd.made_date;
+                            iialg.c_cde_dt = iialg.cde_dt;
+                            _iialgMgr = new IialgMgr(mySqlConnectionString);
+                            _iialgMgr.insertiialg(iialg);
+
+                            IstockChangeQuery istock = new IstockChangeQuery();
+                            istock.sc_trans_id = iialg.doc_no;
+                            istock.item_id = iinvd.item_id;
+                            istock.sc_istock_why = 2;
+                            istock.sc_trans_type = 2;
+                            istock.sc_num_old = prod_qty;
+                            istock.sc_num_chg = iialg.adj_qty;
+                            istock.sc_num_new = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
+                            istock.sc_time = iinvd.create_dtim;
+                            istock.sc_user = iinvd.create_user;
+                            istock.sc_note = "循環盤點";
+                            IstockChangeMgr istockMgr = new IstockChangeMgr(mySqlConnectionString);
+                            istockMgr.insert(istock);
+                        }
+                        else
+                        {
+                            return Json(new { success = falg });
+                        }
+                    }
+                }
+                else {
+                    message = "庫存不能小於1";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return Json(new { success = falg,message=message });
+        }
+        public JsonResult GetIlocCount()
+        {
+            string result = "false";
+            try
+            {
+                IlocQuery query = new IlocQuery();
+                query.loc_id = Request.Params["loc_id"].ToUpper();
+                List<IlocQuery> ilocList = new List<IlocQuery>();
+                _IlocMgr = new IlocMgr(mySqlConnectionString);
+                //_iinvd = new IinvdMgr(mySqlConnectionString);
+                if (_IlocMgr.GetIlocCount(query)!="")
+                {
+                    //if (_iinvd.GetIinvdList(query.loc_id).Count > 0)
+                    //{
+                        result = "true";
+                    //}
+                    //else {
+                    //    result = "0";
+                    //}
+                }
+                else
+                {
+                    result = "false";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return Json(new { success = result });
+        }
+
+        public JsonResult GetItemDate()
+        {
+            string result = "false";
+            string ReturnDate = "";
+            try
+            {
+                int item_id = 0;
+                DateTime returnDate;
+                DateTime date =Convert.ToDateTime(Request.Params["date"]);
+                string dateType = Request.Params["dateType"];
+                if(!int.TryParse(Request.Params["item_id"],out item_id)){
+                    return Json(new { success = result, date = ReturnDate });
+                }
+                IProductExtImplMgr productExt = new ProductExtMgr(mySqlConnectionString);
+                int Cde_dt_incr = productExt.GetCde_dt_incr(item_id);
+                if (dateType == "made")
+                {
+                    returnDate = date.AddDays(Cde_dt_incr);
+                }
+                else {
+                    returnDate = date.AddDays(-Cde_dt_incr);
+                }
+                ReturnDate = returnDate.ToString("yyyy - MM - dd");
+                result = "ture";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return Json(new { success = result,date=ReturnDate });
         }
         #endregion
     }

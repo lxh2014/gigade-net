@@ -69,11 +69,17 @@ namespace BLL.gigade.Mgr
             {
                 string Json = string.Empty;
                 string msgstr = "保存失敗";
-                //判斷是插入還是修改,為空為插入
-                string isAddOrEidt = anpq.isAddOrEidt;
-                if (string.IsNullOrEmpty(isAddOrEidt))
+                //判斷是插入還是修改,為0為插入
+                if (anpq.id == 0)
                 {
                     if (_iappversionsImplDao.AddAppversions(anpq) > 0)
+                    {
+                        msgstr = "保存成功";
+                    }
+                }
+                else
+                {
+                    if (_iappversionsImplDao.EditAppversions(anpq) > 0)
                     {
                         msgstr = "保存成功";
                     }
@@ -87,5 +93,18 @@ namespace BLL.gigade.Mgr
             }
         }
         #endregion
+
+
+        public int UpdateAppversionsActive(int id, int status)
+        {
+            try
+            {
+              return  _iappversionsImplDao.UpdateAppversionsActive(id,status);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AppNotifyPoolMgr-->UpdateAppversionsActive-->" + ex.Message, ex);
+            }
+        }
     }
 }

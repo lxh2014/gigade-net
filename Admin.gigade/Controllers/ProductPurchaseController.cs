@@ -79,7 +79,7 @@ namespace Admin.gigade.Controllers
                 if(!string.IsNullOrEmpty(Request.Params["serchType"] ))
                 {
                     int serchType=int.Parse(Request.Params["serchType"]);
-                    if (!string.IsNullOrEmpty(Request.Params["serchName"]))
+                    if (!string.IsNullOrEmpty(Request.Params["serchName"].Trim()))
                     {
                         switch (serchType)
                         {
@@ -332,7 +332,13 @@ namespace Admin.gigade.Controllers
                 dtExcel.Columns.Add("成本(單價)", typeof(String));
                 dtExcel.Columns.Add("商品狀態", typeof(String));
                 dtExcel.Columns.Add("販售狀態", typeof(String));
-                dtExcel.Columns.Add("下單採購時間", typeof(String));
+                dtExcel.Columns.Add("料位編號", typeof(String));
+                dtExcel.Columns.Add("製造日期", typeof(String));
+                dtExcel.Columns.Add("有效日期", typeof(String));
+                dtExcel.Columns.Add("保存期限", typeof(String));
+                
+                dtExcel.Columns.Add("有效期控管", typeof(String));
+              
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -445,7 +451,14 @@ namespace Admin.gigade.Controllers
                     newRow[19] = dt.Rows[i]["item_cost"];
                     newRow[20] = dt.Rows[i]["product_status_string"];
                     newRow[21] = dt.Rows[i]["sale_name"];
-                    newRow[22] = dt.Rows[i]["create_datetime"];
+                   // newRow[22] = dt.Rows[i]["create_datetime"];
+
+                    newRow[22] = dt.Rows[i]["loc_id"];
+                    newRow[23] = dt.Rows[i]["made_date"];
+                    newRow[24] = dt.Rows[i]["cde_dt"];
+                    newRow[25] = dt.Rows[i]["cde_dt_incr"];
+
+                    newRow[26] = dt.Rows[i]["pwy_dte_ctl"];
                     dtExcel.Rows.Add(newRow);
                 }
                 if (dtExcel.Rows.Count > 0)

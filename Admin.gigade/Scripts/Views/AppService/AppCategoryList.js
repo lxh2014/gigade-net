@@ -136,7 +136,7 @@ var Category3Store = Ext.create('Ext.data.Store', {
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
-            Ext.getCmp("remove").setDisabled(selections.length == 0);
+            Ext.getCmp("delete").setDisabled(selections.length == 0);
         }
     }
 });
@@ -347,7 +347,7 @@ Ext.onReady(function () {
             }]
         }],
         tbar: [
-            { xtype: 'button', text: DELETE, id: 'remove', iconCls: 'icon-user-remove', disabled: true, handler: onRemoveClick },
+            { xtype: 'button', text: DELETE, id: 'delete',hidden:true, iconCls: 'icon-user-remove', disabled: true, handler: onRemoveClick },
             { xtype: 'button', text: IMPORT_EXCEL, id: 'insertexcel', iconCls: 'icon-add', disabled: false, handler: onInsertExcelClick }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {

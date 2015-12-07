@@ -15,6 +15,7 @@ using BLL.gigade.Model;
 using BLL.gigade.Model.Custom;
 using BLL.gigade.Model.Query;
 using System.Collections.Generic;
+using System.Data;
 
 namespace BLL.gigade.Mgr.Impl
 {

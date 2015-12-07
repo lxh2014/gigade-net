@@ -50,5 +50,6 @@ namespace BLL.gigade.Dao.Impl
         DataTable GetBuyAmountAndTaxType(OrderDetailQuery query);
         List<Vendor> GetVendor(Vendor query);
         DataTable GetCategorySummary(OrderDetailQuery query);
+        DataTable GetAmountDetial(OrderDetailQuery query, out int totalCount);
     }
 }

@@ -46,7 +46,7 @@ namespace BLL.gigade.Dao
                 query.Replace4MySQL();
                 StringBuilder TempCol = new StringBuilder("SELECT p.product_id,ap.element_type,ap.packet_status,p.product_name,p.product_status,ap.packet_name, bd.element_id,ap.element_type,");//c.parametername as element_type_name,
                 TempCol.Append(" bd.element_content,bd.packet_id,bd.element_name,bd.element_link_url,bd.element_link_mode,bd.element_remark,bd.element_sort,bd.element_status, bd.element_link_mode,");//d.parametername as element_linkmode,
-                TempCol.Append("  bd.element_start,bd.element_end,bd.element_createdate,bd.element_updatedate,bd.category_id,bd.category_name ");
+                TempCol.Append("  bd.element_start,bd.element_end,bd.element_createdate,bd.element_updatedate,bd.category_id,bd.category_name,bd.element_img_big ");
                 StringBuilder tempCount = new StringBuilder("select count(bd.element_id) as totalCount  ");
                 StringBuilder mainSql = new StringBuilder(" FROM element_detail bd ");
                 mainSql.Append("  join area_packet ap on ap.packet_id=bd.packet_id");
@@ -136,11 +136,11 @@ namespace BLL.gigade.Dao
             try
             {
                 model.Replace4MySQL();
-                sqlStr.Append(@"insert into element_detail(`element_content`,`element_name`,`element_link_url`,`element_link_mode`,`element_sort`,`element_status`,`element_start`,`element_end`,`element_createdate`,`element_updatedate`,`create_userid`,`update_userid`,`element_remark`,`packet_id`,`category_id`,`category_name`) ");
-                sqlStr.AppendFormat(" values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}',{13},'{14}','{15}') ",
+                sqlStr.Append(@"insert into element_detail(`element_content`,`element_name`,`element_link_url`,`element_link_mode`,`element_sort`,`element_status`,`element_start`,`element_end`,`element_createdate`,`element_updatedate`,`create_userid`,`update_userid`,`element_remark`,`packet_id`,`category_id`,`category_name`,`element_img_big`) ");
+                sqlStr.AppendFormat(" values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}',{13},'{14}','{15}','{16}') ",
                     model.element_content, model.element_name, model.element_link_url, model.element_link_mode, model.element_sort, model.element_status,
                     CommonFunction.DateTimeToString(model.element_start), CommonFunction.DateTimeToString(model.element_end), CommonFunction.DateTimeToString(model.element_createdate),
-                    CommonFunction.DateTimeToString(model.element_updatedate), model.create_userid, model.update_userid, model.element_remark, model.packet_id, model.category_id, model.category_name);
+                    CommonFunction.DateTimeToString(model.element_updatedate), model.create_userid, model.update_userid, model.element_remark, model.packet_id, model.category_id, model.category_name,model.element_img_big);
 
                 return _access.execCommand(sqlStr.ToString());
             }
@@ -158,10 +158,10 @@ namespace BLL.gigade.Dao
                 model.Replace4MySQL();
                 sqlStr.AppendFormat(@"update element_detail set ");
                 sqlStr.AppendFormat(" `element_content`='{0}',`element_name`='{1}',`element_link_url`='{2}',`element_link_mode`='{3}',", model.element_content, model.element_name, model.element_link_url, model.element_link_mode);
-                sqlStr.AppendFormat(" `element_sort`='{0}',`element_start`='{1}',`element_end`='{2}',`element_updatedate`='{3}',`update_userid`='{4}',`element_remark`='{5}',`packet_id`={6} ,`category_id`='{7}',`category_name`='{8}' ",
+                sqlStr.AppendFormat(" `element_sort`='{0}',`element_start`='{1}',`element_end`='{2}',`element_updatedate`='{3}',`update_userid`='{4}',`element_remark`='{5}',`packet_id`={6} ,`category_id`='{7}',`category_name`='{8}',element_img_big='{9}' ",
                      model.element_sort, CommonFunction.DateTimeToString(model.element_start),
                      CommonFunction.DateTimeToString(model.element_end),
-                     CommonFunction.DateTimeToString(model.element_updatedate), model.update_userid, model.element_remark, model.packet_id, model.category_id, model.category_name);
+                     CommonFunction.DateTimeToString(model.element_updatedate), model.update_userid, model.element_remark, model.packet_id, model.category_id, model.category_name,model.element_img_big);
                 sqlStr.AppendFormat(" where element_id='{0}'", model.element_id);
                 return _access.execCommand(sqlStr.ToString());
             }
@@ -179,7 +179,7 @@ namespace BLL.gigade.Dao
                 query.Replace4MySQL();
                 sqlStr.Append(@"SELECT element_id,packet_id,category_id,category_name,element_content,element_name,");
                 sqlStr.Append(@"element_link_url,element_link_mode,element_sort,element_status,element_start,element_end,");
-                sqlStr.Append(@"element_createdate,element_updatedate,create_userid,update_userid,element_remark  ");
+                sqlStr.Append(@"element_createdate,element_updatedate,create_userid,update_userid,element_remark,element_img_big  ");
                 sqlStr.AppendFormat(@"from element_detail where element_id={0};", query.element_id);
                 return _access.getSinggleObj<ElementDetail>(sqlStr.ToString());
             }

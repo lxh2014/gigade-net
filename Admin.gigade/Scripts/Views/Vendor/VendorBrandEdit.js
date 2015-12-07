@@ -33,13 +33,28 @@ function editFunction(rowID) {
 
     function tomorrow() {
         var d;
+        var dt;
         var s = "";
         d = new Date();                             // 创建 Date 对象。
         s += d.getFullYear() + "/";                     // 获取年份。
         s += (d.getMonth() + 1) + "/";              // 获取月份。
-        s += d.getDate();                          // 获取日。
-        return (new Date(s));                                 // 返回日期。
+        s += d.getDate();
+        dt = new Date(s);
+        dt.setDate(dt.getDate() + 1);
+        return dt;                                 // 返回日期。
     };
+    setNextMonth = function (source, n) {
+        var s = new Date(source);
+        s.setMonth(s.getMonth() + n);
+        if (n < 0) {
+            s.setHours(0, 0, 0);
+        }
+        else if (n > 0) {
+            s.setHours(23, 59, 59);
+        }
+        return s;
+    }
+
     function initForm(row) {
         Ext.getCmp("Image_Name").setRawValue(row.data.Image_Name);
         Ext.getCmp("Resume_Image").setRawValue(row.data.Resume_Image);
@@ -243,6 +258,8 @@ function editFunction(rowID) {
                     id: 'begin_time',
                     name: 'begin_time',
                     format: 'Y-m-d H:i:s',
+                    time: { hour: 00, min: 00, sec: 00 },
+                    editable: false,
                     anchor: '90%',
                     submitValue: true,
                     enable: false,
@@ -252,8 +269,10 @@ function editFunction(rowID) {
                         select: function (a, b, c) {
                             var start = Ext.getCmp("begin_time");
                             var end = Ext.getCmp("end_time");
-                            var s_date = new Date(start.getValue());
-                            end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                            if (start.getValue() > end.getValue()) {
+                                Ext.Msg.alert(INFORMATION, '開始時間不能大於結束時間');
+                                end.setValue(setNextMonth(start.getValue(), 1));
+                            }
                         }
                     }
                 },
@@ -262,18 +281,20 @@ function editFunction(rowID) {
                     id: 'end_time',
                     name: 'end_time',
                     format: 'Y-m-d H:i:s',
+                    time: { hour: 23, min: 59, sec: 59 },
+                    editable: false,
                     fieldLabel: '顯示結束時間',
                     anchor: '90%',
                     submitValue: true,
                     editable: false,
-                    value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+                    value: setNextMonth(Tomorrow(), 1),
                     listeners: {
                         select: function (a, b, c) {
                             var start = Ext.getCmp("begin_time");
                             var end = Ext.getCmp("end_time");
                             if (end.getValue() < start.getValue()) {
-                                Ext.Msg.alert(INFORMATION, '開始時間不能大於結束時間');
-                                end.setValue(new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)));
+                                Ext.Msg.alert(INFORMATION, '結束時間不能小於開始時間');
+                                start.setValue(setNextMonth(end.getValue(), -1));
                             }
                         }
                     }

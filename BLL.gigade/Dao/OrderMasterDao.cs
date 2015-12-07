@@ -1129,6 +1129,17 @@ namespace BLL.gigade.Dao
                         sqlCondition.AppendFormat(" and imr.invoice_date<='{0}' ", query.last_time);
                     }
                 }
+                else if (query.dateType == 5)
+                {
+                    if (query.order_date_pay_startTime != DateTime.MinValue)
+                    {
+                        sqlCondition.AppendFormat(" and oac.invoice_date_manual>='{0}' ", query.order_date_pay_startTime.ToString("yyyy-MM-dd 00:00:00"));
+                    }
+                    if (query.order_date_pay_endTime != DateTime.MinValue)
+                    {
+                        sqlCondition.AppendFormat(" and oac.invoice_date_manual<='{0}' ", query.order_date_pay_endTime.ToString("yyyy-MM-dd 23:59:59"));
+                    }
+                }
                 if (query.show_type == 1)
                 {
                     sqlCondition.AppendFormat(" and oac.row_id!='' ");
@@ -1139,11 +1150,11 @@ namespace BLL.gigade.Dao
                 }
                 if (query.invoice_type == 1)
                 {
-                    sqlCondition.AppendFormat(" and imr.invoice_id!='' ");
+                    sqlCondition.AppendFormat(" and (imr.invoice_id!='' or  oac.invoice_date_manual!='' ) ");
                 }
                 else if (query.invoice_type == 2)
                 {
-                    sqlCondition.AppendFormat(" and   ISNULL(imr.invoice_id) ");
+                    sqlCondition.AppendFormat(" and  ISNULL(imr.invoice_id) and  ISNULL(oac.invoice_date_manual)  ");
                 }
 
                 if (query.Order_Id != 0)
@@ -1254,7 +1265,7 @@ namespace BLL.gigade.Dao
                         }
                     }
                     dr["imramount"] = imramount;
-                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) && !string.IsNullOrEmpty(dr["imramount"].ToString()) && !string.IsNullOrEmpty(dr["invoice_tax_manual"].ToString()) && !string.IsNullOrEmpty(dr["invoice_sale_manual"].ToString()))
+                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) || !string.IsNullOrEmpty(dr["imramount"].ToString()) || !string.IsNullOrEmpty(dr["invoice_tax_manual"].ToString()) || !string.IsNullOrEmpty(dr["invoice_sale_manual"].ToString()))
                     {
                         dr["invoice_diff"] = totalMoney - imramount;//J=E-H
                     }
@@ -1339,6 +1350,17 @@ namespace BLL.gigade.Dao
                         sqlCondition.AppendFormat(" and imr.invoice_date<='{0}' ", query.last_time);
                     }
                 }
+                else if (query.dateType == 5)
+                {
+                    if (query.order_date_pay_startTime != DateTime.MinValue)
+                    {
+                        sqlCondition.AppendFormat(" and oac.invoice_date_manual>='{0}' ", query.order_date_pay_startTime.ToString("yyyy-MM-dd 00:00:00"));
+                    }
+                    if (query.order_date_pay_endTime != DateTime.MinValue)
+                    {
+                        sqlCondition.AppendFormat(" and oac.invoice_date_manual<='{0}' ", query.order_date_pay_endTime.ToString("yyyy-MM-dd 23:59:59"));
+                    }
+                }
                 if (query.show_type == 1)
                 {
                     sqlCondition.AppendFormat(" and oac.row_id!='' ");
@@ -1349,11 +1371,11 @@ namespace BLL.gigade.Dao
                 }
                 if (query.invoice_type == 1)
                 {
-                    sqlCondition.AppendFormat(" and imr.invoice_id!='' ");
+                    sqlCondition.AppendFormat(" and (imr.invoice_id!='' or  oac.invoice_date_manual!='' ) ");
                 }
                 else if (query.invoice_type == 2)
                 {
-                    sqlCondition.AppendFormat(" and   ISNULL(imr.invoice_id) ");
+                    sqlCondition.AppendFormat(" and  ISNULL(imr.invoice_id) and  ISNULL(oac.invoice_date_manual) ");
                 }
                 if (query.Order_Id != 0)
                 {
@@ -1439,6 +1461,17 @@ namespace BLL.gigade.Dao
                         sql.AppendFormat(" and imr.invoice_date<='{0}' ", query.last_time);
                     }
                 }
+                else if (query.dateType == 5)
+                {
+                    if (query.order_date_pay_startTime != DateTime.MinValue)
+                    {
+                        sql.AppendFormat(" and oac.invoice_date_manual>='{0}' ", query.order_date_pay_startTime.ToString("yyyy-MM-dd 00:00:00"));
+                    }
+                    if (query.order_date_pay_endTime != DateTime.MinValue)
+                    {
+                        sql.AppendFormat(" and oac.invoice_date_manual<='{0}' ", query.order_date_pay_endTime.ToString("yyyy-MM-dd 23:59:59"));
+                    }
+                }
                 if (query.show_type == 1)
                 {
                     sql.AppendFormat(" and oac.row_id!='' ");
@@ -1449,11 +1482,11 @@ namespace BLL.gigade.Dao
                 }
                 if (query.invoice_type == 1)
                 {
-                    sql.AppendFormat(" and imr.invoice_id!='' ");
+                    sql.AppendFormat(" and (imr.invoice_id!='' or  oac.invoice_date_manual!='' ) ");
                 }
                 else if (query.invoice_type == 2)
                 {
-                    sql.AppendFormat(" and   ISNULL(imr.invoice_id) ");
+                    sql.AppendFormat(" and   ISNULL(imr.invoice_id) and  ISNULL(oac.invoice_date_manual)  ");
                 }
                 if (query.Order_Id != 0)
                 {
@@ -1554,7 +1587,7 @@ namespace BLL.gigade.Dao
                         }
                     }
                     dr["imramount"] = imramount;
-                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) && !string.IsNullOrEmpty(dr["imramount"].ToString()) && !string.IsNullOrEmpty(dr["invoice_tax_manual"].ToString()) && !string.IsNullOrEmpty(dr["invoice_sale_manual"].ToString()))
+                    if (!string.IsNullOrEmpty(dr["oacamount"].ToString()) || !string.IsNullOrEmpty(dr["imramount"].ToString()) || !string.IsNullOrEmpty(dr["invoice_tax_manual"].ToString()) || !string.IsNullOrEmpty(dr["invoice_sale_manual"].ToString()))
                     {
                         dr["invoice_diff"] = totalMoney - imramount;//J=E-H
                     }
@@ -2253,11 +2286,11 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.Append("SELECT u.user_name,FROM_UNIXTIME(om.order_createdate) 'order_createdate',om.order_id,om.order_payment, om.order_amount,om.order_status,imr.invoice_number,imr.total_amount,FROM_UNIXTIME(invoice_date) 'invoice_date' ,od.item_id,");
-                sql.Append(" od.detail_status,v.vendor_name_simple,v.vendor_code,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,od.single_money*buy_num 'total_money' ,  ");
-                sql.Append(" od.single_cost,od.bag_check_money,od.single_cost*od.buy_num 'total_cost' , FROM_UNIXTIME(os.slave_date_close) 'slave_date_close',mu.user_username as 'pm',om.source_trace as 'ID',rg.group_name, od.product_mode   ");
+                sql.Append("SELECT u.user_name,FROM_UNIXTIME(om.order_createdate) 'order_createdate',om.order_id,om.order_payment, om.order_amount,om.order_status, od.item_id,");
+                sql.Append(" od.detail_status,v.vendor_name_simple,v.vendor_code,od.product_name,od.buy_num,od.single_money,od.deduct_bonus,od.deduct_welfare,od.single_money*buy_num 'total_money' ,od.item_mode,od.parent_num, ");
+                sql.Append(" od.single_cost,od.bag_check_money,od.single_cost*od.buy_num 'total_cost' , FROM_UNIXTIME(os.slave_date_close) 'slave_date_close',mu.user_username as 'pm',om.source_trace as 'ID',redirect_name, od.product_mode   ");
                 sql.Append(" from order_master om LEFT JOIN order_slave os ON om.order_id=os.order_id  ");
-                sql.Append(" LEFT JOIN order_detail od ON os.slave_id=od.slave_id LEFT JOIN invoice_master_record imr ON om.order_id=imr.order_id  ");
+                sql.Append(" LEFT JOIN order_detail od ON os.slave_id=od.slave_id  ");
                 sql.Append("LEFT JOIN vendor v ON v.vendor_id = od.item_vendor_id left join redirect r on r.redirect_id=om.source_trace  ");
                 sql.Append(" LEFT JOIN redirect_group rg  ON r.group_id = rg.group_id  LEFT JOIN manage_user mu on mu.user_id=v.product_manage LEFT JOIN users u on u.user_id=om.user_id ");
                 sql.AppendFormat(" where  od.item_mode in (0,2) and om.order_date_pay<>0 and om.order_createdate>='{0}' and  om.order_createdate<='{1}'; ", CommonFunction.GetPHPTime(query.datestart.ToString()), CommonFunction.GetPHPTime(query.dateend.ToString()));
@@ -2269,7 +2302,7 @@ namespace BLL.gigade.Dao
             }
         }
 
-        public DataTable GetPara(string type,int order_status)
+        public DataTable GetPara(string type, int order_status)
         {
             StringBuilder sql = new StringBuilder();
             try
@@ -2297,6 +2330,144 @@ namespace BLL.gigade.Dao
             }
         }
 
+        public DataTable GetOrderFreight(uint order_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" select order_freight_normal,order_freight_low from order_master where order_id='{0}';", order_id);
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetOrderFreight-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
 
+        public DataTable GetOrderDetialExportOrderid(OrderDetailQuery query)
+        {
+            StringBuilder sqlSingle = new StringBuilder();
+            StringBuilder sqlFather = new StringBuilder();
+            StringBuilder sqlWhere = new StringBuilder();
+            try
+            {
+                sqlSingle.AppendFormat(@"SELECT om.order_id  FROM order_master om 
+                                    LEFT JOIN order_slave os ON om.order_id=os.order_id
+	                                LEFT JOIN order_detail od ON os.slave_id=od.slave_id
+	                                INNER JOIN product_item pi ON od.item_id=pi.item_id
+	                                INNER JOIN product_category_set pcs ON pi.product_id=pcs.product_id
+	                                WHERE od.item_mode=0  AND pcs.category_id={0} AND od.detail_status NOT IN (89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
+                sqlFather.AppendFormat(@" SELECT om.order_id FROM order_master om  
+                                     LEFT JOIN order_slave os ON om.order_id=os.order_id
+                                     LEFT JOIN order_detail od ON os.slave_id=od.slave_id
+                                     INNER JOIN product_category_set pcs ON od.parent_id=pcs.product_id
+                                     WHERE od.item_mode=1  AND pcs.category_id={0} AND od.detail_status NOT IN (89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
+                if (query.category_status != 0)
+                {
+                    sqlWhere.AppendFormat(" AND om.money_collect_date > 0");
+                }
+                if (query.date_stauts != 0)
+                {
+                    if (query.date_start != DateTime.MinValue && query.date_end != DateTime.MinValue)
+                    {
+                        sqlWhere.AppendFormat(" AND om.order_createdate>='{0}' and  om.order_createdate<='{1}'", CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_start)), CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_end)));
+                    }
+                }
+                return _dbAccess.getDataTable(sqlSingle.ToString() + sqlWhere.ToString() + " UNION " + sqlFather.ToString() + sqlWhere.ToString() + " ORDER BY order_id");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetOrderDetialExportOrderid-->" + sqlSingle.ToString() + ex.Message, ex);
+            }
+        }
+        public DataTable OrderDetialExportInfo(int order_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT DISTINCT od.detail_id,om.order_name,om.order_createdate,'' as order_createdate_format,om.order_id,om.order_payment,'' as  payment_name,
+                                om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,'' as slave_status_name,od.product_name,
+                                od.deduct_bonus,od.deduct_welfare,od.single_money,od.buy_num,od.parent_num,od.single_cost,od.bag_check_money,od.single_cost,os.slave_date_close,'' as slave_date_close_format,
+                                od.product_mode ,'' as product_mode_name,od.item_mode,om.delivery_name,om.delivery_address,'' as amount,'' as cost_amount,od.event_cost,od.parent_id,pi.product_id
+                                FROM order_master om
+                                LEFT JOIN order_slave os ON  om.order_id=os.order_id
+                                LEFT JOIN order_detail od ON os.slave_id=od.slave_id                              
+                                INNER JOIN product_item pi ON od.item_id=pi.item_id                   
+                                WHERE om.order_id='{0}' AND od.detail_status NOT IN (89,90,91) ORDER BY detail_id; ", order_id);
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->OrderDetialExportInfo-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
+
+        public DataTable CagegoryDetialExport(OrderDetailQuery query)
+        {
+            StringBuilder sqlSingle = new StringBuilder();
+            StringBuilder sqlFather = new StringBuilder();
+            StringBuilder sqlJoin1 = new StringBuilder();
+            StringBuilder sqlJoin2 = new StringBuilder();
+            StringBuilder sqlWhere = new StringBuilder();
+            try
+            {
+                sqlSingle.AppendFormat(@"( SELECT pcs.category_id,om.order_name,om.order_createdate,'' as order_createdate_format,
+                                    om.order_id,om.order_payment,'' as  payment_name,om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,
+                                    '' as slave_status_name,od.product_name,od.buy_num,od.parent_num,od.single_money,od.deduct_bonus,od.deduct_welfare,
+                                    od.single_cost,od.bag_check_money,od.single_cost,os.slave_date_close,'' as slave_date_close_format,'' as amount,'' as cost_amount,
+                                    od.product_mode,'' as product_mode_name,od.item_mode,om.delivery_name,om.delivery_address ,od.detail_id,od.event_cost,pi.product_id   FROM order_master om ");
+
+                sqlFather.AppendFormat(@"( SELECT pcs.category_id,om.order_name,om.order_createdate,'' as order_createdate_format,
+                                    om.order_id,om.order_payment,'' as  payment_name,om.order_amount,om.order_status,'' as order_status_name,od.item_id,os.slave_status,
+                                    '' as slave_status_name,od.product_name,od.buy_num,od.parent_num,od.single_money,od.deduct_bonus,od.deduct_welfare,
+                                    od.single_cost,od.bag_check_money,od.single_cost,os.slave_date_close,'' as slave_date_close_format,'' as amount,'' as cost_amount,
+                                    od.product_mode,'' as product_mode_name,od.item_mode,om.delivery_name,om.delivery_address ,od.detail_id,od.event_cost,od.parent_id as product_id   FROM order_master om ");
+                sqlJoin1.AppendFormat(@" LEFT JOIN order_slave os ON om.order_id=os.order_id
+                                        LEFT JOIN order_detail od ON os.slave_id=od.slave_id                                       
+                                        INNER JOIN product_item pi ON od.item_id=pi.item_id
+                                        INNER JOIN product_category_set pcs ON pi.product_id=pcs.product_id
+                                        WHERE od.item_mode=0  AND pcs.category_id={0}
+                                        AND od.detail_status NOT IN(89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
+
+                sqlJoin2.AppendFormat(@"LEFT JOIN order_slave os ON om.order_id=os.order_id
+                                        LEFT JOIN order_detail od ON os.slave_id=od.slave_id
+                                        INNER JOIN product_category_set pcs ON od.parent_id=pcs.product_id
+                                        WHERE od.item_mode=1  AND pcs.category_id={0}
+                                        AND od.detail_status NOT IN(89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
+
+                if (query.category_status != 0)
+                {
+                    sqlWhere.AppendFormat(" AND om.money_collect_date > 0");
+                }
+                if (query.date_stauts != 0)
+                {
+                    if (query.date_start != DateTime.MinValue && query.date_end != DateTime.MinValue)
+                    {
+                        sqlWhere.AppendFormat(" AND om.order_createdate>='{0}' and  om.order_createdate<='{1}'", CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_start)), CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(query.date_end)));
+                    }
+                }
+                sqlWhere.AppendFormat(" GROUP BY  od.detail_id ");
+                return _dbAccess.getDataTable(sqlSingle.ToString() + sqlJoin1.ToString() + sqlWhere.ToString() + ")UNION" + sqlFather.ToString() + sqlJoin2.ToString() + sqlWhere.ToString() + ") ORDER BY order_id");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->CategoryDetialExportInfo-->" + sqlSingle.ToString() + ex.Message, ex);
+            }
+        }
+
+
+        public DataTable GetInvoiceData(uint order_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(" select invoice_number,total_amount,invoice_date from invoice_master_record where order_id='{0}' order by invoice_id DESC limit 1;",order_id);
+                return _dbAccess.getDataTable(sql.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetInvoiceData-->" + sql.ToString() + ex.Message, ex);
+            }
+        }
     }
 }

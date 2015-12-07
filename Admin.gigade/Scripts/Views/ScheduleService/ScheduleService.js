@@ -36,7 +36,7 @@ Ext.define('gridlistMaster', {
 //master 列表頁的數據源 
 var ScheduleStore = Ext.create('Ext.data.Store', {
     pageSize: pageSize,
-   // autoLoad:true,
+    autoLoad:true,
     autoDestroy: true,
     model: 'gridlistMaster',
     proxy: {
@@ -123,10 +123,10 @@ Ext.define('GIGADE.Period', {
         { name: "create_time", type: "int" },
         { name: "change_username", type: "string" },
         { name: "change_time", type: "int" },
-         { name: 'period_type', type: 'int' },
-         {name:"show_period_type",type:'string'},
+        { name: 'period_type', type: 'int' },
+        {name:"show_period_type",type:'string'},
         { name: 'period_nums', type: 'int' },
-        { name: 'show_begin_datetime', type: 'date' },
+        { name: 'show_begin_datetime', type: 'date', dateFormat: "Y-m-d H:i:s" },
         { name: 'current_nums', type: 'int' },
         { name: 'limit_nums', type: 'int' },
         { name: "show_create_time", type: "string" },
@@ -191,7 +191,7 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
     columnLines: true,
     store: ScheduleStore,
     columns: [                      //顯示master
-        { header: '編號', dataIndex: 'rowid', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+        { header: '編號', dataIndex: 'rowid', align: 'left', width: 40, menuDisabled: true, sortable: false, align: 'center' },
          {
              header: "排程狀態", dataIndex: 'schedule_state', align: 'center', width: 60, hidden: false,
              renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
@@ -202,7 +202,7 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
                  }
              }
          },
-        { header: '排程Code', dataIndex: 'schedule_code', align: 'left', width: 80, menuDisabled: true, sortable: false, align: 'center' },
+        { header: '排程Code', dataIndex: 'schedule_code', align: 'left', width: 100, menuDisabled: true, sortable: false, align: 'center' },
         { header: '排程名稱', dataIndex: 'schedule_name', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
        { header: 'contriller/action', dataIndex: 'schedule_api', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
        { header: '排程描述', dataIndex: 'schedule_description', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
@@ -264,7 +264,7 @@ var center = Ext.create('Ext.form.Panel', {
                 {
                     xtype: 'container',
                     autoScroll: true,
-                    defaults: { margin: '0 5 5 10', labelWidth: 60, autoScroll: true, width: 1210 },
+                    defaults: { margin: '0 5 5 10', labelWidth: 60, autoScroll: true, width: 1100 },
                     items: [
                           {
                               id: 'schedule_code',
@@ -285,7 +285,7 @@ var center = Ext.create('Ext.form.Panel', {
                               id: 'detailist1',
                               autoScroll: true,
                               columnLines: true,
-                              height: 330,
+                              height: 350,
                               frame: false,
                               //Height: 550,
                               store: Schedule_Config_Store,
@@ -307,6 +307,20 @@ var center = Ext.create('Ext.form.Panel', {
             { xtype: 'button', text: "刪除", id: 'delete_config', disabled: true, iconCls: 'icon-user-remove', hidden: true, handler: ondelete_config },
 
                               ],
+                              listeners: {
+                                  show: function (scroller)
+                                  {
+                                      if (scroller && scroller.scrollEl)
+                                      {
+                                          scroller.clearManagedListeners();
+                                          scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
+                                      }
+                                  },
+                                  resize: function ()
+                                  {
+                                      this.doLayout();
+                                  }
+                              },
                               selModel: sm_config
                           },
 
@@ -317,7 +331,7 @@ var center = Ext.create('Ext.form.Panel', {
                             id: 'detailist2',
                             autoScroll: true,
                             columnLines: true,
-                            height: document.documentElement.clientHeight - 400,
+                            height: document.documentElement.clientHeight - 420,
                             frame: false,
                             store: Schedule_Period_Store,
                             columns: [
@@ -349,7 +363,7 @@ var center = Ext.create('Ext.form.Panel', {
                                     }
                                 },
                                 resize: function () {
-                                    this.doLayout();
+                                    this.doLayout(); 
                                 }
                             },
                             selModel: sm_period
@@ -416,7 +430,7 @@ function LoadDetail(record) {
         Schedule_Period_Store.removeAll();
     }
 else 
-  {
+    {
         Ext.getCmp("schedule_code").setValue(record.data.schedule_code);
         //center.getForm().loadRecord(record);
         Schedule_Config_Store.load();
@@ -693,7 +707,7 @@ function onrunonce_master() {
                         }
                     },
                     failure: function () {
-                        Ext.Msg.alert("執行失敗!");
+                        Ext.Msg.alert(INFORMATION, "執行失敗!");
                     }
                 });
             }

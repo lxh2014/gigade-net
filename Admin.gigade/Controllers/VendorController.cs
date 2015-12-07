@@ -222,11 +222,13 @@ namespace Admin.gigade.Controllers
                     }
                     if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
                     {
-                        query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
+                        // query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
+                        query.create_dateOne = (uint)CommonFunction.GetPHPTime(Request.Params["dateOne"]);
                     }
                     if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
                     {
-                        query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
+                        //query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
+                        query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Request.Params["dateTwo"]);
                     }
                     stores = _vendorMgr.Query(query, ref totalCount);
                 }
@@ -239,11 +241,13 @@ namespace Admin.gigade.Controllers
                     }
                     if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
                     {
-                        query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
+                        //query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
+                        query.create_dateOne = (uint)CommonFunction.GetPHPTime(Request.Params["dateOne"]);
                     }
                     if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
                     {
-                        query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
+                        //query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
+                        query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Request.Params["dateTwo"]);
                     }
                     stores = _vendorMgr.Query(query, ref totalCount);
                 }
@@ -1959,32 +1963,33 @@ namespace Admin.gigade.Controllers
                                 {
                                     // update_log.AppendFormat("contact_type_1:{0}:{1}:第一聯絡人類型#", oldven.contact_type_1, venQuery.contact_type_1);
                                     list.Add(new TableChangeLog() { change_field = "contact_type_1", old_value = oldven.contact_type_1.ToString(), new_value = venQuery.contact_type_1.ToString(), field_ch_name = "第一聯絡人類型" });
-                                    if (oldven.contact_name_1 != venQuery.contact_name_1)
-                                    {
-                                        // update_log.AppendFormat("contact_name_1:{0}:{1}:第一聯絡人姓名#", oldven.contact_name_1, venQuery.contact_name_1);
-                                        list.Add(new TableChangeLog() { change_field = "contact_name_1", old_value = oldven.contact_name_1, new_value = venQuery.contact_name_1, field_ch_name = "第一聯絡人姓名" });
-                                    }
-                                    if (oldven.contact_phone_1_1 != venQuery.contact_phone_1_1)
-                                    {
-                                        //update_log.AppendFormat("contact_phone_1_1:{0}:{1}:第一聯絡人電話一#", oldven.contact_phone_1_1, venQuery.contact_phone_1_1);
-                                        list.Add(new TableChangeLog() { change_field = "contact_phone_1_1", old_value = oldven.contact_phone_1_1, new_value = venQuery.contact_phone_1_1, field_ch_name = "第一聯絡人電話一" });
-                                    }
-                                    if (oldven.contact_phone_2_1 != venQuery.contact_phone_2_1)
-                                    {
-                                        // update_log.AppendFormat("contact_phone_2_1:{0}:{1}:第一聯絡人電話二#", oldven.contact_phone_2_1, venQuery.contact_phone_2_1);
-                                        list.Add(new TableChangeLog() { change_field = "contact_phone_2_1", old_value = oldven.contact_phone_2_1, new_value = venQuery.contact_phone_2_1, field_ch_name = "第一聯絡人電話二" });
-                                    }
-                                    if (oldven.contact_mobile_1 != venQuery.contact_mobile_1)
-                                    {
-                                        // update_log.AppendFormat("contact_mobile_1:{0}:{1}:第一聯絡人手機號碼#", oldven.contact_mobile_1, venQuery.contact_mobile_1);
-                                        list.Add(new TableChangeLog() { change_field = "contact_mobile_1", old_value = oldven.contact_mobile_1, new_value = venQuery.contact_mobile_1, field_ch_name = "第一聯絡人手機號碼" });
-                                    }
-                                    if (oldven.contact_email_1 != venQuery.contact_email_1)
-                                    {
-                                        //update_log.AppendFormat("contact_email_1:{0}:{1}:第一聯絡人郵箱#", oldven.contact_email_1, venQuery.contact_email_1);
-                                        list.Add(new TableChangeLog() { change_field = "contact_email_1", old_value = oldven.contact_email_1, new_value = venQuery.contact_email_1, field_ch_name = "第一聯絡人郵箱" });
-                                    }
                                 }
+                                if (oldven.contact_name_1 != venQuery.contact_name_1)
+                                {
+                                    // update_log.AppendFormat("contact_name_1:{0}:{1}:第一聯絡人姓名#", oldven.contact_name_1, venQuery.contact_name_1);
+                                    list.Add(new TableChangeLog() { change_field = "contact_name_1", old_value = oldven.contact_name_1, new_value = venQuery.contact_name_1, field_ch_name = "第一聯絡人姓名" });
+                                }
+                                if (oldven.contact_phone_1_1 != venQuery.contact_phone_1_1)
+                                {
+                                    //update_log.AppendFormat("contact_phone_1_1:{0}:{1}:第一聯絡人電話一#", oldven.contact_phone_1_1, venQuery.contact_phone_1_1);
+                                    list.Add(new TableChangeLog() { change_field = "contact_phone_1_1", old_value = oldven.contact_phone_1_1, new_value = venQuery.contact_phone_1_1, field_ch_name = "第一聯絡人電話一" });
+                                }
+                                if (oldven.contact_phone_2_1 != venQuery.contact_phone_2_1)
+                                {
+                                    // update_log.AppendFormat("contact_phone_2_1:{0}:{1}:第一聯絡人電話二#", oldven.contact_phone_2_1, venQuery.contact_phone_2_1);
+                                    list.Add(new TableChangeLog() { change_field = "contact_phone_2_1", old_value = oldven.contact_phone_2_1, new_value = venQuery.contact_phone_2_1, field_ch_name = "第一聯絡人電話二" });
+                                }
+                                if (oldven.contact_mobile_1 != venQuery.contact_mobile_1)
+                                {
+                                    // update_log.AppendFormat("contact_mobile_1:{0}:{1}:第一聯絡人手機號碼#", oldven.contact_mobile_1, venQuery.contact_mobile_1);
+                                    list.Add(new TableChangeLog() { change_field = "contact_mobile_1", old_value = oldven.contact_mobile_1, new_value = venQuery.contact_mobile_1, field_ch_name = "第一聯絡人手機號碼" });
+                                }
+                                if (oldven.contact_email_1 != venQuery.contact_email_1)
+                                {
+                                    //update_log.AppendFormat("contact_email_1:{0}:{1}:第一聯絡人郵箱#", oldven.contact_email_1, venQuery.contact_email_1);
+                                    list.Add(new TableChangeLog() { change_field = "contact_email_1", old_value = oldven.contact_email_1, new_value = venQuery.contact_email_1, field_ch_name = "第一聯絡人郵箱" });
+                                }
+
                             }
                         }
                         else if (i == 1)
@@ -2368,11 +2373,13 @@ namespace Admin.gigade.Controllers
             string agreementEnd = string.Empty;
             if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
             {
-                agreementStart = Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00");
+                // agreementStart = Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00");
+                agreementStart = CommonFunction.DateTimeToString(Convert.ToDateTime(Request.Params["dateOne"]));
             }
             if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
             {
-                agreementEnd = Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59");
+                //  agreementEnd = Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59");
+                agreementEnd = CommonFunction.DateTimeToString(Convert.ToDateTime(Request.Params["dateTwo"]));
             }
             //匯出不需要查詢狀態
             if (!string.IsNullOrEmpty(content) && !string.IsNullOrEmpty(type) && type != "0")
@@ -2870,12 +2877,12 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["timestart"]))
                 {
                     query.serchstart = Convert.ToDateTime(Request.Params["timestart"]);
-                    query.serchstart = Convert.ToDateTime(query.serchstart.ToString("yyyy-MM-dd 00:00:00"));
+                    // query.serchstart = Convert.ToDateTime(query.serchstart.ToString("yyyy-MM-dd 00:00:00"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["timeend"]))
                 {
                     query.serchend = Convert.ToDateTime(Request.Params["timeend"]);
-                    query.serchend = Convert.ToDateTime(query.serchend.ToString("yyyy-MM-dd 23:59:59"));
+                    // query.serchend = Convert.ToDateTime(query.serchend.ToString("yyyy-MM-dd 23:59:59"));
                 }
                 _Ivendorloginlist = new VendorLoginListMgr(connectionString);
                 int totalCount = 0;
@@ -4948,12 +4955,12 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["date_one"]))
                 {
                     query.date_one = Convert.ToDateTime(Request.Params["date_one"]);
-                    query.date_one = Convert.ToDateTime(query.date_one.ToString("yyyy-MM-dd 00:00:00"));
+                    // query.date_one = Convert.ToDateTime(query.date_one.ToString("yyyy-MM-dd 00:00:00"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["date_two"]))
                 {
                     query.date_two = Convert.ToDateTime(Request.Params["date_two"]);
-                    query.date_two = Convert.ToDateTime(query.date_two.ToString("yyyy-MM-dd 23:59:59"));
+                    //query.date_two = Convert.ToDateTime(query.date_two.ToString("yyyy-MM-dd 23:59:59"));
 
                 }
                 // query.IsPage = false;
@@ -5054,12 +5061,12 @@ namespace Admin.gigade.Controllers
             if (!string.IsNullOrEmpty(Request.Params["date_one"]))
             {
                 query.date_one = Convert.ToDateTime(Request.Params["date_one"]);
-                query.date_one = Convert.ToDateTime(query.date_one.ToString("yyyy-MM-dd 00:00:00"));
+                // query.date_one = Convert.ToDateTime(query.date_one.ToString("yyyy-MM-dd 00:00:00"));
             }
             if (!string.IsNullOrEmpty(Request.Params["date_two"]))
             {
                 query.date_two = Convert.ToDateTime(Request.Params["date_two"]);
-                query.date_two = Convert.ToDateTime(query.date_two.ToString("yyyy-MM-dd 23:59:59"));
+                // query.date_two = Convert.ToDateTime(query.date_two.ToString("yyyy-MM-dd 23:59:59"));
             }
             TableChangeLogMgr _tclMgr = new TableChangeLogMgr(connectionString);
             DataTable dt = _tclMgr.VendorLogExport(query);

@@ -208,6 +208,9 @@ namespace BLL.gigade.Mgr
                                 case "black_list":
                                     store[0].ChkBlackList = true;
                                     break;
+                                case "phone":
+                                    store[0].ChkPhone = true;
+                                    break;
                             }
                         } 
                         #endregion

@@ -50,6 +50,7 @@ var DateAllQueryStore = Ext.create('Ext.data.Store', {
     { "txt": '銀行入賬日期', "value": "1" },
     { "txt": '退貨入賬日期', "value": "4" },
     { "txt": '開立發票日期', "value": "2" },
+    { "txt": '手開發票日期', "value": "5" },
     { "txt": '訂單日期', "value": "3" }
 
     ]
@@ -130,14 +131,13 @@ OrderMasterExportStore.on('beforeload', function () {
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
-            if (selections.length == 0 || (selections.length != 0 && selections[0].data.account_collection_time == "" && selections[0].data.return_collection_time == "")) {
+            if (selections.length == 0 || (selections.length != 0 && selections[0].data.account_collection_time == "" && selections[0].data.return_collection_time == "" && selections[0].data.invoice_date_manual == "")) {
                 //  Ext.getCmp("pcGift").down('#edit').setDisabled(true);
                 Ext.getCmp("pcGift").down('#delete').setDisabled(true);
             } else {
                 // Ext.getCmp("pcGift").down('#edit').setDisabled(false);
                 Ext.getCmp("pcGift").down('#delete').setDisabled(false);
             }
-
             Ext.getCmp("pcGift").down('#edit').setDisabled(selections.length == 0);
             //Ext.getCmp("pcGift").down('#delete').setDisabled(selections.length == 0);
 
@@ -157,7 +157,7 @@ Ext.onReady(function () {
     var exportTab = Ext.create('Ext.form.Panel', {
         layout: 'anchor',
         title: '匯入',
-        width: 600,
+        width: 500,
         url: '/Order/OrderMasterImport',
         margin: '0 10 0 0',
         defaults: {
@@ -173,7 +173,7 @@ Ext.onReady(function () {
             xtype: 'panel',
             bodyStyle: "padding:5px;background:#87CEEB",
             border: false,
-            html: "注意事項：<br/>1.檔案為.xls<br/>2.欄位：付款單號、銀行入帳日期、入賬金額、手續費、退貨入帳日期、退貨入賬金額、退貨入帳手續費、備註。<br/>3.當檔案中存在異常時,將不會處理異常數據,且其它數據會繼續匯入.<br/>4.<a href='javascript:void(0);' onclick='ShowMuBan()'>點擊下載匯入模板</a>"
+            html: "注意事項：<br/>1.檔案為.xls<br/>2.欄位：付款單號、銀行入帳日期、入賬金額、手續費、退貨入帳日期、退貨入賬金額、退貨入帳手續費、手開發票日期、手開發票銷售額、手開發票稅額、備註。<br/>3.當檔案中存在異常時,將不會處理異常數據,且其它數據會繼續匯入.<br/>4.<a href='javascript:void(0);' onclick='ShowMuBan()'>點擊下載匯入模板</a>"
         },
         {
             xtype: 'filefield',
@@ -209,11 +209,11 @@ Ext.onReady(function () {
                         },
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
-                          alert(result.msg);
+                            alert(result.msg);
                         },
                         failure: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
-                          alert( result.msg);
+                            alert(result.msg);
                         }
                     });
                 }
@@ -224,7 +224,7 @@ Ext.onReady(function () {
     var hpanel = Ext.create('Ext.form.Panel', {
         //layout: 'hbox',
         title: '匯出查詢',
-        width: 800,
+        width: 700,
         border: false,
         plain: true,
         id: 'OrderMasterExport',
@@ -233,7 +233,7 @@ Ext.onReady(function () {
             xtype: 'panel',
             bodyStyle: "padding:5px;background:#87CEEB",
             border: false,
-            html: "注意事項：<br/>查詢條件：銀行入賬日期、退貨入賬日期、開立發票日期，訂單日期，只能選其一查詢；若不選擇日期條件，請輸入訂單編號查詢。"
+            html: "注意事項：<br/>查詢條件：銀行入賬日期、退貨入賬日期、開立發票日期、手開發票日期、訂單日期，只能選其一查詢；若不選擇日期條件，請輸入訂單編號查詢。"
         },
         {
             xtype: 'fieldcontainer',
@@ -453,21 +453,30 @@ Ext.onReady(function () {
     var searchForm = Ext.create('Ext.form.Panel', {
         id: 'searchForm',
         layout: 'hbox',
-        //height: 450,
-        flex: 3.1,
+        height: 240,
+        //flex: 3.1,
         border: 0,
         bodyPadding: 10,
-        width: document.documentElement.clientWidth,
+        //width: document.documentElement.clientWidth>,
+        width: document.documentElement.clientWidth > 1230 ? document.documentElement.clientWidth : 1230,
         items: [
         exportTab,
         hpanel
-
-        ]
+        ],
+        autoScroll: true,
+        listeners: {
+            scrollershow: function (scroller) {
+                if (scroller && scroller.scrollEl) {
+                    scroller.clearManagedListeners();
+                    scroller.mon(scroller.scrollEl, 'scroll', scroller.onElScroll, scroller);
+                }
+            }
+        },
     });
     var pcGift = Ext.create('Ext.grid.Panel', {
         id: 'pcGift',
         store: OrderMasterExportStore,
-        width: document.documentElement.clientWidth,
+        width: document.documentElement.clientWidth > 1230 ? document.documentElement.clientWidth : 1230,
         columnLines: true,
         frame: true,
         //hidden: true,
@@ -610,7 +619,7 @@ Ext.onReady(function () {
         autoScroll: true,
         listeners: {
             resize: function () {
-                pcGift.width = document.documentElement.clientWidth;
+                pcGift.width = document.documentElement.clientWidth > 1230 ? document.documentElement.clientWidth : 1230,
                 this.doLayout();
             }
         }

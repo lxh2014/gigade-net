@@ -187,5 +187,10 @@ namespace BLL.gigade
         {
             throw new NotImplementedException();
         }
+
+        public List<Parametersrc> SearchParameters(params string[] types)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

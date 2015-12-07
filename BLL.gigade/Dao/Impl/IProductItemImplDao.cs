@@ -16,6 +16,7 @@ using BLL.gigade.Model.Custom;
 using BLL.gigade.Model.Query;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 

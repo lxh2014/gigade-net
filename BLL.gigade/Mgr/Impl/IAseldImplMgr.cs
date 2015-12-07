@@ -21,6 +21,7 @@ namespace BLL.gigade.Mgr.Impl
 
         List<AseldQuery> GetAseldList(Aseld ase);
         List<AseldQuery> GetAseldListByItemid(Aseld ase);
+        List<AseldQuery> GetAllAseldList(AseldQuery ase,out int totalCount);
         string UpdTicker(string m);
         string UpdAseld(Aseld a);
         int SelCom(Aseld a);
@@ -33,7 +34,7 @@ namespace BLL.gigade.Mgr.Impl
         int UpdScaned(Aseld m);
         string updgry(Aseld a, Dictionary<string, string> str);
 
-        DataTable GetDetailOrSimple(string type, string jobNumbers);
+        DataTable GetDetailOrSimple(string type, string jobNumbers, AseldQuery query = null);
         int UpdateScnd(Aseld ase);
         int Updwust(Aseld a);
         DataTable getTime(AseldQuery a);

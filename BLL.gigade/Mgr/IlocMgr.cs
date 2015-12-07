@@ -201,5 +201,28 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IlocMgr-->GetLocidByHash-->" + ex.Message, ex);
             }
         }
+
+        public string GetIlocCount(IlocQuery loc)
+        {
+            try
+            {
+                return _IocDao.GetIlocCount(loc);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IlocMgr-->GetIlocCount-->" + ex.Message, ex);
+            }
+        }
+        public IlocQuery GetIlocLsta_id(string loc_id)
+        {
+            try
+            {
+                return _IocDao.GetIlocLsta_id(loc_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IlocMgr-->GetIlocLsta_id-->" + ex.Message, ex);
+            }
+        }
     }
 }

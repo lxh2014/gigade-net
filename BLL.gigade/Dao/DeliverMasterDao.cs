@@ -1002,10 +1002,12 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1 ")
             Query.Replace4MySQL();
             try
             {
-                sbSql.Append(@"select dm.deliver_id,dm.order_id,om.user_id,dm.type,dm.freight_set,v.vendor_name_full,dm.delivery_status,
+                sbSql.Append(@"select dm.deliver_id,dm.order_id,om.user_id,tp.parameterName as delivery_status_str,dm.type,dm.freight_set,v.vendor_name_full,
                                             dm.estimated_delivery_date,dm.estimated_arrival_date,dm.estimated_arrival_period,
                                             dm.expect_arrive_date,dm.expect_arrive_period ");
-                fromSql.Append(@"from deliver_master dm inner JOIN vendor v on v.vendor_id=dm.export_id inner JOIN order_master om on om.order_id=dm.order_id
+                fromSql.Append(@"from deliver_master dm inner JOIN vendor v on v.vendor_id=dm.export_id inner JOIN order_master om on om.order_id=dm.order_id                                
+                           LEFT JOIN (SELECT * from t_parametersrc  where parameterType ='delivery_status') tp on tp.parameterCode=dm.delivery_status 
+
                                     where 1=1 ");
                 if (Query.type != 0)
                 {

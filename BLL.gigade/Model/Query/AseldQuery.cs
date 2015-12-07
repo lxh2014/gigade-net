@@ -30,7 +30,10 @@ namespace BLL.gigade.Model.Query
         public string freight_set { set; get; }
 
         public string hash_loc_id { get; set; }
+        public DateTime create_dtim2 { get; set; }
 
+        public DateTime start_time { get; set; }
+        public DateTime end_time { get; set; }
         public AseldQuery()
         {
             buy_num = 0;
@@ -44,6 +47,9 @@ namespace BLL.gigade.Model.Query
             cde_dt_incr = 0;
             note_order = string.Empty;
             hash_loc_id = string.Empty;
+            create_dtim2 = DateTime.MinValue;
+            start_time = DateTime.MinValue;
+            end_time = DateTime.MinValue;
         }
 
     }

@@ -801,6 +801,7 @@
     <Compile Include="Mgr\IwmsRrecordMgr.cs" />
     <Compile Include="Mgr\MailSendMgr.cs" />
     <Compile Include="Mgr\ManageLoginMgr.cs" />
+    <Compile Include="Mgr\MarketTallyMgr.cs" />
     <Compile Include="Mgr\MemberEventMgr.cs" />
     <Compile Include="Mgr\MemberLevelMgr.cs" />
     <Compile Include="Mgr\OrderAccumAmountMgr.cs" />
@@ -1174,6 +1175,11 @@
     <Compile Include="Mgr\ScheduleRelationMgr.cs" />
     <Compile Include="Mgr\ScheduleServiceMgr.cs" />
     <Compile Include="Mgr\Schedules\DeliverStatusMgr.cs" />
+    <Compile Include="Mgr\Schedules\SetConfigXmlMgr.cs" />
+    <Compile Include="Mgr\Schedules\UserLoginLogMgr.cs" />
+    <Compile Include="Mgr\Schedules\CheckUnsafeLoginMgr.cs" />
+    <Compile Include="Mgr\Schedules\ReceiveStatusFromTCatMgr.cs" />
+    <Compile Include="Mgr\Schedules\SendOrderInfoToBlackCatFTPMgr.cs" />
     <Compile Include="Mgr\SecretAccountSetMgr.cs" />
     <Compile Include="Mgr\SecretInfoLogMgr.cs" />
     <Compile Include="Mgr\SerialMgr.cs" />
@@ -1397,6 +1403,7 @@
     <Compile Include="Model\Query\BrowseDataQuery.cs" />
     <Compile Include="Model\Query\CertificateCategoryQuery.cs" />
     <Compile Include="Model\Query\CourseQuery.cs" />
+    <Compile Include="Model\Query\DeliverChangeLogQuery.cs" />
     <Compile Include="Model\Query\DeliveryStorePlaceQuery.cs" />
     <Compile Include="Model\Query\DesignRequestQuery.cs" />
     <Compile Include="Model\Query\DisableKeywordsQuery.cs" />
@@ -1431,6 +1438,8 @@
     <Compile Include="Model\Query\ItemIpoCreateLogQuery.cs" />
     <Compile Include="Model\Query\IwmsRrecordQuery.cs" />
     <Compile Include="Model\Query\LogisticsDetailQuery.cs" />
+    <Compile Include="Model\Query\LogisticsTcatSodQuery.cs" />
+    <Compile Include="Model\Query\LogisticsTcatEodQuery.cs" />
     <Compile Include="Model\Query\MailSendQuery.cs" />
     <Compile Include="Model\Query\ManageLoginQuery.cs" />
     <Compile Include="Model\Query\MarketOrderQuery.cs" />
@@ -1865,6 +1874,8 @@
     <Compile Include="Model\SchedulePeriod.cs" />
     <Compile Include="Model\ScheduleLog.cs" />
     <Compile Include="Model\DeliverChangeLog.cs" />
+    <Compile Include="Model\LogisticsTcatSod.cs" />
+    <Compile Include="Model\LogisticsTcatEod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\TrialPicture.cs" />
     <Compile Include="Model\TrialRecord.cs" />

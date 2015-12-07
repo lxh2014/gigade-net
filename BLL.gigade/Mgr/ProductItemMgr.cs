@@ -401,6 +401,5 @@ namespace BLL.gigade.Mgr
             }
         }
 
-        
     }
 }

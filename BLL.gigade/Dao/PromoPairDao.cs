@@ -70,7 +70,7 @@ namespace BLL.gigade.Dao
             {//TP.parameterName,TP1.parameterName as 'PN1',ET.parameterName as PTname,
                 strall.AppendFormat(@"select DISTINCT PP.id,PP.event_name,PP.active, PP.event_desc,PC.banner_image,PC.category_link_url,
 VUG.group_name,CONCAT(PP.event_type ,right(CONCAT('00000000',PP.id),6)) as 'condition_name' ,PP.event_type ,
-PT.payment_name,PP.start as starts,PP.end,PP.deliver_type,PP.device,PP.website,PP.cate_red,
+PT.payment_name,PP.start as starts,PP.end,PP.deliver_type,PP.device,PP.website,PP.cate_red,PP.vendor_coverage,
 PP.cate_green,PP.category_id,PP.price,PP.discount,PP.condition_id,PP.muser,mu.user_username from promo_pair as PP ");
                 str.AppendFormat(" left join vip_user_group as VUG on PP.group_id=VUG.group_id ");
                 str.AppendFormat(" left join product_category as PC on PP.category_id = PC.category_id ");
@@ -185,7 +185,7 @@ PP.cate_green,PP.category_id,PP.price,PP.discount,PP.condition_id,PP.muser,mu.us
                 id = Convert.ToInt32(mySqlCmd.ExecuteScalar());
                 //mySqlCmd.CommandText = string.Format("INSERT INTO product_category(category_father_id,category_name,category_display,category_show_mode,category_createdate,status) values('{0}','{1}','{2}','{3}','{4}',1); select @@identity ;", model.category_id, "綠", "1", "0", CommonFunction.GetPHPTime(model.created.ToString()));
                 #endregion
-                sb.AppendFormat("INSERT INTO promo_pair(event_name,event_desc,event_type,created,kuser,category_id,active,cate_red,cate_green) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}'); select @@identity  ;", model.event_name, model.event_desc, model.event_type, CommonFunction.DateTimeToString(model.created), model.kuser, model.category_id, "0", model.cate_red, model.cate_green);
+                sb.AppendFormat("INSERT INTO promo_pair(event_name,event_desc,event_type,created,kuser,category_id,active,cate_red,cate_green,vendor_coverage) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}'); select @@identity  ;", model.event_name, model.event_desc, model.event_type, CommonFunction.DateTimeToString(model.created), model.kuser, model.category_id, "0", model.cate_red, model.cate_green,model.vendor_coverage);
                 mySqlCmd.CommandText = sb.ToString();
                 id = Convert.ToInt32(mySqlCmd.ExecuteScalar());
                 mySqlCmd.Transaction.Commit();
@@ -216,7 +216,7 @@ PP.cate_green,PP.category_id,PP.price,PP.discount,PP.condition_id,PP.muser,mu.us
                 mySqlCmd.Connection = mySqlConn;
                 mySqlCmd.Transaction = mySqlConn.BeginTransaction();
                 mySqlCmd.CommandType = System.Data.CommandType.Text;
-                sb.AppendFormat(@"UPDATE promo_pair SET condition_id='{1}',group_id='{2}',`start`='{3}',`end`='{4}',modified='{5}',deliver_type='{6}',device='{7}',muser='{8}',website='{9}',price='{10}',discount='{11}',status=1 where id={0} ; ", model.id, model.condition_id, model.group_id, CommonFunction.DateTimeToString(model.starts), CommonFunction.DateTimeToString(model.end), CommonFunction.DateTimeToString(model.modified), model.deliver_type, model.device, model.muser, model.website, model.price, model.discount);
+                sb.AppendFormat(@"UPDATE promo_pair SET condition_id='{1}',group_id='{2}',`start`='{3}',`end`='{4}',modified='{5}',deliver_type='{6}',device='{7}',muser='{8}',website='{9}',price='{10}',discount='{11}',vendor_coverage='{12}',status=1 where id={0} ; ", model.id, model.condition_id, model.group_id, CommonFunction.DateTimeToString(model.starts), CommonFunction.DateTimeToString(model.end), CommonFunction.DateTimeToString(model.modified), model.deliver_type, model.device, model.muser, model.website, model.price, model.discount,model.vendor_coverage);
                 #region 操作ProductCategory
                 ProductCategoryDao _categoryDao = new ProductCategoryDao(connStr);
                 ProductCategory pcmodel = _categoryDao.GetModelById(Convert.ToUInt32(model.category_id));
@@ -332,7 +332,7 @@ PP.cate_green,PP.category_id,PP.price,PP.discount,PP.condition_id,PP.muser,mu.us
                 mySqlCmd.Connection = mySqlConn;
                 mySqlCmd.Transaction = mySqlConn.BeginTransaction();
                 mySqlCmd.CommandType = System.Data.CommandType.Text;
-                sb.AppendFormat(@"update promo_pair set condition_id='{1}',group_id='{2}',`start`='{3}',`end`='{4}',modified='{5}',deliver_type='{6}',device='{7}',muser='{8}',website='{9}',event_name='{10}',event_desc='{11}',price='{12}',discount='{13}',active=0 where id={0} ; ", model.id, model.condition_id, model.group_id, CommonFunction.DateTimeToString(model.starts), CommonFunction.DateTimeToString(model.end), CommonFunction.DateTimeToString(model.modified), model.deliver_type, model.device, model.muser, model.website, model.event_name, model.event_desc, model.price, model.discount);
+                sb.AppendFormat(@"update promo_pair set condition_id='{1}',group_id='{2}',`start`='{3}',`end`='{4}',modified='{5}',deliver_type='{6}',device='{7}',muser='{8}',website='{9}',event_name='{10}',event_desc='{11}',price='{12}',discount='{13}',vendor_coverage='{14}',active=0 where id={0} ; ", model.id, model.condition_id, model.group_id, CommonFunction.DateTimeToString(model.starts), CommonFunction.DateTimeToString(model.end), CommonFunction.DateTimeToString(model.modified), model.deliver_type, model.device, model.muser, model.website, model.event_name, model.event_desc, model.price, model.discount,model.vendor_coverage);
                 #region 操作修改ProductCategory
                 ProductCategoryDao _categoryDao = new ProductCategoryDao(connStr);
                 ProductCategory pcmodel = _categoryDao.GetModelById(Convert.ToUInt32(model.category_id));

@@ -17,6 +17,7 @@ using gigadeExcel.Comment;
 using System.Data;
 using BLL.gigade.Common;
 using System.Net;
+using System.Collections;
 
 namespace Admin.gigade.Controllers
 {
@@ -47,9 +48,13 @@ namespace Admin.gigade.Controllers
 
         private IRecommendedExcleImplMgr _recommendedExcleMgr;
         private IParametersrcImplMgr _iParametersrcImplMgr;
-        string ftpuser = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.ftpuser);//ftp用戶名
-        string ftppwd = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.ftppwd);//ftp密碼
-        string RecommendExcleLocalPath = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.local);//ftp地址
+
+        string ftpyuhuiPath = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.FtpYuhuiPath);//ftp地址宇匯
+        string ftpyuhuiuser = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.ftpyhuser);//ftp用戶名
+        string ftpyuhuipwd = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.ftpyhpwd);//ftp密碼
+        string ftpliaozhiPath = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.FtpLiaozhiPath);//ftp地址曜智
+        string ftpliaozhiuser = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.ftplzuser);//ftp用戶名
+        string ftpliaozhipwd = Unitle.GetImgGigade100ComRecommendSitePath(Unitle.RecommendExcle.ftplzpwd);//ftp密碼
         public ActionResult Index()
         {
             return View();
@@ -959,156 +964,156 @@ namespace Admin.gigade.Controllers
             string endRunInfo = "";
             try
             {
-                if (Request.Url.Host == "mng.gigade100.com")//判断是否为正式线
+                //if (Request.Url.Host == "mng.gigade100.com")//判断是否为正式线
+                //{
+                //    return "{success:false,data:'',msg:'未驗收，暫不執行！'}";
+                //}
+                //else
+                //{
+                startRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown Start";
+                _proRemoveMgr = new ProductRemoveReasonMgr(connectionString);
+
+                ProductRemoveReason prr = new ProductRemoveReason();
+                ProductRemoveReason prrtwo = new ProductRemoveReason();
+                Product pt = new Product();
+                ProductStatusHistory psh = new ProductStatusHistory();
+
+                #region 往临时表中插入数据/或者更新数据  sql可以统一执行
+                //獲取到上架商品庫存<=0,並且排除掉庫存為0可販賣機暫停售賣的商品
+                DataTable _dt = _proRemoveMgr.GetStockLessThanZero();
+                //获取到临时表中的数据
+                DataTable _dttwo = _proRemoveMgr.GetProductRemoveReasonList();
+                //判断临时表是否存在,如果不存在,则插入数据
+                StringBuilder str = new StringBuilder();
+                if (_dt.Rows.Count > 0)
                 {
-                    return "{success:false,data:'',msg:'未驗收，暫不執行！'}";
+                    for (int i = 0; i < _dt.Rows.Count; i++)
+                    {
+                        DataRow[] dr = _dttwo.Select("product_id=" + _dt.Rows[i]["product_id"]);
+                        if (dr.Length <= 0)//小于等于0  无需处理编辑数据,因为获取的库存都是等于或者小于0的
+                        {
+                            prr.create_name = "system";
+                            prr.create_time = Convert.ToInt32(CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(DateTime.Now)));
+                            prr.product_id = Convert.ToUInt32(_dt.Rows[i]["product_id"]);
+                            prr.product_num = Convert.ToInt32(_dt.Rows[i]["item_stock"]);
+                            str.AppendFormat(_proRemoveMgr.InsertProductRemoveReason(prr));
+                        }
+                    }
+                }
+                //获取出临时表中要删除的数据 
+                DataTable _dtthree = _proRemoveMgr.GetDeleteProductRemoveReasonList();
+                for (int b = 0; b < _dtthree.Rows.Count; b++)
+                {
+                    prr.product_id = Convert.ToUInt32(_dtthree.Rows[b]["product_id"]);
+                    str.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prr));
+                }
+                if (str.ToString().Length > 0)
+                {
+                    resultone = _proRemoveMgr.ProductRemoveReasonTransact(str.ToString());
                 }
                 else
                 {
-                    startRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown Start";
-                    _proRemoveMgr = new ProductRemoveReasonMgr(connectionString);
+                    resultone = 1;
+                }
+                #endregion
 
-                    ProductRemoveReason prr = new ProductRemoveReason();
-                    ProductRemoveReason prrtwo = new ProductRemoveReason();
-                    Product pt = new Product();
-                    ProductStatusHistory psh = new ProductStatusHistory();
-
-                    #region 往临时表中插入数据/或者更新数据  sql可以统一执行
-                    //獲取到上架商品庫存<=0,並且排除掉庫存為0可販賣機暫停售賣的商品
-                    DataTable _dt = _proRemoveMgr.GetStockLessThanZero();
-                    //获取到临时表中的数据
-                    DataTable _dttwo = _proRemoveMgr.GetProductRemoveReasonList();
-                    //判断临时表是否存在,如果不存在,则插入数据
-                    StringBuilder str = new StringBuilder();
-                    if (_dt.Rows.Count > 0)
+                #region 缺货商品下架
+                DataTable _dtNew = _proRemoveMgr.GetStockMsg();
+                StringBuilder strsql = new StringBuilder();
+                if (_dtNew.Rows.Count > 0)
+                {
+                    for (int j = 0; j < _dtNew.Rows.Count; j++)
                     {
-                        for (int i = 0; i < _dt.Rows.Count; i++)
+                        int time = Convert.ToInt32(_dtNew.Rows[j]["create_time"]);
+                        DateTime dttime = CommonFunction.GetNetTime(time);
+                        TimeSpan ts = DateTime.Now - dttime;
+                        prrtwo.product_id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
+                        pt.Product_Id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
+                        pt.Product_Status = 7;//7为缺货系统下架
+                        psh.product_id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
+                        psh.user_id = 2;
+                        psh.create_time = DateTime.Now;
+                        psh.type = 9;//缺货系统下架
+                        psh.product_status = 7;
+                        psh.remark = "系统账号插入";
+                        if (ts.Days >= (_dtNew.Rows[j]["outofstock_days_stopselling"] == "" ? 0 : Convert.ToInt32(_dtNew.Rows[j]["outofstock_days_stopselling"])))//表示可以下架,执行下架工作
                         {
-                            DataRow[] dr = _dttwo.Select("product_id=" + _dt.Rows[i]["product_id"]);
-                            if (dr.Length <= 0)//小于等于0  无需处理编辑数据,因为获取的库存都是等于或者小于0的
-                            {
-                                prr.create_name = "system";
-                                prr.create_time = Convert.ToInt32(CommonFunction.GetPHPTime(CommonFunction.DateTimeToString(DateTime.Now)));
-                                prr.product_id = Convert.ToUInt32(_dt.Rows[i]["product_id"]);
-                                prr.product_num = Convert.ToInt32(_dt.Rows[i]["item_stock"]);
-                                str.AppendFormat(_proRemoveMgr.InsertProductRemoveReason(prr));
-                            }
+                            //改变product表中商品的状态
+                            strsql.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
+                            //网记录表中插入一条数据
+                            strsql.AppendFormat(_proRemoveMgr.InsertIntoProductStatusHistory(psh));
+                            //删除临时表中的数据
+                            strsql.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prrtwo));
                         }
-                    }
-                    //获取出临时表中要删除的数据 
-                    DataTable _dtthree = _proRemoveMgr.GetDeleteProductRemoveReasonList();
-                    for (int b = 0; b < _dtthree.Rows.Count; b++)
-                    {
-                        prr.product_id = Convert.ToUInt32(_dtthree.Rows[b]["product_id"]);
-                        str.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prr));
-                    }
-                    if (str.ToString().Length > 0)
-                    {
-                        resultone = _proRemoveMgr.ProductRemoveReasonTransact(str.ToString());
-                    }
-                    else
-                    {
-                        resultone = 1;
-                    }
-                    #endregion
-
-                    #region 缺货商品下架
-                    DataTable _dtNew = _proRemoveMgr.GetStockMsg();
-                    StringBuilder strsql = new StringBuilder();
-                    if (_dtNew.Rows.Count > 0)
-                    {
-                        for (int j = 0; j < _dtNew.Rows.Count; j++)
-                        {
-                            int time = Convert.ToInt32(_dtNew.Rows[j]["create_time"]);
-                            DateTime dttime = CommonFunction.GetNetTime(time);
-                            TimeSpan ts = DateTime.Now - dttime;
-                            prrtwo.product_id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
-                            pt.Product_Id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
-                            pt.Product_Status = 7;//7为缺货系统下架
-                            psh.product_id = Convert.ToUInt32(_dtNew.Rows[j]["product_id"]);
-                            psh.user_id = 2;
-                            psh.create_time = DateTime.Now;
-                            psh.type = 9;//缺货系统下架
-                            psh.product_status = 7;
-                            psh.remark = "系统账号插入";
-                            if (ts.Days >= (_dtNew.Rows[j]["outofstock_days_stopselling"] == "" ? 0 : Convert.ToInt32(_dtNew.Rows[j]["outofstock_days_stopselling"])))//表示可以下架,执行下架工作
-                            {
-                                //改变product表中商品的状态
-                                strsql.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
-                                //网记录表中插入一条数据
-                                strsql.AppendFormat(_proRemoveMgr.InsertIntoProductStatusHistory(psh));
-                                //删除临时表中的数据
-                                strsql.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prrtwo));
-                            }
-                        }
-                    }
-                    if (strsql.ToString().Length > 0)
-                    {
-                        resulttwo = _proRemoveMgr.ProductRemoveReasonTransact(strsql.ToString());
-                    }
-                    else
-                    {
-                        resulttwo = 1;
-                    }
-                    #endregion
-
-                    #region 缺货商品状态改为申请审核
-                    DataTable _dtOutofStock = _proRemoveMgr.GetOutofStockMsg();
-                    StringBuilder strslqmsg = new StringBuilder();
-                    StringBuilder strslqmsgtwo = new StringBuilder();
-                    if (_dtOutofStock.Rows.Count > 0)
-                    {
-                        for (int z = 0; z < _dtOutofStock.Rows.Count; z++)
-                        {
-                            if (Convert.ToInt32(_dtOutofStock.Rows[z]["item_stock"]) > 0)
-                            {
-                                pt.Product_Id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);
-                                pt.Product_Status = 1;//1表示申请审核
-                                _proRemoveMgr.UpdateProductStatus(pt);
-                                psh.product_id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);
-                                psh.user_id = 2;
-                                psh.create_time = DateTime.Now;
-                                psh.type = 1;//1表示申请审核
-                                psh.product_status = 1;//申请审核
-                                psh.remark = "系统账号插入";
-                                strslqmsg.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
-                                strslqmsg.AppendFormat(_proRemoveMgr.InsertIntoProductStatusHistory(psh));
-                            }
-                            prr.product_id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);//根据product_id删除数据
-                            strslqmsgtwo.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prr));
-                        }
-                    }
-
-                    if (strslqmsg.ToString().Length > 0)
-                    {
-                        resultthree = _proRemoveMgr.ProductRemoveReasonTransact(strslqmsg.ToString() + strslqmsgtwo.ToString());
-                    }
-                    else
-                    {
-                        if (strslqmsgtwo.ToString().Length > 0)
-                        {
-                            _proRemoveMgr.ProductRemoveReasonTransact(strslqmsgtwo.ToString());
-                        }
-                        resultthree = 1;
-                    }
-                    #endregion
-
-                    if (resultone > 0 && resulttwo > 0 && resultthree > 0)
-                    {
-                        SaleStatus();
-                        DataTable _excelMsg = _proRemoveMgr.GetStockMsg();
-                        ExeclProductRmoveDownMsg(_excelMsg);
-                        endRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown End ";
-                        WriterInfo("SetProductRmoveDown-Success", startRunInfo, endRunInfo);
-                        return "{success:true}";
-                    }
-                    else
-                    {
-                        endRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown End ";
-                        WriterInfo("SetProductRmoveDown-Fail", startRunInfo, endRunInfo);
-                        return "{success:false}";
                     }
                 }
+                if (strsql.ToString().Length > 0)
+                {
+                    resulttwo = _proRemoveMgr.ProductRemoveReasonTransact(strsql.ToString());
+                }
+                else
+                {
+                    resulttwo = 1;
+                }
+                #endregion
+
+                #region 缺货商品状态改为申请审核
+                DataTable _dtOutofStock = _proRemoveMgr.GetOutofStockMsg();
+                StringBuilder strslqmsg = new StringBuilder();
+                StringBuilder strslqmsgtwo = new StringBuilder();
+                if (_dtOutofStock.Rows.Count > 0)
+                {
+                    for (int z = 0; z < _dtOutofStock.Rows.Count; z++)
+                    {
+                        if (Convert.ToInt32(_dtOutofStock.Rows[z]["item_stock"]) > 0)
+                        {
+                            pt.Product_Id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);
+                            pt.Product_Status = 1;//1表示申请审核
+                            _proRemoveMgr.UpdateProductStatus(pt);
+                            psh.product_id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);
+                            psh.user_id = 2;
+                            psh.create_time = DateTime.Now;
+                            psh.type = 1;//1表示申请审核
+                            psh.product_status = 1;//申请审核
+                            psh.remark = "系统账号插入";
+                            strslqmsg.AppendFormat(_proRemoveMgr.UpdateProductStatus(pt));
+                            strslqmsg.AppendFormat(_proRemoveMgr.InsertIntoProductStatusHistory(psh));
+                        }
+                        prr.product_id = Convert.ToUInt32(_dtOutofStock.Rows[z]["product_id"]);//根据product_id删除数据
+                        strslqmsgtwo.AppendFormat(_proRemoveMgr.DeleteProductRemoveReason(prr));
+                    }
+                }
+
+                if (strslqmsg.ToString().Length > 0)
+                {
+                    resultthree = _proRemoveMgr.ProductRemoveReasonTransact(strslqmsg.ToString() + strslqmsgtwo.ToString());
+                }
+                else
+                {
+                    if (strslqmsgtwo.ToString().Length > 0)
+                    {
+                        _proRemoveMgr.ProductRemoveReasonTransact(strslqmsgtwo.ToString());
+                    }
+                    resultthree = 1;
+                }
+                #endregion
+
+                if (resultone > 0 && resulttwo > 0 && resultthree > 0)
+                {
+                    SaleStatus();
+                    //DataTable _excelMsg = _proRemoveMgr.GetStockMsg();
+                    //ExeclProductRmoveDownMsg(_excelMsg);
+                    endRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown End ";
+                    WriterInfo("SetProductRmoveDown-Success", startRunInfo, endRunInfo);
+                    return "{success:true}";
+                }
+                else
+                {
+                    endRunInfo = DateTime.Now.ToString() + ": SetProductRmoveDown End ";
+                    WriterInfo("SetProductRmoveDown-Fail", startRunInfo, endRunInfo);
+                    return "{success:false}";
+                }
+                //}
             }
             catch (Exception ex)
             {
@@ -1168,7 +1173,7 @@ namespace Admin.gigade.Controllers
                 log.Error(logMessage);
             }
         }
-        #region 吉甲地推薦系統匯出
+        #region 吉甲地推薦系統匯出excel
         // 吉甲地推薦系統匯出 guodong1130w 2015/10/9
         public string OutExcleForRecommended()
         {
@@ -1176,8 +1181,19 @@ namespace Admin.gigade.Controllers
             {
                 //獲取傳參并封裝到對象
                 RecommendedOutPra rop = new RecommendedOutPra();
-                string outType = Request.Params["outType"].ToString();
-                string outTime = Request.Params["outTime"].ToString();
+
+                string outType = string.Empty;
+                if (!string.IsNullOrEmpty(Request.Params["outType"]))
+                {
+                    outType = Request.Params["outType"].ToString();
+                }
+
+                string outTime = string.Empty;
+                if (!string.IsNullOrEmpty(Request.Params["outTime"]))
+                {
+                    outTime = Request.Params["outTime"].ToString();
+                }
+
                 if (!string.IsNullOrEmpty(outType))
                 {
                     rop.outType = outType;
@@ -1196,42 +1212,26 @@ namespace Admin.gigade.Controllers
                 _iParametersrcImplMgr = new ParameterMgr(Server.MapPath(strXml), ParaSourceType.XML);
                 List<Parametersrc> liparsrc = _iParametersrcImplMgr.QueryUsed(new Parametersrc { ParameterType = "RecommendedExcleSheetName" }).ToList();
                 //導出文件名稱
-                List<string> strPath = new List<string>();
-                List<string> strNewPath = new List<string>();
                 DateTime nowtime = DateTime.Now;
                 //導出EXCLE  分別導出6種
-                List<MemoryStream> msVipUser = _recommendedExcleMgr.GetVipUserInfo(rop, liparsrc[0].parameterName);
-                OutExcleForRecommendedByMs(msVipUser, liparsrc[0].parameterName, out strNewPath, nowtime);
-                strPath = AddstrPath(strPath, strNewPath);
-                List<MemoryStream> msProduct = _recommendedExcleMgr.GetProductInfo(rop, liparsrc[1].parameterName);
-                OutExcleForRecommendedByMs(msProduct, liparsrc[1].parameterName, out strNewPath, nowtime);
-                strPath = AddstrPath(strPath, strNewPath);
-                List<MemoryStream> msOrder = _recommendedExcleMgr.GetOrderInfo(rop, liparsrc[2].parameterName);
-                OutExcleForRecommendedByMs(msOrder, liparsrc[2].parameterName, out strNewPath, nowtime);
-                strPath = AddstrPath(strPath, strNewPath);
-                List<MemoryStream> msOrderDetail = _recommendedExcleMgr.GetOrderDetailInfo(rop, liparsrc[3].parameterName);
-                OutExcleForRecommendedByMs(msOrderDetail, liparsrc[3].parameterName, out strNewPath, nowtime);
-                strPath = AddstrPath(strPath, strNewPath);
-                List<MemoryStream> msCategory = _recommendedExcleMgr.GetCategoryInfo(rop, liparsrc[4].parameterName);
-                OutExcleForRecommendedByMs(msCategory, liparsrc[4].parameterName, out strNewPath, nowtime);
-                strPath = AddstrPath(strPath, strNewPath);
-                List<MemoryStream> msBrand = _recommendedExcleMgr.GetBrandInfo(rop, liparsrc[5].parameterName);
-                OutExcleForRecommendedByMs(msBrand, liparsrc[5].parameterName, out strNewPath, nowtime);
-                strPath = AddstrPath(strPath, strNewPath);
-                #region
-                //打包壓縮文件
-                string zipfifilename = "吉甲地推薦系統匯出.zip";
-                string strZipPath = Server.MapPath("../ImportUserIOExcel/" + zipfifilename + "");
-                string strZipTopDirectoryPath = Server.MapPath("../ImportUserIOExcel/");
-                int intZipLevel = 6;
-                string strPassword = "";
-                SharpZipLibHelp szlh = new SharpZipLibHelp();
-                szlh.Zip(strZipPath, strZipTopDirectoryPath, intZipLevel, strPassword, strPath);
-                //下載
-                downLoad(strZipPath, zipfifilename);
-                //下載完後刪除本次的緩存文件
-                DeleteFileByPath(strPath);
-                #endregion
+                DataTable msVipUser = _recommendedExcleMgr.GetVipUserInfo(rop, liparsrc[0].parameterName);
+                OutExcleForRecommendedByMs(msVipUser, liparsrc[0].parameterName, nowtime);
+                
+                DataTable msProduct = _recommendedExcleMgr.GetProductInfo(rop, liparsrc[1].parameterName);
+                OutExcleForRecommendedByMs(msProduct, liparsrc[1].parameterName, nowtime);
+
+                DataTable msOrder = _recommendedExcleMgr.GetOrderInfo(rop, liparsrc[2].parameterName);
+                OutExcleForRecommendedByMs(msOrder, liparsrc[2].parameterName, nowtime);
+
+                DataTable msOrderDetail = _recommendedExcleMgr.GetOrderDetailInfo(rop, liparsrc[3].parameterName);
+                OutExcleForRecommendedByMs(msOrderDetail, liparsrc[3].parameterName, nowtime);
+
+                DataTable msCategory = _recommendedExcleMgr.GetCategoryInfo(rop, liparsrc[4].parameterName);
+                OutExcleForRecommendedByMs(msCategory, liparsrc[4].parameterName, nowtime);
+
+                DataTable msBrand = _recommendedExcleMgr.GetBrandInfo(rop, liparsrc[5].parameterName);
+                OutExcleForRecommendedByMs(msBrand, liparsrc[5].parameterName, nowtime);
+
                 return "{success:true}";
             }
             catch (Exception ex)
@@ -1244,33 +1244,46 @@ namespace Admin.gigade.Controllers
             }
         }
         //導出Exlce
-        public void OutExcleForRecommendedByMs(List<MemoryStream> ms, string exclename, out  List<string> strPath, DateTime dtnow)
+        public void OutExcleForRecommendedByMs(DataTable dt, string exclename, DateTime dtnow)
         {
-            strPath = new List<string>();
-            for (int i = 0; i < ms.Count; i++)
+            try
             {
-                string fileName = "吉甲地推薦系統" + exclename + "匯出" + dtnow.ToString("yyyyMMddHHmmss") + ".xls";
-                string serverPath = Server.MapPath("../ImportUserIOExcel/" + fileName);
-                FileStream fs = new FileStream(serverPath, FileMode.OpenOrCreate);
-                BinaryWriter w = new BinaryWriter(fs);
-                w.Write(ms[i].ToArray());
-                fs.Close();
-                ms[i].Close();
-                //上傳FTP
-                //UploadFTP(RecommendExcleLocalPath, serverPath, ftpuser, ftppwd);
-                //記錄本次導出文件
-                strPath.Add(serverPath);
+                string fileName = "吉甲地推薦系統" + exclename + "匯出" + dtnow.ToString("yyyyMMdd_HHmm") + ".csv";
+               // ArrayList al = new ArrayList();
+              
+                string str=string.Empty;
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    if (!string.IsNullOrEmpty(str))
+                    {
+                        str = str + ',' + dt.Columns[i].ColumnName;
+                    }
+                    else
+                    {
+                        str = dt.Columns[i].ColumnName;
+                    }
+                }
+                string[] columnName = new string[] { str};
+                string txtserverPath = Server.MapPath("../ImportUserIOExcel/" + fileName);
+                CsvHelper.ExportDataTableToCsvBySdy(dt, txtserverPath, columnName, true);
+                UploadFTP(ftpliaozhiPath, txtserverPath, ftpliaozhiuser, ftpliaozhipwd);//曜智上傳csv文件
+                FileInfo file = new FileInfo(txtserverPath);//指定文件路径
+                if (file.Exists)//判断文件是否存在
+                {
+                    file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
+                    file.Delete();//删除文件
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
             }
         }
-        //新增導出地址
-        public List<string> AddstrPath(List<string> strPath, List<string> strNewPath)
-        {
-            for (int i = 0; i < strNewPath.Count; i++)
-            {
-                strPath.Add(strNewPath[i]);
-            }
-            return strPath;
-        }
+       
+        #region 上传Ftp
         /// <summary>
         /// 上傳FTP方法
         /// </summary>
@@ -1325,6 +1338,8 @@ namespace Admin.gigade.Controllers
                 Response.Write("Upload Error：" + ex.Message);
             }
         }
+        #endregion
+
         //文件下載方法
         private void downLoad(string path, string filename)
         {
@@ -1355,24 +1370,59 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        #region 匯出xml信息
+        #region 匯出xml商品信息
         public string OutXmlForProduct()
         {
+            StringWriter swone = new StringWriter();
             try
             {
                 //導出方法
                 _recommendedExcleMgr = new RecommendedExcleMgr(connectionString);
                 DateTime nowtime = DateTime.Now;
                 //導出XML
-                StringWriter sw = _recommendedExcleMgr.GetThisProductInfo();
-                string filename = "128_MYFONE_item_" + nowtime.ToString("yyyyMMdd-HHmm") + ".xml";
-
-                Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
-                Response.ContentType = "application/octet-stream";
-                Response.ContentEncoding = Encoding.UTF8;
-                Response.Write(sw);
-                Response.End();
-                return "{success:true}";
+                int start_product_id = 0;
+                int end_product_id = 0;
+                if (!string.IsNullOrEmpty(Request.Params["type"]))
+                {
+                    StringBuilder sb = _recommendedExcleMgr.GetThisProductInfo(start_product_id, end_product_id);
+                    swone.WriteLine(sb.ToString());
+                    string filename = "33_gigade_item_" + nowtime.ToString("yyyyMMdd_HHmm") + ".xml";
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
+                    Response.ContentType = "application/octet-stream";
+                    Response.ContentEncoding = Encoding.UTF8;
+                    Response.Write(swone);
+                    Response.End();
+                    return "{success:true}";
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(Request.Params["start_product_id"]))
+                    {
+                        start_product_id = Convert.ToInt32(Request.Params["start_product_id"]);
+                    }
+                    if (!string.IsNullOrEmpty(Request.Params["end_product_id"]))
+                    {
+                        end_product_id = Convert.ToInt32(Request.Params["end_product_id"]);
+                    }
+                    #region 汇出信息
+                    StringBuilder sb = _recommendedExcleMgr.GetThisProductInfo(start_product_id, end_product_id);
+                    string filename = "33_gigade_item_" + nowtime.ToString("yyyyMMdd_HHmm") + ".xml";
+                    string xmlserverPath = Server.MapPath("../ImportUserIOExcel/" + filename);
+                    FileStream aFile = new FileStream(xmlserverPath, FileMode.OpenOrCreate);
+                    StreamWriter sw = new StreamWriter(aFile);
+                    sw.Write(sb.ToString());
+                    sw.Close();
+                    aFile.Close();
+                    UploadFTP(ftpyuhuiPath, xmlserverPath, ftpyuhuiuser, ftpyuhuipwd);
+                    FileInfo file = new FileInfo(xmlserverPath);//指定文件路径
+                    if (file.Exists)//判断文件是否存在
+                    {
+                        file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
+                        file.Delete();//删除文件
+                    }
+                    #endregion
+                    return "{success:true}";
+                }
 
             }
             catch (Exception ex)
@@ -1382,25 +1432,51 @@ namespace Admin.gigade.Controllers
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
                 return "{success:false,data:'',msg:" + ex.Message + "}";
+            }
+            finally
+            {
+                swone.Close();
             }
         }
         #endregion
 
-        #region 匯出廠商的類別txt信息
+        #region 匯出廠商的類別csv信息--宇匯和曜智都需要
         public string OutExportVendorCategoryMsg()
         {
+            StringWriter sw = new StringWriter();
             try
             {
                 _recommendedExcleMgr = new RecommendedExcleMgr(connectionString);
                 DateTime nowtime = DateTime.Now;
-                string filename = "食用品館類別樹-含品牌" + nowtime.ToString("yyyyMMdd-HHmm") + ".txt";
-                StringWriter sw = _recommendedExcleMgr.GetVendorCategoryMsg();
-                Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
-                Response.ContentType = "application/octet-stream";
-                Response.ContentEncoding = Encoding.UTF8;
-                Response.Write(sw);
-                Response.End();
-                return "{success:true}";
+                string filename = "33_gigade_category_" + nowtime.ToString("yyyyMMdd_HHmm") + ".csv";
+                DataTable _result = _recommendedExcleMgr.GetVendorCategoryMsg();
+                if (!string.IsNullOrEmpty(Request.Params["type"]))
+                {
+                    sw = ExcelHelperXhf.SetCsvFromDataBySdy(_result, filename);
+                    Response.Clear();
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + filename);
+                    Response.ContentType = "application/ms-excel";
+                    Response.ContentEncoding = Encoding.UTF8;
+                    Response.Write(sw);
+                    Response.End();
+                    return "{success:true}";
+
+                }
+                else
+                {
+                    string[] columnName = { "category_name", "category_id", "parent_id", "level" };
+                    string txtserverPath = Server.MapPath("../ImportUserIOExcel/" + filename);
+                    CsvHelper.ExportDataTableToCsvBySdy(_result, txtserverPath, columnName, false);
+                    UploadFTP(ftpyuhuiPath, txtserverPath, ftpyuhuiuser, ftpyuhuipwd);//宇匯上傳csv文件
+                    UploadFTP(ftpliaozhiPath, txtserverPath, ftpliaozhiuser, ftpliaozhipwd);//曜智上傳csv文件
+                    FileInfo file = new FileInfo(txtserverPath);//指定文件路径
+                    if (file.Exists)//判断文件是否存在
+                    {
+                        file.Attributes = FileAttributes.Normal;//将文件属性设置为普通,比方说只读文件设置为普通
+                        file.Delete();//删除文件
+                    }
+                    return "{success:true}";
+                }
             }
             catch (Exception ex)
             {
@@ -1409,6 +1485,10 @@ namespace Admin.gigade.Controllers
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
                 return "{success:false,data:'',msg:" + ex.Message + "}";
+            }
+            finally
+            {
+                sw.Close();
             }
         }
         #endregion

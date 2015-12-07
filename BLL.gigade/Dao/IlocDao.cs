@@ -381,5 +381,52 @@ namespace BLL.gigade.Dao
                 throw new Exception("IlocDao.GetLocidByHash-->" + ex.Message + sql.ToString(), ex);
             }
         }
+
+        public string GetIlocCount(IlocQuery loc)
+        {
+            StringBuilder sbt = new StringBuilder("SELECT loc_id FROM iloc WHERE 1=1");
+            if (loc.loc_id != "")
+            {
+                sbt.AppendFormat(@" and (loc_id='{0}' or hash_loc_id='{0}')", loc.loc_id);
+            }
+            try
+            {
+                DataTable table = _access.getDataTable(sbt.ToString());
+                if(table.Rows.Count>0)
+                {
+                    return table.Rows[0][0].ToString();
+                }
+                return "";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IlocDao.GetIlocCount-->" + ex.Message + sbt.ToString(), ex);
+            }
+        }
+
+        public IlocQuery GetIlocLsta_id(string loc_id)//add by yafeng0715j
+        {
+            StringBuilder sbt = new StringBuilder("SELECT lsta_id,row_id FROM iloc WHERE 1=1");
+            IlocQuery query = new IlocQuery();
+            if (loc_id != "")
+            {
+                sbt.AppendFormat(" and loc_id='{0}'",loc_id);
+            }
+            try
+            {
+               DataTable table=_access.getDataTable(sbt.ToString());
+                if(table.Rows.Count>0)
+                {
+                    query.lsta_id = table.Rows[0][0].ToString();
+                    query.row_id = int.Parse(table.Rows[0][1].ToString());
+                    return query;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IlocDao.GetIlocLsta_id-->" + ex.Message + sbt.ToString(), ex);
+            }
+        }
     }
 }

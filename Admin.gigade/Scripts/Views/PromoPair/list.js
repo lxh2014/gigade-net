@@ -29,7 +29,8 @@ Ext.define('gigade.Fares', {
         { name: "condition_id", type: "string" },
         { name: "category_link_url", type: "string" },
         { name: 'muser', type: 'int' },
-        { name: 'user_username', type: 'string' }
+        { name: 'user_username', type: 'string' },
+        { name: 'vendor_coverage',type:'string' }
     ]
 });
 
@@ -97,6 +98,7 @@ Ext.onReady(function () {
             { header: HDID, dataIndex: 'condition_name', width: 70, align: 'center', align: 'center' },
             { header: ACTIVENAME, dataIndex: 'event_name', width: 120, align: 'center' },
             { header: ACTIVEDESC, dataIndex: 'event_desc', width: 120, align: 'center' },
+            { header: VENDORCOVERAGE, dataIndex: 'vendor_coverage', width: 120, align: 'center' },
             {
                 header: BANNERIMG,
                 dataIndex: 'banner_image',
@@ -118,14 +120,14 @@ Ext.onReady(function () {
                             return value;
                         }
                     }
-                }
+                } 
             },
         //{ header: VIPCONDITION, dataIndex: 'condition_name', width: 120, align: 'center', renderer: MultipleShow },
-            { header: YSCLASS, dataIndex: 'parameterName', width: 100, align: 'center', renderer: DeviceShow },
+            { header: YSCLASS, dataIndex: 'deliver_type', width: 100, align: 'center', renderer: DeliverTypeShow },
             { header: PROSORT1, dataIndex: 'PTname', width: 100, align: 'center' },
         //{ header: PAYTYPE, dataIndex: 'payment_name', width: 100, align: 'center' },
         //{ header: BANK, dataIndex: 'PN1', width: 100, align: 'center' },
-            { header: DEVICE, dataIndex: 'PN1', width: 100, align: 'center', renderer: DeviceShow },
+            { header: DEVICE, dataIndex: 'device', width: 100, align: 'center', renderer: DeviceShow },
             { header: BEGINTIME, dataIndex: 'starts', width: 130, align: 'center' },
             { header: ENDTIME, dataIndex: 'end', width: 130, align: 'center' },
             { header: 'muser', dataIndex: 'muser', hidden: true },
@@ -214,17 +216,38 @@ function MultipleShow(val) {
             break;
     }
 }
-function DeviceShow(val) {
+function DeliverTypeShow(val) {
     switch (val) {
-        case "":
-            return DEVICE_1;
+        case "0":
+            return "不分";
+            break;
+        case "1":
+            return '常溫';
+            break;
+        case "2":
+            return '冷藏';
             break;
         default:
             return val;
             break;
     }
 }
-
+function DeviceShow(val) {
+    switch (val) {
+        case "0":
+            return "不分";
+            break;
+        case "1":
+            return 'PC';
+            break;
+        case "4":
+            return '手機/平板';
+            break;
+        default:
+            return val;
+            break;
+    }
+}
 /********************************************新增*****************************************/
 onAddClick = function () {
     //addWin.show();

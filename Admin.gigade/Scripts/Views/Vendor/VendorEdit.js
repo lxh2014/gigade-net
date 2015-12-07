@@ -368,7 +368,7 @@ function editFunction(rowID) {
                 }
             },
             {
-                header: '姓名', dataIndex: 'contact_name', width: 65, align: 'center',
+                header: '姓名', dataIndex: 'contact_name', width: 120, align: 'center',
                 editor: {
                     // id: 'txt_contactname',
                     listeners: {
@@ -408,7 +408,7 @@ function editFunction(rowID) {
                 }
             },
             {
-                header: '電話1', dataIndex: 'contact_phone1', width: 70, align: 'center', editor: { id: 'txt_contactphone' },
+                header: '電話1', dataIndex: 'contact_phone1', width: 120, align: 'center', editor: { id: 'txt_contactphone' },
                 editor: {
                     xtype: "textfield",
                     minLength: 5,
@@ -418,7 +418,7 @@ function editFunction(rowID) {
                 }
             },
             {
-                header: '電話2', dataIndex: 'contact_phone2', width: 70, align: 'center', editor: { id: 'txt_contactphone1' },
+                header: '電話2', dataIndex: 'contact_phone2', width: 120, align: 'center', editor: { id: 'txt_contactphone1' },
                 editor: {
                     xtype: "textfield",
                     minLength: 5,
@@ -428,7 +428,7 @@ function editFunction(rowID) {
                 }
             },
             {
-                header: '手機', dataIndex: 'contact_mobile', width: 70, align: 'center', editor: { id: 'txt_contactmobile' },
+                header: '手機', dataIndex: 'contact_mobile', width: 120, align: 'center', editor: { id: 'txt_contactmobile' },
                 editor: {
                     xtype: "textfield",
                     minLength: 10,
@@ -437,7 +437,7 @@ function editFunction(rowID) {
                 }
             },
             {
-                header: 'E-mail', dataIndex: 'contact_email', width: 80, align: 'center', editor: { id: 'txt_contactemail' },
+                header: 'E-mail', dataIndex: 'contact_email', width: 150, align: 'center', editor: { id: 'txt_contactemail' },
                 editor: {
                     xtype: "textfield",
                     sumbitValue: true,
@@ -1716,6 +1716,8 @@ function editFunction(rowID) {
                 id: 'agreement_createdate',
                 name: 'agreement_createdate',
                 format: 'Y-m-d',
+                //time: { hour: 00, min: 00, sec: 00 },
+                editable: false,
                 labelWidth: 120,
                 fieldLabel: '合約簽訂日期',
                 allowBlank: false,
@@ -1733,17 +1735,19 @@ function editFunction(rowID) {
                         xtype: "datefield",
                         id: 'agreement_start',
                         name: 'agreement_start',
-                        format: 'Y-m-d',
+                        format: 'Y-m-d',                      
                         allowBlank: false,
-                        //editable: false,
+                        editable: false,
                         submitValue: true,
                         value: Tomorrow(),
+                       // time: { hour: 00, min: 00, sec: 00 },//開始時間00：00：00
                         listeners: {
                             select: function (a, b, c) {
                                 var start = Ext.getCmp("agreement_start");
                                 var end = Ext.getCmp("agreement_end");
-                                var s_date = new Date(start.getValue());
-                                end.setValue(new Date(s_date.setFullYear(s_date.getFullYear() + 1)));
+                                if (start.getValue() > end.getValue()) {
+                                    end.setValue(setNextMonth(start.getValue(), 1));
+                                }
                             }
                         }
                     },
@@ -1754,20 +1758,21 @@ function editFunction(rowID) {
                     {
                         xtype: "datefield",
                         format: 'Y-m-d',
+                       // time: { hour: 23, min: 59, sec: 59 },
                         id: 'agreement_end',
                         // editable: false,
                         name: 'agreement_end',
                         allowBlank: false,
                         submitValue: true,
-                        value: new Date(Tomorrow().setFullYear(Tomorrow().getFullYear() + 1)),
+                        editable: false,
+                        value: setNextMonth(Tomorrow(), 1),
                         listeners: {
                             select: function (a, b, c) {
                                 var start = Ext.getCmp("agreement_start");
                                 var end = Ext.getCmp("agreement_end");
-                                if (end.getValue() < start.getValue()) {
-                                    Ext.Msg.alert(INFORMATION, '開始時間不能大於結束時間');
-                                    end.setValue(new Date(Tomorrow().setFullYear(Tomorrow().getFullYear() + 1)));
-                                }
+                                if (end.getValue() < start.getValue()) {                                   
+                                    start.setValue(setNextMonth(end.getValue(), -1));
+                                }                             
                             }
                         }
                     }

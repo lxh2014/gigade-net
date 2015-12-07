@@ -549,7 +549,7 @@ Ext.onReady(function () {
                                             margin: '5 0 0 10',
                                             iconCls: 'icon-excel',
                                             id: 'btnExcelReport',
-                                            //hidden: true,
+                                            hidden: true,
                                             handler: ExportReport
                                         }
                 ]

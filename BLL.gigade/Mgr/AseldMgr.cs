@@ -113,6 +113,25 @@ namespace BLL.gigade.Mgr
             }
         }
         #endregion
+        #region
+        /// <summary>
+        /// 自動理貨 獲取所有需要理貨的商品
+        /// </summary>
+        /// <param name="ase"></param>
+        /// <returns></returns>
+
+        public List<AseldQuery> GetAllAseldList(AseldQuery ase,out int totalCount)
+        {
+            try
+            {
+                return _aseldDao.GetAllAseldList(ase,out totalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldMgr-->GetAllAseldList-->" + ex.Message, ex);
+            }
+        }
+        #endregion
         public string UpdTicker(string m)
         {
             try
@@ -229,17 +248,17 @@ namespace BLL.gigade.Mgr
                 throw new Exception("AseldMgr-->UpdScaned-->" + ex.Message, ex);
             }
         }
-        public DataTable GetDetailOrSimple(string type, string jobNumbers)
+        public DataTable GetDetailOrSimple(string type, string jobNumbers, AseldQuery query = null)
         {
             try
             {
                 if (type == "0")
                 {
-                    return _aseldDao.GetNComJobSimple();
+                    return _aseldDao.GetNComJobSimple(query);
                 }
                 else
                 {
-                    return _aseldDao.GetNComJobDetail(jobNumbers);
+                    return _aseldDao.GetNComJobDetail(jobNumbers,query);
                 } 
             }
             catch (Exception ex)

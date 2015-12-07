@@ -427,82 +427,106 @@ namespace BLL.gigade.Mgr
         //schedule_master判断是新增 还是 编辑 
         public int SaveScheduleMasterInfo(ScheduleMasterQuery query)
         {
-            if (query.rowid == 0)//新增
+            try
             {
-                
-
-                return _secheduleServiceDao.ScheduleMasterInfoInsert(query);
+                if (query.rowid == 0)//新增
+                {
+                    return _secheduleServiceDao.ScheduleMasterInfoInsert(query);
+                }
+                else//編輯
+                {
+                    return _secheduleServiceDao.ScheduleMasterInfoUpdate(query);
+                }
             }
-            else//編輯
+            catch (Exception ex)
             {
-                return _secheduleServiceDao.ScheduleMasterInfoUpdate(query);
+                throw new Exception("ScheduleServiceDao-->SaveScheduleMasterInfo-->" + ex.Message);
             }
         }
 
         //schedule_config判断是新增 还是 编辑 
         public int SaveScheduleConfigInfo(ScheduleConfigQuery query)
         {
-            if (query.rowid == 0)//新增
+            try
             {
-                return _secheduleServiceDao.ScheduleConfigInfoInsert(query);
+                if (query.rowid == 0)//新增
+                {
+                    return _secheduleServiceDao.ScheduleConfigInfoInsert(query);
+                }
+                else//編輯
+                {
+                    return _secheduleServiceDao.ScheduleConfigInfoUpdate(query);
+                }
             }
-            else//編輯
+            catch (Exception ex)
             {
-                return _secheduleServiceDao.ScheduleConfigInfoUpdate(query);
+                throw new Exception("ScheduleServiceDao-->SaveScheduleConfigInfo-->" + ex.Message);
             }
         }
 
         //schedule_period判断是新增 还是 编辑 
         public int SaveSchedulePeriodInfo(SchedulePeriodQuery query)
         {
-            if (query.rowid == 0)//新增
+            try
             {
-                return _secheduleServiceDao.SchedulePeriodInfoInsert(query);
+                if (query.rowid == 0)//新增
+                {
+                    return _secheduleServiceDao.SchedulePeriodInfoInsert(query);
+                }
+                else//編輯
+                {
+                    return _secheduleServiceDao.SchedulePeriodInfoUpdate(query);
+                }
             }
-            else//編輯
+            catch (Exception ex)
             {
-                return _secheduleServiceDao.SchedulePeriodInfoUpdate(query);
-            }
+                throw new Exception("ScheduleServiceDao-->SaveSchedulePeriodInfo-->" + ex.Message);
+            } 
         }
 
         //可以多行刪除數據_master
         public int ScheduleMasterDelete(string ids)
         {
-
-            return _secheduleServiceDao.ScheduleMasterDelete(ids);
+            try
+            {
+                return _secheduleServiceDao.ScheduleMasterDelete(ids);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ScheduleServiceDao-->ScheduleMasterDelete-->" + ex.Message);
+            }
+            
         }
 
         //可以多行刪除數據_config
         public int ScheduleConfigDelete(string ids)
         {
-
-            return _secheduleServiceDao.ScheduleConfigDelete(ids);
+            try
+            {
+                return _secheduleServiceDao.ScheduleConfigDelete(ids);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ScheduleServiceDao-->ScheduleConfigDelete-->" + ex.Message);
+            }  
+            
         }
 
         //可以多行刪除數據_period
         public int SchedulePeriodDelete(string ids)
         {
-
-            return _secheduleServiceDao.SchedulePeriodDelete(ids);
-        }
-
-        #region 郵件排成使用
-        //清除過期信件
-        public bool SendEMail(MailHelper mail)
-        {
             try
             {
-                _secheduleServiceDao.ValidUntilDate();
-                _secheduleServiceDao.MaxRetry();
-                
-                return _secheduleServiceDao.SendEMail(mail);
+                return _secheduleServiceDao.SchedulePeriodDelete(ids);
             }
             catch (Exception ex)
             {
                 throw new Exception("ScheduleServiceDao-->SchedulePeriodDelete-->" + ex.Message);
             }    
+           
         }
-        #endregion
+
+      
 
     }
 }

@@ -232,12 +232,16 @@ namespace Admin.gigade.Controllers
                 _iappversionsMgr = new AppversionsMgr(mySqlConnectionString);
                 //獲得頁面SaveReport方法提交的參數
                 AppversionsQuery asq = new AppversionsQuery();
+                if (!string.IsNullOrEmpty(Request.Params["txtid"]))
+                {
+                    asq.id = Convert.ToInt32(Request.Params["txtid"].ToString());
+                }
                 asq.drive = Convert.ToInt32(Request.Params["cmbdriverEdit"].ToString());
-                asq.isAddOrEidt = Request.Params["isAddOrEidt"].ToString();
                 asq.versions_code = Convert.ToInt32(Request.Params["txtversions_code"].ToString());
                 asq.versions_desc = Request.Params["txtversions_desc"].ToString();
                 asq.versions_id = Convert.ToInt32(Request.Params["txtversions_id"].ToString());
                 asq.versions_name = Request.Params["txtversions_name"].ToString();
+                asq.release_type = Convert.ToInt32(Request.Params["status_type"]);
                 string releasedateQuerytime = Request.Params["daterelease_date"].ToString();
                 if (!string.IsNullOrEmpty(releasedateQuerytime))
                 {
@@ -255,6 +259,35 @@ namespace Admin.gigade.Controllers
                 json = "{success:false}";
             }
             return BackAjaxData(json);
+        }
+        /// <summary>
+        /// 改變上架版本的狀態
+        /// </summary>
+        /// <returns></returns>
+        public JsonResult UpdateAppversionsActive()
+        {
+            try
+            {
+                _iappversionsMgr = new AppversionsMgr(mySqlConnectionString);
+                int activeValue = Convert.ToInt32(Request.Params["active"]);//要改變的狀態
+                int id = Convert.ToInt32(Request.Params["id"]);//對應的id
+                if (_iappversionsMgr.UpdateAppversionsActive(id,activeValue)>0)
+                {
+                    return Json(new { success = "true", msg = "" });
+                }
+                else
+                {
+                    return Json(new { success = "false", msg = "" });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                return Json(new { success="false",msg=""});
+            }
         }
         #endregion
 

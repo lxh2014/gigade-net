@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using BLL.gigade.Common;
+using System.Net;
+using System.IO;
 
 namespace BLL.gigade.Mgr
 {
@@ -16,6 +19,8 @@ namespace BLL.gigade.Mgr
         private MySqlDao _mySql;
         private EdmListConditionMainMgr _edmListConditionMgr;
         private EmailGroupDao _emailGroup;
+        private string subscribe = "SUBSCRIBE_2015";
+        private string subscribe_url = "<p style='text-align:center;'><span style='font-size:small;'><span style='color:#666666;'><a href='https://www.gigade100.com/member/mb_newsletter.php' target='_blank'>訂閱/解訂電子報</a></span></span></p>";
         public EdmContentNewMgr(string connectionString)
         {
             _edmContentNewDao = new EdmContentNewDao(connectionString);
@@ -121,11 +126,13 @@ namespace BLL.gigade.Mgr
             }
         }
 
+        #region 測試發送與正式發送
         public string MailAndRequest(EdmSendLog eslQuery, MailRequest MRquery)
         {
             eslQuery.Replace4MySQL();
             MRquery.Replace4MySQL();
             string json = string.Empty;
+           
             ArrayList arrList = new ArrayList();
             try
             {
@@ -472,6 +479,7 @@ namespace BLL.gigade.Mgr
                     }
                     #endregion
                     #region 賦值，生成sql語句
+                    string RecommendHtml = string.Empty;
                     if (_dt.Rows.Count > 0)
                     {
                         eslQuery.receiver_count = _dt.Rows.Count;
@@ -499,6 +507,7 @@ namespace BLL.gigade.Mgr
                                     {
                                         MRquery.user_id = 0;
                                     }
+                                  
                                 }
                                 else
                                 {
@@ -516,34 +525,74 @@ namespace BLL.gigade.Mgr
                                     MRquery.user_id = 0;
                                 }
                             }
-
+                            RecommendHtml = GetRecommendHtml(Convert.ToUInt32(MRquery.user_id));//根據user_id做出精準推薦
                             EdmTraceEmail ete = new EdmTraceEmail();
                             ete.email = MRquery.receiver_address;
                             ete.name = MRquery.receiver_name;
-
                             int email_id = Convert.ToInt32(_edmContentNewDao.InsertEdmTraceEmail(ete).Rows[0][0]);
                             EdmTrace et = new EdmTrace();
                             et.log_id = log_id;
                             et.content_id = eslQuery.content_id;
                             et.count = 0;
                             et.success = -1;
-
                             et.email_id = email_id;
                             arrList.Add(_edmContentNewDao.InsertEdmTrace(et));
                             MRquery.success_action = "update edm_trace set success=1,send_date=NOW()  where log_id=" + log_id + " and  content_id=" + eslQuery.content_id + " and email_id=" + email_id + ";";
                             MRquery.fail_action = "update edm_trace set success=0,send_date=NOW()  where log_id=" + log_id + " and  content_id=" + eslQuery.content_id + " and email_id=" + email_id + ";";
-                            DataTable _dtUrl = _edmContentNewDao.GetPraraData(2);
+                            #region 用於統計開信人數次數的url
+                            DataTable _dtUrl = _edmContentNewDao.GetPraraData(2);//用於統計開信人數次數的url
                             string url = string.Empty;
                             if (_dtUrl != null && _dtUrl.Rows.Count > 0)
                             {
-                             url=   "<img src='" + _dtUrl.Rows[0][0].ToString() + "?c=" + eslQuery.content_id + "&e=" + email_id + "&l=" + log_id + "'/>";
+                                url = "<img src='" + _dtUrl.Rows[0][0].ToString() + "?c=" + eslQuery.content_id + "&e=" + email_id + "&l=" + log_id + "'/>";
                             }
-                            else
-                            {
-                                url = "<img src='http://www.gigade100.com/edm.php?c=" + eslQuery.content_id + "&e=" + email_id + "&l=" + log_id + "'/>";
-                            }
-                          
-                            MRquery.bodyData = MRquery.body + url;
+                            #endregion
+                            #region 獲得電子報整體內容
+
+                            #region 是範本還是活動頁面
+                                string replaceStr = string.Empty;
+                                string editStr = string.Empty;
+                                string content_url = GetContentUrlByContentId(eslQuery.content_id);
+                                if (!string.IsNullOrEmpty(content_url))
+                                {
+                                    #region 獲取網頁內容
+                                    HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(content_url);
+                                    httpRequest.Timeout = 9000;
+                                    httpRequest.Method = "GET";
+                                    HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                                    StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
+                                    //     contentStr = sr.ReadToEnd();
+                                    string contentStr = sr.ReadToEnd();
+                                    DataTable replaceStrDt = GetPraraData(1);
+                                    if (replaceStrDt != null && replaceStrDt.Rows.Count > 0)
+                                    {
+                                        replaceStr = replaceStrDt.Rows[0][0].ToString();
+                                    }
+                                    else
+                                    {
+                                        replaceStr = "&nbsp;&nbsp;";
+                                    }
+                                    DataTable _dtEdit =GetPraraData(3);
+                                    if (_dtEdit != null && _dtEdit.Rows.Count > 0)
+                                    {
+                                        editStr = _dtEdit.Rows[0][0].ToString();
+                                    }
+                                    else
+                                    {
+                                        editStr = "&nbsp;&nbsp;";
+                                    }
+                                    if (MRquery.body.IndexOf(subscribe) > 0)//找到了埋的那個code，證明是點擊了訂閱電子報
+                                    {
+                                        MRquery.bodyData = contentStr.Replace(replaceStr, MRquery.body.Replace(editStr, "").Replace(subscribe, "\n") + RecommendHtml) + subscribe_url + url;
+                                    }
+                                    else
+                                    {
+                                        MRquery.bodyData = contentStr.Replace(replaceStr, MRquery.body.Replace(editStr, "") + RecommendHtml + url);
+                                    }
+                                    #endregion
+                                }
+                            #endregion
+                            #endregion
                             arrList.Add(_edmContentNewDao.InsertEmailRequest(MRquery));
                             MRquery.bodyData = string.Empty;
 
@@ -566,6 +615,15 @@ namespace BLL.gigade.Mgr
                 throw new Exception("EdmContentNewMgr-->MailAndRequest-->" + ex.Message, ex);
             }
         }
+
+        //根據user_id得到精準推薦商品
+        public string GetRecommendHtml(uint user_id)
+        {
+            string html = string.Empty;
+
+            return html;
+        }
+        #endregion
 
         public int GetSendMailSCount(int content_id,int log_id)
         {
@@ -753,6 +811,25 @@ namespace BLL.gigade.Mgr
             }
         }
 
+
+        public string GetContentUrl(int template_id)
+        {
+            string url = string.Empty;
+            try
+            {
+                DataTable _dt = _edmContentNewDao.GetContentUrl(template_id);
+                if (_dt.Rows.Count > 0 && _dt != null)
+                {
+                    url = _dt.Rows[0][0].ToString();
+                }
+                return url;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetContentUrl-->" + ex.Message, ex);
+            }
+        }
+
         public string GetHtml(EdmContentNew query)
         {
             string htmlStr = string.Empty;
@@ -771,5 +848,133 @@ namespace BLL.gigade.Mgr
             }
         }
 
+        #region 郵件排成使用
+        //清除過期信件
+        public bool SendEMail(MailHelper mail)
+        {
+            try
+            {
+                _edmContentNewDao.ValidUntilDate();
+                _edmContentNewDao.MaxRetry();
+
+                return _edmContentNewDao.SendEMail(mail);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ScheduleServiceDao-->SendEMail-->" + ex.Message);
+            }
+        }
+        #endregion
+
+        public DataTable GetParaStore(string paraType)
+        {
+            try
+            {
+                return _edmContentNewDao.GetParaStore(paraType);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetParaStore-->" + ex.Message, ex);
+            }
+        }
+
+        public string  GetContentUrlByContentId(int content_id)
+        {
+            string content_url = string.Empty;
+            try
+            {
+                DataTable _dt = _edmContentNewDao.GetContentUrlByContentId(content_id);
+                if (_dt.Rows.Count > 0)
+                {
+                    content_url = _dt.Rows[0][0].ToString();
+                }
+                return content_url;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetParaStore-->" + ex.Message, ex);
+            }
+        }
+
+        public string GetContentIDAndUrl(int group_id)
+        {
+            string replaceStr = string.Empty;
+            string content_data = string.Empty;
+            string splitStr = string.Empty;
+            try
+            {
+                DataTable _dt = _edmContentNewDao.GetContentIDAndUrl(group_id);
+                if (_dt.Rows.Count > 0 && _dt != null)
+                {
+                    string content_url = _dt.Rows[0][0].ToString();
+                    int content_id = Convert.ToInt32(_dt.Rows[0][1]);
+                    int template_id = Convert.ToInt32(_dt.Rows[0][2]);
+                    string template_data = _dt.Rows[0][3].ToString();
+                    #region 替換符
+                    DataTable _dtReplace  = GetPraraData(1);
+                    if (_dtReplace != null && _dtReplace.Rows.Count > 0)
+                    {
+                        replaceStr = _dtReplace.Rows[0][0].ToString();
+                    }
+                    else
+                    {
+                        replaceStr = "&nbsp;&nbsp;";
+                    }
+                    #endregion
+                    #region template_data中的分隔符
+                    DataTable _dtSplit = GetPraraData(3);
+                    if (_dtSplit != null && _dtSplit.Rows.Count > 0)
+                    {
+                        splitStr = _dtSplit.Rows[0][0].ToString();
+                    }
+                    else
+                    {
+                        splitStr = "&nbsp;&nbsp;";
+                    }
+                    #endregion
+                    #region 讀content_url
+                    HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(content_url);
+                    httpRequest.Timeout = 9000;
+                    httpRequest.Method = "GET";
+                    HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                    StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
+                    content_data = sr.ReadToEnd();
+                    #endregion
+                    if (template_data.IndexOf(subscribe) > 0)
+                    {
+                        content_data =  content_data.Replace(replaceStr, template_data.Replace(subscribe, "\n").Replace(splitStr,"")) + subscribe_url;
+                    }
+                    else
+                    {
+                        content_data = content_data.Replace(replaceStr, template_data.Replace(subscribe, "\n").Replace(splitStr, ""));
+                    }
+                    #region 拼組成html
+                    #endregion
+                }
+                return content_data;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetContentIDAndUrl-->" + ex.Message, ex);
+            }
+        }
+
+        public int AdvanceTemplate()
+        {
+            int template_id = 0;
+            try
+            {
+                DataTable _dt = _edmContentNewDao.AdvanceTemplate();
+                if (_dt.Rows.Count > 0 && _dt != null)
+                {
+                    template_id = Convert.ToInt32(_dt.Rows[0][0]);
+                }
+                return template_id;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->AdvanceTemplate-->" + ex.Message, ex);
+            }
+        }
     }
 }

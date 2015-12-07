@@ -33,6 +33,7 @@ namespace Admin.gigade.Controllers
         //   private IInvoiceAllowanceRecordlMgr _invoiceAllow;
         private IOrderMasterImplMgr _orderMasterMgr;
         private IOrderSlaveImplMgr _orderSlaveMgr;
+
         //  private IOrderPaymentCtImplMgr _iopcMgr;
         private InvoiceMasterRecordMgr imrMgr;
         private IOrderDetailImplMgr _orderDetailMgr;
@@ -44,6 +45,8 @@ namespace Admin.gigade.Controllers
         private static DataTable DTExcel = new DataTable();
         private static DataTable DTExcel1 = new DataTable();
         private static string excelPath = ConfigurationManager.AppSettings["ImportUserIOExcel"];//關於導入的excel文件的限制
+        private IupcMgr _iupc;
+
         #region 視圖
         public ActionResult Index()
         {
@@ -3260,6 +3263,7 @@ namespace Admin.gigade.Controllers
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "20");//用於分頁的變量
 
                 _IVAMMgr = new VendorAccountMonthMgr(mySqlConnectionString);
+                _iupc = new IupcMgr(mySqlConnectionString);
                 int totalCount = 0;
                 stores = _IVAMMgr.GetVendorAccountMonthDetailList(query, out totalCount);
                 foreach (var item in stores)
@@ -3267,12 +3271,22 @@ namespace Admin.gigade.Controllers
                     item.order_createdates = CommonFunction.GetNetTime(item.order_createdate);
                     item.account_dates = CommonFunction.GetNetTime(item.account_date);
                     item.slave_date_deliverys = CommonFunction.GetNetTime(item.slave_date_delivery);
-
-                }
-                foreach (var item in stores)
-                {
+                    if (item.item_mode == 2)
+                    {
+                        item.buy_num *= item.parent_num;
+                    }
                     item.search_start_time = query.search_start_time;
                     item.search_end_time = query.search_end_time;
+                    if (item.item_mode == 1)
+                    {
+                        item.item_id = 0;
+                        item.upc_id = "";
+                    }
+                    else
+                    {
+                        item.upc_id = _iupc.Getupc(item.item_id.ToString(), "1");
+                    }
+
                 }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
@@ -5554,7 +5568,9 @@ namespace Admin.gigade.Controllers
             dr9[28] = "父親商品編號";
             dr9[29] = "寄倉費";
             dr9[30] = "稅別";
-            dr9[31] = "管理員備註";
+            dr9[31] = "商品細項編號";
+            dr9[32] = "國際編碼";
+            dr9[33] = "管理員備註";
             dtHZ.Rows.Add(dr1);
             dtHZ.Rows.Add(dr2);
             dtHZ.Rows.Add(dr3);
@@ -5686,7 +5702,7 @@ namespace Admin.gigade.Controllers
                 dr[17] = item.Product_Name + item.Product_Spec_Name;
                 if (item.item_mode == 2)
                 {
-                    dr[19] = item.Buy_Num;
+                    dr[19] = item.Buy_Num * item.parent_num;
                 }
                 else
                 {
@@ -5714,6 +5730,7 @@ namespace Admin.gigade.Controllers
                 dr[26] = "";
                 dr[27] = item.order_status_name;
                 dr[28] = item.parent_id;
+
                 if (item.od_bag_check_money * item.Buy_Num == 0)
                 {
                     dr[29] = 0;
@@ -5722,6 +5739,7 @@ namespace Admin.gigade.Controllers
                 {
                     dr[29] = "-" + (item.od_bag_check_money * item.Buy_Num);
                 }
+
                 //dr[29] = item.od_bag_check_money * item.Buy_Num == 0 ? 0 : '-' + (item.od_bag_check_money * item.Buy_Num);
 
                 if (item.tax_type == 1)
@@ -5735,7 +5753,17 @@ namespace Admin.gigade.Controllers
                 }
 
                 dr[30] = item.taxtype;
-                dr[31] = item.Note_Admin;
+                if (item.item_mode != 1)
+                {
+                    dr[31] = item.Item_Id;
+                    dr[32] = " " + item.upc_id;
+                }
+                else
+                {
+                    dr[31] = "";
+                    dr[32] = "";
+                }
+                dr[33] = item.Note_Admin;
                 dtHZ.Rows.Add(dr);
             }
             if (type == 1 || type == 3)
@@ -5813,7 +5841,9 @@ namespace Admin.gigade.Controllers
                 DataRow drT6 = dtHZ.NewRow();
                 drT6[0] = "3.付款:吉甲地廠商款付款，每月最後一工作日";
                 dtHZ.Rows.Add(drT6);
-
+                DataRow drT8 = dtHZ.NewRow();
+                drT8[13] = "(稅別金額如下，提供開立發票參考,如金額有誤,請跟吉甲地連絡,如為開立收據,可毋需理會)";
+                dtHZ.Rows.Add(drT8);
                 DataRow drShuiBei = dtHZ.NewRow();
                 drShuiBei[13] = "稅別";
                 drShuiBei[14] = "免稅";
@@ -5928,7 +5958,7 @@ namespace Admin.gigade.Controllers
                 query.search_end_time = list[1];
                 int tempFreightDelivery_Normal = 0;
                 int tempFreightDelivery_Low = 0;
-                for (int i = 1; i <= 32; i++)
+                for (int i = 1; i <= 34; i++)
                 {
                     dtHZ.Columns.Add("", typeof(String));
                 }
@@ -6001,7 +6031,7 @@ namespace Admin.gigade.Controllers
                 query.search_end_time = list[1];
                 int tempFreightDelivery_Normal = 0;
                 int tempFreightDelivery_Low = 0;
-                for (int i = 1; i <= 32; i++)
+                for (int i = 1; i <= 34; i++)
                 {
                     dtHZ.Columns.Add("", typeof(String));
                 }
@@ -6126,7 +6156,7 @@ namespace Admin.gigade.Controllers
                     //tempDT.Add(0, tempTemp);
                     //供應商信息
                     vendorQuery = _IVAMMgr.GetVendorInfoByCon(vendorQuery);
-                    for (int i = 1; i <= 32; i++)
+                    for (int i = 1; i <= 34; i++)
                     {
                         dtHZ.Columns.Add("", typeof(String));
                     }

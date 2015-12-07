@@ -534,7 +534,7 @@ namespace gigadeExcel.Comment
                 sheet.AutoSizeColumn(10, true);
                 sheet.AutoSizeColumn(11, true);
                 sheet.AutoSizeColumn(12, true);
-                sheet.AutoSizeColumn(13, true);
+               // sheet.AutoSizeColumn(13, true);
                 sheet.AutoSizeColumn(14, true);
                 sheet.AutoSizeColumn(15, true);
                 sheet.AutoSizeColumn(16, true);
@@ -553,6 +553,8 @@ namespace gigadeExcel.Comment
                 sheet.AutoSizeColumn(29, true);
                 sheet.AutoSizeColumn(30, true);
                 sheet.AutoSizeColumn(31, true);
+                sheet.AutoSizeColumn(32, true);
+                sheet.AutoSizeColumn(33, true);
             }
             using (MemoryStream ms = new MemoryStream())
             {
@@ -1463,6 +1465,36 @@ namespace gigadeExcel.Comment
                 return false;
 
         }
+
+        public static StringWriter SetCsvFromDataBySdy(System.Data.DataTable dt, string FileName)
+        {
+            StringWriter sw = new StringWriter();
+            StringBuilder sb = new StringBuilder();
+            //for (int i = 0; i < dt.Columns.Count; i++)
+            //{
+            //    sb.Append(dt.Columns[i].ColumnName);
+            //    if (i != dt.Columns.Count - 1)
+            //    {
+            //        sb.Append(",");
+            //    }
+            //}
+            //sw.WriteLine(sb.ToString());
+            foreach (DataRow dr in dt.Rows)
+            {
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    sw.Write(dr[i].ToString().Replace(',', '，').Replace("\r", "").Replace("\n", ""));
+                    if (i != dt.Columns.Count - 1)
+                    {
+                        sw.Write(",");
+                    }
+                }
+                sw.WriteLine("");
+            }
+            sw.Close();
+            return sw;
+        }
+
 
         public static StringWriter SetCsvFromData(System.Data.DataTable dt, string FileName)
         {

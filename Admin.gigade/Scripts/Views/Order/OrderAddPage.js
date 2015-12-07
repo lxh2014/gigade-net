@@ -32,7 +32,7 @@ var storeModeStroe = Ext.create('Ext.data.Store', {
             root: 'items'
         }
     }
-})
+});
 
 //超商店家(订购人)
 var b_superStore = Ext.create('Ext.data.Store', {
@@ -247,6 +247,9 @@ function sameAsBuyerClick() {
         Ext.getCmp("r_txtContactPhoneContent").setValue(Ext.getCmp("txtContactPhoneContent").getValue());
         Ext.getCmp("r_txtContactAddress").setValue(Ext.getCmp("b_txtAddress").getValue());
         Ext.getCmp("g_checkActionSex").setValue({ 'g_checkActionSex': Ext.getCmp("s_checkActionSex").getValue().s_checkActionSex }); //add by wwei0216w 添加收購人性別同訂購人相同 2015/1/21
+        //add by zhuoqin0830w  2015/11/12
+        Ext.getCmp("r_userEmail").setValue(Ext.getCmp("d_userEmail").getValue());
+        Ext.getCmp("r_userID").setValue(Ext.getCmp("d_userID").getValue());
         if (isSuper) {
             r_superStore.load({ params: { storeId: Ext.getCmp('combStoreMode').getValue() } });
             Ext.getCmp('r_combSuperMarket').setValue(Ext.getCmp('b_combSuperMarket').getValue());
@@ -279,12 +282,13 @@ function sameAsReceiverClick() {
         Ext.getCmp("txtContactPhoneContent").setValue(Ext.getCmp("r_txtContactPhoneContent").getValue());
         Ext.getCmp("b_txtAddress").setValue(Ext.getCmp("r_txtContactAddress").getValue());
         Ext.getCmp("s_checkActionSex").setValue({ 's_checkActionSex': Ext.getCmp("g_checkActionSex").getValue().g_checkActionSex }); //add by wwei0216w 添加訂購人人性別同收購人相同 2015/1/21
+        //add by zhuoqin0830w  2015/11/12
+        Ext.getCmp("d_userEmail").setValue(Ext.getCmp("r_userEmail").getValue());
+        Ext.getCmp("d_userID").setValue(Ext.getCmp("r_userID").getValue());
         if (isSuper) {
             b_superStore.load({ params: { storeId: Ext.getCmp('combStoreMode').getValue() } });
             Ext.getCmp('b_combSuperMarket').setValue(Ext.getCmp('r_combSuperMarket').getValue());
-
-        }
-        else {
+        } else {
             if (Ext.getCmp("r_cob_ccity").getValue() == null) {
                 return;
             }
@@ -318,6 +322,7 @@ function combChannelSelect(comb, record) {
         spec1_show: '',
         spec2_show: '',
         product_cost: '0',
+        Event_Item_Money: '0',//活動售價  add by zhuoqin0830w  2015/11/16
         Event_Item_Cost: '0',//活動成本
         Deduct_Welfare: '0',//購物金金額
         Deduct_Bonus: '0',//抵用卷金額
@@ -332,7 +337,7 @@ myPanel = Ext.create('Ext.form.Panel', {
     layout: 'anchor',
     defaults: { anchor: "95%" },
     //height: docHeight / 2,
-    height: 420,
+    height: 450,
     width: docWidth * 0.8,
     minWidth: 1100,
     bodyPadding: '10 0 0 10',
@@ -376,7 +381,40 @@ myPanel = Ext.create('Ext.form.Panel', {
                 displayField: 'Site_Name',
                 valueField: 'Site_Id',
                 queryMode: 'local',
-                colName: 'site_id'
+                colName: 'site_id',
+                listeners: {//edit by zhuoqin0830w  2015/11/16   根據站台的選擇來顯示grid中的相關信息
+                    select: function (comb, record) {
+                        var combOrderDate = Ext.getCmp("combOrderDate").getValue();
+                        var Site_Id = record[0].data.Site_Id;
+                        var result;
+                        if (combOrderDate != null && combOrderDate != "") {
+                            for (var i = 0; i <= orderStore.data.length; i++) {
+                                if (orderStore.getAt(i).get("product_id") != " " && orderStore.getAt(i).get("product_id") != "" && orderStore.getAt(i).get("product_id") != null) {
+                                    if (orderStore.getAt(i).get("item_id") != "0") {//組合商品在後台中傳到前台的item_id為0 所以在這使用item_id進行判斷
+                                        result = searchByProID(orderStore.getAt(i).get("item_id"), i, null, null, orderStore.getAt(i), null, Site_Id, combOrderDate);
+                                        if (result == 0) { orderStore.removeAt(i); i--; continue; }
+                                    } else {
+                                        var curData = orderStore.getAt(i);
+                                        var length = curData.get("g_must_buy");
+                                        var parentIdx = findParentIdx(i);
+                                        var parentBuyNum = orderStore.getAt(parentIdx).get('buynum');
+                                        for (var j = 1; j <= length;) {
+                                            if (orderStore.getAt(j + i).get("product_id") == " ") { //實行 j + i 的原因：  因為組合商品中需要刪除子商品后再進行添加操作 而如果不實行的話 則會在頁面上重複顯示
+                                                orderStore.removeAt(j + i);
+                                                length--;
+                                            }
+                                            else {
+                                                break;
+                                            }
+                                        }
+                                        result = searchByProID(orderStore.getAt(i).get("product_id"), i, null, null, orderStore.getAt(i), null, Site_Id, combOrderDate);
+                                        if (result == 0) { orderStore.removeAt(i); i--; continue; }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }, {
                 fieldLabel: STORE_MODE,
                 editable: false,
@@ -448,10 +486,44 @@ myPanel = Ext.create('Ext.form.Panel', {
                     disabledMin: true,
                     disabledSec: true,
                     name: 'combOrderDate',
+                    id: 'combOrderDate',
                     allowBlank: false,
                     editable: false,
                     maxValue: new Date(),
-                    format: 'Y-m-d H:i:s'
+                    format: 'Y-m-d H:i:s',
+                    listeners: {//edit by zhuoqin0830w  2015/11/16   根據訂單日期判斷活動價格和活動成本是否顯示
+                        select: function (a, b, c) {
+                            var combOrderDate = Ext.getCmp("combOrderDate").getValue();
+                            var Site_Id = Ext.getCmp("Site_Id").getValue();
+                            var result;
+                            if (combOrderDate != null && combOrderDate != "") {
+                                for (var i = 0; i < orderStore.data.length; i++) {
+                                    if (orderStore.getAt(i).get("product_id") != " " && orderStore.getAt(i).get("product_id") != "" && orderStore.getAt(i).get("product_id") != null) {
+                                        if (orderStore.getAt(i).get("item_id") != "0") {//組合商品在後台中傳到前台的item_id為0 所以在這使用item_id進行判斷
+                                            result = searchByProID(orderStore.getAt(i).get("item_id"), i, null, null, orderStore.getAt(i), null, Site_Id, combOrderDate);
+                                            if (result == 0) { orderStore.removeAt(i); i--; continue; }
+                                        } else {
+                                            var curData = orderStore.getAt(i);
+                                            var length = curData.get("g_must_buy");
+                                            var parentIdx = findParentIdx(i);
+                                            var parentBuyNum = orderStore.getAt(parentIdx).get('buynum');
+                                            for (var j = 1; j <= length;) {
+                                                if (orderStore.getAt(j + i).get("product_id") == " ") { //實行 j + i 的原因：  因為組合商品中需要刪除子商品后在進行添加操作 而如果不實行的話 則會在頁面上
+                                                    orderStore.removeAt(j + i);
+                                                    length--;
+                                                }
+                                                else {
+                                                    break;
+                                                }
+                                            }
+                                            result = searchByProID(orderStore.getAt(i).get("product_id"), i, null, null, orderStore.getAt(i), null, Site_Id, combOrderDate);
+                                            if (result == 0) { orderStore.removeAt(i); i--; continue; }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }]
             }]
         }, {
@@ -508,9 +580,9 @@ myPanel = Ext.create('Ext.form.Panel', {
                         depStore.load({ params: { TopValue: record[0].data.TopValue } });
                     }
                 }
-            }, {//add by zhuoqin0830w  2015/04/09   公關單與報廢單功能 部門
+            }, {//add by zhuoqin0830w  2015/04/09   公關單與報廢單功能
                 xtype: 'combobox',
-                fieldLabel: DEPTTYPE,
+                fieldLabel: DEPTTYPE,//部門
                 labelWidth: 65,
                 queryMode: 'local',
                 listConfig: { loadMask: false },
@@ -582,7 +654,10 @@ myPanel = Ext.create('Ext.form.Panel', {
                 colName: 'HolidayDeliver',
                 vertical: true,
                 items: [
-                    { boxLabel: YES, inputValue: '1', checked: true },
+                    {
+                        boxLabel: YES, inputValue: '1', checked: true
+
+                    },
                     { boxLabel: NO, inputValue: '0' }, ]
             }]
         }, {
@@ -594,7 +669,7 @@ myPanel = Ext.create('Ext.form.Panel', {
                 xtype: 'radiogroup',
                 colName: 'EstimatedArrivalPeriod',
                 hidden: true,
-                id: 'EstimatedArrivalPeriod',//配送系統 add 2014/09/15
+                id: 'EstimatedArrivalPeriod',//配送系統 add2014/09/15
                 labelWidth: 90,
                 fieldLabel: HOPE_TIME,
                 width: 500,
@@ -619,12 +694,34 @@ myPanel = Ext.create('Ext.form.Panel', {
         layout: 'hbox',
         items: [{
             xtype: 'fieldset',
-            title: '<input id="chkSameReceiver" onclick="sameAsReceiverClick()" type="checkbox" /><label for="chkSameReceiver">' + SAME_AS_RECEIVER + '</label> ' + BUYER_INFO + '',
+            title: '<input id="chkSameReceiver"  onclick="sameAsReceiverClick()" type="checkbox" /><label for="chkSameReceiver">' + SAME_AS_RECEIVER + '</label> ' + BUYER_INFO + '',
             width: 450,
             defaultType: 'textfield',
             layout: 'anchor',
             style: { 'margin-right': '30px' },
             items: [OrderName, {
+                xtype: 'fieldcontainer',
+                id: 'MAIL_GENDER',
+                labelWidth: 65,
+                layout: 'hbox',
+                defaultType: 'textfield',
+                items: [{
+                    fieldLabel: CNFULLNAME,
+                    name: 'b_txtName',
+                    readOnly: true,
+                    labelWidth: 65,
+                    width: 200,
+                    id: 'txtCNFullName',
+                }, {//add by zhuoqin0830w  2015/11/12
+                    fieldLabel: USEREMAIL,
+                    name: 'd_userEmail',
+                    readOnly: true,
+                    margin: '0 0 0 10',
+                    labelWidth: 65,
+                    width: 200,
+                    id: 'd_userEmail',
+                }]
+            }, {
                 fieldLabel: ACTION_PHONENO,
                 name: 'b_txtMobel',
                 labelWidth: 65,
@@ -740,21 +837,20 @@ myPanel = Ext.create('Ext.form.Panel', {
                 xtype: 'fieldcontainer',
                 labelWidth: 65,
                 layout: 'hbox',
-                items: [
-                {
+                items: [{//add by zhuoqin0830w  2015/11/12
                     xtype: 'textfield',
-                    fieldLabel: CNFULLNAME,
-                    labelWidth: 65,
-                    width: 200,
-                    submitValue: false,
+                    fieldLabel: USERID,
+                    name: 'r_userID',
                     allowBlank: false,
-                    id: 'r_txtCNFullName',
-                    name: 'r_txtCNFullName'
+                    labelWidth: 65,
+                    vtype: 'regxUserID',
+                    width: 200,
+                    id: 'r_userID',
                 }, {
                     xtype: 'radiogroup',
                     id: 'g_checkActionSex',
                     labelWidth: 45,
-                    margin: '0 0 0 20',
+                    margin: '0 0 0 10',
                     fieldLabel: GENDER,
                     width: 150,
                     defaults: {
@@ -763,9 +859,30 @@ myPanel = Ext.create('Ext.form.Panel', {
                     columns: 2,
                     vertical: true,
                     items: [
-                    { boxLabel: BOY, inputValue: '1' },
-                    { boxLabel: GIRL, inputValue: '0', checked: true },
-                    ]
+                { boxLabel: BOY, inputValue: '1' },
+                { boxLabel: GIRL, inputValue: '0', checked: true }]
+                }]
+            }, {
+                xtype: 'fieldcontainer',
+                labelWidth: 65,
+                layout: 'hbox',
+                items: [{
+                    xtype: 'textfield',
+                    fieldLabel: CNFULLNAME,
+                    submitValue: false,
+                    allowBlank: false,
+                    labelWidth: 65,
+                    width: 200,
+                    id: 'r_txtCNFullName',
+                    name: 'r_txtCNFullName'
+                }, {//add by zhuoqin0830w  2015/11/12
+                    fieldLabel: USEREMAIL,
+                    xtype: 'textfield',
+                    name: 'r_userEmail',
+                    labelWidth: 65,
+                    margin: '0 0 0 10',
+                    width: 200,
+                    id: 'r_userEmail',
                 }]
             }, {
                 fieldLabel: ACTION_PHONENO,
@@ -898,8 +1015,7 @@ myPanel = Ext.create('Ext.form.Panel', {
             id: 'txtareCartNote',
             name: 'txtareCartNote',
             fieldLabel: CART_NOTE
-        }
-        ]
+        }]
     }]
 });
 
@@ -918,6 +1034,7 @@ Ext.define('GIGADE.ORDER', {
     { name: 'spec2_show', type: 'string' },
     { name: 'original_price', type: 'int' },
     { name: 'product_cost', type: 'int' }, //售價
+    { name: 'Event_Item_Money', type: 'int' },//活動售價 add by zhuoqin0830w  2015/11/16
     { name: 'cost', type: 'int' },  //組合商品之成本
     { name: 'Event_Item_Cost', type: 'int' },//活動成本
     { name: 'Item_Cost', type: 'int' }, //單一商品之成本
@@ -938,8 +1055,7 @@ Ext.define('GIGADE.ORDER', {
     { name: 'childSum', type: 'int' },          //組合下必選商品的必購數量之和
     { name: 'isAdd', type: 'string' },          //組合時是否為手動添加的行
     { name: 'price_master_id', type: 'int' },
-    { name: "product_status_name", type: "string" }
-    ]
+    { name: "product_status_name", type: "string" }]
 });
 
 //訂單Store
@@ -958,6 +1074,7 @@ var orderStore = Ext.create('Ext.data.Store', {
         spec2_show: '',
         original_price: '0',        //原始售价
         product_cost: '0',          //现售价
+        Event_Item_Money: '0',//活動售價  add by zhuoqin0830w 2015/11/16
         cost: '0',
         Event_Item_Cost: '0', //活動成本
         Deduct_Welfare: '0',//購物金金額
@@ -992,7 +1109,8 @@ var orderStore = Ext.create('Ext.data.Store', {
                 for (var i = 0, j = orderStore.getCount() ; i < j; i++) {
                     var data = orderStore.getAt(i);
                     if (data.get("buynum") != 0) {
-                        numSum += parseInt(data.get("buynum"));    //  numSum += parseInt(data.get("buynum") != 0);
+                        numSum += parseInt(data.get("buynum"));    // 
+                        numSum += parseInt(data.get("buynum") != 0);
                     }
                 }
                 if (numSum != 0) {
@@ -1019,6 +1137,7 @@ function addTr() {
         spec1_show: '',
         spec2_show: '',
         product_cost: '0',
+        Event_Item_Money: '0',//活動售價  add by zhuoqin0830w   2015/11/16
         Event_Item_Cost: '0',//活動成本
         Deduct_Welfare: '0',//購物金金額
         Deduct_Bonus: '0',//抵用卷金額
@@ -1069,6 +1188,7 @@ function addComboSelTr(Product_Id, parent_id, rowIdx, combination, buy_limit, is
         spec2_show: '',
         original_price: '0',
         product_cost: '0',
+        Event_Item_Money: '0',//活動售價  add by zhuoqin0830w  2015/11/16
         Event_Item_Cost: '0',//活動成本
         Deduct_Welfare: '0',//購物金金額
         Deduct_Bonus: '0',//抵用卷金額
@@ -1102,6 +1222,7 @@ function addComboTr(data, parentData, rowIdx) {
         cost: data.cost,//add 2014/10/23
         Item_Cost: data.Item_Cost,
         Event_Item_Cost: data.Event_Item_Cost,//活動成本
+        Event_Item_Money: data.Event_Item_Money,//活動售價  add by zhuoqin0830w  2015/11/16
         Deduct_Welfare: '0',//購物金金額
         Deduct_Bonus: '0',//抵用卷金額
         stock: data.Item_Stock,
@@ -1130,6 +1251,7 @@ function addMustBuyTr(childData, parentData, rowIdx) {
         product_cost: childData.product_cost,
         cost: childData.cost,//add 2014/10/23
         Event_Item_Cost: childData.Event_Item_Cost,//活動成本
+        Event_Item_Money: childData.Event_Item_Money,//活動售價  add  by zhuoqin0830w  2015/11/16
         Deduct_Welfare: '0',//購物金金額
         Deduct_Bonus: '0',//抵用卷金額
         stock: childData.Item_Stock,
@@ -1157,6 +1279,7 @@ function addComboCooperationTr(data, rowIdx) {
         product_cost: data.product_cost,
         cost: data.cost,//add 2014/10/23
         Event_Item_Cost: data.Event_Item_Cost,//活動成本
+        Event_Item_Money: data.Event_Item_Money,//活動售價  add by zhuoqin0830w  2015/11/16
         Deduct_Welfare: '0',//購物金金額
         Deduct_Bonus: '0',//抵用卷金額
         stock: data.stock,
@@ -1182,7 +1305,7 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
             currentCol = e.colIdx;
             currentRow = e.rowIdx;
             var data = orderGrid.getStore().data.getAt(e.rowIdx);
-            if (e.colIdx == 1) {
+            if (e.colIdx == 1) {//賣場商品編號
                 var channelValue = Ext.getCmp('combChannelId').getValue();
                 if (channelValue == "" || channelValue == null) {
                     Ext.getCmp('combChannelId').markInvalid(OUTSITE_SELECT);
@@ -1193,7 +1316,8 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                     return false;
                 }
             }
-            if (e.colIdx == 3) {
+
+            if (e.colIdx == 3) {//子商品名稱
                 if (!data.data.child) {
                     return false;
                 }
@@ -1239,7 +1363,10 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
 
                             orderGrid.columns[3].getEditor().getStore().removeAll();
                             for (var a = 0; a < child_list.length; a++) {
-                                orderGrid.columns[3].getEditor().getStore().add({ Product_Name: child_list[a].Product_Name, Child_Id: child_list[a].Child_Id });
+                                orderGrid.columns[3].getEditor().getStore().add({
+                                    Product_Name: child_list[a].Product_Name,
+                                    Child_Id: child_list[a].Child_Id
+                                });
                             }
                         },
                         failure: function (response) {
@@ -1247,7 +1374,8 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                     });
                 }
             }
-            if (e.colIdx == 4) {
+
+            if (e.colIdx == 4) {//規格一
                 if (!data.data.spec1_show) {
                     return false;
                 }
@@ -1287,7 +1415,8 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                     }
                 });
             }
-            if (e.colIdx == 5) {
+
+            if (e.colIdx == 5) {//規格二
                 if (!data.data.spec2_show) {
                     return false;
                 }
@@ -1326,6 +1455,7 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                     }
                 });
             }
+
             if (e.colIdx == 6) {//定價
                 var pid = orderGrid.getStore().data.getAt(e.rowIdx).get("product_id");
                 if (pid == " ") {
@@ -1337,6 +1467,7 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                     return false;
                 }
             }
+
             if (e.colIdx == 7) {//成本
                 var pid = orderGrid.getStore().data.getAt(e.rowIdx).get("product_id");
                 if (pid == " ") {
@@ -1348,7 +1479,20 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                     return false;
                 }
             }
-            if (e.colIdx == 8) {//活動成本
+
+            if (e.colIdx == 8) {//活動售價
+                var pid = orderGrid.getStore().data.getAt(e.rowIdx).get("product_id");
+                if (pid == " ") {
+                    return false;
+                }
+                var parentIdx = findParentIdx(e.rowIdx);
+                var parentData = orderStore.getAt(parentIdx);
+                if (parentData.data.buynum > 0) {
+                    return false;
+                }
+            }
+
+            if (e.colIdx == 9) {//活動成本
                 var pid = orderGrid.getStore().data.getAt(e.rowIdx).get("product_id");
                 if (pid == " ") {
                     return false;
@@ -1360,7 +1504,8 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                     return false;
                 }
             }
-            if (e.colIdx == 9) {//購物金金額
+
+            if (e.colIdx == 11) {//購物金金額
                 var pid = orderGrid.getStore().data.getAt(e.rowIdx).get("product_id");
                 if (pid == " ") {
                     return false;
@@ -1372,14 +1517,9 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                         return false;
                     }
                 }
-                //// add by zhuoqin0830w  2015/05/13  判斷 數量是否大於 0  如果大於0 則不能更改
-                //var parentIdx = findParentIdx(e.rowIdx);
-                //var parentData = orderStore.getAt(parentIdx);
-                //if (parentData.data.buynum > 0) {
-                //    return false;
-                //}
             }
-            if (e.colIdx == 10) {//抵用卷金額 
+
+            if (e.colIdx == 12) {//抵用卷金額
                 var pid = orderGrid.getStore().data.getAt(e.rowIdx).get("product_id");
                 if (pid == " ") {
                     return false;
@@ -1391,14 +1531,9 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                         return false;
                     }
                 }
-                //// add by zhuoqin0830w  2015/05/13  判斷 數量是否大於 0  如果大於0 則不能更改
-                //var parentIdx = findParentIdx(e.rowIdx);
-                //var parentData = orderStore.getAt(parentIdx);
-                //if (parentData.data.buynum > 0) {
-                //    return false;
-                //}
             }
-            if (e.colIdx == 12) {//數量
+
+            if (e.colIdx == 10) {//數量
                 var curData = orderGrid.getStore().data.getAt(e.rowIdx);
                 var pid = curData.get("product_id");
                 var combination = curData.get("combination");
@@ -1435,7 +1570,7 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                 //                var stock = data.get("stock");
                 //                if (ChileSum != IgnoreSum) {
                 //                    if (stock == 0) {
-                //                        e.column.getEditor().setDisabled(true);
+                //                        e.column.getEditor ().setDisabled(true);
                 //                    }
                 //                    else {
                 //                        e.column.getEditor().setDisabled(false)
@@ -1448,8 +1583,9 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
         },
         edit: function (editor, e) {
             var data = orderStore.getAt(e.rowIdx);
-            var cost = parseFloat(data.get("product_cost"));
-            if (e.colIdx == 1) {
+            var cost_total = parseFloat(data.get("product_cost"));
+            var event_item_money_total = parseFloat(data.get("Event_Item_Money"));//add by zhuoqin0830w 2015/12/02 獲取活動價
+            if (e.colIdx == 1) {//商品編號
                 for (var i = e.rowIdx + 1; i <= orderStore.data.length; i) {
                     if (!orderStore.data.items[i]) {
                         break;
@@ -1469,30 +1605,41 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                 data.set("spec1_show", "");
                 data.set("spec2_show", "");
                 var channelValue = Ext.getCmp('combChannelId').getValue();
-                if (channelValue == "" || channelValue == null) {
-                    Ext.Msg.alert(INFORMATION, SET_CHANNEL);
+                //添加設置站台的條件  edit by zhuoqin0830w  2015/11/16
+                var Site_Id = Ext.getCmp("Site_Id").getValue();
+                var combOrderDate = Ext.getCmp("combOrderDate").getValue();
+                if ((channelValue == "" || channelValue == null) || (Site_Id == "" || Site_Id == null) || (combOrderDate == "" || combOrderDate == null)) {
+                    Ext.Msg.alert(INFORMATION, SET_CHANNEL_AND_SITE_AND_ORDER_DATE);
                     return;
                 }
-                searchByProID(e.value, e.rowIdx, null, null, e);
+                searchByProID(e.value, e.rowIdx, null, null, e, null, Site_Id, combOrderDate);
             }
-            if (e.colIdx == 9) {
+
+            if (e.colIdx == 11) {//購物金
                 //判斷輸入 的 購物金金額 是否 大於 商品定價
                 for (var i = 0; i < orderStore.data.length; i++) {
                     var cost = orderStore.getAt(i).get("product_cost");
                     var bonus = orderStore.getAt(i).get("Deduct_Bonus");
-                    if (bonus == null || bonus == "") { orderStore.getAt(i).set("Deduct_Bonus", "0"); return; }
+                    if (bonus == null || bonus == "") {
+                        orderStore.getAt(i).set("Deduct_Bonus", "0");
+                        return;
+                    }
                     if (bonus > cost) {
                         Ext.Msg.alert(INFORMATION, DEDUCT_BONUS + BOUNS_OR_WELFARE_IS_NO_PRICE);
                         orderStore.getAt(i).set("Deduct_Bonus", "0");
                     }
                 }
             }
-            if (e.colIdx == 10) {
+
+            if (e.colIdx == 12) {//抵用券
                 //判斷輸入 的 抵用券金額 是否 大於 商品定價
                 for (var i = 0; i < orderStore.data.length; i++) {
                     var cost = orderStore.getAt(i).get("product_cost");
                     var welfare = orderStore.getAt(i).get("Deduct_Welfare");
-                    if (welfare == null || welfare == "") { orderStore.getAt(i).set("Deduct_Welfare", "0"); return; }
+                    if (welfare == null || welfare == "") {
+                        orderStore.getAt(i).set("Deduct_Welfare", "0");
+                        return;
+                    }
                     if (welfare > cost) {
                         Ext.Msg.alert(INFORMATION, DEDUCT_WELFARE + BOUNS_OR_WELFARE_IS_NO_PRICE);
                         orderStore.getAt(i).set("Deduct_Welfare", "0");
@@ -1500,7 +1647,7 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                 }
             }
 
-            if (e.colIdx == 12 || e.colIdx == 6) {
+            if (e.colIdx == 10 || e.colIdx == 6) {
                 var data = orderStore.getAt(e.rowIdx);
 
                 //返還購物金  add by zhuoqin0830w  2015/08/03
@@ -1567,7 +1714,10 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                                 parentBuyNum = 1;
                             }
                             var childBuyNum = curData.get("s_must_buy") * parentBuyNum;
-                            var curSum = curData.get('product_cost') * childBuyNum;
+                            //根據活動時間判斷使用定價還是活動價  edit by zhuoqin0830w  2015/12/02
+                            var event_item_money = curData.get('Event_Item_Money');
+                            var cost = curData.get('product_cost');
+                            var curSum = event_item_money == 0 ? cost * childBuyNum : event_item_money * childBuyNum;
                             curData.set("buynum", childBuyNum);
                             curData.set("sumprice", curSum);
                             totalPrice += curSum;
@@ -1587,6 +1737,8 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                         var parentData = orderStore.getAt(parentIdx);
                         var totalPrice = 0;
                         var totalMustBuyNum = 0;
+                        var event_item_money = curData.get('Event_Item_Money');//add by zhuoqin0830w 2015/12/02 獲取活動價
+                        var cost = curData.get('product_cost');//add by zhuoqin0830w 2015/12/02 獲取定價
                         for (childIdx; ; childIdx++) {
                             var curData = orderStore.getAt(childIdx);
                             if (!curData || curData.get('parent_id') != parentData.get('product_id')) {
@@ -1596,7 +1748,8 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                                 continue;
                             }
                             totalMustBuyNum += curData.get('s_must_buy');
-                            var curSumPrice = curData.get('product_cost') * curData.get('s_must_buy');
+                            //根據活動時間判斷使用定價還是活動價  edit by zhuoqin0830w  2015/12/02
+                            var curSumPrice = event_item_money == 0 ? cost * curData.get('s_must_buy') : event_item_money * curData.get('s_must_buy');
                             totalPrice += curSumPrice;
                             curData.set('sumprice', curSumPrice);
                         }
@@ -1607,8 +1760,10 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                         }
                         data.set("s_must_buy", e.value);
                         data.set("buynum", e.value);
-                        data.set("sumprice", data.get('product_cost') * data.get('buynum'));
-                        totalPrice += data.get('product_cost') * data.get('buynum');
+                        //根據活動時間判斷使用定價還是活動價  edit by zhuoqin0830w  2015/12/02
+                        data.set("sumprice", event_item_money == 0 ? cost * curData.get('buynum') : event_item_money * curData.get('buynum'));
+                        //根據活動時間判斷使用定價還是活動價  edit by zhuoqin0830w  2015/12/02
+                        totalPrice += event_item_money == 0 ? cost * curData.get('buynum') : event_item_money * curData.get('buynum');
                         if (parentData.get('price_type') == 2) {
                             parentData.set("product_cost", totalPrice);
                         }
@@ -1621,14 +1776,18 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                         for (var i = 1; i <= data.get("g_must_buy") ; i++) {
                             var current = orderStore.getAt(e.rowIdx + i);
                             var childBuyNum = current.get("s_must_buy") * data.get("buynum");
+                            var cost = current.get("product_cost");//add by zhuoqin0830w 2015/12/02 獲取定價
+                            var event_item_money = current.get("Event_Item_Money");//add by zhuoqin0830w 2015/12/02 獲取活動價
                             current.set("buynum", childBuyNum);
-                            current.set("sumprice", current.get("product_cost") * childBuyNum);
-                            totalPrice += current.get("product_cost") * childBuyNum;
+                            //根據活動時間判斷使用定價還是活動價  edit by zhuoqin0830w  2015/12/02
+                            current.set("sumprice", event_item_money == 0 ? cost * childBuyNum : event_item_money * childBuyNum);
+                            totalPrice += event_item_money == 0 ? cost * childBuyNum : event_item_money * childBuyNum;
                         }
                     }
                     //edit by xinglu0624w  當前組合商品價格類型為按比例拆分或者當前商品為單一商品時，總價 ＝ 當前商品之定價 * 當前商品數量
                     if (data.get('price_type') == 1 || data.get('price_type') == 0) {
-                        data.set("sumprice", parseInt(data.get("buynum")) * cost);
+                        //根據活動時間判斷使用定價還是活動價  edit by zhuoqin0830w  2015/12/02
+                        data.set("sumprice", event_item_money_total == 0 ? parseInt(data.get("buynum")) * cost_total : parseInt(data.get("buynum")) * event_item_money_total);
                     }
                     else if (data.get('price_type') == 2) {
                         data.set("sumprice", totalPrice);
@@ -1659,7 +1818,6 @@ function findParentIdx(index) {
 
 /****************  驗證（Vtype）  *******************/
 //商品編號
-
 Ext.apply(Ext.form.field.VTypes, {
     regxPNo: function (val, field) {
         return /^\d{5,}$/.test(val)//5
@@ -1670,8 +1828,8 @@ Ext.apply(Ext.form.field.VTypes, {
 //價格
 Ext.apply(Ext.form.field.VTypes, {
     regxMoney: function (val, field) {
-        return /^[1-9]\d*\.\d*|0\.\d*[1-9]\d*|0?\.0+|[0-9]$/.test(val)
-
+        return /^[1-9]\d*\.\d*|0\.\d*[1-9]\d*|0?\.0+|[0-9]$/.test
+(val);
     },
     regxMoneyText: FORMAT_ERROR
 });
@@ -1682,6 +1840,14 @@ Ext.apply(Ext.form.field.VTypes, {
         return /^09\d{8}$/.test(val)
     },
     regxMobileNoText: PHONENO_ERROR
+});
+
+//會員編號  add by zhuoqin0830w  2015/11/12
+Ext.apply(Ext.form.field.VTypes, {
+    regxUserID: function (val, field) {
+        return /^[1-9]\d*$/.test(val);
+    },
+    regxUserIDText: FORMAT_ERROR
 });
 
 /**************************************************/
@@ -1748,6 +1914,7 @@ function removeStore(rowIdx) {
     data.set('spec2_show', '');
     data.set('Item_Cost', '0');
     data.set('product_cost', '0');
+    data.set('Event_Item_Money', '0');//活動售價  add by zhuoqin0830w 2015/11/16
     data.set('Event_Item_Cost', '0');//活動成本
     data.set('Deduct_Welfare', '0');//購物金金額
     data.set('Deduct_Bonus', '0');//抵用卷金額
@@ -1785,6 +1952,7 @@ function afterSuccess() {
         spec1_show: '',
         spec2_show: '',
         product_cost: '0',
+        Event_Item_Money: '0',//活動售價  add by zhuoqin0830w   2015/11/16
         Event_Item_Cost: '0',//活動成本
         Deduct_Welfare: '0',//購物金金額
         Deduct_Bonus: '0',//抵用卷金額
@@ -1807,8 +1975,8 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
     store: orderStore,
     plugins: [cellEditing],
     width: docWidth,
-    minHeight: 330,
-    height: docHeight - 420,
+    minHeight: 300,
+    height: docHeight - 450,
     tbar: {
         bodyStyle: 'padding:2px 5px;',
         items: [{
@@ -1996,11 +2164,11 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                                 //組合子商品
                                 existNum += parseInt(data.get("buynum"));
                                 gridData += "{" + productTitle + ":'" + data.get('Product_Id') + "',item_id:" + data.get('item_id') + ",buynum:" + data.get('buynum');
-                                //add by zhuoqin0830w  2015/07/31  向後臺傳遞返還購物金的值
-                                gridData += ",accumulated_bonus:" + data.get('accumulated_bonus');
-                                //添加 活動成本 金額顯示 ",Event_Item_Cost:" + data.get('Event_Item_Cost')  edit by zhuoqin0830w  2015/04/30
+                                //add by zhuoqin0830w  2015/07/31  向 後臺傳遞返還購物金的值  添加活動售價  ',Event_Item_Money:' + data.get('Event_Item_Money')  add by zhuoqin0830w  2015/11/16
+                                gridData += ",accumulated_bonus:" + data.get('accumulated_bonus') + ',Event_Item_Money:' + data.get('Event_Item_Money');
+                                //添加 活動成本 金額顯示  ",Event_Item_Cost:" + data.get('Event_Item_Cost')  edit by zhuoqin0830w  2015/04/30
                                 gridData += ",Item_Cost:'" + data.get('Item_Cost') + "',product_cost:" + data.get('product_cost') + ",Event_Item_Cost:" + data.get('Event_Item_Cost') + ",sumprice:" + data.get('sumprice');
-                                //添加 購物金 和 抵用金 顯示  ",Deduct_Bonus:" + data.get('Deduct_Bonus') + ",Deduct_Welfare:" + data.get('Deduct_Welfare')  edit by zhuoqin0830w  2015/05/14
+                                //添加 購物金 和 抵用金 顯示   ",Deduct_Bonus:" + data.get('Deduct_Bonus') + ",Deduct_Welfare:" +   data.get('Deduct_Welfare')  edit by zhuoqin0830w  2015/05/14
                                 gridData += ",parent_id:'" + parent_id + "',product_name:'" + Ext.htmlEncode(data.get('child')) + "',deduct_bonus:" + data.get('Deduct_Bonus') + ",deduct_welfare:" + data.get('Deduct_Welfare') + ",s_must_buy:" + data.get('s_must_buy') + ",group_id:" + parent_group_id;
                                 gridData += ",price_master_id:" + data.get('price_master_id') + ",ignore_stock:" + data.get('ignore_stock') + "}";
                             }
@@ -2010,21 +2178,21 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                                 if (data.get("item_id") != 0) {
                                     //單一商品
                                     gridData += "{" + productTitle + ":'" + data.get('product_id') + "',item_id:" + data.get('item_id') + ",buynum:" + data.get('buynum');
-                                    //add by zhuoqin0830w  2015/07/31  向後臺傳遞返還購物金的值
-                                    gridData += ",accumulated_bonus:" + data.get('accumulated_bonus');
+                                    //add by zhuoqin0830w  2015/07/31 向後臺傳遞返還購物金的值   添加活動售價  ',Event_Item_Money:' + data.get('Event_Item_Money')  add by zhuoqin0830w  2015/11/16
+                                    gridData += ",accumulated_bonus:" + data.get('accumulated_bonus') + ',Event_Item_Money:' + data.get('Event_Item_Money');
                                     //添加 活動成本 金額顯示 ",Event_Item_Cost:" + data.get('Event_Item_Cost')  zhuoqin0830w  2015/04/30
                                     gridData += ",product_cost:" + data.get('product_cost') + ",Item_Cost:" + data.get('Item_Cost') + ",Event_Item_Cost:" + data.get('Event_Item_Cost') + ",sumprice:" + data.get('sumprice');
-                                    //添加 購物金 和 抵用金 顯示  ",Deduct_Bonus:" + data.get('Deduct_Bonus') + ",Deduct_Welfare:" + data.get('Deduct_Welfare')  edit by zhuoqin0830w  2015/05/14
+                                    //添加 購物金 和 抵用金 顯示  ",Deduct_Bonus:" + data.get('Deduct_Bonus') + ",Deduct_Welfare:" +  data.get('Deduct_Welfare')  edit by zhuoqin0830w  2015/05/14
                                     gridData += ",parent_id:0,product_name:'" + Ext.htmlEncode(data.get('product_name')) + "',deduct_bonus:" + data.get('Deduct_Bonus') + ",deduct_welfare:" + data.get('Deduct_Welfare') + ",ignore_stock:" + data.get('ignore_stock') + "}";//edit by jiajun
                                 }
                                 else {
                                     //組合父級商品
                                     gridData += "{" + productTitle + ":'" + data.get('product_id') + "',item_id:" + data.get('item_id');
-                                    //add by zhuoqin0830w  2015/07/31  向後臺傳遞返還購物金的值
-                                    gridData += ",accumulated_bonus:" + data.get('accumulated_bonus');
-                                    //添加 活動成本 金額顯示 ",Event_Item_Cost:" + data.get('Event_Item_Cost')  zhuoqin0830w  2015/04/30
+                                    //add by zhuoqin0830w  2015/07/31 向後臺傳遞返還購物金的值     添加活動售價  ',Event_Item_Money:' + data.get('Event_Item_Money')  add by zhuoqin0830w  2015/11/16
+                                    gridData += ",accumulated_bonus:" + data.get('accumulated_bonus') + ',Event_Item_Money:' + data.get('Event_Item_Money');
+                                    //添加 活動成本 金額顯示  ",Event_Item_Cost:" + data.get('Event_Item_Cost')  zhuoqin0830w   2015/04/30
                                     gridData += ",buynum:" + data.get('buynum') + ",Item_Cost:'" + data.get('Item_Cost') + "',product_cost:" + data.get('product_cost') + ",Event_Item_Cost:" + data.get('Event_Item_Cost') + ",sumprice:" + data.get('sumprice');
-                                    //添加 購物金 和 抵用金 顯示  ",Deduct_Bonus:" + data.get('Deduct_Bonus') + ",Deduct_Welfare:" + data.get('Deduct_Welfare')  edit by zhuoqin0830w  2015/05/14
+                                    //添加 購物金 和 抵用金 顯示   ",Deduct_Bonus:" + data.get('Deduct_Bonus') + ",Deduct_Welfare:" + data.get('Deduct_Welfare')  edit by zhuoqin0830w  2015/05/14
                                     gridData += ",parent_id:0,product_name:'" + Ext.htmlEncode(data.get('product_name')) + "',group_id:" + (i + 1) + ",deduct_bonus:" + data.get('Deduct_Bonus') + ",deduct_welfare:" + data.get('Deduct_Welfare') + ",price_type:" + data.get('price_type') + "}";
                                     parent_group_id = (i + 1);
                                 }
@@ -2061,7 +2229,6 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                                 storeType: storeType,
                                 receipt_to: receipt_to,
                                 gridData: Ext.htmlEncode(gridData),
-
                                 txtareAdminNote: Ext.htmlEncode(Ext.getCmp('txtareAdminNote').getValue()),
                                 txtareCartNote: Ext.htmlEncode(Ext.getCmp('txtareCartNote').getValue()),
                                 txtTradeNumber: Ext.htmlEncode(Ext.getCmp('txtTradeNumber').getValue()),
@@ -2069,12 +2236,10 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                                 txtDeliverNumber: Ext.htmlEncode(Ext.getCmp('txtDeliverNumber').getValue()),
 
                                 b_txtName: Ext.htmlEncode(Ext.getCmp('txtCNFullName').getRawValue()),
-                                //edit by zhuoqin0830w  2015/08/21  獲取combobox選中的userid
-                                userId: Ext.htmlEncode(Ext.getCmp('selectUserID').getValue()),//內部訂單使用訂購人的user_id edit by xiangwang0413w 2014/10/29
+                                userId: Ext.htmlEncode(Ext.getCmp('d_userID').getValue()),//內部訂單使用訂購人的user_id edit by xiangwang0413w 2014/10/29
                                 b_txtPhoneHead: Ext.htmlEncode(Ext.getCmp('txtContactPhoneHead').getValue()),
                                 b_txtPhoneContent: Ext.htmlEncode(Ext.getCmp('txtContactPhoneContent').getValue()),
                                 b_txtAddress: Ext.htmlEncode(Ext.getCmp('b_txtAddress').getValue()),
-
                                 r_txtCNFullName: Ext.htmlEncode(Ext.getCmp('r_txtCNFullName').getValue()),
                                 r_txtContactPhoneHead: Ext.htmlEncode(Ext.getCmp('r_txtContactPhoneHead').getValue()),
                                 r_txtContactPhoneContent: Ext.htmlEncode(Ext.getCmp('r_txtContactPhoneContent').getValue()),
@@ -2166,6 +2331,7 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                 else if (orderStore.getCount() == 1) {
                     removeStore(0);
                 }
+
                 if (curData && curData.get('product_id') == ' ' && curData.get('item_id')) {
                     CalculatePrice(curData.data.combination, curData.data.price_type);
                 }
@@ -2194,8 +2360,7 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
             //vtype: 'regxPNo',
             id: 'txtProductId'
         }
-    },
-    {
+    }, {
         header: PRODUCT_NAME, sortable: false, menuDisabled: true, dataIndex: 'product_name', width: 200
     }, {
         header: CHILD_PRODUCT_NAME, sortable: false, menuDisabled: true, dataIndex: 'child', width: 200, renderer: function (value, m, r, row, column) {
@@ -2279,12 +2444,12 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                             }
                         }
                         if (status) {
-                            var result = searchByProID(rec[0].data.Child_Id, currentRow, null, null, null, Product_Id);
+                            var result = searchByProID(rec[0].data.Child_Id, currentRow, null, null, null, Product_Id, null, null);
                             if (result == 0) {
                                 status = false;
                                 combo.setValue(SELECT);
                                 removeChildStore(orderStore.getAt(currentRow));
-                                //Ext.Msg.alert(PROMPT, "此單一商品規格價格數據錯誤，請重新選擇。");
+                                //Ext.Msg.alert(PROMPT, "此單一商品規 格價格數據錯誤，請重新選擇。");
                             }
                         }
                         //選擇錯誤后，父級售價重新計算，購買數量重置
@@ -2346,7 +2511,7 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                     var spec1 = record[0].data.spec_id;
                     var spec2 = orderStore.getAt(currentRow).get("spec2");
                     var result;
-                    result = searchByProID(val, currentRow, spec1, spec2, null, Product_Id);
+                    result = searchByProID(val, currentRow, spec1, spec2, null, Product_Id, null, null);
                     if (result == 0) {
                         return;
                     }
@@ -2386,7 +2551,7 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                     var spec1 = orderStore.getAt(currentRow).get("spec1");
                     var spec2 = record[0].data.spec_id;
                     var result;
-                    result = searchByProID(val, currentRow, spec1, spec2, null, Product_Id);
+                    result = searchByProID(val, currentRow, spec1, spec2, null, Product_Id, null, null);
                     if (result == 0) {
                         return;
                     }
@@ -2422,7 +2587,7 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                         var current_child = orderStore.getAt(currentRow + i);
                         var num = current_child.get("s_must_buy");
                         if (i == s_must_buy) {
-                            //var result = Math.round((price - beforePriceCount) / num);
+                            //var result = Math.round((price -  beforePriceCount) / num);
                             var result = Math.round((price) / num);
                             current_child.set("product_cost", result);
                         }
@@ -2477,6 +2642,47 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                 }
             }
         }
+    }, {//edit by zhuoqin0830w  2015/11/16   添加活動售價金額
+        header: EVENT_PRICE, id: 'Event_Item_Money', dataIndex: 'Event_Item_Money', hidden: true, sortable: false, menuDisabled: true, width: 80,
+        editor: {
+            xtype: 'numberfield',
+            minValue: 0,
+            vtype: 'regxMoney',
+            listeners: {
+                blur: function (a, b) {
+                    var s_must_buy = orderStore.getAt(currentRow).get("s_must_buy");
+                    var child_scale = orderStore.getAt(currentRow).get("child_scale");
+                    var price = a.rawValue;
+                    orderStore.getAt(currentRow).set("Event_Item_Money", price);
+                    if (!child_scale) {
+                        return;
+                    }
+                    var child_scale_list = child_scale.split(',');
+                    var beforePriceCount = 0;
+                    for (var i = 1; i <= s_must_buy; i++) {
+                        var current_child = orderStore.getAt(currentRow + i);
+                        var num = current_child.get("s_must_buy");
+                        if (num == 0) {
+                            return;
+                        }
+                    }
+                    for (var i = 1; i <= s_must_buy; i++) {
+                        var current_child = orderStore.getAt(currentRow + i);
+                        var num = current_child.get("s_must_buy");
+                        if (i == s_must_buy) {
+                            var result = Math.round((price) / num);
+                            current_child.set("Event_Item_Money", result);
+                        }
+                        else {
+                            var result = Math.round((price * child_scale_list[i - 1]) / num)
+                            beforePriceCount += result * num;
+                            price -= result * num;
+                            current_child.set("Event_Item_Money", result);
+                        }
+                    }
+                }
+            }
+        }
     }, {//edit by zhuoqin0830w  2015/04/30  添加活動成本金額
         header: EVENT_COST, id: 'Event_Item_Cost', dataIndex: 'Event_Item_Cost', hidden: true, sortable: false, menuDisabled: true, width: 80,
         editor: {
@@ -2514,6 +2720,26 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                             price -= result * num;
                             current_child.set("Event_Item_Cost", result);
                         }
+                    }
+                }
+            }
+        }
+    }, {
+        header: BUY_NUM, id: 'buynum', dataIndex: 'buynum', sortable: false, menuDisabled: true, width: 80,
+        editor: {
+            xtype: 'numberfield',
+            decimalPrecision: 0,
+            minValue: 0,
+            listeners: {
+                blur: function (self, The, eOpts) {
+                    var Product_Id = orderStore.getAt(currentRow).data.Product_Id; //子商品product_id
+                    var parent_id = orderStore.getAt(currentRow).data.parent_id;
+                    var product_id = orderStore.getAt(currentRow).data.product_id; //父商品product_id
+                    var price_type = orderStore.getAt(currentRow).data.price_type;
+                    var combination = orderStore.getAt(currentRow).data.combination;
+                    if (product_id == " ") {
+                        orderStore.getAt(currentRow).set("s_must_buy", self.value);
+                        CalculatePrice(combination, price_type, self.value);
                     }
                 }
             }
@@ -2606,28 +2832,8 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                 }
             }
         }
-    },
-    { header: STOCK, sortable: false, menuDisabled: true, dataIndex: 'stock', width: 80 },
-    {
-        header: BUY_NUM, id: 'buynum', dataIndex: 'buynum', sortable: false, menuDisabled: true, width: 80,
-        editor: {
-            xtype: 'numberfield',
-            decimalPrecision: 0,
-            minValue: 0,
-            listeners: {
-                blur: function (self, The, eOpts) {
-                    var Product_Id = orderStore.getAt(currentRow).data.Product_Id; //子商品product_id
-                    var parent_id = orderStore.getAt(currentRow).data.parent_id;
-                    var product_id = orderStore.getAt(currentRow).data.product_id; //父商品product_id
-                    var price_type = orderStore.getAt(currentRow).data.price_type;
-                    var combination = orderStore.getAt(currentRow).data.combination;
-                    if (product_id == " ") {
-                        orderStore.getAt(currentRow).set("s_must_buy", self.value);
-                        CalculatePrice(combination, price_type, self.value);
-                    }
-                }
-            }
-        }
+    }, {
+        header: STOCK, sortable: false, menuDisabled: true, dataIndex: 'stock', width: 80
     }, {
         header: SUM_PRICE, dataIndex: 'sumprice', width: 120, sortable: false, menuDisabled: true,
         renderer: function (value, m, r, row, column) {
@@ -2636,19 +2842,27 @@ var orderGrid = Ext.create('Ext.grid.Panel', {
                 return value;
             }
             var cost = parseFloat(data.get("product_cost"));
+            var event_item_money = parseFloat(data.get("Event_Item_Money"));
             var Deduct_Bonus = parseFloat(data.get('Deduct_Bonus'));
             var Deduct_Welfare = parseFloat(data.get('Deduct_Welfare'));
-            return parseInt(data.get("buynum")) * cost - Deduct_Welfare - Deduct_Bonus;
+            //根據活動時間判斷使用定價還是活動價  edit by zhuoqin0830w  2015/12/02
+            var price = event_item_money == 0 ? cost : event_item_money;
+            return parseInt(data.get("buynum")) * price - Deduct_Welfare - Deduct_Bonus;
         }
-    }, { width: 120, hidden: true, dataIndex: 'spec1_show', sortable: false, menuDisabled: true },
-    { width: 120, hidden: true, dataIndex: 'spec2_show', sortable: false, menuDisabled: true },
+    }, {
+        width: 120, hidden: true, dataIndex: 'spec1_show', sortable: false, menuDisabled: true
+    }, {
+        width: 120, hidden: true, dataIndex: 'spec2_show', sortable: false, menuDisabled: true
+    }, {
+        header: PRODUCT_STATUS, dataIndex: 'product_status_name', id: 'product_status_name', hidden: true, sortable: false, menuDisabled: true
+    }, {
+        header: ACCUMULATED_BONUS, id: 'accumulated_bonus', dataIndex: 'accumulated_bonus', hidden: true, sortable: false, menuDisabled: true, width: 80
+    }]
     //{ header: PRODUCT_ID, dataIndex: 'Product_Id', hidden: false, sortable: false, menuDisabled: true },
     //{ header: 'item_id', dataIndex: 'item_id', hidden: true, sortable: false, menuDisabled: true },
     //{ header: 'child_price_scale', dataIndex: 'child_scale', hidden: false, sortable: false, menuDisabled: true },
     //{ header: 's_must_buy', dataIndex: 's_must_buy', hidden: false, sortable: false, menuDisabled: true },
     //{ header: 'child_cost_scale', dataIndex: 'child_cost_scale', hidden: false, sortable: false, menuDisabled: true },
-    { header: PRODUCT_STATUS, dataIndex: 'product_status_name', id: 'product_status_name', hidden: true, sortable: false, menuDisabled: true },
-    { header: ACCUMULATED_BONUS, id: 'accumulated_bonus', dataIndex: 'accumulated_bonus', hidden: true, sortable: false, menuDisabled: true, width: 80 }]
 });
 
 Ext.onReady(function () {
@@ -2656,7 +2870,7 @@ Ext.onReady(function () {
         layout: 'anchor',
         items: [myPanel, orderGrid],
         renderTo: Ext.getBody(),
-        autoScroll: true,//edit by zhuoqin0830w  添加頁面滾動條  ahon 說需要更改  2015/09/24 11:38
+        autoScroll: true,//edit by zhuoqin0830w  添加頁面滾動條  ahon  說需要更改  2015/09/24 11:38
         listeners: {
             resize: function () {
                 orderGrid.width = document.documentElement.clientWidth;
@@ -2675,10 +2889,10 @@ function removeChildStore(data) {
 }
 
 //根據商品編號查詢商品信息
-function searchByProID(val, rowIdx, spec1, spec2, obj, Product_Id) {
+function searchByProID(val, rowIdx, spec1, spec2, obj, Product_Id, Site_Id, combOrderDate) {
     switch (storeType) {
         case CHANNEL_TYPE_COOPERATOR: searchByCooperator(val, rowIdx, spec1, spec2, obj); break; //合作外站
-        case CHANNEL_TYPE_GIGADE: return searchByGigade(val, rowIdx, spec1, spec2, obj, Product_Id); break; //吉甲地站臺
+        case CHANNEL_TYPE_GIGADE: return searchByGigade(val, rowIdx, spec1, spec2, obj, Product_Id, Site_Id, combOrderDate); break; //吉甲地站臺
         default:
     }
 }
@@ -2686,7 +2900,7 @@ function searchByProID(val, rowIdx, spec1, spec2, obj, Product_Id) {
 var rowCount;
 
 //Gigade之商品查詢
-function searchByGigade(val, rowIdx, spec1, spec2, obj, Product_Id) {
+function searchByGigade(val, rowIdx, spec1, spec2, obj, Product_Id, Site_Id, combOrderDate) {
     var regx = /^\d{5,}$/;
     if (!regx.test(val) && !Product_Id) {
         Ext.Msg.alert(INFORMATION, FOURNUMBER_INPUT);
@@ -2700,7 +2914,9 @@ function searchByGigade(val, rowIdx, spec1, spec2, obj, Product_Id) {
             method: 'POST',
             async: false,
             params: {
-                item_id: val == " " ? 0 : val
+                item_id: val == " " ? 0 : val,
+                Site_Id: Site_Id,
+                combOrderDate: combOrderDate,
             },
             success: function (response, opts) {
                 var resText = Ext.decode("(" + response.responseText + ")");
@@ -2719,6 +2935,7 @@ function searchByGigade(val, rowIdx, spec1, spec2, obj, Product_Id) {
                     storeData.set("product_status_name", data.product_status_name) //edit 2014/10/28
                     storeData.set("Item_Cost", data.Item_Cost);
                     storeData.set("Event_Item_Cost", data.Event_Item_Cost);
+                    storeData.set("Event_Item_Money", data.Event_Item_Money);//活動售價  add by zhuoqin0830w  2015/11/16
                     storeData.set("stock", data.stock);
                     storeData.set("spec1", data.spec1);
                     storeData.set("spec2", data.spec2);
@@ -2750,7 +2967,10 @@ function searchByGigade(val, rowIdx, spec1, spec2, obj, Product_Id) {
                     if (storeData.data.child != undefined && storeData.data.child != "") {
                         CalculatePrice(data.child, price_type);
                     }
-                    storeData.set("sumprice", parseFloat(storeData.get("product_cost")) * parseInt(storeData.get("buynum")));
+                    //根據活動時間判斷使用定價還是活動價  edit by zhuoqin0830w  2015/12/02
+                    var cost = parseFloat(storeData.get("product_cost"));
+                    var event_item_money = parseFloat(storeData.get("Event_Item_Money"));
+                    storeData.set("sumprice", event_item_money == 0 ? cost * parseInt(storeData.get("buynum")) : event_item_money * parseInt(storeData.get("buynum")));
                 }
                 else {
                     if (resText.msg) {
@@ -2780,7 +3000,9 @@ function searchByGigade(val, rowIdx, spec1, spec2, obj, Product_Id) {
                 'pid': val == " " ? Product_Id : val,
                 'parent_id': Product_Id,
                 'spec1': spec1,
-                'spec2': spec2
+                'spec2': spec2,
+                Site_Id: Site_Id,
+                combOrderDate: combOrderDate,
             },
             success: function (response, opts) {
                 var resText = Ext.decode("(" + response.responseText + ")");
@@ -2795,10 +3017,11 @@ function searchByGigade(val, rowIdx, spec1, spec2, obj, Product_Id) {
                     else {
                         storeData.set("original_price", data.product_cost);
                     }
-                    storeData.set("cost", data.cost);  //edit 2014/10/23
+                    storeData.set("cost", data.cost);  //edit  2014/10/23
                     storeData.set("product_status_name", data.product_status_name) //edit 2014/10/28
                     storeData.set("Item_Cost", data.Item_Cost);
                     storeData.set("Event_Item_Cost", data.Event_Item_Cost);
+                    storeData.set("Event_Item_Money", data.Event_Item_Money);//活動售價  add by zhuoqin0830w  2015/11/16
                     storeData.set("stock", data.stock);
                     storeData.set("spec1", data.spec1);
                     storeData.set("spec2", data.spec2);
@@ -2831,6 +3054,7 @@ function searchByGigade(val, rowIdx, spec1, spec2, obj, Product_Id) {
                     if (storeData.data.child != undefined && storeData.data.child != "") {
                         CalculatePrice(data.child, price_type);
                     }
+
                     /**************************end******************************/
                     /*if (storeData.get("product_id") != " ") {
                     if (data.stock != 0) {
@@ -2840,7 +3064,10 @@ function searchByGigade(val, rowIdx, spec1, spec2, obj, Product_Id) {
                     storeData.set("buynum", 0);
                     }
                     }*/
-                    storeData.set("sumprice", parseFloat(storeData.get("product_cost")) * parseInt(storeData.get("buynum")));
+                    //根據活動時間判斷使用定價還是活動價  edit by zhuoqin0830w  2015/12/02
+                    var cost = parseFloat(storeData.get("product_cost"));
+                    var event_item_money = parseFloat(storeData.get("Event_Item_Money"));
+                    storeData.set("sumprice", event_item_money == 0 ? cost * parseInt(storeData.get("buynum")) : event_item_money * parseInt(storeData.get("buynum")));
                     //組合商品
                     if (data.g_must_buy != 0) {
                         if (data.child == 3) {
@@ -2920,6 +3147,7 @@ function searchByCooperator(val, rowIdx, spec1, spec2, obj) {
                 //storeData.set("cost", data.cost); //add 2014/10/23
                 storeData.set("product_cost", data.product_cost);
                 storeData.set("Event_Item_Cost", data.Event_Item_Cost);
+                storeData.set("Event_Item_Money", data.Event_Item_Money);//活動售價  add by zhuoqin0830w  2015/11/16
                 storeData.set("spec1_show", data.spec1_show);
                 storeData.set("spec2_show", data.spec2_show);
                 storeData.set("stock", data.stock);
@@ -2936,7 +3164,11 @@ function searchByCooperator(val, rowIdx, spec1, spec2, obj) {
                 //                    storeData.set("buynum", 0);
                 //                }
 
-                storeData.set("sumprice", parseFloat(storeData.get("product_cost")) * parseInt(storeData.get("buynum")));
+                //根據活動時間判斷使用定價還是活動價  edit by zhuoqin0830w  2015/12/02
+                var cost = parseFloat(storeData.get("product_cost"));
+                var event_item_money = parseFloat(storeData.get("Event_Item_Money"));
+                storeData.set("sumprice", event_item_money == 0 ? cost * parseInt(storeData.get("buynum")) : event_item_money * parseInt(storeData.get("buynum")));
+
                 if (data.g_must_buy != 0) {
                     for (var i = 0; i < data.g_must_buy; i++) {
                         addComboCooperationTr(resText.child[i], rowIdx);
@@ -3030,7 +3262,8 @@ function CalculatePrice(combination, price_type) {
     if (price_type == 2) {
         orderStore.getAt(parent_id_row).set("product_cost", childrenTotalPrice);
         var frontStock = orderStore.getAt(parent_id_row + 1).data;
-        var minStock = parseInt(frontStock.stock / (frontStock.s_must_buy == 0 ? 1 : frontStock.s_must_buy));          //最小庫存為組合下子商品最小庫存/該商品的必購數量
+        var minStock = parseInt(frontStock.stock / (frontStock.s_must_buy == 0 ? 1 : frontStock.s_must_buy));
+        //最小庫存為組合下子商品最小庫存/該商品的必購數量
         for (var i = 1; i <= rowCount; i++) {
             var curDa = orderStore.data.items[parent_id_row + i].data;
             var stock = parseInt(curDa.stock / (curDa.s_must_buy == 0 ? 1 : curDa.s_must_buy));
@@ -3039,7 +3272,10 @@ function CalculatePrice(combination, price_type) {
             }
         }
         orderStore.getAt(parent_id_row).set("stock", minStock);
-        orderStore.getAt(parent_id_row).set("sumprice", orderStore.getAt(parent_id_row).get("product_cost") * orderStore.getAt(parent_id_row).get("buynum"));        //add by xxl
+        //根據活動時間判斷使用定價還是活動價  edit by zhuoqin0830w  2015/12/02
+        var cost = orderStore.getAt(parent_id_row).get("product_cost");
+        var event_item_money = orderStore.getAt(parent_id_row).get("Event_Item_Money");
+        orderStore.getAt(parent_id_row).set("sumprice", event_item_money == 0 ? cost * orderStore.getAt(parent_id_row).get("buynum") : event_item_money * orderStore.getAt(parent_id_row).get("buynum"));        //add by xxl
         orderStore.getAt(parent_id_row).set("s_must_buy", rowCount);
     }
     else {
@@ -3089,22 +3325,23 @@ function CalculatePrice(combination, price_type) {
             //                var child_product_price = 0;
 
             //                child_product_price = price * num;
-            //                var result = Math.round(combo_price * (child_product_price / childrenTotalPrice) / num);
+            //                var result = Math.round(combo_price *  (child_product_price / childrenTotalPrice) / num);
             //                child_scale += (child_product_price / childrenTotalPrice) + ",";
             //                beforePrice += result * num;
-            //                orderStore.getAt(parent_id_row + i).set("product_cost", result);
+            //                orderStore.getAt(parent_id_row +  i).set("product_cost", result);
 
             //            }
         }
-        child_scale = child_scale.substring(0, child_scale.length - 1);
+        child_scale = child_scale.substring(0, child_scale.length -
+1);
         child_cost_scale = child_cost_scale.substring(0, child_cost_scale.length - 1);
         orderStore.getAt(parent_id_row).set("stock", minStock);
         //            if (minStock == 0) {
-        //                orderStore.getAt(parent_id_row).set("buynum", 0);
+        //                orderStore.getAt(parent_id_row).set ("buynum", 0);
         //                for (var i = 1; i <= rowCount; i++) {
         //                    if (orderStore.getAt(parent_id_row + i).data.isAdd != 'false') {
         //                        orderStore.getAt(parent_id_row + i).set("buynum", 0);
-        //                        orderStore.getAt(parent_id_row + i).set("s_must_buy", 0);
+        //                        orderStore.getAt(parent_id_row +  i).set("s_must_buy", 0);
         //                    }
         //                }
         //            }

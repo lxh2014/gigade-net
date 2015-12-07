@@ -308,12 +308,13 @@ Ext.onReady(function () {
                       {
                           xtype: "datetimefield",
                           fieldLabel: "合約簽訂日",
-                          width: 200,
+                          width: 240,
                           labelWidth: 80,
                           margin: '5 0 0 5',
                           id: 'dateOne',
                           name: 'dateOne',
-                          format: 'Y-m-d',
+                          format: 'Y-m-d H:i:s',
+                          time: { hour: 00, min: 00, sec: 00 },
                           submitValue: true,
                           editable: false,
                           listeners: {
@@ -335,17 +336,18 @@ Ext.onReady(function () {
                       },
                      {
                          xtype: 'displayfield',
-                         margin: '5 0 0 0',
+                         margin: '5 5 0 5', 
                          value: "~"
                      }
                      , {
                          xtype: "datetimefield",
-                         format: 'Y-m-d',
+                         format: 'Y-m-d H:i:s',
+                         time: { hour: 23, min: 59, sec: 59 },
                          id: 'dateTwo',
                          name: 'dateTwo',
                          margin: '5 0 0 0',
                          editable: false,
-                         width: 120,
+                         width: 160,
                          submitValue: true,
                          listeners: {
                              select: function (a, b, c) {
@@ -644,6 +646,7 @@ function VendorFunction(rid) {
         }
     });
 }
+
 setNextMonth = function (source, n) {
     var s = new Date(source);
     s.setMonth(s.getMonth() + n);

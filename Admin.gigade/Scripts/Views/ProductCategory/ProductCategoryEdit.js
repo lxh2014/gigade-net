@@ -90,7 +90,7 @@ editFunction = function (row, store, fatherid, fathername) {
             allowDecimals: false,
             submitValue: true,
             width: 300,
-            maxValue:9999
+            maxValue: 9999
         },
         {
             xtype: 'radiogroup',
@@ -152,36 +152,51 @@ editFunction = function (row, store, fatherid, fathername) {
             allowBlank: true,
             fileUpload: true,
             hidden: false,
-            width: 300
+            width: 300,
+            vtype: 'imageFilter'
         },
-          {
-              xtype: 'filefield',
-              name: 'image_in',
-              id: 'image_in',
-              fieldLabel: CATEBANNERIN,
-              msgTarget: 'side',
-              buttonText: SELECT_IMG,
-              submitValue: true,
-              allowBlank: true,
-              fileUpload: true,
-              hidden: false,
-              width: 300,
-              vtype: 'imageFilter'
-          },
-          {
-              xtype: 'filefield',
-              name: 'image_out',
-              id: 'image_out',
-              fieldLabel: CATEBANNEROUT,
-              msgTarget: 'side',
-              buttonText: SELECT_IMG,
-              submitValue: true,
-              allowBlank: true,
-              fileUpload: true,
-              hidden: false,
-              width: 300,
-              vtype: 'imageFilter'
-          },
+        {
+            xtype: 'filefield',
+            name: 'image_in',
+            id: 'image_in',
+            fieldLabel: CATEBANNERIN,
+            msgTarget: 'side',
+            buttonText: SELECT_IMG,
+            submitValue: true,
+            allowBlank: true,
+            fileUpload: true,
+            hidden: false,
+            width: 300,
+            vtype: 'imageFilter'
+        },
+        {
+            xtype: 'filefield',
+            name: 'image_out',
+            id: 'image_out',
+            fieldLabel: CATEBANNEROUT,
+            msgTarget: 'side',
+            buttonText: SELECT_IMG,
+            submitValue: true,
+            allowBlank: true,
+            fileUpload: true,
+            hidden: false,
+            width: 300,
+            vtype: 'imageFilter'
+        },
+        {
+            xtype: 'filefield',
+            name: 'category_image_app',
+            id: 'category_image_app',
+            fieldLabel: CATEAPP,
+            msgTarget: 'side',
+            buttonText: SELECT_IMG,
+            submitValue: true,
+            allowBlank: true,
+            fileUpload: true,
+            hidden: false,
+            width: 300,
+            vtype: 'imageFilter'
+        },
         {
             xtype: 'radiogroup',
             hidden: false,
@@ -274,14 +289,14 @@ editFunction = function (row, store, fatherid, fathername) {
                 }
             }
         },
-            {
-                xtype: 'textareafield',
-                fieldLabel: '短文字說明 (300字內)',
-                id: 'short_description',
-                name: 'short_description',
-                width: 300,
-                maxLength: 300
-            }
+        {
+            xtype: 'textareafield',
+            fieldLabel: '短文字說明 (300字內)',
+            id: 'short_description',
+            name: 'short_description',
+            width: 300,
+            maxLength: 300
+        }
         ],
         buttons: [{
             formBind: true,
@@ -309,7 +324,8 @@ editFunction = function (row, store, fatherid, fathername) {
                             enddate: Ext.htmlEncode(Ext.getCmp('enddate').getRawValue()),
                             short_description: Ext.htmlEncode(Ext.getCmp('short_description').getValue()),
                             image_in: Ext.htmlEncode(Ext.getCmp('image_in').getValue()),
-                            image_out: Ext.htmlEncode(Ext.getCmp('image_out').getValue())
+                            image_out: Ext.htmlEncode(Ext.getCmp('image_out').getValue()),
+                            category_image_app: Ext.htmlEncode(Ext.getCmp('category_image_app').getValue())
                         },
                         success: function (form, action) {
                             myMask.hide();
@@ -402,12 +418,18 @@ editFunction = function (row, store, fatherid, fathername) {
                         case 2:
                             Ext.getCmp("lm").setValue(true);
                             break;
+                        default:
+                            Ext.getCmp("lm").setValue(true);
+                            break;
                     };
                     switch (row.data.banner_status) {
                         case 1:
                             Ext.getCmp("isStatus").setValue(true);
                             break;
                         case 2:
+                            Ext.getCmp("noStatus").setValue(true);
+                            break;
+                        default:
                             Ext.getCmp("noStatus").setValue(true);
                             break;
                     };
@@ -418,6 +440,9 @@ editFunction = function (row, store, fatherid, fathername) {
                         case 2:
                             Ext.getCmp("link_mode12").setValue(true);
                             break;
+                        default:
+                            Ext.getCmp("link_mode12").setValue(true);
+                            break;
                     };
                     Ext.getCmp('photo').setRawValue(row.data.banner_image);
 
@@ -426,6 +451,7 @@ editFunction = function (row, store, fatherid, fathername) {
                     Ext.getCmp('comboFrontCage_hide').setValue(row.data.category_father_id);
                     Ext.getCmp('image_in').setRawValue(row.data.category_image_in);
                     Ext.getCmp('image_out').setRawValue(row.data.category_image_out);
+                    Ext.getCmp('category_image_app').setRawValue(row.data.category_image_app);
                 } else {
                     Ext.getCmp('comboFrontCage').setValue(fathername);
                     Ext.getCmp('comboFrontCage_hide').setValue(fatherid);

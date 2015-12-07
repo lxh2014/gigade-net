@@ -18,7 +18,7 @@
                 hidden:true,
             }, {
                 xtype: 'textfield',
-                fieldLabel: '群組名稱',
+                fieldLabel: '類型名稱',
                 id: 'group_name',
                 name: 'group_name',
                 allowBlank: false
@@ -28,7 +28,7 @@
                 layout: 'hbox',
                 items: [
                 {
-                    fieldLabel: '會員電子報',
+                    fieldLabel: '可自由訂閱',
                     xtype: 'radiogroup',
                     id: 'is_member_edm',
                     labelWidth:100,
@@ -49,9 +49,10 @@
                 fieldLabel: '試閱連接',
                 id: 'trial_url',
                 name: 'trial_url',
-                allowBlank: false,
+                //allowBlank: false,
                 submitValue: true,
                 vtype: 'url',
+                hidden:true,
             }, {
                 xtype: 'numberfield',
                 fieldLabel: '排序',

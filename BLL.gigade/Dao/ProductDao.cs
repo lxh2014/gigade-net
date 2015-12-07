@@ -801,9 +801,9 @@ namespace BLL.gigade.Dao
                 }
                 if (query.combination != 0)
                 {
-                    if (query.combination == 1&&query.outofstock_days_stopselling > 0)// add by dongya 2015/10/22
+                    if (query.combination == 1 && query.outofstock_days_stopselling > 0)// add by dongya 2015/10/22
                     {
-                            strCondition.AppendFormat(" and a.combination={0} and a.outofstock_days_stopselling >= '{1}' ", query.combination,query.outofstock_days_stopselling);
+                        strCondition.AppendFormat(" and a.combination={0} and a.outofstock_days_stopselling >= '{1}' ", query.combination, query.outofstock_days_stopselling);
                     }
                     else
                     {
@@ -1499,8 +1499,8 @@ WHERE   ((order_payment=8 and money_collect_date=0) or money_collect_date<>0)) a
 
         public Model.Custom.OrderComboAddCustom OrderQuery(Product query, uint user_level, uint user_id, uint site_id)
         {
-            //edit by zhuoqin0830w  2015/11/06 添加 活動成本,活動時間 查詢欄位 b.event_cost,b.event_end,b.event_start
-            StringBuilder stb = new StringBuilder("select distinct a.price_type, b.product_id,b.product_name,b.cost,b.price as product_cost,b.event_cost,b.event_end,b.event_start,c.buy_limit,case c.g_must_buy ");
+            //edit by zhuoqin0830w  2015/11/06 添加 活動成本,活動時間 查詢欄位 b.event_cost,b.event_end,b.event_start   添加活動價格欄位  add by zhuoqin0830w 2015/11/17
+            StringBuilder stb = new StringBuilder("select distinct a.price_type, b.product_id,b.product_name,b.cost,b.price as product_cost,b.event_price,b.event_cost,b.event_end,b.event_start,c.buy_limit,case c.g_must_buy ");
             stb.Append("when 0 then count(c.g_must_buy) else c.g_must_buy end  as g_must_buy, ");
             stb.Append("case c.g_must_buy when 0 then 2 else 3 end as child ");
             stb.Append("from product a ");
@@ -1845,7 +1845,7 @@ WHERE   ((order_payment=8 and money_collect_date=0) or money_collect_date<>0)) a
                 //strTbls.Append("LEFT JOIN (SELECT parametercode,parametername FROM t_parametersrc WHERE parametertype='product_mode') g ON p.product_mode=g.parametercode ");
                 strTbls.Append("LEFT JOIN product_spec s1 on item.spec_id_1 = s1.spec_id ");
                 strTbls.Append("LEFT JOIN product_spec s2 on item.spec_id_2 = s2.spec_id ");
-                StringBuilder strCondition = new StringBuilder(" WHERE 1=1 AND p.product_id > 10000 AND p.combination = 1 ");
+                StringBuilder strCondition = new StringBuilder(" WHERE 1=1 AND p.product_id > 10000 ");
 
                 if (query.StockStatus != 0)// 1.庫存為0還可販售 2.補貨中停止販售 3.庫存數<1
                 {
@@ -1858,11 +1858,15 @@ WHERE   ((order_payment=8 and money_collect_date=0) or money_collect_date<>0)) a
                             strCondition.Append(" and p.shortage=1");//2.補貨中停止販售
                             break;
                         case 3:
-                            strCondition.Append(" and p.combination=1 and p.product_id in (select distinct product_id from product_item pi where item_stock <1 and pi.product_id=a.product_id)");//3.庫存數<1
+                            strCondition.Append(" and p.combination=1 and p.product_id in (select distinct product_id from product_item pi where item_stock <1 and pi.product_id=p.product_id)");//3.庫存數<1 edit by wwei0216w 不存在a.product_id 改為p.product_id 2015/11/18
                             break;
                         default:
                             throw new Exception("unaccepted StockStatus");
                     }
+                }
+                if (query.combination != 0)
+                {
+                    strCondition.AppendFormat(" AND p.combination={0}", query.combination);
                 }
 
                 if (query.brand_id != 0)

@@ -24,6 +24,8 @@ namespace BLL.gigade.Dao.Impl
         int SaveBySql(string str);
         int HashAll();
         string GetLocidByHash(string loc_id);
+        string GetIlocCount(IlocQuery loc);
+        IlocQuery GetIlocLsta_id(string loc_id);
        
     }
 }
