@@ -1451,8 +1451,8 @@ namespace Admin.gigade.Controllers
                             // update_log.AppendFormat("agreement_start:{0}:{1}:合約開始日#", CommonFunction.GetNetTime(oldven.agreement_start).ToShortDateString(), CommonFunction.GetNetTime(venQuery.agreement_start).ToShortDateString());
                             TableChangeLog item = new TableChangeLog();
                             item.change_field = "agreement_start";
-                            item.old_value = CommonFunction.GetNetTime(oldven.agreement_start).ToString();
-                            item.new_value = CommonFunction.GetNetTime(venQuery.agreement_start).ToString();
+                            item.old_value = CommonFunction.GetNetTime(oldven.agreement_start).ToShortDateString();
+                            item.new_value = CommonFunction.GetNetTime(venQuery.agreement_start).ToShortDateString();
                             item.field_ch_name = "合約開始日";
                             list.Add(item);
                         }
@@ -1469,8 +1469,8 @@ namespace Admin.gigade.Controllers
                             // update_log.AppendFormat("agreement_end:{0}:{1}:合約結束日#", CommonFunction.GetNetTime(oldven.agreement_end).ToShortDateString(), CommonFunction.GetNetTime(venQuery.agreement_end).ToShortDateString());
                             TableChangeLog item = new TableChangeLog();
                             item.change_field = "agreement_end";
-                            item.old_value = CommonFunction.GetNetTime(oldven.agreement_end).ToString();
-                            item.new_value = CommonFunction.GetNetTime(venQuery.agreement_end).ToString();
+                            item.old_value = CommonFunction.GetNetTime(oldven.agreement_end).ToShortDateString();
+                            item.new_value = CommonFunction.GetNetTime(venQuery.agreement_end).ToShortDateString();
                             item.field_ch_name = "合約結束日";
                             list.Add(item);
                         }
