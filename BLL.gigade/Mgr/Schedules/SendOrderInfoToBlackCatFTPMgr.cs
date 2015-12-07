@@ -161,7 +161,7 @@ where lte.upload_time is null ");
                     {                      
                         string str = "eod文件生成失敗，失敗的原因：" + ex.Message;
                         SendMail(schedule_code, str);
-                        throw new Exception(ex.Message);
+                        //throw new Exception(ex.Message);
                     }
                     
 
@@ -186,7 +186,7 @@ where lte.upload_time is null ");
                         string errorMessage = ex.Message.Substring(subStrLeng, ex.Message.Length - subStrLeng);
                         string str = newfilename + " 文件上傳失敗，失敗的原因：" + errorMessage;
                         SendMail(schedule_code, str);
-                        throw new Exception(ex.Message);
+                        //throw new Exception(ex.Message);
                     }                  
                 
                     if (result)//上傳成功，更新 upload_time為當前時間，轉移文件，發送郵件
@@ -232,7 +232,7 @@ where lte.upload_time is null ");
                         {
                             string str1 =  newfilename + " 文件上傳成功。"+"數據庫upload_time欄位更新成功，但是該文件在本地保存失敗，失敗的原因：" + ex.Message;
                             SendMail(schedule_code, str1);
-                            throw new Exception(ex.Message);
+                            //throw new Exception(ex.Message);
                         }                                         
 
                         string str = newfilename + " 文件上傳成功，全部操作執行成功";//全部執行成功
@@ -244,7 +244,7 @@ where lte.upload_time is null ");
                 }
                 else//沒有需要上傳的數據，發送郵件
                 {
-                    string str = "沒有要上傳的數據";
+                    string str = "沒有要上傳的資料";
                     SendMail(schedule_code, str);
                 }                        
             }
@@ -361,7 +361,7 @@ where lte.upload_time is null ");
                 #endregion
 
                 MailHelper mail = new MailHelper(mailModel);
-                mail.SendToGroup(GroupCode, MailTitle, MailBody, IsSeparate, IsDisplyName);
+                mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", IsSeparate, IsDisplyName);
             }
             catch (Exception ex)
             {

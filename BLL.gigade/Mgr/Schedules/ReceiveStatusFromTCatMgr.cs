@@ -84,7 +84,7 @@ namespace BLL.gigade.Mgr.Schedules
                 {
                     string str1 = " 參數 localPath_1 有問題，創建路徑（保存下載文件）失敗，失敗的原因：" + ex.Message;
                     SendMail(schedule_code, str1);
-                    throw new Exception(ex.Message);
+                    //throw new Exception(ex.Message);
                 }
               
 
@@ -106,7 +106,7 @@ namespace BLL.gigade.Mgr.Schedules
                     string errorMessage = ex.Message.Substring(subStrLeng, ex.Message.Length - subStrLeng);
                     string str = "sod文件下載失敗，失敗的原因：" + errorMessage;
                     SendMail(schedule_code, str);
-                    throw new Exception(ex.Message);
+                    //throw new Exception(ex.Message);
                 }
                
 
@@ -211,7 +211,7 @@ namespace BLL.gigade.Mgr.Schedules
                             {
                                 string str1 = " sod文件下載成功，數據庫更新成功。" + "但是該文件在本地保存失敗，失敗的原因：" + ex.Message;                                
                                 SendMail(schedule_code, str1);
-                                throw new Exception(ex.Message);
+                                //throw new Exception(ex.Message);
                             }
                         }
                         //所有操作都執行成功
@@ -383,7 +383,7 @@ namespace BLL.gigade.Mgr.Schedules
                 #endregion
 
                 MailHelper mail = new MailHelper(mailModel);
-                mail.SendToGroup(GroupCode, MailTitle, MailBody, IsSeparate, IsDisplyName);
+                mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", IsSeparate, IsDisplyName);
             }
             catch (Exception ex)
             {
