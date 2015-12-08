@@ -46,7 +46,7 @@
             </div>
             
             <div class="col-lg-2">
-                <h3 >訂單數量： <span class="label label-info " id="ord_qty"></span></h3>
+                <h3 >訂貨數量： <span class="label label-info " id="ord_qty"></span></h3>
                 <!-- /input-group -->
             </div>
             <div class="col-lg-3 text-right">
@@ -354,7 +354,7 @@
             else if (count > parseInt($('#out_qty').text()))
             {
                 $('#act_pick_qty').attr("class", "label label-warning");
-                $('#MessageContentId').text("實際撿貨量不能大於訂單數量!");
+                $('#MessageContentId').text("實際撿貨量不能大於需要揀貨數量!");
                 $('.MarketTally-modal-alert').modal('toggle')
                 $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
                 {
@@ -724,7 +724,7 @@
             
             if (parseInt($('#act_pick_qty').text()) > parseInt($('#out_qty').text()))
             {
-                $('#MessageContentId').text("實際撿貨量不能大於訂單數量!");
+                $('#MessageContentId').text("實際撿貨量不能大於需要揀貨數量!");
                 $('.MarketTally-modal-alert').modal('toggle')
                 $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
                 {
@@ -735,7 +735,7 @@
             else if (parseInt($('#act_pick_qty').text()) < parseInt($('#out_qty').text()))
             {
                 ///////////////
-                $('#WarnContentId').text("實際撿貨量小於訂單數量!，確認進行分貨？");
+                $('#WarnContentId').text("實際撿貨量小於需要揀貨數量!，確認進行分貨？");
                 $('.MarketTally-modal-warn').modal({
                     backdrop: 'static'
                 })
