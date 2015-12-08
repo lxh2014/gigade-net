@@ -551,22 +551,22 @@ namespace BLL.gigade.Dao
             }
         }
         /// <summary>
-        /// 更具order_id更新取消金額
+        /// 根據order_id更新取消金額
         /// </summary>
         /// <param name="return_money"></param>
         /// <param name="order_id"></param>
         /// <returns></returns>
-        public string UpdateMoneycanale(int return_money, uint order_id)
+        public string UpdateMoneyReturn(int return_money, uint order_id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat(@"update order_master set money_cancel=money_cancel+'{0}' where order_id ='{1}';", return_money, order_id);
+                sql.AppendFormat(@"update order_master set money_return=money_return+'{0}' where order_id ='{1}';", return_money, order_id);
                 return sql.ToString();
             }
             catch (Exception ex)
             {
-                throw new Exception("OrderMasterDao.UpdateMoneycanale -->" + ex.Message + sql.ToString(), ex);
+                throw new Exception("OrderMasterDao.UpdateMoneyReturn -->" + ex.Message + sql.ToString(), ex);
             }
         }
 
