@@ -454,7 +454,7 @@ namespace BLL.gigade.Dao
                     }
                     #endregion
                     //寫入付款單退款金額
-                    arrList.Add(_ordermasterdao.UpdateMoneycanale(returnmoney, om.Order_Id));
+                    arrList.Add(_ordermasterdao.UpdateMoneyReturn(returnmoney, om.Order_Id));
                     //退回購買扣抵的hp點數
                     #region 判斷退回購買扣抵的hp點數  判斷是否要退回購物金
                     if (deduct_happygo > 0)
@@ -1092,11 +1092,11 @@ namespace BLL.gigade.Dao
                 sql.AppendFormat("insert into hg_batch_accumulate_refund(order_id,head,card_no,card_checksum,enc_idno,");
                 sql.AppendFormat("checksum,merchant_pos,terminal_pos,refund_point,category_id, ");
                 sql.AppendFormat("order_note,wallet,batch_error_code,batch_status,");
-                sql.AppendFormat("created_time,modified_time,billing_checked)");
+                sql.AppendFormat("created_time,modified_time,billing_checked,transaction_time,batch_import_time)");
                 sql.AppendFormat("values('{0}','{1}','{2}','{3}','{4}',", query.order_id, query.head, query.card_no, query.card_checksum, query.enc_idno);
-                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',",query.checksum,query.merchant_pos,query.terminal_pos,query.refund_point,query.category_id);
+                sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',", query.checksum, query.merchant_pos, query.terminal_pos, query.refund_point, query.category_id);
                 sql.AppendFormat("'{0}','{1}','{2}','{3}',", "吉甲地台灣好市集訂單編號" + query.order_id + "累點取消" + query.refund_point + "點", query.wallet, query.batch_error_code, query.batch_status);
-                sql.AppendFormat("'{0}','{1}',{2});",CommonFunction.DateTimeToString(DateTime.Now),CommonFunction.DateTimeToString(DateTime.Now),query.billing_checked);
+                sql.AppendFormat("'{0}','{1}',{2});", CommonFunction.DateTimeToString(DateTime.Now), CommonFunction.DateTimeToString(DateTime.Now), query.billing_checked, CommonFunction.DateTimeToString(DateTime.Now), CommonFunction.DateTimeToString(DateTime.Now));
             }
             catch (Exception ex)
             {
@@ -1119,11 +1119,11 @@ namespace BLL.gigade.Dao
                 sql.AppendFormat("insert into hg_batch_deduct_refund(order_id,head,card_no,card_checksum,enc_idno,");
                 sql.AppendFormat("checksum,merchant_pos,terminal_pos,refund_point,category_id, ");
                 sql.AppendFormat("order_note,wallet,batch_error_code,batch_status,");
-                sql.AppendFormat("created_time,modified_time,billing_checked)");
+                sql.AppendFormat("created_time,modified_time,billing_checked,transaction_time,batch_import_time)");
                 sql.AppendFormat("values('{0}','{1}','{2}','{3}','{4}',", query.order_id, query.head, query.card_no, query.card_checksum, query.enc_idno);
                 sql.AppendFormat("'{0}','{1}','{2}','{3}','{4}',", query.checksum, query.merchant_pos, query.terminal_pos, query.refund_point, query.category_id);
                 sql.AppendFormat("'{0}','{1}','{2}','{3}',", "吉甲地台灣好市集訂單編號" + query.order_id + "返還" + query.refund_point + "點", query.wallet, query.batch_error_code, query.batch_status);
-                sql.AppendFormat("'{0}','{1}',{2});", CommonFunction.DateTimeToString(DateTime.Now), CommonFunction.DateTimeToString(DateTime.Now), query.billing_checked);
+                sql.AppendFormat("'{0}','{1}',{2},'{3}','{4}');", CommonFunction.DateTimeToString(DateTime.Now), CommonFunction.DateTimeToString(DateTime.Now), query.billing_checked, CommonFunction.DateTimeToString(DateTime.Now), CommonFunction.DateTimeToString(DateTime.Now));
             }
             catch (Exception ex)
             {
