@@ -1012,11 +1012,10 @@ od.single_cost,od.event_cost,od.single_price,od.single_money,od.deduct_bonus,od.
             try
             {
                 sqlCount.AppendFormat("SELECT count(lb.order_id) from( ");
-                sql.AppendFormat(@"SELECT lb.order_id,order_name,single_money, lb.buy_num ,deduct_bonus, deduct_welfare,category_id,order_product_subtotal,
-                                    order_amount,delivery_name,order_payment,'' as  payment_name,slave_status,'' as slave_status_name,channel,
+                sql.AppendFormat(@"SELECT lb.order_id,order_name,SUM(money) as money,SUM(lb.deduct_bonus) AS 'deduct_bonus', SUM(deduct_welfare) as deduct_welfare,category_id,order_product_subtotal,order_amount,delivery_name,order_payment,'' as  payment_name,slave_status,'' as slave_status_name,channel,
                                     '' as channel_name_simple,order_createdate,'' as order_createdate_format,'' as deducts,'' as amount from( ");
-                
-                sqlSingle.AppendFormat(@" (SELECT  om.order_id,om.order_name,od.single_money,buy_num,pcs.category_id ,om.order_payment,
+
+                sqlSingle.AppendFormat(@" (SELECT  om.order_id,om.order_name,od.single_money*buy_num as money,pcs.category_id ,om.order_payment,
                                         om.order_product_subtotal,om.order_amount,os.slave_status,om.channel,om.order_createdate,
                                         od.deduct_bonus,od.deduct_welfare,od.detail_id,om.delivery_name  FROM  order_detail od
                                         INNER JOIN product_item pit USING(item_id)
@@ -1026,7 +1025,7 @@ od.single_cost,od.event_cost,od.single_price,od.single_money,od.deduct_bonus,od.
                                         INNER JOIN product_category_set pcs USING(product_id)
                                         LEFT JOIN channel c ON om.channel=c.channel_id
                                         WHERE category_id={0} AND item_mode =0 AND od.detail_status NOT IN(89,90,91) AND om.order_status NOT IN(90,91)", query.category_id);
-                sqlFather.AppendFormat(@"(SELECT  om.order_id,om.order_name,od.single_money,buy_num,pcs.category_id ,om.order_payment,
+                sqlFather.AppendFormat(@"(SELECT  om.order_id,om.order_name,od.single_money*buy_num as money,pcs.category_id ,om.order_payment,
                                         om.order_product_subtotal,om.order_amount,os.slave_status,om.channel,om.order_createdate,
                                         od.deduct_bonus,od.deduct_welfare,od.detail_id,om.delivery_name FROM  order_detail od
                                         INNER JOIN order_slave os USING (slave_id)

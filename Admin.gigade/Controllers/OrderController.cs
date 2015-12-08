@@ -3934,7 +3934,8 @@ namespace Admin.gigade.Controllers
                 store = _OrderMasterMgr.CagegoryDetialExportInfo(query);
                 DataTable dtHZ = GetTableHead(store, 2);
                 string[] colname = new string[dtHZ.Columns.Count];
-                string filename = query.category_id + query.category_name + "-類別訂單明細" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                string name = query.category_name.Replace("．", ".");
+                string filename = query.category_id + name.Replace("。", "­.") + "-類別訂單明細" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
                 newExcelName = Server.MapPath(excelPath_export) + filename;
                 for (int i = 0; i < dtHZ.Columns.Count; i++)
                 {
@@ -3945,6 +3946,8 @@ namespace Admin.gigade.Controllers
                 {
                     System.IO.File.Delete(newExcelName);
                 }
+                //newExcelName = newExcelName.Replace("。", "·");
+                
                 ExcelHelperXhf.ExportDTtoExcel(dtHZ, "", newExcelName);
                 json = "{success:true,ExcelName:\'" + filename + "\'}";
             }
@@ -4006,7 +4009,7 @@ namespace Admin.gigade.Controllers
                 DataRow dr_v = store.Rows[i];
                 if (i == 0 || (i > 0 && dr_v["order_id"].ToString() != store.Rows[i - 1]["order_id"].ToString()))
                 {
-                    dr[0] = dr_v["order_name"].ToString();
+                    dr[0] = " "+ dr_v["order_name"].ToString();
                     if (!string.IsNullOrEmpty(dr_v["order_createdate_format"].ToString()))
                     {
                         DateTime order_createdate = Convert.ToDateTime(dr_v["order_createdate_format"].ToString());
@@ -4196,7 +4199,7 @@ namespace Admin.gigade.Controllers
                 if (a == 2)
                 {//如果是類別匯出 加上以下欄位
                     dr[24] = dr_v["deliver_id"].ToString();
-                    dr[25] = dr_v["delivery_code"].ToString();
+                    dr[25] = " " + dr_v["delivery_code"].ToString();
                     dr[26] = dr_v["deliver_name"].ToString();
                     if (!string.IsNullOrEmpty(dr_v["order_id"].ToString()) && !string.IsNullOrEmpty(dr_v["product_id"].ToString()))
                     {

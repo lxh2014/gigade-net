@@ -46,7 +46,7 @@
             </div>
             
             <div class="col-lg-2">
-                <h3 >訂單數量： <span class="label label-info " id="ord_qty"></span></h3>
+                <h3 >訂貨數量： <span class="label label-info " id="ord_qty"></span></h3>
                 <!-- /input-group -->
             </div>
             <div class="col-lg-3 text-right">
@@ -353,8 +353,10 @@
             }
             else if (count > parseInt($('#out_qty').text()))
             {
+                //alert($('#pick_num' + index).val())
+                $('#pick_num' + index).blur();
                 $('#act_pick_qty').attr("class", "label label-warning");
-                $('#MessageContentId').text("實際撿貨量不能大於訂單數量!");
+                $('#MessageContentId').text("實際撿貨量不能大於需要揀貨數量!");
                 $('.MarketTally-modal-alert').modal('toggle')
                 $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
                 {
@@ -385,6 +387,7 @@
 
                 if ($('#hidden_loc_id').text() == "YY999999")
                 {
+                    $('#pick_num' + index).blur();
                     $('#MessageContentId').text("該商品沒有主料位,不能庫調!");
                     $('.MarketTally-modal-alert').modal('toggle')
                     $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
@@ -404,6 +407,7 @@
                 }
                 else
                 {
+                    $('#pick_num' + index).blur();
                     var pnum = parseInt($('#pick_num' + index).val());
                     $('#ConfirmContentId').text("該商品庫存不夠，確認直接進行商品數量庫調？");
                     $('.MarketTally-modal-confirm').modal({
@@ -464,6 +468,7 @@
                         }
                         if (message != "")
                         {
+                            $('#pick_num' + index).blur();
                             $('#MessageContentId').text(message);
                             $('.MarketTally-modal-alert').modal('toggle')
                             $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
@@ -724,7 +729,7 @@
             
             if (parseInt($('#act_pick_qty').text()) > parseInt($('#out_qty').text()))
             {
-                $('#MessageContentId').text("實際撿貨量不能大於訂單數量!");
+                $('#MessageContentId').text("實際撿貨量不能大於需要揀貨數量!");
                 $('.MarketTally-modal-alert').modal('toggle')
                 $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
                 {
@@ -735,7 +740,7 @@
             else if (parseInt($('#act_pick_qty').text()) < parseInt($('#out_qty').text()))
             {
                 ///////////////
-                $('#WarnContentId').text("實際撿貨量小於訂單數量!，確認進行分貨？");
+                $('#WarnContentId').text("實際撿貨量小於需要揀貨數量!，確認進行分貨？");
                 $('.MarketTally-modal-warn').modal({
                     backdrop: 'static'
                 })
