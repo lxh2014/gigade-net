@@ -39,7 +39,7 @@ namespace BLL.gigade.Mgr.Schedules
                 string ftpUserID = string.Empty;
                 string ftpPassword = string.Empty;
                 string localPath_1 = string.Empty;
-                string localPath_2 = string.Empty;
+                string localPath_2 = "c:\\EOD_TCAT";
 
                 //獲取該排程參數
                 List<ScheduleConfigQuery> store_config = new List<ScheduleConfigQuery>();
@@ -97,6 +97,8 @@ where lte.upload_time is null ");
                 
                 
                 //有需要上傳的數據
+
+                bool localPath1Bool = true; 
                 if (lteDT.Rows.Count > 0)
                 {
                     #region 要上傳的文件生成
@@ -158,10 +160,11 @@ where lte.upload_time is null ");
                         }
                     }
                     catch (Exception ex)
-                    {                      
+                    {
+                        localPath1Bool = false;
                         string str = "eod文件生成失敗，失敗的原因：" + ex.Message;
                         SendMail(schedule_code, str);
-                        //throw new Exception(ex.Message);
+                        throw new Exception(ex.Message);
                     }
                     
 
@@ -173,21 +176,25 @@ where lte.upload_time is null ");
                     /// FTP上傳
                     /// </summary>
                     bool result = false;
-                    try 
+                    if (localPath1Bool)
                     {
-                        string filePath = localFilePath_1;//本地的文件路徑
-                        result = UploadFTP(ftpServerIP, filePath, ftpUserID, ftpPassword);
+                        try
+                        {
+                            string filePath = localFilePath_1;//本地的文件路徑
+                            result = UploadFTP(ftpServerIP, filePath, ftpUserID, ftpPassword);
+                        }
+                        catch (Exception ex)
+                        {
+                            int index = ex.Message.LastIndexOf("-->");
+                            //int index1 = ex.Message.LastIndexOfAny(new char[] {'>'});
+                            int subStrLeng = index + 3;
+                            string errorMessage = ex.Message.Substring(subStrLeng, ex.Message.Length - subStrLeng);
+                            string str = newfilename + " 文件上傳失敗，失敗的原因：" + errorMessage;
+                            SendMail(schedule_code, str);
+                            throw new Exception(ex.Message);
+                        }
                     }
-                    catch(Exception ex)
-                    {
-                        int index = ex.Message.LastIndexOf("-->");
-                        //int index1 = ex.Message.LastIndexOfAny(new char[] {'>'});
-                        int subStrLeng = index + 3;
-                        string errorMessage = ex.Message.Substring(subStrLeng, ex.Message.Length - subStrLeng);
-                        string str = newfilename + " 文件上傳失敗，失敗的原因：" + errorMessage;
-                        SendMail(schedule_code, str);
-                        //throw new Exception(ex.Message);
-                    }                  
+                                     
                 
                     if (result)//上傳成功，更新 upload_time為當前時間，轉移文件，發送郵件
                     {
@@ -197,6 +204,8 @@ where lte.upload_time is null ");
                                                     DateTime.Now.ToString("yy-MM-dd HH:mm:ss"));
                         _accessMySql.execCommand(UpdateSql.ToString());
 
+
+                        bool localPath2Bool = true;
                         try
                         {
                             if (!Directory.Exists(localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd")))
@@ -230,13 +239,18 @@ where lte.upload_time is null ");
                         }
                         catch (Exception ex)
                         {
+                            localPath2Bool = false;
                             string str1 =  newfilename + " 文件上傳成功。"+"數據庫upload_time欄位更新成功，但是該文件在本地保存失敗，失敗的原因：" + ex.Message;
                             SendMail(schedule_code, str1);
-                            //throw new Exception(ex.Message);
-                        }                                         
+                            throw new Exception(ex.Message);
+                        }
 
-                        string str = newfilename + " 文件上傳成功，全部操作執行成功";//全部執行成功
-                        SendMail(schedule_code, str);
+                        if (localPath2Bool)
+                        {
+                            string str = newfilename + " 文件上傳成功，全部操作執行成功";//全部執行成功
+                            SendMail(schedule_code, str);
+                        }
+                        
                      
                     }                                                 
                     #endregion
