@@ -33,7 +33,7 @@ namespace BLL.gigade.Dao.Impl
         OrderMaster GetPaymentById(uint order_id);
         List<OrderMasterQuery> getOrderSearch(OrderMasterQuery query, string sqladdstr, out int totalCount, string addSerch);
         List<OrderMasterQuery> Export(OrderMasterQuery query, string sqladdstr, out int totalCount);
-        string UpdateMoneycanale(int return_money, uint order_id);
+        string UpdateMoneyReturn(int return_money, uint order_id);
         string UpdatePriority(uint order_id);
 
         OrderShowMasterQuery GetData(uint orderId);
