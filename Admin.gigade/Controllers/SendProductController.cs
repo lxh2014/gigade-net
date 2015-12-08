@@ -21,6 +21,7 @@ using iTextSharp.text.pdf.collection;
 using System.IO;
 using System.Collections;
 using gigadeExcel.Comment;
+using BLL.gigade.Model.APIModels;
 namespace Admin.gigade.Controllers
 {
     /// <summary>
@@ -5695,6 +5696,12 @@ namespace Admin.gigade.Controllers
             {
                                              
                 dCL.deliver_id = Convert.ToInt32(Request.Params["deliver_id"]);
+                string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];//XML的設置
+                string path = Server.MapPath(xmlPath);
+                SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+                string APIServer = _siteConfigMgr.GetConfigByName("APIServer").Value;
+                bool isCanModidy = _DeliverChangeLogMgr.isCanModifyExpertArriveDate(APIServer,dCL.deliver_id);
+                
                 dCL.dcl_create_datetime = DateTime.Now;
                 dCL.dcl_ipfrom = CommonFunction.GetIP4Address(Request.UserHostAddress.ToString());
                 dCL.dcl_create_muser = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
@@ -5716,7 +5723,8 @@ namespace Admin.gigade.Controllers
                     dCL.expect_arrive_period = Convert.ToInt32(Request.Params["expect_arrive_period"]);
                     dmQuery.expect_arrive_period = Convert.ToInt32(Request.Params["expect_arrive_period"]);
                 }
-                                               
+                ModifyExpertArriveDateViewModel expertArriveDateViewModel = new ModifyExpertArriveDateViewModel();
+               
                 //更新deliver_mater表的 期望到貨日期、時段
                 int result1 = _DeliverMsterMgr.UpdateExpectArrive(dmQuery);
                 //向deliver_change_log表插入數據

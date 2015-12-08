@@ -73,6 +73,7 @@ namespace BLL.gigade.Mgr.Schedules
                 }             
                 #endregion
 
+                bool localPath1Bool = true; 
                 try
                 {
                     if (!Directory.Exists(localPath_1))
@@ -82,6 +83,7 @@ namespace BLL.gigade.Mgr.Schedules
                 }
                 catch(Exception ex)
                 {
+                    localPath1Bool = false;
                     string str1 = " 參數 localPath_1 有問題，創建路徑（保存下載文件）失敗，失敗的原因：" + ex.Message;
                     SendMail(schedule_code, str1);
                     throw new Exception(ex.Message);
@@ -94,20 +96,24 @@ namespace BLL.gigade.Mgr.Schedules
                 /// </summary>
                 string fileContentStr = string.Empty;
                 bool result = false;
-                try
+                if (localPath1Bool)
                 {
-                    string filePath = localPath_1;//下載保存文件路徑
-                    result = DownloadFTP(filePath, ftpServerIP , ftpUserID, ftpPassword);
+                    try
+                    {
+                        string filePath = localPath_1;//下載保存文件路徑
+                        result = DownloadFTP(filePath, ftpServerIP, ftpUserID, ftpPassword);
+                    }
+                    catch (Exception ex)
+                    {
+                        int index = ex.Message.LastIndexOf("-->");
+                        int subStrLeng = index + 3;
+                        string errorMessage = ex.Message.Substring(subStrLeng, ex.Message.Length - subStrLeng);
+                        string str = "sod文件下載失敗，失敗的原因：" + errorMessage;
+                        SendMail(schedule_code, str);
+                        throw new Exception(ex.Message);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    int index = ex.Message.LastIndexOf("-->");                  
-                    int subStrLeng = index + 3;
-                    string errorMessage = ex.Message.Substring(subStrLeng, ex.Message.Length - subStrLeng);
-                    string str = "sod文件下載失敗，失敗的原因：" + errorMessage;
-                    SendMail(schedule_code, str);
-                    throw new Exception(ex.Message);
-                }
+               
                
 
                 if (result)//下載成功后，插入數據，轉移文件，發送郵件
@@ -167,59 +173,72 @@ namespace BLL.gigade.Mgr.Schedules
                     /// <summary>
                     /// 循環轉移文件
                     /// </summary>
-                    foreach (string file in filenames)
+                    if (filenames.Length > 0)
                     {
-                        int index = file.LastIndexOfAny(new char[] { '/', '\\' });
-                        int subStrLeng = index + 1;
-                        string localFilePath_1 = file;
-                        string localFilePath_2 = localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + file.Substring(subStrLeng, file.Length - subStrLeng);
-                        try
+                        bool localPath2Bool = true;
+                        foreach (string file in filenames)
                         {
-                            //轉移文件
-                            if (!Directory.Exists(localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd")))
+                            int index = file.LastIndexOfAny(new char[] { '/', '\\' });
+                            int subStrLeng = index + 1;
+                            string localFilePath_1 = file;
+                            string localFilePath_2 = localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + file.Substring(subStrLeng, file.Length - subStrLeng);
+
+                            
+                            try
                             {
-                                Directory.CreateDirectory(localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd"));
+                                //轉移文件
+                                if (!Directory.Exists(localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd")))
+                                {
+                                    Directory.CreateDirectory(localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd"));
+                                }
+                                if (File.Exists(localFilePath_1))
+                                {
+                                    File.Move(localFilePath_1, localFilePath_2);
+                                }
+                                //if (!File.Exists(localFilePath_2))//本地文件（处理过的文件保存）存在
+                                //{
+                                //    FileStream fs2 = new FileStream(localFilePath_2, FileMode.Create, FileAccess.Write);//创建写入文件 
+                                //    FileStream fs1 = new FileStream(localFilePath_1, FileMode.Open);
+                                //    StreamReader sr = new StreamReader(fs1, Encoding.GetEncoding("big5"));
+                                //    StreamWriter sw = new StreamWriter(fs2, Encoding.GetEncoding("big5"));
+                                //    sw.Write(sr.ReadToEnd());//开始写入值
+                                //    sw.Close();
+                                //    fs1.Close();
+                                //}
+                                //else
+                                //{
+                                //    FileStream fs2 = new FileStream(localFilePath_2, FileMode.Truncate, FileAccess.Write);//创建写入文件 
+                                //    FileStream fs1 = new FileStream(localFilePath_1, FileMode.Open);
+                                //    StreamReader sr = new StreamReader(fs1, Encoding.GetEncoding("big5"));
+                                //    StreamWriter sw = new StreamWriter(fs2, Encoding.GetEncoding("big5"));//Big5
+                                //    sw.Write(sr.ReadToEnd());//开始写入值
+                                //    sw.Close();
+                                //    fs1.Close();
+                                //}
                             }
-                            if (!File.Exists(localFilePath_2))//本地文件（处理过的文件保存）存在
+                            catch (Exception ex)
                             {
-                                FileStream fs2 = new FileStream(localFilePath_2, FileMode.Create, FileAccess.Write);//创建写入文件 
-                                FileStream fs1 = new FileStream(localFilePath_1, FileMode.Open);
-                                StreamReader sr = new StreamReader(fs1, Encoding.GetEncoding("big5"));
-                                StreamWriter sw = new StreamWriter(fs2, Encoding.GetEncoding("big5"));
-                                sw.Write(sr.ReadToEnd());//开始写入值
-                                sw.Close();
-                                fs1.Close();
-                            }
-                            else
-                            {
-                                FileStream fs2 = new FileStream(localFilePath_2, FileMode.Truncate, FileAccess.Write);//创建写入文件 
-                                FileStream fs1 = new FileStream(localFilePath_1, FileMode.Open);
-                                StreamReader sr = new StreamReader(fs1, Encoding.GetEncoding("big5"));
-                                StreamWriter sw = new StreamWriter(fs2, Encoding.GetEncoding("big5"));//Big5
-                                sw.Write(sr.ReadToEnd());//开始写入值
-                                sw.Close();
-                                fs1.Close();
+                                localPath2Bool = false;
+                                string str1 = " sod文件下載成功，數據庫更新成功。" + "但是該文件在本地保存失敗，失敗的原因：" + ex.Message;                                
+                                SendMail(schedule_code, str1);
+                                throw new Exception(ex.Message);
                             }
                         }
-                        catch (Exception ex)
+
+                        if (localPath2Bool)
                         {
-                            string str1 = " sod文件下載成功。" + "數據庫更新成功，但是該文件在本地保存失敗，失敗的原因：" + ex.Message;
-                            SendMail(schedule_code, str1);
-                            throw new Exception(ex.Message);
-                        }
-                        //文件轉移過後，刪除文件
-                        if (File.Exists(localFilePath_1))
-                        {
-                            File.Delete(localFilePath_1);
-                        }
-                    } 
-                    #endregion
-
-
-                    //所有操作都執行成功
-                    string downLoadSuccess = "sod文件下載成功，所有操作都執行成功";
-                    SendMail(schedule_code, downLoadSuccess);
-
+                            //所有操作都執行成功
+                            string downLoadSuccess = "sod文件下載成功，所有操作都執行成功";
+                            SendMail(schedule_code, downLoadSuccess);
+                        }                       
+                    }
+                    else
+                    {
+                        string downLoadNull = "沒有要下載的sod文件";
+                        SendMail(schedule_code, downLoadNull);
+                    }
+                     
+                    #endregion                  
                 }
                 #endregion
 
@@ -378,7 +397,7 @@ namespace BLL.gigade.Mgr.Schedules
                 #endregion
 
                 MailHelper mail = new MailHelper(mailModel);
-                mail.SendToGroup(GroupCode, MailTitle, MailBody, IsSeparate, IsDisplyName);
+                mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", IsSeparate, IsDisplyName);
             }
             catch (Exception ex)
             {

@@ -3858,7 +3858,7 @@ namespace Admin.gigade.Controllers
                 query.IsPage = false;
                 string newExcelName = string.Empty;
                 store = _OrderMasterMgr.OrderDetialExportInfo(query);
-                DataTable dtHZ = GetTableHead(store);
+                DataTable dtHZ = GetTableHead(store,1);
                 string[] colname = new string[dtHZ.Columns.Count];
                 string filename = query.category_id + query.category_name + "-訂單明細" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
                 //MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "");
@@ -3932,7 +3932,7 @@ namespace Admin.gigade.Controllers
                 query.IsPage = false;
                 string newExcelName = string.Empty;
                 store = _OrderMasterMgr.CagegoryDetialExportInfo(query);
-                DataTable dtHZ = GetTableHead(store);
+                DataTable dtHZ = GetTableHead(store, 2);
                 string[] colname = new string[dtHZ.Columns.Count];
                 string filename = query.category_id + query.category_name + "-類別訂單明細" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
                 newExcelName = Server.MapPath(excelPath_export) + filename;
@@ -3962,7 +3962,7 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        public DataTable GetTableHead(DataTable store)
+        public DataTable GetTableHead(DataTable store, int a)
         {
             DataTable dt = new DataTable();
             string newExcelName = string.Empty;
@@ -3974,14 +3974,14 @@ namespace Admin.gigade.Controllers
             dt.Columns.Add("付款狀態", typeof(String));
             dt.Columns.Add("商品細項編號", typeof(String));
             dt.Columns.Add("商品編號", typeof(String));
-            dt.Columns.Add("訂單狀態", typeof(String)); 
+            dt.Columns.Add("訂單狀態", typeof(String));
             dt.Columns.Add("品名", typeof(String));
             dt.Columns.Add("商品類型", typeof(String));
             dt.Columns.Add("數量", typeof(int));
             dt.Columns.Add("購買單價", typeof(int));
             dt.Columns.Add("折抵購物金", typeof(int));
             dt.Columns.Add("抵用券", typeof(int));
-            dt.Columns.Add("總價", typeof(int));          
+            dt.Columns.Add("總價", typeof(int));
             dt.Columns.Add("成本單價", typeof(int));
             dt.Columns.Add("活動成本", typeof(int));
             dt.Columns.Add("寄倉費", typeof(int));
@@ -3990,10 +3990,20 @@ namespace Admin.gigade.Controllers
             dt.Columns.Add("出貨方式", typeof(String));
             dt.Columns.Add("收貨人", typeof(String));
             dt.Columns.Add("收貨地址", typeof(String));
-            for(int i=0;i<store.Rows.Count;i++)
+            if (a == 2)
+            {//如果是類別匯出 加上以下欄位
+                dt.Columns.Add("出貨單編號", typeof(String));
+                dt.Columns.Add("物流單號", typeof(String));
+                dt.Columns.Add("物流業者", typeof(String));
+                dt.Columns.Add("發票號碼", typeof(String));
+                dt.Columns.Add("發票日期", typeof(String));
+                dt.Columns.Add("稅別", typeof(String));
+            }
+
+            for (int i = 0; i < store.Rows.Count; i++)
             {
                 DataRow dr = dt.NewRow();
-                DataRow dr_v=store.Rows[i];
+                DataRow dr_v = store.Rows[i];
                 if (i == 0 || (i > 0 && dr_v["order_id"].ToString() != store.Rows[i - 1]["order_id"].ToString()))
                 {
                     dr[0] = dr_v["order_name"].ToString();
@@ -4039,11 +4049,11 @@ namespace Admin.gigade.Controllers
                 dr[7] = dr_v["product_id"].ToString();
 
                 dr[8] = dr_v["slave_status_name"].ToString();
-               
+
                 dr[9] = dr_v["product_name"].ToString();
                 string item_mode;
                 switch (dr_v["item_mode"].ToString())
-                { 
+                {
                     case "0":
                         item_mode = "單一商品";
                         break;
@@ -4162,6 +4172,10 @@ namespace Admin.gigade.Controllers
                     {
                         dr[19] = Convert.ToInt32(dr[16].ToString()) * Convert.ToInt32(dr[11].ToString());
                     }
+                    else if (dr[17].ToString() != "0")
+                    {
+                        dr[19] = Convert.ToInt32(dr[17].ToString()) * Convert.ToInt32(dr[11].ToString());
+                    }
                     else
                     {
                         dr[19] = Convert.ToInt32(dr_v["cost_amount"].ToString());
@@ -4179,6 +4193,40 @@ namespace Admin.gigade.Controllers
                 dr[21] = dr_v["product_mode_name"].ToString();
                 dr[22] = dr_v["delivery_name"].ToString();
                 dr[23] = dr_v["delivery_address"].ToString();
+                if (a == 2)
+                {//如果是類別匯出 加上以下欄位
+                    dr[24] = dr_v["deliver_id"].ToString();
+                    dr[25] = dr_v["delivery_code"].ToString();
+                    dr[26] = dr_v["deliver_name"].ToString();
+                    if (!string.IsNullOrEmpty(dr_v["order_id"].ToString()) && !string.IsNullOrEmpty(dr_v["product_id"].ToString()))
+                    {
+                        DataTable invoice = _OrderMasterMgr.GetInvoice(uint.Parse(dr_v["order_id"].ToString()), uint.Parse(dr_v["product_id"].ToString()));
+                        if (invoice.Rows.Count > 0)
+                        {
+                            dr[27] = invoice.Rows[0]["invoice_number"].ToString();
+
+                            if (invoice.Rows[0]["invoice_date"].ToString() != null)
+                            {
+                                dr[28] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(invoice.Rows[0]["invoice_date"].ToString())));
+                            }
+                            if (invoice.Rows[0]["tax_type"].ToString() == "1")
+                            {
+                                dr[29] = "應稅";
+                            }
+                            else if (invoice.Rows[0]["tax_type"].ToString() == "3")
+                            {
+                                dr[29] = "免稅";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        dr[27] = "";
+                        dr[28] = "";
+                        dr[29] = "";
+                    }
+                }
+
                 dt.Rows.Add(dr);
             }
             return dt;
