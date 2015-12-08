@@ -2477,7 +2477,7 @@ od.detail_id,od.event_cost,od.parent_id as product_id,dd.deliver_id,dm.delivery_
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("SELECT invoice_number,invoice_date,imr.tax_type,order_id from product p LEFT JOIN invoice_master_record  imr ON p.tax_type=imr.tax_type WHERE  imr.tax_type IN (1,3) AND p.product_id='{0}' and imr.order_id='{1}' ;", pid, order_id);
+                sql.AppendFormat("SELECT invoice_number,invoice_date,imr.tax_type,total_amount,order_id from product p LEFT JOIN invoice_master_record  imr ON p.tax_type=imr.tax_type WHERE  imr.tax_type IN (1,3) AND p.product_id='{0}' and imr.order_id='{1}' ;", pid, order_id);
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)
