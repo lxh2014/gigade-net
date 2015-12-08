@@ -181,7 +181,7 @@ namespace BLL.gigade.Mgr.Schedules
                             int index = file.LastIndexOfAny(new char[] { '/', '\\' });
                             int subStrLeng = index + 1;
                             string localFilePath_1 = file;
-                            string localFilePath_2 = localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + file.Substring(subStrLeng, file.Length - subStrLeng);
+                            string localFilePath_2 = localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + file.Substring(subStrLeng, file.Length - subStrLeng).Replace(".", DateTime.Now.ToString("mmss") + ".");
 
                             
                             try
