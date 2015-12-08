@@ -73,6 +73,7 @@ namespace BLL.gigade.Mgr.Schedules
                 }             
                 #endregion
 
+                bool localPath1Bool = true; 
                 try
                 {
                     if (!Directory.Exists(localPath_1))
@@ -82,6 +83,7 @@ namespace BLL.gigade.Mgr.Schedules
                 }
                 catch(Exception ex)
                 {
+                    localPath1Bool = false;
                     string str1 = " 參數 localPath_1 有問題，創建路徑（保存下載文件）失敗，失敗的原因：" + ex.Message;
                     SendMail(schedule_code, str1);
                     throw new Exception(ex.Message);
@@ -94,20 +96,24 @@ namespace BLL.gigade.Mgr.Schedules
                 /// </summary>
                 string fileContentStr = string.Empty;
                 bool result = false;
-                try
+                if (localPath1Bool)
                 {
-                    string filePath = localPath_1;//下載保存文件路徑
-                    result = DownloadFTP(filePath, ftpServerIP , ftpUserID, ftpPassword);
+                    try
+                    {
+                        string filePath = localPath_1;//下載保存文件路徑
+                        result = DownloadFTP(filePath, ftpServerIP, ftpUserID, ftpPassword);
+                    }
+                    catch (Exception ex)
+                    {
+                        int index = ex.Message.LastIndexOf("-->");
+                        int subStrLeng = index + 3;
+                        string errorMessage = ex.Message.Substring(subStrLeng, ex.Message.Length - subStrLeng);
+                        string str = "sod文件下載失敗，失敗的原因：" + errorMessage;
+                        SendMail(schedule_code, str);
+                        throw new Exception(ex.Message);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    int index = ex.Message.LastIndexOf("-->");                  
-                    int subStrLeng = index + 3;
-                    string errorMessage = ex.Message.Substring(subStrLeng, ex.Message.Length - subStrLeng);
-                    string str = "sod文件下載失敗，失敗的原因：" + errorMessage;
-                    SendMail(schedule_code, str);
-                    throw new Exception(ex.Message);
-                }
+               
                
 
                 if (result)//下載成功后，插入數據，轉移文件，發送郵件
@@ -169,12 +175,15 @@ namespace BLL.gigade.Mgr.Schedules
                     /// </summary>
                     if (filenames.Length > 0)
                     {
+                        bool localPath2Bool = true;
                         foreach (string file in filenames)
                         {
                             int index = file.LastIndexOfAny(new char[] { '/', '\\' });
                             int subStrLeng = index + 1;
                             string localFilePath_1 = file;
                             string localFilePath_2 = localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + file.Substring(subStrLeng, file.Length - subStrLeng);
+
+                            
                             try
                             {
                                 //轉移文件
@@ -209,14 +218,19 @@ namespace BLL.gigade.Mgr.Schedules
                             }
                             catch (Exception ex)
                             {
+                                localPath2Bool = false;
                                 string str1 = " sod文件下載成功，數據庫更新成功。" + "但是該文件在本地保存失敗，失敗的原因：" + ex.Message;                                
                                 SendMail(schedule_code, str1);
                                 throw new Exception(ex.Message);
                             }
                         }
-                        //所有操作都執行成功
-                        string downLoadSuccess = "sod文件下載成功，所有操作都執行成功";
-                        SendMail(schedule_code, downLoadSuccess);
+
+                        if (localPath2Bool)
+                        {
+                            //所有操作都執行成功
+                            string downLoadSuccess = "sod文件下載成功，所有操作都執行成功";
+                            SendMail(schedule_code, downLoadSuccess);
+                        }                       
                     }
                     else
                     {
@@ -383,7 +397,7 @@ namespace BLL.gigade.Mgr.Schedules
                 #endregion
 
                 MailHelper mail = new MailHelper(mailModel);
-                mail.SendToGroup(GroupCode, MailTitle, MailBody, IsSeparate, IsDisplyName);
+                mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", IsSeparate, IsDisplyName);
             }
             catch (Exception ex)
             {

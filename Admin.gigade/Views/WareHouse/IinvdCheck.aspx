@@ -80,7 +80,6 @@
                     <td style="text-align: center; vertical-align: middle;"><%=BLL.gigade.Common.CommonFunction.DateTimeToShortString(ViewBag.data[i].made_date)%></td>
                     <td style="text-align: center; vertical-align: middle;"><%=BLL.gigade.Common.CommonFunction.DateTimeToShortString(ViewBag.data[i].cde_dt)%></td>
                     <%}%>
-                    <td style="text-align: center; vertical-align: middle;" id="prod_qtys" hidden="hidden"><%=ViewBag.data[i].prod_qty%></td>
                     <td style="text-align: center; vertical-align: middle;">
                         <input min="0" class="form-control" id="input<%=ViewBag.data[i].row_id%>" onkeydown="return check(event);" type="number">
                     </td>
@@ -99,7 +98,7 @@
                     <td style="text-align: center; vertical-align: middle;"><%=BLL.gigade.Common.CommonFunction.DateTimeToShortString(ViewBag.data[i].made_date)%></td>
                     <td style="text-align: center; vertical-align: middle;"><%=BLL.gigade.Common.CommonFunction.DateTimeToShortString(ViewBag.data[i].cde_dt)%></td>
                     <%} %>
-                    <td style="text-align: center; vertical-align: middle;"hidden="hidden"><%=ViewBag.data[i].prod_qty%></td>
+                   <%-- <td style="text-align: center; vertical-align: middle;" id="prod_qtys<%=ViewBag.data[i].row_id%>" hidden="hidden"><%=ViewBag.data[i].prod_qty%></td>--%>
                     <td style="text-align: center; vertical-align: middle;">
                         <input type="number" min="0" class="form-control" id="input<%=ViewBag.data[i].row_id%>" onkeydown="return check(event);">
                     </td>
@@ -389,7 +388,6 @@
     function Save(id) {
         var changeStore = $('#' + id).val();
         var pwy_dte_ctl = $('#pwy_dte_ctl').text();
-        var prod_qtys = $('#prod_qtys').text();
         var loc_id = $('#loc_id').text();
         var item_id = $('#item_id').text();
         if (changeStore.trim() == "") return false;
@@ -398,13 +396,13 @@
             url: "/WareHouse/IinvdSave",
             type: "POST",
             dataType: "text",
-            data: { changeStore: changeStore, rowid: id, pwy_dte_ctl: pwy_dte_ctl, prod_qtys: prod_qtys, loc_id: loc_id, item_id: item_id },
+            data: { changeStore: changeStore, rowid: id, pwy_dte_ctl: pwy_dte_ctl,loc_id: loc_id, item_id: item_id },
             success: function (data) {
                 var result = eval("(" + data + ")");
                 if (result.success) {
                     $('#' + id).val(''); 
                     $('#alertsuccess').modal('toggle');
-                    setTimeout(location.href = "/WareHouse/IinvdCheck?pwy_dte_ctl=" + pwy_dte_ctl + "&loc_id=" + loc_id, 500);
+                    setTimeout(location.href = "/WareHouse/IinvdCheck?pwy_dte_ctl=" + pwy_dte_ctl + "&loc_id=" + loc_id, 3000);
                 }
                 else {
                     $("#alertmessage").text(result.message);
@@ -492,7 +490,7 @@
                     $('#datetimepicker1').val('');
                     $('#prod_qty').val('');
                     $('#alertsuccess').modal('toggle');
-                    setTimeout(location.reload(),500);
+                    setTimeout(location.reload(),3000);
                 }
                 else {
                     $("#message").text(result.message);
