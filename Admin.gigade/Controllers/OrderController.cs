@@ -3860,7 +3860,11 @@ namespace Admin.gigade.Controllers
                 store = _OrderMasterMgr.OrderDetialExportInfo(query);
                 DataTable dtHZ = GetTableHead(store,1);
                 string[] colname = new string[dtHZ.Columns.Count];
-                string filename = query.category_id + query.category_name + "-訂單明細" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+
+                string name = query.category_name.Replace("．", ".");
+                name = name.Replace("/", " ");
+                name = name.Replace("。", "­.");
+                string filename = query.category_id + name + "-訂單明細" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
                 //MemoryStream ms = ExcelHelperXhf.ExportDT(dtHZ, "");
                 //Response.AddHeader("Content-Disposition", "attach-ment;filename=" + filename);
                 //Response.BinaryWrite(ms.ToArray());
@@ -3934,7 +3938,10 @@ namespace Admin.gigade.Controllers
                 store = _OrderMasterMgr.CagegoryDetialExportInfo(query);
                 DataTable dtHZ = GetTableHead(store, 2);
                 string[] colname = new string[dtHZ.Columns.Count];
-                string filename = query.category_id + query.category_name + "-類別訂單明細" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+                string name = query.category_name.Replace("．", ".");
+                name = name.Replace("/", " ");
+                name = name.Replace("。", "­.");
+                string filename = query.category_id + name + "-類別訂單明細" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
                 newExcelName = Server.MapPath(excelPath_export) + filename;
                 for (int i = 0; i < dtHZ.Columns.Count; i++)
                 {
@@ -3945,6 +3952,8 @@ namespace Admin.gigade.Controllers
                 {
                     System.IO.File.Delete(newExcelName);
                 }
+                //newExcelName = newExcelName.Replace("。", "·");
+                
                 ExcelHelperXhf.ExportDTtoExcel(dtHZ, "", newExcelName);
                 json = "{success:true,ExcelName:\'" + filename + "\'}";
             }
@@ -3954,6 +3963,7 @@ namespace Admin.gigade.Controllers
                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
+                json = "{success:false}";
             }
             this.Response.Clear();
             this.Response.Write(json);
@@ -3996,6 +4006,7 @@ namespace Admin.gigade.Controllers
                 dt.Columns.Add("物流單號", typeof(String));
                 dt.Columns.Add("物流業者", typeof(String));
                 dt.Columns.Add("發票號碼", typeof(String));
+                dt.Columns.Add("發票金額", typeof(String));
                 dt.Columns.Add("發票日期", typeof(String));
                 dt.Columns.Add("稅別", typeof(String));
             }
@@ -4006,7 +4017,7 @@ namespace Admin.gigade.Controllers
                 DataRow dr_v = store.Rows[i];
                 if (i == 0 || (i > 0 && dr_v["order_id"].ToString() != store.Rows[i - 1]["order_id"].ToString()))
                 {
-                    dr[0] = dr_v["order_name"].ToString();
+                    dr[0] = " "+ dr_v["order_name"].ToString();
                     if (!string.IsNullOrEmpty(dr_v["order_createdate_format"].ToString()))
                     {
                         DateTime order_createdate = Convert.ToDateTime(dr_v["order_createdate_format"].ToString());
@@ -4196,7 +4207,7 @@ namespace Admin.gigade.Controllers
                 if (a == 2)
                 {//如果是類別匯出 加上以下欄位
                     dr[24] = dr_v["deliver_id"].ToString();
-                    dr[25] = dr_v["delivery_code"].ToString();
+                    dr[25] = " " + dr_v["delivery_code"].ToString();
                     dr[26] = dr_v["deliver_name"].ToString();
                     if (!string.IsNullOrEmpty(dr_v["order_id"].ToString()) && !string.IsNullOrEmpty(dr_v["product_id"].ToString()))
                     {
@@ -4204,18 +4215,18 @@ namespace Admin.gigade.Controllers
                         if (invoice.Rows.Count > 0)
                         {
                             dr[27] = invoice.Rows[0]["invoice_number"].ToString();
-
+                            dr[28] = invoice.Rows[0]["total_amount"].ToString();
                             if (invoice.Rows[0]["invoice_date"].ToString() != null)
                             {
-                                dr[28] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(invoice.Rows[0]["invoice_date"].ToString())));
+                                dr[29] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(invoice.Rows[0]["invoice_date"].ToString())));
                             }
                             if (invoice.Rows[0]["tax_type"].ToString() == "1")
                             {
-                                dr[29] = "應稅";
+                                dr[30] = "應稅";
                             }
                             else if (invoice.Rows[0]["tax_type"].ToString() == "3")
                             {
-                                dr[29] = "免稅";
+                                dr[30] = "免稅";
                             }
                         }
                     }
@@ -4224,6 +4235,7 @@ namespace Admin.gigade.Controllers
                         dr[27] = "";
                         dr[28] = "";
                         dr[29] = "";
+                        dr[30] = "";
                     }
                 }
 

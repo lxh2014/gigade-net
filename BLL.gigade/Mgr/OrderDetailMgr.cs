@@ -447,9 +447,9 @@ namespace BLL.gigade.Mgr
                         {
                             dr["deducts"] = Convert.ToInt32(dr["deduct_bonus"].ToString()) + Convert.ToInt32(dr["deduct_welfare"]);
                         }
-                        if (dr["single_money"] != null && dr["buy_num"] != null)
+                        if (dr["money"] != null)
                         {
-                            dr["amount"] = Convert.ToInt32(dr["single_money"].ToString()) * Convert.ToInt32(dr["buy_num"]) - Convert.ToInt32(dr["deducts"]);
+                            dr["amount"] = Convert.ToInt32(dr["money"].ToString()) - Convert.ToInt32(dr["deducts"]);
                         }
                     }
                 }
