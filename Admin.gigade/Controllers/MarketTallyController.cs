@@ -256,15 +256,22 @@ namespace Admin.gigade.Controllers
                 {
                     m.item_id = Convert.ToUInt32(Request.Params["item_id"].ToString().Trim());
                 }
-                list = _iasdMgr.GetAseldListByItemid(m);
-                foreach (var item in list)
+                if (_iasdMgr.GetCountByItem(m) == 0)
                 {
-                    m.seld_id = item.seld_id;
+                    json = "{success:true,totalCount:" + 0 + ",msg:1,data:" + JsonConvert.SerializeObject(list, Formatting.Indented) + "}";//返回json數據     
                 }
-                m.wust_id = "BSY";
-                m.create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
-                _iasdMgr.Updwust(m);
-                json = "{success:true,totalCount:" + list.Count + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented) + "}";//返回json數據              
+                else
+                {
+                    list = _iasdMgr.GetAseldListByItemid(m);
+                    foreach (var item in list)
+                    {
+                        m.seld_id = item.seld_id;
+                    }
+                    m.wust_id = "BSY";
+                    m.create_user = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+                    _iasdMgr.Updwust(m);
+                    json = "{success:true,totalCount:" + list.Count + ",msg:0,data:" + JsonConvert.SerializeObject(list, Formatting.Indented) + "}";//返回json數據             
+                }
             }
             catch (Exception ex)
             {

@@ -87,13 +87,19 @@
                             var result = eval("(" + data + ")");
                             if (result.success)
                             {
-                                if (result.totalCount > 0)
+                                if (result.msg == 1)
+                                {
+                                    $('#MessageContentId').text("產品條碼(" + upc + ")非本工作代號撿貨商品，請重新掃描!");
+                                    $('#alert').show();
+                                    $("#upc").focus()
+                                }
+                                else if (result.totalCount > 0)
                                 {
                                     document.location.href = "/MarketTally/MarketTallyWDProduct?number=" + number + "&itemid=" + itemid;
                                 }
-                                else
+                                else if (result.totalCount == 0)
                                 {
-                                    $('#MessageContentId').text("當前工作代號中沒有該產品條碼(" + upc + ")或者其不需要分貨，請重新掃描!");
+                                    $('#MessageContentId').text("產品條碼(" + upc + ")不需要分貨，請重新掃描!");
                                     $('#alert').show();
                                     $("#upc").focus()
                                 }

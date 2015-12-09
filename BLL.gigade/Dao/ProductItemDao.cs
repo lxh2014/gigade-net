@@ -394,8 +394,8 @@ namespace BLL.gigade.Dao
             sbSqlColumn.Append(" '' as item_money,'' as item_cost,sum_biao.sum_total, subTtotal.iinvd_stock,v_product_onsale.product_start,v_product_onsale.product_end, min_purchase_amount,vendor_name_simple,vendor_name_full, procurement_days,product_status,'' as product_status_string, ");
             sbSqlColumn.Append(" spec_id_1 ,spec_id_2,''as NoticeGoods ");
 
-            sbSqlTable.Append(" from (SELECT  od.item_id,sum( case item_mode when 0 then od.buy_num when  2 then od.buy_num*od.parent_num end ) as sum_total from order_master om INNER JOIN order_slave os USING(order_id)INNER JOIN order_detail od USING(slave_id)  ");
-            sbSqlTable.AppendFormat(" where FROM_UNIXTIME( om.order_createdate)>='{0}' and od.item_mode in (0,2) and od.detail_status=4 GROUP BY od.item_id) sum_biao ", sumdate);
+            sbSqlTable.Append(" from (SELECT  od.item_id,sum( case dt1.item_mode when 0 then dt1.buy_num when  2 then dt1.buy_num*dt1.parent_num end ) as sum_total from order_master om INNER JOIN order_slave os USING(order_id)INNER JOIN order_detail od USING(slave_id)  ");
+            sbSqlTable.AppendFormat(" left join order_detail dt1 on dt1.detail_id=od.detail_id and dt1.detail_status=4 where FROM_UNIXTIME( om.order_createdate)>='{0}' and od.item_mode in (0,2) GROUP BY od.item_id) sum_biao ", sumdate);
             sbSqlTable.Append(" INNER JOIN  v_product_onsale  on v_product_onsale.item_id=sum_biao.item_id ");
             sbSqlTable.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=sum_biao.item_id ");
 
@@ -533,6 +533,10 @@ namespace BLL.gigade.Dao
 //where 1=1 and iin.ista_id='A' order by cde_dt asc  
                 foreach (DataRow dr in dtResult.Rows)
                 {
+                    if (string.IsNullOrEmpty(dr["sum_total"].ToString()))
+                    {
+                        dr["sum_total"] = 0;
+                    }
                     _dtloc = GettSuggestPurchaseIloc(dr["item_id"].ToString());
                     if (string.IsNullOrEmpty(_dtloc.Rows[0]["loc_id"].ToString()))//沒有主料位
                     {
