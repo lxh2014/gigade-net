@@ -1844,7 +1844,7 @@ namespace Admin.gigade.Controllers
                                     product_id = uint.Parse(item.Product_Id.ToString()),
                                     user_id = 0,
                                     user_level = 1,
-                                    site_id = 1,
+                                    site_id = Site_Id,
                                     child_id = 0
                                 });
                                 if (pM != null)
@@ -1906,7 +1906,7 @@ namespace Admin.gigade.Controllers
                                     product_id = uint.Parse(item.Product_Id.ToString()),
                                     user_id = 0,
                                     user_level = 1,
-                                    site_id = 1,
+                                    site_id = Site_Id,
                                     child_id = int.Parse(item.Product_Id.ToString())
                                 });
                                 odcList2.Find(rec => rec.Product_Id == item.Product_Id && rec.group_id == item.group_id).price_master_id = pMaster.price_master_id;
@@ -1928,7 +1928,7 @@ namespace Admin.gigade.Controllers
                                         product_id = uint.Parse(child.Product_Id.ToString()),
                                         user_id = 0,
                                         user_level = 1,
-                                        site_id = 1,
+                                        site_id = Site_Id,
                                         child_id = 0
                                     });
                                     List<ItemPriceCustom> ipList = new List<ItemPriceCustom>();
@@ -1983,7 +1983,7 @@ namespace Admin.gigade.Controllers
                                         product_id = uint.Parse(child.Product_Id.ToString()),
                                         user_id = 0,
                                         user_level = 1,
-                                        site_id = 1,
+                                        site_id = Site_Id,
                                         child_id = 0
                                     });
                                     List<ItemPriceCustom> ipList = new List<ItemPriceCustom>();
