@@ -669,8 +669,15 @@ namespace Admin.gigade.Controllers
                             }
                             if (!string.IsNullOrEmpty(ErrorMsg))
                             {
+                                if (iFile == 0)
+                                {
+                                    ErrorMsg = "元素圖 " + ErrorMsg;
+                                }
+                                else {
+                                    ErrorMsg = "元素圖(大) " + ErrorMsg;
+                                }
                                 string json = string.Empty;
-                                json = "{success:true,msg:\"" + ErrorMsg + "\"}";
+                                json = "{success:true,msg:\""+ ErrorMsg + "\"}";
                                 this.Response.Clear();
                                 this.Response.Write(json);
                                 this.Response.End();
@@ -775,7 +782,7 @@ namespace Admin.gigade.Controllers
                             {
                                 //上傳
                                 Resource.CoreMessage = new CoreResource("Product");//尋找product.resx中的資源文件
-                                bool result = fileLoad.UpLoadFile(file, ServerPath, NewFileName, extention, int.Parse(maxValue), int.Parse(minValue), ref ErrorMsg, ftpuser, ftppwd);
+                                bool result = fileLoad.UpLoadFile(file, ServerPath, NewFileName, extention, int.Parse(maxValue), int.Parse(minValue), ref ErrorMsg, ftpuser, ftppwd);                                
                                 if (result)//上傳成功
                                 {
                                     model.element_img_big = fileName;                                    
@@ -791,6 +798,7 @@ namespace Admin.gigade.Controllers
                             }
                             if (!string.IsNullOrEmpty(ErrorMsg))
                             {
+                                ErrorMsg = "元素圖(大)" + ErrorMsg;
                                 string json = string.Empty;
                                 json = "{success:true,msg:\"" + ErrorMsg + "\"}";
                                 this.Response.Clear();
