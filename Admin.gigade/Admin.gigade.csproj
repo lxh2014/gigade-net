@@ -4715,8 +4715,8 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>59673</DevelopmentServerPort>          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>
+          <DevelopmentServerPort>63063</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>          <IISUrl>
           </IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>

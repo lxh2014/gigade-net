@@ -37,6 +37,8 @@ namespace BLL.gigade.Model
         public string edm_pm { get; set; }
 
         public int active { get; set; }
+
+        public  UInt64 static_template { get; set; }
         public EdmContentNew()
         {
             content_id = 0;
@@ -60,6 +62,7 @@ namespace BLL.gigade.Model
             pm = 0;
             edm_pm = string.Empty;
             active = 0;
+            static_template = 1;
         }
     }
 }
