@@ -132,6 +132,25 @@ namespace BLL.gigade.Mgr
             }
         }
         #endregion
+        #region
+        /// <summary>
+        /// 判斷itemid是否在某個工作項中
+        /// </summary>
+        /// <param name="ase"></param>
+        /// <returns></returns>
+
+        public int GetCountByItem(Aseld a)
+        {
+            try
+            {
+                return _aseldDao.GetCountByItem(a);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldMgr-->GetCountByItem-->" + ex.Message, ex);
+            }
+        }
+        #endregion
         public string UpdTicker(string m)
         {
             try

@@ -669,8 +669,15 @@ namespace Admin.gigade.Controllers
                             }
                             if (!string.IsNullOrEmpty(ErrorMsg))
                             {
+                                if (iFile == 0)
+                                {
+                                    ErrorMsg = "元素圖 " + ErrorMsg;
+                                }
+                                else {
+                                    ErrorMsg = "元素圖(大) " + ErrorMsg;
+                                }
                                 string json = string.Empty;
-                                json = "{success:true,msg:\"" + ErrorMsg + "\"}";
+                                json = "{success:true,msg:\""+ ErrorMsg + "\"}";
                                 this.Response.Clear();
                                 this.Response.Write(json);
                                 this.Response.End();
@@ -775,7 +782,7 @@ namespace Admin.gigade.Controllers
                             {
                                 //上傳
                                 Resource.CoreMessage = new CoreResource("Product");//尋找product.resx中的資源文件
-                                bool result = fileLoad.UpLoadFile(file, ServerPath, NewFileName, extention, int.Parse(maxValue), int.Parse(minValue), ref ErrorMsg, ftpuser, ftppwd);
+                                bool result = fileLoad.UpLoadFile(file, ServerPath, NewFileName, extention, int.Parse(maxValue), int.Parse(minValue), ref ErrorMsg, ftpuser, ftppwd);                                
                                 if (result)//上傳成功
                                 {
                                     model.element_img_big = fileName;                                    
@@ -791,6 +798,7 @@ namespace Admin.gigade.Controllers
                             }
                             if (!string.IsNullOrEmpty(ErrorMsg))
                             {
+                                ErrorMsg = "元素圖(大)" + ErrorMsg;
                                 string json = string.Empty;
                                 json = "{success:true,msg:\"" + ErrorMsg + "\"}";
                                 this.Response.Clear();
@@ -1250,6 +1258,39 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
+
+        public HttpResponseBase Getpic()
+        {//判斷該文件是否超過限制
+            string Json = "";
+            FileManagement fileLoad = new FileManagement();
+
+            string path = Server.MapPath(xmlPath);
+            SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+            SiteConfig minValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_Min_Element");
+            SiteConfig maxValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MaxValue");
+            //擴展名、最小值、最大值
+            string minValue = minValue_config.Value == "" ? minValue_config.DefaultValue : minValue_config.Value;
+            string maxValue = maxValue_config.Value == "" ? maxValue_config.DefaultValue : maxValue_config.Value;
+            //if (Request.Files.Count > 0)//單個圖片上傳
+            for (int iFile = 0; iFile < Request.Files.Count; iFile++)//多個上傳圖片
+            {
+                HttpPostedFileBase file = Request.Files[iFile];//單個Request.Files[0]
+                int fileSize = file.ContentLength;
+                if (fileSize > int.Parse(minValue) && fileSize < int.Parse(maxValue))
+                {
+                    Json = "{success:true}";
+                }
+                else
+                {
+                    Json = "{success:false}";
+                }
+            }
+            this.Response.Clear();
+            this.Response.Write(Json);
+            this.Response.End();
+            return this.Response;
+        }
+
         #endregion
 
         #region 站台頁面管理
