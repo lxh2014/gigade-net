@@ -490,7 +490,7 @@
                     $('#datetimepicker1').val('');
                     $('#prod_qty').val('');
                     $('#alertsuccess').modal('toggle');
-                    setTimeout(location.reload(),3000);
+                    setTimeout(location.href = "/WareHouse/IinvdCheck?pwy_dte_ctl=" + pwy_dte_ctl + "&loc_id=" + loc_id,3000);
                 }
                 else {
                     $("#message").text(result.message);

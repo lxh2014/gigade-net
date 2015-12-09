@@ -198,9 +198,9 @@ where lte.upload_time is null ");
                 
                     if (result)//上傳成功，更新 upload_time為當前時間，轉移文件，發送郵件
                     {
-                        
-                        StringBuilder UpdateSql = new StringBuilder();
-                        UpdateSql.AppendFormat(@" update logistics_tcat_eod set upload_time='{0}' where upload_time is null;",
+
+                        StringBuilder UpdateSql = new StringBuilder();//sql.AppendFormat("set sql_safe_updates = 1;");
+                        UpdateSql.AppendFormat(@"set sql_safe_updates = 0; update logistics_tcat_eod set upload_time='{0}' where upload_time is null; set sql_safe_updates = 1;",
                                                     DateTime.Now.ToString("yy-MM-dd HH:mm:ss"));
                         _accessMySql.execCommand(UpdateSql.ToString());
 
@@ -208,6 +208,8 @@ where lte.upload_time is null ");
                         bool localPath2Bool = true;
                         try
                         {
+                             //要上傳的文件的名稱                           
+                            localFilePath_2 = localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + ftpUserID + DateTime.Now.ToString("MMddHHmmss") + ".eod";
                             if (!Directory.Exists(localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd")))
                             {
                                 Directory.CreateDirectory(localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd"));
