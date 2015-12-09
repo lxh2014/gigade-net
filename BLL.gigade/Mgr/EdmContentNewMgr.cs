@@ -657,7 +657,7 @@ namespace BLL.gigade.Mgr
         public string GetRecommendHtml(uint user_id)
         {
             string html = string.Empty;
-            html = "This is mine";
+            //html = "This is mine";
             return html;
         }
         #endregion
