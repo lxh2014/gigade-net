@@ -311,7 +311,7 @@
 
     var editUserWin = Ext.create('Ext.window.Window', {
         id: 'editUserWin',
-        width: 700,
+        width: 760,
         title: "中信活動",
         iconCls: 'icon-user-edit',
         iconCls: row ? "icon-user-edit" : "icon-user-add",

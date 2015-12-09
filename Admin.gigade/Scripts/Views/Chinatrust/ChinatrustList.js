@@ -166,33 +166,27 @@ Ext.onReady(function () {
                            //emptyText:'請選擇'
                        },
                        {
-                           xtype: "datefield",
+                           xtype: "datetimefield",
                            editable: false,
                            margin: '0 0 0 5',
                            id: 'start_time',
                            name: 'start_time',
-                           format: 'Y-m-d',
-                           width: 110,
-                          // value: Tomorrow(1 - new Date().getDate()),
+                           time: { hour: 00, min: 00, sec: 00 },
+                           format: 'Y-m-d H:i:s',
+                           width: 145,
                            listeners: {
                                select: function (a, b, c) {
                                    var start = Ext.getCmp("start_time");
                                    var end = Ext.getCmp("end_time");
-                                   var s_date = new Date(start.getValue());
-                                   end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                   /*
-                                   var data1 = Date.parse(start.getValue());
-                                   var data2 = Date.parse(end.getValue());
-                                   var datadiff = data2 - data1;
-                                   var time = 31 * 24 * 60 * 60 * 1000;
-
-                                   if (datadiff < 0 || datadiff > time) {
-                                       Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                                       end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                   if (end.getValue() == null) {
+                                       end.setValue(setNextMonth(start.getValue(), 1));
                                    }
-                                   else {
-                                       end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                   }*/
+                                  else if (end.getValue() < start.getValue()) {
+                                       var start_date = start.getValue();
+                                       Ext.getCmp('end_time').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                                   }
+                                    
+                                 
                                },
                                specialkey: function (field, e) {
                                    if (e.getKey() == Ext.EventObject.ENTER) {
@@ -209,35 +203,26 @@ Ext.onReady(function () {
                        },
                        {
 
-                           xtype: "datefield",
+                           xtype: "datetimefield",
                            editable: false,
                            id: 'end_time',
                            name: 'end_time',
-                           format: 'Y-m-d',
-                           //value: Tomorrow(0),
-                           width: 110,
+                           time: { hour: 23, min: 59, sec: 59 },
+                           format: 'Y-m-d H:i:s',
+                           width: 145,
                            listeners: {
                                select: function (a, b, c) {
                                    var start = Ext.getCmp("start_time");
                                    var end = Ext.getCmp("end_time");
-                                   var s_date = new Date(end.getValue());
                                    if (start.getValue() == null)
                                    {
-                                       Ext.getCmp("start_time").setValue(new Date(s_date.setMonth(s_date.getMonth() - 1)));
+                                       start.setValue(setNextMonth(end.getValue(), -1));
                                    }
-                                   /*搜索條件限制在一個月之內
-                                   var data1 = Date.parse(start.getValue());
-                                   var data2 = Date.parse(end.getValue());
-                                   var datadiff = data2 - data1;
-                                   var time = 31 * 24 * 60 * 60 * 1000;*/
-                                   if (end.getValue() < start.getValue()) {
-                                       Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
-                                       end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                 else  if (end.getValue() < start.getValue()) {
+                                     var end_date = end.getValue();
+                                     Ext.getCmp('start_time').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                                    }
-                                   //else if (datadiff < 0 || datadiff > time) {
-                                   //    Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                                   //    end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                   //}
+                                   
                                },
                                specialkey: function (field, e) {
                                    if (e.getKey() == Ext.EventObject.ENTER) {
@@ -443,5 +428,22 @@ function UpdateActive(id) {
         }
     });
 
+}
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
+}
+function Tomorrow(s) {
+    var d;
+    d = new Date();                             // 创建 Date 对象。                               // 返回日期。
+    d.setDate(d.getDate() + s);
+    return d;
 }
 

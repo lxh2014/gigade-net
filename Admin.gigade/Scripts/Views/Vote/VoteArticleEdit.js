@@ -543,7 +543,7 @@ function editFunction(RowID, Store) {
         title: '文章詳情',
         id: 'editWin',
         iconCls: RowID ? "icon-user-edit" : "icon-user-add",
-        width: 700,
+        width: 760,
         height: 530,
         layout: 'fit',
         items: [editFrm],
