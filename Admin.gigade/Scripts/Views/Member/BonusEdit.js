@@ -56,7 +56,8 @@ editFunction = function (row, store) {
                 id: 'smaster_start',
                 name: 'smaster_start',
                 allowBlank: false,
-                format: 'Y-m-d H:i:s'
+                format: 'Y-m-d H:i:s',
+                time: { hour: 00, min: 00, sec: 00 }
             },
             {
                 xtype: 'datetimefield',
@@ -64,7 +65,8 @@ editFunction = function (row, store) {
                 id: 'smaster_end',
                 name: 'smaster_end',
                 allowBlank: false,
-                format: 'Y-m-d H:i:s'
+                format: 'Y-m-d H:i:s',
+                time: { hour: 23, min: 59, sec: 59 }
             },
             {
                 xtype: 'textfield',

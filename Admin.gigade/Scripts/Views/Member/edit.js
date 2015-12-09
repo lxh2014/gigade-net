@@ -651,9 +651,10 @@ editFunction = function (rowID) {
                             ]
                         },
                         {
-                            xtype: "datetimefield",
+                            xtype: "datefield",
                             id: 'my_birthday',
                             name: 'my_birthday',
+                            format: 'Y-m-d',
                             fieldLabel: '生日',
                             allowBlank: false
                         },

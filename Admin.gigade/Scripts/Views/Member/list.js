@@ -416,9 +416,11 @@ Ext.onReady(function () {
                 }
             },
             {
-                xtype: 'datefield',
+                xtype: 'datetimefield',
                 fieldLabel: "註冊日期",
                 id: 'timestart',
+                format: 'Y-m-d  H:i:s',
+                time: { hour: 00, min: 00, sec: 00 },
                 labelWidth: 60,
                 editable: false,
                 listeners: {
@@ -447,8 +449,10 @@ Ext.onReady(function () {
             },
             { xtype: 'displayfield', value: "~", margin: '0' },
             {
-                xtype: 'datefield',
+                xtype: 'datetimefield',
                 id: 'timeend',
+                format: 'Y-m-d  H:i:s',
+                time: { hour: 23, min: 59, sec: 59 },
                 editable: false,
                 listeners: {
                     select: function (a, b, c) {
