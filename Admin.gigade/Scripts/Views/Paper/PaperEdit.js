@@ -66,14 +66,15 @@
                 submitValue: true
             },
               {
-                  xtype: "datefield",
+                  xtype: "datetimefield",
                   fieldLabel: '開始時間',
                   id: 'paperStart',
                   name: 'paperStart',
-                  format: 'Y-m-d',
+                  format: 'Y-m-d H:i:s',
+                  time: { hour: 00, min: 00, sec: 00 },
                   allowBlank: false,
                   submitValue: true,
-                  value: new Date(),
+                  value: new Date(new Date().getFullYear(),new Date().getMonth(),new  Date().getDate(),00,00,00),
                   editable:false,
                   //vtype: 'daterange',//daterange类型为上代码定义的类型
                   //endDateField: 'paperEnd'//必须跟endDate的id名相同
@@ -92,11 +93,12 @@
                   }
               },
                {
-                   xtype: "datefield",
+                   xtype: "datetimefield",
                    fieldLabel: '結束時間',
                    id: 'paperEnd',
                    name: 'paperEnd',
-                   format: 'Y-m-d',
+                   format: 'Y-m-d H:i:s',
+                   time: { hour: 23, min: 59, sec: 59 },
                    editable: false,
                    allowBlank: false,
                    submitValue: true,
@@ -595,12 +597,12 @@
             'show': function () {
                 if (row != null) {
                     editPaperFrm.getForm().loadRecord(row);
-                    if (row.data.paperStart != "") {
-                        Ext.getCmp('paperStart').setValue(row.data.paperStart.substring(0,10));
-                    }
-                    if (row.data.paperStart != "") {
-                        Ext.getCmp('paperEnd').setValue(row.data.paperEnd.substring(0, 10));
-                    }
+                    //if (row.data.paperStart != "") {
+                    //    Ext.getCmp('paperStart').setValue(row.data.paperStart.substring(0,10));
+                    //}
+                    //if (row.data.paperStart != "") {
+                    //    Ext.getCmp('paperEnd').setValue(row.data.paperEnd.substring(0, 10));
+                    //}
                                     
                     Ext.getCmp('created').show();
                     Ext.getCmp('modified').show();
@@ -632,7 +634,8 @@ function sformatDate(now) {
 function eformatDate(now) {
     //now = new Date(now.getFullYear() + "-" + +(now.getMonth() + 1) + "-" + +now.getDate() + "   " + +now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds());
     //var end = new Date(now.getTime() + 31 * 24 * 3600 * 1000);
-    now.setMonth(now.getMonth()+1);
+    now.setMonth(now.getMonth() + 1);
+    now.setHours(23, 59, 59);
     //var year = now.getFullYear();
     //var month = now.getMonth();
     //var date = now.getDate();

@@ -160,33 +160,26 @@ Ext.onReady(function () {
                            value: '0',
                        },
                        {
-                           xtype: "datefield",
+                           xtype: "datetimefield",
                            margin: '0 5,0,5',
                            editable: false,
-                           width:110,
+                           width:145,
                            id: 'start_time',
                            name: 'start_time',
-                           format: 'Y-m-d ',
-                          // value: Tomorrow(1 - new Date().getDate()),
+                           time: { hour: 00, min: 00, sec: 00 },
+                           format: 'Y-m-d H:i:s',
                            listeners: {
                                select: function (a, b, c) {
                                    var start = Ext.getCmp("start_time");
                                    var end = Ext.getCmp("end_time");
-                                   var s_date = new Date(start.getValue());
-
-                                   end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                   /*搜索时间加一个月限制
-                                   var data1 = Date.parse(start.getValue());
-                                   var data2 = Date.parse(end.getValue());
-                                   var datadiff = data2 - data1;
-                                   var time = 31 * 24 * 60 * 60 * 1000;
-                                    if (datadiff < 0 || datadiff > time) {
-                                       Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                                       end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                   if (end.getValue() == null) {
+                                       end.setValue(setNextMonth(start.getValue(), 1));
                                    }
-                                   else {
-                                       end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                   }*/
+                                   else if (end.getValue() < start.getValue()) {
+                                       var start_date = start.getValue();
+                                       Ext.getCmp('end_time').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                                   }
+                               
                                    
                                },
                                specialkey: function (field, e) {
@@ -204,33 +197,26 @@ Ext.onReady(function () {
                        },
                        {
 
-                           xtype: "datefield",
+                           xtype: "datetimefield",
                            margin: '0 5,0,5',
                            editable: false,
                            id: 'end_time',
                            name: 'end_time',
-                           width: 110,
-                           format: 'Y-m-d',
-                          // value: Tomorrow(0),
+                           width: 145,
+                           format: 'Y-m-d H:i:s',
+                           time: { hour: 23, min: 59, sec: 59 },
                            listeners: {
                                select: function (a, b, c) {
                                    var start = Ext.getCmp("start_time");
                                    var end = Ext.getCmp("end_time");
-                                   var s_date = new Date(start.getValue());
-
-                                   //搜索时间限定一个月
-                                   //var data1 = Date.parse(start.getValue());
-                                   //var data2 = Date.parse(end.getValue());
-                                   //var datadiff = data2 - data1;
-                                   //var time = 31 * 24 * 60 * 60 * 1000;
-                                   if (end.getValue() < start.getValue()) {
-                                       Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間！");
-                                       end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                   if (start.getValue() == null) {
+                                       start.setValue(setNextMonth(end.getValue(), -1));
                                    }
-                                   //else if (datadiff < 0 || datadiff > time) {
-                                   //    Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                                   //    end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                   //}
+                                 else  if (end.getValue() < start.getValue()) {
+                                     var end_date = end.getValue();
+                                     Ext.getCmp('start_time').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
+                                   }
+                                  
                                },
                                specialkey: function (field, e) {
                                    if (e.getKey() == Ext.EventObject.ENTER) {
@@ -435,5 +421,30 @@ function UpdateActive(id) {
         }
     });
 
+}
+
+function Tomorrow() {
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate() + 1);
+    return dt;                                 // 返回日期。
+}
+
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }
 
