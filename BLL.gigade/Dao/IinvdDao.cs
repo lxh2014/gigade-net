@@ -1551,7 +1551,9 @@ us.user_username as user_name from iinvd ii ");
                             iialg.cde_dt = date;
                             int.TryParse(table.Rows[i][1].ToString(), out temp);
                             iialg.qty_o = temp;//原始庫存數量
+                            sc_num_chg += row_id_end_prod_pty;
                             iialg.adj_qty = -row_id_end_prod_pty;
+
                             iialg.create_dtim = DateTime.Now;
                             iialg.doc_no = "C" + DateTime.Now.ToString("yyyyMMddHHmmss");
                             if (DateTime.TryParse(table.Rows[i][3].ToString(), out date))
@@ -1569,7 +1571,7 @@ us.user_username as user_name from iinvd ii ");
                         istock.sc_istock_why = 2;
                         istock.sc_trans_type = 2;
                         istock.sc_num_old = query.prod_qtys;//原始庫存數量
-                        istock.sc_num_chg = iialg.adj_qty + sc_num_chg;//轉移數量
+                        istock.sc_num_chg = -sc_num_chg;//轉移數量
                         istock.sc_num_new = GetProd_qty((int)query.item_id, query.plas_loc_id, "", "");//結餘數量
                         istock.sc_time = DateTime.Now;
                         istock.sc_user = query.create_user;
