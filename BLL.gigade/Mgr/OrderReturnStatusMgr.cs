@@ -62,10 +62,39 @@ namespace BLL.gigade.Mgr
                         }
                     }
                 }
-                else//顯示確認物流form
+                else
                 {
                     OrderMaster om = _orderReturnStatus.GetOrderInfo(Convert.ToUInt32(query.ors_order_id));
-                    json = "{success:true,name:'" + om.Delivery_Name + "',mobile:'" + om.Delivery_Mobile + "',address:'" + om.Delivery_Address + "',zipcode:'"+om.Delivery_Zip+"',status:'0'}";
+                    string delivery_name = "***";
+                    string delivery_mobile = "***";
+                    string delivery_address = "***";
+                    if (!string.IsNullOrEmpty(om.Delivery_Name))
+                    {
+                        delivery_name = om.Delivery_Name.Substring(0, 1) + "**";
+                    }
+                    if (!string.IsNullOrEmpty(om.Delivery_Mobile))
+                    {
+                        if (om.Delivery_Mobile.Length > 3)
+                        {
+                            delivery_mobile = om.Delivery_Mobile.Substring(0, 3) + "**";
+                        }
+                        else
+                        {
+                            delivery_mobile = om.Delivery_Mobile + "***";
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(om.Delivery_Address))
+                    {
+                        if (om.Delivery_Address.Length > 3)
+                        {
+                            delivery_address = om.Delivery_Address.Substring(0, 3) + "**";
+                        }
+                        else
+                        {
+                            delivery_address = om.Delivery_Address + "***";
+                        }
+                    }
+                    json = "{success:true,name:'" + delivery_name + "',mobile:'" + delivery_mobile + "',address:'" + delivery_address + "',zipcode:'" + om.Delivery_Zip + "',status:'0'}";
                 }
             }
             else//無此訂單編號
@@ -88,6 +117,13 @@ namespace BLL.gigade.Mgr
               ArrayList arrList = new ArrayList();
               bool zichu = false;
               query.ors_createdate = DateTime.Now;
+              if (query.orc_name.IndexOf("*")>0)
+              {
+                  OrderMaster om = _orderReturnStatus.GetOrderInfo(Convert.ToUInt32(query.orc_order_id));
+                  query.orc_name = om.Delivery_Name;
+                  query.orc_phone = om.Delivery_Mobile;
+                  query.orc_address = om.Delivery_Address;
+              }
               arrList.Add(_orderReturnStatus.InsertOrderReturnContent(query));
               arrList.Add(_orderReturnStatus.InsertOrderReturnStatus(query));
               arrList.Add(_orderReturnStatus.UpdateORM(query));
@@ -319,6 +355,20 @@ namespace BLL.gigade.Mgr
           catch (Exception ex)
           {
               throw new Exception("OrderReturnStatusDao-->PlaceOnFile-->" + ex.Message, ex);
+          }
+      }
+
+      public OrderMaster GetOrderInfo(uint return_id)
+      {
+          try
+          {
+              int order_id = GetOrderIdByReturnId(return_id);
+              OrderMaster om = _orderReturnStatus.GetOrderInfo(Convert.ToUInt32(order_id));
+              return om;
+          }
+          catch (Exception ex)
+          {
+              throw new Exception("OrderReturnStatusDao-->GetOrderInfo-->" + ex.Message, ex);
           }
       }
     }
