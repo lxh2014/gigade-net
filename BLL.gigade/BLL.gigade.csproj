@@ -1174,6 +1174,7 @@
     <Compile Include="Mgr\ScheduleParamerMgr.cs" />
     <Compile Include="Mgr\ScheduleRelationMgr.cs" />
     <Compile Include="Mgr\ScheduleServiceMgr.cs" />
+    <Compile Include="Mgr\Schedules\PromotionsAmountGiftMgr.cs" />
     <Compile Include="Mgr\Schedules\DeliverStatusMgr.cs" />
     <Compile Include="Mgr\Schedules\SetConfigXmlMgr.cs" />
     <Compile Include="Mgr\Schedules\UserLoginLogMgr.cs" />
