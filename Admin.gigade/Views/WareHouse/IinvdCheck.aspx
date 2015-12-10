@@ -402,7 +402,7 @@
                 if (result.success) {
                     $('#' + id).val(''); 
                     $('#alertsuccess').modal('toggle');
-                    setTimeout(location.href = "/WareHouse/IinvdCheck?pwy_dte_ctl=" + pwy_dte_ctl + "&loc_id=" + loc_id, 3000);
+                    setTimeout('onload()',500);
                 }
                 else {
                     $("#alertmessage").text(result.message);
@@ -410,6 +410,12 @@
                 }
             }
         });
+    }
+    function onload()
+    {
+        var pwy_dte_ctl = $('#pwy_dte_ctl').text();
+        var loc_id = $('#loc_id').text();
+        location.href = "/WareHouse/IinvdCheck?pwy_dte_ctl=" + pwy_dte_ctl + "&loc_id=" + loc_id;
     }
     function reset() {
         $('#datetimepicker1').val('');
@@ -420,6 +426,14 @@
         $('#datetimepicker3').hide();
         $('#datetimepicker4').hide();
         $('.date1').hide();
+        var date = new Date();
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var day = date.getDate();
+        $('#datetimepicker1').datetimepicker('setEndDate', year + '-' + month + '-' + day);
+        $('#datetimepicker2').datetimepicker('setStartDate', year + '-' + month + '-' + day);
+        $('#datetimepicker3').datetimepicker('setEndDate', year + '-' + month + '-' + day);
+        $('#datetimepicker4').datetimepicker('setStartDate', year + '-' + month + '-' + day);
     }
     function SaveIinvd() {
         var pwy_dte_ctl = $('#pwy_dte_ctl').text();
@@ -490,7 +504,7 @@
                     $('#datetimepicker1').val('');
                     $('#prod_qty').val('');
                     $('#alertsuccess').modal('toggle');
-                    setTimeout(location.href = "/WareHouse/IinvdCheck?pwy_dte_ctl=" + pwy_dte_ctl + "&loc_id=" + loc_id,3000);
+                    setTimeout("onload()",500);
                 }
                 else {
                     $("#message").text(result.message);

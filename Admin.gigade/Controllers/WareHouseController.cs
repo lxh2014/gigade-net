@@ -13802,7 +13802,12 @@ namespace Admin.gigade.Controllers
                             if (iinvd.pwy_dte_ctl == "Y")
                             {
                                 prod_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id, iinvd.pwy_dte_ctl, iinvd.row_id.ToString());
-                                if (_iinvd.SaveIinvd(iinvd) == 1)
+                                if (prod_qty == iinvd.prod_qty)
+                                {
+                                    falg = true;
+                                    return Json(new { success = falg, message = message });
+                                }
+                                else if (_iinvd.SaveIinvd(iinvd) == 1)
                                 {
                                     falg = true;
                                 }
