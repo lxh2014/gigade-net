@@ -17,6 +17,7 @@ namespace BLL.gigade.Model
         public int template_create_userid { set; get; }//範本建立者的使用者代碼
         public int template_update_userid { set; get; }//範本更新者的使用者代碼
         public string user_username { get; set; }
+        public UInt64 static_template { get; set; }
         public EdmTemplate() 
         {
             template_id = 0;
@@ -29,6 +30,7 @@ namespace BLL.gigade.Model
             template_updatedate = DateTime.Now;
             template_update_userid = 0;
             template_create_userid = 0;
+            static_template = 0;
         }
     }
 }

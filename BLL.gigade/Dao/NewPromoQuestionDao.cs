@@ -133,10 +133,10 @@ start,end,active,kuser,muser,created,modified,vug.group_name as group_name ");
             try
             {
                 sql.AppendFormat(@" update   new_promo_questionnaire set ");
-                if (store.IsModified != 0)//新增
-                {
+                //if (store.IsModified != 0)//新增
+                //{
                     sql.AppendFormat(@"  event_name='{0}',event_desc='{1}',start='{2}',end='{3}',", store.event_name, store.event_desc, Common.CommonFunction.DateTimeToString(store.start), Common.CommonFunction.DateTimeToString(store.end));
-                }
+                //}
                 sql.AppendFormat(@" present_event_id='{0}',group_id='{1}'", store.present_event_id, store.group_id);
                 sql.AppendFormat(@",link_url='{0}',promo_image='{1}',device='{2}',count_by='{3}'", store.link_url, store.promo_image, store.device, store.count_by);
                 sql.AppendFormat(@",count='{0}',active_now='{1}',new_user='{2}',new_user_date='{3}'", store.count, store.active_now, store.new_user, Common.CommonFunction.DateTimeToString(store.new_user_date));

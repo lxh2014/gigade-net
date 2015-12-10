@@ -145,7 +145,7 @@ Ext.onReady(function () {
                                     tend.setValue(setNextMonth(tstart.getValue(), 1));
                                 }
                                 else if (tend.getValue() < tstart.getValue()) {
-                                    Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                                     
                                     tend.setValue(setNextMonth(tstart.getValue(), 1));
                                 }
                             },
@@ -181,7 +181,7 @@ Ext.onReady(function () {
                                     tstart.setValue(setNextMonth(tend.getValue(), -1));
                                 }
                                 else if (tend.getValue() < tstart.getValue()) {
-                                    Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                                    
                                     tstart.setValue(setNextMonth(tend.getValue(), -1));
                                 }
                             },

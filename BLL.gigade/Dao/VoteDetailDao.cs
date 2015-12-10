@@ -210,7 +210,7 @@ namespace BLL.gigade.Dao
                 }
                 if (query.end_time != null)
                 {
-                    sbSqlCondition.AppendFormat(" and vd.create_time < '{0}' ", query.end_time.ToString("yyyy-MM-dd 23:59:59"));
+                    sbSqlCondition.AppendFormat(" and vd.create_time < '{0}' ", CommonFunction.DateTimeToString(query.end_time));
                 }
                 if (query.vote_status != -1)
                 {

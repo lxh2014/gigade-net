@@ -180,13 +180,15 @@
                    width: 150,
                    allowBlank: false,
                    submitValue: true,
-                   value: timestart,
+                   value: Tomorrow(),
+                   time: { hour: 00, min: 00, sec: 00 },
                    listeners: {
                        select: function (a, b, c) {
                            var start = Ext.getCmp("p_start");
                            var end = Ext.getCmp("p_end");
                            if (end.getValue() < start.getValue()) {
-                               Ext.Msg.alert(INFORMATION, TIMETIP);
+                               var start_date = start.getValue();
+                               Ext.getCmp('p_end').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
                            }
                        }
                    }
@@ -201,13 +203,15 @@
                    format: 'Y-m-d H:i:s',
                    allowBlank: false,
                    submitValue: true,
-                   value: timeend,
+                   time: { hour: 23, min: 59, sec: 59 },
+                   value: setNextMonth(Tomorrow(), 1),
                    listeners: {
                        select: function (a, b, c) {
                            var start = Ext.getCmp("p_start");
                            var end = Ext.getCmp("p_end");
                            if (end.getValue() < start.getValue()) {
-                               Ext.Msg.alert(INFORMATION, TIMETIP);
+                               var end_date = end.getValue();
+                               Ext.getCmp('p_start').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                            }
                        }
                    }
@@ -355,6 +359,18 @@
         dt = new Date(s);
         dt.setDate(dt.getDate() + 1);
         return dt;                                 // 返回日期。
+    }
+
+    function setNextMonth(source, n) {
+        var s = new Date(source);
+        s.setMonth(s.getMonth() + n);
+        if (n < 0) {
+            s.setHours(0, 0, 0);
+        }
+        else if (n > 0) {
+            s.setHours(23, 59, 59);
+        }
+        return s;
     }
 }
 
