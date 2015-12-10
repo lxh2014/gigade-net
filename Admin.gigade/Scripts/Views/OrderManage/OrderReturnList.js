@@ -854,7 +854,8 @@
                 id: 'orc_name',
                 name: 'orc_name',
                 allowBlank: false,
-                maxLength:10,
+                maxLength: 10,
+                disabled:true,
                 width: 360
             },
             {
@@ -863,7 +864,8 @@
                 id: 'orc_phone',
                 name: 'orc_phone',
                 allowBlank: false,
-                maxLength:30,
+                maxLength: 30,
+                disabled: true,
                 width: 360
             },
             {
@@ -889,6 +891,7 @@
                         name: 'orc_address',
                         allowBlank: false,
                         maxLength: 200,
+                        disabled: true,
                         width: 200
                     },
                 ],
@@ -947,7 +950,12 @@
             },
         ],
         buttonAlign: 'right',
-        buttons: [{
+        buttons: [
+               {
+                   text: '詳細資料',
+                   handler: SecretLogin
+               },
+            {
             text: '確認',
             formBind: true,
             disabled: true,
@@ -1099,5 +1107,22 @@
         }
     });
     ToolAuthority();
-    //QueryAuthorityByUrl('/OrderManage/OrderReturnList');
+   
 });
+function SecretLogin() {
+    var secret_type = "23";//參數表中的"退貨資安"
+    var url = "/OrderManage/OrderRerturnList";
+    var ralated_id = Ext.getCmp('return_id').getValue();
+    //點擊機敏信息先保存記錄在驗證密碼是否需要輸入
+    boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+    if (boolPassword != "-1") {//不准查看
+        if (boolPassword) {//超過5分鐘沒有輸入密碼
+            //參數1：機敏頁面代碼，2：機敏資料主鍵，3：是否彈出驗證密碼框,4：是否直接顯示機敏信息6.驗證通過后是否打開編輯窗口
+            //  function SecretLoginFun(type, relatedID, isLogin, isShow, editO, isEdit) {
+            SecretLoginFun(secret_type, ralated_id, true, true, false, url);//先彈出驗證框，關閉時在彈出顯示框
+
+        } else {
+            SecretLoginFun(secret_type, ralated_id, false, true, false, url);//先彈出驗證框，關閉時在彈出顯示框
+        }
+    }
+}
