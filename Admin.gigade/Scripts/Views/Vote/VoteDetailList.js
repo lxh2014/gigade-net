@@ -218,19 +218,12 @@ Ext.onReady(function () {
                                    var data1 = Date.parse(startTime.getValue());
                                    var data2 = Date.parse(endTime.getValue());
                                    var datadiff = data2 - data1;
-                                   //var time = 31 * 24 * 60 * 60 * 1000;
-                                   //if (endTime.getValue() < startTime.getValue()) {
-                                   //    Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間!");
-                                   //    startTime.setValue(new Date(endTime.getValue()));
-                                   //}
-                                   //else
+                                 
                                    if (datadiff < 0 ) {
-                                       Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                                        
                                        endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
                                    }
-                                   //else {
-                                   //    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                   //}
+                                   
 
                                },
                                specialkey: function (field, e) {
@@ -262,21 +255,23 @@ Ext.onReady(function () {
                                 var startTime = Ext.getCmp("time_start");
                                 var endTime = Ext.getCmp("time_end");
                                 var s_date = new Date(startTime.getValue());
-
+                                var d_date = new Date(endTime.getValue());
                                 var data1 = Date.parse(startTime.getValue());
                                 var data2 = Date.parse(endTime.getValue());
                                 var datadiff = data2 - data1;
-                                //var time = 31 * 24 * 60 * 60 * 1000;
+                               
                                 if (endTime.getValue() < startTime.getValue()) {
-                                    Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間!");
-                                    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                    //endTime.setValue(new Date(startTime.getValue()));
+                                    //開始時間限制為結束時間月份-1
+                                    //endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                    startTime.setValue(new Date(d_date.setMonth(d_date.getMonth() - 1)));
+                                    //endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                  
                                 }
-                                else if (datadiff < 0 ) {
-                                    Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                                    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                    //endTime.setValue(new Date(startTime.getValue()));
-                                }
+                                //else if (datadiff < 0 ) {
+                                //    startTime.setValue(new Date(s_date.setMonth(d_date.getMonth() - 1)));
+                                //  //  endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                     
+                                //}
                             },
                             specialkey: function (field, e) {
                                 if (e.getKey() == Ext.EventObject.ENTER) {
