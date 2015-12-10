@@ -10,17 +10,19 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using BLL.gigade.Dao;
 
 namespace BLL.gigade.Mgr.Schedules
 {
     public class ReceiveStatusFromTCatMgr
     {
         private ScheduleServiceMgr _secheduleServiceMgr;
-
+        private LogisticsTcatSodDao logisticsTcatSodDao;
         static IDBAccess _accessMySql;
         static string mySqlConnectionString = string.Empty;
         public ReceiveStatusFromTCatMgr(string connectionString)
         {
+            logisticsTcatSodDao = new LogisticsTcatSodDao(connectionString);
             _accessMySql = DBFactory.getDBAccess(DBType.MySql, connectionString);
             mySqlConnectionString = connectionString;
         }
@@ -151,18 +153,26 @@ namespace BLL.gigade.Mgr.Schedules
                             string second = array2[3].ToString().Substring(12, 2);
                             string delivery_status_time = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
 
-                            StringBuilder InsertSql = new StringBuilder("");
-                            StringBuilder selectSql = new StringBuilder("");
-                            selectSql.AppendFormat(@"select order_id  from logistics_tcat_sod where delivery_number='{0}' and order_id='{1}' 
-                                            and delivery_status_time='{2}' and status_id='{3}'", array2[0], array2[1], array2[3], array2[5]);
+                            
+                            LogisticsTcatSodQuery query = new LogisticsTcatSodQuery ();                            
+                            query.delivery_number = array2[0];
+                            query.order_id = Convert.ToInt32(array2[1]);
+                            query.delivery_status_time = Convert.ToDateTime(delivery_status_time);
+                            query.status_id = array2[5];
+                            DataTable selDT = logisticsTcatSodDao.GetRepeatInfo(query);
 
-                            DataTable selDT = _accessMySql.getDataTable(selectSql.ToString());
                             if (selDT.Rows.Count == 0)//如果數據已經存在，不插入
                             {
-                                InsertSql.AppendFormat(@" INSERT INTO logistics_tcat_sod (delivery_number,order_id,station_name,delivery_status_time,customer_id,status_id,
-                                   status_note,specification,create_date) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}'); ",
-                                      array2[0], array2[1], array2[2], delivery_status_time, array2[4], array2[5], array2[6], array2[7], DateTime.Now.ToString("yy-MM-dd HH:mm:ss"));
-                                _accessMySql.execCommand(InsertSql.ToString());
+                                LogisticsTcatSod model = new LogisticsTcatSod();
+                                model.delivery_number = array2[0];
+                                model.order_id = Convert.ToInt32(array2[1]);
+                                model.station_name = array2[2];
+                                model.delivery_status_time = Convert.ToDateTime(delivery_status_time);
+                                model.customer_id = array2[4];
+                                model.status_id = array2[5];
+                                model.status_note = array2[6];
+                                model.specification = array2[7];
+                                logisticsTcatSodDao.InsertReceiveFromTcatFTP(model);                               
                             }
                         }
                     } 
