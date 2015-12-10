@@ -66,11 +66,11 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["TimeStart"]))
                 {
-                    query.event_start_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["TimeStart"].ToString()).ToString("yyyy-MM-dd 00:00:00"));
+                    query.event_start_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["TimeStart"].ToString()).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["TimeEnd"]))
                 {
-                    query.event_end_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["TimeEnd"].ToString()).ToString("yyyy-MM-dd 23:59:59"));
+                    query.event_end_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["TimeEnd"].ToString()).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 int totalCount = 0;
                 _IOrderAccumAmount = new OrderAccumAmountMgr(mySqlConnectionString);

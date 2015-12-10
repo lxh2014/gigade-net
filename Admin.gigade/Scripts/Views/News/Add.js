@@ -168,13 +168,19 @@ editFunction = function (row, store) {
                 id: 's_news_show_start',
                 name: 's_news_show_start',
                 format: 'Y-m-d H:i:s',
+                time: { hour: 00, min: 00, sec: 00 },
                 editable: false,
                 allowBlank: false,
                 value: Tomorrow(),
                 listeners: {
-                    select: function () {
-                        var Month = new Date(this.getValue()).getMonth() + 1;
-                        Ext.getCmp("s_news_show_end").setValue(new Date(new Date(this.getValue()).setMonth(Month)));
+                    select: function (a,b,c) {
+                        var start = Ext.getCmp("s_news_show_start");
+                        var end = Ext.getCmp("s_news_show_end");
+                        if (end.getValue() < start.getValue()) {
+                            var start_date = start.getValue();
+                            Ext.getCmp('s_news_show_end').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                        }
+                       
                     }
 
                 }
@@ -187,15 +193,15 @@ editFunction = function (row, store) {
                 format: 'Y-m-d H:i:s',
                 allowBlank: false,
                 editable: false,
-                value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+                time: { hour: 23, min: 59, sec: 59 },
+                value: setNextMonth(Tomorrow(), 1),
                 listeners: {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("s_news_show_start");
                         var end = Ext.getCmp("s_news_show_end");
-                        var s_date = new Date(start.getValue());
                         if (end.getValue() < start.getValue()) {
-                            Ext.Msg.alert("提示信息", "開始時間不能大於結束時間！");
-                            end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                            var end_date = end.getValue();
+                            Ext.getCmp('s_news_show_start').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                         }
                     }
                 }
@@ -372,8 +378,8 @@ editFunction = function (row, store) {
         title: '最新消息管理',
         iconCls: 'icon-user-edit',
         id: 'editWin',
-        height: 335,
-        width: 600,
+        height: 545,
+        width: 960,
         y: 100,
         layout: 'fit',
         items: [editFrm],
@@ -452,3 +458,27 @@ function Today() {
     s += d.getDate();                          // 获取日。
     return (new Date(s));                                 // 返回日期。
 };
+function Tomorrow() {
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate() + 1);
+    return dt;                                 // 返回日期。
+}
+
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
+}

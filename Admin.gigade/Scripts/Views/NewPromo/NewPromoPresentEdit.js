@@ -270,7 +270,7 @@ editPresentFunction = function (row, store, o_event_id) {
                            var end = Ext.getCmp("tend");
                            if (end.getValue() < start.getValue()) {//開始時間大於了結束時間
                                var start_date = start.getValue();
-                               Ext.getCmp('tend').setValue(new Date(start_date.getFullYear(), start_date.getMonth()+ 1, start_date.getDate()));
+                               Ext.getCmp('tend').setValue(new Date(start_date.getFullYear(), start_date.getMonth()+ 1, start_date.getDate(),23,59,59));
                            }
                        }
                    }

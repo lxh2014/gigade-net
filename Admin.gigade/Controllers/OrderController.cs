@@ -1850,7 +1850,7 @@ namespace Admin.gigade.Controllers
                                     product_id = uint.Parse(item.Product_Id.ToString()),
                                     user_id = 0,
                                     user_level = 1,
-                                    site_id = 1,
+                                    site_id = Site_Id,
                                     child_id = 0
                                 });
                                 if (pM != null)
@@ -1912,7 +1912,7 @@ namespace Admin.gigade.Controllers
                                     product_id = uint.Parse(item.Product_Id.ToString()),
                                     user_id = 0,
                                     user_level = 1,
-                                    site_id = 1,
+                                    site_id = Site_Id,
                                     child_id = int.Parse(item.Product_Id.ToString())
                                 });
                                 odcList2.Find(rec => rec.Product_Id == item.Product_Id && rec.group_id == item.group_id).price_master_id = pMaster.price_master_id;
@@ -1934,7 +1934,7 @@ namespace Admin.gigade.Controllers
                                         product_id = uint.Parse(child.Product_Id.ToString()),
                                         user_id = 0,
                                         user_level = 1,
-                                        site_id = 1,
+                                        site_id = Site_Id,
                                         child_id = 0
                                     });
                                     List<ItemPriceCustom> ipList = new List<ItemPriceCustom>();
@@ -1989,7 +1989,7 @@ namespace Admin.gigade.Controllers
                                         product_id = uint.Parse(child.Product_Id.ToString()),
                                         user_id = 0,
                                         user_level = 1,
-                                        site_id = 1,
+                                        site_id = Site_Id,
                                         child_id = 0
                                     });
                                     List<ItemPriceCustom> ipList = new List<ItemPriceCustom>();
@@ -4165,8 +4165,8 @@ namespace Admin.gigade.Controllers
                 }
                 dr[21] = dr_v["product_mode_name"].ToString();
                 dr[22] = " "+ dr_v["delivery_name"].ToString();
-                dr[23] = dr_v["delivery_address"].ToString();
-                if (a == 2)
+                dr[23] = dr_v["delivery_address"].ToString();                if (a == 2)
+
                 {//如果是類別匯出 加上以下欄位 
                     dr[24] = dr_v["deliver_id"].ToString();
                     dr[25] = " " + dr_v["delivery_code"].ToString();

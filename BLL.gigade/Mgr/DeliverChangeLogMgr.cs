@@ -315,7 +315,7 @@ namespace BLL.gigade.Mgr
                 //public Boolean SendToGroup(int GroupID, string MailTitle, string MailBody, 
                 //                           Boolean IsSeparate = false, Boolean IsDisplyName = false)
                 //return mail.SendToGroup(GroupCode, MailTitle, MailBody + "<br/>郵件發送共耗時" + Second + "秒", true, true);  
-                return mail.SendToGroup(GroupCode, MailTitle, MailBody, true, true); 
+                return mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", true, true); 
             }
             catch (Exception ex)
             {
@@ -338,7 +338,8 @@ namespace BLL.gigade.Mgr
             try
             {
                 GigadeApiRequest request = new GigadeApiRequest(apiServer);
-                var result = request.Request<DeliverIdViewModel, object>("api/admin/Logistics/CanModifyExpertArriveDate", new DeliverIdViewModel() { deliver_id = 1121 });
+                var result = request.Request<DeliverIdViewModel, object>("api/admin/Logistics/CanModifyExpertArriveDate", new DeliverIdViewModel() { deliver_id = deliver_id });
+                //var result = request.Request<DeliverIdViewModel, object>("api/Logistics/ModifyExpertArriveDate", new DeliverIdViewModel() { deliver_id = deliver_id });//api/Logistics/ModifyExpertArriveDate
                 if (Convert.ToBoolean(result.result))
                 {
                     return true;

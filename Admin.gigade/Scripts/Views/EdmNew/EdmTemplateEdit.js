@@ -39,7 +39,25 @@
                  allowBlank: false,
                  submitValue: true,
                  vtype: 'url',
-             }, {
+             },
+        {
+            xtype: 'fieldcontainer',
+            layout: 'hbox',
+            items: [
+                {
+                    xtype: 'checkbox',
+                    margin:'0 0 0 53',
+                    id: 'static_template',
+
+                },
+                {
+                    value: '靜態範本',
+                    margin:'0 0 0 5',
+                    xtype:'displayfield',
+                }
+            ],
+        }
+             , {
                  xtype: 'displayfield',
                  fieldLabel: '建立日期',
                  id: 'template_createdate',
@@ -83,6 +101,7 @@
                                 template_update_user: Ext.htmlEncode(Ext.getCmp('template_update_user').getValue().ignore_stockVal),
                                 template_createdate: Ext.htmlEncode(Ext.getCmp('template_createdate').getValue()),
                                 template_updatedate: Ext.htmlEncode(Ext.getCmp('template_updatedate').getValue()),
+                                static_template: Ext.htmlEncode(Ext.getCmp('static_template').getValue()),
                             },
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);
@@ -111,7 +130,7 @@
         id: 'editWin',
         iconCls: "icon-user-add",
         width:435,
-        height: 300,
+        height: 315,
         layout: 'fit',//布局样式
         items: [editFrm],
         constrain: true, //束縛窗口在框架內
@@ -141,6 +160,11 @@
             'show': function () {
                 if (row) {
                     editFrm.getForm().loadRecord(row);
+                    if (row.data.static_template == 1) {
+                        Ext.getCmp('static_template').setValue(true);
+                    } else {
+                        Ext.getCmp('static_template').setValue(false);
+                    }
                 }
                 else {
                     Ext.getCmp('template_id').hide();
@@ -149,6 +173,7 @@
                     Ext.getCmp('template_createdate').hide();
                     Ext.getCmp('template_updatedate').hide();
                     editFrm.getForm().reset();
+                    Ext.getCmp('static_template').setValue(true);
                 }
             }
         }

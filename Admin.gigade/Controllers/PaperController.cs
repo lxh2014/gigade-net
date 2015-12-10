@@ -99,7 +99,7 @@ namespace Admin.gigade.Controllers
                 }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
-                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss ";
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = "{success:true,totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";//返回json數據
             }
             catch (Exception ex)
@@ -158,11 +158,11 @@ namespace Admin.gigade.Controllers
                 p.bannerUrl = Request.Params["banner_url"];
                 if (!string.IsNullOrEmpty(Request.Params["paper_start"]))
                 {
-                    p.paperStart = DateTime.Parse(DateTime.Parse(Request.Params["paper_start"]).ToString("yyyy-MM-dd") + " 00:00:00");
+                    p.paperStart = DateTime.Parse(DateTime.Parse(Request.Params["paper_start"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["paper_end"]))
                 {
-                    p.paperEnd = DateTime.Parse(DateTime.Parse(Request.Params["paper_end"]).ToString("yyyy-MM-dd") + " 23:59:59");
+                    p.paperEnd = DateTime.Parse(DateTime.Parse(Request.Params["paper_end"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 p.event_ID = Request.Params["eventid"];
                 if (!string.IsNullOrEmpty(Request.Params["isRepeatGift"]))

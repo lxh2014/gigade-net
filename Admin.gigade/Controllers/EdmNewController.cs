@@ -211,7 +211,6 @@ namespace Admin.gigade.Controllers
                 {
                     query.description = Request.Params["description"];
                 }
-
                 query.group_create_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 query.group_update_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 int _dt = edmgroupmgr.SaveEdmGroupNewAdd(query);
@@ -253,7 +252,7 @@ namespace Admin.gigade.Controllers
                 {
                     int group_id = Convert.ToInt32(Request.Params["group_id"]);
                     _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
-                    contentStr =Server.HtmlDecode(_edmContentNewMgr.GetContentIDAndUrl(group_id));
+                    contentStr = Server.HtmlDecode(_edmContentNewMgr.GetContentIDAndUrl(group_id, (Session["caller"] as Caller).user_id));
                 }
             }
             catch (Exception ex)
@@ -368,11 +367,17 @@ namespace Admin.gigade.Controllers
                 {
                     query.content_url = Request.Params["content_url"];
                 }
-                //if (!string.IsNullOrEmpty(Request.Params["template_createdate"]))
-                //{
-                //    query.template_createdate = Convert.ToDateTime(Request.Params["template_createdate"]);
-                //}
-                //query.template_updatedate = System.DateTime.Now;
+                if (!string.IsNullOrEmpty(Request.Params["static_template"]))
+                {
+                    if (Request.Params["static_template"] == "true")
+                    {
+                        query.static_template = 1;
+                    }
+                    else
+                    {
+                        query.static_template = 0;
+                    }
+                }
                 query.template_update_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
                 query.template_create_userid = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
 
@@ -767,7 +772,6 @@ namespace Admin.gigade.Controllers
             string json = string.Empty;
             EdmSendLog eslQuery = new EdmSendLog();
             MailRequest mQuery = new MailRequest();
-             ArrayList nameList=new ArrayList ();
             try
             {
                 _edmContentNewMgr = new EdmContentNewMgr(mySqlConnectionString);
@@ -795,6 +799,10 @@ namespace Admin.gigade.Controllers
                 {
                     mQuery.template_id = Convert.ToInt32(Request.Params["template_id"]);
                 }
+                if (!string.IsNullOrEmpty(Request.Params["static_template"]))
+                {
+                    mQuery.static_template = Convert.ToUInt64(Request.Params["static_template"]);
+                }
                 eslQuery.create_userid = (Session["caller"] as Caller).user_id;
                 mQuery.user_id = 0;
                 if (!string.IsNullOrEmpty(Request.Params["testSend"]))
@@ -815,21 +823,26 @@ namespace Admin.gigade.Controllers
                         mQuery.max_retry = 1;
                         if (!string.IsNullOrEmpty(Request.Params["test_send_list"]))
                         {
-                            nameList = new ArrayList();
                             string[] test_send_arr = Request.Params["test_send_list"].ToString().TrimEnd('\n').Split('\n');
                             for (int i = 0; i < test_send_arr.Length; i++)
                             {
                                 if (test_send_arr[i] != "")
                                 {
-                                    nameList.Add(test_send_arr[i]);
+                                    
                                     mQuery.receiver_address = test_send_arr[i];
                                     eslQuery.receiver_count = test_send_arr.Length;
                                     if (!string.IsNullOrEmpty(Request.Params["body"]))
                                     {
-                                        mQuery.bodyData = Request.Params["body"]+ _edmContentNewMgr.GetRecommendHtml(0);
+                                        if (mQuery.static_template == 0)//非靜態範本，需動態生成推薦
+                                        {
+                                            mQuery.bodyData = Request.Params["body"] + _edmContentNewMgr.GetRecommendHtml(0);
+                                        }
+                                        else//靜態範本
+                                        {
+                                            mQuery.bodyData = Request.Params["body"];
+                                        }
+                                        
                                         #region   得到電子報整體內容
-                                       // if (mQuery.template_id != 0)//不是通過活動頁面，而是選擇了範本
-                                      //  {
                                             string replaceStr = string.Empty;
                                             string editStr = string.Empty;
                                             string content_url = _edmContentNewMgr.GetContentUrlByContentId(eslQuery.content_id);
@@ -841,7 +854,7 @@ namespace Admin.gigade.Controllers
                                                 httpRequest.Method = "GET";
                                                 HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
                                                 StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
-                                                //     contentStr = sr.ReadToEnd();
+                                                
                                                 string contentStr = sr.ReadToEnd();
                                                 DataTable _dt = _edmContentNewMgr.GetPraraData(1);
                                                 if (_dt != null && _dt.Rows.Count > 0)
@@ -871,16 +884,6 @@ namespace Admin.gigade.Controllers
                                                 }
                                                 #endregion
                                             }
-                                        //}
-                                        //else//選擇的是活動頁面
-                                        //{
-                                        //    #region 是否點了訂閱電子報
-                                        //    if (mQuery.bodyData.IndexOf(subscribe) > 0)//找到了埋的那個code，證明是點擊了訂閱電子報
-                                        //    {
-                                        //        mQuery.bodyData = mQuery.bodyData.Replace(subscribe, "\n") + _edmContentNewMgr.GetRecommendHtml(0) + subscribe_url;
-                                        //    }
-                                        //    #endregion
-                                        //}
                                             #endregion
                                     }
                                     MailHelper mail = new MailHelper();
@@ -969,6 +972,11 @@ namespace Admin.gigade.Controllers
         #endregion
 
         #region 獲取預覽html
+        /*
+         編輯的預覽按鈕和列表頁的預覽都訪問這個方法
+         * 1.
+         * 
+         */
         public HttpResponseBase GetPreviewHtml()
         {
             string html = string.Empty;
@@ -1005,9 +1013,19 @@ namespace Admin.gigade.Controllers
                     }
                     
                 }
+                //列表頁的預覽按鈕不進這個方法
                 if (!string.IsNullOrEmpty(Request.Params["template_id"]))
                 {
                     query.template_id = Convert.ToInt32(Request.Params["template_id"]);
+                    edmtemplatemgr = new EdmTemplateMgr(mySqlConnectionString);
+                    if (edmtemplatemgr.GetStaticTemplate(query.template_id))
+                    {
+                        recommendStr = string.Empty;
+                    }
+                    else
+                    {
+                        recommendStr = _edmContentNewMgr.GetRecommendHtml(Convert.ToUInt32((Session["caller"] as Caller).user_id));
+                    }
                 }
                 //獲取template_data（編輯器中的內容或者是表中的template_data）
                 if (!string.IsNullOrEmpty(Request.Params["template_data"]))
@@ -1018,8 +1036,20 @@ namespace Admin.gigade.Controllers
                 {
                     templateStr = _edmContentNewMgr.GetHtml(query);
                 }
+                //編輯的預覽按鈕不進這個方法
                 //根據user_id獲得精準推薦
-                recommendStr = _edmContentNewMgr.GetRecommendHtml(Convert.ToUInt32((Session["caller"] as Caller).user_id));
+                if (!string.IsNullOrEmpty(Request.Params["static_template"]))
+                {
+                    if (Request.Params["static_template"] == "0")// 動態範本，精準推薦
+                    {
+                        recommendStr = _edmContentNewMgr.GetRecommendHtml(Convert.ToUInt32((Session["caller"] as Caller).user_id));
+                    }
+                    else
+                    {
+                        recommendStr = string.Empty;
+                    }
+                }
+             
                 //替換符
                 DataTable _dt = _edmContentNewMgr.GetPraraData(1);
                 if (_dt != null && _dt.Rows.Count > 0)

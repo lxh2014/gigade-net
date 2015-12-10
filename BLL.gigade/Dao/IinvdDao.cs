@@ -1409,7 +1409,7 @@ us.user_username as user_name from iinvd ii ");
             StringBuilder sbwhere = new StringBuilder();
             try
             {
-                sql.AppendFormat("SELECT pi.item_id, p.product_name,CONCAT(ps1.spec_name,'-',ps2.spec_name)AS spec, made_date,cde_dt,prod_qty,pe.pwy_dte_ctl,i.row_id,ic.lcat_id  FROM iinvd i ");
+                sql.AppendFormat("SELECT pi.item_id, p.product_name,CONCAT_WS('-',ps1.spec_name,ps2.spec_name)AS spec, made_date,cde_dt,prod_qty,pe.pwy_dte_ctl,i.row_id,ic.lcat_id  FROM iinvd i ");
                 sql.Append(" LEFT JOIN iloc ic ON ic.loc_id=i.plas_loc_id");
                 sql.Append(" LEFT JOIN product_item pi ON i.item_id=pi.item_id");
                 sql.Append(" LEFT JOIN product p ON p.product_id =pi.product_id");
@@ -1421,6 +1421,7 @@ us.user_username as user_name from iinvd ii ");
                 {
                     sbwhere.AppendFormat(" AND i.plas_loc_id='{0}'", loc_id);
                 }
+                sbwhere.Append(" GROUP BY ic.loc_id;");
                 return _access.getDataTableForObj<IinvdQuery>(sql.ToString() + sbwhere.ToString());
             }
             catch (Exception ex)
@@ -1551,7 +1552,9 @@ us.user_username as user_name from iinvd ii ");
                             iialg.cde_dt = date;
                             int.TryParse(table.Rows[i][1].ToString(), out temp);
                             iialg.qty_o = temp;//原始庫存數量
+                            sc_num_chg += row_id_end_prod_pty;
                             iialg.adj_qty = -row_id_end_prod_pty;
+
                             iialg.create_dtim = DateTime.Now;
                             iialg.doc_no = "C" + DateTime.Now.ToString("yyyyMMddHHmmss");
                             if (DateTime.TryParse(table.Rows[i][3].ToString(), out date))
@@ -1569,7 +1572,7 @@ us.user_username as user_name from iinvd ii ");
                         istock.sc_istock_why = 2;
                         istock.sc_trans_type = 2;
                         istock.sc_num_old = query.prod_qtys;//原始庫存數量
-                        istock.sc_num_chg = iialg.adj_qty + sc_num_chg;//轉移數量
+                        istock.sc_num_chg = -sc_num_chg;//轉移數量
                         istock.sc_num_new = GetProd_qty((int)query.item_id, query.plas_loc_id, "", "");//結餘數量
                         istock.sc_time = DateTime.Now;
                         istock.sc_user = query.create_user;
