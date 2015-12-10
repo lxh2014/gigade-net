@@ -132,6 +132,12 @@ namespace Admin.gigade.Controllers
                             ViewBag.date_end = Convert.ToDateTime(arr[i]);
                             ViewBag.date_end = Convert.ToDateTime(ViewBag.date_end.ToString("yyyy-MM-dd  23:59:59"));
                             break;
+                        case 7:
+                            ViewBag.c_money = arr[i];
+                            break;
+                        case 8:
+                            ViewBag.c_money1 = arr[i];
+                            break;
                     }
 
                 }
@@ -3735,6 +3741,15 @@ namespace Admin.gigade.Controllers
                     query.date_end = Convert.ToDateTime(Request.Params["date_end"]);
                     query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
                 }
+                int money;
+                if (int.TryParse(Request.Params["c_money"],out money))
+                {
+                    query.c_money = money;
+                }
+                if (int.TryParse(Request.Params["c_money1"], out money))
+                {
+                    query.c_money1 = money;
+                }
                 List<OrderDetailQuery> store = _orderDetialMgr.GetCategorySummaryList(query, out totalCount, out sumAmount);
                 if (store != null && store.Count > 0)
                 {
@@ -3792,6 +3807,17 @@ namespace Admin.gigade.Controllers
                     query.date_end = Convert.ToDateTime(Request.Params["date_end"]);
                     query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
                 }
+                int money;
+                if (int.TryParse(Request.Params["c_money"], out money))
+                {
+                    query.c_money = money;
+                }
+                if (int.TryParse(Request.Params["c_money1"], out money))
+                {
+                    query.c_money1 = money;
+                }
+
+
                 DataTable store = _orderDetialMgr.GetAmountDetial(query, out totalCount);
                 if (store != null && store.Rows.Count > 0)
                 {
@@ -3854,6 +3880,16 @@ namespace Admin.gigade.Controllers
                 {
                     query.date_end = Convert.ToDateTime(Request.Params["date_end"]);
                     query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
+                }
+
+                int money;
+                if (int.TryParse(Request.Params["c_money"], out money))
+                {
+                    query.c_money = money;
+                }
+                if (int.TryParse(Request.Params["c_money1"], out money))
+                {
+                    query.c_money1 = money;
                 }
                 query.IsPage = false;
                 string newExcelName = string.Empty;
@@ -3933,6 +3969,17 @@ namespace Admin.gigade.Controllers
                     query.date_end = Convert.ToDateTime(Request.Params["date_end"]);
                     query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
                 }
+
+                int money;
+                if (int.TryParse(Request.Params["c_money"], out money))
+                {
+                    query.c_money = money;
+                }
+                if (int.TryParse(Request.Params["c_money1"], out money))
+                {
+                    query.c_money1 = money;
+                }
+
                 query.IsPage = false;
                 string newExcelName = string.Empty;
                 store = _OrderMasterMgr.CagegoryDetialExportInfo(query);
@@ -3999,7 +4046,7 @@ namespace Admin.gigade.Controllers
             dt.Columns.Add("出貨單歸檔期", typeof(String));
             dt.Columns.Add("出貨方式", typeof(String));
             dt.Columns.Add("收貨人", typeof(String));
-            dt.Columns.Add("收貨地址", typeof(String));
+            dt.Columns.Add("收貨地址", typeof(String)); 
             if (a == 2)
             {//如果是類別匯出 加上以下欄位
                 dt.Columns.Add("出貨單編號", typeof(String));
@@ -4017,7 +4064,7 @@ namespace Admin.gigade.Controllers
                 DataRow dr_v = store.Rows[i];
                 if (i == 0 || (i > 0 && dr_v["order_id"].ToString() != store.Rows[i - 1]["order_id"].ToString()))
                 {
-                    dr[0] = " "+ dr_v["order_name"].ToString();
+                    dr[0] = " " + dr_v["order_name"].ToString();
                     if (!string.IsNullOrEmpty(dr_v["order_createdate_format"].ToString()))
                     {
                         DateTime order_createdate = Convert.ToDateTime(dr_v["order_createdate_format"].ToString());
@@ -4117,10 +4164,10 @@ namespace Admin.gigade.Controllers
                     dr[20] = slave_date_close == Convert.ToDateTime("1/1/1970 8:00:00 AM") ? "未歸檔" : CommonFunction.DateTimeToString(slave_date_close);
                 }
                 dr[21] = dr_v["product_mode_name"].ToString();
-                dr[22] = " " + dr_v["delivery_name"].ToString();
-                dr[23] = dr_v["delivery_address"].ToString();             
-                if (a == 2)
-                {//如果是類別匯出 加上以下欄位
+                dr[22] = " "+ dr_v["delivery_name"].ToString();
+                dr[23] = dr_v["delivery_address"].ToString();                if (a == 2)
+
+                {//如果是類別匯出 加上以下欄位 
                     dr[24] = dr_v["deliver_id"].ToString();
                     dr[25] = " " + dr_v["delivery_code"].ToString();
                     dr[26] = dr_v["deliver_name"].ToString();
@@ -4156,7 +4203,7 @@ namespace Admin.gigade.Controllers
 
                 dt.Rows.Add(dr);
             }
-            return dt;
+            return dt; 
         }
         #endregion
 
