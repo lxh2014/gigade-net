@@ -24,7 +24,7 @@ Ext.define('gigade.EdmContentNew', {
    { name: "content_url", type: "string" },
    { name: "pm", type: "int" },
    { name: "edm_pm", type: "string" },
-   
+   { name: "static_template", type: "int" },
     ]
 });
 EdmContentNewStore = Ext.create('Ext.data.Store', {
@@ -181,48 +181,6 @@ onEditClick = function () {
         editFunction(row[0], EdmContentNewStore);
     }
 }
-//onGoSendClick = function () {
-//    var row = Ext.getCmp("EdmContentNew").getSelectionModel().getSelection();
-//    if (row.length == 0) {
-//        Ext.Msg.alert("提示信息", "沒有選擇一行");
-//    } else if (row.length > 1) {
-//        Ext.Msg.alert("提示信息", "只能選擇一行");
-//    } else if (row.length == 1) {
-//        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
-//        myMask.show();
-//        if (row[0].data.template_id != 0) {
-//            Ext.Ajax.request({
-//                url: '/EdmNew/GetContentUrl',
-//                params: {
-//                    template_id:row[0].data.template_id,
-//                    content_url: row[0].data.content_url,
-//                    template_data: row[0].data.template_data,
-//                },
-//                success: function (data) {
-//                    myMask.hide();
-//                    if (data.responseText == "獲取網頁出現異常！") {
-//                        Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
-//                    }
-//                    else {
-//                        row[0].data.template_data_send = data.responseText;
-//                        sendFunction(row[0], EdmContentNewStore);
-//                    }
-//                },
-//                failure: function () {
-//                    myMask.hide();
-//                    Ext.Msg.alert("提示信息", "獲取網頁出現異常！");
-//                }
-//            });
-//        }
-//        else {
-//            myMask.hide();
-//            row[0].data.template_data_send = row[0].data.template_data;
-//            sendFunction(row[0], EdmContentNewStore);
-//        }
-
-//    }
-//}
-
 
 onGoSendClick = function () {
     var row = Ext.getCmp("EdmContentNew").getSelectionModel().getSelection();
@@ -231,9 +189,6 @@ onGoSendClick = function () {
     } else if (row.length > 1) {
         Ext.Msg.alert("提示信息", "只能選擇一行");
     } else if (row.length == 1) {
-        //var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
-        //myMask.show();
-        //myMask.hide();
            row[0].data.template_data_send = row[0].data.template_data;
             sendFunction(row[0], EdmContentNewStore);
        
@@ -283,9 +238,11 @@ function ContentNewReportList(content_id) {
 }
 
 function ReviewEdm() {
+  
     var checked;
     var template_data;
     var row = Ext.getCmp("EdmContentNew").getSelectionModel().getSelection();
+    var static_template=row[0].data.static_template;
     if (row[0].data.template_data.indexOf(subscribe) > 0) {
         checked = true;
         template_data = row[0].data.template_data.replace(subscribe, "");
@@ -302,6 +259,7 @@ function ReviewEdm() {
             content_id: row[0].data.content_id,
             template_data: template_data,
             checked: checked,
+            static_template: static_template,
           
         },
         success: function (data) {

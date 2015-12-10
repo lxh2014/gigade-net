@@ -150,7 +150,40 @@ namespace BLL.gigade.Mgr
                      4.包含非訂閱的與額外發送列表和額外不發送列表進行查重進行查重
                      5.4的結果和3的結果去重
                      */
-
+                    string[] extra_send_temp = new string[] { };
+                    string[] extra_send = new string[] { };
+                    string[] extra_no_send_temp = new string[] { };
+                    string[] extra_no_send = new string[] { };
+                    #region 額外發送列表中數據去重
+                    if (MRquery.extra_send != "")
+                    {
+                        extra_send_temp = MRquery.extra_send.Split('\n');
+                        List<string> extraSendTList = new List<string>();
+                        for (int i = 0; i < extra_send_temp.Length; i++)
+                        {
+                            if (!extraSendTList.Contains(extra_send_temp[i]))
+                            {
+                                extraSendTList.Add(extra_send_temp[i]);
+                            }
+                        }
+                      extra_send=    extraSendTList.ToArray();
+                    }
+                    #endregion
+                    #region 額外不發送列表中數據去重
+                    if (MRquery.extra_no_send != "")
+                    {
+                        extra_no_send_temp = MRquery.extra_no_send.Split('\n');
+                        List<string> extraNoSendTList = new List<string>();
+                        for (int i = 0; i < extra_no_send_temp.Length; i++)
+                        {
+                            if (!extraNoSendTList.Contains(extra_no_send_temp[i]))
+                            {
+                                extraNoSendTList.Add(extra_no_send_temp[i]);
+                            }
+                        }
+                        extra_no_send = extraNoSendTList.ToArray();
+                    }
+                    #endregion
                     #region 第一步： 【發送名單條件】和額外發送列表和額外不發送列表進行查重
                     #region 發送名單條件
                     DataTable _newDt = new DataTable();
@@ -172,7 +205,8 @@ namespace BLL.gigade.Mgr
                     #region 發送名單為空，額外發送不空
                     if ((_dt == null || _dt.Rows.Count == 0) && MRquery.extra_send != "")
                     {
-                        string[] extra_send = MRquery.extra_send.Split('\n');
+                        
+ 
                         for (int i = 0; i < extra_send.Length; i++)
                         {
                             if (extra_send[i] != "")
@@ -196,7 +230,7 @@ namespace BLL.gigade.Mgr
                     #region 發送名單不空，額外發送不空
                     else if ((_dt != null && _dt.Rows.Count > 0) && MRquery.extra_send != "")
                     {
-                        string[] extra_send = MRquery.extra_send.Split('\n');
+                       
                         for (int i = 0; i < extra_send.Length; i++)
                         {
                             if (extra_send[i] != "")
@@ -237,7 +271,6 @@ namespace BLL.gigade.Mgr
                     #region 發送名單不空，額外排除不空
                     if ((_dt != null && _dt.Rows.Count > 0) && MRquery.extra_no_send != "")
                     {
-                        string[] extra_no_send = MRquery.extra_no_send.Split('\n');
 
                         for (int i = 0; i < extra_no_send.Length; i++)
                         {
@@ -268,7 +301,7 @@ namespace BLL.gigade.Mgr
                     {
                         _emailDt.Columns.Add("email_address", typeof(string));
                         _emailDt.Columns.Add("name", typeof(string));
-                        string[] extra_send = MRquery.extra_send.Split('\n');
+                         
                         for (int i = 0; i < extra_send.Length; i++)
                         {
                             if (extra_send[i] != "")
@@ -290,7 +323,7 @@ namespace BLL.gigade.Mgr
                     #region 固定信箱名單不為空，額外發送不為空
                     else if ((_emailDt != null && _emailDt.Rows.Count > 0) && MRquery.extra_send != "")
                     {
-                        string[] extra_send = MRquery.extra_send.Split('\n');
+                         
                         for (int i = 0; i < extra_send.Length; i++)
                         {
                             if (extra_send[i] != "")
@@ -331,7 +364,6 @@ namespace BLL.gigade.Mgr
                     #region 信箱名單不為空，額外排除為空
                     if ((_emailDt != null && _emailDt.Rows.Count > 0) && MRquery.extra_no_send != "")
                     {
-                        string[] extra_no_send = MRquery.extra_no_send.Split('\n');
 
                         for (int i = 0; i < extra_no_send.Length; i++)
                         {
@@ -415,7 +447,7 @@ namespace BLL.gigade.Mgr
 
                         if (MRquery.extra_send != "")
                         {
-                            string[] extra_send = MRquery.extra_send.Split('\n');
+                            
                             for (int i = 0; i < extra_send.Length; i++)
                             {
                                 if (extra_send[i] != "")
@@ -443,8 +475,6 @@ namespace BLL.gigade.Mgr
                         #region 額外排除列表
                         if (MRquery.extra_no_send != "")
                         {
-                            string[] extra_no_send = MRquery.extra_no_send.Split('\n');
-
                             for (int i = 0; i < extra_no_send.Length; i++)
                             {
                                 if (extra_no_send[i] != "")
@@ -525,7 +555,14 @@ namespace BLL.gigade.Mgr
                                     MRquery.user_id = 0;
                                 }
                             }
-                            RecommendHtml = GetRecommendHtml(Convert.ToUInt32(MRquery.user_id));//根據user_id做出精準推薦
+                            if (MRquery.static_template == 0)
+                            {
+                                RecommendHtml = GetRecommendHtml(Convert.ToUInt32(MRquery.user_id));//根據user_id做出精準推薦
+                            }
+                            else
+                            {
+                                RecommendHtml = string.Empty;
+                            }
                             EdmTraceEmail ete = new EdmTraceEmail();
                             ete.email = MRquery.receiver_address;
                             ete.name = MRquery.receiver_name;
@@ -620,7 +657,7 @@ namespace BLL.gigade.Mgr
         public string GetRecommendHtml(uint user_id)
         {
             string html = string.Empty;
-
+            //html = "This is mine";
             return html;
         }
         #endregion
@@ -896,7 +933,7 @@ namespace BLL.gigade.Mgr
             }
         }
 
-        public string GetContentIDAndUrl(int group_id)
+        public string GetContentIDAndUrl(int group_id,int user_id)
         {
             string replaceStr = string.Empty;
             string content_data = string.Empty;
@@ -910,6 +947,12 @@ namespace BLL.gigade.Mgr
                     int content_id = Convert.ToInt32(_dt.Rows[0][1]);
                     int template_id = Convert.ToInt32(_dt.Rows[0][2]);
                     string template_data = _dt.Rows[0][3].ToString();
+                    string static_template=  _dt.Rows[0][4].ToString();
+                    if (static_template == "0")//動態範本
+                    {
+                        
+                        template_data = template_data + GetRecommendHtml(0);
+                    }
                     #region 替換符
                     DataTable _dtReplace  = GetPraraData(1);
                     if (_dtReplace != null && _dtReplace.Rows.Count > 0)

@@ -12382,7 +12382,7 @@ namespace Admin.gigade.Controllers
         {
             PdfHelper pdf = new PdfHelper();
             List<string> pdfList = new List<string>();
-            float[] arrColWidth = new float[] { 150, 60, 35,  45, 45,50, 50, 50, 45, 55, 35 };
+            float[] arrColWidth = new float[] { 135, 60, 45, 35, 45, 45, 50, 55, 55, 45, 60, 35 };
             int index = 0;
             string newFileName = string.Empty;
             string newName = string.Empty;
@@ -12438,7 +12438,7 @@ namespace Admin.gigade.Controllers
             DataTable _dtBody = new DataTable();
             _dtBody.Columns.Add("商品名稱", typeof(string));
             _dtBody.Columns.Add("條碼", typeof(string));
-           // _dtBody.Columns.Add("規格", typeof(string));
+            _dtBody.Columns.Add("細項編號", typeof(string));
             _dtBody.Columns.Add("訂貨量", typeof(string));
             _dtBody.Columns.Add("已撿貨量", typeof(string));
             _dtBody.Columns.Add("待撿貨量", typeof(string));
@@ -12464,7 +12464,7 @@ namespace Admin.gigade.Controllers
                 aseldTable = aseldMgr.GetAseldTable(ase_query, out total);
                 #region 標頭
                 #region 表頭
-                PdfPTable ptable = new PdfPTable(11);
+                PdfPTable ptable = new PdfPTable(12);
 
 
                 ptable.WidthPercentage = 100;//表格寬度
@@ -12472,7 +12472,7 @@ namespace Admin.gigade.Controllers
                 PdfPCell cell = new PdfPCell();
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 12;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12481,7 +12481,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 3;
+                cell.Colspan = 4;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12508,7 +12508,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 12;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12517,7 +12517,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("印表人：" + user_username, new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 2;
+                cell.Colspan = 3;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12543,7 +12543,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 12;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12552,7 +12552,7 @@ namespace Admin.gigade.Controllers
                 #endregion
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
-                cell.Colspan = 3;
+                cell.Colspan = 4;
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -12579,10 +12579,10 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                //cell = new PdfPCell(new Phrase("規格", new iTextSharp.text.Font(bf, 8)));
-                //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                //cell.DisableBorderSide(8);
-                //ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
 
                 cell = new PdfPCell(new Phrase("訂貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
@@ -12700,7 +12700,7 @@ namespace Admin.gigade.Controllers
                                     {
                                         row["商品名稱"] = "";
                                         row["條碼"] = "";
-                                        // row["規格"] = rows["spec"];
+                                        row["細項編號"] ="";
                                         row["訂貨量"] = "";
                                         row["已撿貨量"] = "";
                                         row["待撿貨量"] = "";
@@ -12710,7 +12710,7 @@ namespace Admin.gigade.Controllers
                                     {
                                         row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
                                         row["條碼"] = upc_id;
-                                        // row["規格"] = rows["spec"];
+                                        row["細項編號"] = rows["item_id"];
                                         row["訂貨量"] = rows["ord_qty"];
                                         row["已撿貨量"] = rows["act_pick_qty"];
                                         row["待撿貨量"] = rows["out_qty"];
@@ -12735,7 +12735,7 @@ namespace Admin.gigade.Controllers
                                     {
                                         row["商品名稱"] = "";
                                         row["條碼"] = "";
-                                        // row["規格"] = rows["spec"];
+                                        row["細項編號"] = "";
                                         row["訂貨量"] = "";
                                         row["已撿貨量"] = "";
                                         row["待撿貨量"] = "";
@@ -12745,7 +12745,7 @@ namespace Admin.gigade.Controllers
                                     {
                                         row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
                                         row["條碼"] = upc_id;
-                                        //row["規格"] = rows["spec"];
+                                        row["細項編號"] = rows["item_id"];
                                         row["訂貨量"] = rows["ord_qty"];
                                         row["已撿貨量"] = rows["act_pick_qty"];
                                         row["待撿貨量"] = rows["out_qty"];
@@ -12774,7 +12774,7 @@ namespace Admin.gigade.Controllers
                             DataRow row = _dtBody.NewRow();
                             row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
                             row["條碼"] = upc_id;
-                           // row["規格"] = rows["spec"];
+                            row["細項編號"] = rows["item_id"];
                             row["訂貨量"] = rows["ord_qty"];
                             row["已撿貨量"] = rows["act_pick_qty"];
                             row["待撿貨量"] = rows["out_qty"];
@@ -12796,7 +12796,7 @@ namespace Admin.gigade.Controllers
 
                 //  pdfList.Add(MakePDF(aseldTable, ase_query.assg_id, user_username, newPDFName, index++));
                 newFileName = newPDFName + "_part" + index++ + "." + "pdf";
-                pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 11, uint.Parse(_dtBody.Rows.Count.ToString()));/*第一7是列，第二個是行*/
+                pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 12, uint.Parse(_dtBody.Rows.Count.ToString()));/*第一7是列，第二個是行*/
                 pdfList.Add(newFileName);
             }
             else if (ase_query.start_dtim != DateTime.MinValue && ase_query.change_dtim != DateTime.MinValue || serchWhr == 0)
@@ -12809,7 +12809,7 @@ namespace Admin.gigade.Controllers
                     _dtBody.Rows.Clear();
                     #region 標頭
                     #region 表頭
-                    PdfPTable ptable = new PdfPTable(11);
+                    PdfPTable ptable = new PdfPTable(12);
 
 
                     ptable.WidthPercentage = 100;//表格寬度
@@ -12817,7 +12817,7 @@ namespace Admin.gigade.Controllers
                     PdfPCell cell = new PdfPCell();
                     cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.Colspan = 11;
+                    cell.Colspan = 12;
                     cell.DisableBorderSide(1);
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
@@ -12826,7 +12826,7 @@ namespace Admin.gigade.Controllers
 
                     cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.Colspan = 3;
+                    cell.Colspan = 4;
                     cell.DisableBorderSide(1);
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
@@ -12844,7 +12844,7 @@ namespace Admin.gigade.Controllers
 
                     cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.Colspan = 3;
+                    cell.Colspan = 4;
                     cell.DisableBorderSide(1);
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
@@ -12853,7 +12853,7 @@ namespace Admin.gigade.Controllers
 
                     cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.Colspan = 11;
+                    cell.Colspan = 12;
                     cell.DisableBorderSide(1);
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
@@ -12862,7 +12862,7 @@ namespace Admin.gigade.Controllers
 
                     cell = new PdfPCell(new Phrase("印表人：" + user_username, new iTextSharp.text.Font(bf, 8)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.Colspan = 2;
+                    cell.Colspan = 3;
                     cell.DisableBorderSide(1);
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
@@ -12888,7 +12888,7 @@ namespace Admin.gigade.Controllers
 
                     cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.Colspan = 11;
+                    cell.Colspan = 12;
                     cell.DisableBorderSide(1);
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
@@ -12897,7 +12897,7 @@ namespace Admin.gigade.Controllers
                     #endregion
                     cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                     cell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
-                    cell.Colspan = 3;
+                    cell.Colspan = 4;
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
@@ -12924,10 +12924,10 @@ namespace Admin.gigade.Controllers
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
 
-                    //cell = new PdfPCell(new Phrase("規格", new iTextSharp.text.Font(bf, 8)));
-                    //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    //cell.DisableBorderSide(8);
-                    //ptable.AddCell(cell);
+                    cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
+                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                    cell.DisableBorderSide(8);
+                    ptable.AddCell(cell);
 
                     cell = new PdfPCell(new Phrase("訂貨量", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
@@ -13046,7 +13046,7 @@ namespace Admin.gigade.Controllers
                                         {
                                             row["商品名稱"] = "";
                                             row["條碼"] = "";
-                                            // row["規格"] = rows["spec"];
+                                            row["細項編號"] = "";
                                             row["訂貨量"] = "";
                                             row["已撿貨量"] = "";
                                             row["待撿貨量"] = "";
@@ -13056,7 +13056,7 @@ namespace Admin.gigade.Controllers
                                         {
                                             row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
                                             row["條碼"] = upc_id;
-                                            // row["規格"] = rows["spec"];
+                                            row["細項編號"] = rows["item_id"];
                                             row["訂貨量"] = rows["ord_qty"];
                                             row["已撿貨量"] = rows["act_pick_qty"];
                                             row["待撿貨量"] = rows["out_qty"];
@@ -13076,7 +13076,7 @@ namespace Admin.gigade.Controllers
                                         {
                                             row["商品名稱"] = "";
                                             row["條碼"] = "";
-                                            // row["規格"] = rows["spec"];
+                                            row["細項編號"] = "";
                                             row["訂貨量"] = "";
                                             row["已撿貨量"] = "";
                                             row["待撿貨量"] = "";
@@ -13086,7 +13086,7 @@ namespace Admin.gigade.Controllers
                                         {
                                             row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
                                             row["條碼"] = upc_id;
-                                            //row["規格"] = rows["spec"];
+                                            row["細項編號"] = rows["item_id"];
                                             row["訂貨量"] = rows["ord_qty"];
                                             row["已撿貨量"] = rows["act_pick_qty"];
                                             row["待撿貨量"] = rows["out_qty"];
@@ -13115,11 +13115,13 @@ namespace Admin.gigade.Controllers
                                 DataRow row = _dtBody.NewRow();
                                 row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
                                 row["條碼"] = upc_id;
-                               // row["規格"] = rows["spec"];
+                                row["細項編號"] = rows["item_id"];
                                 row["訂貨量"] = rows["ord_qty"];
                                 row["已撿貨量"] = rows["act_pick_qty"];
                                 row["待撿貨量"] = rows["out_qty"];
+                                
                                 row["本次撿貨量"] = " ";
+                                row["料位編號"] = rows["loc_id"];
                                 //row["撿貨料位編號"] = " ";
                                 row["撿貨庫存"] = 0;
                                 row["製造日期"] = " ";
@@ -13136,7 +13138,7 @@ namespace Admin.gigade.Controllers
 
                     //  pdfList.Add(MakePDF(aseldTable, ase_query.assg_id, user_username, newPDFName, index++));
                     newFileName = newPDFName + "_part" + index++ + "." + "pdf";
-                    pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 11, uint.Parse(_dtBody.Rows.Count.ToString()));/*第一7是列，第二個是行*/
+                    pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 12, uint.Parse(_dtBody.Rows.Count.ToString()));/*第一7是列，第二個是行*/
                     pdfList.Add(newFileName);
                 }
             }
@@ -13157,7 +13159,7 @@ namespace Admin.gigade.Controllers
                 PdfPCell cell = new PdfPCell();
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 12;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -13166,7 +13168,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 3;
+                cell.Colspan = 4;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -13193,7 +13195,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 12;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -13202,7 +13204,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("印表人：" + user_username, new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 2;
+                cell.Colspan = 3;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -13228,7 +13230,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 12;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -13237,7 +13239,7 @@ namespace Admin.gigade.Controllers
                 #endregion
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
-                cell.Colspan = 3;
+                cell.Colspan = 4;
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -13264,10 +13266,10 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                //cell = new PdfPCell(new Phrase("規格", new iTextSharp.text.Font(bf, 8)));
-                //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                //cell.DisableBorderSide(8);
-                //ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
 
                 cell = new PdfPCell(new Phrase("訂貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
@@ -13338,7 +13340,7 @@ namespace Admin.gigade.Controllers
                 // document.Add(ptable);
                 //document.Add(ptablefoot); 
                 newFileName = newPDFName + "_part" + index++ + "." + "pdf";
-                pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 11, uint.Parse(_dtBody.Rows.Count.ToString()));/*第一7是列，第二個是行*/
+                pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 12, uint.Parse(_dtBody.Rows.Count.ToString()));/*第一7是列，第二個是行*/
                 pdfList.Add(newFileName);
 
             }
@@ -13393,7 +13395,11 @@ namespace Admin.gigade.Controllers
                     ViewBag.item_id = list[0].item_id.ToString()                                        ;
                     ViewBag.pwy_dte_ctl = list[0].pwy_dte_ctl;
                     iupc.item_id=uint.Parse(ViewBag.item_id);
-                    List<IupcQuery> listiupc = _IiupcMgr.GetIupcByItemID(iupc);
+                    List<IupcQuery> listiupc=new List<IupcQuery>();
+                    if (iupc.item_id!=0)
+                    {
+                        listiupc = _IiupcMgr.GetIupcByItemID(iupc);
+                    }
                     if (listiupc.Count > 0)
                     {
                         ViewBag.upc_id = listiupc[0].upc_id;
@@ -13448,7 +13454,7 @@ namespace Admin.gigade.Controllers
                     ilocquery.lsta_id = "";
                     ilocquery.IsPage = false;
                     List<IlocQuery> listiloc = ilocMgr.GetIocList(ilocquery, out total);
-                    if (list.Count > 0)
+                    if (listiloc.Count > 0)
                     {
                         string lcat_id =listiloc.Count==0?"": listiloc[0].lcat_id;
                         if (lcat_id == "S")
@@ -13469,6 +13475,11 @@ namespace Admin.gigade.Controllers
                                     ViewBag.product_name = table.Rows[0]["product_name"];
                                     ViewBag.spec = table.Rows[0]["spec"];
                                     ViewBag.lcat_id = lcat_id;
+                                }
+                                DataTable tablePwy = _iinvd.Getprodubybar(item_id);
+                                if (tablePwy.Rows.Count > 0)
+                                {
+                                    ViewBag.pwy_dte_ctl = tablePwy.Rows[0]["pwy_dte_ctl"].ToString();
                                 }
                             }
                             else
@@ -13538,51 +13549,69 @@ namespace Admin.gigade.Controllers
                             }
                         }
 
+                        #region 判斷是否指定主料位
+                        IlocQuery ilocquery = new IlocQuery();
                         _IiplasMgr = new IplasMgr(mySqlConnectionString);
                         IplasQuery iplasquery = new IplasQuery();
                         iplasquery.item_id = iinvd.item_id;
-                        if (_IiplasMgr.GetIplasid(iplasquery)==0)
+                        IIlocImplMgr ilocMgr = new IlocMgr(mySqlConnectionString);
+                        IplasDao iplasdao = new IplasDao(mySqlConnectionString);
+                        int total = 0;
+                        ilocquery.loc_id = iinvd.plas_loc_id;
+                        ilocquery.lcat_id = "0";
+                        ilocquery.lsta_id = "";
+                        ilocquery.IsPage = false;
+                        List<IlocQuery> listiloc = ilocMgr.GetIocList(ilocquery, out total);
+                        if (listiloc.Count > 0)
                         {
-                            Iplas iplas = new Iplas();
-                            if (int.TryParse(Request.Params["item_id"], out temp))
+                            string lcat_id = listiloc.Count == 0 ? "" : listiloc[0].lcat_id;
+                            if (lcat_id == "S")
                             {
-                                iplas.item_id = uint.Parse(Request.Params["item_id"]);
-                                if (_IiplasMgr.IsTrue(iplas) == "false")
+                                string item_id = iplasdao.Getlocid(ilocquery.loc_id);
+                                if (item_id == "")
                                 {
-                                    json = "{success:false,message:'不存在該商品編號'}";
-                                    this.Response.Clear();
-                                    this.Response.Write(json);
-                                    this.Response.End();
-                                    return this.Response;    
+                                    Iplas iplas = new Iplas();
+                                    if (int.TryParse(Request.Params["item_id"], out temp))
+                                    {
+                                        iplas.item_id = uint.Parse(Request.Params["item_id"]);
+                                        if (_IiplasMgr.IsTrue(iplas) == "false")
+                                        {
+                                            json = "{success:false,message:'不存在該商品編號'}";
+                                            this.Response.Clear();
+                                            this.Response.Write(json);
+                                            this.Response.End();
+                                            return this.Response;
+                                        }
+                                        if (_IiplasMgr.GetIplasid(iplasquery) > 0)
+                                        {
+                                            json = "{success:false,message:'此商品主料位非該料位'}";
+                                            this.Response.Clear();
+                                            this.Response.Write(json);
+                                            this.Response.End();
+                                            return this.Response;
+                                        }
+                                        Iloc iloc = new Iloc();
+                                        iloc.loc_id = iinvd.plas_loc_id;
+                                        if (_IiplasMgr.GetLocCount(iloc) <= 0)
+                                        {
+                                            json = "{success:false,message:'該料位已鎖定或被指派'}";
+                                            this.Response.Clear();
+                                            this.Response.Write(json);
+                                            this.Response.End();
+                                            return this.Response;
+                                        }
+                                        iplas.loc_id = iloc.loc_id;
+                                        iplas.loc_stor_cse_cap = 100;
+                                        iplas.create_user = (Session["caller"] as Caller).user_id;
+                                        iplas.create_dtim = DateTime.Now;
+                                        iplas.change_user = (Session["caller"] as Caller).user_id;
+                                        iplas.change_dtim = DateTime.Now;
+                                        _IiplasMgr.InsertIplas(iplas);
+                                    }
                                 }
-                                if (_IiplasMgr.GetIplasid(iplasquery) >0)
-                                {
-                                    json = "{success:false,message:'此商品主料位非該料位'}";
-                                    this.Response.Clear();
-                                    this.Response.Write(json);
-                                    this.Response.End();
-                                    return this.Response;         
-                                }
-                                Iloc iloc = new Iloc();
-                                iloc.loc_id = iinvd.plas_loc_id;
-                                if (_IiplasMgr.GetLocCount(iloc) <= 0)
-                                {
-                                    json = "{success:false,message:'該料位已鎖定或被指派'}";
-                                    this.Response.Clear();
-                                    this.Response.Write(json);
-                                    this.Response.End();
-                                    return this.Response; 
-                                }
-                                iplas.loc_id = iloc.loc_id;
-                                iplas.loc_stor_cse_cap = 100;
-                                iplas.create_user = (Session["caller"] as Caller).user_id;
-                                iplas.create_dtim = DateTime.Now;
-                                iplas.change_user = (Session["caller"] as Caller).user_id;
-                                iplas.change_dtim = DateTime.Now;
-                                _IiplasMgr.InsertIplas(iplas);
                             }
                         }
-
+                        #endregion
                         iinvd.create_user = (Session["caller"] as Caller).user_id;
                         iinvd.create_dtim = DateTime.Now;
                         iinvd.change_user = iinvd.create_user;
@@ -13608,24 +13637,7 @@ namespace Admin.gigade.Controllers
                                 iinvd.item_id = uint.Parse(Request.Params["item_id"]);
                             }
                         }
-                        //else
-                        //{
-                        //    IIlocImplMgr ilocMgr = new IlocMgr(mySqlConnectionString);
-                        //    int total = 0;
-                        //    IlocQuery iloc = new IlocQuery();
-                        //    iloc.loc_id = iinvd.plas_loc_id;
-                        //    iloc.IsPage = false;
-                        //    List<IlocQuery> list = ilocMgr.GetIocList(iloc, out total);
-                        //    if(list.Count>0)
-                        //    {
-                        //        string lcat_id = list[0].lcat_id;
-                        //        if(lcat_id=="S")
-                        //        {
-                        //        }
-                        //    }
-                        //}
                         DateTime date = DateTime.Now;
-                        string sq = Request.Params["datetimepicker1"];
                         if (DateTime.TryParse(Request.Params["datetimepicker1"], out date))
                         {
                             iinvd.made_date = date;
@@ -13637,57 +13649,44 @@ namespace Admin.gigade.Controllers
                         _iinvd = new IinvdMgr(mySqlConnectionString);
                         if (Request.Params["pwy_dte_ctl"] == "Y")
                         {
+                            iinvd.pwy_dte_ctl = "Y";
                             IProductExtImplMgr productExt = new ProductExtMgr(mySqlConnectionString);
                             int Cde_dt_incr = productExt.GetCde_dt_incr((int)iinvd.item_id);
                             iinvd.cde_dt = date.AddDays(Cde_dt_incr);
                         }
-                        IialgQuery iialg = new IialgQuery();
-                        iialg.cde_dt = iinvd.cde_dt;
-                        int prod_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
-                        if (Request.Params["pwy_dte_ctl"] == "Y")
-                        {
-                            iinvd.pwy_dte_ctl = "Y";
-                            if (_iinvd.GetIinvdCount(iinvd) == 1)
-                            {
-                                json = "{success:true}";
-                            }
-                            else
-                            {
-                                if (_iinvd.Insert(iinvd) == 1)
-                                {
-                                    json = "{success:true}";
-                                }
-                            }
-
-                        }
                         else
                         {
                             iinvd.cde_dt = DateTime.Now;
-                            if (_iinvd.GetIinvdCount(iinvd) == 1)
+                        }
+                        iinvd.prod_qtys = _iinvd.GetProd_qty(Convert.ToInt32(iinvd.item_id), iinvd.plas_loc_id, "", iinvd.row_id.ToString());
+                        IialgQuery iialg = new IialgQuery();
+                        iialg.cde_dt = iinvd.cde_dt;
+                        int prod_qty = 0;// _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id, "", "");
+                        int row = _iinvd.GetIinvdCount(iinvd);
+                        if (row > 1)
+                        {
+                            prod_qty = row - 1;
+                            json = "{success:true}";
+                        }
+                        else
+                        {
+                            if (_iinvd.Insert(iinvd) == 1)
                             {
                                 json = "{success:true}";
                             }
-                            else
-                            {
-                                if (_iinvd.Insert(iinvd) == 1)
-                                {
-                                    json = "{success:true}";
-                                }
-                            }
                         }
+                        
                         iialg.qty_o = prod_qty;
                         iialg.loc_id = iinvd.plas_loc_id;
                         iialg.item_id = iinvd.item_id;
                         iialg.iarc_id = "循環盤點";
-                        iialg.adj_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id) - prod_qty;
+                        iialg.adj_qty = change_prod_qty;
                         iialg.create_dtim = DateTime.Now;
                         iialg.create_user = iinvd.create_user;
                         iialg.type = 2;
                         iialg.doc_no = "C" + DateTime.Now.ToString("yyyyMMddHHmmss");
                         iialg.made_dt = iinvd.made_date;
                         iialg.cde_dt = iinvd.cde_dt;
-                        iialg.c_made_dt = iinvd.made_date;
-                        iialg.c_cde_dt = iinvd.cde_dt;
                         _iialgMgr = new IialgMgr(mySqlConnectionString);
                         _iialgMgr.insertiialg(iialg);
 
@@ -13696,9 +13695,9 @@ namespace Admin.gigade.Controllers
                         istock.item_id = iinvd.item_id;
                         istock.sc_istock_why = 2;
                         istock.sc_trans_type = 2;
-                        istock.sc_num_old = prod_qty;
+                        istock.sc_num_old = iinvd.prod_qtys;
                         istock.sc_num_chg = iialg.adj_qty;
-                        istock.sc_num_new = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
+                        istock.sc_num_new = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id,"N","");
                         istock.sc_time = iinvd.create_dtim;
                         istock.sc_user = iinvd.create_user;
                         istock.sc_note = "循環盤點";
@@ -13752,9 +13751,13 @@ namespace Admin.gigade.Controllers
                     }
                     else
                     {
+                        _iinvd = new IinvdMgr(mySqlConnectionString);
                         IinvdQuery iinvd = new IinvdQuery();
                         iinvd.pwy_dte_ctl = Request.Params["pwy_dte_ctl"];
-                        iinvd.prod_qtys = int.Parse(Request.Params["prod_qtys"]);
+                        if (!string.IsNullOrEmpty(Request.Params["loc_id"]))
+                        {
+                            iinvd.plas_loc_id = Request.Params["loc_id"];
+                        }
                         int id = 0;
                         if (int.TryParse(row_id, out id))
                         {
@@ -13764,29 +13767,29 @@ namespace Admin.gigade.Controllers
                         {
                             iinvd.prod_qty = id;
                         }
-                        if (!string.IsNullOrEmpty(Request.Params["loc_id"]))
-                        {
-                            iinvd.plas_loc_id = Request.Params["loc_id"];
-                        }
-                        int temp = 0;
                         if (!string.IsNullOrEmpty(Request.Params["item_id"]))
                         {
-                            if (int.TryParse(Request.Params["item_id"], out temp))
+                            if (int.TryParse(Request.Params["item_id"], out id))
                             {
                                 iinvd.item_id = uint.Parse(Request.Params["item_id"]);
                             }
                         }
+                       
                         iinvd.create_user = (Session["caller"] as Caller).user_id;
                         iinvd.create_dtim = DateTime.Now;
                         iinvd.change_user = iinvd.create_user;
                         iinvd.change_dtim = iinvd.create_dtim;
-                        _iinvd = new IinvdMgr(mySqlConnectionString);
+                        iinvd.prod_qtys = _iinvd.GetProd_qty(Convert.ToInt32(iinvd.item_id), iinvd.plas_loc_id, "", iinvd.row_id.ToString());
+
                         if (iinvd.pwy_dte_ctl == "Y")
                         {
-                            iinvd.cde_dt = _iinvd.GetCde_dt(iinvd.row_id);
-                            IProductExtImplMgr productExt = new ProductExtMgr(mySqlConnectionString);
-                            int Cde_dt_incr = productExt.GetCde_dt_incr((int)iinvd.item_id);
-                            iinvd.made_date = iinvd.cde_dt.AddDays(-Cde_dt_incr);
+                            List<DateTime> list = new List<DateTime>();
+                            list=_iinvd.GetCde_dt(iinvd.row_id);
+                            if(list.Count>0)
+                            {
+                                iinvd.cde_dt = list[0];
+                                iinvd.made_date = list[1];
+                            }
                         }
                         else
                         {
@@ -13795,13 +13798,19 @@ namespace Admin.gigade.Controllers
                         }
                         if (iinvd.row_id != 0)
                         {
+
                             if (iinvd.pwy_dte_ctl == "Y")
                             {
-                                prod_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
-                            }
-                            else
-                            {
-                                prod_qty = iinvd.prod_qtys;
+                                prod_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id, iinvd.pwy_dte_ctl, iinvd.row_id.ToString());
+                                if (prod_qty == iinvd.prod_qty)
+                                {
+                                    falg = true;
+                                    return Json(new { success = falg, message = message });
+                                }
+                                else if (_iinvd.SaveIinvd(iinvd) == 1)
+                                {
+                                    falg = true;
+                                }
                             }
                             if (iinvd.pwy_dte_ctl == "N" || iinvd.pwy_dte_ctl == "")
                             {
@@ -13811,8 +13820,10 @@ namespace Admin.gigade.Controllers
                                     iinvd.ista_id = "A";
                                     iinvd.prod_qty = iinvd.prod_qty - iinvd.prod_qtys;
                                     iinvd.cde_dt = DateTime.Now;
-                                    if (_iinvd.GetIinvdCount(iinvd) == 1)
+                                    int result=_iinvd.GetIinvdCount(iinvd);
+                                    if (result>1)
                                     {
+                                        prod_qty = result - 1;
                                         falg = true;
                                     }
                                     else
@@ -13823,40 +13834,35 @@ namespace Admin.gigade.Controllers
                                         }
                                     }
                                 }
-                                else if (iinvd.prod_qtys > iinvd.prod_qty)
+                                else if (iinvd.prod_qtys> iinvd.prod_qty)
                                 {
                                     if (_iinvd.SaveIinvd(iinvd) == 1)
                                     {
                                         falg = true;
+                                        return Json(new { success = falg, message = message });
                                     }
                                 }
                                 else if (iinvd.prod_qtys == iinvd.prod_qty)
                                 {
                                     falg = true;
-                                }
-                            }
-                            else
-                            {
-                                if (_iinvd.SaveIinvd(iinvd) == 1)
-                                {
-                                    falg = true;
+                                    return Json(new { success = falg, message = message });
                                 }
                             }
 
                             IialgQuery iialg = new IialgQuery();
 
                             iialg.cde_dt = iinvd.cde_dt;
-                            iialg.qty_o = prod_qty;
+                            iialg.qty_o = prod_qty;//原始庫存數量
                             iialg.loc_id = iinvd.plas_loc_id;
                             iialg.item_id = iinvd.item_id;
                             iialg.iarc_id = "循環盤點";
                             if (iinvd.pwy_dte_ctl == "Y")
                             {
-                                iialg.adj_qty = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id) - prod_qty;
+                                iialg.adj_qty = iinvd.prod_qty - prod_qty;
                             }
                             else
                             {
-                                iialg.adj_qty = int.Parse(changeStore) - prod_qty;
+                                iialg.adj_qty = iinvd.prod_qty-prod_qty;//轉移數量
                             }
                             iialg.create_dtim = DateTime.Now;
                             iialg.create_user = iinvd.create_user;
@@ -13864,8 +13870,6 @@ namespace Admin.gigade.Controllers
                             iialg.doc_no = "C" + DateTime.Now.ToString("yyyyMMddHHmmss");
                             iialg.made_dt = iinvd.made_date;
                             iialg.cde_dt = iinvd.cde_dt;
-                            iialg.c_made_dt = iinvd.made_date;
-                            iialg.c_cde_dt = iialg.cde_dt;
                             _iialgMgr = new IialgMgr(mySqlConnectionString);
                             _iialgMgr.insertiialg(iialg);
 
@@ -13874,9 +13878,9 @@ namespace Admin.gigade.Controllers
                             istock.item_id = iinvd.item_id;
                             istock.sc_istock_why = 2;
                             istock.sc_trans_type = 2;
-                            istock.sc_num_old = prod_qty;
-                            istock.sc_num_chg = iialg.adj_qty;
-                            istock.sc_num_new = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id);
+                            istock.sc_num_old = iinvd.prod_qtys;//原始庫存數量
+                            istock.sc_num_chg = iialg.adj_qty;//轉移數量
+                            istock.sc_num_new = _iinvd.GetProd_qty((int)iinvd.item_id, iinvd.plas_loc_id,"","");//結餘數量
                             istock.sc_time = iinvd.create_dtim;
                             istock.sc_user = iinvd.create_user;
                             istock.sc_note = "循環盤點";
@@ -13911,16 +13915,9 @@ namespace Admin.gigade.Controllers
                 query.loc_id = Request.Params["loc_id"].ToUpper();
                 List<IlocQuery> ilocList = new List<IlocQuery>();
                 _IlocMgr = new IlocMgr(mySqlConnectionString);
-                //_iinvd = new IinvdMgr(mySqlConnectionString);
                 if (_IlocMgr.GetIlocCount(query)!="")
-                {
-                    //if (_iinvd.GetIinvdList(query.loc_id).Count > 0)
-                    //{
+                {                    
                         result = "true";
-                    //}
-                    //else {
-                    //    result = "0";
-                    //}
                 }
                 else
                 {
@@ -13936,7 +13933,6 @@ namespace Admin.gigade.Controllers
             }
             return Json(new { success = result });
         }
-
         public JsonResult GetItemDate()
         {
             string result = "false";

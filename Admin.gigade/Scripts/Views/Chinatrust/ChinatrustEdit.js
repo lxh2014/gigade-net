@@ -213,20 +213,40 @@
                  name: 'event_start_time',
                  allowBlank: false,
                  editable: false,
-                 format: 'Y-m-d 00:00:00',
-                 vtype: 'daterange',//標記類型
-                 endDateField: 'event_end_time'//標記結束時間
+                 format: 'Y-m-d H:i:s',
+                 value: Tomorrow(),
+                 time: { hour: 00, min: 00, sec: 00 },
+                 listeners: {
+                     select: function (a, b, c) {
+                         var start = Ext.getCmp("event_start_time");
+                         var end = Ext.getCmp("event_end_time");
+                         if (end.getValue() < start.getValue()) {
+                             var start_date = start.getValue();
+                             Ext.getCmp('event_end_time').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                         }
+                     }
+                 }
              },
             {
                 fieldLabel: "活動結束時間",
                 xtype: 'datetimefield',
                 id: 'event_end_time',
                 name: 'event_end_time',
-                format: 'Y-m-d 23:59:59',
+                format: 'Y-m-d H:i:s',
+                time: { hour: 23, min: 59, sec: 59 },
                 allowBlank: false,
                 editable: false,
-                vtype: 'daterange',
-                startDateField: 'event_start_time'//標記開始時間
+                value: setNextMonth(Tomorrow(), 1),
+                listeners: {
+                    select: function (a, b, c) {
+                        var start = Ext.getCmp("event_start_time");
+                        var end = Ext.getCmp("event_end_time");
+                        if (end.getValue() < start.getValue()) {//開始時間大於了結束時間
+                            var end_date = end.getValue();
+                            Ext.getCmp('event_start_time').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
+                        }
+                    }
+                }
             }
         ],
         buttons: [{
@@ -291,7 +311,7 @@
 
     var editUserWin = Ext.create('Ext.window.Window', {
         id: 'editUserWin',
-        width: 700,
+        width: 760,
         title: "中信活動",
         iconCls: 'icon-user-edit',
         iconCls: row ? "icon-user-edit" : "icon-user-add",
@@ -348,4 +368,28 @@
         Ext.getCmp('event_banner').setRawValue(imgUrl);
         $('textarea[name=kendoEditor]').data("kendoEditor").value(Row.data.event_desc);
     }
+}
+function Tomorrow() {
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate() + 1);
+    return dt;                                 // 返回日期。
+}
+
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

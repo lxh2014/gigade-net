@@ -152,7 +152,7 @@ Ext.onReady(function () {
                           allowBlank: true,
                           editable: false,
                           time: { hour: 00, min: 00, sec: 00 },//標記結束時間00:00:00
-                          value:'',
+                          
                           listeners: {
                               select: function (a, b, c) {
                                   var start = Ext.getCmp("start_time");
@@ -161,7 +161,7 @@ Ext.onReady(function () {
                                       end.setValue(setNextMonth(start.getValue(), 1));
                                   }
                                   else if (end.getValue() < start.getValue()) {
-                                      Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                                       
                                       end.setValue(setNextMonth(start.getValue(), 1));
                                   }
                               }
@@ -190,7 +190,7 @@ Ext.onReady(function () {
                                       start.setValue(setNextMonth(end.getValue(), -1));
                                   }
                                   else if ( end.getValue() < start.getValue()) {
-                                      Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                                       
                                       start.setValue(setNextMonth(end.getValue(),-1));
                                   }
                               }

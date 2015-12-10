@@ -390,8 +390,8 @@ namespace Admin.gigade.Controllers
                     dtExcel.Columns.Add("商品細項編號", typeof(String));
                     dtExcel.Columns.Add("商品ERP編號", typeof(String));
                     dtExcel.Columns.Add("商品名稱", typeof(String));
-                    dtExcel.Columns.Add("商品狀態", typeof(String));
-                    dtExcel.Columns.Add("販售狀態", typeof(String));
+                    //dtExcel.Columns.Add("商品狀態", typeof(String));
+                    //dtExcel.Columns.Add("販售狀態", typeof(String));
                     dtExcel.Columns.Add("規格", typeof(String));
                     // dtExcel.Columns.Add("規格二", typeof(String));
                     dtExcel.Columns.Add("庫存量", typeof(String));
@@ -413,16 +413,16 @@ namespace Admin.gigade.Controllers
                         newRow[4] = dt.Rows[i]["item_id"];
                         newRow[5] = dt.Rows[i]["erp_id"];
                         newRow[6] = dt.Rows[i]["product_name"];
-                        newRow[7] = dt.Rows[i]["product_status_string"];
-                        newRow[8] = dt.Rows[i]["sale_name"];
-                        newRow[9] = dt.Rows[i]["spec_title_1"];
+                        //newRow[7] = dt.Rows[i]["product_status_string"];
+                        //newRow[8] = dt.Rows[i]["sale_name"];
+                        newRow[7] = dt.Rows[i]["spec_title_1"];
                        
-                        newRow[10] = dt.Rows[i]["item_stock"];
-                        newRow[11] = dt.Rows[i]["iinvd_stock"];
-                        newRow[12] = dt.Rows[i]["item_alarm"];
+                        newRow[8] = dt.Rows[i]["item_stock"];
+                        newRow[9] = dt.Rows[i]["iinvd_stock"];
+                        newRow[10] = dt.Rows[i]["item_alarm"];
                         if (string.IsNullOrEmpty(dt.Rows[i]["sum_total"].ToString()))
                         {
-                            newRow[13] = 0;
+                            newRow[11] = 0;
                         }
                         else
                         {
@@ -459,29 +459,29 @@ namespace Admin.gigade.Controllers
 
                                 if (suggestPurchaseTemp <= int.Parse(dt.Rows[i]["min_purchase_amount"].ToString()))   //最小值為1
                                 {
-                                    newRow[13] = dt.Rows[i]["min_purchase_amount"];
+                                    newRow[11] = dt.Rows[i]["min_purchase_amount"];
                                 }
                                 else
                                 {
                                     int suggestPurchase = Convert.ToInt32(suggestPurchaseTemp);
                                     if (suggestPurchase < suggestPurchaseTemp)
                                     {
-                                        newRow[13] = Convert.ToInt32(suggestPurchaseTemp) + 1;
+                                        newRow[11] = Convert.ToInt32(suggestPurchaseTemp) + 1;
                                     }
                                     else
                                     {
-                                        newRow[13] = Convert.ToInt32(suggestPurchaseTemp);
+                                        newRow[11] = Convert.ToInt32(suggestPurchaseTemp);
                                     }
                                 }
                             }
 
                         }
-                        newRow[14] = dt.Rows[i]["NoticeGoods"];
+                        newRow[12] = dt.Rows[i]["NoticeGoods"];
 
-                        newRow[15] = dt.Rows[i]["item_cost"];
-                        newRow[16] = dt.Rows[i]["item_money"];
-                        newRow[17] = string.IsNullOrEmpty(dt.Rows[i]["product_start"].ToString()) ? " " : DateTime.Parse(dt.Rows[i]["product_start"].ToString()).ToString("yyyy-MM-dd hh:mm:ss");
-                        newRow[18] = string.IsNullOrEmpty(dt.Rows[i]["product_end"].ToString()) ? "" : DateTime.Parse(dt.Rows[i]["product_end"].ToString()).ToString("yyyy-MM-dd hh:mm:ss");
+                        newRow[13] = dt.Rows[i]["item_cost"];
+                        newRow[14] = dt.Rows[i]["item_money"];
+                        newRow[15] = string.IsNullOrEmpty(dt.Rows[i]["product_start"].ToString()) ? " " : DateTime.Parse(dt.Rows[i]["product_start"].ToString()).ToString("yyyy-MM-dd hh:mm:ss");
+                        newRow[16] = string.IsNullOrEmpty(dt.Rows[i]["product_end"].ToString()) ? "" : DateTime.Parse(dt.Rows[i]["product_end"].ToString()).ToString("yyyy-MM-dd hh:mm:ss");
                         dtExcel.Rows.Add(newRow);
 
                     }
@@ -531,8 +531,8 @@ namespace Admin.gigade.Controllers
             sb.AppendFormat("<td>{0}</td>", dtExcel.Columns[14]);
             sb.AppendFormat("<td>{0}</td>", dtExcel.Columns[15]);
             sb.AppendFormat("<td>{0}</td>", dtExcel.Columns[16]);
-            sb.AppendFormat("<td>{0}</td>", dtExcel.Columns[17]);
-            sb.AppendFormat("<td>{0}</td>", dtExcel.Columns[18]);
+            //sb.AppendFormat("<td>{0}</td>", dtExcel.Columns[17]);
+            //sb.AppendFormat("<td>{0}</td>", dtExcel.Columns[18]);
             sb.AppendFormat("</tr></thead>");
             int i = 0;
             foreach (DataRow item in dtExcel.Rows)
@@ -562,8 +562,8 @@ namespace Admin.gigade.Controllers
                 sb.AppendFormat("<td>{0}</td>", item[14]);
                 sb.AppendFormat("<td>{0}</td>", item[15]);
                 sb.AppendFormat("<td>{0}</td>", item[16]);
-                sb.AppendFormat("<td>{0}</td>", item[17]);
-                sb.AppendFormat("<td>{0}</td>", item[18]);
+                //sb.AppendFormat("<td>{0}</td>", item[17]);
+                //sb.AppendFormat("<td>{0}</td>", item[18]);
                 sb.Append("</tr>");
                 i++;
             }

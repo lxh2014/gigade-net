@@ -369,6 +369,36 @@ LEFT JOIN order_master o ON a.ord_id=o.order_id
             
         }
         #endregion
+        #region 判斷itemid是否在某個工作項中
+        public int GetCountByItem(Aseld a)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT count(seld_id) as totalCount  FROM aseld a where 1=1 ");
+
+                if (!string.IsNullOrEmpty(a.assg_id))
+                {
+                    sql.AppendFormat(" and a.assg_id='{0}' ", a.assg_id);
+                }
+                if (a.item_id != 0)
+                {
+                    sql.AppendFormat(" and a.item_id='{0}' ", a.item_id);
+                }
+
+                DataTable _dt = _access.getDataTable(sql.ToString());
+
+                return Convert.ToInt32(_dt.Rows[0]["totalCount"]);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldDao.GetCountByItem-->" + ex.Message + sql.ToString(), ex);
+            }
+
+        }
+        #endregion
+
 
         /// <summary>
         /// 調度頁面數據
