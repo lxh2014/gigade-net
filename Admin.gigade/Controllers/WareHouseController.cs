@@ -12382,7 +12382,7 @@ namespace Admin.gigade.Controllers
         {
             PdfHelper pdf = new PdfHelper();
             List<string> pdfList = new List<string>();
-            float[] arrColWidth = new float[] { 150, 60, 35,  45, 45,50, 50, 50, 45, 55, 35 };
+            float[] arrColWidth = new float[] { 135, 60, 45, 35, 45, 45, 50, 55, 55, 45, 60, 35 };
             int index = 0;
             string newFileName = string.Empty;
             string newName = string.Empty;
@@ -12438,7 +12438,7 @@ namespace Admin.gigade.Controllers
             DataTable _dtBody = new DataTable();
             _dtBody.Columns.Add("商品名稱", typeof(string));
             _dtBody.Columns.Add("條碼", typeof(string));
-           // _dtBody.Columns.Add("規格", typeof(string));
+            _dtBody.Columns.Add("細項編號", typeof(string));
             _dtBody.Columns.Add("訂貨量", typeof(string));
             _dtBody.Columns.Add("已撿貨量", typeof(string));
             _dtBody.Columns.Add("待撿貨量", typeof(string));
@@ -12464,7 +12464,7 @@ namespace Admin.gigade.Controllers
                 aseldTable = aseldMgr.GetAseldTable(ase_query, out total);
                 #region 標頭
                 #region 表頭
-                PdfPTable ptable = new PdfPTable(11);
+                PdfPTable ptable = new PdfPTable(12);
 
 
                 ptable.WidthPercentage = 100;//表格寬度
@@ -12472,7 +12472,7 @@ namespace Admin.gigade.Controllers
                 PdfPCell cell = new PdfPCell();
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 12;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12481,7 +12481,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 3;
+                cell.Colspan = 4;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12508,7 +12508,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 12;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12517,7 +12517,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("印表人：" + user_username, new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 2;
+                cell.Colspan = 3;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12543,7 +12543,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 12;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -12552,7 +12552,7 @@ namespace Admin.gigade.Controllers
                 #endregion
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
-                cell.Colspan = 3;
+                cell.Colspan = 4;
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -12579,10 +12579,10 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                //cell = new PdfPCell(new Phrase("規格", new iTextSharp.text.Font(bf, 8)));
-                //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                //cell.DisableBorderSide(8);
-                //ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
 
                 cell = new PdfPCell(new Phrase("訂貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
@@ -12700,7 +12700,7 @@ namespace Admin.gigade.Controllers
                                     {
                                         row["商品名稱"] = "";
                                         row["條碼"] = "";
-                                        // row["規格"] = rows["spec"];
+                                        row["細項編號"] ="";
                                         row["訂貨量"] = "";
                                         row["已撿貨量"] = "";
                                         row["待撿貨量"] = "";
@@ -12710,7 +12710,7 @@ namespace Admin.gigade.Controllers
                                     {
                                         row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
                                         row["條碼"] = upc_id;
-                                        // row["規格"] = rows["spec"];
+                                        row["細項編號"] = rows["item_id"];
                                         row["訂貨量"] = rows["ord_qty"];
                                         row["已撿貨量"] = rows["act_pick_qty"];
                                         row["待撿貨量"] = rows["out_qty"];
@@ -12735,7 +12735,7 @@ namespace Admin.gigade.Controllers
                                     {
                                         row["商品名稱"] = "";
                                         row["條碼"] = "";
-                                        // row["規格"] = rows["spec"];
+                                        row["細項編號"] = "";
                                         row["訂貨量"] = "";
                                         row["已撿貨量"] = "";
                                         row["待撿貨量"] = "";
@@ -12745,7 +12745,7 @@ namespace Admin.gigade.Controllers
                                     {
                                         row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
                                         row["條碼"] = upc_id;
-                                        //row["規格"] = rows["spec"];
+                                        row["細項編號"] = rows["item_id"];
                                         row["訂貨量"] = rows["ord_qty"];
                                         row["已撿貨量"] = rows["act_pick_qty"];
                                         row["待撿貨量"] = rows["out_qty"];
@@ -12774,7 +12774,7 @@ namespace Admin.gigade.Controllers
                             DataRow row = _dtBody.NewRow();
                             row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
                             row["條碼"] = upc_id;
-                           // row["規格"] = rows["spec"];
+                            row["細項編號"] = rows["item_id"];
                             row["訂貨量"] = rows["ord_qty"];
                             row["已撿貨量"] = rows["act_pick_qty"];
                             row["待撿貨量"] = rows["out_qty"];
@@ -12796,7 +12796,7 @@ namespace Admin.gigade.Controllers
 
                 //  pdfList.Add(MakePDF(aseldTable, ase_query.assg_id, user_username, newPDFName, index++));
                 newFileName = newPDFName + "_part" + index++ + "." + "pdf";
-                pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 11, uint.Parse(_dtBody.Rows.Count.ToString()));/*第一7是列，第二個是行*/
+                pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 12, uint.Parse(_dtBody.Rows.Count.ToString()));/*第一7是列，第二個是行*/
                 pdfList.Add(newFileName);
             }
             else if (ase_query.start_dtim != DateTime.MinValue && ase_query.change_dtim != DateTime.MinValue || serchWhr == 0)
@@ -12809,7 +12809,7 @@ namespace Admin.gigade.Controllers
                     _dtBody.Rows.Clear();
                     #region 標頭
                     #region 表頭
-                    PdfPTable ptable = new PdfPTable(11);
+                    PdfPTable ptable = new PdfPTable(12);
 
 
                     ptable.WidthPercentage = 100;//表格寬度
@@ -12817,7 +12817,7 @@ namespace Admin.gigade.Controllers
                     PdfPCell cell = new PdfPCell();
                     cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.Colspan = 11;
+                    cell.Colspan = 12;
                     cell.DisableBorderSide(1);
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
@@ -12826,7 +12826,7 @@ namespace Admin.gigade.Controllers
 
                     cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.Colspan = 3;
+                    cell.Colspan = 4;
                     cell.DisableBorderSide(1);
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
@@ -12844,7 +12844,7 @@ namespace Admin.gigade.Controllers
 
                     cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.Colspan = 3;
+                    cell.Colspan = 4;
                     cell.DisableBorderSide(1);
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
@@ -12853,7 +12853,7 @@ namespace Admin.gigade.Controllers
 
                     cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.Colspan = 11;
+                    cell.Colspan = 12;
                     cell.DisableBorderSide(1);
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
@@ -12862,7 +12862,7 @@ namespace Admin.gigade.Controllers
 
                     cell = new PdfPCell(new Phrase("印表人：" + user_username, new iTextSharp.text.Font(bf, 8)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.Colspan = 2;
+                    cell.Colspan = 3;
                     cell.DisableBorderSide(1);
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
@@ -12888,7 +12888,7 @@ namespace Admin.gigade.Controllers
 
                     cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.Colspan = 11;
+                    cell.Colspan = 12;
                     cell.DisableBorderSide(1);
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
@@ -12897,7 +12897,7 @@ namespace Admin.gigade.Controllers
                     #endregion
                     cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                     cell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
-                    cell.Colspan = 3;
+                    cell.Colspan = 4;
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
@@ -12924,10 +12924,10 @@ namespace Admin.gigade.Controllers
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
 
-                    //cell = new PdfPCell(new Phrase("規格", new iTextSharp.text.Font(bf, 8)));
-                    //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    //cell.DisableBorderSide(8);
-                    //ptable.AddCell(cell);
+                    cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
+                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                    cell.DisableBorderSide(8);
+                    ptable.AddCell(cell);
 
                     cell = new PdfPCell(new Phrase("訂貨量", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
@@ -13046,7 +13046,7 @@ namespace Admin.gigade.Controllers
                                         {
                                             row["商品名稱"] = "";
                                             row["條碼"] = "";
-                                            // row["規格"] = rows["spec"];
+                                            row["細項編號"] = "";
                                             row["訂貨量"] = "";
                                             row["已撿貨量"] = "";
                                             row["待撿貨量"] = "";
@@ -13056,7 +13056,7 @@ namespace Admin.gigade.Controllers
                                         {
                                             row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
                                             row["條碼"] = upc_id;
-                                            // row["規格"] = rows["spec"];
+                                            row["細項編號"] = rows["item_id"];
                                             row["訂貨量"] = rows["ord_qty"];
                                             row["已撿貨量"] = rows["act_pick_qty"];
                                             row["待撿貨量"] = rows["out_qty"];
@@ -13076,7 +13076,7 @@ namespace Admin.gigade.Controllers
                                         {
                                             row["商品名稱"] = "";
                                             row["條碼"] = "";
-                                            // row["規格"] = rows["spec"];
+                                            row["細項編號"] = "";
                                             row["訂貨量"] = "";
                                             row["已撿貨量"] = "";
                                             row["待撿貨量"] = "";
@@ -13086,7 +13086,7 @@ namespace Admin.gigade.Controllers
                                         {
                                             row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
                                             row["條碼"] = upc_id;
-                                            //row["規格"] = rows["spec"];
+                                            row["細項編號"] = rows["item_id"];
                                             row["訂貨量"] = rows["ord_qty"];
                                             row["已撿貨量"] = rows["act_pick_qty"];
                                             row["待撿貨量"] = rows["out_qty"];
@@ -13115,11 +13115,13 @@ namespace Admin.gigade.Controllers
                                 DataRow row = _dtBody.NewRow();
                                 row["商品名稱"] = rows["product_name"] + rows["spec"].ToString();
                                 row["條碼"] = upc_id;
-                               // row["規格"] = rows["spec"];
+                                row["細項編號"] = rows["item_id"];
                                 row["訂貨量"] = rows["ord_qty"];
                                 row["已撿貨量"] = rows["act_pick_qty"];
                                 row["待撿貨量"] = rows["out_qty"];
+                                
                                 row["本次撿貨量"] = " ";
+                                row["料位編號"] = rows["loc_id"];
                                 //row["撿貨料位編號"] = " ";
                                 row["撿貨庫存"] = 0;
                                 row["製造日期"] = " ";
@@ -13136,7 +13138,7 @@ namespace Admin.gigade.Controllers
 
                     //  pdfList.Add(MakePDF(aseldTable, ase_query.assg_id, user_username, newPDFName, index++));
                     newFileName = newPDFName + "_part" + index++ + "." + "pdf";
-                    pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 11, uint.Parse(_dtBody.Rows.Count.ToString()));/*第一7是列，第二個是行*/
+                    pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 12, uint.Parse(_dtBody.Rows.Count.ToString()));/*第一7是列，第二個是行*/
                     pdfList.Add(newFileName);
                 }
             }
@@ -13157,7 +13159,7 @@ namespace Admin.gigade.Controllers
                 PdfPCell cell = new PdfPCell();
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 12;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -13166,7 +13168,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 3;
+                cell.Colspan = 4;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -13193,7 +13195,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 12;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -13202,7 +13204,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase("印表人：" + user_username, new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 2;
+                cell.Colspan = 3;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -13228,7 +13230,7 @@ namespace Admin.gigade.Controllers
 
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.Colspan = 11;
+                cell.Colspan = 12;
                 cell.DisableBorderSide(1);
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
@@ -13237,7 +13239,7 @@ namespace Admin.gigade.Controllers
                 #endregion
                 cell = new PdfPCell(new Phrase(" ", new iTextSharp.text.Font(bf, 8)));
                 cell.VerticalAlignment = Element.ALIGN_RIGHT;//字體水平居右
-                cell.Colspan = 3;
+                cell.Colspan = 4;
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -13264,10 +13266,10 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                //cell = new PdfPCell(new Phrase("規格", new iTextSharp.text.Font(bf, 8)));
-                //cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                //cell.DisableBorderSide(8);
-                //ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
 
                 cell = new PdfPCell(new Phrase("訂貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
@@ -13338,7 +13340,7 @@ namespace Admin.gigade.Controllers
                 // document.Add(ptable);
                 //document.Add(ptablefoot); 
                 newFileName = newPDFName + "_part" + index++ + "." + "pdf";
-                pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 11, uint.Parse(_dtBody.Rows.Count.ToString()));/*第一7是列，第二個是行*/
+                pdf.ExportDataTableToPDF(_dtBody, false, newFileName, arrColWidth, ptable, ptablefoot, "", "", 12, uint.Parse(_dtBody.Rows.Count.ToString()));/*第一7是列，第二個是行*/
                 pdfList.Add(newFileName);
 
             }
