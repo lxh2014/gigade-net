@@ -1109,7 +1109,8 @@ var orderStore = Ext.create('Ext.data.Store', {
                 for (var i = 0, j = orderStore.getCount() ; i < j; i++) {
                     var data = orderStore.getAt(i);
                     if (data.get("buynum") != 0) {
-                        numSum += parseInt(data.get("buynum"));    // 
+                        numSum += parseInt(data.get("buynum"));    // 
+
                         numSum += parseInt(data.get("buynum") != 0);
                     }
                 }
@@ -1364,7 +1365,8 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
                             orderGrid.columns[3].getEditor().getStore().removeAll();
                             for (var a = 0; a < child_list.length; a++) {
                                 orderGrid.columns[3].getEditor().getStore().add({
-                                    Product_Name: child_list[a].Product_Name,
+                                    Product_Name: child_list[a].Product_Name,
+
                                     Child_Id: child_list[a].Child_Id
                                 });
                             }
@@ -1616,15 +1618,18 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
             }
 
             if (e.colIdx == 11) {//購物金
-                //判斷輸入 的 購物金金額 是否 大於 商品定價
+                //判斷輸入 的 購物金金額 是否 大於 商品定價 X 購買數量
                 for (var i = 0; i < orderStore.data.length; i++) {
-                    var cost = orderStore.getAt(i).get("product_cost");
+                    var product_cost = orderStore.getAt(i).get("product_cost");
+                    var event_item_money = orderStore.getAt(i).get("Event_Item_Money");
+                    var price = event_item_money == 0 ? product_cost : event_item_money;
+                    var buynum = orderStore.getAt(i).get("buynum");
                     var bonus = orderStore.getAt(i).get("Deduct_Bonus");
                     if (bonus == null || bonus == "") {
                         orderStore.getAt(i).set("Deduct_Bonus", "0");
                         return;
                     }
-                    if (bonus > cost) {
+                    if (bonus > (price * buynum)) {
                         Ext.Msg.alert(INFORMATION, DEDUCT_BONUS + BOUNS_OR_WELFARE_IS_NO_PRICE);
                         orderStore.getAt(i).set("Deduct_Bonus", "0");
                     }
@@ -1632,15 +1637,18 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
             }
 
             if (e.colIdx == 12) {//抵用券
-                //判斷輸入 的 抵用券金額 是否 大於 商品定價
+                //判斷輸入 的 抵用券金額 是否 大於 商品定價 X 購買數量
                 for (var i = 0; i < orderStore.data.length; i++) {
-                    var cost = orderStore.getAt(i).get("product_cost");
+                    var product_cost = orderStore.getAt(i).get("product_cost");
+                    var event_item_money = orderStore.getAt(i).get("Event_Item_Money");
+                    var price = event_item_money == 0 ? product_cost : event_item_money;
+                    var buynum = orderStore.getAt(i).get("buynum");
                     var welfare = orderStore.getAt(i).get("Deduct_Welfare");
                     if (welfare == null || welfare == "") {
                         orderStore.getAt(i).set("Deduct_Welfare", "0");
                         return;
                     }
-                    if (welfare > cost) {
+                    if (welfare > (price * buynum)) {
                         Ext.Msg.alert(INFORMATION, DEDUCT_WELFARE + BOUNS_OR_WELFARE_IS_NO_PRICE);
                         orderStore.getAt(i).set("Deduct_Welfare", "0");
                     }
@@ -1650,12 +1658,27 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
             if (e.colIdx == 10 || e.colIdx == 6) {
                 var data = orderStore.getAt(e.rowIdx);
 
+                var product_cost = data.get("product_cost");//add by zhuoqin0830w 2015/12/03 獲取定價
+                var event_item_money = data.get("Event_Item_Money");//add by zhuoqin0830w 2015/12/02 獲取活動價
+                var price = event_item_money == 0 ? product_cost : event_item_money;
+
+                var Item_Cost = data.get("Item_Cost");//add by zhuoqin0830w 2015/12/03 獲取成本
+                var event_item_cost = data.get("Event_Item_Cost");//add by zhuoqin0830w 2015/12/02 獲取活動成本
+                var cost = event_item_money == 0 ? Item_Cost : event_item_cost;
+
                 //返還購物金  add by zhuoqin0830w  2015/08/03
-                var bonus = Math.round((data.get("product_cost") - data.get("Item_Cost")) * 0.08);
+                var bonus = Math.round((price - cost) * 0.08);
                 if (bonus > 0) {
                     bonus = bonus < 5 ? parseInt(5 * data.get("buynum")) : parseInt(bonus * data.get("buynum"));
                 } else { bonus = 0; }
                 data.set("accumulated_bonus", bonus);
+
+                //如果購買數量變為 0  則將購物金和抵用金的金額也恢復初始值
+                if (data.get("buynum") == 0) {
+                    data.set("Deduct_Welfare", "0");
+                    data.set("Deduct_Bonus", "0");
+                }
+
                 //父商品下子商品的返還金
                 var s_must_buy = data.get("s_must_buy");
                 var child_scale = data.get("child_scale");
@@ -1828,7 +1851,8 @@ Ext.apply(Ext.form.field.VTypes, {
 //價格
 Ext.apply(Ext.form.field.VTypes, {
     regxMoney: function (val, field) {
-        return /^[1-9]\d*\.\d*|0\.\d*[1-9]\d*|0?\.0+|[0-9]$/.test
+        return /^[1-9]\d*\.\d*|0\.\d*[1-9]\d*|0?\.0+|[0-9]$/.test
+
 (val);
     },
     regxMoneyText: FORMAT_ERROR
@@ -1882,8 +1906,14 @@ function accBonus() {
     var bonus = 0;
     for (var i = 0, j = orderStore.getCount() ; i < j; i++) {
         if (orderStore.getAt(i).get("product_id") != " ") {
-            var price = parseFloat(orderStore.getAt(i).get("product_cost"));
-            var cost = parseFloat(orderStore.getAt(i).get("Item_Cost"));
+            var product_cost = parseFloat(orderStore.getAt(i).get("product_cost"));//edit by zhuoqin0830w 2015/12/03 獲取定價
+            var event_item_money = parseFloat(orderStore.getAt(i).get("Event_Item_Money"));//add by zhuoqin0830w 2015/12/02 獲取活動價
+            var price = event_item_money == 0 ? product_cost : event_item_money;
+
+            var Item_Cost = parseFloat(orderStore.getAt(i).get("Item_Cost"));//edit by zhuoqin0830w 2015/12/03 獲取成本
+            var event_item_cost = parseFloat(orderStore.getAt(i).get("Event_Item_Cost"));//add by zhuoqin0830w 2015/12/02 獲取活動成本
+            var cost = event_item_money == 0 ? Item_Cost : event_item_cost;
+
             var buynum = parseInt(orderStore.getAt(i).get("buynum"));
 
             if (buynum == 0) {
@@ -3054,7 +3084,8 @@ function searchByGigade(val, rowIdx, spec1, spec2, obj, Product_Id, Site_Id, com
                     if (storeData.data.child != undefined && storeData.data.child != "") {
                         CalculatePrice(data.child, price_type);
                     }
-
+
+
                     /**************************end******************************/
                     /*if (storeData.get("product_id") != " ") {
                     if (data.stock != 0) {
@@ -3262,7 +3293,8 @@ function CalculatePrice(combination, price_type) {
     if (price_type == 2) {
         orderStore.getAt(parent_id_row).set("product_cost", childrenTotalPrice);
         var frontStock = orderStore.getAt(parent_id_row + 1).data;
-        var minStock = parseInt(frontStock.stock / (frontStock.s_must_buy == 0 ? 1 : frontStock.s_must_buy));
+        var minStock = parseInt(frontStock.stock / (frontStock.s_must_buy == 0 ? 1 : frontStock.s_must_buy));
+
         //最小庫存為組合下子商品最小庫存/該商品的必購數量
         for (var i = 1; i <= rowCount; i++) {
             var curDa = orderStore.data.items[parent_id_row + i].data;
@@ -3332,7 +3364,8 @@ function CalculatePrice(combination, price_type) {
 
             //            }
         }
-        child_scale = child_scale.substring(0, child_scale.length -
+        child_scale = child_scale.substring(0, child_scale.length -
+
 1);
         child_cost_scale = child_cost_scale.substring(0, child_cost_scale.length - 1);
         orderStore.getAt(parent_id_row).set("stock", minStock);

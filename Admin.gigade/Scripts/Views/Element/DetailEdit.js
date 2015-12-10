@@ -463,7 +463,30 @@ function editFunction(RowID, Store, i) {
                     buttonText: TAKEALOOK,
                     submitValue: true,
                     allowBlank: false,
-                    fileUpload: true
+                    fileUpload: true,
+                    listeners: {
+                        //change: function () {
+
+                        //    Ext.Ajax.request({
+                        //        url: "/Element/Getpic",
+                        //        method: 'post',
+                        //        type: 'text',
+                        //        params: {
+                        //            element_image: Ext.htmlEncode(Ext.getCmp('element_image').getValue()),
+                        //        },
+                        //        success: function (form, action) {
+                        //            var result = Ext.decode(form.responseText);
+                        //            if (result.success) {
+
+                        //            }
+                        //            else {
+                        //                alert(1);
+                        //                Ext.getCmp("element_image").setValue("");
+                        //            }
+                        //        }
+                        //    });
+                        //}
+                    }
                 },
                 {
                     xtype: 'button',
@@ -504,13 +527,13 @@ function editFunction(RowID, Store, i) {
                         submitValue: true,
                         fileUpload: true
                     },
-                     {
-                         xtype: 'button', id: 'delbig', margin: '0 0 0 10', iconCls: 'icon-cross',
-                         handler: function () {
-                             var targetImage2 = Ext.getCmp("element_img_big");
-                             targetImage2.setRawValue("");
-                         }
-                     }
+                    {
+                        xtype: 'button', id: 'delbig', margin: '0 0 0 10', iconCls: 'icon-cross',
+                        handler: function () {
+                            var targetImage2 = Ext.getCmp("element_img_big");
+                            targetImage2.setRawValue("");
+                        }
+                    }
                     // ,
                     //{
                     //    xtype: 'button',
@@ -708,7 +731,6 @@ function editFunction(RowID, Store, i) {
                                             element_remark: Ext.htmlEncode(Ext.getCmp("element_remark").getValue()),
                                             packet_id: Ext.htmlEncode(Ext.getCmp("packet_id").getValue()),
                                             element_img_big: Ext.htmlEncode(Ext.getCmp("element_img_big").getValue())
-                                            
                                         },
                                         success: function (form, action) {
                                                 myMask.hide();

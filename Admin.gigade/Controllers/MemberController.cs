@@ -93,11 +93,11 @@ namespace Admin.gigade.Controllers
                 DateTime datetime;
                 if (DateTime.TryParse(Request.Params["time_start"], out datetime))
                 {
-                    query.created_start = DateTime.Parse(datetime.ToString("yyyy-MM-dd 00:00:00"));
+                    query.created_start = DateTime.Parse(datetime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["time_end"], out datetime))
                 {
-                    query.created_end = DateTime.Parse(datetime.ToString("yyyy-MM-dd 23:59:59"));
+                    query.created_end = DateTime.Parse(datetime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 int totalCount = 0;
                 ShippingVoucherMgr = new ShippingVoucherMgr(mySqlConnectionString);
@@ -771,12 +771,12 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["timestart"]))
                 {
                     query.serchstart = Convert.ToDateTime(Request.Params["timestart"]);
-                    query.serchstart = Convert.ToDateTime(query.serchstart.ToString("yyyy-MM-dd 00:00:00"));
+                    query.serchstart = Convert.ToDateTime(query.serchstart.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["timeend"]))
                 {
                     query.serchend = Convert.ToDateTime(Request.Params["timeend"]);
-                    query.serchend = Convert.ToDateTime(query.serchend.ToString("yyyy-MM-dd 23:59:59"));
+                    query.serchend = Convert.ToDateTime(query.serchend.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 _userloginlog = new UserLoginLogMgr(mySqlConnectionString);
                 int totalCount = 0;
@@ -833,12 +833,12 @@ namespace Admin.gigade.Controllers
 
                 if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
                 {
-                    query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
+                    query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd HH:mm:ss"));
 
                 }
                 if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
                 {
-                    query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
+                    query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["user_id"]))
                 {
@@ -907,11 +907,11 @@ namespace Admin.gigade.Controllers
             {              
                 if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
                 {
-                    query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd 00:00:00"));
+                    query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
                 {
-                    query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd 23:59:59"));
+                    query.create_dateTwo = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateTwo"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["user_id"]))
                 {
@@ -1901,12 +1901,12 @@ namespace Admin.gigade.Controllers
                 {
 
                     query.serchstart = Convert.ToDateTime(Request.Params["timestart"]);
-                    query.serchstart = Convert.ToDateTime(query.serchstart.ToString("yyyy-MM-dd 00:00:00"));
+                    query.serchstart = Convert.ToDateTime(query.serchstart.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["timeend"]))
                 {
                     query.serchend = Convert.ToDateTime(Request.Params["timeend"]);
-                    query.serchend = Convert.ToDateTime(query.serchend.ToString("yyyy-MM-dd 23:59:59"));
+                    query.serchend = Convert.ToDateTime(query.serchend.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 query.content = Request.Params["serchcontent"];
@@ -2461,11 +2461,11 @@ namespace Admin.gigade.Controllers
                 DateTime dt;
                 if (DateTime.TryParse(Request.Params["timestart"], out dt))
                 {
-                    query.smaster_start =Convert.ToDateTime(dt.ToString("yyyy-MM-dd 00:00:00"));
+                    query.smaster_start =Convert.ToDateTime(dt.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["timeend"], out dt))
                 {
-                    query.smaster_end = Convert.ToDateTime(dt.ToString("yyyy-MM-dd 23:59:59")); ;
+                    query.smaster_end = Convert.ToDateTime(dt.ToString("yyyy-MM-dd HH:mm:ss")); ;
                 }
 
                 if (UInt32.TryParse(Request.Params["bonus_type"], out uint32))
@@ -2648,12 +2648,12 @@ namespace Admin.gigade.Controllers
             {
 
                 query.serchstart = Convert.ToDateTime(Request.Params["timestart"]);
-                query.serchstart = Convert.ToDateTime(query.serchstart.ToString("yyyy-MM-dd 00:00:00"));
+                query.serchstart = Convert.ToDateTime(query.serchstart.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (!string.IsNullOrEmpty(Request.Params["timestart"]))
             {
                 query.serchend = Convert.ToDateTime(Request.Params["timeend"]);
-                query.serchend = Convert.ToDateTime(query.serchend.ToString("yyyy-MM-dd 23:59:59"));
+                query.serchend = Convert.ToDateTime(query.serchend.ToString("yyyy-MM-dd HH:mm:ss"));
             }
 
             query.content = Request.Params["serchcontent"];

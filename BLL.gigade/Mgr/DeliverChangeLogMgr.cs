@@ -20,6 +20,9 @@ using BLL.gigade.Dao.Impl;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using BLL.gigade.Mgr.Impl;
+using BLL.gigade.Common;
+using System.Configuration;
+using BLL.gigade.Model.APIModels;
 
 namespace BLL.gigade.Mgr
 {
@@ -312,7 +315,7 @@ namespace BLL.gigade.Mgr
                 //public Boolean SendToGroup(int GroupID, string MailTitle, string MailBody, 
                 //                           Boolean IsSeparate = false, Boolean IsDisplyName = false)
                 //return mail.SendToGroup(GroupCode, MailTitle, MailBody + "<br/>郵件發送共耗時" + Second + "秒", true, true);  
-                return mail.SendToGroup(GroupCode, MailTitle, MailBody, true, true); 
+                return mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", true, true); 
             }
             catch (Exception ex)
             {
@@ -320,5 +323,74 @@ namespace BLL.gigade.Mgr
             }
         } 
         #endregion
-    }
+
+        #region 是否能夠修改期望到貨日 +bool isCanModifyExpertArriveDate(string apiServer,long deliver_id) 
+        /// <summary>
+        /// 是否能夠修改期望到貨日
+        /// </summary>
+        /// <param name="apiServer">apisever地址</param>
+        /// <param name="deliver_id">要修改的deliver_id</param>
+        /// <returns></returns>
+        public bool isCanModifyExpertArriveDate(string apiServer, long deliver_id)
+        {
+
+
+            try
+            {
+                GigadeApiRequest request = new GigadeApiRequest(apiServer);
+                var result = request.Request<DeliverIdViewModel, object>("api/admin/Logistics/CanModifyExpertArriveDate", new DeliverIdViewModel() { deliver_id = deliver_id });
+                //var result = request.Request<DeliverIdViewModel, object>("api/Logistics/ModifyExpertArriveDate", new DeliverIdViewModel() { deliver_id = deliver_id });//api/Logistics/ModifyExpertArriveDate
+                if (Convert.ToBoolean(result.result))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+                throw new Exception("DeliverChangeLogMgr-->isCanModifyExpertArriveDate-->" + ex.Message, ex);
+
+            }
+
+        } 
+        #endregion
+
+        #region 修改期望到貨日 +bool ModifyExpertArriveDate(string apiServer, ModifyExpertArriveDateViewModel expertArriveDateViewModel)
+        /// <summary>
+        /// 修改期望到貨日
+        /// </summary>
+        /// <param name="apiServer"></param>
+        /// <param name="expertArriveDateViewModel"></param>
+        /// <returns></returns>
+        public bool ModifyExpertArriveDate(string apiServer, ModifyExpertArriveDateViewModel expertArriveDateViewModel)
+        {
+
+
+            try
+            {
+                GigadeApiRequest request = new GigadeApiRequest(apiServer);
+                var result = request.Request<ModifyExpertArriveDateViewModel, object>("api/admin/Logistics/ModifyExpertArriveDate", expertArriveDateViewModel);
+                if (Convert.ToBoolean(result.result))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+                throw new Exception("DeliverChangeLogMgr-->isCanModifyExpertArriveDate-->" + ex.Message, ex);
+
+            }
+
+        }
+    } 
+        #endregion
 }

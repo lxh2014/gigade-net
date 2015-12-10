@@ -675,13 +675,34 @@ Query = function () {
 //編輯
 onEditClick = function () {
     var row = Ext.getCmp("deliverExpectArrivalGrid").getSelectionModel().getSelection();
+   
+    var deliver_id = row[0].data.deliver_id;
+    
     if (row.length == 0) {
         Ext.Msg.alert(INFORMATION, NO_SELECTION);
     }
     else if (row.length > 1) {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
-    } else if (row.length == 1) {
-        editFunction(row[0], DeliverExpectArrivalStore);
+    } else if (row.length == 1) {     
+        Ext.Ajax.request({
+            url: '/SendProduct/isCanModifyExpectArriveDate',
+            method: "POST",
+            params: { deliver_id: deliver_id },
+            success: function (form, action) {
+                var data = Ext.decode(form.responseText);
+                if (data.msg == "0") {                                      
+                    Ext.Msg.alert("提示信息", "該出貨單不容許修改期望到貨日");                   
+                }
+                else {
+                    editFunction(row[0], DeliverExpectArrivalStore);
+                }
+            },
+            failure: function (form, action) {
+                result = false;
+                var data = Ext.decode(form.responseText);
+                Ext.Msg.alert(data.msg);
+            }   
+        })       
     }
 }
 

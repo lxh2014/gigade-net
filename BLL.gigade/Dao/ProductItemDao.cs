@@ -533,6 +533,10 @@ namespace BLL.gigade.Dao
 //where 1=1 and iin.ista_id='A' order by cde_dt asc  
                 foreach (DataRow dr in dtResult.Rows)
                 {
+                    if (string.IsNullOrEmpty(dr["iinvd_stock"].ToString()))
+                    {
+                        dr["iinvd_stock"] = 0;
+                    }
                     if (string.IsNullOrEmpty(dr["sum_total"].ToString()))
                     {
                         dr["sum_total"] = 0;

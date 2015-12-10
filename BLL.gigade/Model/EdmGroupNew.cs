@@ -18,7 +18,7 @@ namespace BLL.gigade.Model
         public int group_create_userid { get; set; }
         public int group_update_userid { get; set; }
         public string trial_url { get; set; }
-
+  
         public EdmGroupNew()
         {
             group_id = 0;

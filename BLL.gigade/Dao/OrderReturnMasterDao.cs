@@ -286,7 +286,7 @@ namespace BLL.gigade.Dao
                         #region  寫入付款單退款金額
                         if (returnmoney > 0)
                         {
-                            mySqlCmd.CommandText = _ordermasterdao.UpdateMoneycanale(returnmoney, om.Order_Id);
+                            mySqlCmd.CommandText = _ordermasterdao.UpdateMoneyReturn(returnmoney, om.Order_Id);
                             sql.Append(mySqlCmd.CommandText);
                             mySqlCmd.ExecuteNonQuery();
                             sql.Clear();

@@ -68,11 +68,11 @@ namespace BLL.gigade.Dao
                     }
                 }
                 if (query.startdate != DateTime.Parse("2010/01/01"))
-                    str.AppendFormat(" and createtime >= '" + query.startdate.ToString("yyyy-MM-dd 00:00:00") + "' ");
+                    str.AppendFormat(" and createtime >= '" + query.startdate.ToString("yyyy-MM-dd HH:mm:ss") + "' ");
                 else
                     str.AppendFormat(" and createtime >= '2010-01-01' ");
                 if (query.enddate != DateTime.Parse("2010/01/01"))
-                    str.AppendFormat(" and createtime <= '" + query.enddate.ToString("yyyy-MM-dd 23:59:59") + "' ");
+                    str.AppendFormat(" and createtime <= '" + query.enddate.ToString("yyyy-MM-dd HH:mm:ss") + "' ");
                 else
                     str.AppendFormat(" and createtime <= '" + DateTime.Now + "' ");
                 totalCount = 0;

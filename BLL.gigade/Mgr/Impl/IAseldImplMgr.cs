@@ -22,6 +22,7 @@ namespace BLL.gigade.Mgr.Impl
         List<AseldQuery> GetAseldList(Aseld ase);
         List<AseldQuery> GetAseldListByItemid(Aseld ase);
         List<AseldQuery> GetAllAseldList(AseldQuery ase,out int totalCount);
+        int GetCountByItem(Aseld a);
         string UpdTicker(string m);
         string UpdAseld(Aseld a);
         int SelCom(Aseld a);
