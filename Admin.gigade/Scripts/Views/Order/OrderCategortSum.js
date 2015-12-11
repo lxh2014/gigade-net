@@ -181,12 +181,14 @@ Ext.onReady(function () {
             },
             {
                 xtype: "numberfield",
-                fieldLabel: '金額範圍',
+                fieldLabel: '類別訂單金額範圍',
                 id: 'c_money',
                 name: 'c_money',
-                labelWidth: 60,
+                labelWidth: 100,
                 margin: '5 0 0 0',
                 minValue: 0,
+                maxValue: 99999999,
+                allowDecimals: false,
                 value: 0
             },
             {
@@ -201,6 +203,8 @@ Ext.onReady(function () {
                 labelWidth: 60,
                 margin: '5 0 0 0',
                 minValue: 0,
+                maxValue: 99999999,
+                allowDecimals: false,
                 value: 0
             },
             {
