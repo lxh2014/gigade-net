@@ -46,10 +46,10 @@ namespace BLL.gigade.Mgr.Schedules
 
                     str.AppendFormat("</table>");
                 }
-                else
-                {
-                    str.Append("<span style='color:red;'><b>沒有適合條件的數據<b></span>");
-                }
+                //else
+                //{
+                //    str.Append("<span style='color:red;'><b>沒有適合條件的數據<b></span>");
+                //}
 
                 List<ScheduleConfigQuery> store_config = new List<ScheduleConfigQuery>();
                 ScheduleConfigQuery query_config = new ScheduleConfigQuery();
@@ -92,15 +92,18 @@ namespace BLL.gigade.Mgr.Schedules
                     }
                 }
                 MailHelper mHelper = new MailHelper(mailModel);
-                if (mHelper.SendToGroup(GroupCode, EmailTile, str.ToString(), false, true))
+                if (str.ToString().Length > 0)
                 {
-                    return true;
+                    if (mHelper.SendToGroup(GroupCode, EmailTile, str.ToString(), false, true))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
-                else
-                {
-                    return false;
-                }
-
+                return true; 
             }
             catch (Exception ex)
             {
