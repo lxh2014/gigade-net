@@ -41,30 +41,30 @@ var freightTypeStore = Ext.create('Ext.data.Store', {
     ]
 });
 //出貨方式store
-//var productModeStore = Ext.create('Ext.data.Store', {
-//    fields: ['txt', 'value'],
-//    data: [
-//        { "txt": '自出', "value": "1" },
-//        { "txt": '寄倉', "value": "2" },
-//        { "txt": '調度', "value": "3" }
-//    ]
-//});
 var productModeStore = Ext.create('Ext.data.Store', {
-    // fields: ['ParameterCode', 'parameterName'],
-    model: 'gigade.paraModel',
-    autoLoad: true,
-    proxy: {
-        type: 'ajax',
-        url: '/Parameter/QueryPara?paraType=product_mode',
-        noCache: false,
-        getMethod: function () { return 'get'; },
-        actionMethods: 'post',
-        reader: {
-            type: 'json',
-            root: 'items'
-        }
-    }
+    fields: ['txt', 'value'],
+    data: [
+        { "txt": '統倉出貨', "value": "1" },
+        { "txt": '供應商自行出貨', "value": "2" },
+        { "txt": '其他', "value": "101" }
+    ]
 });
+//var productModeStore = Ext.create('Ext.data.Store', {
+//    // fields: ['ParameterCode', 'parameterName'],
+//    model: 'gigade.paraModel',
+//    autoLoad: true,
+//    proxy: {
+//        type: 'ajax',
+//        url: '/Parameter/QueryPara?paraType=product_mode',
+//        noCache: false,
+//        getMethod: function () { return 'get'; },
+//        actionMethods: 'post',
+//        reader: {
+//            type: 'json',
+//            root: 'items'
+//        }
+//    }
+//});
 
 //出貨查詢Model
 Ext.define('GIGADE.deliverExpectArrival', {
@@ -78,7 +78,7 @@ Ext.define('GIGADE.deliverExpectArrival', {
         { name: 'vendor_name_full', type: 'string' },//供應商名稱
         { name: 'delivery_status_str', type: 'string' },//出貨單狀態        
         { name: 'estimated_delivery_date', type: 'string' },//預計出貨日期
-        { name: 'estimated_arrival_date', type: 'string' },//預計到貨日期
+        { name: 'deliver_org_days_str', type: 'string' },//預計到貨日期
         { name: 'estimated_arrival_period', type: 'int' },//預計到貨時段：0 => '不限時', 1 => '12:00以前',2 => '12:00-17:00', 3 => '17:00-20:00'
         { name: 'expect_arrive_date', type: 'string' },//期望到貨日
         { name: 'expect_arrive_period', type: 'int' },//期望到貨時段
@@ -112,7 +112,7 @@ DeliverExpectArrivalStore.on('beforeload', function () {
         orderId: Ext.htmlEncode(Ext.getCmp('orderId').getValue().trim()),//訂單編號
         vendorId_ro_name: Ext.htmlEncode(Ext.getCmp('vendorId_ro_name').getValue().trim()),//供應商編號/名稱
 
-        time_start: Ext.getCmp('time_start').getValue(),//預計到貨日（estimated_arrival_date）--開始時間
+        time_start: Ext.getCmp('time_start').getValue(),//預計到貨日（deliver_org_days）--開始時間
         time_end: Ext.getCmp('time_end').getValue(),//結束時間         
     })
 });
@@ -149,8 +149,8 @@ Ext.onReady(function () {
                         labelWidth: 80 ,
                         
                         store: productModeStore,
-                        displayField: 'parameterName',
-                        valueField: 'parameterCode',
+                        displayField: 'txt',
+                        valueField: 'value',
                         editable: false,
                         allowBlank: true,
                         emptyText: '全部',
@@ -427,16 +427,16 @@ Ext.onReady(function () {
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     switch (record.data.type) {
                         case 1:
-                            return "自出";
+                            return "統倉出貨";
                             break;
                         case 2:
-                            return "寄倉";
+                            return "供應商自行出貨";
                             break;
                         case 101:
-                            return "調度";
+                            return "其他";
                             break;
                         default:
-                            return record.data.type;
+                            return "其他";
                             break;
                     }
                 }
@@ -505,7 +505,7 @@ Ext.onReady(function () {
                 }
             },
             {
-                header: '預計到貨日', dataIndex: 'estimated_arrival_date', width: 100, align: 'center',
+                header: '預計到貨日', dataIndex: 'deliver_org_days_str', width: 100, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (value.substr(0, 10) == "0001-01-01") {
                         return "";
@@ -675,13 +675,39 @@ Query = function () {
 //編輯
 onEditClick = function () {
     var row = Ext.getCmp("deliverExpectArrivalGrid").getSelectionModel().getSelection();
+   
+    var deliver_id = row[0].data.deliver_id;
+    
     if (row.length == 0) {
         Ext.Msg.alert(INFORMATION, NO_SELECTION);
     }
     else if (row.length > 1) {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
-    } else if (row.length == 1) {
-        editFunction(row[0], DeliverExpectArrivalStore);
+    } else if (row.length == 1) {     
+        Ext.Ajax.request({
+            url: '/SendProduct/isCanModifyExpectArriveDate',
+            method: "POST",
+            params: { deliver_id: deliver_id },
+            success: function (form, action) {
+                var data = Ext.decode(form.responseText);
+                if (data.success) {
+                    if (data.msg == "0") {
+                        Ext.Msg.alert("提示信息", "該出貨單不容許修改期望到貨日");
+                    }
+                    else {
+                        editFunction(row[0], DeliverExpectArrivalStore);
+                    }
+                }
+                else {
+                    Ext.Msg.alert(data.msg);
+                }
+            },
+            failure: function (form, action) {
+                result = false;
+                var data = Ext.decode(form.responseText);
+                Ext.Msg.alert(data.msg);
+            }   
+        })       
     }
 }
 

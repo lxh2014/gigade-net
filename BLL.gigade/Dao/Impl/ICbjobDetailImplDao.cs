@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
+using System.Data;
 
 namespace BLL.gigade.Dao.Impl
 {
@@ -21,5 +22,6 @@ namespace BLL.gigade.Dao.Impl
 
         string insertsql(CbjobDetail cb);
         int InsertSql(string sql);
+        DataTable GetDetailTable(CbjobDetail cb);
     }
 }

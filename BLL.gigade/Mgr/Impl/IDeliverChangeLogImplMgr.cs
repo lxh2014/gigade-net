@@ -5,6 +5,7 @@ using System.Text;
 using System.Data;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
+using BLL.gigade.Model.APIModels;
 
 namespace BLL.gigade.Mgr.Impl
 {
@@ -14,5 +15,7 @@ namespace BLL.gigade.Mgr.Impl
         List<DeliverChangeLogQuery> GetDeliverChangeLogList(DeliverChangeLogQuery Query, out int totalCount);
         bool Start(string schedule_code);
         string GetHtmlByDataTable(DataTable _dtmyMonth);
+        bool isCanModifyExpertArriveDate(string apiServer, long deliver_id);
+        bool ModifyExpertArriveDate(string apiServer, ModifyExpertArriveDateViewModel expertArriveDateViewModel);
     }
 }

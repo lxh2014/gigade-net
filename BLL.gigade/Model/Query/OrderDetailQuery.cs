@@ -149,6 +149,8 @@ namespace BLL.gigade.Model.Query
         public string product_mode_name { get; set; }
         public string slave_date_close_format { get; set; }
         public int cost_amount { get; set; }
+        public int c_money { get; set; }
+        public int c_money1 { get; set; }
         public OrderDetailQuery()
         {
             //Detail_Id = 0;

@@ -651,9 +651,10 @@ editFunction = function (rowID) {
                             ]
                         },
                         {
-                            xtype: "datetimefield",
+                            xtype: "datefield",
                             id: 'my_birthday',
                             name: 'my_birthday',
+                            format: 'Y-m-d',
                             fieldLabel: '生日',
                             allowBlank: false
                         },
@@ -704,7 +705,14 @@ editFunction = function (rowID) {
                         },
                         {
                             xtype: 'textfield',
-                            fieldLabel: "聯絡電話",
+
+
+                            //Edit Start Modify by Gaoyuwei 2015-12-07
+                            //fieldLabel: "聯絡電話",
+                            fieldLabel: "市話",
+                            //Edit End Modify by Gaoyuwei 2015-12-07
+
+
                             id: 'user_phone',
                             name: 'user_phone',
                             allowBlank: true,

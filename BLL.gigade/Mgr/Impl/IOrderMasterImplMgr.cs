@@ -92,5 +92,6 @@ namespace BLL.gigade.Mgr.Impl
         DataTable CagegoryDetialExportInfo(OrderDetailQuery query);
         DataTable OrderDetialExportInfo(OrderDetailQuery query);
         DataTable GetInvoiceData(uint order_id);
+        DataTable GetInvoice(uint order_id, uint pid);
     }
 }

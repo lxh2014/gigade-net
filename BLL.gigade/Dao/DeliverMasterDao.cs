@@ -16,6 +16,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using BLL.gigade.Dao.Impl;
+using BLL.gigade.Common;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using DBAccess;
@@ -1004,7 +1005,7 @@ and  dm.delivery_store=1 and dm.deliver_org_days <>0 and dm.delivery_code<>'' an
             try
             {
                 sbSql.Append(@"select dm.deliver_id,dm.order_id,om.user_id,tp.parameterName as delivery_status_str,dm.type,dm.freight_set,v.vendor_name_full,
-                                            dm.estimated_delivery_date,dm.estimated_arrival_date,dm.estimated_arrival_period,
+                                            dm.estimated_delivery_date,dm.deliver_org_days,dm.estimated_arrival_period,
                                             dm.expect_arrive_date,dm.expect_arrive_period ");
                 fromSql.Append(@"from deliver_master dm inner JOIN vendor v on v.vendor_id=dm.export_id inner JOIN order_master om on om.order_id=dm.order_id                                
                            LEFT JOIN (SELECT * from t_parametersrc  where parameterType ='delivery_status') tp on tp.parameterCode=dm.delivery_status 
@@ -1012,7 +1013,7 @@ and  dm.delivery_store=1 and dm.deliver_org_days <>0 and dm.delivery_code<>'' an
                                     where 1=1 ");
                 if (Query.type != 0)
                 {
-                    if (Query.type == 3)
+                    if (Query.type == 101)
                     {
                         conSql.AppendFormat(" and dm.type='{0}'", 101);
                     }
@@ -1041,12 +1042,12 @@ and  dm.delivery_store=1 and dm.deliver_org_days <>0 and dm.delivery_code<>'' an
                 }
                 if (Query.time_start != DateTime.MinValue && Query.time_end != DateTime.MinValue)
                 {
-                    conSql.AppendFormat(" and dm.estimated_arrival_date between '{0}' and '{1}'", Query.time_start.ToString("yyyy-MM-dd"), Query.time_end.ToString("yyyy-MM-dd"));
+                    conSql.AppendFormat(" and dm.deliver_org_days between '{0}' and '{1}'",CommonFunction.GetPHPTime(Query.time_start.ToString("yyyy-MM-dd 00:00:00")), CommonFunction.GetPHPTime(Query.time_end.ToString("yyyy-MM-dd 23:59:59")));
                     
                 }
                 //if (Query.time_end != DateTime.MinValue)
                 //{
-                //    conSql.AppendFormat(" and dm.estimated_arrival_date <= '{0}'", Query.time_end.ToString("yyyy-MM-dd"));
+                //    conSql.AppendFormat(" and dm.deliver_org_days <= '{0}'", Query.time_end.ToString("yyyy-MM-dd"));
                 //    //BLL.gigade.Common.CommonFunction.DateTimeToString(Query.time_end)
                 //}
                 if (Query.vendor_id != 0)
@@ -1057,7 +1058,7 @@ and  dm.delivery_store=1 and dm.deliver_org_days <>0 and dm.delivery_code<>'' an
                 {
                     conSql.AppendFormat(" and v.vendor_name_full like '%{0}%'", Query.vendor_name_full);
                 }
-                finalSql.Append(sbSql.ToString() + fromSql.ToString() + conSql.ToString());
+                finalSql.Append(sbSql.ToString() + fromSql.ToString() + conSql.ToString() + "order by deliver_id desc");
 
                 totalCount = 0;
                 if (Query.IsPage)

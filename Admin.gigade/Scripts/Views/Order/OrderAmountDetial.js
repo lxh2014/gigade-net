@@ -36,7 +36,9 @@ AmountDetial.on('beforeload', function () {
         category_status: document.getElementById('category_status').value,
         date_stauts: document.getElementById('date_stauts').value,
         date_start: document.getElementById('date_start').value,
-        date_end: document.getElementById('date_end').value
+        date_end: document.getElementById('date_end').value,
+        c_money: document.getElementById('c_money').value,
+        c_money1: document.getElementById('c_money1').value
     });
 });
 
@@ -185,7 +187,9 @@ OnCategoryDetialExport = function () {
             category_status: document.getElementById('category_status').value,
             date_stauts: document.getElementById('date_stauts').value,
             date_start: document.getElementById('date_start').value,
-            date_end: document.getElementById('date_end').value
+            date_end: document.getElementById('date_end').value,
+            c_money: document.getElementById('c_money').value,
+            c_money1: document.getElementById('c_money1').value
         },
         success: function (form, action) {
             var result = Ext.decode(form.responseText);
@@ -224,7 +228,9 @@ OnOrderDetialExport = function () {
             category_status: document.getElementById('category_status').value,
             date_stauts: document.getElementById('date_stauts').value,
             date_start: document.getElementById('date_start').value,
-            date_end: document.getElementById('date_end').value
+            date_end: document.getElementById('date_end').value,
+            c_money: document.getElementById('c_money').value,
+            c_money1: document.getElementById('c_money1').value
         },
         success: function (form, action) {
             var result = Ext.decode(form.responseText);

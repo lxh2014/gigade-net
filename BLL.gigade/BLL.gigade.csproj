@@ -95,6 +95,10 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http, Version=2.2.22.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\System.Net.Http.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -114,6 +118,7 @@
     <Compile Include="Common\ExcelHelperXhf.cs" />
     <Compile Include="Common\FileManagement.cs" />
     <Compile Include="Common\FTP.cs" />
+    <Compile Include="Common\GigadeApiRequest.cs" />
     <Compile Include="Common\HashEncrypt.cs" />
     <Compile Include="Common\HeaderAndFooterEvent.cs" />
     <Compile Include="Common\ImageClass.cs" />
@@ -681,6 +686,8 @@
     <Compile Include="Dao\WebContentTypeSetupDao.cs" />
     <Compile Include="Dao\ZipDao.cs" />
     <Compile Include="Dao\DeliverChangeLogDao.cs" />
+    <Compile Include="Dao\LogisticsTcatEodDao.cs" />
+    <Compile Include="Dao\LogisticsTcatSodDao.cs" />
     <Compile Include="Mgr\AnnounceMgr.cs" />
     <Compile Include="Mgr\AppcategoryMgr.cs" />
     <Compile Include="Mgr\AppmessageMgr.cs" />
@@ -1174,6 +1181,7 @@
     <Compile Include="Mgr\ScheduleParamerMgr.cs" />
     <Compile Include="Mgr\ScheduleRelationMgr.cs" />
     <Compile Include="Mgr\ScheduleServiceMgr.cs" />
+    <Compile Include="Mgr\Schedules\PromotionsAmountGiftMgr.cs" />
     <Compile Include="Mgr\Schedules\DeliverStatusMgr.cs" />
     <Compile Include="Mgr\Schedules\SetConfigXmlMgr.cs" />
     <Compile Include="Mgr\Schedules\UserLoginLogMgr.cs" />
@@ -1261,6 +1269,11 @@
     <Compile Include="Mgr\ZipMgr.cs" />
     <Compile Include="Mgr\DeliverChangeLogMgr.cs" />
     <Compile Include="Model\Announce.cs" />
+    <Compile Include="Model\APIModels\DeliverIdViewModel.cs" />
+    <Compile Include="Model\APIModels\ExpectArrivePeriod.cs" />
+    <Compile Include="Model\APIModels\ModifyExpertArriveDateViewModel.cs" />
+    <Compile Include="Model\APIModels\SuppliersLoginResult.cs" />
+    <Compile Include="Model\APIModels\SuppliersLoginViewModel.cs" />
     <Compile Include="Model\Appcategory.cs" />
     <Compile Include="Model\Appmessage.cs" />
     <Compile Include="Model\AppNotifyPool.cs" />
@@ -1902,6 +1915,7 @@
     <Content Include="Lib\NPOI.OpenXml4Net.dll" />
     <Content Include="Lib\NPOI.OpenXmlFormats.dll" />
     <Content Include="Lib\Sphinx.Client.dll" />
+    <Content Include="Lib\System.Net.Http.dll" />
     <Content Include="Lib\WebDav.dll" />
   </ItemGroup>
   <ItemGroup>

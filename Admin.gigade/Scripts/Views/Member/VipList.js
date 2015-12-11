@@ -262,11 +262,12 @@ Ext.onReady(function () {
                }
            },
           {
-              xtype: "datefield",
+              xtype: "datetimefield",
               fieldLabel: "最近歸檔日",
               id: 'dateOne',
               name: 'dateOne',
-              format: 'Y-m-d',
+              format: 'Y-m-d  H:i:s',
+              time: { hour: 00, min: 00, sec: 00 },
               allowBlank: true,
               editable: false,            
               submitValue: true,
@@ -289,8 +290,9 @@ Ext.onReady(function () {
                   }
               }
           }, '~', {
-              xtype: "datefield",
-              format: 'Y-m-d',
+              xtype: "datetimefield",
+              format: 'Y-m-d  H:i:s',
+              time: { hour: 23, min: 59, sec: 59 },
               id: 'dateTwo',
               name: 'dateTwo',
               allowBlank: true,

@@ -281,17 +281,17 @@ Ext.onReady(function () {
                      },
                        //===========-時間區間=================
                        {
-                           xtype: 'datefield',
+                           xtype: 'datetimefield',
                            id: 'startTime',
                            name: 'startTime',
                            fieldLabel: "創建時間區間",
                            margin: '0 5 0 40',
                            labelWidth: 100,
-                           width: 250,
+                           width: 255,
                            editable: false,
                            allowBlank: true,
-                           format: 'Y-m-d',
-                          // time: { hour: 00, min: 00, sec: 00 },//標記結束時間00:00:00
+                           format: 'Y-m-d  H:i:s',                          
+                           time: { hour: 00, min: 00, sec: 00 },//標記結束時間00:00:00
                            editable: false,
                            //默認開始時間
                            //value: setNextMonth(Date.now(), -3),
@@ -322,16 +322,15 @@ Ext.onReady(function () {
                             margin: '0 5'
                         },
                         {
-                            xtype: 'datefield',
+                            xtype: 'datetimefield',
                             id: 'endTime',
                             name: 'endTime',
                             width: 150,
                             editable: false,
                             allowBlank: true,
                             margin: '0 10 0 5',
-                            format: 'Y-m-d',
-                            editable: false,
-                            //time: { hour: 23, min: 59, sec: 59 },//標記結束時間23:59:59    
+                            format: 'Y-m-d  H:i:s',
+                            time: { hour: 23, min: 59, sec: 59 },//標記結束時間23:59:59    
                             // value: setNextMonth(Date.now(), 0),
                             listeners: {
                                 select: function (a, b, c) {

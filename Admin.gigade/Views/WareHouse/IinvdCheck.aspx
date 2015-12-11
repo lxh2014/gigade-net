@@ -20,7 +20,7 @@
         <h1>請開始盤點商品數量</h1>
         <br />
         <h3>料位編號: <span class="label label-info" id="loc_id"><%=ViewBag.loc_id%></span></h3>
-        <h3>商品名稱: <span class="label label-info">(<%=ViewBag.item_id%>) <%=ViewBag.product_name%> <%=ViewBag.spec%> 條碼:<%=ViewBag.upc_id %></span></h3>
+        <h3>商品名稱: <span class="label label-info">(<%=ViewBag.item_id%>) <%=ViewBag.product_name%> 規格:<%=ViewBag.spec%> 條碼:<%=ViewBag.upc_id %></span></h3>
         <span id="item_id" hidden="hidden"><%=ViewBag.item_id%></span>
         <span id="pwy_dte_ctl" hidden="hidden"><%=ViewBag.pwy_dte_ctl%></span>
         <span id="iplas" hidden="hidden"><%=ViewBag.iplas%></span>
@@ -80,7 +80,6 @@
                     <td style="text-align: center; vertical-align: middle;"><%=BLL.gigade.Common.CommonFunction.DateTimeToShortString(ViewBag.data[i].made_date)%></td>
                     <td style="text-align: center; vertical-align: middle;"><%=BLL.gigade.Common.CommonFunction.DateTimeToShortString(ViewBag.data[i].cde_dt)%></td>
                     <%}%>
-                    <td style="text-align: center; vertical-align: middle;" id="prod_qtys" hidden="hidden"><%=ViewBag.data[i].prod_qty%></td>
                     <td style="text-align: center; vertical-align: middle;">
                         <input min="0" class="form-control" id="input<%=ViewBag.data[i].row_id%>" onkeydown="return check(event);" type="number">
                     </td>
@@ -99,7 +98,7 @@
                     <td style="text-align: center; vertical-align: middle;"><%=BLL.gigade.Common.CommonFunction.DateTimeToShortString(ViewBag.data[i].made_date)%></td>
                     <td style="text-align: center; vertical-align: middle;"><%=BLL.gigade.Common.CommonFunction.DateTimeToShortString(ViewBag.data[i].cde_dt)%></td>
                     <%} %>
-                    <td style="text-align: center; vertical-align: middle;"hidden="hidden"><%=ViewBag.data[i].prod_qty%></td>
+                   <%-- <td style="text-align: center; vertical-align: middle;" id="prod_qtys<%=ViewBag.data[i].row_id%>" hidden="hidden"><%=ViewBag.data[i].prod_qty%></td>--%>
                     <td style="text-align: center; vertical-align: middle;">
                         <input type="number" min="0" class="form-control" id="input<%=ViewBag.data[i].row_id%>" onkeydown="return check(event);">
                     </td>
@@ -389,7 +388,6 @@
     function Save(id) {
         var changeStore = $('#' + id).val();
         var pwy_dte_ctl = $('#pwy_dte_ctl').text();
-        var prod_qtys = $('#prod_qtys').text();
         var loc_id = $('#loc_id').text();
         var item_id = $('#item_id').text();
         if (changeStore.trim() == "") return false;
@@ -398,13 +396,13 @@
             url: "/WareHouse/IinvdSave",
             type: "POST",
             dataType: "text",
-            data: { changeStore: changeStore, rowid: id, pwy_dte_ctl: pwy_dte_ctl, prod_qtys: prod_qtys, loc_id: loc_id, item_id: item_id },
+            data: { changeStore: changeStore, rowid: id, pwy_dte_ctl: pwy_dte_ctl,loc_id: loc_id, item_id: item_id },
             success: function (data) {
                 var result = eval("(" + data + ")");
                 if (result.success) {
                     $('#' + id).val(''); 
                     $('#alertsuccess').modal('toggle');
-                    setTimeout(location.href = "/WareHouse/IinvdCheck?pwy_dte_ctl=" + pwy_dte_ctl + "&loc_id=" + loc_id, 500);
+                    setTimeout('onload()',500);
                 }
                 else {
                     $("#alertmessage").text(result.message);
@@ -412,6 +410,12 @@
                 }
             }
         });
+    }
+    function onload()
+    {
+        var pwy_dte_ctl = $('#pwy_dte_ctl').text();
+        var loc_id = $('#loc_id').text();
+        location.href = "/WareHouse/IinvdCheck?pwy_dte_ctl=" + pwy_dte_ctl + "&loc_id=" + loc_id;
     }
     function reset() {
         $('#datetimepicker1').val('');
@@ -422,6 +426,14 @@
         $('#datetimepicker3').hide();
         $('#datetimepicker4').hide();
         $('.date1').hide();
+        var date = new Date();
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var day = date.getDate();
+        $('#datetimepicker1').datetimepicker('setEndDate', year + '-' + month + '-' + day);
+        $('#datetimepicker2').datetimepicker('setStartDate', year + '-' + month + '-' + day);
+        $('#datetimepicker3').datetimepicker('setEndDate', year + '-' + month + '-' + day);
+        $('#datetimepicker4').datetimepicker('setStartDate', year + '-' + month + '-' + day);
     }
     function SaveIinvd() {
         var pwy_dte_ctl = $('#pwy_dte_ctl').text();
@@ -492,7 +504,7 @@
                     $('#datetimepicker1').val('');
                     $('#prod_qty').val('');
                     $('#alertsuccess').modal('toggle');
-                    setTimeout(location.reload(),500);
+                    setTimeout("onload()",500);
                 }
                 else {
                     $("#message").text(result.message);

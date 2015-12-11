@@ -102,11 +102,11 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["time_start"]))
                 {
-                    query.time_start = Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy-MM-dd 00:00:00");
+                    query.time_start = Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 if (!string.IsNullOrEmpty(Request.Params["time_end"]))
                 {
-                    query.time_end =Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy-MM-dd 23:59:59");
+                    query.time_end = Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 _votearticle = new VoteArticleMgr(mySqlConnectionString);
 
@@ -1244,11 +1244,11 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(start_time))
             {
-                query.start_time =Convert.ToDateTime(Convert.ToDateTime(start_time).ToString("yyyy-MM-dd 00:00:00"));
+                query.start_time =Convert.ToDateTime(Convert.ToDateTime(start_time).ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (!string.IsNullOrEmpty(end_time))
             {
-                query.end_time = Convert.ToDateTime(Convert.ToDateTime(end_time).ToString("yyyy-MM-dd 23:59:59"));
+                query.end_time = Convert.ToDateTime(Convert.ToDateTime(end_time).ToString("yyyy-MM-dd HH:mm:ss"));
             }
             query.vote_status = -1;
             if (!string.IsNullOrEmpty(vote_status))

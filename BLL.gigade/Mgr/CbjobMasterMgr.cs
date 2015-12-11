@@ -6,6 +6,7 @@ using BLL.gigade.Dao;
 using BLL.gigade.Dao.Impl;
 using BLL.gigade.Mgr.Impl;
 using BLL.gigade.Model;
+using BLL.gigade.Model.Query;
 
 namespace BLL.gigade.Mgr
 {
@@ -37,6 +38,17 @@ namespace BLL.gigade.Mgr
             catch (Exception ex)
             {
                 throw new Exception("CbjobMasterMgr-->Insertsql-->" + ex.Message, ex);
+            }
+        }
+        public List<CbjobMasterQuery> GetjobMaster(CbjobMasterQuery m, out int totalCount)
+        {
+            try
+            {
+                return _cbjobDao.GetjobMaster(m, out totalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("CbjobMasterMgr-->GetjobMaster-->" + ex.Message, ex);
             }
         }
     }

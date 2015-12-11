@@ -11,17 +11,19 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Web;
+using BLL.gigade.Dao;
 
 namespace BLL.gigade.Mgr.Schedules
 {
     public class SendOrderInfoToBlackCatFTPMgr
     {
         private ScheduleServiceMgr _secheduleServiceMgr;
-
+        private LogisticsTcatEodDao logisticsTcatEodDao;
         static IDBAccess _accessMySql;
         static string mySqlConnectionString = string.Empty;
         public SendOrderInfoToBlackCatFTPMgr(string connectionString)
         {
+            logisticsTcatEodDao = new LogisticsTcatEodDao(connectionString);
             _accessMySql = DBFactory.getDBAccess(DBType.MySql, connectionString);
             mySqlConnectionString = connectionString;
         }
@@ -39,7 +41,7 @@ namespace BLL.gigade.Mgr.Schedules
                 string ftpUserID = string.Empty;
                 string ftpPassword = string.Empty;
                 string localPath_1 = string.Empty;
-                string localPath_2 = string.Empty;
+                string localPath_2 = "c:\\EOD_TCAT";
 
                 //獲取該排程參數
                 List<ScheduleConfigQuery> store_config = new List<ScheduleConfigQuery>();
@@ -80,23 +82,13 @@ namespace BLL.gigade.Mgr.Schedules
 
 
 
-                StringBuilder sql = new StringBuilder();
+                
                 StringBuilder sb = new StringBuilder();
-                sql.AppendFormat(@"select 
-lte.delivery_type,lte.delivery_number,lte.order_id,'' as 'ftp_userID',lte.freight_set,lte.delivery_distance,lte.package_size,
-lte.cash_collect_service,lte.cash_collect_amount,'N' as '是否到付','01'as '是否付現',
-CASE when delivery_type='1' then '*' else  dm.delivery_name end ,
-CASE when delivery_type='1' then '*' else  dm.delivery_mobile end ,
-CASE when delivery_type='1' then '*' else  dm.delivery_phone end ,
-lte.receiver_zip,lte.receiver_address,'' as '寄件人姓名','' as '寄件人電話','' as '寄件人手機','' as '寄件人郵遞區號','' as '寄件人地址',lte.delivery_date,
-'' as '預定取件時段',lte.estimate_arrival,om.user_id,lte.package_name,'N' as '易碎物品' ,'N' as '精密儀器' ,lte.delivery_note,''  as 'SD路線代碼' 
-from logistics_tcat_eod lte left join deliver_master dm on dm.order_id=lte.order_id and dm.delivery_code=lte.delivery_number 
-                            LEFT JOIN order_master om on om.order_id=lte.order_id 
-where lte.upload_time is null ");
-                DataTable lteDT = _accessMySql.getDataTable(sql.ToString());
-                
-                
+                DataTable lteDT = logisticsTcatEodDao.GetOrderInfoForTcat();
+                              
                 //有需要上傳的數據
+
+                bool localPath1Bool = true; 
                 if (lteDT.Rows.Count > 0)
                 {
                     #region 要上傳的文件生成
@@ -158,7 +150,8 @@ where lte.upload_time is null ");
                         }
                     }
                     catch (Exception ex)
-                    {                      
+                    {
+                        localPath1Bool = false;
                         string str = "eod文件生成失敗，失敗的原因：" + ex.Message;
                         SendMail(schedule_code, str);
                         throw new Exception(ex.Message);
@@ -173,72 +166,79 @@ where lte.upload_time is null ");
                     /// FTP上傳
                     /// </summary>
                     bool result = false;
-                    try 
+                    if (localPath1Bool)
                     {
-                        string filePath = localFilePath_1;//本地的文件路徑
-                        result = UploadFTP(ftpServerIP, filePath, ftpUserID, ftpPassword);
-                    }
-                    catch(Exception ex)
-                    {
-                        int index = ex.Message.LastIndexOf("-->");
-                        //int index1 = ex.Message.LastIndexOfAny(new char[] {'>'});
-                        int subStrLeng = index + 3;
-                        string errorMessage = ex.Message.Substring(subStrLeng, ex.Message.Length - subStrLeng);
-                        string str = newfilename + " 文件上傳失敗，失敗的原因：" + errorMessage;
-                        SendMail(schedule_code, str);
-                        throw new Exception(ex.Message);
-                    }                  
-                
-                    if (result)//上傳成功，更新 upload_time為當前時間，轉移文件，發送郵件
-                    {
-                        
-                        StringBuilder UpdateSql = new StringBuilder();
-                        UpdateSql.AppendFormat(@" update logistics_tcat_eod set upload_time='{0}' where upload_time is null;",
-                                                    DateTime.Now.ToString("yy-MM-dd HH:mm:ss"));
-                        _accessMySql.execCommand(UpdateSql.ToString());
-
                         try
                         {
-                            if (!Directory.Exists(localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd")))
-                            {
-                                Directory.CreateDirectory(localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd"));
-                            }
-                            if (!File.Exists(localFilePath_2))//本地文件（要上傳的文件）存在
-                            {
-                                FileStream fs2 = new FileStream(localFilePath_2, FileMode.Create, FileAccess.Write);//创建写入文件 
-                                FileStream fs1 = new FileStream(localFilePath_1, FileMode.Open);
-                                StreamReader sr = new StreamReader(fs1, Encoding.GetEncoding("big5"));
-                                StreamWriter sw = new StreamWriter(fs2, Encoding.GetEncoding("big5"));
-                                sw.Write(sr.ReadToEnd());//开始写入值
-                                sw.Close();
-                                fs1.Close();
-                            }
-                            else
-                            {
-                                FileStream fs2 = new FileStream(localFilePath_2, FileMode.Truncate, FileAccess.Write);//创建写入文件 
-                                FileStream fs1 = new FileStream(localFilePath_1, FileMode.Open);
-                                StreamReader sr = new StreamReader(fs1, Encoding.GetEncoding("big5"));
-                                StreamWriter sw = new StreamWriter(fs2, Encoding.GetEncoding("big5"));//Big5
-                                sw.Write(sr.ReadToEnd());//开始写入值
-                                sw.Close();
-                                fs1.Close();
-                            }
+                            string filePath = localFilePath_1;//本地的文件路徑
+                            result = UploadFTP(ftpServerIP, filePath, ftpUserID, ftpPassword);
                         }
                         catch (Exception ex)
                         {
+                            int index = ex.Message.LastIndexOf("-->");
+                            //int index1 = ex.Message.LastIndexOfAny(new char[] {'>'});
+                            int subStrLeng = index + 3;
+                            string errorMessage = ex.Message.Substring(subStrLeng, ex.Message.Length - subStrLeng);
+                            string str = newfilename + " 文件上傳失敗，失敗的原因：" + errorMessage;
+                            SendMail(schedule_code, str);
+                            throw new Exception(ex.Message);
+                        }
+                    }
+                                     
+                
+                    if (result)//上傳成功，更新 upload_time為當前時間，轉移文件，發送郵件
+                    {
+
+                        logisticsTcatEodDao.UpdateUploadTime();//更新 upload_time為當前時間
+
+                        bool localPath2Bool = true;
+                        try
+                        {
+                             //要上傳的文件的名稱                           
+                            localFilePath_2 = localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + ftpUserID + DateTime.Now.ToString("MMddHHmmss") + ".eod";
+                            if (!Directory.Exists(localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd")))
+                            {
+                                Directory.CreateDirectory(localPath_2 + "\\" + DateTime.Now.ToString("yyyyMMdd"));
+                            }                           
+                            if (File.Exists(localFilePath_1))
+                            {
+                                File.Move(localFilePath_1, localFilePath_2);
+                            }
+                            //if (!File.Exists(localFilePath_2))//本地文件（要上傳的文件）存在
+                            //{
+                            //    FileStream fs2 = new FileStream(localFilePath_2, FileMode.Create, FileAccess.Write);//创建写入文件 
+                            //    FileStream fs1 = new FileStream(localFilePath_1, FileMode.Open);
+                            //    StreamReader sr = new StreamReader(fs1, Encoding.GetEncoding("big5"));
+                            //    StreamWriter sw = new StreamWriter(fs2, Encoding.GetEncoding("big5"));
+                            //    sw.Write(sr.ReadToEnd());//开始写入值
+                            //    sw.Close();
+                            //    fs1.Close();
+                            //}
+                            //else
+                            //{
+                            //    FileStream fs2 = new FileStream(localFilePath_2, FileMode.Truncate, FileAccess.Write);//创建写入文件 
+                            //    FileStream fs1 = new FileStream(localFilePath_1, FileMode.Open);
+                            //    StreamReader sr = new StreamReader(fs1, Encoding.GetEncoding("big5"));
+                            //    StreamWriter sw = new StreamWriter(fs2, Encoding.GetEncoding("big5"));//Big5
+                            //    sw.Write(sr.ReadToEnd());//开始写入值
+                            //    sw.Close();
+                            //    fs1.Close();
+                            //}
+                        }
+                        catch (Exception ex)
+                        {
+                            localPath2Bool = false;
                             string str1 =  newfilename + " 文件上傳成功。"+"數據庫upload_time欄位更新成功，但是該文件在本地保存失敗，失敗的原因：" + ex.Message;
                             SendMail(schedule_code, str1);
                             throw new Exception(ex.Message);
                         }
 
-                        //文件轉移過後，刪除文件
-                        if (File.Exists(localFilePath_1))
+                        if (localPath2Bool)
                         {
-                            File.Delete(localFilePath_1);
+                            string str = newfilename + " 文件上傳成功，全部操作執行成功";//全部執行成功
+                            SendMail(schedule_code, str);
                         }
-
-                        string str = newfilename + " 文件上傳成功，全部操作執行成功";//全部執行成功
-                        SendMail(schedule_code, str);
+                        
                      
                     }                                                 
                     #endregion
@@ -246,7 +246,7 @@ where lte.upload_time is null ");
                 }
                 else//沒有需要上傳的數據，發送郵件
                 {
-                    string str = "沒有要上傳的數據";
+                    string str = "沒有要上傳的資料";
                     SendMail(schedule_code, str);
                 }                        
             }
@@ -363,7 +363,7 @@ where lte.upload_time is null ");
                 #endregion
 
                 MailHelper mail = new MailHelper(mailModel);
-                mail.SendToGroup(GroupCode, MailTitle, MailBody, IsSeparate, IsDisplyName);
+                mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", IsSeparate, IsDisplyName);
             }
             catch (Exception ex)
             {

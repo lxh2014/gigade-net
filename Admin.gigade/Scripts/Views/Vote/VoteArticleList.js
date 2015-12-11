@@ -189,12 +189,14 @@ Ext.onReady(function () {
                         value:0
                     },
                     {
-                        xtype: 'datefield',
+                        xtype: 'datetimefield',
                         margin: '0 0 0 10',
-                        width: 110,
+                        width: 145,
                         id: 'time_start',
-                        format: 'Y-m-d',                       
+                        format: 'Y-m-d H:i:s',
+                        time: { hour: 00, min: 00, sec: 00 },
                         editable: false,
+                       // value: Tomorrow(),
                         listeners: {
                             select: function (a, b, c) {
                                 var start = Ext.getCmp("time_start");
@@ -203,8 +205,8 @@ Ext.onReady(function () {
                                     end.setValue(setNextMonth(start.getValue(), 1));
                                 }
                                 else if (end.getValue() < start.getValue()) {
-                                    Ext.Msg.alert(INFORMATION, DATA_TIP);
-                                    end.setValue(setNextMonth(start.getValue(), 1));
+                                    var start_date = start.getValue();
+                                    Ext.getCmp('time_end').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
                                 }   
                             },
                             specialkey: function (field, e) {
@@ -220,11 +222,13 @@ Ext.onReady(function () {
                         value: '~',
                     },
                     {
-                        xtype: 'datefield',
+                        xtype: 'datetimefield',
                         id: 'time_end',
-                        format: 'Y-m-d',
-                        width: 110,
+                        format: 'Y-m-d H:i:s',
+                        width: 145,
                         editable: false,
+                        time: { hour: 23, min: 59, sec: 59 },
+                         
                         listeners: {
                             select: function (a, b, c) {
                                 var start = Ext.getCmp("time_start");
@@ -233,9 +237,9 @@ Ext.onReady(function () {
                                     start.setValue(setNextMonth(end.getValue(), -1));
                                 }
                                 else if (end.getValue() < start.getValue()) {
-                                    Ext.Msg.alert(INFORMATION, DATA_TIP);
-                                    start.setValue(setNextMonth(end.getValue(), -1));
-                                }                              
+                                    var end_date = end.getValue();
+                                    Ext.getCmp('time_start').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
+                                } 
                             },
                             specialkey: function (field, e) {
                                 if (e.getKey() == Ext.EventObject.ENTER) {
