@@ -690,11 +690,16 @@ onEditClick = function () {
             params: { deliver_id: deliver_id },
             success: function (form, action) {
                 var data = Ext.decode(form.responseText);
-                if (data.msg == "0") {                                      
-                    Ext.Msg.alert("提示信息", "該出貨單不容許修改期望到貨日");                   
+                if (data.success) {
+                    if (data.msg == "0") {
+                        Ext.Msg.alert("提示信息", "該出貨單不容許修改期望到貨日");
+                    }
+                    else {
+                        editFunction(row[0], DeliverExpectArrivalStore);
+                    }
                 }
                 else {
-                    editFunction(row[0], DeliverExpectArrivalStore);
+                    Ext.Msg.alert(data.msg);
                 }
             },
             failure: function (form, action) {
