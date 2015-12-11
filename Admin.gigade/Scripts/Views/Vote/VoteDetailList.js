@@ -109,6 +109,10 @@ edit_VoteDetailStore.on('beforeload', function () {
     });
 });
 function Query(x) {
+    if (Ext.getCmp("time_start").getValue() ==null) {
+        Ext.Msg.alert("提示信息", "日期條件未選擇！");
+        return;
+    }
     VoteDetailStore.removeAll();
     Ext.getCmp("gdFgroup").store.loadPage(1);
 }
@@ -208,30 +212,17 @@ Ext.onReady(function () {
                            format: 'Y-m-d H:i:s',
                            time: { hour: 00, min: 00, sec: 00 },
                            width: 215,
-                           value: Tomorrow(1 - new Date().getDate()),
+                          // value: Tomorrow(1 - new Date().getDate()),
                            listeners: {
                                select: function () {
                                    var startTime = Ext.getCmp("time_start");
                                    var endTime = Ext.getCmp("time_end");
-                                   var s_date = new Date(startTime.getValue());
-
-                                   var data1 = Date.parse(startTime.getValue());
-                                   var data2 = Date.parse(endTime.getValue());
-                                   var datadiff = data2 - data1;
-                                   //var time = 31 * 24 * 60 * 60 * 1000;
-                                   //if (endTime.getValue() < startTime.getValue()) {
-                                   //    Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間!");
-                                   //    startTime.setValue(new Date(endTime.getValue()));
-                                   //}
-                                   //else
-                                   if (datadiff < 0 ) {
-                                       Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                                       endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                   if (endTime.getValue() == null) {
+                                       endTime.setValue(setNextMonth(startTime.getValue(), 1));
                                    }
-                                   //else {
-                                   //    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                   //}
-
+                                   else if (endTime.getValue() < startTime.getValue()) {
+                                       endTime.setValue(setNextMonth(startTime.getValue(), 1));
+                                   }
                                },
                                specialkey: function (field, e) {
                                    if (e.getKey() == Ext.EventObject.ENTER) {
@@ -256,27 +247,19 @@ Ext.onReady(function () {
                         allowBlank: false,
                         submitValue: true,
                         width: 155,
-                        value: Tomorrow(0),
+                        //value: Tomorrow(0),
                         listeners: {
                             select: function () {
                                 var startTime = Ext.getCmp("time_start");
                                 var endTime = Ext.getCmp("time_end");
-                                var s_date = new Date(startTime.getValue());
-
-                                var data1 = Date.parse(startTime.getValue());
-                                var data2 = Date.parse(endTime.getValue());
-                                var datadiff = data2 - data1;
-                                //var time = 31 * 24 * 60 * 60 * 1000;
-                                if (endTime.getValue() < startTime.getValue()) {
-                                    Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間!");
-                                    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                    //endTime.setValue(new Date(startTime.getValue()));
+                                if (startTime.getValue() == null) {
+                                    startTime.setValue(setNextMonth(endTime.getValue(), -1));
                                 }
-                                else if (datadiff < 0 ) {
-                                    Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                                    endTime.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
-                                    //endTime.setValue(new Date(startTime.getValue()));
+                                else if (endTime.getValue() < startTime.getValue()) {
+                                    startTime.setValue(setNextMonth(endTime.getValue(), -1));
                                 }
+                               
+                             
                             },
                             specialkey: function (field, e) {
                                 if (e.getKey() == Ext.EventObject.ENTER) {

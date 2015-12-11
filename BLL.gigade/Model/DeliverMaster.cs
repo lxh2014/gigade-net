@@ -38,6 +38,7 @@ namespace BLL.gigade.Model
        public int work_status { get; set; }
        public DateTime expect_arrive_date { get; set; }
        public int expect_arrive_period { get; set; }
+       public int deliver_org_days { get; set; }
        public DeliverMaster()
        {
            deliver_id = 0;
@@ -66,6 +67,7 @@ namespace BLL.gigade.Model
            work_status = 0;
            expect_arrive_date = DateTime.MinValue;
            expect_arrive_period = 0;
+           deliver_org_days = 0;
        }
     }
 }

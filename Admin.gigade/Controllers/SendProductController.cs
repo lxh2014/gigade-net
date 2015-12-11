@@ -5660,11 +5660,18 @@ namespace Admin.gigade.Controllers
 
                 int totalCount = 0;
                 dmList = _DeliverMsterMgr.GetDeliverExpectArriveList(dmQuery,out totalCount);
-                //foreach (var item in dmList)
-                //{
-                //    if(item.type==)
-                    
-                //}
+
+                foreach (var item in dmList)
+                {
+                    if (item.deliver_org_days == 0)
+                    {
+                        item.deliver_org_days_str = "";
+                    }
+                    else
+                    {
+                        item.deliver_org_days_str = CommonFunction.GetNetTime(item.deliver_org_days).ToString("yyyy-MM-dd");
+                    }                 
+                }
 
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     

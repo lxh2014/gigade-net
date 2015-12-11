@@ -78,7 +78,7 @@ Ext.define('GIGADE.deliverExpectArrival', {
         { name: 'vendor_name_full', type: 'string' },//供應商名稱
         { name: 'delivery_status_str', type: 'string' },//出貨單狀態        
         { name: 'estimated_delivery_date', type: 'string' },//預計出貨日期
-        { name: 'estimated_arrival_date', type: 'string' },//預計到貨日期
+        { name: 'deliver_org_days_str', type: 'string' },//預計到貨日期
         { name: 'estimated_arrival_period', type: 'int' },//預計到貨時段：0 => '不限時', 1 => '12:00以前',2 => '12:00-17:00', 3 => '17:00-20:00'
         { name: 'expect_arrive_date', type: 'string' },//期望到貨日
         { name: 'expect_arrive_period', type: 'int' },//期望到貨時段
@@ -112,7 +112,7 @@ DeliverExpectArrivalStore.on('beforeload', function () {
         orderId: Ext.htmlEncode(Ext.getCmp('orderId').getValue().trim()),//訂單編號
         vendorId_ro_name: Ext.htmlEncode(Ext.getCmp('vendorId_ro_name').getValue().trim()),//供應商編號/名稱
 
-        time_start: Ext.getCmp('time_start').getValue(),//預計到貨日（estimated_arrival_date）--開始時間
+        time_start: Ext.getCmp('time_start').getValue(),//預計到貨日（deliver_org_days）--開始時間
         time_end: Ext.getCmp('time_end').getValue(),//結束時間         
     })
 });
@@ -427,16 +427,16 @@ Ext.onReady(function () {
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     switch (record.data.type) {
                         case 1:
-                            return "自出";
+                            return "統倉出貨";
                             break;
                         case 2:
-                            return "寄倉";
+                            return "供應商自行出貨";
                             break;
                         case 101:
-                            return "調度";
+                            return "其他";
                             break;
                         default:
-                            return record.data.type;
+                            return "其他";
                             break;
                     }
                 }
@@ -505,7 +505,7 @@ Ext.onReady(function () {
                 }
             },
             {
-                header: '預計到貨日', dataIndex: 'estimated_arrival_date', width: 100, align: 'center',
+                header: '預計到貨日', dataIndex: 'deliver_org_days_str', width: 100, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (value.substr(0, 10) == "0001-01-01") {
                         return "";

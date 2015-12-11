@@ -1,5 +1,6 @@
 ﻿using BLL.gigade.Dao.Impl;
 using BLL.gigade.Model;
+using BLL.gigade.Model.Query;
 using DBAccess;
 using System;
 using System.Collections.Generic;
@@ -53,5 +54,52 @@ namespace BLL.gigade.Dao
             }
         } 
         #endregion
+
+        public List<CbjobMasterQuery> GetjobMaster(CbjobMasterQuery m, out int totalCount)
+        {
+            StringBuilder sbclumn=new StringBuilder();
+            StringBuilder sqlCondi = new StringBuilder();
+            totalCount = 0;
+            try
+            {
+                sbclumn.Append(" select cm.row_id,cm.cbjob_id,cm.create_datetime,cm.status,cm.create_user,cm.sta_id ");
+                sqlCondi.Append(" from cbjob_master cm where 1=1 ");
+                if (!string.IsNullOrEmpty(m.startDate))
+                {
+                    sqlCondi.AppendFormat(" and cm.create_datetime>='{0}' ", m.startDate);
+                }
+                if (!string.IsNullOrEmpty(m.endDate))
+                {
+                    sqlCondi.AppendFormat(" and cm.create_datetime<='{0}' ", m.endDate);
+                }
+                if (!string.IsNullOrEmpty(m.cbjob_id))
+                {
+                    sqlCondi.AppendFormat(" and cm.cbjob_id like'{0}' ", m.cbjob_id);
+                }
+                if (!string.IsNullOrEmpty(m.sta_id))
+                {
+                    sqlCondi.AppendFormat(" and cm.sta_id = '{0}' ", m.sta_id);
+                }
+                if (!string.IsNullOrEmpty(m.row_id_IN))
+                {
+                    sqlCondi.AppendFormat(" and cm.row_id in ({0}) ", m.row_id_IN);
+                }
+                if (m.IsPage)
+                {
+                    System.Data.DataTable _dt = _accessMySql.getDataTable("select count(cm.row_id) as totalCount " + sqlCondi.ToString());
+                    if (_dt != null && _dt.Rows.Count > 0)
+                    {
+                        totalCount = int.Parse(_dt.Rows[0]["totalCount"].ToString());
+                    }
+                    sqlCondi.AppendFormat(" limit {0},{1}", m.Start, m.Limit);
+                }
+                return _accessMySql.getDataTableForObj<CbjobMasterQuery>(sbclumn .ToString()+ sqlCondi.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("CbjobMasterDao-->GetjobMaster-->" + ex.Message + sbclumn.ToString() + sqlCondi.ToString(), ex);
+            }
+           
+        }
     }
 }

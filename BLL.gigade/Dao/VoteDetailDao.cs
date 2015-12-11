@@ -202,7 +202,7 @@ namespace BLL.gigade.Dao
                 }
                 if (!string.IsNullOrEmpty(query.searchContent))
                 {
-                    sbSqlCondition.AppendFormat(" and (vd.article_id like N'%{0}%' vd.or user_id like N'%{0}%') ", query.searchContent);
+                    sbSqlCondition.AppendFormat(" and (vd.article_id like N'%{0}%'  or  va.article_title  like N'%{0}%'  or u.user_id like N'%{0}%') ", query.searchContent);
                 }
                 if (query.start_time != null)
                 {

@@ -76,6 +76,7 @@ namespace BLL.gigade.Model.Query
         public uint freight_set { get; set; }//add by zhaozhi0623j 2015/11/11 03:23PM,用於“出貨單期望到貨日”的查詢
         public uint user_id { set; get; }//add by zhaozhi0623j 2015/11/11 03:23PM,用於“出貨單期望到貨日”的查詢
         public string delivery_status_str { set; get; }//add by zhaozhi0623j 2015/11/16 PM,用於“出貨單期望到貨日”的查詢
+        public string deliver_org_days_str { set; get; }
         public DeliverMasterQuery()
         {
             vendor_id = 0;
