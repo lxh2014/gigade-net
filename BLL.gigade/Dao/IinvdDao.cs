@@ -1410,7 +1410,7 @@ us.user_username as user_name from iinvd ii ");
             try
             {
                 sql.AppendFormat("SELECT pi.item_id, p.product_name,CONCAT_WS('-',ps1.spec_name,ps2.spec_name)AS spec, made_date,cde_dt,prod_qty,pe.pwy_dte_ctl,i.row_id,ic.lcat_id  FROM iinvd i ");
-                sql.Append(" LEFT JOIN iloc ic ON ic.loc_id=i.plas_loc_id");
+                sql.Append(" LEFT JOIN (SELECT loc_id,lcat_id FROM iloc GROUP BY loc_id) ic ON ic.loc_id=i.plas_loc_id");
                 sql.Append(" LEFT JOIN product_item pi ON i.item_id=pi.item_id");
                 sql.Append(" LEFT JOIN product p ON p.product_id =pi.product_id");
                 sql.Append(" LEFT JOIN product_ext pe ON pe.item_id=pi.item_id");
@@ -1421,7 +1421,6 @@ us.user_username as user_name from iinvd ii ");
                 {
                     sbwhere.AppendFormat(" AND i.plas_loc_id='{0}'", loc_id);
                 }
-                sbwhere.Append(" GROUP BY ic.loc_id;");
                 return _access.getDataTableForObj<IinvdQuery>(sql.ToString() + sbwhere.ToString());
             }
             catch (Exception ex)
