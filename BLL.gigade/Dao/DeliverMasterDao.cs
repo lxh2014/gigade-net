@@ -16,6 +16,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using BLL.gigade.Dao.Impl;
+using BLL.gigade.Common;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using DBAccess;
@@ -1003,7 +1004,7 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1 ")
             try
             {
                 sbSql.Append(@"select dm.deliver_id,dm.order_id,om.user_id,tp.parameterName as delivery_status_str,dm.type,dm.freight_set,v.vendor_name_full,
-                                            dm.estimated_delivery_date,dm.estimated_arrival_date,dm.estimated_arrival_period,
+                                            dm.estimated_delivery_date,dm.deliver_org_days,dm.estimated_arrival_period,
                                             dm.expect_arrive_date,dm.expect_arrive_period ");
                 fromSql.Append(@"from deliver_master dm inner JOIN vendor v on v.vendor_id=dm.export_id inner JOIN order_master om on om.order_id=dm.order_id                                
                            LEFT JOIN (SELECT * from t_parametersrc  where parameterType ='delivery_status') tp on tp.parameterCode=dm.delivery_status 
@@ -1040,12 +1041,12 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1 ")
                 }
                 if (Query.time_start != DateTime.MinValue && Query.time_end != DateTime.MinValue)
                 {
-                    conSql.AppendFormat(" and dm.estimated_arrival_date between '{0}' and '{1}'", Query.time_start.ToString("yyyy-MM-dd"), Query.time_end.ToString("yyyy-MM-dd"));
+                    conSql.AppendFormat(" and dm.deliver_org_days between '{0}' and '{1}'",CommonFunction.GetPHPTime(Query.time_start.ToString("yyyy-MM-dd 00:00:00")), CommonFunction.GetPHPTime(Query.time_end.ToString("yyyy-MM-dd 23:59:59")));
                     
                 }
                 //if (Query.time_end != DateTime.MinValue)
                 //{
-                //    conSql.AppendFormat(" and dm.estimated_arrival_date <= '{0}'", Query.time_end.ToString("yyyy-MM-dd"));
+                //    conSql.AppendFormat(" and dm.deliver_org_days <= '{0}'", Query.time_end.ToString("yyyy-MM-dd"));
                 //    //BLL.gigade.Common.CommonFunction.DateTimeToString(Query.time_end)
                 //}
                 if (Query.vendor_id != 0)

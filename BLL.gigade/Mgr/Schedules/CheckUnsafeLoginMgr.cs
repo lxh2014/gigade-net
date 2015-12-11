@@ -152,8 +152,8 @@ GROUP BY login_ipfrom,login_type,login_mail ;", login_start, login_end, errorCou
 
                 if (_newDt.Rows.Count > 0)
                 {
-                    //MailBody = GetHtmlByDataTable(_newDt);
-                    MailBody = "<br/><font size=\"4\">   在 " + "<font color=\"#FF0000\" >" + start_time + " ~ " + end_time + "</font>" + " 的一個小時里，用戶登錄異常記錄如下：</font><br/><p/>" + GetHtmlByDataTable(_newDt);
+                    MailBody = GetHtmlByDataTable(_newDt);
+                    //MailBody = "<br/><font size=\"4\">   在 " + "<font color=\"#FF0000\" >" + start_time + " ~ " + end_time + "</font>" + " 的一個小時里，用戶登錄異常記錄如下：</font><br/><p/>" + GetHtmlByDataTable(_newDt);
                     MailHelper mail = new MailHelper(mailModel);
                     mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", IsSeparate, IsDisplyName);
                 }
@@ -178,10 +178,7 @@ GROUP BY login_ipfrom,login_type,login_mail ;", login_start, login_end, errorCou
             string[] str = { "style=\"background-color:#dda29a;\"", "style=\"background-color:#d98722;\"", "style=\"background-color:#cfbd2d;\"", "style=\"background-color:#cbd12c;\"", "style=\"background-color:#91ca15;\"", "style=\"background-color:#6dc71e;\"", "style=\"background-color:#25b25c;\"", "style=\"background-color:#13a7a2;\"" };
             string aligns = "align=\"right\"";
 
-            sbHtml.Append("<th ");
-            sbHtml.Append(" >");
-            sbHtml.Append("行號");
-            sbHtml.Append("</th>");
+            
             for (int i = 0; i < _dt.Columns.Count; i++)
             {
                 sbHtml.Append("<th ");
@@ -193,11 +190,11 @@ GROUP BY login_ipfrom,login_type,login_mail ;", login_start, login_end, errorCou
             sbHtml.Append("</tr>");
             for (int i = 0; i < _dt.Rows.Count; i++)//行
             {
-                sbHtml.Append("<tr>");
-                sbHtml.Append("<td ");                
-                sbHtml.Append(" >");
-                sbHtml.Append(i + 1);
-                sbHtml.Append("</td>");
+                //sbHtml.Append("<tr>");
+                //sbHtml.Append("<td ");                
+                //sbHtml.Append(" >");
+                //sbHtml.Append(i + 1);
+                //sbHtml.Append("</td>");
                 for (int j = 0; j < _dt.Columns.Count; j++)
                 {
                     sbHtml.Append("<td ");
