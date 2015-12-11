@@ -1057,7 +1057,7 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1 ")
                 {
                     conSql.AppendFormat(" and v.vendor_name_full like '%{0}%'", Query.vendor_name_full);
                 }
-                finalSql.Append(sbSql.ToString() + fromSql.ToString() + conSql.ToString());
+                finalSql.Append(sbSql.ToString() + fromSql.ToString() + conSql.ToString() + "order by deliver_id desc");
 
                 totalCount = 0;
                 if (Query.IsPage)
