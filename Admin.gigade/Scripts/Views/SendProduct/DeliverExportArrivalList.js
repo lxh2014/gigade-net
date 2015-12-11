@@ -41,30 +41,30 @@ var freightTypeStore = Ext.create('Ext.data.Store', {
     ]
 });
 //出貨方式store
-//var productModeStore = Ext.create('Ext.data.Store', {
-//    fields: ['txt', 'value'],
-//    data: [
-//        { "txt": '自出', "value": "1" },
-//        { "txt": '寄倉', "value": "2" },
-//        { "txt": '調度', "value": "3" }
-//    ]
-//});
 var productModeStore = Ext.create('Ext.data.Store', {
-    // fields: ['ParameterCode', 'parameterName'],
-    model: 'gigade.paraModel',
-    autoLoad: true,
-    proxy: {
-        type: 'ajax',
-        url: '/Parameter/QueryPara?paraType=product_mode',
-        noCache: false,
-        getMethod: function () { return 'get'; },
-        actionMethods: 'post',
-        reader: {
-            type: 'json',
-            root: 'items'
-        }
-    }
+    fields: ['txt', 'value'],
+    data: [
+        { "txt": '統倉出貨', "value": "1" },
+        { "txt": '供應商自行出貨', "value": "2" },
+        { "txt": '其他', "value": "101" }
+    ]
 });
+//var productModeStore = Ext.create('Ext.data.Store', {
+//    // fields: ['ParameterCode', 'parameterName'],
+//    model: 'gigade.paraModel',
+//    autoLoad: true,
+//    proxy: {
+//        type: 'ajax',
+//        url: '/Parameter/QueryPara?paraType=product_mode',
+//        noCache: false,
+//        getMethod: function () { return 'get'; },
+//        actionMethods: 'post',
+//        reader: {
+//            type: 'json',
+//            root: 'items'
+//        }
+//    }
+//});
 
 //出貨查詢Model
 Ext.define('GIGADE.deliverExpectArrival', {
@@ -149,8 +149,8 @@ Ext.onReady(function () {
                         labelWidth: 80 ,
                         
                         store: productModeStore,
-                        displayField: 'parameterName',
-                        valueField: 'parameterCode',
+                        displayField: 'txt',
+                        valueField: 'value',
                         editable: false,
                         allowBlank: true,
                         emptyText: '全部',
