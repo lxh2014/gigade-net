@@ -54,5 +54,6 @@ namespace BLL.gigade.Dao.Impl
         DateTime GetCde_dt(int row_id);
         int GetProd_qty(int item_id, string loc_id);
         List<IinvdQuery> GetPlasIinvd(Model.Query.IinvdQuery ivd);
+        DataTable getVentory(IinvdQuery m);
     }
 }

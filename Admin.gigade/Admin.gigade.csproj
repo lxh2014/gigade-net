@@ -2009,6 +2009,7 @@
     <Content Include="Scripts\Views\WareHouse\IlocChangeDetailLink.js" />
     <Content Include="Scripts\Views\WareHouse\IlocChangeDetailList.js" />
     <Content Include="Scripts\Views\WareHouse\IlocExportInto.js" />
+    <Content Include="Scripts\Views\WareHouse\InventoryList.js" />
     <Content Include="Scripts\Views\WareHouse\IplasExportEnter.js" />
     <Content Include="Scripts\Views\WareHouse\IplasExportInto.js" />
     <Content Include="Scripts\Views\WareHouse\IpodCheckNo.js" />
@@ -4485,6 +4486,7 @@
     <Content Include="Views\SendProduct\DeliverExpectArrival.cshtml" />
     <Content Include="Views\SendProduct\ExpectArrivalChangeLog.cshtml" />
     <Content Include="Views\Order\OrderAmountDetial.cshtml" />
+    <Content Include="Views\WareHouse\Inventory.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4699,7 +4701,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>37011</DevelopmentServerPort>
+          <DevelopmentServerPort>4557</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>
