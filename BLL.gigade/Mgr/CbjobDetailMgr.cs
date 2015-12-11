@@ -6,6 +6,7 @@ using BLL.gigade.Dao;
 using BLL.gigade.Dao.Impl;
 using BLL.gigade.Mgr.Impl;
 using BLL.gigade.Model;
+using System.Data;
 
 namespace BLL.gigade.Mgr
 {
@@ -99,6 +100,17 @@ namespace BLL.gigade.Mgr
             catch (Exception ex)
             {
                 throw new Exception("CbjobDetailMgr-->InsertSql-->" + ex.Message, ex);
+            }
+        }
+        public DataTable GetDetailTable(CbjobDetail cb)
+        {
+            try
+            {
+                return _cbjobDao.GetDetailTable(cb);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("CbjobDetailMgr-->GetDetailTable-->" + ex.Message, ex);
             }
         }
     }
