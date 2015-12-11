@@ -234,11 +234,11 @@ Ext.onReady(function () {
             { header: "規格", dataIndex: 'spec', width: 170, align: 'center' },
             { header: "訂货量", dataIndex: 'ord_qty', width: 60, align: 'center' },
             { header: "已撿貨量 ", dataIndex: 'act_pick_qty', width: 65, align: 'center' },
-            { header: "待检货量", dataIndex: 'out_qty', width: 65, align: 'center' },
+            { header: "待撿货量", dataIndex: 'out_qty', width: 65, align: 'center' },
             { header: "創建時間", dataIndex: 'create_dtim', width: 120, align: 'center' }
         ],
         tbar: [
-           { xtype: 'button', text: "待撿貨商品匯出PDF", id: 'outExcel', icon: '../../../Content/img/icons/excel.gif', handler: outExcel }
+           { xtype: 'button', text: "總量撿貨報表匯出PDF", id: 'outExcel', icon: '../../../Content/img/icons/excel.gif', handler: outExcel }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
             store: AseldStore,

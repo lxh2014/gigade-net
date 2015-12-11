@@ -1,4 +1,4 @@
-﻿pageSize = 25;
+﻿pageSize = 20;
 // 類別下拉框store
 Ext.define('gigade.ProductCategory', {
     extend: 'Ext.data.Model',
@@ -56,7 +56,9 @@ CategorySummaryStore.on('beforeload', function () {
         date_start: Ext.getCmp('timestart').getValue(),
         date_end: Ext.getCmp('timeend').getValue(),
         chooseCategory: Ext.getCmp('chooseCategory').getValue(),
-        receiptStatus: Ext.getCmp('receiptStatus').getValue().status
+        receiptStatus: Ext.getCmp('receiptStatus').getValue().status,
+        c_money: Ext.getCmp('c_money').getValue(),
+        c_money1: Ext.getCmp('c_money1').getValue()
     });
 });
 Ext.onReady(function () {
@@ -79,13 +81,19 @@ Ext.onReady(function () {
                 store: chooseCategoryStore,
                 labelWidth: 60,
                 margin: '5 10 0 5',
-                editable: false,
+                typeAhead: true,
+                queryMode: 'local',
+                editable: true,
                 submitValue: true,
                 displayField: 'category_name',
                 valueField: 'category_id',
                 forceSelection: false,
                 lastQuery: '',
-                value: '5'
+                value: '5',
+                listeners: {
+                    focus: function ()
+                    { this.setValue(''); }
+                }
             },
             {
                 xtype: 'combobox',
@@ -162,7 +170,7 @@ Ext.onReady(function () {
                 id: 'receiptStatus',
                 name: 'receiptStatus',
                 labelWidth: 60,
-                margin: '5 10 0 5',
+                margin: '5 0 0 5',
                 columns: 2,
                 width: 300,
                 vertical: true,
@@ -170,6 +178,30 @@ Ext.onReady(function () {
                 { boxLabel: '未收+實收金額', id: 'rdo1', name: 'status', inputValue: '0' },
                 { boxLabel: '實收金額', id: 'rdo2', name: 'status', inputValue: '1', checked: true }
                 ]
+            },
+            {
+                xtype: "numberfield",
+                fieldLabel: '金額範圍',
+                id: 'c_money',
+                name: 'c_money',
+                labelWidth: 60,
+                margin: '5 0 0 0',
+                minValue: 0,
+                value: 0
+            },
+            {
+                xtype: 'displayfield',
+                margin: '5 5 0 5',
+                value: "~"
+            },
+            {
+                xtype: "numberfield",
+                id: 'c_money1',
+                name: 'c_money1',
+                labelWidth: 60,
+                margin: '5 0 0 0',
+                minValue: 0,
+                value: 0
             },
             {
                 xtype: 'button',
@@ -188,6 +220,7 @@ Ext.onReady(function () {
                 listeners: {
                     click: function () {
                         Ext.getCmp("searchForm").getForm().reset();
+                        Ext.getCmp("chooseCategory").setValue('');
                         Ext.getCmp("gdList").store.removeAll();
                     }
                 }
@@ -272,6 +305,14 @@ Query = function () {
     var date_end = Ext.getCmp('timeend').getValue();
     CategorySummaryStore.removeAll();
     Ext.getCmp("sumValue").reset();
+    
+    var c_money = Ext.getCmp('c_money').getValue();
+    var c_money1 = Ext.getCmp('c_money1').getValue();
+    if (c_money > c_money1)
+    {
+        Ext.getCmp('c_money').setValue(c_money1);
+        Ext.getCmp('c_money1').setValue(c_money);
+    }
     if (chooseCategory == null || chooseCategory == "") {
         Ext.Msg.alert(INFORMATION, "請選擇類別");
         return;
@@ -313,8 +354,11 @@ function openAmountDetial(index) {
     var dateCon = Ext.getCmp('dateCon').getValue();
     var date_start = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('timestart').getValue()), 'Y-m-d H:i:s'));
     var date_end = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('timeend').getValue()), 'Y-m-d H:i:s'));
+    var c_money = Ext.getCmp('c_money').getValue();
+    var c_money1 = Ext.getCmp('c_money1').getValue();
+
     var receiptStatus = Ext.getCmp('receiptStatus').getValue().status;
-    var params = id + '|' + name + '|' + amount + '|' + receiptStatus + '|' + dateCon + '|' + date_start + '|' + date_end;
+    var params = id + '|' + name + '|' + amount + '|' + receiptStatus + '|' + dateCon + '|' + date_start + '|' + date_end + '|' + c_money + '|' + c_money1;
     var urlTran = '/Order/OrderAmountDetial?_parameters=' + params;
     var panel = window.parent.parent.Ext.getCmp('ContentPanel');
     var copy = panel.down('#OrderAmountDetial');
@@ -334,7 +378,15 @@ function openAmountDetial(index) {
 function change(value) {
     value = value.toString();
     if (/^\d+$/.test(value)) {
-        value = value.replace(/^(\d+)(\d{3})$/, "$1,$2");
+        if (value.length > 9) {
+            value = value.replace(/^(\d+)(\d{3})(\d{3})(\d{3})$/, "$1,$2,$3,$4");
+        }
+        else if (value.length > 6) {
+            value = value.replace(/^(\d+)(\d{3})(\d{3})$/, "$1,$2,$3");
+        }
+        else {
+            value = value.replace(/^(\d+)(\d{3})$/, "$1,$2");
+        }
     }
     return value;
 }

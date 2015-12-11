@@ -199,5 +199,18 @@ namespace BLL.gigade.Dao
             }
         }
 
+        public Site GetSiteInfo(int ids)
+        {
+            StringBuilder stb = new StringBuilder();
+            try
+            {
+                stb.AppendFormat("select site_id,site_name from site where site_id ={0}", ids);
+                return _access.getSinggleObj <Site>(stb.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("SiteDao-->GetSiteInfo-->" + ex.Message + stb.ToString(), ex);
+            }
+        }
     }
 }

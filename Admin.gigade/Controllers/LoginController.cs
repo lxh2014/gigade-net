@@ -12,6 +12,8 @@ using System.Timers;
 using log4net;
 using Admin.gigade.CustomError;
 using BLL.gigade.Common;
+using GigadeApi.Framework.ViewModels.SuppliersAccount;
+
 namespace Admin.gigade.Controllers
 {
     [HandleError]
@@ -267,6 +269,30 @@ namespace Admin.gigade.Controllers
                 }
 
                 caller.user_password = "";
+
+                try
+                {
+                    string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];//XML的設置
+                    string path = Server.MapPath(xmlPath);
+                    SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+                    string APIServer = _siteConfigMgr.GetConfigByName("APIServer").Value;
+
+
+                    GigadeApiRequest request = new GigadeApiRequest(APIServer);
+
+                    var result = request.Request<SuppliersLoginViewModel, SuppliersLoginResult>("api/admin/account/login",
+                         new SuppliersLoginViewModel() { user_email = email, user_password = newpasswd, user_halfToken = challenge_key, login_ipfrom = CommonFunction.GetIP4Address(Request.UserHostAddress.ToString()) });
+                    var back = result.result;
+                    Session["AccessToken"] = back.userToken.user_token;
+                }
+                catch (Exception ex)
+                {
+                    Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                    logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                    logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                    log.Error(logMessage);
+                }
+                
 
                 Session["caller"] = caller;
                 return Redirect("../home");

@@ -23,6 +23,8 @@ namespace BLL.gigade.Dao.Impl
         string UpdTicker(string id);
         List<AseldQuery> GetAseldList(Aseld ase);
         List<AseldQuery> GetAseldListByItemid(Aseld ase);
+        List<AseldQuery> GetAllAseldList(AseldQuery ase, out int totalCount);
+        int GetCountByItem(Aseld a);
         string UpdAseld(Aseld a);
         int SelCom(Aseld a);
         int SelComA(Aseld a);

@@ -12,6 +12,7 @@ using BLL.gigade.Common;
 using BLL.gigade.Model;
 using BLL.gigade.Model.Query;
 using DBAccess;
+using System.Data;
 
 namespace BLL.gigade.Mgr
 {
@@ -80,6 +81,31 @@ namespace BLL.gigade.Mgr
            else//編輯
            {
                return _edmtemplatedao.EdmTemplateUpdate(query);
+           }
+       }
+       /// <summary>
+       /// 為true是靜態範本
+       /// </summary>
+       /// <param name="template_id"></param>
+       /// <returns>為true是靜態範本</returns>
+       public bool GetStaticTemplate(int template_id)
+       {
+           bool static_template=true;
+           try
+           {
+               DataTable _dt = _edmtemplatedao.GetStaticTemplate(template_id);
+               if (_dt != null && _dt.Rows.Count > 0)
+               {
+                   if (Convert.ToInt32(_dt.Rows[0][0]) ==0)//動態範本
+                   {
+                       static_template = false;
+                   }
+               }
+               return static_template;
+           }
+           catch (Exception ex)
+           {
+               throw new Exception("EdmTemplateMgr-->GetStaticTemplate-->" + ex.Message +  ex);
            }
        }
   

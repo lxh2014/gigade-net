@@ -97,27 +97,45 @@
             },
               {
                   fieldLabel: "開始時間",
-                  xtype: 'datefield',
+                  xtype: "datetimefield",
                   id: 'event_start',
                   name: 'event_start',
                   allowBlank: false,
                   editable: false,
-                  format: 'Y-m-d 00:00:00',
-                  value: new Date(),
-                  vtype: 'daterange',
-                  endDateField: 'event_end'
+                  format: 'Y-m-d H:i:s',
+                  value: Tomorrow(),
+                  time: { hour: 00, min: 00, sec: 00 },
+                  listeners: {
+                      select: function (a, b, c) {
+                          var start = Ext.getCmp("event_start");
+                          var end = Ext.getCmp("event_end");
+                          if (end.getValue() < start.getValue()) {
+                              var start_date = start.getValue();
+                              Ext.getCmp('event_end').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                          }
+                      }
+                  }
               },
               {
                   fieldLabel: "結束時間",
-                  xtype: 'datefield',
+                  xtype: 'datetimefield',
                   id: 'event_end',
                   name: 'event_end',
-                  format: 'Y-m-d 23:59:59',
+                  format: 'Y-m-d H:i:s',
+                  time: { hour: 23, min: 59, sec: 59 },
                   allowBlank: false,
                   editable: false,
-                  value: eformatDate(new Date()),
-                  vtype: 'daterange',
-                  startDateField: 'event_start'
+                  value: setNextMonth(Tomorrow(), 1),
+                  listeners: {
+                      select: function (a, b, c) {
+                          var start = Ext.getCmp("event_start");
+                          var end = Ext.getCmp("event_end");
+                          if (end.getValue() < start.getValue()) {//開始時間大於了結束時間
+                              var end_date = end.getValue();
+                              Ext.getCmp('event_start').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
+                          }
+                      }
+                  }
 
               },
              {
@@ -387,3 +405,28 @@ function eformatDate(now)
     now.setMonth(now.getMonth() + 1);
     return now;
 };
+
+function Tomorrow() {
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate() + 1);
+    return dt;                                 // 返回日期。
+}
+
+  function setNextMonth (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
+}

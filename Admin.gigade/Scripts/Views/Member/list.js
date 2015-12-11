@@ -28,8 +28,16 @@ Ext.define('gigade.Users', {
     { name: "user_zip", type: "string" }, //用戶地址
     { name: "user_address", type: "string" }, //用戶地址
     { name: "user_actkey", type: "string" },
-    { name: "user_mobile", type: "string" },
-    { name: "user_phone", type: "string" }, //行動電話
+
+
+    //Edit Start Modify by Gaoyuwei 2015-12-07
+    //{ name: "user_mobile", type: "string" },
+    //{ name: "user_phone", type: "string" }, //行動電話
+    { name: "user_mobile", type: "string" },//行動電話
+    { name: "user_phone", type: "string" }, //市話
+    //Edti End Modify by Gaoyuwei 2015-12-07
+
+
     { name: "reg_date", type: "string" }, //註冊日期 
     { name: "mytype", type: "string" },//會員類別
     { name: "send_sms_ad", type: "bool" }, //是否接收簡訊廣告 
@@ -148,10 +156,21 @@ var DDLStore = Ext.create('Ext.data.Store', {
     data: [
     { "txt": "電子信箱", "value": "1" },
     { "txt": "會員姓名", "value": "2" },
-    { "txt": "手機號碼", "value": "3" },
+
+
+    //Edti Start Modify by Gaoyuwei 2015-12-07
+    //{ "txt": "手機號碼", "value": "3" },
+    { "txt": "行動電話", "value": "3" },
+    //Edit End Modify by Gaoyuwei 2015-12-07
+
+
     { "txt": "會員編號", "value": "4" },
     { "txt": "市話", "value": "5" },
-    { "txt": "地址", "value": "6" }
+    { "txt": "地址", "value": "6" },
+    //Edit Start
+    //Add by yuwei1015j 2015-12-02
+    { "txt": "會員等級", "value": "7" }
+    //Edit End
     ]
 });
 
@@ -412,9 +431,11 @@ Ext.onReady(function () {
                 }
             },
             {
-                xtype: 'datefield',
+                xtype: 'datetimefield',
                 fieldLabel: "註冊日期",
                 id: 'timestart',
+                format: 'Y-m-d  H:i:s',
+                time: { hour: 00, min: 00, sec: 00 },
                 labelWidth: 60,
                 editable: false,
                 listeners: {
@@ -443,8 +464,10 @@ Ext.onReady(function () {
             },
             { xtype: 'displayfield', value: "~", margin: '0' },
             {
-                xtype: 'datefield',
+                xtype: 'datetimefield',
                 id: 'timeend',
+                format: 'Y-m-d  H:i:s',
+                time: { hour: 23, min: 59, sec: 59 },
                 editable: false,
                 listeners: {
                     select: function (a, b, c) {

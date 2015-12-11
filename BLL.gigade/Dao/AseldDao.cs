@@ -300,6 +300,106 @@ LEFT JOIN order_master o ON a.ord_id=o.order_id
         }
         #endregion
 
+        #region 根據工作代號、產品條碼查找數據
+        public List<AseldQuery> GetAllAseldList(AseldQuery a, out int totalCount)
+        {
+            StringBuilder sql = new StringBuilder();//left join iloc ic on i.plas_loc_id=ic.loc_id 
+            StringBuilder sqlCount = new StringBuilder();
+            StringBuilder sqlWhere = new StringBuilder();
+            try
+            {
+                sqlCount.AppendFormat(@"SELECT count(seld_id) as totalCount ");
+                sql.AppendFormat(@"SELECT seld_id,assg_id,case when ip.loc_id is null then 'YY999999' else ip.loc_id end as sel_loc,CONCAT('(',a.item_id,')',v.brand_name,'-',p.product_name) as description,concat(IFNULL(ps1.spec_name,''),IFNULL(ps2.spec_name,'')) as prod_sz,ord_qty,out_qty,ord_id,cust_name,a.item_id,ordd_id,upc_id,pe.cde_dt_shp,deliver_id,deliver_code,o.note_order,ic.hash_loc_id ");
+                //LEFT JOIN iinvd i ON a.item_id=i.item_id i.cde_dt,
+                sqlWhere.AppendFormat(@" FROM aseld a  
+LEFT JOIN product_ext pe ON a.item_id = pe.item_id 
+LEFT JOIN iplas ip on a.item_id=ip.item_id 
+left join iloc ic on ip.loc_id=ic.loc_id  
+LEFT JOIN product_item pi ON a.item_id = pi.item_id 
+LEFT JOIN product_spec ps1 ON pi.spec_id_1 = ps1.spec_id
+LEFT JOIN product_spec ps2 ON pi.spec_id_2 = ps2.spec_id
+LEFT JOIN product p ON pi.product_id=p.product_id 
+LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id
+LEFT JOIN order_master o ON a.ord_id=o.order_id
+            WHERE wust_id<>'COM' AND commodity_type='2'");// and scaned='0' 
+                if (a.seld_id != 0)
+                {
+                    sqlWhere.AppendFormat(" and a.seld_id='{0}' ", a.seld_id);
+                }
+                if (!string.IsNullOrEmpty(a.assg_id))
+                {
+                    sqlWhere.AppendFormat(" and a.assg_id='{0}' ", a.assg_id);
+                }
+                if (a.item_id != 0)
+                {
+                    sqlWhere.AppendFormat(" and a.item_id='{0}' ", a.item_id);
+                }
+                if (a.ord_id != 0)
+                {
+                    sqlWhere.AppendFormat(" and a.ord_id='{0}' ", a.ord_id);
+                }
+                if (!string.IsNullOrEmpty(a.deliver_code))
+                {
+                    sqlWhere.AppendFormat(" and a.deliver_code='{0}' ", a.deliver_code);
+                }
+                if (a.start_time != DateTime.MinValue && a.end_time != DateTime.MinValue)
+                {
+                    sqlWhere.AppendFormat(" and a.create_dtim between '{0}' and '{1}'",
+                      CommonFunction.DateTimeToString(a.start_time), CommonFunction.DateTimeToString(a.end_time));
+
+                }
+                sqlWhere.AppendFormat(" ORDER BY sel_loc,seld_id ");
+                totalCount = 0;
+                if (a.IsPage)
+                {
+                    DataTable _dt = _access.getDataTable(sqlCount.ToString() + sqlWhere.ToString());
+                    if (_dt.Rows.Count > 0)
+                    {
+                        totalCount = Convert.ToInt32(_dt.Rows[0]["totalCount"]);
+                        sqlWhere.AppendFormat(" limit {0},{1};", a.Start, a.Limit);
+                    }
+                }
+                return _access.getDataTableForObj<AseldQuery>(sql.ToString() + sqlWhere.ToString());
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldDao.GetAllAseldList-->" + ex.Message + sql.ToString() + sqlWhere.ToString(), ex);
+            }
+            
+        }
+        #endregion
+        #region 判斷itemid是否在某個工作項中
+        public int GetCountByItem(Aseld a)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"SELECT count(seld_id) as totalCount  FROM aseld a where 1=1 ");
+
+                if (!string.IsNullOrEmpty(a.assg_id))
+                {
+                    sql.AppendFormat(" and a.assg_id='{0}' ", a.assg_id);
+                }
+                if (a.item_id != 0)
+                {
+                    sql.AppendFormat(" and a.item_id='{0}' ", a.item_id);
+                }
+
+                DataTable _dt = _access.getDataTable(sql.ToString());
+
+                return Convert.ToInt32(_dt.Rows[0]["totalCount"]);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldDao.GetCountByItem-->" + ex.Message + sql.ToString(), ex);
+            }
+
+        }
+        #endregion
+
+
         /// <summary>
         /// 調度頁面數據
         /// </summary>

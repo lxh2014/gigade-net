@@ -29,8 +29,9 @@ Ext.define('gridlistET', {
         { name: "template_create_user", type: "string" },//顯示建立者
         { name: "template_update_user",type:"string" },//顯示修改者
         { name: "template_createdate",type:"datetime" },//建立日期
-        { name: "template_updatedate",type:"datetime" },//更新時間
-
+        { name: "template_updatedate", type: "datetime" },//更新時間
+           { name: "static_template", type: "int" }
+        
     ],
 });
 
@@ -71,11 +72,19 @@ Ext.onReady(function () {
         frame: true,
         flex: 9.4,
         columns: [
-            new Ext.grid.RowNumberer(),//自動顯示行號
-            { header: "編號", dataIndex: "template_id", align: 'center',hidden:true },
+            { header: "編號", dataIndex: "template_id", align: 'center' },
             { header: "範本名稱", dataIndex: "template_name", width: 200, align: 'center' },
             { header: "內容編輯網址", dataIndex: "edit_url", width: 200, align: 'center' },
             { header: "內容產生網址", dataIndex: "content_url", width: 200, align: 'center' },
+             {
+                 header: "靜態範本", dataIndex: "static_template", width: 100, align: 'center', renderer: function (value) {
+                     if (value == 1) {
+                         return "是";
+                     } else {
+                         return "否";
+                     }
+                 }
+             },
             { header: "建立者", dataIndex: "template_create_user", width: 80, align: 'center' },
             { header: "修改者", dataIndex: "template_update_user", width: 80, align: 'center' },
             { header: "更新時間", dataIndex: "template_updatedate", width: 140, align: 'center'},

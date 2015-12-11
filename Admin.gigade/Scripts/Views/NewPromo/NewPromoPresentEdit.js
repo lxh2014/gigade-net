@@ -1,4 +1,5 @@
 ﻿VipGroupStore.load();
+EventTypeStore.load();
 editPresentFunction = function (row, store, o_event_id) {
 
     var p_editFrm = Ext.create('Ext.form.Panel', {
@@ -40,7 +41,22 @@ editPresentFunction = function (row, store, o_event_id) {
                     valueField: 'group_id',
                     typeAhead: true,
                     forceSelection: false,
-                    value: "0"
+                    value:"0"
+                },
+                {
+                    xtype: 'combobox',
+                    editable: false,
+                    hidden: false,
+                    id: 'event_type',
+                    fieldLabel: '促銷類型',
+                    name: 'event_type',
+                    store: EventTypeStore,
+                    displayField: 'parameterName',
+                    valueField: 'ParameterCode',
+                    typeAhead: true,
+                    lastQuery: '',
+                    forceSelection: false,
+                    value:0
                 },
                {
                    xtype: 'fieldcontainer',
@@ -254,7 +270,7 @@ editPresentFunction = function (row, store, o_event_id) {
                            var end = Ext.getCmp("tend");
                            if (end.getValue() < start.getValue()) {//開始時間大於了結束時間
                                var start_date = start.getValue();
-                               Ext.getCmp('tend').setValue(new Date(start_date.getFullYear(), start_date.getMonth()+ 1, start_date.getDate()));
+                               Ext.getCmp('tend').setValue(new Date(start_date.getFullYear(), start_date.getMonth()+ 1, start_date.getDate(),23,59,59));
                            }
                        }
                    }
@@ -313,6 +329,7 @@ editPresentFunction = function (row, store, o_event_id) {
                                     valid_start: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('tstart').getValue()), 'Y-m-d H:i:s')),
                                     gift_amount: Ext.getCmp('gift_amount').getValue(),
                                     use_span_day: Ext.getCmp('use_span_day').getValue(),
+                                    event_type: Ext.getCmp('event_type').getValue(),
                                 },
                                 success: function (form, action) {
                                     var result = Ext.decode(action.response.responseText);
@@ -355,7 +372,8 @@ editPresentFunction = function (row, store, o_event_id) {
                                 bonus_expire_day: Ext.htmlEncode(Ext.getCmp('bonus_expire_day').getValue()),
                                 valid_end: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('tend').getValue()), 'Y-m-d H:i:s')),
                                 valid_start: Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('tstart').getValue()), 'Y-m-d H:i:s')),
-                                gift_amount: Ext.getCmp('gift_amount').getValue()
+                                gift_amount: Ext.getCmp('gift_amount').getValue(),
+                                event_type: Ext.getCmp('event_type').getValue(),
                             },
                             success: function (form, action) {
                                 var result = Ext.decode(action.response.responseText);
@@ -384,7 +402,7 @@ editPresentFunction = function (row, store, o_event_id) {
         iconCls: row ? 'icon-user-edit' : 'icon-user-add',
         id: 'p_editWins',
         width: 400,
-        height: 350,
+        height: 380,
         layout: 'fit',
         items: [p_editFrm],
         constrain: true,

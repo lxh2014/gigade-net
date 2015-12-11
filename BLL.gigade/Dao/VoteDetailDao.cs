@@ -202,7 +202,7 @@ namespace BLL.gigade.Dao
                 }
                 if (!string.IsNullOrEmpty(query.searchContent))
                 {
-                    sbSqlCondition.AppendFormat(" and (vd.article_id like N'%{0}%' vd.or user_id like N'%{0}%') ", query.searchContent);
+                    sbSqlCondition.AppendFormat(" and (vd.article_id like N'%{0}%'  or  va.article_title  like N'%{0}%'  or u.user_id like N'%{0}%') ", query.searchContent);
                 }
                 if (query.start_time != null)
                 {
@@ -210,7 +210,7 @@ namespace BLL.gigade.Dao
                 }
                 if (query.end_time != null)
                 {
-                    sbSqlCondition.AppendFormat(" and vd.create_time < '{0}' ", query.end_time.ToString("yyyy-MM-dd 23:59:59"));
+                    sbSqlCondition.AppendFormat(" and vd.create_time < '{0}' ", CommonFunction.DateTimeToString(query.end_time));
                 }
                 if (query.vote_status != -1)
                 {

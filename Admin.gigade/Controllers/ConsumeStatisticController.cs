@@ -63,12 +63,12 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["startTime"]))
                 {
                     query.startTime = Convert.ToDateTime(Request.Params["startTime"]);
-                    query.startTime = Convert.ToDateTime(query.startTime.ToString("yyyy-MM-dd 00:00:00"));
+                    query.startTime = Convert.ToDateTime(query.startTime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["endTime"]))
                 {
                     query.endTime = Convert.ToDateTime(Request.Params["endTime"]);
-                    query.endTime = Convert.ToDateTime(query.endTime.ToString("yyyy-MM-dd 23:59:59"));
+                    query.endTime = Convert.ToDateTime(query.endTime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["searchType"]))
                 {

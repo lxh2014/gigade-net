@@ -21,6 +21,12 @@
 setNextMonth = function (source, n) {
     var s = new Date(source);
     s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
     return s;
 }
 var pageSize = 25;
@@ -172,12 +178,13 @@ Ext.onReady(function () {
                             value: '發放起止時間:'
                         },
                        {
-                           xtype: "datefield",
+                           xtype: "datetimefield",
                            editable: false,
                            margin: '0 0 0 14',
                            id: 'start_time',
                            name: 'start_time',
-                           format: 'Y-m-d 00:00:00',
+                           format: 'Y-m-d  H:i:s',
+                           time: { hour: 00, min: 00, sec: 00 },//標記結束時間00:00:00
                            width: 150,
                            //vtype: 'daterange',
                            //endDateField: 'end_time',
@@ -188,26 +195,27 @@ Ext.onReady(function () {
                                    }
                                }
                                , select: function () {
-                                   var startTime = Ext.getCmp("start_time");
-                                   var endTime = Ext.getCmp("end_time");
-                                   if (endTime.getValue() != null) {
-                                       if (startTime.getValue() > endTime.getValue()) {
-                                           startTime.setValue('');
-                                           Ext.Msg.alert('提示', '開始時間不能大於結束時間');
-                                       }
+                                   var start = Ext.getCmp("start_time");
+                                   var end = Ext.getCmp("end_time");
+                                   if (end.getValue() == null) {
+                                       end.setValue(setNextMonth(start.getValue(), 1));
                                    }
-
+                                   else if (end.getValue() < start.getValue()) {
+                                       Ext.Msg.alert(INFORMATION, DATA_TIP);
+                                       end.setValue(setNextMonth(start.getValue(), 1));
+                                   }
                                }
                            }
                        },
                        { xtype: 'displayfield', value: '~ ', margin: '0 0 0 10', },
                        {
-                           xtype: "datefield",
+                           xtype: "datetimefield",
                            editable: false,
                            margin: '0 0 0 10',
                            id: 'end_time',
                            name: 'end_time',
-                           format: 'Y-m-d 23:59:59',
+                           format: 'Y-m-d  H:i:s',
+                           time: { hour: 23, min: 59, sec: 59 },//標記結束時間00:00:00
                            width: 150,
                            //vtype: 'daterange',
                            //startDateField: 'start_time',
@@ -218,13 +226,16 @@ Ext.onReady(function () {
                                    }
                                }
                                , select: function () {
-                                   var startTime = Ext.getCmp("start_time");
-                                   var endTime = Ext.getCmp("end_time");
-                                   if (startTime.getValue() != null) {
-                                       if (startTime.getValue() > endTime.getValue()) {
-                                           endTime.setValue('');
-                                           Ext.Msg.alert('提示', '結束時間不能小於開始時間');
-                                       }
+                                   var start = Ext.getCmp("start_time");
+                                   var end = Ext.getCmp("end_time");                                 
+                                   if (start.getValue() != "" && start.getValue() != null) {
+                                       if (end.getValue() < start.getValue()) {
+                                           Ext.Msg.alert(INFORMATION, DATA_TIP);
+                                           start.setValue(setNextMonth(end.getValue(), -1));
+                                       }                                      
+                                   }
+                                   else {
+                                       start.setValue(setNextMonth(end.getValue(), -1));
                                    }
                                }
                            }

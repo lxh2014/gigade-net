@@ -20,17 +20,19 @@
         <h1>請開始盤點商品數量</h1>
         <br />
         <h3>料位編號: <span class="label label-info" id="loc_id"><%=ViewBag.loc_id%></span></h3>
-        <h3>商品名稱: <span class="label label-info">(<%=ViewBag.item_id%>) <%=ViewBag.product_name%> <%=ViewBag.spec%></span></h3>
+        <h3>商品名稱: <span class="label label-info">(<%=ViewBag.item_id%>) <%=ViewBag.product_name%> 規格:<%=ViewBag.spec%> 條碼:<%=ViewBag.upc_id %></span></h3>
         <span id="item_id" hidden="hidden"><%=ViewBag.item_id%></span>
         <span id="pwy_dte_ctl" hidden="hidden"><%=ViewBag.pwy_dte_ctl%></span>
+        <span id="iplas" hidden="hidden"><%=ViewBag.iplas%></span>
         <br />
         <div class="bs-example bs-example-padded-bottom">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">新增庫存</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" onclick="reset()">新增庫存</button>
         </div>
         <table class="table table-bordered table-striped table-hover" id="Table1">
+            <%if(ViewBag.count!=0){ %>
             <thead class="lead">
                 <tr>
-                    <%if (ViewBag.pwy_dte_ctl == "Y")
+                    <%if (ViewBag.pwy_dte_ctl == "Y" && ViewBag.item_id != "此料位暫無商品" &&ViewBag.lcat_id=="")
                       { %>
                     <th style="text-align: center; vertical-align: middle;" data-field="made_date" tabindex="0">
                         <div class="th-inner ">
@@ -45,12 +47,12 @@
                         <div class="fht-cell"></div>
                     </th>
                     <%} %>
-                    <th style="text-align: center; vertical-align: middle;" data-field="prod_qty" tabindex="0">
+                 <%--   <th style="text-align: center; vertical-align: middle;" data-field="prod_qty" tabindex="0">
                         <div class="th-inner ">
                             現有庫存                   
                         </div>
                         <div class="fht-cell"></div>
-                    </th>
+                    </th>--%>
                     <th style="text-align: center; vertical-align: middle;" data-field="3" tabindex="0">
                         <div class="th-inner ">
                             實際庫存                 
@@ -65,6 +67,7 @@
                     </th>
                 </tr>
             </thead>
+            <%} %>
             <tbody>
                 <%for (int i = 0; i < ViewBag.count; i++)
                   {
@@ -72,12 +75,11 @@
                       { %>
                 <tr data-index="0">
                     <td style="text-align: center; vertical-align: middle;" hidden="hidden"><%=ViewBag.data[i].row_id%></td>
-                    <%if (ViewBag.pwy_dte_ctl == "Y")
+                    <%if (ViewBag.pwy_dte_ctl == "Y" && ViewBag.item_id != "此料位暫無商品" && ViewBag.lcat_id == "")
                       { %>
                     <td style="text-align: center; vertical-align: middle;"><%=BLL.gigade.Common.CommonFunction.DateTimeToShortString(ViewBag.data[i].made_date)%></td>
                     <td style="text-align: center; vertical-align: middle;"><%=BLL.gigade.Common.CommonFunction.DateTimeToShortString(ViewBag.data[i].cde_dt)%></td>
                     <%}%>
-                    <td style="text-align: center; vertical-align: middle;" id="prod_qtys"><%=ViewBag.data[i].prod_qty%></td>
                     <td style="text-align: center; vertical-align: middle;">
                         <input min="0" class="form-control" id="input<%=ViewBag.data[i].row_id%>" onkeydown="return check(event);" type="number">
                     </td>
@@ -91,12 +93,12 @@
                       { %>
                 <tr data-index="1">
                     <td style="text-align: center; vertical-align: middle;" hidden="hidden" id="<%=ViewBag.data[i].row_id%>"></td>
-                    <%if (ViewBag.pwy_dte_ctl == "Y")
+                    <%if (ViewBag.pwy_dte_ctl == "Y" && ViewBag.item_id != "此料位暫無商品" && ViewBag.lcat_id == "")
                       { %>
                     <td style="text-align: center; vertical-align: middle;"><%=BLL.gigade.Common.CommonFunction.DateTimeToShortString(ViewBag.data[i].made_date)%></td>
                     <td style="text-align: center; vertical-align: middle;"><%=BLL.gigade.Common.CommonFunction.DateTimeToShortString(ViewBag.data[i].cde_dt)%></td>
                     <%} %>
-                    <td style="text-align: center; vertical-align: middle;"><%=ViewBag.data[i].prod_qty%></td>
+                   <%-- <td style="text-align: center; vertical-align: middle;" id="prod_qtys<%=ViewBag.data[i].row_id%>" hidden="hidden"><%=ViewBag.data[i].prod_qty%></td>--%>
                     <td style="text-align: center; vertical-align: middle;">
                         <input type="number" min="0" class="form-control" id="input<%=ViewBag.data[i].row_id%>" onkeydown="return check(event);">
                     </td>
@@ -118,16 +120,27 @@
                     <div class="modal-body">
                         <%if (ViewBag.pwy_dte_ctl == "Y")
                           { %>
-                        <span style="font-size: large;">製造日期：</span><input class="form-control" style="width:157px;float:right;margin-right:320px;" size="21" type="text" id="datetimepicker1" readonly="readonly">
-                        <%--<div class="input-group date form_date col-md-5" data-link-field="dtp_input2" style="float:right;margin-right:220px;" ><input class="form-control" size="5" type="text" value="" readonly="readonly" id="datetimepicker1"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span></div>--%>
+                        <span style="font-size: large;">製造日期：</span><input class="form-control" style="width:157px;float:right;margin-right:320px;" size="21" type="text" id="datetimepicker1" readonly="readonly" onchange="GetDate('datetimepicker1')">
                         <br />
                         <br />
-                        <%--<span style="font-size: large;">有效日期：</span><input class="span2" size="21" type="text" id="datetimepicker2" readonly="readonly"><span class="add-on"><i class="icon-th"></i></span>--%>
-                        <%--       <div class="input-group date form_date col-md-5" data-link-field="dtp_input2" style="float:right;">
-                            <input class="form-control" size="16" type="text" value="" readonly="readonly" id="datetimepicker2">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                        </div>--%>
+                        <span style="font-size: large;">有效日期：</span><input class="form-control" style="width:157px;float:right;margin-right:320px;" size="21" type="text" id="datetimepicker2" readonly="readonly" onchange="GetDate('datetimepicker2')">
+                        <%--<div class="input-group date form_date col-md-5" data-link-field="dtp_input2" style="float:right;margin-right:220px;" ><input class="form-control" size="5" type="text" value="" readonly="readonly" id="datetimepicker2"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span></div>--%>
+                        <br />
+                        <br />
                         <%} %>
+                        <%if (ViewBag.pwy_dte_ctl == "N"&&ViewBag.item_id == "此料位暫無商品")
+                          { %>
+                        <span style="font-size: large;">細項編號：</span><input class="span2" size="16" type="number" id="itemid" min="0" onkeydown="return check(event);" onblur="CheckItem('itemid')">
+                        <br /><br />
+                        <span style="font-size: large;">商品名稱：</span><span style="font-size: large;" id="productname"></span>
+                        <br /><br />
+                        <%} %>
+                        <span class="date1" style="font-size: large;">製造日期：</span><input class="form-control" style="width:157px;float:right;margin-right:320px;" size="21" type="text" id="datetimepicker3" readonly="readonly" onchange="GetDate('datetimepicker3')" hidden="hidden">
+                        <br class="date1" />
+                        <br class="date1"/>
+                        <span style="font-size: large;" class="date1">有效日期：</span><input class="form-control" style="width:157px;float:right;margin-right:320px;" size="21" type="text" id="datetimepicker4" readonly="readonly" onchange="GetDate('datetimepicker4')" hidden="hidden">
+                        <br class="date1"/>
+                        <br class="date1"/>
                         <span style="font-size: large;">現有庫存：</span><input class="span2" size="16" type="number" id="prod_qty" min="0" onkeydown="return check(event);">
                         <br /><br />
                         <div id="myAlert" class="alert alert-warning" hidden="hidden">
@@ -161,9 +174,41 @@
             </div>
             <!-- /.modal-dialog -->
         </div>
-<%--        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>--%>
+
+        <div id="alertdatediv" class="modal fade MarketTally-modal-alert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="H2">溫馨提示</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="div2" class="alert alert-warning">
+                            <strong id="alertdate"></strong>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <div id="alertsuccess" class="modal fade MarketTally-modal-alert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="H3">溫馨提示</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="div3" class="alert alert-warning">
+                            <strong id="Strong1">保存成功！</strong>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
         <!-- /.modal -->
          <div class="bs-example bs-example-padded-bottom">
             <button type="button" class="btn btn-primary" onclick="NextIloc()">盤點下一個料位</button>
@@ -175,7 +220,126 @@
     function NextIloc() {
         location.href = "/WareHouse/IlocCheck";
     }
+    function CheckItem(id)
+    {
+        $("#myAlert").hide();
+        var item_id = $('#' + id).val();
+        if(item_id.trim()!='')
+        {
+            $.ajax({
+                url: "/WareHouse/Getprodbyid",
+                type: 'POST',
+                dataType: "text",
+                data: { id: item_id },
+                success: function (data) {
+                    var result = eval("(" + data + ")");
+                    if (result.success) {
+                        msg = result.msg;
+                        $('#productname').text(msg);
+                        pwy_dte_ctl = result.pwy_dte_ctl;
+                        if (pwy_dte_ctl == "Y") {
+                            $('#pwy_dte_ctl').text('Y');
+                            $('#datetimepicker3').show();
+                            $('#datetimepicker4').show();
+                            $('.date1').show();
+                        }
+                        else {
+                            $('#pwy_dte_ctl').text('');
+                            $('#datetimepicker3').hide();
+                            $('#datetimepicker4').hide();
+                            $('.date1').hide();
+                        }
+                    }
+                    else {
+                        $('#productname').text("沒有該商品信息！");
+                    }
+                }
+            });
+        } 
+    }
+    function GetDate(id)
+    {
+        var date = $('#' + id).val();
+        var dateType = 'cde';
+        var item_id = $('#item_id').text(); 
+
+        if (item_id.trim() == "此料位暫無商品") {
+            item_id = $('#itemid').val();
+            if(item_id.length<6)
+            {
+                return false;
+            }
+        }
+
+        if (id == 'datetimepicker1'|| id=='datetimepicker3')
+        {
+            dateType = 'made';
+        }
+        $.ajax({
+            url: "/WareHouse/GetItemDate",
+            type: "POST",
+            dataType: "text",
+            data: { date: date, dateType: dateType, item_id: item_id},
+            success: function (data) {
+                var result = eval("(" + data + ")");
+                if (result.success) {
+                    if (dateType == 'made') {
+                        if (id == 'datetimepicker1') {
+                            $('#datetimepicker2').val(result.date);
+                        }
+                        else {
+                            $('#datetimepicker4').val(result.date);
+                        } 
+                    }
+                    else {
+                        if (id == 'datetimepicker2') {
+                            $('#datetimepicker1').val(result.date);
+                        }
+                        else {
+                            $('#datetimepicker3').val(result.date);
+                        }
+                    }
+                }
+            }
+        });
+    }
     $('#datetimepicker1').datetimepicker({
+        language: 'zh-TW',
+        format: "yyyy - mm - dd",
+        weekStart: 1,
+        todayBtn: 1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        minView: 2,
+        forceParse: 0,
+        showMeridian: 1
+    });
+    $('#datetimepicker2').datetimepicker({
+        language: 'zh-TW',
+        format: "yyyy - mm - dd",
+        weekStart: 1,
+        todayBtn: 1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        minView: 2,
+        forceParse: 0,
+        showMeridian: 1
+    });
+    $('#datetimepicker3').datetimepicker({
+        language: 'zh-TW',
+        format: "yyyy - mm - dd",
+        weekStart: 1,
+        todayBtn: 1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        minView: 2,
+        forceParse: 0,
+        showMeridian: 1
+    });
+    $('#datetimepicker4').datetimepicker({
         language: 'zh-TW',
         format: "yyyy - mm - dd",
         weekStart: 1,
@@ -192,6 +356,9 @@
     var month = date.getMonth() + 1;
     var day = date.getDate();
     $('#datetimepicker1').datetimepicker('setEndDate', year + '-' + month + '-' + day);
+    $('#datetimepicker2').datetimepicker('setStartDate', year + '-' + month + '-' + day);
+    $('#datetimepicker3').datetimepicker('setEndDate', year + '-' + month + '-' + day);
+    $('#datetimepicker4').datetimepicker('setStartDate', year + '-' + month + '-' + day);
     function check(e) {
         var keynum
         var keychar
@@ -221,20 +388,21 @@
     function Save(id) {
         var changeStore = $('#' + id).val();
         var pwy_dte_ctl = $('#pwy_dte_ctl').text();
-        var prod_qtys = $('#prod_qtys').text();
         var loc_id = $('#loc_id').text();
         var item_id = $('#item_id').text();
         if (changeStore.trim() == "") return false;
+        $('#' + id).val('');
         $.ajax({
             url: "/WareHouse/IinvdSave",
             type: "POST",
             dataType: "text",
-            data: { changeStore: changeStore, rowid: id, pwy_dte_ctl: pwy_dte_ctl, prod_qtys: prod_qtys, loc_id: loc_id, item_id: item_id },
+            data: { changeStore: changeStore, rowid: id, pwy_dte_ctl: pwy_dte_ctl,loc_id: loc_id, item_id: item_id },
             success: function (data) {
                 var result = eval("(" + data + ")");
                 if (result.success) {
-                    $('#' + id).val('');
-                    location.reload();
+                    $('#' + id).val(''); 
+                    $('#alertsuccess').modal('toggle');
+                    setTimeout('onload()',500);
                 }
                 else {
                     $("#alertmessage").text(result.message);
@@ -243,38 +411,100 @@
             }
         });
     }
+    function onload()
+    {
+        var pwy_dte_ctl = $('#pwy_dte_ctl').text();
+        var loc_id = $('#loc_id').text();
+        location.href = "/WareHouse/IinvdCheck?pwy_dte_ctl=" + pwy_dte_ctl + "&loc_id=" + loc_id;
+    }
     function reset() {
         $('#datetimepicker1').val('');
-        $('#prod_qty').val('');
+        $('#datetimepicker2').val('');
+        $('#prod_qty').val(''); 
+        $('#itemid').val('');
+        $('#productname').text('');
+        $('#datetimepicker3').hide();
+        $('#datetimepicker4').hide();
+        $('.date1').hide();
+        var date = new Date();
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var day = date.getDate();
+        $('#datetimepicker1').datetimepicker('setEndDate', year + '-' + month + '-' + day);
+        $('#datetimepicker2').datetimepicker('setStartDate', year + '-' + month + '-' + day);
+        $('#datetimepicker3').datetimepicker('setEndDate', year + '-' + month + '-' + day);
+        $('#datetimepicker4').datetimepicker('setStartDate', year + '-' + month + '-' + day);
     }
     function SaveIinvd() {
         var pwy_dte_ctl = $('#pwy_dte_ctl').text();
-        var datetimepicker1 = $('#datetimepicker1').val()
+        var datetimepicker1 = $('#datetimepicker1').val();
         var datetimepicker2 = $('#datetimepicker2').val();
+        if (datetimepicker1==null)
+        {
+            datetimepicker1 = $('#datetimepicker3').val();
+            datetimepicker2 = $('#datetimepicker4').val();
+        }
         var prod_qty = $('#prod_qty').val();
+        var st_qty = $('#st_qty').val();
+        var loc_id = $('#loc_id').text();
+        var item_id = $('#item_id').text();
+        var itemid = $('#itemid').val();
+        var iplas = $('#iplas').text();
         if (pwy_dte_ctl == "Y") {
-            if (datetimepicker1.trim() == "" && prod_qty.trim() == "")
+            if (datetimepicker1.trim() == "" || prod_qty.trim() == "" || datetimepicker2.trim() == "") return false;
+            var date = new Date();
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if(month<10)
+            {
+                month = '0' + month;
+            }
+            if (day<10) {
+                day = '0' + day;
+            }
+            var datetime = year + ' - ' + month + ' - ' + day;
+            if (datetimepicker1 > datetime) {
+                $("#alertdate").text('製造日期不能大於當前日期');
+                $('#alertdatediv').modal('toggle');
                 return false;
+            }
+            if (datetimepicker2 < datetime) {
+                $("#alertdate").text('有效日期不能小於當前日期');
+                $('#alertdatediv').modal('toggle');
+                return false;
+            }
         }
         else {
             if (prod_qty.trim() == "")
                 return false;
+            if (item_id.trim() == "此料位暫無商品"&&itemid.trim()=="")
+            {
+                return false;
+            }
+        } 
+        if (item_id.trim() == "此料位暫無商品")
+        {
+            item_id = itemid;
         }
-        var st_qty = $('#st_qty').val();
-        var loc_id = $('#loc_id').text();
-        var item_id = $('#item_id').text();
-
+        if(iplas=="false")
+        {
+            var productname = $('#productname').text();
+            if (productname == "" || productname == "沒有該商品信息！") return false;
+        }
+        $('#prod_qty').val('');
         $.ajax({
             url: "/WareHouse/SaveIinvd",
             type: "POST",
             dataType: "text",
-            data: { datetimepicker1: datetimepicker1, prod_qty: prod_qty, st_qty: st_qty, loc_id: loc_id, item_id: item_id, pwy_dte_ctl: pwy_dte_ctl },
+            data: { datetimepicker1: datetimepicker1, prod_qty: prod_qty, st_qty: st_qty, loc_id: loc_id, item_id: item_id, pwy_dte_ctl: pwy_dte_ctl, iplas: iplas },
             success: function (data) {
                 var result = eval("(" + data + ")");
                 if (result.success) {
                     $('#datetimepicker1').val('');
                     $('#prod_qty').val('');
-                    location.reload();
+                    $('#alertsuccess').modal('toggle');
+                    setTimeout("onload()",500);
                 }
                 else {
                     $("#message").text(result.message);

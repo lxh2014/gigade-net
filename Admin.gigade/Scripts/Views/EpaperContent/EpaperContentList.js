@@ -170,18 +170,13 @@ Ext.onReady(function () {
                 margin: '0 5 0 2'
             },
             {
-                xtype: 'datetimefield', allowBlank: true, id: 'timestart', format: 'Y-m-d H:i:s', name: 'serchcontent', editable: false, labelWidth: 60, listeners: {//value: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate(), 0, 0, 0),
+                xtype: 'datetimefield', allowBlank: true, id: 'timestart', format: 'Y-m-d H:i:s', name: 'serchcontent', editable: false, labelWidth: 60, time: { hour: 00, min: 00, sec: 00 }, listeners: {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("timestart");
                         var end = Ext.getCmp("timeend");
                         if (end.getValue() == null) {
                             end.setValue(setNextMonth(start.getValue(), 1));
                         } else if (end.getValue() < start.getValue()) {
-                            Ext.Msg.alert(INFORMATION, DATA_TIP);
-                            start.setValue(setNextMonth(end.getValue(), -1));
-                        }
-                        else if (end.getValue() > setNextMonth(start.getValue(), 3)) {
-                            // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
                             end.setValue(setNextMonth(start.getValue(), 1));
                         }
                     }
@@ -192,21 +187,14 @@ Ext.onReady(function () {
                 value: '~'
             },
             {
-                xtype: 'datetimefield', allowBlank: true, id: 'timeend', format: 'Y-m-d H:i:s', editable: false, name: 'serchcontent', listeners: {//value: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 23, 59, 59), 
+                xtype: 'datetimefield', allowBlank: true, id: 'timeend', format: 'Y-m-d H:i:s', editable: false, name: 'serchcontent', time: { hour: 23, min: 59, sec: 59 }, listeners: { 
                     select: function (a, b, c) {
                         var start = Ext.getCmp("timestart");
                         var end = Ext.getCmp("timeend");
-                        if (start.getValue() != "" && start.getValue() != null) {
-                            if (end.getValue() < start.getValue()) {
-                                Ext.Msg.alert(INFORMATION, DATA_TIP);
-                                end.setValue(setNextMonth(start.getValue(), 1));
-                            }
-                            else if (end.getValue() > setNextMonth(start.getValue(), 3)) {
-                                // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                                start.setValue(setNextMonth(end.getValue(), -1));
-                            }
+                        if ( start.getValue()== null) {
+                            start.setValue(setNextMonth(end.getValue(), -1));
                         }
-                        else {
+                        else if (end.getValue() < start.getValue()) {
                             start.setValue(setNextMonth(end.getValue(), -1));
                         }
                     }

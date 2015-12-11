@@ -1028,14 +1028,14 @@ Ext.onReady(function () {
                 },
                 ]
             },
-               {
-                   xtype: 'button',
-                   id: 'change_info',
-                   text: '更改收貨人資訊',
-                   margin: '0 0 0 0',
-                   hidden: true,
-                   handler: onModifyDeliverData
-               },
+            {
+                xtype: 'button',
+                id: 'change_info',
+                text: '更改收貨人資訊',
+                margin: '0 0 0 0',
+                hidden: true,
+                handler: onModifyDeliverData
+            }
             ]
         }]        
     });

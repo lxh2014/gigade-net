@@ -21,6 +21,7 @@ using iTextSharp.text.pdf.collection;
 using System.IO;
 using System.Collections;
 using gigadeExcel.Comment;
+using BLL.gigade.Model.APIModels;
 namespace Admin.gigade.Controllers
 {
     /// <summary>
@@ -5684,66 +5685,154 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
 
+        public HttpResponseBase isCanModifyExpectArriveDate(string deliverId)
+        {
+            int deliver_id = Convert.ToInt32(Request.Params["deliver_id"]);
+            string json = string.Empty;
+       
+            try
+            {
+                string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];//XML的設置
+                string path = Server.MapPath(xmlPath);
+                SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+                _DeliverChangeLogMgr = new DeliverChangeLogMgr(mySqlConnectionString);
+                string APIServer = _siteConfigMgr.GetConfigByName("APIServer").Value;
+                bool isCanModify = _DeliverChangeLogMgr.isCanModifyExpertArriveDate(APIServer, deliver_id);
+                if (isCanModify)//可以修改
+                {
+                    json = "{success:true,msg:'1'}";
+                }
+                else 
+                {
+                    json = "{success:true,msg:'0'}";
+                }
+            }
+            catch(Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:false,msg:'請求失敗'}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return this.Response;      
+        }
+
         public HttpResponseBase SaveDeliverExportArrivalInfo()
         {
             string json = string.Empty;
-            DeliverChangeLog dCL = new DeliverChangeLog();
-            DeliverMasterQuery dmQuery = new DeliverMasterQuery();
+            //DeliverChangeLog dCL = new DeliverChangeLog();
+            //DeliverMasterQuery dmQuery = new DeliverMasterQuery();
             _DeliverChangeLogMgr = new DeliverChangeLogMgr(mySqlConnectionString);
-            _DeliverMsterMgr = new DeliverMasterMgr(mySqlConnectionString);
+            //_DeliverMsterMgr = new DeliverMasterMgr(mySqlConnectionString);
             try
             {
                                              
-                dCL.deliver_id = Convert.ToInt32(Request.Params["deliver_id"]);
-                dCL.dcl_create_datetime = DateTime.Now;
-                dCL.dcl_ipfrom = CommonFunction.GetIP4Address(Request.UserHostAddress.ToString());
-                dCL.dcl_create_muser = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
-                dCL.dcl_create_user = 0;
-                dCL.dcl_create_type = 2;
-                dmQuery.deliver_id = Convert.ToUInt32(Request.Params["deliver_id"]); 
+                //dCL.deliver_id = Convert.ToInt32(Request.Params["deliver_id"]);                            
+                //dCL.dcl_create_datetime = DateTime.Now;
+                //dCL.dcl_ipfrom = CommonFunction.GetIP4Address(Request.UserHostAddress.ToString());
+                //dCL.dcl_create_muser = (System.Web.HttpContext.Current.Session["caller"] as Caller).user_id;
+                //dCL.dcl_create_user = 0;
+                //dCL.dcl_create_type = 2;
+                //dmQuery.deliver_id = Convert.ToUInt32(Request.Params["deliver_id"]); 
     
-                if (!string.IsNullOrEmpty(Request.Params["dcl_note"]))
-                {
-                    dCL.dcl_note = Request.Params["dcl_note"]; 
-                }
+                //if (!string.IsNullOrEmpty(Request.Params["dcl_note"]))
+                //{
+                //    dCL.dcl_note = Request.Params["dcl_note"]; 
+                //}
+                //if (!string.IsNullOrEmpty(Request.Params["expect_arrive_date"]))
+                //{
+                //    dCL.expect_arrive_date = Convert.ToDateTime(Request.Params["expect_arrive_date"]);
+                //    dmQuery.expect_arrive_date = Convert.ToDateTime(Request.Params["expect_arrive_date"]);
+                //}
+                //if (!string.IsNullOrEmpty(Request.Params["expect_arrive_period"]))
+                //{
+                //    dCL.expect_arrive_period = Convert.ToInt32(Request.Params["expect_arrive_period"]);
+                //    dmQuery.expect_arrive_period = Convert.ToInt32(Request.Params["expect_arrive_period"]);
+                //}
+
+
+                ModifyExpertArriveDateViewModel expertArriveDateViewModel = new ModifyExpertArriveDateViewModel();
+                expertArriveDateViewModel.deliver_id = Convert.ToInt32(Request.Params["deliver_id"]);
                 if (!string.IsNullOrEmpty(Request.Params["expect_arrive_date"]))
                 {
-                    dCL.expect_arrive_date = Convert.ToDateTime(Request.Params["expect_arrive_date"]);
-                    dmQuery.expect_arrive_date = Convert.ToDateTime(Request.Params["expect_arrive_date"]);
+                    expertArriveDateViewModel.newDate = Convert.ToDateTime(Request.Params["expect_arrive_date"]);
                 }
                 if (!string.IsNullOrEmpty(Request.Params["expect_arrive_period"]))
                 {
-                    dCL.expect_arrive_period = Convert.ToInt32(Request.Params["expect_arrive_period"]);
-                    dmQuery.expect_arrive_period = Convert.ToInt32(Request.Params["expect_arrive_period"]);
-                }
-                                               
-                //更新deliver_mater表的 期望到貨日期、時段
-                int result1 = _DeliverMsterMgr.UpdateExpectArrive(dmQuery);
-                //向deliver_change_log表插入數據
-                int result2 = _DeliverChangeLogMgr.insertDeliverChangeLog(dCL);
+                    string period_num = Request.Params["expect_arrive_period"];
 
-                if (result1 > 0)
+                    switch (period_num)
+                    {
+                        case "0": 
+                            expertArriveDateViewModel.period = ExpectArrivePeriod.NoLimit;
+                            break;
+                        case "1":
+                            expertArriveDateViewModel.period = ExpectArrivePeriod.Morning;
+                            break;
+                        case "2":
+                            expertArriveDateViewModel.period = ExpectArrivePeriod.Afternoon;
+                            break;
+                        case "3":
+                            expertArriveDateViewModel.period = ExpectArrivePeriod.Evening;
+                            break;
+                    }               
+                }
+                if (!string.IsNullOrEmpty(Request.Params["dcl_note"]))
                 {
-                    if (result2 > 0)
-                    {
-                        json = "{success:true,msg:'保存成功'}";//
-                    }
-                    else
-                    {
-                        json = "{success:true,msg:'deliver_mster表數據更新成功,<br/>deliver_change_log表數據添加失敗'}";
-                    }
+                    expertArriveDateViewModel.note = Request.Params["dcl_note"];
                 }
                 else
                 {
-                    if (result2 > 0)
-                    {
-                        json = "{success:true,msg: 'deliver_mster表數據更新失敗,<br/>deliver_change_log數據添加成功'}";
-                    }
-                    else
-                    {
-                        json = "{success:true,msg:'deliver_mster表數據更新失敗,<br/>deliver_change_log表數據添加失敗'}";
-                    }
-                }                
+                    expertArriveDateViewModel.note = " ";
+                }
+
+                string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];//XML的設置
+                string path = Server.MapPath(xmlPath);
+                SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+                string APIServer = _siteConfigMgr.GetConfigByName("APIServer").Value;
+                //修改期望到貨日
+                bool result = _DeliverChangeLogMgr.ModifyExpertArriveDate(APIServer, expertArriveDateViewModel);
+
+                if (result)
+                {
+                    json = "{success:true,msg:'保存成功'}";//
+                }
+                else
+                {
+                    json = "{success:false,msg:'保存失敗'}";//
+                }
+                
+                ////更新deliver_mater表的 期望到貨日期、時段
+                //int result1 = _DeliverMsterMgr.UpdateExpectArrive(dmQuery);
+                ////向deliver_change_log表插入數據
+                //int result2 = _DeliverChangeLogMgr.insertDeliverChangeLog(dCL);
+
+                //if (result1 > 0)
+                //{
+                //    if (result2 > 0)
+                //    {
+                //        json = "{success:true,msg:'保存成功'}";//
+                //    }
+                //    else
+                //    {
+                //        json = "{success:true,msg:'deliver_mster表數據更新成功,<br/>deliver_change_log表數據添加失敗'}";
+                //    }
+                //}
+                //else
+                //{
+                //    if (result2 > 0)
+                //    {
+                //        json = "{success:true,msg: 'deliver_mster表數據更新失敗,<br/>deliver_change_log數據添加成功'}";
+                //    }
+                //    else
+                //    {
+                //        json = "{success:true,msg:'deliver_mster表數據更新失敗,<br/>deliver_change_log表數據添加失敗'}";
+                //    }
+                //}                
             }
             catch(Exception ex)
             {

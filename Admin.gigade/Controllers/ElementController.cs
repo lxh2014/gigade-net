@@ -50,7 +50,7 @@ namespace Admin.gigade.Controllers
         string imgLocalPath = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.local);//ftp地址
         string imgServerPath = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server);//"http://192.168.71.10:2121"
         string ElementPath = Unitle.GetImgGigade100ComPath(Unitle.ImgGigade100ComType.elementPath);//圖片保存路徑
-
+        string defaultImg = Unitle.GetImgGigade100ComSitePath(Unitle.ImgPathType.server) + "/product/nopic_50.jpg";
         //end 上傳圖片
 
         #region View
@@ -477,6 +477,14 @@ namespace Admin.gigade.Controllers
                         {
                             item.element_content = imgServerPath + ElementPath + item.element_content;
                         }
+                        if (item.element_img_big != "")
+                        {
+                            item.element_img_big = imgServerPath + ElementPath + item.element_img_big;
+                        }
+                        else
+                        {
+                            item.element_img_big = defaultImg;
+                        }
                     }
                     if (item.element_type == 2)
                     {
@@ -485,9 +493,21 @@ namespace Admin.gigade.Controllers
                             item.kendo_editor = Server.HtmlDecode(Server.HtmlDecode(item.element_content));
                         }
                     }
+                    if (item.element_type == 3)
+                    {
+                        if (item.element_img_big != "")
+                        {
+                            item.element_img_big = imgServerPath + ElementPath + item.element_img_big;
+                        }
+                        else
+                        {
+                            item.element_img_big = defaultImg;
+                        }
+                    }
                     if (item.category_name != "")
                     {
                         item.category_name = Server.HtmlDecode(Server.HtmlDecode(item.category_name));
+                      
                     }
 
                 }
@@ -519,7 +539,21 @@ namespace Admin.gigade.Controllers
             ElementDetail model = new ElementDetail();
             ElementDetail oldModel = new ElementDetail();
             _detailMgr = new ElementDetailMgr(mySqlConnectionString);
+            #region 獲取圖片信息
+            string path = Server.MapPath(xmlPath);
+            SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+            SiteConfig extention_config = _siteConfigMgr.GetConfigByName("PIC_Extention_Format");
+            SiteConfig minValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_Min_Element");
+            SiteConfig maxValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MaxValue");
+            SiteConfig admin_userName = _siteConfigMgr.GetConfigByName("ADMIN_USERNAME");
+            SiteConfig admin_passwd = _siteConfigMgr.GetConfigByName("ADMIN_PASSWD");
+            //擴展名、最小值、最大值
+            string extention = extention_config.Value == "" ? extention_config.DefaultValue : extention_config.Value;
+            string minValue = minValue_config.Value == "" ? minValue_config.DefaultValue : minValue_config.Value;
+            string maxValue = maxValue_config.Value == "" ? maxValue_config.DefaultValue : maxValue_config.Value;
+            string localBannerPath = imgLocalPath + ElementPath;//圖片存儲地址
 
+            #endregion
             if (!String.IsNullOrEmpty(Request.Params["element_id"]))//如果不存在該id說明是添加頁面
             {
                 model.element_id = Convert.ToInt32(Request.Params["element_id"].ToString());
@@ -556,44 +590,34 @@ namespace Admin.gigade.Controllers
                 #region 上傳圖片
                 try
                 {
-                    string path = Server.MapPath(xmlPath);
-                    SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
-                    SiteConfig extention_config = _siteConfigMgr.GetConfigByName("PIC_Extention_Format");
-                    SiteConfig minValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_Min_Element");
-                    SiteConfig maxValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MaxValue");
-                    SiteConfig admin_userName = _siteConfigMgr.GetConfigByName("ADMIN_USERNAME");
-                    SiteConfig admin_passwd = _siteConfigMgr.GetConfigByName("ADMIN_PASSWD");
-                    //擴展名、最小值、最大值
-                    string extention = extention_config.Value == "" ? extention_config.DefaultValue : extention_config.Value;
-                    string minValue = minValue_config.Value == "" ? minValue_config.DefaultValue : minValue_config.Value;
-                    string maxValue = maxValue_config.Value == "" ? maxValue_config.DefaultValue : maxValue_config.Value;
-                    string localBannerPath = imgLocalPath + ElementPath;//圖片存儲地址
-
                     FileManagement fileLoad = new FileManagement();
 
-                    //for (int iFile = 0; iFile < Request.Files.Count; iFile++)
-                    if (Request.Files.Count > 0)//單個圖片上傳
+                    //if (Request.Files.Count > 0)//單個圖片上傳
+                    for (int iFile = 0; iFile < Request.Files.Count; iFile++)//多個上傳圖片
                     {
-                        HttpPostedFileBase file = Request.Files[0];
+                        HttpPostedFileBase file = Request.Files[iFile];//單個Request.Files[0]
                         string fileName = string.Empty;//當前文件名
-
                         string fileExtention = string.Empty;//當前文件的擴展名
                         //獲取圖片名稱
                         fileName = fileLoad.NewFileName(file.FileName);
-                        if (fileName != "")
+                        if (iFile == 0 && fileName == oldModel.element_content)
+                        {
+                            fileName = "";
+                        }
+                        if(iFile == 1 && string.IsNullOrEmpty(Request.Params["element_img_big"].ToString()) )
+                        {
+                            fileName = Request.Params["element_img_big"].ToString();
+                        }
+                        if (!String.IsNullOrEmpty(fileName))
                         {
                             fileName = fileName.Substring(0, fileName.LastIndexOf("."));
                             fileExtention = file.FileName.Substring(file.FileName.LastIndexOf('.')).ToLower().ToString();
-
                             string NewFileName = string.Empty;
-
                             BLL.gigade.Common.HashEncrypt hash = new BLL.gigade.Common.HashEncrypt();
                             NewFileName = hash.Md5Encrypt(fileName, "32");
-
                             string ServerPath = string.Empty;
                             //判斷目錄是否存在，不存在則創建
                             FTP f_cf = new FTP();
-
                             f_cf.MakeMultiDirectory(localBannerPath.Substring(0, localBannerPath.Length - ElementPath.Length + 1), ElementPath.Substring(1, ElementPath.Length - 2).Split('/'), ftpuser, ftppwd);
 
                             fileName = NewFileName + fileExtention;
@@ -605,6 +629,10 @@ namespace Admin.gigade.Controllers
                             if (model.element_id != 0)
                             {
                                 string oldFileName = oldModel.element_content;
+                                if (iFile == 1)
+                                {
+                                    oldFileName = oldModel.element_img_big;
+                                }
                                 CommonFunction.DeletePicFile(ServerPath + oldFileName);//刪除本地圖片
                                 FTP ftp = new FTP(localBannerPath, ftpuser, ftppwd);
                                 List<string> tem = ftp.GetFileList();
@@ -621,7 +649,14 @@ namespace Admin.gigade.Controllers
                                 bool result = fileLoad.UpLoadFile(file, ServerPath, NewFileName, extention, int.Parse(maxValue), int.Parse(minValue), ref ErrorMsg, ftpuser, ftppwd);
                                 if (result)//上傳成功
                                 {
-                                    model.element_content = fileName;
+                                    if (iFile == 0)
+                                    {
+                                        model.element_content = fileName;
+                                    }
+                                    else 
+                                    {
+                                        model.element_img_big = fileName; 
+                                    }
                                 }
                             }
                             catch (Exception ex)
@@ -634,22 +669,41 @@ namespace Admin.gigade.Controllers
                             }
                             if (!string.IsNullOrEmpty(ErrorMsg))
                             {
+                                if (iFile == 0)
+                                {
+                                    ErrorMsg = "元素圖 " + ErrorMsg;
+                                }
+                                else {
+                                    ErrorMsg = "元素圖(大) " + ErrorMsg;
+                                }
                                 string json = string.Empty;
-                                json = "{success:true,msg:\"" + ErrorMsg + "\"}";
+                                json = "{success:true,msg:\""+ ErrorMsg + "\"}";
                                 this.Response.Clear();
                                 this.Response.Write(json);
                                 this.Response.End();
                                 return this.Response;
                             }
-
                         }
                         else
                         {
-                            model.element_content = oldModel.element_content;
+                            if (iFile == 0)
+                            {
+                                model.element_content = oldModel.element_content;
+                            }
+                            else 
+                            {
+                                if (Request.Params["element_img_big"].ToString() == "")
+                                {//編輯時如果傳過來空值則直接刪除
+                                    model.element_img_big = "";
+                                }
+                                else
+                                {
+                                    model.element_img_big = oldModel.element_img_big;
+                                }
+                                //model.element_img_big = oldModel.element_img_big;
+                            }
                         }
-
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -682,6 +736,99 @@ namespace Admin.gigade.Controllers
                 {
                     model.element_content = oldModel.element_content;
                 }
+                #region 上傳圖片
+                try
+                {
+                    FileManagement fileLoad = new FileManagement();
+                    //if (Request.Files.Count > 0)//單個圖片上傳
+                    for (int iFile = 1; iFile < Request.Files.Count; iFile++)//多個上傳圖片
+                    {
+                        HttpPostedFileBase file = Request.Files[iFile];//單個Request.Files[0]
+                        string fileName = string.Empty;//當前文件名
+                        string fileExtention = string.Empty;//當前文件的擴展名
+                        //獲取圖片名稱
+                        fileName = fileLoad.NewFileName(file.FileName);
+                        if (!String.IsNullOrEmpty(fileName) && !String.IsNullOrEmpty(Request.Params["element_img_big"].ToString()))
+                        {//可獲取文件,名稱不為空則變更圖片
+                            fileName = fileName.Substring(0, fileName.LastIndexOf("."));
+                            fileExtention = file.FileName.Substring(file.FileName.LastIndexOf('.')).ToLower().ToString();
+                            string NewFileName = string.Empty;
+                            BLL.gigade.Common.HashEncrypt hash = new BLL.gigade.Common.HashEncrypt();
+                            NewFileName = hash.Md5Encrypt(fileName, "32");
+                            string ServerPath = string.Empty;
+                            //判斷目錄是否存在，不存在則創建
+                            FTP f_cf = new FTP();
+                            f_cf.MakeMultiDirectory(localBannerPath.Substring(0, localBannerPath.Length - ElementPath.Length + 1), ElementPath.Substring(1, ElementPath.Length - 2).Split('/'), ftpuser, ftppwd);
+
+                            fileName = NewFileName + fileExtention;
+                            NewFileName = localBannerPath + NewFileName + fileExtention;//絕對路徑
+                            ServerPath = Server.MapPath(imgLocalServerPath + ElementPath);
+                            string ErrorMsg = string.Empty;
+
+                            //上傳之前刪除已有的圖片
+                            if (model.element_id != 0)
+                            {
+                                string oldFileName = oldModel.element_img_big;
+                                CommonFunction.DeletePicFile(ServerPath + oldFileName);//刪除本地圖片
+                                FTP ftp = new FTP(localBannerPath, ftpuser, ftppwd);
+                                List<string> tem = ftp.GetFileList();
+                                if (tem.Contains(oldFileName))
+                                {
+                                    FTP ftps = new FTP(localBannerPath + oldFileName, ftpuser, ftppwd);
+                                    ftps.DeleteFile(localBannerPath + oldFileName);//刪除ftp:71.159上的舊圖片
+                                }
+                            }
+                            try
+                            {
+                                //上傳
+                                Resource.CoreMessage = new CoreResource("Product");//尋找product.resx中的資源文件
+                                bool result = fileLoad.UpLoadFile(file, ServerPath, NewFileName, extention, int.Parse(maxValue), int.Parse(minValue), ref ErrorMsg, ftpuser, ftppwd);                                
+                                if (result)//上傳成功
+                                {
+                                    model.element_img_big = fileName;                                    
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                                log.Error(logMessage);
+                                model.element_img_big = oldModel.element_img_big;
+                            }
+                            if (!string.IsNullOrEmpty(ErrorMsg))
+                            {
+                                ErrorMsg = "元素圖(大)" + ErrorMsg;
+                                string json = string.Empty;
+                                json = "{success:true,msg:\"" + ErrorMsg + "\"}";
+                                this.Response.Clear();
+                                this.Response.Write(json);
+                                this.Response.End();
+                                return this.Response;
+                            }
+                        }
+                        else
+                        {
+                            if (Request.Params["element_img_big"].ToString() == "")
+                            {//編輯時如果傳過來空值則直接刪除
+                                model.element_img_big = "";
+                            }
+                            else
+                            {
+                                model.element_img_big = oldModel.element_img_big;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                    logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                    logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                    log.Error(logMessage);
+                    model.element_img_big = oldModel.element_img_big;
+                }
+                #endregion
             }
             if (int.TryParse(Request.Params["category_id_s"].ToString(), out isTranInt))
             {
@@ -1111,6 +1258,39 @@ namespace Admin.gigade.Controllers
             return this.Response;
         }
         #endregion
+
+        //public HttpResponseBase Getpic()
+        //{//判斷該文件是否超過限制
+        //    string Json = "";
+        //    FileManagement fileLoad = new FileManagement();
+
+        //    string path = Server.MapPath(xmlPath);
+        //    SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+        //    SiteConfig minValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_Min_Element");
+        //    SiteConfig maxValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MaxValue");
+        //    //擴展名、最小值、最大值
+        //    string minValue = minValue_config.Value == "" ? minValue_config.DefaultValue : minValue_config.Value;
+        //    string maxValue = maxValue_config.Value == "" ? maxValue_config.DefaultValue : maxValue_config.Value;
+        //    //if (Request.Files.Count > 0)//單個圖片上傳
+        //    for (int iFile = 0; iFile < Request.Files.Count; iFile++)//多個上傳圖片
+        //    {
+        //        HttpPostedFileBase file = Request.Files[iFile];//單個Request.Files[0]
+        //        int fileSize = file.ContentLength;
+        //        if (fileSize > int.Parse(minValue) && fileSize < int.Parse(maxValue))
+        //        {
+        //            Json = "{success:true}";
+        //        }
+        //        else
+        //        {
+        //            Json = "{success:false}";
+        //        }
+        //    }
+        //    this.Response.Clear();
+        //    this.Response.Write(Json);
+        //    this.Response.End();
+        //    return this.Response;
+        //}
+
         #endregion
 
         #region 站台頁面管理

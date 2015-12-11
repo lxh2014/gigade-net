@@ -127,7 +127,7 @@
                 var bool_2 = (Ext.getCmp('expect_arrive_period').getValue() == row.data.expect_arrive_period);
                 var bool_3 = (Ext.getCmp('dcl_note').getValue().trim() == '');
 
-                var bool_4 = (Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('expect_arrive_date').getValue()), 'Y-m-d')) < row.data.expect_arrive_date.toString());
+                var bool_4 = (Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('expect_arrive_date').getValue()), 'Y-m-d')) <= row.data.expect_arrive_date.toString());
                 var bool_5 = Ext.getCmp('yes').getValue();
                 
                 var start = Ext.getCmp("expect_arrive_date").getValue();
@@ -151,11 +151,15 @@
                         return false;
                     }
                 }
-                if (bool_4) {                    
-                    if(!bool_5){
-                        Ext.Msg.alert('提示', '您選擇的期望到貨日<font color="red">小於</font>修改前的日期，<br/>請與營管聯繫進行協調');
-                        return false;
-                    }
+                //if (bool_4) {                    
+                //    if(!bool_5){
+                //        Ext.Msg.alert('提示', '您選擇的期望到貨日<font color="red">小於</font>修改前的日期，<br/>請與營管聯繫進行協調');                       
+                //        return false;
+                //    }
+                //}
+                if (bool_4) {
+                    Ext.Msg.alert('提示', '您選擇的期望到貨日<font color="red">必須大於</font>修改前的日期！');
+                    return false;
                 }
                 //time1 = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('expect_arrive_date').getValue()), 'Y-m-d'));
                                                                         

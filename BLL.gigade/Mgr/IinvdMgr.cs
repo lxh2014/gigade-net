@@ -566,7 +566,7 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IinvdMgr-->GetIinvdCount-->" + ex.Message, ex);
             }
         }
-        public DateTime GetCde_dt(int row_id)
+        public List<DateTime> GetCde_dt(int row_id)
         {
             try
             {
@@ -577,11 +577,11 @@ namespace BLL.gigade.Mgr
                 throw new Exception("IinvdMgr-->GetCde_dt-->" + ex.Message, ex);
             }
         }
-        public int GetProd_qty(int item_id, string loc_id)
+        public int GetProd_qty(int item_id, string loc_id,string pwy_dte_ctl,string row_id)
         {
             try
             {
-                return _ivddao.GetProd_qty(item_id,loc_id);
+                return _ivddao.GetProd_qty(item_id,loc_id,pwy_dte_ctl,row_id);
             }
             catch (Exception ex)
             {

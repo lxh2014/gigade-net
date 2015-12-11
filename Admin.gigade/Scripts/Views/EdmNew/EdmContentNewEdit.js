@@ -301,7 +301,17 @@ editFunction = function (row, store) {
                           id: 'btn_load',
                           margin: '0 0 0 5',
                           handler: LoadEpaperContent
-                      }
+                      },
+                          {
+                              xtype: 'checkbox',
+                              id: 'check',
+                              margin: '0 0 0 40',
+                          },
+                       {
+                           xtype: 'displayfield',
+                           margin: '0 0 0 5',
+                           value: '是否添加訂閱',
+                       }
                       ]
 
                   },
@@ -315,31 +325,16 @@ editFunction = function (row, store) {
                        xtype: 'fieldcontainer',
                        layout: 'hbox',
                        items: [
-                       {
-                           xtype: 'checkbox',
-                           id: 'check',
-                           margin: '5 0 0 55',
-                           //handler: function () {
-                           //    if (Ext.getCmp('check').checked) {
-                           //        try {
-                           //            $("#editor").data("kendoEditor").value(subscriber);
-                           //        }
-                           //        catch (ex) {
-                           //            var value = Ext.htmlDecode(document.getElementById('editor3').value) + subscriber;
-                           //            $("#editor3").data("kendoEditor").value(value);
-                           //        }
-                           //    }
-                           //    else {
-                           //        var value = Ext.htmlDecode(document.getElementById('editor3').value).replace(subscriber, "");
-                           //        $("#editor3").data("kendoEditor").value(value);
-                           //    }
-                           //}
-                       },
-                       {
-                           xtype: 'displayfield',
-                           margin: '5 0 0 5',
-                           value: '是否添加訂閱',
-                       }
+                       //{
+                       //    xtype: 'checkbox',
+                       //    id: 'check',
+                       //    margin: '5 0 0 55',
+                       //},
+                       //{
+                       //    xtype: 'displayfield',
+                       //    margin: '5 0 0 5',
+                       //    value: '是否添加訂閱',
+                       //}
                        ]
                    },
         ],
@@ -675,6 +670,7 @@ editFunction = function (row, store) {
                         Query(1);
                         Ext.getCmp('active_dis').setValue(active);
                         $("#editor3").data("kendoEditor").value(Ext.htmlDecode(result.data.epaper_content).replace(/>\s*<map/g, '><map'));
+                         
                     }
                     else {
                         if (result.msg == '0') {

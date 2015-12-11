@@ -140,7 +140,7 @@ Ext.onReady(function () {
                }
            },
            {
-               xtype: 'datefield', fieldLabel: TIMESTART, id: 'timestart', labelWidth: 80, editable: false,allowBlank: true,
+               xtype: 'datetimefield', fieldLabel: TIMESTART, id: 'timestart', labelWidth: 80, editable: false, allowBlank: true, format: 'Y-m-d  H:i:s',time: { hour: 00, min: 00, sec: 00 },
               // value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
                listeners: {
                    select: function (a, b, c) {
@@ -162,7 +162,7 @@ Ext.onReady(function () {
            },
            { xtype: 'displayfield', value: "~", margin: '0 2 0 0' },
            {
-               xtype: 'datefield', id: 'timeend', labelWidth: 60, editable: false,allowBlank: true,
+               xtype: 'datetimefield', id: 'timeend', labelWidth: 60, editable: false, allowBlank: true, format: 'Y-m-d  H:i:s', time: { hour: 23, min: 59, sec: 59 },
              //  value: Tomorrow(),
                listeners: {
                    select: function (a, b, c) {

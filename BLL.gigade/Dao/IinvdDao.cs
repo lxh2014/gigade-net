@@ -8,6 +8,7 @@ using BLL.gigade.Dao.Impl;
 using System.Data;
 using BLL.gigade.Model.Query;
 using BLL.gigade.Common;
+using BLL.gigade.Mgr;
 /*
  *創建者：張瑜
  *創建時間：2014-11-4
@@ -18,10 +19,12 @@ namespace BLL.gigade.Dao
     public class IinvdDao : IinvdImplDao
     {
         private IDBAccess _access;
+        private string mySqlConnectionString;
 
         public IinvdDao(string connectionString)
         {
             _access = DBFactory.getDBAccess(DBType.MySql, connectionString);
+            mySqlConnectionString = connectionString;
         }
 
         #region 上架料位列表頁
@@ -880,7 +883,7 @@ ORDER BY loc.loc_id,loc.row_id DESC  ", sbWhere.ToString(), sbjoin.ToString());
                     sbSql.Append("cd.cb_newid, ");
                     sbjoin.AppendFormat(" LEFT JOIN cbjob_detail cd ON nvd.row_id=cd.iinvd_id and cd.cb_jobid='{0}' ", m.cb_jobid);
                 }
-                sbSql.AppendFormat(@" loc.loc_id,loc.lsta_id ,nvd.item_id,nvd.prod_qty ,nvd.made_date,nvd.cde_dt ,CONCAT(v.brand_name,'-',p.product_name) as 'product_name','' as prod_sz,p.prepaid ,ptet.cde_dt_incr,ptet.cde_dt_var ,ptet.cde_dt_shp,ptet.pwy_dte_ctl,p.product_id
+                sbSql.AppendFormat(@" loc.loc_id,nvd.ista_id as lsta_id ,nvd.item_id,nvd.prod_qty ,nvd.made_date,nvd.cde_dt ,CONCAT(v.brand_name,'-',p.product_name) as 'product_name','' as prod_sz,p.prepaid ,ptet.cde_dt_incr,ptet.cde_dt_var ,ptet.cde_dt_shp,ptet.pwy_dte_ctl,p.product_id
 from iloc loc LEFT JOIN iinvd nvd on  loc.loc_id=nvd.plas_loc_id
 LEFT JOIN product_item pi on pi.item_id = nvd.item_id
 LEFT JOIN product p on p.product_id = pi.product_id 	 
@@ -1406,9 +1409,10 @@ us.user_username as user_name from iinvd ii ");
             StringBuilder sbwhere = new StringBuilder();
             try
             {
-                sql.AppendFormat("SELECT pi.item_id, p.product_name,CONCAT(ps1.spec_name,'-',ps2.spec_name)AS spec, made_date,cde_dt,prod_qty,pe.pwy_dte_ctl,i.row_id  FROM iinvd i ");
-                sql.Append(" INNER  JOIN product_item pi ON i.item_id=pi.item_id");
-                sql.Append(" INNER JOIN product p ON p.product_id =pi.product_id");
+                sql.AppendFormat("SELECT pi.item_id, p.product_name,CONCAT_WS('-',ps1.spec_name,ps2.spec_name)AS spec, made_date,cde_dt,prod_qty,pe.pwy_dte_ctl,i.row_id,ic.lcat_id  FROM iinvd i ");
+                sql.Append(" LEFT JOIN (SELECT loc_id,lcat_id FROM iloc GROUP BY loc_id) ic ON ic.loc_id=i.plas_loc_id");
+                sql.Append(" LEFT JOIN product_item pi ON i.item_id=pi.item_id");
+                sql.Append(" LEFT JOIN product p ON p.product_id =pi.product_id");
                 sql.Append(" LEFT JOIN product_ext pe ON pe.item_id=pi.item_id");
                 sql.Append(" LEFT JOIN product_spec ps1 ON ps1.spec_id=pi.spec_id_1");
                 sql.Append(" LEFT JOIN product_spec ps2 ON ps2.spec_id=pi.spec_id_2");
@@ -1439,7 +1443,8 @@ us.user_username as user_name from iinvd ii ");
                     sql.Clear();
                     iinvd.row_id = int.Parse(row_id);
                     iinvd.prod_qty = iinvd.prod_qty + int.Parse(prod_qty);
-                    return SaveIinvd(iinvd);
+                    int row=SaveIinvd(iinvd);
+                    return row + int.Parse(prod_qty);
                 }
                 else
                 {
@@ -1455,31 +1460,78 @@ us.user_username as user_name from iinvd ii ");
         public int SaveIinvd(IinvdQuery query)
         {
             query.Replace4MySQL();
+            int falg = 0;
             StringBuilder sql = new StringBuilder();
             try
             {
-                if (query.pwy_dte_ctl == "N")
+                if (query.pwy_dte_ctl == "Y")
+                {
+                    if (query.row_id != 0)
+                    {
+                        if (query.prod_qty == 0)
+                        {
+                            sql.AppendFormat("DELETE FROM iinvd WHERE row_id={0};", query.row_id);
+                        }
+                        else
+                        {
+                            sql.AppendFormat("UPDATE iinvd  SET prod_qty={0},change_user={2},change_dtim='{3}' WHERE row_id={1};", query.prod_qty, query.row_id, query.change_user, CommonFunction.DateTimeToString(query.change_dtim));
+                        }
+                    }
+                    else
+                    {
+                        sql.AppendFormat("UPDATE iinvd  SET prod_qty=prod_qty+{0},change_user={2},change_dtim='{3}' WHERE plas_loc_id='{1}';", query.prod_qty, query.plas_loc_id, query.change_user, CommonFunction.DateTimeToString(query.change_dtim));
+                    }
+                    _access.execCommand(sql.ToString()); falg = 1;
+                }
+                else
                 {
                     if (query.row_id != 0)
                     {
                         sql.Append("update iinvd set prod_qty=" + query.prod_qty + ",change_user=" + query.change_user + ",change_dtim='" + CommonFunction.DateTimeToString(query.change_dtim) + "' where row_id =" + query.row_id);
-                        return  _access.execCommand(sql.ToString());
+                        return _access.execCommand(sql.ToString());
                     }
                     else
                     {
-                        sql.AppendFormat("SELECT row_id,prod_qty  FROM iinvd WHERE plas_loc_id='{0}' AND ista_id='A' ORDER BY made_date;", query.plas_loc_id);
+                        sql.AppendFormat("SELECT row_id,prod_qty,made_date,cde_dt  FROM iinvd WHERE plas_loc_id='{0}' AND ista_id='A' ORDER BY made_date;", query.plas_loc_id);
                         DataTable table = _access.getDataTable(sql.ToString());
                         string row_id = "";
                         string row_idend = "";
                         int row_id_end_prod_pty = 0;
+                        query.prod_qtys = GetProd_qty((int)query.item_id, query.plas_loc_id, "", "");
                         int prod_qty = query.prod_qtys - query.prod_qty;
-                        int i = 0; 
+                        int sc_num_chg=0;
+                        int i = 0;
+                        IialgQuery iialg = new IialgQuery();
+                        IialgMgr _iialgMgr;
+                        DateTime date = DateTime.Now;
+                        int temp = 0;
+                        iialg.loc_id = query.plas_loc_id;
+                        iialg.item_id = query.item_id;
+                        iialg.iarc_id = "循環盤點";
+                        iialg.create_user = query.create_user;
+                        iialg.type = 2;
+
                         for (i = 0; i < table.Rows.Count; i++)
                         {
                             if ((int)table.Rows[i][1] <= prod_qty || (int)table.Rows[i][1] == 0)
                             {
                                 row_id += table.Rows[i][0] + ",";
                                 prod_qty = prod_qty - (int)table.Rows[i][1];
+                                sc_num_chg+=(int)table.Rows[i][1];
+
+                                DateTime.TryParse(table.Rows[i][3].ToString(), out date);
+                                iialg.cde_dt = date;
+                                int.TryParse(table.Rows[i][1].ToString(), out temp);
+                                iialg.qty_o = temp;//原始庫存數量
+                                iialg.adj_qty = -temp;
+                                iialg.create_dtim = DateTime.Now;
+                                iialg.doc_no = "C" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                                if(DateTime.TryParse(table.Rows[i][3].ToString(), out date))
+                                {
+                                    iialg.made_dt = date;
+                                }
+                                _iialgMgr = new IialgMgr(mySqlConnectionString);
+                                _iialgMgr.insertiialg(iialg);
                             }
                             else
                             {
@@ -1491,51 +1543,68 @@ us.user_username as user_name from iinvd ii ");
                         if (row_id != "")
                         {
                             _access.execCommand("DELETE FROM iinvd WHERE row_id IN(" + row_id.TrimEnd(',') + ")");
+                            falg = 1;
                         }
-                        if(i!=table.Rows.Count){
-                            return _access.execCommand("update iinvd set prod_qty=prod_qty-" + row_id_end_prod_pty + ",change_user=" + query.change_user + ",change_dtim='" + CommonFunction.DateTimeToString(query.change_dtim) + "' where row_id =" + row_idend);
-                        } 
-                    }
-                }
-                else
-                {
-                    if (query.row_id != 0)
-                    {
-                        if (query.prod_qty == 0)
+                        if (i != table.Rows.Count)
                         {
-                            sql.AppendFormat("DELETE FROM iinvd WHERE row_id={0};", query.row_id);
+                            DateTime.TryParse(table.Rows[i][3].ToString(), out date);
+                            iialg.cde_dt = date;
+                            int.TryParse(table.Rows[i][1].ToString(), out temp);
+                            iialg.qty_o = temp;//原始庫存數量
+                            sc_num_chg += row_id_end_prod_pty;
+                            iialg.adj_qty = -row_id_end_prod_pty;
+
+                            iialg.create_dtim = DateTime.Now;
+                            iialg.doc_no = "C" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                            if (DateTime.TryParse(table.Rows[i][3].ToString(), out date))
+                            {
+                                iialg.made_dt = date;
+                            }
+                            _iialgMgr = new IialgMgr(mySqlConnectionString);
+                            _iialgMgr.insertiialg(iialg);
+                            falg= _access.execCommand("update iinvd set prod_qty=prod_qty-" + row_id_end_prod_pty + ",change_user=" + query.change_user + ",change_dtim='" + CommonFunction.DateTimeToString(query.change_dtim) + "' where row_id =" + row_idend);
                         }
-                        else {
-                            sql.AppendFormat("UPDATE iinvd  SET prod_qty={0},change_user={2},change_dtim='{3}' WHERE row_id={1};", query.prod_qty, query.row_id, query.change_user, CommonFunction.DateTimeToString(query.change_dtim));
-                        }  
-                    }
-                    else
-                    {
-                        sql.AppendFormat("UPDATE iinvd  SET prod_qty=prod_qty+{0},change_user={2},change_dtim='{3}' WHERE plas_loc_id='{1}';", query.prod_qty, query.plas_loc_id, query.change_user, CommonFunction.DateTimeToString(query.change_dtim));
+
+                        IstockChangeQuery istock = new IstockChangeQuery();
+                        istock.sc_trans_id = iialg.doc_no;
+                        istock.item_id = query.item_id;
+                        istock.sc_istock_why = 2;
+                        istock.sc_trans_type = 2;
+                        istock.sc_num_old = query.prod_qtys;//原始庫存數量
+                        istock.sc_num_chg = -sc_num_chg;//轉移數量
+                        istock.sc_num_new = GetProd_qty((int)query.item_id, query.plas_loc_id, "", "");//結餘數量
+                        istock.sc_time = DateTime.Now;
+                        istock.sc_user = query.create_user;
+                        istock.sc_note = "循環盤點";
+                        IstockChangeMgr istockMgr = new IstockChangeMgr(mySqlConnectionString);
+                        istockMgr.insert(istock);
                     }
                 }
-
-                return _access.execCommand(sql.ToString());
             }
             catch (Exception ex)
             {
                 throw new Exception("IinvdDao-->SaveIinvd-->" + ex.Message + sql.ToString(), ex);
             }
+            return falg;
         }
 
-        public DateTime GetCde_dt(int row_id)
+        public List<DateTime> GetCde_dt(int row_id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("SELECT cde_dt FROM iinvd WHERE row_id={0};",row_id);
+                List<DateTime> list = new List<DateTime>();
+                sql.AppendFormat("SELECT cde_dt,made_date FROM iinvd WHERE row_id={0};", row_id);
                 DataTable table = _access.getDataTable(sql.ToString());
                 DateTime cde_dt = DateTime.MinValue;
                 if (table.Rows.Count > 0)
                 {
                      cde_dt =Convert.ToDateTime(table.Rows[0][0].ToString());
+                     list.Add(cde_dt);
+                     cde_dt = Convert.ToDateTime(table.Rows[0][1].ToString());
+                     list.Add(cde_dt);
                 }
-                return cde_dt;
+                return list;
             }
             catch (Exception ex)
             {
@@ -1543,17 +1612,25 @@ us.user_username as user_name from iinvd ii ");
             }
         }
 
-        public int GetProd_qty(int item_id,string loc_id)
+        public int GetProd_qty(int item_id, string loc_id, string pwy_dte_ctl,string row_id)
         {
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("SELECT SUM(prod_qty) FROM iinvd WHERE item_id={0} AND ista_id='A' AND plas_loc_id='{1}';", item_id,loc_id);
+                if (pwy_dte_ctl == "Y")
+                {
+                    sql.AppendFormat("SELECT prod_qty FROM iinvd WHERE row_id={0};",row_id);
+                }
+                else
+                {
+                    sql.AppendFormat("SELECT SUM(prod_qty) FROM iinvd WHERE item_id={0} AND ista_id='A' AND plas_loc_id='{1}';", item_id, loc_id);
+                }
+                
                 DataTable table = _access.getDataTable(sql.ToString());
                 int prod_qty = 0;
                 if (table.Rows.Count > 0)
                 {
-                    prod_qty = int.Parse(table.Rows[0][0].ToString());
+                    int.TryParse(table.Rows[0][0].ToString(), out prod_qty);
                 }
                 return prod_qty;
             }

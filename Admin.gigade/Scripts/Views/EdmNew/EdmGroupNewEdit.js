@@ -18,7 +18,7 @@
                 hidden:true,
             }, {
                 xtype: 'textfield',
-                fieldLabel: '群組名稱',
+                fieldLabel: '類型名稱',
                 id: 'group_name',
                 name: 'group_name',
                 allowBlank: false
@@ -59,12 +59,15 @@
                 id: 'sort_order',
                 name: 'sort_order',
                 minValue: 0,
+                maxValue:9999,
+                allowDecimals:false,
                 allowBlank: false
             }, {
                 xtype: 'textareafield',
                 fieldLabel: '電子報類型描述',
                 id: 'description',
                 name: 'description',
+                height:180,
                 allowBlank: false
             },
         ],
@@ -113,8 +116,8 @@
         title: "新增電子報類型",
         id: 'editWin',
         iconCls: "icon-user-add",
-        width: 360,
-        height: 300,
+        width: 430,
+        height: 370,
         layout: 'fit',//布局样式
         items: [editFrm],
         constrain: true, //束縛窗口在框架內

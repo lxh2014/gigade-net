@@ -23,6 +23,7 @@ using BLL.gigade.Model.Query;
 using BLL.gigade.Model.Custom;
 using System.Data;
 using System.Collections;
+using BLL.gigade.Common;
 
 namespace BLL.gigade.Mgr
 {
@@ -35,8 +36,10 @@ namespace BLL.gigade.Mgr
         private MySqlDao _mySqlDao;
         private IProductCategoryImplDao _productCategoryDao;
         private OrderMasterStatusDao _orderMaterStatusDao;
-        
+        private IParametersrcImplDao _parametersrcDao;
+       // private ISiteImplDao _siteDao;
         //private OrderDetailDao _orderDetailDao;
+        private IChannelImplDao _channelDao;
         public OrderDetailMgr(string connectionStr)
         {
             _orderDetailDao = new OrderDetailDao(connectionStr);
@@ -46,6 +49,9 @@ namespace BLL.gigade.Mgr
             _serial = new SerialDao(connectionStr);
             _mySqlDao = new MySqlDao(connectionStr);
             _productCategoryDao = new ProductCategoryDao(connectionStr);
+            _parametersrcDao = new ParametersrcDao(connectionStr);
+            //_siteDao = new SiteDao(connectionStr); 
+            _channelDao = new ChannelDao(connectionStr);
         }
 
         #region 開發用
@@ -399,26 +405,61 @@ namespace BLL.gigade.Mgr
         public DataTable GetAmountDetial(OrderDetailQuery query,out int totalCount)
         {
             totalCount = 0;
+            DataTable dt = new DataTable();
             try
             {
-               return _orderDetailDao.GetAmountDetial(query,out totalCount);
+                dt = _orderDetailDao.GetAmountDetial(query, out totalCount);
+                if (dt != null && dt.Rows.Count > 0)
+                {                   
+                    List<Parametersrc> parameterList = _parametersrcDao.SearchParameters("payment", "order_status", "product_mode");
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        var alist = parameterList.Find(m => m.ParameterType == "payment" && m.ParameterCode == dr["order_payment"].ToString());
+                        var blist = parameterList.Find(m => m.ParameterType == "order_status" && m.ParameterCode == dr["slave_status"].ToString());
+                       
+                        if (alist != null)
+                        {
+                            dr["payment_name"] = alist.parameterName;
+                        }
+                        if (blist != null)
+                        {
+                            dr["slave_status_name"] = blist.remark;
+                        }
+                        int channel = dr["channel"].ToString() == "" ? 0 : Convert.ToInt32(dr["channel"].ToString());
+                        Channel clist = new Channel();
+                        if (channel == 0)
+                        {
+                            dr["channel_name_simple"] = "";
+                        }
+                        else
+                        {
+                            clist = _channelDao.getSingleObj(channel);
+                        }
+                        if (clist != null)
+                        {
+                            dr["channel_name_simple"] = clist.channel_name_simple;
+                        }
+                        if (dr["order_createdate"] != null)
+                        {
+                            dr["order_createdate_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr["order_createdate"].ToString())));
+                        }
+                        if (dr["deduct_bonus"] != null)
+                        {
+                            dr["deducts"] = Convert.ToInt32(dr["deduct_bonus"].ToString());
+                        }
+                        if (dr["money"] != null)
+                        {
+                            dr["amount"] = Convert.ToInt32(dr["money"].ToString());
+                        }
+                    }
+                }
+                return dt;
             }
             catch (Exception ex)
             {
                throw new Exception("OrderMasterMgr-->GetAmountDetial-->" + ex.Message, ex);
             }
         }
-
-        public DataTable CategoryDetialExportInfo(OrderDetailQuery query)
-        {
-            try
-            {
-                return _orderMaterDao.CagegoryDetialExport(query);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("OrderMasterMgr-->CategoryDetialExportInfo-->" + ex.Message, ex);
-            }
-        }
+   
     }
 }

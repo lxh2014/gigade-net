@@ -19,7 +19,8 @@ namespace BLL.gigade.Mgr
         private MySqlDao _mySql;
         private EdmListConditionMainMgr _edmListConditionMgr;
         private EmailGroupDao _emailGroup;
-
+        private string subscribe = "SUBSCRIBE_2015";
+        private string subscribe_url = "<p style='text-align:center;'><span style='font-size:small;'><span style='color:#666666;'><a href='https://www.gigade100.com/member/mb_newsletter.php' target='_blank'>訂閱/解訂電子報</a></span></span></p>";
         public EdmContentNewMgr(string connectionString)
         {
             _edmContentNewDao = new EdmContentNewDao(connectionString);
@@ -131,8 +132,7 @@ namespace BLL.gigade.Mgr
             eslQuery.Replace4MySQL();
             MRquery.Replace4MySQL();
             string json = string.Empty;
-            string subscribe = "SUBSCRIBE_2015";
-            string subscribe_url ="<p style='text-align:center;'><span style='font-size:small;'><span style='color:#666666;'><a href='https://www.gigade100.com/member/mb_newsletter.php' target='_blank'>訂閱/解訂電子報</a></span></span></p>";
+           
             ArrayList arrList = new ArrayList();
             try
             {
@@ -150,7 +150,40 @@ namespace BLL.gigade.Mgr
                      4.包含非訂閱的與額外發送列表和額外不發送列表進行查重進行查重
                      5.4的結果和3的結果去重
                      */
-
+                    string[] extra_send_temp = new string[] { };
+                    string[] extra_send = new string[] { };
+                    string[] extra_no_send_temp = new string[] { };
+                    string[] extra_no_send = new string[] { };
+                    #region 額外發送列表中數據去重
+                    if (MRquery.extra_send != "")
+                    {
+                        extra_send_temp = MRquery.extra_send.Split('\n');
+                        List<string> extraSendTList = new List<string>();
+                        for (int i = 0; i < extra_send_temp.Length; i++)
+                        {
+                            if (!extraSendTList.Contains(extra_send_temp[i]))
+                            {
+                                extraSendTList.Add(extra_send_temp[i]);
+                            }
+                        }
+                      extra_send=    extraSendTList.ToArray();
+                    }
+                    #endregion
+                    #region 額外不發送列表中數據去重
+                    if (MRquery.extra_no_send != "")
+                    {
+                        extra_no_send_temp = MRquery.extra_no_send.Split('\n');
+                        List<string> extraNoSendTList = new List<string>();
+                        for (int i = 0; i < extra_no_send_temp.Length; i++)
+                        {
+                            if (!extraNoSendTList.Contains(extra_no_send_temp[i]))
+                            {
+                                extraNoSendTList.Add(extra_no_send_temp[i]);
+                            }
+                        }
+                        extra_no_send = extraNoSendTList.ToArray();
+                    }
+                    #endregion
                     #region 第一步： 【發送名單條件】和額外發送列表和額外不發送列表進行查重
                     #region 發送名單條件
                     DataTable _newDt = new DataTable();
@@ -172,7 +205,8 @@ namespace BLL.gigade.Mgr
                     #region 發送名單為空，額外發送不空
                     if ((_dt == null || _dt.Rows.Count == 0) && MRquery.extra_send != "")
                     {
-                        string[] extra_send = MRquery.extra_send.Split('\n');
+                        
+ 
                         for (int i = 0; i < extra_send.Length; i++)
                         {
                             if (extra_send[i] != "")
@@ -196,7 +230,7 @@ namespace BLL.gigade.Mgr
                     #region 發送名單不空，額外發送不空
                     else if ((_dt != null && _dt.Rows.Count > 0) && MRquery.extra_send != "")
                     {
-                        string[] extra_send = MRquery.extra_send.Split('\n');
+                       
                         for (int i = 0; i < extra_send.Length; i++)
                         {
                             if (extra_send[i] != "")
@@ -237,7 +271,6 @@ namespace BLL.gigade.Mgr
                     #region 發送名單不空，額外排除不空
                     if ((_dt != null && _dt.Rows.Count > 0) && MRquery.extra_no_send != "")
                     {
-                        string[] extra_no_send = MRquery.extra_no_send.Split('\n');
 
                         for (int i = 0; i < extra_no_send.Length; i++)
                         {
@@ -268,7 +301,7 @@ namespace BLL.gigade.Mgr
                     {
                         _emailDt.Columns.Add("email_address", typeof(string));
                         _emailDt.Columns.Add("name", typeof(string));
-                        string[] extra_send = MRquery.extra_send.Split('\n');
+                         
                         for (int i = 0; i < extra_send.Length; i++)
                         {
                             if (extra_send[i] != "")
@@ -290,7 +323,7 @@ namespace BLL.gigade.Mgr
                     #region 固定信箱名單不為空，額外發送不為空
                     else if ((_emailDt != null && _emailDt.Rows.Count > 0) && MRquery.extra_send != "")
                     {
-                        string[] extra_send = MRquery.extra_send.Split('\n');
+                         
                         for (int i = 0; i < extra_send.Length; i++)
                         {
                             if (extra_send[i] != "")
@@ -331,7 +364,6 @@ namespace BLL.gigade.Mgr
                     #region 信箱名單不為空，額外排除為空
                     if ((_emailDt != null && _emailDt.Rows.Count > 0) && MRquery.extra_no_send != "")
                     {
-                        string[] extra_no_send = MRquery.extra_no_send.Split('\n');
 
                         for (int i = 0; i < extra_no_send.Length; i++)
                         {
@@ -415,7 +447,7 @@ namespace BLL.gigade.Mgr
 
                         if (MRquery.extra_send != "")
                         {
-                            string[] extra_send = MRquery.extra_send.Split('\n');
+                            
                             for (int i = 0; i < extra_send.Length; i++)
                             {
                                 if (extra_send[i] != "")
@@ -443,8 +475,6 @@ namespace BLL.gigade.Mgr
                         #region 額外排除列表
                         if (MRquery.extra_no_send != "")
                         {
-                            string[] extra_no_send = MRquery.extra_no_send.Split('\n');
-
                             for (int i = 0; i < extra_no_send.Length; i++)
                             {
                                 if (extra_no_send[i] != "")
@@ -525,7 +555,14 @@ namespace BLL.gigade.Mgr
                                     MRquery.user_id = 0;
                                 }
                             }
-                            RecommendHtml = GetRecommendHtml(Convert.ToUInt32(MRquery.user_id));//根據user_id做出精準推薦
+                            if (MRquery.static_template == 0)
+                            {
+                                RecommendHtml = GetRecommendHtml(Convert.ToUInt32(MRquery.user_id));//根據user_id做出精準推薦
+                            }
+                            else
+                            {
+                                RecommendHtml = string.Empty;
+                            }
                             EdmTraceEmail ete = new EdmTraceEmail();
                             ete.email = MRquery.receiver_address;
                             ete.name = MRquery.receiver_name;
@@ -546,16 +583,10 @@ namespace BLL.gigade.Mgr
                             {
                                 url = "<img src='" + _dtUrl.Rows[0][0].ToString() + "?c=" + eslQuery.content_id + "&e=" + email_id + "&l=" + log_id + "'/>";
                             }
-                            else
-                            {
-                                url = "<img src='http://www.gigade100.com/edm.php?c=" + eslQuery.content_id + "&e=" + email_id + "&l=" + log_id + "'/>";
-                            }
                             #endregion
                             #region 獲得電子報整體內容
 
                             #region 是範本還是活動頁面
-                            if (MRquery.template_id != 0)//不是通過活動頁面，而是選擇了範本
-                            {
                                 string replaceStr = string.Empty;
                                 string editStr = string.Empty;
                                 string content_url = GetContentUrlByContentId(eslQuery.content_id);
@@ -589,28 +620,14 @@ namespace BLL.gigade.Mgr
                                     }
                                     if (MRquery.body.IndexOf(subscribe) > 0)//找到了埋的那個code，證明是點擊了訂閱電子報
                                     {
-                                        MRquery.bodyData = contentStr.Replace(replaceStr, MRquery.body.Replace(editStr,"").Replace(subscribe,"\n") + RecommendHtml) + subscribe_url;
+                                        MRquery.bodyData = contentStr.Replace(replaceStr, MRquery.body.Replace(editStr, "").Replace(subscribe, "\n") + RecommendHtml) + subscribe_url + url;
                                     }
                                     else
                                     {
-                                        MRquery.bodyData = contentStr.Replace(replaceStr, MRquery.body.Replace(editStr, "") + RecommendHtml);
+                                        MRquery.bodyData = contentStr.Replace(replaceStr, MRquery.body.Replace(editStr, "") + RecommendHtml + url);
                                     }
                                     #endregion
                                 }
-                            }
-                            else//選擇的是活動頁面
-                            {
-                                #region 是否訂閱電子報
-                                if (MRquery.body.IndexOf(subscribe) > 0)
-                                {
-                                    MRquery.bodyData = MRquery.body.Replace(subscribe, "\n") + subscribe_url;
-                                }
-                                else
-                                {
-                                    MRquery.bodyData = MRquery.body;
-                                }
-                                #endregion
-                            }
                             #endregion
                             #endregion
                             arrList.Add(_edmContentNewDao.InsertEmailRequest(MRquery));
@@ -640,7 +657,7 @@ namespace BLL.gigade.Mgr
         public string GetRecommendHtml(uint user_id)
         {
             string html = string.Empty;
-
+            //html = "This is mine";
             return html;
         }
         #endregion
@@ -913,6 +930,93 @@ namespace BLL.gigade.Mgr
             catch (Exception ex)
             {
                 throw new Exception("EdmContentNewMgr-->GetParaStore-->" + ex.Message, ex);
+            }
+        }
+
+        public string GetContentIDAndUrl(int group_id,int user_id)
+        {
+            string replaceStr = string.Empty;
+            string content_data = string.Empty;
+            string splitStr = string.Empty;
+            try
+            {
+                DataTable _dt = _edmContentNewDao.GetContentIDAndUrl(group_id);
+                if (_dt.Rows.Count > 0 && _dt != null)
+                {
+                    string content_url = _dt.Rows[0][0].ToString();
+                    int content_id = Convert.ToInt32(_dt.Rows[0][1]);
+                    int template_id = Convert.ToInt32(_dt.Rows[0][2]);
+                    string template_data = _dt.Rows[0][3].ToString();
+                    string static_template=  _dt.Rows[0][4].ToString();
+                    if (static_template == "0")//動態範本
+                    {
+                        
+                        template_data = template_data + GetRecommendHtml(0);
+                    }
+                    #region 替換符
+                    DataTable _dtReplace  = GetPraraData(1);
+                    if (_dtReplace != null && _dtReplace.Rows.Count > 0)
+                    {
+                        replaceStr = _dtReplace.Rows[0][0].ToString();
+                    }
+                    else
+                    {
+                        replaceStr = "&nbsp;&nbsp;";
+                    }
+                    #endregion
+                    #region template_data中的分隔符
+                    DataTable _dtSplit = GetPraraData(3);
+                    if (_dtSplit != null && _dtSplit.Rows.Count > 0)
+                    {
+                        splitStr = _dtSplit.Rows[0][0].ToString();
+                    }
+                    else
+                    {
+                        splitStr = "&nbsp;&nbsp;";
+                    }
+                    #endregion
+                    #region 讀content_url
+                    HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(content_url);
+                    httpRequest.Timeout = 9000;
+                    httpRequest.Method = "GET";
+                    HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                    StreamReader sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.GetEncoding("UTF-8"));
+                    content_data = sr.ReadToEnd();
+                    #endregion
+                    if (template_data.IndexOf(subscribe) > 0)
+                    {
+                        content_data =  content_data.Replace(replaceStr, template_data.Replace(subscribe, "\n").Replace(splitStr,"")) + subscribe_url;
+                    }
+                    else
+                    {
+                        content_data = content_data.Replace(replaceStr, template_data.Replace(subscribe, "\n").Replace(splitStr, ""));
+                    }
+                    #region 拼組成html
+                    #endregion
+                }
+                return content_data;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->GetContentIDAndUrl-->" + ex.Message, ex);
+            }
+        }
+
+        public int AdvanceTemplate()
+        {
+            int template_id = 0;
+            try
+            {
+                DataTable _dt = _edmContentNewDao.AdvanceTemplate();
+                if (_dt.Rows.Count > 0 && _dt != null)
+                {
+                    template_id = Convert.ToInt32(_dt.Rows[0][0]);
+                }
+                return template_id;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EdmContentNewMgr-->AdvanceTemplate-->" + ex.Message, ex);
             }
         }
     }

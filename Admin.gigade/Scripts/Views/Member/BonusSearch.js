@@ -204,14 +204,15 @@ Ext.onReady(function () {
                     margin: '0 0 0 0',
                     items: [
                         {
-                            xtype: 'datefield',
+                            xtype: 'datetimefield',
                             fieldLabel: "發放日期",
                             labelWidth: 60,
-                            width: 210,
+                            //width: 220,
                             id: 'time_start_create',
                             name: 'time_start_create',
                             margin: '5 0 0 5',
-                            format: 'Y-m-d',
+                            format: 'Y-m-d  H:i:s',
+                            time: { hour: 00, min: 00, sec: 00 },
                             editable: false,
                             listeners: {
                                 select: function () {
@@ -239,12 +240,13 @@ Ext.onReady(function () {
                             margin: '5 0 0 5'
                         },
                         {
-                            xtype: 'datefield',
-                            width: 145,
+                            xtype: 'datetimefield',
+                            width: 150,
                             id: 'time_end_create',
                             name: 'time_end_create',
                             margin: '5 0 0 6',
-                            format: 'Y-m-d',
+                            format: 'Y-m-d  H:i:s',
+                            time: { hour: 23, min: 59, sec: 59 },
                             editable: false,
                             listeners: {
                                 select: function () {

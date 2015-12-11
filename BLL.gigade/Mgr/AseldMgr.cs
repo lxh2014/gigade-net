@@ -113,6 +113,44 @@ namespace BLL.gigade.Mgr
             }
         }
         #endregion
+        #region
+        /// <summary>
+        /// 自動理貨 獲取所有需要理貨的商品
+        /// </summary>
+        /// <param name="ase"></param>
+        /// <returns></returns>
+
+        public List<AseldQuery> GetAllAseldList(AseldQuery ase,out int totalCount)
+        {
+            try
+            {
+                return _aseldDao.GetAllAseldList(ase,out totalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldMgr-->GetAllAseldList-->" + ex.Message, ex);
+            }
+        }
+        #endregion
+        #region
+        /// <summary>
+        /// 判斷itemid是否在某個工作項中
+        /// </summary>
+        /// <param name="ase"></param>
+        /// <returns></returns>
+
+        public int GetCountByItem(Aseld a)
+        {
+            try
+            {
+                return _aseldDao.GetCountByItem(a);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AseldMgr-->GetCountByItem-->" + ex.Message, ex);
+            }
+        }
+        #endregion
         public string UpdTicker(string m)
         {
             try

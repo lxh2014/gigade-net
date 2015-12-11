@@ -1,17 +1,17 @@
-﻿pageSize = 18;
+﻿pageSize = 20;
 Ext.define('gigade.OrderDetial', {
     extend: 'Ext.data.Model',
     fields: [
     { name: 'order_id', type: 'int' },
-    { name: 'user_name', type: 'string' },
+    { name: 'order_name', type: 'string' },
     { name: 'delivery_name', type: 'string' },
     { name: 'order_product_subtotal', type: 'int' },
     { name: 'order_amount', type: 'int' },
     { name: 'amount', type: 'int' },
-    { name: 'order_payment', type: 'string' },
-    { name: 'slave_status', type: 'string' },
-    { name: 'order_createdate', type: 'string' },
-    { name: 'site_name', type: 'string' },
+    { name: 'payment_name', type: 'string' },
+    { name: 'slave_status_name', type: 'string' },
+    { name: 'order_createdate_format', type: 'string' },
+    { name: 'channel_name_simple', type: 'string' },
     { name: 'deducts', type: 'int' },
     ]
 });
@@ -36,7 +36,9 @@ AmountDetial.on('beforeload', function () {
         category_status: document.getElementById('category_status').value,
         date_stauts: document.getElementById('date_stauts').value,
         date_start: document.getElementById('date_start').value,
-        date_end: document.getElementById('date_end').value
+        date_end: document.getElementById('date_end').value,
+        c_money: document.getElementById('c_money').value,
+        c_money1: document.getElementById('c_money1').value
     });
 });
 
@@ -94,16 +96,16 @@ Ext.onReady(function () {
         frame: true,
         columns: [
         { header: "付款單號", dataIndex: 'order_id', flex: 1, align: 'center' },
-        { header: "訂購人", dataIndex: 'user_name', flex: 1, align: 'center' },
+        { header: "訂購人", dataIndex: 'order_name', flex: 1, align: 'center' },
         { header: "收貨人", dataIndex: 'delivery_name', flex: 1, align: 'center' },
         {
-            header: "訂單應收金額", dataIndex: 'order_product_subtotal', flex: 1, align: 'center',
+            header: "訂單金額", dataIndex: 'order_product_subtotal', flex: 1, align: 'center',
             renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                 return change(value);
             }
         },
         {
-            header: "訂單實收金額", dataIndex: 'order_amount', flex: 1, align: 'center',
+            header: "訂單應收金額", dataIndex: 'order_amount', flex: 1, align: 'center',
             renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                 return change(value);
             }
@@ -120,10 +122,10 @@ Ext.onReady(function () {
                 return change(value);
             }
         },
-        { header: "付款方式", dataIndex: 'order_payment', flex: 1.5, align: 'center' },
-        { header: "訂單狀態", dataIndex: 'slave_status', flex: 1, align: 'center' },
-        { header: "訂單日期", dataIndex: 'order_createdate', flex: 1, align: 'center' },
-        { header: "賣場", dataIndex: 'site_name', flex: 1, align: 'center', }
+        { header: "付款方式", dataIndex: 'payment_name', flex: 1.5, align: 'center' },
+        { header: "訂單狀態", dataIndex: 'slave_status_name', flex: 1, align: 'center' },
+        { header: "訂單日期", dataIndex: 'order_createdate_format', flex: 1, align: 'center' },
+        { header: "賣場", dataIndex: 'channel_name_simple', flex: 1, align: 'center', }
         ],
         tbar: [
         { xtype: 'button', id: 'category_detialExport', text: '類別訂單明細匯出', icon: '../../../Content/img/icons/excel.gif', handler: OnCategoryDetialExport },
@@ -161,6 +163,17 @@ Ext.onReady(function () {
 })
 
 OnCategoryDetialExport = function () {
+    //var category_id = document.getElementById('category_id').value;
+    //var category_name = document.getElementById('category_name').value;
+    //var category_status = document.getElementById('category_status').value;
+    //var date_stauts = document.getElementById('date_stauts').value;
+    //var date_start = document.getElementById('date_start').value;
+    //var date_end = document.getElementById('date_end').value;
+    //window.open("/Order/CategoryDetialExport?category_id=" + category_id + "&category_name=" + category_name
+    //    + "&category_status=" + category_status
+    //    + "&date_stauts=" + date_stauts
+    //    + "&date_start=" + date_start
+    //    + "&date_end=" + date_end);
     Ext.MessageBox.show({
         msg: 'Loading....',
         wait: true
@@ -174,7 +187,9 @@ OnCategoryDetialExport = function () {
             category_status: document.getElementById('category_status').value,
             date_stauts: document.getElementById('date_stauts').value,
             date_start: document.getElementById('date_start').value,
-            date_end: document.getElementById('date_end').value
+            date_end: document.getElementById('date_end').value,
+            c_money: document.getElementById('c_money').value,
+            c_money1: document.getElementById('c_money1').value
         },
         success: function (form, action) {
             var result = Ext.decode(form.responseText);
@@ -189,6 +204,17 @@ OnCategoryDetialExport = function () {
     });
 }
 OnOrderDetialExport = function () {
+   //var category_id = document.getElementById('category_id').value;
+   //var category_name = document.getElementById('category_name').value;
+   //var category_status = document.getElementById('category_status').value;
+   //var date_stauts = document.getElementById('date_stauts').value;
+   //var date_start = document.getElementById('date_start').value;
+   //var date_end = document.getElementById('date_end').value;
+   //window.open("/Order/OrderDetialExport?category_id=" + category_id + "&category_name=" + category_name
+   //    + "&category_status=" + category_status
+   //    + "&date_stauts=" + date_stauts
+   //    + "&date_start=" + date_start
+   //    + "&date_end=" + date_end);
     Ext.MessageBox.show({
         msg: 'Loading....',
         wait: true
@@ -202,7 +228,9 @@ OnOrderDetialExport = function () {
             category_status: document.getElementById('category_status').value,
             date_stauts: document.getElementById('date_stauts').value,
             date_start: document.getElementById('date_start').value,
-            date_end: document.getElementById('date_end').value
+            date_end: document.getElementById('date_end').value,
+            c_money: document.getElementById('c_money').value,
+            c_money1: document.getElementById('c_money1').value
         },
         success: function (form, action) {
             var result = Ext.decode(form.responseText);
@@ -220,7 +248,15 @@ OnOrderDetialExport = function () {
 function change(value) {
     value = value.toString();
     if (/^\d+$/.test(value)) {
-        value = value.replace(/^(\d+)(\d{3})$/, "$1,$2");
+        if (value.length > 9) {
+            value = value.replace(/^(\d+)(\d{3})(\d{3})(\d{3})$/, "$1,$2,$3,$4");
+        }
+        else if (value.length > 6) {
+            value = value.replace(/^(\d+)(\d{3})(\d{3})$/, "$1,$2,$3");
+        }
+        else {
+            value = value.replace(/^(\d+)(\d{3})$/, "$1,$2");
+        }
     }
     return value;
 }

@@ -49,8 +49,8 @@ namespace BLL.gigade.Mgr.Impl
         List<IinvdQuery> GetIinvdList(string loc_id);
         int SaveIinvd(IinvdQuery query);
         int GetIinvdCount(IinvdQuery iinvd);
-        DateTime GetCde_dt(int row_id);
-        int GetProd_qty(int item_id, string loc_id);
+        List<DateTime> GetCde_dt(int row_id);
+        int GetProd_qty(int item_id, string loc_id,string pwy_dte_ctl,string row_id);
         List<IinvdQuery> GetPlasIinvd(Model.Query.IinvdQuery ivd);
         DataTable getVentory(IinvdQuery m);
     }
