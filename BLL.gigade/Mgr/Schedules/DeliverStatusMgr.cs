@@ -162,21 +162,25 @@ namespace BLL.gigade.Mgr.Schedules
             }
             IDeliverMasterImplMgr DeliverMaster = new DeliverMasterMgr(mySqlConnectionString);
             DataTable table = DeliverMaster.GetDeliverMaster(HourNum);
+            int delNumber = table.Rows.Count;
             int updateNumber = 0;
-            if (table.Rows.Count > 0)
+            if (delNumber > 0)
             {
                 DeliveryInfo Model;
+                LogisticsTcatSodDao LTSDao=new LogisticsTcatSodDao(mySqlConnectionString);
                 for (int i = 0; i < table.Rows.Count; i++)
                 {
-                    Model = GetWebContent(table.Rows[i]["delivery_code"].ToString());
+                    table.Rows[i]["gettime"] = "";
+                    Model =LTSDao.GetLogisticsTcatSod(table.Rows[i]["delivery_code"].ToString());
                     if (Model.Status == "順利送達")
                     {
+                        table.Rows[i]["gettime"] = Model.CreateTime;
                         updateNumber++;
                         DeliverStatus dsmodel = new DeliverStatus();
 
                         dsmodel.freight_type = 11;//物流配送模式
                         dsmodel.Logistics_providers = 1;//物流商
-                        dsmodel.deliver_id = int.Parse(table.Rows[i]["deliver_id"].ToString());
+                        dsmodel.deliver_id = Int64.Parse(table.Rows[i]["deliver_id"].ToString());
                         dsmodel.state = 99;
                         dsmodel.settime = Model.CreateTime;
                         dsmodel.endtime = Model.CreateTime;
@@ -187,8 +191,129 @@ namespace BLL.gigade.Mgr.Schedules
             DateTime endTime = DateTime.Now;
             TimeSpan ts = endTime - startTime;
             double Second = ts.TotalSeconds;
+            int num1 = 0;//期望到貨日<運達時間的物流單個數
+            int num2 = 0;//期望到貨日>今天的物流單個數
             MailHelper mail = new MailHelper(mailModel);
-            return mail.SendToGroup(GroupCode, MailTitle, "物流狀態抓取排程執行成功,<br/>更新" + updateNumber + "個物流單<br/>共耗時" + Second + "秒", true, true);
+            StringBuilder sbmailBody = new StringBuilder();
+            string tablestr = GetHtmlByDataTable(GetSendTable(table), out num1, out num2);
+            sbmailBody.Append("物流狀態抓取排程執行成功<br/>");
+            sbmailBody.Append("更新<span style=\"font-size:large;\">" + delNumber + "</span>個出貨單<br/>");
+            sbmailBody.Append("更新<span style=\"font-size:large;\">" + updateNumber + "</span>個物流單<br/>");
+            sbmailBody.Append("期望到貨日小於運達時間的物流單個數:<span style=\"font-size:large;\">" + num1 + "</span><br/>");
+            sbmailBody.Append("期望到貨日小於今天的物流單個數:<span style=\"font-size:large;\">" + num2 + "</span><br/>");
+            sbmailBody.Append("共耗時<span style=\"font-size:large;\">" + Second + "</span>秒<br/>");
+            sbmailBody.Append("更新出貨單詳情如下:<br/><br/>");
+            sbmailBody.Append(tablestr);
+            return mail.SendToGroup(GroupCode, MailTitle,sbmailBody.ToString(), false, true);
+        }
+
+        public static string GetHtmlByDataTable(DataTable _dtmyMonth,out int num1,out int num2) 
+        {
+            num1 = 0;
+            num2 = 0;
+            StringBuilder sbHtml = new StringBuilder();
+            sbHtml.Append("<table  cellpadding=3 cellspacing=1  border=1 style=\"border-collapse: collapse\">");
+            sbHtml.Append("<tr  style=\"text-align: center; COLOR: #0076C8; BACKGROUND-COLOR: #F4FAFF; font-weight: bold\">");
+            string[] str = { "style=\"background-color:#dda29a;\"", "style=\"background-color:#d98722;\"", "style=\"background-color:#cfbd2d;\"", "style=\"background-color:#cbd12c;\"", "style=\"background-color:#91ca15;\"", "style=\"background-color:#6dc71e;\"", "style=\"background-color:#25b25c;\"", "style=\"background-color:#13a7a2;\"", "style=\"background-color:#13b7a2;\"", "style=\"background-color:#d48952;\"" };
+            string aligns = "align=\"right\"";
+            string alignsleft = "align=\"left\"";
+            for (int i = 0; i < _dtmyMonth.Columns.Count; i++)
+            {
+                sbHtml.Append("<th ");
+                sbHtml.Append(str[i]);
+                sbHtml.Append(" >");
+                sbHtml.Append(_dtmyMonth.Columns[i].ColumnName);
+                sbHtml.Append("</th>");
+            }
+            sbHtml.Append("</tr>");
+            for (int i = 0; i < _dtmyMonth.Rows.Count; i++)//行
+            {
+                DateTime planTime = DateTime.MinValue;
+                DateTime getTime = DateTime.MinValue;
+                DateTime.TryParse(_dtmyMonth.Rows[i]["期望到貨日"].ToString(), out planTime);
+                DateTime.TryParse(_dtmyMonth.Rows[i]["運達時間"].ToString(), out getTime);
+
+                if (planTime.Date<getTime.Date)
+                {
+                    sbHtml.Append("<tr style=\"background-color:#E68688;\" >");
+                    num1++;
+                }
+                else
+                {
+                    if (planTime.Date< DateTime.Now.Date)
+                    {
+                        sbHtml.Append("<tr style=\"background-color:#ffda44;\" >");
+                        num2++;
+                    }
+                    else
+                    {
+                        sbHtml.Append("<tr>");
+                    }
+                }
+                for (int j = 0; j < _dtmyMonth.Columns.Count; j++)
+                {
+                    sbHtml.Append("<td ");
+                    if (j == 0)
+                    {
+                        sbHtml.Append(alignsleft);
+                    }
+                    else
+                    {
+                        sbHtml.Append(aligns);
+                    }
+                    sbHtml.Append(" >");
+                    sbHtml.Append(_dtmyMonth.Rows[i][j]);
+                    sbHtml.Append("</td>");
+                }
+                sbHtml.Append("</tr>");
+            }
+            sbHtml.Append("</table>");
+            return sbHtml.ToString();
+
+        }
+
+        public static DataTable GetSendTable(DataTable table)
+        {
+            DataTable dataTable = new DataTable();
+
+            dataTable.Columns.Add("訂單編號", typeof(String));
+            dataTable.Columns.Add("出貨單編號", typeof(String));
+            dataTable.Columns.Add("物流單號", typeof(String));
+            dataTable.Columns.Add("物流商", typeof(String));
+            dataTable.Columns.Add("出貨單位", typeof(String));
+            dataTable.Columns.Add("出貨單建立時間", typeof(String));
+            dataTable.Columns.Add("出貨單壓單時間", typeof(String));
+            dataTable.Columns.Add("預計到貨日", typeof(String));
+            dataTable.Columns.Add("期望到貨日", typeof(String));
+            dataTable.Columns.Add("運達時間", typeof(String));
+
+            if (table.Rows.Count > 0)
+            {
+                for (int i = 0; i < table.Rows.Count; i++)
+                {
+                    DataRow row = dataTable.NewRow();
+                    row["訂單編號"] = table.Rows[i]["order_id"];
+                    row["出貨單編號"] = table.Rows[i]["deliver_id"];
+                    row["物流單號"] = table.Rows[i]["delivery_code"];
+                    row["物流商"] = table.Rows[i]["delivery_store"];
+                    row["出貨單位"] = table.Rows[i]["vendor_name_full"];
+                    row["出貨單建立時間"] = Convert.ToDateTime(table.Rows[i]["created"]).ToString("yyyy-MM-dd HH:mm:ss");
+                    row["出貨單壓單時間"] = Convert.ToDateTime(table.Rows[i]["delivery_date"]).ToString("yyyy-MM-dd HH:mm:ss");
+                    row["預計到貨日"] = Convert.ToDateTime(table.Rows[i]["deliver_org_days"]).ToString("yyyy-MM-dd");
+                    row["期望到貨日"] = Convert.ToDateTime(table.Rows[i]["expect_arrive_date"]).ToString("yyyy-MM-dd");
+                    try
+                    {
+                        row["運達時間"] = Convert.ToDateTime(table.Rows[i]["gettime"]).ToString("yyyy-MM-dd HH:mm:ss");
+                    }
+                    catch (Exception)
+                    {
+
+                        row["運達時間"] = "";
+                    }
+                    dataTable.Rows.Add(row);
+                }
+            }
+            return dataTable;
         }
     }
     public class DeliveryInfo
@@ -243,5 +368,34 @@ namespace BLL.gigade.Mgr.Schedules
             int row = _accessMySql.execCommand(sqlDS);
             return row;
         }
+    }
+
+    class LogisticsTcatSodDao
+    {
+        static IDBAccess _accessMySql;
+        public LogisticsTcatSodDao(string connectionString)
+        {
+            _accessMySql = DBFactory.getDBAccess(DBType.MySql, connectionString);
+        }
+        public DeliveryInfo GetLogisticsTcatSod(string delivery_code)
+        {
+            DeliveryInfo deliver = new DeliveryInfo();
+
+            string sql =string.Format("SELECT  status_id,delivery_status_time  FROM logistics_tcat_sod WHERE delivery_number={0};",delivery_code);
+            DataTable table = _accessMySql.getDataTable(sql);
+            if(table.Rows.Count>0)
+            {
+                DateTime date;
+                if(DateTime.TryParse(table.Rows[0]["delivery_status_time"].ToString(),out date))
+                {
+                    deliver.CreateTime = date;
+                }
+                if (table.Rows[0]["status_id"].ToString() == "00003")
+                {
+                    deliver.Status = "順利送達";
+                }
+            }
+            return deliver;
+        }  
     }
 }
