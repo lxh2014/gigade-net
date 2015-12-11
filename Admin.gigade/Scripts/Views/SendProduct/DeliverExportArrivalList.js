@@ -427,16 +427,16 @@ Ext.onReady(function () {
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     switch (record.data.type) {
                         case 1:
-                            return "寄倉";
+                            return "統倉出貨";
                             break;
                         case 2:
-                            return "自出";
+                            return "供應商自行出貨";
                             break;
                         case 101:
-                            return "調度";
+                            return "其他";
                             break;
                         default:
-                            return record.data.type;
+                            return "其他";
                             break;
                     }
                 }

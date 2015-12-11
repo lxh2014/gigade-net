@@ -234,15 +234,16 @@ namespace BLL.gigade.Mgr
                     
                         if (dclTable.Rows[i]["type"].ToString() == "1")
                         {
-                            dr["出貨方式"] = "寄倉";
+                            dr["出貨方式"] = "統倉出貨";
                         }
                         else if (dclTable.Rows[i]["type"].ToString() == "2")
                         {
-                            dr["出貨方式"] = "自出";
+                            dr["出貨方式"] = "供應商自行出貨";
                         }
-                        else if (dclTable.Rows[i]["type"].ToString() == "101")
+                        else 
+                            //if (dclTable.Rows[i]["type"].ToString() == "101")
                         {
-                            dr["出貨方式"] = "調度";
+                            dr["出貨方式"] = "其他";
                         }
 
                         if (dclTable.Rows[i]["dcl_create_type"].ToString() == "1")
