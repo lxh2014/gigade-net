@@ -1012,7 +1012,7 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1 ")
                                     where 1=1 ");
                 if (Query.type != 0)
                 {
-                    if (Query.type == 3)
+                    if (Query.type == 101)
                     {
                         conSql.AppendFormat(" and dm.type='{0}'", 101);
                     }
