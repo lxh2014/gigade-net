@@ -8025,7 +8025,7 @@ namespace Admin.gigade.Controllers
         {
             PdfHelper pdf = new PdfHelper();
             List<string> pdfList = new List<string>();
-            float[] arrColWidth = new float[] { 30, 60, 40, 30, 55,40, 140, 50, 35, 55};
+            float[] arrColWidth = new float[] { 25, 60, 40, 30, 55,40, 140, 50, 40, 55};
             string newFileName = string.Empty;
             string newName = string.Empty;
             string json = string.Empty;
@@ -8059,7 +8059,7 @@ namespace Admin.gigade.Controllers
             _dtBody.Columns.Add("效期控制", typeof(string));
             _dtBody.Columns.Add("品名", typeof(string));
             _dtBody.Columns.Add("規格", typeof(string));
-            _dtBody.Columns.Add("六碼", typeof(string));
+            _dtBody.Columns.Add("細項編號", typeof(string));
             _dtBody.Columns.Add("備註", typeof(string));
             PdfPTable ptablefoot = new PdfPTable(10);
 
@@ -8099,7 +8099,7 @@ namespace Admin.gigade.Controllers
                         cell.DisableBorderSide(8);
                         ptable.AddCell(cell);
 
-                        cell = new PdfPCell(new Phrase("盤點薄" + "-" + cbdetail.cb_jobid, new iTextSharp.text.Font(bf, 18)));
+                        cell = new PdfPCell(new Phrase("      盤點薄" + "-" + cbdetail.cb_jobid, new iTextSharp.text.Font(bf, 18)));
                         cell.VerticalAlignment = Element.ALIGN_LEFT;
                         cell.Colspan = 3;
                         cell.DisableBorderSide(1);
@@ -8168,7 +8168,7 @@ namespace Admin.gigade.Controllers
                         cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                         cell.DisableBorderSide(8);
                         ptable.AddCell(cell);
-                        cell = new PdfPCell(new Phrase("六碼", new iTextSharp.text.Font(bf, 12)));
+                        cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
                         cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                         cell.DisableBorderSide(8);
                         ptable.AddCell(cell);
@@ -8234,7 +8234,7 @@ namespace Admin.gigade.Controllers
                                 row["效期控制"] = string.IsNullOrEmpty(rows["pwy_dte_ctl"].ToString()) ? "否" : (rows["pwy_dte_ctl"].ToString() == "Y" ? "是" : "否");
                                 row["品名"] = rows["product_name"];
                                 row["規格"] = rows["spec_title_1"];
-                                row["六碼"] = rows["item_id"];
+                                row["細項編號"] = rows["item_id"];
                                 row["備註"] = " ";
                                 _dtBody.Rows.Add(row);
                             }
@@ -8272,7 +8272,7 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("盤點薄", new iTextSharp.text.Font(bf, 18)));
+                cell = new PdfPCell(new Phrase("      盤點薄", new iTextSharp.text.Font(bf, 18)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;
                 cell.Colspan = 3;
                 cell.DisableBorderSide(1);
@@ -8341,7 +8341,7 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("六碼", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
