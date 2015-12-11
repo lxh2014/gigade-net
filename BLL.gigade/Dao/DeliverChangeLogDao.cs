@@ -142,7 +142,7 @@ namespace BLL.gigade.Dao
             {
                 //sbSql.AppendFormat("select dm.order_id,dcl.deliver_id,dcl_create_type, u.user_name as dcl_create_username,mu.user_username as dcl_create_musername ,
                 //                            dcl.dcl_create_datetime,'' as ori_expect_arrive_date,dcl.expect_arrive_date,dcl.expect_arrive_period,dcl.dcl_note,dcl.dcl_ipfrom
-                sbSql.AppendFormat(@"select dm.order_id,dcl.deliver_id,dcl_create_type, u.user_name as dcl_create_username,mu.user_username as dcl_create_musername ,
+                sbSql.AppendFormat(@"select dm.order_id,dcl.deliver_id,dm.type,dcl_create_type, u.user_name as dcl_create_username,mu.user_username as dcl_create_musername ,
                                             dcl.dcl_create_datetime,dcl.expect_arrive_date,dcl.expect_arrive_period,dcl.dcl_note,dcl.dcl_ipfrom
 from delivery_change_log dcl
 LEFT JOIN deliver_master dm on dm.deliver_id=dcl.deliver_id 

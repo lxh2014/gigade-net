@@ -605,22 +605,19 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                             if (result.order_id != undefined) {//供應商簡稱
                                  Ext.getCmp('order_name').setValue(result.order_name).show();                              
                             }
-
-                            //if (infoarr.indexOf("group_committe_chairman") >= 0 || infoarr == "") {
-                            //    if (result.group_committe_chairman != "" && result.group_committe_chairman != "0" && result.group_committe_chairman != undefined) {
-                            //        Ext.getCmp('group_committe_chairman').setValue(result.group_committe_chairman).show();
-                            //    }
-                            //}
-                            //if (infoarr.indexOf("group_committe_phone") >= 0 || infoarr == "") {
-                            //    if (result.group_committe_phone != "" && result.group_committe_phone != undefined) {
-                            //        Ext.getCmp('group_committe_phone').setValue(result.group_committe_phone).show();
-                            //    }
-                            //}
-                            //if (infoarr.indexOf("group_committe_mail") >= 0 || infoarr == "") {
-                            //    if (result.group_committe_mail != "" && result.group_committe_mail != undefined) {
-                            //        Ext.getCmp('group_committe_mail').setValue(result.group_committe_mail).show();
-                            //    }
-                            //}
+                            if (result.orc_name != undefined) {
+                                var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
+                                myMask.show();
+                                Ext.getCmp('orc_name').setValue(result.orc_name);
+                                Ext.getCmp('orc_phone').setValue(result.orc_phone);
+                                Ext.getCmp('orc_address').setValue(result.orc_address);
+                                Ext.getCmp('orc_name').setDisabled(false);
+                                Ext.getCmp('orc_phone').setDisabled(false);
+                                Ext.getCmp('orc_address').setDisabled(false);
+                                WinShow.hide();
+                                myMask.hide();
+                            }
+                           
                             if (result.order_phone != undefined) {//
                                 Ext.getCmp('order_phone').setValue(result.order_phone).show();
                             }
@@ -758,7 +755,7 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                                 Ext.getCmp('user_name').setValue(name).show();
                             }
                         }
-                        break;                   
+                        break;
                     default:
                         if (mail != "") {
                             Ext.getCmp('user_email').setValue(mail).show();

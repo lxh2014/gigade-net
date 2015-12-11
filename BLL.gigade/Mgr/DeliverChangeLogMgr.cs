@@ -212,7 +212,9 @@ namespace BLL.gigade.Mgr
                 DataRow dr;
                 _dt.Columns.Add("訂單編號", typeof(string));
                 _dt.Columns.Add("出貨單號", typeof(string));
+                _dt.Columns.Add("出貨方式", typeof(string));
                 _dt.Columns.Add("異動人", typeof(string));
+                _dt.Columns.Add("異動類型", typeof(string));//
                 _dt.Columns.Add("異動時間", typeof(string));
                 //_dt.Columns.Add("原期望到貨日", typeof(string));
                 _dt.Columns.Add("期望到貨日", typeof(string));
@@ -228,14 +230,30 @@ namespace BLL.gigade.Mgr
                         dr = _dt.NewRow();
                         StringBuilder sb = new StringBuilder();
                         dr["訂單編號"] = dclTable.Rows[i]["order_id"].ToString();
-                        dr["出貨單號"] = dclTable.Rows[i]["deliver_id"].ToString();
+                        dr["出貨單號"] = dclTable.Rows[i]["deliver_id"].ToString(); 
+                    
+                        if (dclTable.Rows[i]["type"].ToString() == "1")
+                        {
+                            dr["出貨方式"] = "自出";
+                        }
+                        else if (dclTable.Rows[i]["type"].ToString() == "2")
+                        {
+                            dr["出貨方式"] = "寄倉";
+                        }
+                        else if (dclTable.Rows[i]["type"].ToString() == "101")
+                        {
+                            dr["出貨方式"] = "調度";
+                        }
+
                         if (dclTable.Rows[i]["dcl_create_type"].ToString() == "1")
                         {
                             dr["異動人"] = dclTable.Rows[i]["dcl_create_username"].ToString();
+                            dr["異動類型"] = "前臺";
                         }
-                        else
+                        else if (dclTable.Rows[i]["dcl_create_type"].ToString() == "2")
                         {
                             dr["異動人"] = dclTable.Rows[i]["dcl_create_musername"].ToString();
+                            dr["異動類型"] = "後臺";
                         }
                         dr["異動時間"] = Convert.ToDateTime(dclTable.Rows[i]["dcl_create_datetime"]).ToString("yyyy-MM-dd HH:mm:ss");
 

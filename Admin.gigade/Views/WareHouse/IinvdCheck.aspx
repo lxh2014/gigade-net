@@ -20,7 +20,7 @@
         <h1>請開始盤點商品數量</h1>
         <br />
         <h3>料位編號: <span class="label label-info" id="loc_id"><%=ViewBag.loc_id%></span></h3>
-        <h3>商品名稱: <span class="label label-info">(<%=ViewBag.item_id%>) <%=ViewBag.product_name%> <%=ViewBag.spec%> 條碼:<%=ViewBag.upc_id %></span></h3>
+        <h3>商品名稱: <span class="label label-info">(<%=ViewBag.item_id%>) <%=ViewBag.product_name%> 規格:<%=ViewBag.spec%> 條碼:<%=ViewBag.upc_id %></span></h3>
         <span id="item_id" hidden="hidden"><%=ViewBag.item_id%></span>
         <span id="pwy_dte_ctl" hidden="hidden"><%=ViewBag.pwy_dte_ctl%></span>
         <span id="iplas" hidden="hidden"><%=ViewBag.iplas%></span>

@@ -463,30 +463,29 @@ function editFunction(RowID, Store, i) {
                     buttonText: TAKEALOOK,
                     submitValue: true,
                     allowBlank: false,
-                    fileUpload: true,
-                    listeners: {
-                        //change: function () {
-
-                        //    Ext.Ajax.request({
-                        //        url: "/Element/Getpic",
-                        //        method: 'post',
-                        //        type: 'text',
-                        //        params: {
-                        //            element_image: Ext.htmlEncode(Ext.getCmp('element_image').getValue()),
-                        //        },
-                        //        success: function (form, action) {
-                        //            var result = Ext.decode(form.responseText);
-                        //            if (result.success) {
-
-                        //            }
-                        //            else {
-                        //                alert(1);
-                        //                Ext.getCmp("element_image").setValue("");
-                        //            }
-                        //        }
-                        //    });
-                        //}
-                    }
+                    fileUpload: true
+                    //,
+                    //listeners: {
+                    //    //change: function () {
+                    //    //    Ext.Ajax.request({
+                    //    //        url: "/Element/Getpic",
+                    //    //        method: 'post',
+                    //    //        type: 'text',
+                    //    //        params: {
+                    //    //            element_image: Ext.htmlEncode(Ext.getCmp('element_image').getValue()),
+                    //    //        },
+                    //    //        success: function (form, action) {
+                    //    //            var result = Ext.decode(form.responseText);
+                    //    //            if (result.success) {
+                    //    //            }
+                    //    //            else {
+                    //    //                alert(1);
+                    //    //                Ext.getCmp("element_image").setValue("");
+                    //    //            }
+                    //    //        }
+                    //    //    });
+                    //    //}
+                    //}
                 },
                 {
                     xtype: 'button',
