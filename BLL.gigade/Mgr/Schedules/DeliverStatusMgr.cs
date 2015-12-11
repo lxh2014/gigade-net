@@ -1,4 +1,5 @@
 ﻿using BLL.gigade.Common;
+using BLL.gigade.Dao;
 using BLL.gigade.Mgr.Impl;
 using BLL.gigade.Model.Query;
 using DBAccess;
@@ -368,34 +369,5 @@ namespace BLL.gigade.Mgr.Schedules
             int row = _accessMySql.execCommand(sqlDS);
             return row;
         }
-    }
-
-    class LogisticsTcatSodDao
-    {
-        static IDBAccess _accessMySql;
-        public LogisticsTcatSodDao(string connectionString)
-        {
-            _accessMySql = DBFactory.getDBAccess(DBType.MySql, connectionString);
-        }
-        public DeliveryInfo GetLogisticsTcatSod(string delivery_code)
-        {
-            DeliveryInfo deliver = new DeliveryInfo();
-
-            string sql =string.Format("SELECT  status_id,delivery_status_time  FROM logistics_tcat_sod WHERE delivery_number={0};",delivery_code);
-            DataTable table = _accessMySql.getDataTable(sql);
-            if(table.Rows.Count>0)
-            {
-                DateTime date;
-                if(DateTime.TryParse(table.Rows[0]["delivery_status_time"].ToString(),out date))
-                {
-                    deliver.CreateTime = date;
-                }
-                if (table.Rows[0]["status_id"].ToString() == "00003")
-                {
-                    deliver.Status = "順利送達";
-                }
-            }
-            return deliver;
-        }  
     }
 }
