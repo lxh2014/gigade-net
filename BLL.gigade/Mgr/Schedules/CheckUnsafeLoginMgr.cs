@@ -155,7 +155,8 @@ GROUP BY login_ipfrom,login_type,login_mail ;", login_start, login_end, errorCou
                     MailBody = GetHtmlByDataTable(_newDt);
                     //MailBody = "<br/><font size=\"4\">   在 " + "<font color=\"#FF0000\" >" + start_time + " ~ " + end_time + "</font>" + " 的一個小時里，用戶登錄異常記錄如下：</font><br/><p/>" + GetHtmlByDataTable(_newDt);
                     MailHelper mail = new MailHelper(mailModel);
-                    mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", IsSeparate, IsDisplyName);
+                   // mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", IsSeparate, IsDisplyName);
+                    mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true);
                 }
                 else
                 {

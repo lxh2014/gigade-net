@@ -334,7 +334,7 @@ namespace BLL.gigade.Mgr
                 //public Boolean SendToGroup(int GroupID, string MailTitle, string MailBody, 
                 //                           Boolean IsSeparate = false, Boolean IsDisplyName = false)
                 //return mail.SendToGroup(GroupCode, MailTitle, MailBody + "<br/>郵件發送共耗時" + Second + "秒", true, true);  
-                return mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", true, true); 
+                return mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true); 
             }
             catch (Exception ex)
             {
