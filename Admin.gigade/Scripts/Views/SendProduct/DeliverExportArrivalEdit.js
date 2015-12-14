@@ -129,6 +129,8 @@
 
                 var bool_4 = (Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('expect_arrive_date').getValue()), 'Y-m-d')) <= row.data.expect_arrive_date.toString());
                 var bool_5 = Ext.getCmp('yes').getValue();
+                var weekDay = ["1","2","3","4","5","6","7"];
+                var bool_6 = (weekDay[Ext.getCmp('expect_arrive_date').getValue().getDay()] == "1");
                 
                 var start = Ext.getCmp("expect_arrive_date").getValue();
                 //alert((Ext.htmlEncode(Ext.getCmp('expect_arrive_date').getValue())));
@@ -159,6 +161,11 @@
                 //}
                 if (bool_4) {
                     Ext.Msg.alert('提示', '您選擇的期望到貨日<font color="red">必須大於</font>修改前的日期！');
+                    return false;
+                }
+                if (bool_6)
+                {
+                    Ext.Msg.alert('提示', '請不要選擇假日');
                     return false;
                 }
                 //time1 = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('expect_arrive_date').getValue()), 'Y-m-d'));
