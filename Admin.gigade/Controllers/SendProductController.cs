@@ -5614,11 +5614,11 @@ namespace Admin.gigade.Controllers
 
                 #region 查詢條件
 
-                if (Request.Params["productMode"] != "-1")//type為0時，表示全部
+                if (!string.IsNullOrEmpty(Request.Params["productMode"]))//type為0時，表示全部
                 {
                     dmQuery.type = Convert.ToUInt32(Request.Params["productMode"]);
                 }
-                if (Request.Params["freightType"] != "-1")//freight_set為0時，表示全部
+                if (!string.IsNullOrEmpty(Request.Params["freightType"]))//freight_set為0時，表示全部
                 {
                     dmQuery.freight_set = Convert.ToUInt32(Request.Params["freightType"]);
                 }

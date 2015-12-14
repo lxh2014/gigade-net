@@ -912,8 +912,10 @@ deleteListInfo = function () {
             success: function (form, action) {
                 var result = Ext.decode(form.responseText);
                 if (result.success) {
-                    if (result.msg = '1') {
+                    if (result.msg == '1') {
+                        Ext.getCmp("conditionName").reset();
                         Ext.Msg.alert(INFORMATION, "默認條件不能刪除!");
+                        Ext.getCmp("FrmCondition").getForm().reset();
                     }
                     else {
                         Ext.getCmp("conditionName").reset();

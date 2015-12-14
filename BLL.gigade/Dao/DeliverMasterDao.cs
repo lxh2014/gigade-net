@@ -1011,7 +1011,7 @@ and  dm.delivery_store=1 and dm.deliver_org_days <>0 and dm.delivery_code<>'' an
                            LEFT JOIN (SELECT * from t_parametersrc  where parameterType ='delivery_status') tp on tp.parameterCode=dm.delivery_status 
 
                                     where 1=1 ");
-                if (Query.type != 0)
+                if (Query.type != 10000 && Query.type != 1000)
                 {
                     if (Query.type == 101)
                     {
@@ -1020,9 +1020,9 @@ and  dm.delivery_store=1 and dm.deliver_org_days <>0 and dm.delivery_code<>'' an
                     else
                     {
                         conSql.AppendFormat(" and dm.type='{0}'", Query.type);
-                    }              
+                    }                                 
                 }
-                if (Query.freight_set != 0)
+                if (Query.freight_set != 10000 && Query.freight_set != 1000)
                 {
                     conSql.AppendFormat(" and dm.freight_set='{0}'", Query.freight_set);
                 }
