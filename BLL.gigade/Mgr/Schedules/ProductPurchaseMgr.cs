@@ -242,11 +242,11 @@ namespace BLL.gigade.Mgr.Schedules
 
 
                     string EmailContent = GetMail(dtExcel);
-                    mail.SendToGroup(GroupCode, MailTitle, EmailContent, true, true);//發送郵件給群組
+                    mail.SendToGroup(GroupCode, MailTitle, EmailContent, false, true);//發送郵件給群組
                 }
                 else
                 {
-                    mail.SendToGroup(GroupCode, MailTitle, NOSuggestCountMsg, true, true);//發送郵件給群組 
+                    mail.SendToGroup(GroupCode, MailTitle, NOSuggestCountMsg, false, true);//發送郵件給群組 
                 }
                 result = true;
             }

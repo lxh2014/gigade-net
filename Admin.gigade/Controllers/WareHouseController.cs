@@ -7991,6 +7991,27 @@ namespace Admin.gigade.Controllers
                         
                         dtCountBook.Rows.Add(dr);
                     }
+                    for (int i = 0; i < 3; i++)
+                    {
+                        DataRow dr = dtCountBook.NewRow();
+                        dr[0] = "";
+                        dr[1] = "";
+                        dr[2] ="";
+                        dr[3] = " ";
+                        dr[4] = " ";
+                        dr[5] = " ";
+                        dr[6] = " ";
+                        dr[7] = " ";
+                        dr[8] = " ";
+                        dr[9] = " ";
+                        if (i == 2)
+                        {
+                            dr[8] = "ＫＥＹＩＮ人員:";
+                            dr[9] = "_________";
+                        }
+
+                        dtCountBook.Rows.Add(dr);
+                    }
 
                     string s = " ";
                     //dtCountBook.Columns.RemoveAt(0);

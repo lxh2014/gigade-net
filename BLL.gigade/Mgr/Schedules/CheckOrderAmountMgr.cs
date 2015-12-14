@@ -77,22 +77,7 @@ namespace BLL.gigade.Mgr.Schedules
                     {
                         MailTitle = item.value;
                     }
-                    //else if (item.parameterCode.Equals("MailBody"))
-                    //{
-                    //    MailBody = item.value;
-                    //}
-                    //else if (item.parameterCode.Equals("sumDays"))
-                    //{
-                    //    sumDays = item.value;
-                    //}
-                    //else if (item.parameterCode.Equals("periodDays"))
-                    //{
-                    //    periodDays = item.value;
-                    //}
-                    //else if (item.parameterCode.Equals("NOSuggestCountMsg"))
-                    //{
-                    //    NOSuggestCountMsg = item.value;
-                    //}
+                
                 }
                 #endregion
 
@@ -172,9 +157,9 @@ namespace BLL.gigade.Mgr.Schedules
                 }
                 else
                 {
-                    strbody.AppendFormat("異常訂單不存在");
+                    strbody.AppendFormat("異常訂單不存在 ");
                 }
-                mail.SendToGroup(GroupCode, MailTitle, strbody.ToString(), true, true);//發送郵件給群組
+                mail.SendToGroup(GroupCode, MailTitle, strbody.ToString(), false, true);//發送郵件給群組
                 result= true;
             }
             catch (Exception ex)
@@ -216,7 +201,7 @@ namespace BLL.gigade.Mgr.Schedules
                 }
                 sbHtml.Append("</tr>");
             }
-            sbHtml.Append("</table>");
+            sbHtml.Append("</table> ");
             return sbHtml.ToString();
 
         }
