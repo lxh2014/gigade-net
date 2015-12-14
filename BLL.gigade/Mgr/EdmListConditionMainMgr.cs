@@ -35,8 +35,15 @@ namespace BLL.gigade.Mgr
             try
             {
                 model = _edmlistmainDao.SelectElcmIDByConditionName(query.elcm_name);
-                query.elcm_id = model.elcm_id;
-                return _edmlistmainDao.DeleteListInfo(query);
+                if (model != null)
+                {
+                    query.elcm_id = model.elcm_id;
+                    return _edmlistmainDao.DeleteListInfo(query);
+                }
+                else
+                {
+                    return 0;
+                }
             }
             catch (Exception ex)
             {

@@ -6,6 +6,7 @@ using BLL.gigade.Dao.Impl;
 using DBAccess;
 using System.Data;
 using BLL.gigade.Model;
+using BLL.gigade.Mgr.Schedules;
 namespace BLL.gigade.Dao
 {
     public class LogisticsTcatSodDao 
@@ -35,5 +36,25 @@ namespace BLL.gigade.Dao
                                      model.status_id,model.status_note,model.specification ,DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             return _accessMySql.execCommand(InsertSql.ToString());
         }
+        public DeliveryInfo GetLogisticsTcatSod(string delivery_code)
+        {
+            DeliveryInfo deliver = new DeliveryInfo();
+
+            string sql = string.Format("SELECT  status_id,delivery_status_time  FROM logistics_tcat_sod WHERE delivery_number={0};", delivery_code);
+            DataTable table = _accessMySql.getDataTable(sql);
+            if (table.Rows.Count > 0)
+            {
+                DateTime date;
+                if (DateTime.TryParse(table.Rows[0]["delivery_status_time"].ToString(), out date))
+                {
+                    deliver.CreateTime = date;
+                }
+                if (table.Rows[0]["status_id"].ToString() == "00003")
+                {
+                    deliver.Status = "順利送達";
+                }
+            }
+            return deliver;
+        }  
     }
 }
