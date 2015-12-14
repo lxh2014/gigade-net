@@ -962,10 +962,11 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1 ")
         public DataTable GetDeliverMaster(string hourNum)
         {
             int hoursNum = int.Parse(hourNum);
-            DateTime date = DateTime.Now.AddHours(hoursNum);
-            string sql = string.Format(@"SELECT  dm.deliver_id,delivery_code from deliver_master dm WHERE not EXISTS (SELECT deliver_id from deliver_status ds where ds.deliver_id=dm.deliver_id and ds.state=99)and  dm.delivery_store=1 and dm.deliver_org_days <>0 and dm.delivery_code<>''and created between '{0}' and '{1}'", Common.CommonFunction.DateTimeToString(date), Common.CommonFunction.DateTimeToString(DateTime.Now));
-            DataTable table = _access.getDataTable(sql);
-            return table;
+            DateTime date = DateTime.Now.AddHours(-hoursNum);
+            string sql = string.Format(@"select  dm.deliver_id,dm.delivery_code,dm.order_id,FROM_UNIXTIME(dm.deliver_org_days) AS deliver_org_days, CASE dm.delivery_store WHEN 1 THEN '黑貓宅急便' END  AS delivery_store,dm.created,dm.delivery_date,dm.delivery_name AS gettime,v.vendor_name_full,dm.expect_arrive_date   
+from deliver_master dm LEFT JOIN vendor v on v.vendor_id=dm.export_id  where not EXISTS (SELECT deliver_id from deliver_status ds where ds.deliver_id=dm.deliver_id and ds.state=99) 
+and  dm.delivery_store=1 and dm.deliver_org_days <>0 and dm.delivery_code<>'' and created between '{0}' and '{1}'", Common.CommonFunction.DateTimeToString(date), Common.CommonFunction.DateTimeToString(DateTime.Now));
+            return _access.getDataTable(sql);
         }
 
         #region 出貨單期望到貨日
@@ -1012,7 +1013,7 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1 ")
                                     where 1=1 ");
                 if (Query.type != 0)
                 {
-                    if (Query.type == 3)
+                    if (Query.type == 101)
                     {
                         conSql.AppendFormat(" and dm.type='{0}'", 101);
                     }
@@ -1057,7 +1058,7 @@ INNER JOIN product pt on pii.product_id=pt.product_id where odt.item_mode !=1 ")
                 {
                     conSql.AppendFormat(" and v.vendor_name_full like '%{0}%'", Query.vendor_name_full);
                 }
-                finalSql.Append(sbSql.ToString() + fromSql.ToString() + conSql.ToString());
+                finalSql.Append(sbSql.ToString() + fromSql.ToString() + conSql.ToString() + "order by deliver_id desc");
 
                 totalCount = 0;
                 if (Query.IsPage)
