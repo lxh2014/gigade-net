@@ -35,7 +35,7 @@ var deliveryStatusStore = Ext.create('Ext.data.Store', {
 var freightTypeStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
-        //{ "txt": '全部', "value": "0" },
+        { "txt": '全部', "value": "-1" },
         { "txt": '常溫', "value": "1" },
         { "txt": '低溫', "value": "2" }
     ]
@@ -44,6 +44,7 @@ var freightTypeStore = Ext.create('Ext.data.Store', {
 var productModeStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
+        { "txt": '全部', "value": "-1" },
         { "txt": '統倉出貨', "value": "1" },
         { "txt": '供應商自行出貨', "value": "2" },
         { "txt": '其他', "value": "101" }
