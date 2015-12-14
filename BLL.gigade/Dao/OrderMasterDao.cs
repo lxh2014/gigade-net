@@ -2297,7 +2297,7 @@ namespace BLL.gigade.Dao
                 sql.Append(" LEFT JOIN (select parameterCode,remark from t_parametersrc where parameterType='order_status') t_detail_status on t_detail_status.parameterCode=od.detail_status ");
                 sql.Append(" LEFT JOIN (select parameterCode,parameterName from t_parametersrc where parameterType='payment') t_payment on t_payment.parameterCode=om.order_payment ");
                 sql.Append(" LEFT JOIN(select parameterCode,parameterName  from t_parametersrc where parameterType='product_mode') t_product_mode on t_product_mode.parameterCode=od.product_mode ");
-                sql.AppendFormat(" where  od.item_mode in (0,2) and om.order_date_pay<>0 and om.order_createdate>='{0}' and  om.order_createdate<='{1}'; ", CommonFunction.GetPHPTime(query.datestart.ToString()), CommonFunction.GetPHPTime(query.dateend.ToString()));
+                sql.AppendFormat(" where  od.item_mode in (0,2) and om.order_date_pay<>0 and om.order_createdate>='{0}' and  om.order_createdate<='{1}' order by om.order_id asc; ", CommonFunction.GetPHPTime(query.datestart.ToString()), CommonFunction.GetPHPTime(query.dateend.ToString()));
                 return _dbAccess.getDataTable(sql.ToString());
             }
             catch (Exception ex)
