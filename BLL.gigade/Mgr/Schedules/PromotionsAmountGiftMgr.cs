@@ -94,7 +94,7 @@ namespace BLL.gigade.Mgr.Schedules
                 MailHelper mHelper = new MailHelper(mailModel);
                 if (str.ToString().Length > 0)
                 {
-                    if (mHelper.SendToGroup(GroupCode, EmailTile, str.ToString(), false, true))
+                    if (mHelper.SendToGroup(GroupCode, EmailTile, str.ToString()+" ", false, true))
                     {
                         return true;
                     }

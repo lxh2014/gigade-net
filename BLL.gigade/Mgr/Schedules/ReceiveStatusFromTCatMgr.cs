@@ -407,7 +407,7 @@ namespace BLL.gigade.Mgr.Schedules
                 #endregion
 
                 MailHelper mail = new MailHelper(mailModel);
-                mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", IsSeparate, IsDisplyName);
+                mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true);
             }
             catch (Exception ex)
             {
