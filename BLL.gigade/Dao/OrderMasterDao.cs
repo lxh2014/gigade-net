@@ -2561,43 +2561,71 @@ WHERE od.item_mode=1 AND pcs.category_id='{0}' AND od.detail_status NOT IN(89,90
             }
         }
 
-        #region MyRegion
-        
-       
+        #region 檢查異常訂單
         /// <summary>
-        /// chaojie1124j add by 2015/12/14 12/32am
-        /// 用於實現付款金額統計排程
+        /// chaojie1124j add by 2015/12/14 04/46pm
+        /// 一個小時內之內數量過多訂單檢查
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public DataTable GetCheckOrderAmount(OrderMasterQuery query)
+        public DataTable GetBigOrderNumbers(OrderMasterQuery query)
         {
             StringBuilder sb = new StringBuilder();
-            StringBuilder strCondi = new StringBuilder();
+            List<OrderMasterQuery> odMaster = new List<OrderMasterQuery>();
             try
             {
-                sb.Append(" SELECT  order_id,money_collect_date,order_amount,us.user_name,us.user_email,om.order_ipfrom,om.order_id,FROM_UNIXTIME(om.money_collect_date)as new_time  ");
-                sb.Append(" FROM order_master om LEFT JOIN users us on us.user_id=om.user_id ");
-                strCondi.Append(" where 1=1 and om.order_amount>(select parameterName from t_parametersrc where parameterType='auto_paramer' and parameterCode='order_amount_limit' ) ");
-                if (query.user_id != 0)
-                {
-                    strCondi.AppendFormat(" and om.user_id='{0}' ", query.user_id);
-                }
-                if (query.Money_Collect_Date != 0)
-                {
-                    strCondi.AppendFormat(" and om.money_collect_date>'{0}' ", query.Money_Collect_Date);
-                }
-                return _dbAccess.getDataTable(sb.ToString()+strCondi.ToString());
+
+                sb.AppendFormat(" SELECT count(1) as odcount,user_id from order_master where   order_date_pay>'{0}'  GROUP BY user_id ", CommonFunction.GetPHPTime(query.order_date_pay_startTime.ToString("yyyy/MM/dd HH:mm:ss")));
+                sb.Append(" HAVING odcount>(select parameterName from t_parametersrc where parameterType='auto_paramer' and parameterCode='order_count_limit' limit 1) ");
+                odMaster = _dbAccess.getDataTableForObj<OrderMasterQuery>(sb.ToString());
+               sb.Clear();
+               string user_id = "";
+                DataTable _dt=new DataTable();
+               if (odMaster.Count > 0)
+               {
+                   for (int i = 0; i < odMaster.Count; i++)
+                   {
+                       user_id += odMaster[i].user_id + ",";
+                   }
+                   user_id.TrimEnd(',');
+                   sb.AppendFormat(" SELECT us.user_name,us.user_email,om.order_ipfrom,om.order_id,FROM_UNIXTIME(om.order_date_pay)as new_time ");
+                   sb.AppendFormat(" FROM order_master om LEFT JOIN users us on us.user_id=om.user_id ");
+                   sb.AppendFormat(" WHERE om.order_date_pay>'{0}' and om.user_id in({1}) ", CommonFunction.GetPHPTime(query.order_date_pay_startTime.ToString("yyyy/MM/dd HH:mm:ss")), user_id);
+                   _dt = _dbAccess.getDataTable(sb.ToString());
+               }
+               return _dt;
             }
             catch (Exception ex)
             {
-                throw new Exception("OrderMasterDao-->GetCheckOrderAmount-->" + sb.ToString() + strCondi .ToString() + ex.Message, ex);
+                throw new Exception("OrderMasterDao-->GetBigOrderNumbers-->" + sb.ToString() + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// chaojie1124j add by 2015/12/14 05/01pm
+        /// 用於實現大金額訂單檢查
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public DataTable GetBigAmount(OrderMasterQuery query)
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                sb.Append(" select order_id ,order_date_pay, order_amount from order_master where 1=1 ");
+                sb.Append(" and order_amount>(select parameterName from t_parametersrc where parameterType='auto_paramer' and parameterCode='order_amount_limit' )  ");
+                sb.AppendFormat(" and order_date_pay>'{0}' order by order_date_pay desc; ", CommonFunction.GetPHPTime(query.order_date_pay_startTime.ToString("yyyy/MM/dd HH:mm:ss")));
+                return _dbAccess.getDataTable(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetBigAmount-->" + sb.ToString() + ex.Message, ex);
             }
 
         }
         /// <summary>
-        /// chaojie1124j add by 2015/12/14 01/36pm
-        ///  用於實現付款金額統計排程
+        /// chaojie1124j add by 2015/12/14 05/04pm
+        ///  首購超過5000檢查
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -2606,10 +2634,8 @@ WHERE od.item_mode=1 AND pcs.category_id='{0}' AND od.detail_status NOT IN(89,90
             StringBuilder sb = new StringBuilder();
             try
             {
-               sb.Append(@"SELECT user_id,odcount  from (  SELECT count(1) as odcount,user_id FROM ( ");
-               sb.Append(" select order_amount,user_id from  order_master where order_amount>(select parameterName from t_parametersrc where parameterType='auto_paramer' and parameterCode='order_amount_limit' ) ");
-               sb.AppendFormat("  and money_collect_date>'{0}' ) as new_table GROUP BY user_id) as new_tabletwo  ",query.Money_Collect_Date);
-               sb.Append(" WHERE odcount>(select parameterName from t_parametersrc where parameterType='auto_paramer' and parameterCode='order_count_limit') ");
+                sb.Append(@"select om.order_id,om.order_date_pay,om.order_amount from order_master om INNER JOIN users u ON om.user_id=u.user_id AND om.money_collect_date=u.first_time ");
+                sb.AppendFormat(" WHERE order_amount>=5000 AND order_date_pay BETWEEN '{0}' AND '{1}' order by order_date_pay desc ", CommonFunction.GetPHPTime(query.order_date_pay_startTime.ToString("yyyy/MM/dd HH:mm:ss")), CommonFunction.GetPHPTime(query.order_date_pay_endTime.ToString("yyyy/MM/dd HH:mm:ss")));
                 return _dbAccess.getDataTable(sb.ToString());
             }
             catch (Exception ex)
@@ -2617,6 +2643,31 @@ WHERE od.item_mode=1 AND pcs.category_id='{0}' AND od.detail_status NOT IN(89,90
                 throw new Exception("OrderMasterDao-->GetUsersOrderAmount-->" + sb.ToString() + ex.Message, ex);
             }
         }
+        /// <summary>
+        /// chaojie1124j add by 2015/12/14 05/14pm
+        /// 異地付款訂單檢查
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public DataTable GetOtherTWPay(OrderMasterQuery query)
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                sb.Append(@"SELECT om.order_id,om.order_amount,om.order_date_pay,om.order_ipfrom,opc.pan from order_payment_nccc opc INNER JOIN order_master om on opc.orderid=om.order_id ");
+                sb.AppendFormat(@"where opc.nccc_createdate>{0} and opc.transcode='00' and opc.responsecode='00'  ", CommonFunction.GetPHPTime(query.order_date_pay_startTime.ToString("yyyy/MM/dd HH:mm:ss")));
+                sb.Append("  and opc.pan is not NULL and opc.pan <>'' and (opc.bankname ='' or opc.bankname is null) ");
+                sb.Append(" union SELECT om.order_id,om.order_amount,money_collect_date,om.order_ipfrom, oph.pan from order_payment_hitrust oph ");
+                sb.AppendFormat(" INNER JOIN order_master om on oph.order_id=om.order_id where oph.updatetime>'{0}' ",CommonFunction.GetPHPTime(query.order_date_pay_endTime.ToString("yyyy/MM/dd HH:mm:ss")));
+                sb.Append(" and oph.retstatus=1 and oph.pan is NULL and  oph.pan <> '' and (oph.bankname<>'' or oph.bankname is null) ");
+                return _dbAccess.getDataTable(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetOtherTWPay-->" + sb.ToString() + ex.Message, ex);
+            }
+        }
+        
         #endregion
 
     }

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using BLL.gigade.Common;
 
 namespace BLL.gigade.Mgr.Schedules
 {
@@ -84,82 +85,66 @@ namespace BLL.gigade.Mgr.Schedules
                 MailHelper mail = new MailHelper(mailModel);
 
                 OrderMasterQuery query = new OrderMasterQuery();
-                query.Money_Collect_Date = int.Parse(CommonFunction.GetPHPTime(DateTime.Now.AddHours(-1).ToString("yyyy/MM/dd HH:mm:ss")).ToString());
-
-//                long time = CommonFunction.GetPHPTime(DateTime.Now.AddHours(-1).ToString("yyyy/MM/dd HH:mm:ss"));
-//                string sql = string.Format(@"select order_id ,money_collect_date, order_amount from order_master where order_amount>(select parameterName 
-//                from t_parametersrc where parameterType='auto_paramer' and parameterCode='order_amount_limit' )  and money_collect_date>'{0}' order by money_collect_date desc;", time);
-                _orderMaster = new OrderMasterMgr(mySqlConnectionString);
-
-                DataTable _dtCheck = new DataTable();
-                _dtCheck = _orderMaster.GetCheckOrderAmount(query);
-                if (_dtCheck.Rows.Count > 0)
+                query.order_date_pay_startTime = DateTime.Now;
+                query.order_date_pay_endTime = query.order_date_pay_startTime.AddHours(-1);
+                StringBuilder sbMailBody = new StringBuilder();
+                try
                 {
-                    DataTable _newDt = new DataTable();
-                    _newDt.Columns.Add("訂單編號", typeof(String));
-                    _newDt.Columns.Add("付款時間", typeof(String));
-                    _newDt.Columns.Add("付款總金額", typeof(String));
-                    for (int i = 0; i < _dtCheck.Rows.Count; i++)
+                      bool isSHow = false;
+                      string html =GetBigAmountMailBody(query,out isSHow);
+                      if (isSHow)
+                      {
+                          sbMailBody.AppendLine(html);
+                      }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("CheckOrderAmountMgr-->GetBigAmountMailBody-->" + "大金額訂單排程:" + ex.Message);
+                }
+                try
+                {
+                     bool isSHow = false;
+                     string html = GetBigOrderNumbersMailBody(query, out isSHow);
+                     if (isSHow)
+                     {
+                         sbMailBody.AppendLine(html);
+                     }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("CheckOrderAmountMgr-->GetBigOrderNumbersMailBody-->"+"一小時多次付款客戶異常訂單付款通知:"+ ex.Message);
+                }
+                try
+                {
+                    bool isSHow = false;
+                    string html = FirstBuyEmail(query, out isSHow);
+                    if (isSHow)
                     {
-                        DataRow dr = _newDt.NewRow();
-                        dr[0] = _dtCheck.Rows[i]["order_id"];
-                        dr[1] = CommonFunction.GetNetTime(Convert.ToInt32(_dtCheck.Rows[i]["money_collect_date"])).ToString("yyyy/MM/dd HH:mm:ss");
-                        dr[2] = GetString(_dtCheck.Rows[i]["order_amount"].ToString());
-                        _newDt.Rows.Add(dr);
+                        sbMailBody.AppendLine(html);
                     }
-                    strbody.AppendFormat(GetHtmlByDataTable(_newDt));
                 }
-                else
+                catch (Exception ex)
                 {
-                    strbody.AppendFormat("付款金額訂單不存在");
+                    throw new Exception("CheckOrderAmountMgr-->OtherTWPay-->" + "首購超過5000訂單付款檢查:" + ex.Message);
                 }
-                strbody.AppendFormat("<br/>");
-               // int totalcount = Convert.ToInt32(_accessMySql.getDataTable("select parameterName from t_parametersrc where parameterType='auto_paramer' and parameterCode='order_count_limit';").Rows[0][0]);
-                DataTable _newErrorDt = new DataTable();
-                _newErrorDt.Columns.Add("訂購人", typeof(String));
-                _newErrorDt.Columns.Add("郵箱", typeof(String));
-                _newErrorDt.Columns.Add("IP地址", typeof(String));
-                _newErrorDt.Columns.Add("訂單編號", typeof(String));
-                _newErrorDt.Columns.Add("訂購時間", typeof(String));
-//                string strsql = string.Format(@"SELECT user_id,odcount 
-//                from (
-//                SELECT count(1) as odcount,user_id 
-//                FROM 
-//                (select order_amount,user_id
-//                from 
-//                order_master where order_amount>
-//                (select parameterName from t_parametersrc where parameterType='auto_paramer' and parameterCode='order_amount_limit' ) and money_collect_date>'{0}' ) 
-//                as new_table 
-//                GROUP BY user_id) as new_tabletwo 
-//                WHERE odcount>'{1}';", time, totalcount);
-                DataTable _dtUsers = _orderMaster.GetUsersOrderAmount(query);
-                if (_dtUsers.Rows.Count > 0)
+                try
                 {
-                    for (int i = 0; i < _dtUsers.Rows.Count; i++)
+                    bool isSHow = false;
+                    string html = OtherTWPay(query, out isSHow);
+                    if (isSHow)
                     {
-                        query.user_id = Convert.ToUInt32(_dtUsers.Rows[i]["user_id"]);
-//                        string newsqlstr = string.Format(@"SELECT us.user_name,us.user_email,om.order_ipfrom,om.order_id,FROM_UNIXTIME(om.money_collect_date)as new_time 
-//FROM order_master om LEFT JOIN users us on us.user_id=om.user_id  
-//WHERE om.money_collect_date>'{0}' and om.user_id='{1}' and om.order_amount>(select parameterName from t_parametersrc where parameterType='auto_paramer' and parameterCode='order_amount_limit' );", time, _dtUsers.Rows[i]["user_id"]);
-                        DataTable _dtResult = _orderMaster.GetCheckOrderAmount(query);
-                        for (int j = 0; j < _dtResult.Rows.Count; j++)
-                        {
-                            DataRow drtwo = _newErrorDt.NewRow();
-                            drtwo[0] = _dtResult.Rows[j]["user_name"];
-                            drtwo[1] = _dtResult.Rows[j]["user_email"];
-                            drtwo[2] = _dtResult.Rows[j]["order_ipfrom"];
-                            drtwo[3] = _dtResult.Rows[j]["order_id"];
-                            drtwo[4] = _dtResult.Rows[j]["new_time"];
-                            _newErrorDt.Rows.Add(drtwo);
-                        }
+                        sbMailBody.AppendLine(html);
                     }
-                    strbody.AppendFormat(GetHtmlByDataTable(_newErrorDt));
                 }
-                else
+                catch (Exception ex)
                 {
-                    strbody.AppendFormat("異常訂單不存在 ");
+                    throw new Exception("CheckOrderAmountMgr-->OtherTWPay-->" + "異地信用卡付款付款訂單通知:" + ex.Message);
                 }
-                mail.SendToGroup(GroupCode, MailTitle, strbody.ToString(), false, true);//發送郵件給群組
+
+                if (!String.IsNullOrEmpty(sbMailBody.ToString()))
+                {
+                    mail.SendToGroup(GroupCode, MailTitle, sbMailBody.ToString(), false, true);//發送郵件給群組
+                }
                 result= true;
             }
             catch (Exception ex)
@@ -170,9 +155,150 @@ namespace BLL.gigade.Mgr.Schedules
         }
 
 
+        #region 一小時之內數量過多訂單檢查
+        public string GetBigOrderNumbersMailBody(OrderMasterQuery query,out bool isShow)
+        {
+            isShow = false;
+            StringBuilder strbody = new StringBuilder();
+            strbody.AppendLine("一小時之內數量過多訂單檢查:");
+            
+            DataTable _newErrorDt = new DataTable();
+            _newErrorDt.Columns.Add("訂購人", typeof(String));
+            _newErrorDt.Columns.Add("郵箱", typeof(String));
+            _newErrorDt.Columns.Add("IP地址", typeof(String));
+            _newErrorDt.Columns.Add("訂單編號", typeof(String));
+            _newErrorDt.Columns.Add("訂購時間", typeof(String));
+            _orderMaster = new OrderMasterMgr(mySqlConnectionString);
+
+            DataTable _dtResult = _orderMaster.GetBigOrderNumbers(query);
+            if (_dtResult.Rows.Count > 0)
+            {
+                for (int j = 0; j < _dtResult.Rows.Count; j++)
+                {
+                    DataRow drtwo = _newErrorDt.NewRow();
+                    drtwo[0] = _dtResult.Rows[j][0];
+                    drtwo[1] = _dtResult.Rows[j][1];
+                    drtwo[2] = _dtResult.Rows[j][2];
+                    drtwo[3] = _dtResult.Rows[j][3];
+                    drtwo[4] = _dtResult.Rows[j][4];
+                    _newErrorDt.Rows.Add(drtwo);
+                }
+
+                isShow = true;
+            }
+            strbody.AppendFormat(GetHtmlByDataTable(_newErrorDt));
+            return strbody.ToString();
+        }
+        #endregion
+
+        #region 大金額訂單檢查
+        public string GetBigAmountMailBody(OrderMasterQuery query,out bool isShow)
+        {
+            isShow = false;
+
+            StringBuilder strbody = new StringBuilder();
+            strbody.AppendLine("大金額訂單檢查");
+            _orderMaster = new OrderMasterMgr(mySqlConnectionString);
+
+            DataTable _dt = _orderMaster.GetBigOrderNumbers(query);
+
+            if (_dt.Rows.Count > 0)
+            {
+                DataTable _newDt = new DataTable();
+                _newDt.Columns.Add("訂單編號", typeof(String));
+                _newDt.Columns.Add("付款時間", typeof(String));
+                _newDt.Columns.Add("付款總金額", typeof(String));
+                for (int i = 0; i < _dt.Rows.Count; i++)
+                {
+                    DataRow dr = _newDt.NewRow();
+                    dr[0] = _dt.Rows[i][0];
+                    dr[1] = CommonFunction.GetNetTime(Convert.ToInt64(_dt.Rows[i][1])).ToString("yyyy/MM/dd HH:mm:ss");
+                    dr[2] = GetString(_dt.Rows[i][2].ToString());
+                    _newDt.Rows.Add(dr);
+                }
+                strbody.AppendFormat(GetHtmlByDataTable(_newDt));
+                isShow = true;
+            }
+
+            return strbody.ToString();
+        }
+        #endregion
+
+        #region 首購超過5000檢查
+        public string FirstBuyEmail(OrderMasterQuery query,out bool isShow)
+        {
+            isShow = false;
+            StringBuilder strbody = new StringBuilder();
+            strbody.AppendLine("首購超過5000訂單檢查");
+            _orderMaster = new OrderMasterMgr(mySqlConnectionString);
+
+            DataTable _dt = _orderMaster.GetBigAmount(query);
+            if (_dt.Rows.Count > 0)
+            {
+                DataTable _newdt = new DataTable();
+                _newdt.Columns.Add("訂單編號", typeof(String));
+                _newdt.Columns.Add("付款時間", typeof(String));
+                _newdt.Columns.Add("付款總金額", typeof(String));
+                for (int i = 0; i < _dt.Rows.Count; i++)
+                {
+                    DataRow dr = _newdt.NewRow();
+                    dr[0] = _dt.Rows[i][0];
+                    dr[1] = CommonFunction.GetNetTime(Convert.ToInt64(_dt.Rows[i][1])).ToString("yyyy/MM/dd HH:mm:ss");
+                    dr[2] = GetString(_dt.Rows[i][2].ToString());
+                    _newdt.Rows.Add(dr);
+                }
+                strbody.AppendFormat(GetHtmlByDataTable(_newdt));
+                isShow = true;
+            }
+            return strbody.ToString();
 
 
-        static string GetHtmlByDataTable(DataTable _dtmyMonth)
+        }
+        #endregion
+
+        #region 異地付款訂單檢查
+        public string OtherTWPay(OrderMasterQuery query,out bool isShow)
+        {
+            isShow = false;
+            StringBuilder strbody = new StringBuilder();
+            strbody.AppendLine("異地付款訂單檢查");
+
+            _orderMaster = new OrderMasterMgr(mySqlConnectionString);
+
+            DataTable _dt = _orderMaster.GetOtherTWPay(query);
+            if (_dt.Rows.Count > 0)
+            {
+                DataTable _newdt = new DataTable();
+                _newdt.Columns.Add("訂單編號", typeof(String));
+                _newdt.Columns.Add("付款總金額", typeof(String));
+                _newdt.Columns.Add("付款時間", typeof(String));
+                _newdt.Columns.Add("IP", typeof(String));
+                for (int i = 0; i < _dt.Rows.Count; i++)
+                {
+                    DataRow dr = _newdt.NewRow();
+                    dr[0] = _dt.Rows[i][0];
+                    dr[1] = _dt.Rows[i][1].ToString();
+                    dr[2] = CommonFunction.GetNetTime(Convert.ToInt64(_dt.Rows[i][2])).ToString();
+                    dr[3] = _dt.Rows[i][3].ToString();
+                    _newdt.Rows.Add(dr);
+                }
+                strbody.AppendFormat(GetHtmlByDataTable(_newdt));
+                isShow = true;
+            }
+            return strbody.ToString();
+        }
+        #endregion
+
+
+
+
+        #region DataTable轉Html +string GetHtmlByDataTable(DataTable _dtmyMonth)
+        /// <summary>
+        /// DataTable轉Html
+        /// </summary>
+        /// <param name="_dtmyMonth"></param>
+        /// <returns></returns>
+        public  string GetHtmlByDataTable(DataTable _dtmyMonth)
         {
             StringBuilder sbHtml = new StringBuilder();
             sbHtml.Append("<table  cellpadding=3 cellspacing=1  border=1 style=\"border-collapse: collapse\">");
@@ -201,11 +327,14 @@ namespace BLL.gigade.Mgr.Schedules
                 }
                 sbHtml.Append("</tr>");
             }
-            sbHtml.Append("</table> ");
+            sbHtml.Append("</table>");
             return sbHtml.ToString();
 
         }
-        static string GetString(string name)
+        #endregion
+
+        #region +string GetString(string name)
+        public string GetString(string name)
         {
             string results = Convert.ToDouble(name).ToString("N");
             if (results.IndexOf('.') > 0)
@@ -217,6 +346,7 @@ namespace BLL.gigade.Mgr.Schedules
                 return results;
             }
         }
+        #endregion
 
     }
 }
