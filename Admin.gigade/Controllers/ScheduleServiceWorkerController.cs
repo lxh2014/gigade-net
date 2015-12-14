@@ -373,5 +373,30 @@ namespace Admin.gigade.Controllers
             return result;
         }
         #endregion
+
+        #region 檢查異常訂單排程
+        public bool GetCheckOrderAmountEMail()
+        {
+            bool result = false;
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+                BLL.gigade.Mgr.Schedules.CheckOrderAmountMgr OrderAmountMgr = new BLL.gigade.Mgr.Schedules.CheckOrderAmountMgr(mySqlConnectionString);
+                result = OrderAmountMgr.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+
+            return result;
+        }
+        #endregion
     }
 }

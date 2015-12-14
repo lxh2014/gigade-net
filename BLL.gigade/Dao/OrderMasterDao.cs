@@ -2560,5 +2560,64 @@ WHERE od.item_mode=1 AND pcs.category_id='{0}' AND od.detail_status NOT IN(89,90
                 throw new Exception("OrderMasterDao-->GetInvoiceData-->" + sql.ToString() + ex.Message, ex);
             }
         }
+
+        #region MyRegion
+        
+       
+        /// <summary>
+        /// chaojie1124j add by 2015/12/14 12/32am
+        /// 用於實現付款金額統計排程
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public DataTable GetCheckOrderAmount(OrderMasterQuery query)
+        {
+            StringBuilder sb = new StringBuilder();
+            StringBuilder strCondi = new StringBuilder();
+            try
+            {
+                sb.Append(" SELECT  order_id,money_collect_date,order_amount,us.user_name,us.user_email,om.order_ipfrom,om.order_id,FROM_UNIXTIME(om.money_collect_date)as new_time  ");
+                sb.Append(" FROM order_master om LEFT JOIN users us on us.user_id=om.user_id ");
+                strCondi.Append(" where 1=1 and om.order_amount>(select parameterName from t_parametersrc where parameterType='auto_paramer' and parameterCode='order_amount_limit' ) ");
+                if (query.user_id != 0)
+                {
+                    strCondi.AppendFormat(" and om.user_id='{0}' ", query.user_id);
+                }
+                if (query.Money_Collect_Date != 0)
+                {
+                    strCondi.AppendFormat(" and om.money_collect_date>'{0}' ", query.Money_Collect_Date);
+                }
+                return _dbAccess.getDataTable(sb.ToString()+strCondi.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetCheckOrderAmount-->" + sb.ToString() + strCondi .ToString() + ex.Message, ex);
+            }
+
+        }
+        /// <summary>
+        /// chaojie1124j add by 2015/12/14 01/36pm
+        ///  用於實現付款金額統計排程
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public DataTable GetUsersOrderAmount(OrderMasterQuery query)
+        {
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+               sb.Append(@"SELECT user_id,odcount  from (  SELECT count(1) as odcount,user_id FROM ( ");
+               sb.Append(" select order_amount,user_id from  order_master where order_amount>(select parameterName from t_parametersrc where parameterType='auto_paramer' and parameterCode='order_amount_limit' ) ");
+               sb.AppendFormat("  and money_collect_date>'{0}' ) as new_table GROUP BY user_id) as new_tabletwo  ",query.Money_Collect_Date);
+               sb.Append(" WHERE odcount>(select parameterName from t_parametersrc where parameterType='auto_paramer' and parameterCode='order_count_limit') ");
+                return _dbAccess.getDataTable(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMasterDao-->GetUsersOrderAmount-->" + sb.ToString() + ex.Message, ex);
+            }
+        }
+        #endregion
+
     }
 }

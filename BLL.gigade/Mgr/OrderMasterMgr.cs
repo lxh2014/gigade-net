@@ -1462,5 +1462,28 @@ set ");
                 throw new Exception("OrderMgr-->GetInvoice-->" + ex.Message, ex);
             }
         }
+
+        public DataTable GetCheckOrderAmount(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.GetCheckOrderAmount(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->GetCheckOrderAmount-->" + ex.Message, ex);
+            }
+        }
+        public DataTable GetUsersOrderAmount(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.GetUsersOrderAmount(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->GetUsersOrderAmount-->" + ex.Message, ex);
+            }
+        }
     }
 }
