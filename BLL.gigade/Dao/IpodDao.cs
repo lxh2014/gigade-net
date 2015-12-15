@@ -160,10 +160,11 @@ namespace BLL.gigade.Dao
             StringBuilder sqlCondi = new StringBuilder();
             try
             {
-                sql.Append(@" select ipl.loc_id,p.product_id,p.product_name,dfsm.delivery_freight_set as product_freight_set,pi.item_stock,pi.erp_id,p.product_name,p.spec_title_1,p.spec_title_2,pi.spec_id_1,pi.spec_id_2,i.row_id,i.po_id,i.pod_id,i.plst_id,i.bkord_allow,i.cde_dt_incr,i.cde_dt_var,i.cde_dt_shp,i.pwy_dte_ctl,i.qty_ord,i.qty_damaged,i.qty_claimed,i.promo_invs_flg,i.req_cost, ");
+                sql.Append(@" select ipl.loc_id,p.product_id,p.product_name,dfsm.delivery_freight_set as product_freight_set,pi.item_stock,pi.erp_id,p.product_name,p.spec_title_1,p.spec_title_2,pi.spec_id_1,pi.spec_id_2,i.row_id,i.po_id,i.pod_id,i.plst_id,i.bkord_allow,pe.cde_dt_incr,i.cde_dt_var,i.cde_dt_shp,pe.pwy_dte_ctl,i.qty_ord,i.qty_damaged,i.qty_claimed,i.promo_invs_flg,i.req_cost,i.made_date,i.cde_dt,");
                 sql.Append(" i.off_invoice,i.new_cost,i.freight_price,i.prod_id,i.create_user,i.create_dtim,mu.user_username,i.change_user,i.change_dtim ");
                 sqlCondi.Append(" from ipod i ");
                 sqlCondi.Append(" left join product_item pi on pi.item_id=i.prod_id ");
+                sqlCondi.Append(" left join product_ext pe on pe.item_id=pi.item_id ");
                 sqlCondi.Append(" inner join product p on pi.product_id=p.product_id ");
                 sqlCondi.Append(" left join delivery_freight_set_mapping dfsm on dfsm.product_freight_set=p.product_freight_set ");
                 sqlCondi.Append(" left join iplas ipl on ipl.item_id=i.prod_id ");
@@ -245,7 +246,7 @@ namespace BLL.gigade.Dao
             try
             {
                 //sb.AppendFormat("set sql_safe_updates=0;");
-                sb.AppendFormat(" update ipod set qty_damaged='{0}',qty_claimed='{1}',plst_id='{2}' ", query.qty_damaged, query.qty_claimed, query.plst_id);
+                sb.AppendFormat(" update ipod set qty_damaged='{0}',qty_claimed='{1}',plst_id='{2}',made_date='{3}',cde_dt='{4}' ", query.qty_damaged, query.qty_claimed, query.plst_id, query.made_date.ToString("yyyy-MM-dd"), query.cde_dt.ToString("yyyy-MM-dd"));
                 sb.AppendFormat(" ,change_user='{0}',change_dtim='{1}' where row_id='{2}'; ", query.change_user, Common.CommonFunction.DateTimeToString(query.change_dtim), query.row_id);
                 //sb.AppendFormat("set sql_safe_updates=0;");
                 //int result = _access.execCommand(sb.ToString());
@@ -255,6 +256,25 @@ namespace BLL.gigade.Dao
             catch (Exception ex)
             {
                 throw new Exception("IpodDao.UpdateIpodCheck-->" + ex.Message + sb.ToString(), ex);
+            }
+        }
+        /// <summary>
+        /// 採購單驗收
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public string GetInsertIpoNvdSql(IpoNvdQuery query)
+        {
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat(@"INSERT INTO `ipo_nvd` (`work_id`, `ipo_id`, `item_id`, `ipo_qty`, `out_qty`, `com_qty`, `cde_dt`, `made_date`, `work_status`, `create_user`, `create_datetime`, `modify_user`, `modify_datetime`) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}', '{12}');", query.work_id, query.ipo_id, query.item_id, query.ipo_qty, query.out_qty, query.com_qty, query.cde_dt.ToString("yyyy-MM-dd"), query.made_date.ToString("yyyy-MM-dd"), query.work_status, query.create_user, Common.CommonFunction.DateTimeToString(query.create_datetime), query.modify_user, Common.CommonFunction.DateTimeToString(query.modify_datetime));
+
+               return sql.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IpodDao.GetInsertIpoNvdSql-->" + ex.Message + sql.ToString(), ex);
             }
         }
 

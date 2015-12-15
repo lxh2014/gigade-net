@@ -83,7 +83,7 @@ namespace BLL.gigade.Mgr
                throw new Exception("IpoMgr-->UpdateIpod-->" + ex.Message, ex);
            }
        }
-       public bool UpdateIpodCheck(IpodQuery query)
+       public bool UpdateIpodCheck(IpodQuery query,IpoNvdQuery ipoNvd_query)
        {
            Boolean result = false;
            try
@@ -98,6 +98,10 @@ namespace BLL.gigade.Mgr
                int functionid = funList.Count == 0 ? 0 : funList[0].RowId;
                HistoryBatch batch = new HistoryBatch { functionid = functionid };
                batch.kuser = query.user_email;
+
+               //獲取添加IpoNvd的SQL
+               string ipoNvdSql = _IpodDao.GetInsertIpoNvdSql(ipoNvd_query);
+               aList.Add(ipoNvdSql);
 
                //獲取歷史記錄SQL
                string Check = _IpodDao.UpdateIpodCheck(query);

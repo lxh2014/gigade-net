@@ -686,6 +686,7 @@
     <Compile Include="Dao\WebContentTypeSetupDao.cs" />
     <Compile Include="Dao\ZipDao.cs" />
     <Compile Include="Dao\DeliverChangeLogDao.cs" />
+    <Compile Include="Dao\IpoNvdDao.cs" />
     <Compile Include="Mgr\AnnounceMgr.cs" />
     <Compile Include="Mgr\AppcategoryMgr.cs" />
     <Compile Include="Mgr\AppmessageMgr.cs" />
@@ -1265,6 +1266,7 @@
     <Compile Include="Mgr\Work\Work.cs" />
     <Compile Include="Mgr\ZipMgr.cs" />
     <Compile Include="Mgr\DeliverChangeLogMgr.cs" />
+    <Compile Include="Mgr\IpoNvdMgr.cs" />
     <Compile Include="Model\Announce.cs" />
     <Compile Include="Model\APIModels\DeliverIdViewModel.cs" />
     <Compile Include="Model\APIModels\ExpectArrivePeriod.cs" />
@@ -1379,6 +1381,7 @@
     <Compile Include="Model\InspectionReport.cs" />
     <Compile Include="Model\Ipo.cs" />
     <Compile Include="Model\Ipod.cs" />
+    <Compile Include="Model\IpoNvd.cs" />
     <Compile Include="Model\IstockChange.cs" />
     <Compile Include="Model\ItemIpoCreateLog.cs" />
     <Compile Include="Model\IwmsRrecord.cs" />
@@ -1443,6 +1446,7 @@
     <Compile Include="Model\Query\IlocChangeDetailQuery.cs" />
     <Compile Include="Model\Query\InspectionReportQuery.cs" />
     <Compile Include="Model\Query\IpodQuery.cs" />
+    <Compile Include="Model\Query\IpoNvdQuery.cs" />
     <Compile Include="Model\Query\IpoQuery.cs" />
     <Compile Include="Model\Query\IstockChangeQuery.cs" />
     <Compile Include="Model\Query\ItemIpoCreateLogQuery.cs" />

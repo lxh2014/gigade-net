@@ -235,6 +235,7 @@
     <Compile Include="Controllers\PromotionsDiscountController.cs" />
     <Compile Include="Controllers\PromotionsMaintainController.cs" />
     <Compile Include="Controllers\PromotionsUserController.cs" />
+    <Compile Include="Controllers\ReceiptShelvesController.cs" />
     <Compile Include="Controllers\RedirectController.cs" />
     <Compile Include="Controllers\ReportManagementController.cs" />
     <Compile Include="Controllers\ScheduleServiceController.cs" />
@@ -2026,6 +2027,7 @@
     <Content Include="Scripts\Views\VipUserGroup\GCCInfo.js" />
     <Content Include="Scripts\Views\VipUserGroup\list.js" />
     <Content Include="Scripts\Views\WareHouse\Aseld.js" />
+    <Content Include="Scripts\Views\ReceiptShelves\IpoNvdList.js" />
     <Content Include="Scripts\Views\WareHouse\Check.js" />
     <Content Include="Scripts\Views\WareHouse\Idiff_count_book.js" />
     <Content Include="Scripts\Views\WareHouse\IialgList.js" />
@@ -2043,6 +2045,7 @@
     <Content Include="Scripts\Views\WareHouse\IstockChangeList.js" />
     <Content Include="Scripts\Views\WareHouse\IwmsRecord.js" />
     <Content Include="Scripts\Views\WareHouse\WaitLiaoWeiList.js" />
+    <Content Include="Scripts\Views\WareHouse\CheckEdit.js" />
     <Content Include="Scripts\Views\Website\BannerCategoryList.js" />
     <Content Include="Scripts\Views\Website\BannerImageEdit.js" />
     <Content Include="Scripts\Views\Website\BannerImageHistoryDetail.js" />
@@ -4511,6 +4514,8 @@
     <Content Include="Views\SendProduct\ExpectArrivalChangeLog.cshtml" />
     <Content Include="Views\Order\OrderAmountDetial.cshtml" />
     <Content Include="Views\MarketTally\AutoMarketTally.cshtml" />
+    <Content Include="Views\WareHouse\IpoNvd.cshtml" />
+    <Content Include="Views\ReceiptShelves\IpoNvdList.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4716,7 +4721,8 @@
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>63063</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>          <IISUrl>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
           </IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
