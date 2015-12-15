@@ -40,7 +40,8 @@ namespace BLL.gigade.Dao
                 sqlCondi.Append(" from mail_send  where 1=1 ");
                 if (!string.IsNullOrEmpty(query.startT)&&!string.IsNullOrEmpty(query.endT))
                 {
-                    sqlCondi.AppendFormat(" AND kdate BETWEEN '{0}' AND '{1}' ", query.startT, query.endT);
+
+                    sqlCondi.AppendFormat(" AND kdate BETWEEN '{0}' AND '{1}' ",Convert.ToDateTime(query.startT).ToString("yyyy-MM-dd HH:mm:ss"), Convert.ToDateTime(query.endT).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(query.search))
                 {
