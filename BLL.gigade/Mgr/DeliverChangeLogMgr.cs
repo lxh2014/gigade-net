@@ -64,6 +64,7 @@ namespace BLL.gigade.Mgr
 
         #region 期望到貨日調整記錄通知排程 add by zhaozhi0623j 20151118PM
         //將DataTable轉化為Html 
+
         public string GetHtmlByDataTable(DataTable _dtmyMonth)
         {
             System.Text.StringBuilder sbHtml = new System.Text.StringBuilder();
@@ -74,10 +75,10 @@ namespace BLL.gigade.Mgr
             string aligns = "align=\"left\"";
             string color = "style=\"background-color:#ffeedd;\"";//單數行的樣式f0f0f0 dcb5ff  e0e0e0
             
-            sbHtml.Append("<th ");
-            sbHtml.Append(" >");
-            sbHtml.Append("行號");
-            sbHtml.Append("</th>");
+            //sbHtml.Append("<th ");
+            //sbHtml.Append(" >");
+            //sbHtml.Append("行號");
+            //sbHtml.Append("</th>");
 
             //插入列頭
             for (int i = 0; i < _dtmyMonth.Columns.Count; i++)
@@ -93,19 +94,19 @@ namespace BLL.gigade.Mgr
             {
                 sbHtml.Append("<tr>");
 
-                sbHtml.Append("<td ");
-                if (i % 2 == 0)
-                {
-                    sbHtml.Append(aligns + color);
-                }
-                else
-                {
-                    sbHtml.Append(aligns);
-                }
+                //sbHtml.Append("<td ");
+                //if (i % 2 == 0)
+                //{
+                //    sbHtml.Append(aligns + color);
+                //}
+                //else
+                //{
+                //    sbHtml.Append(aligns);
+                //}
                 
-                sbHtml.Append(" >");
-                sbHtml.Append(i+1);
-                sbHtml.Append("</td>");
+                //sbHtml.Append(" >");
+                //sbHtml.Append(i+1);
+                //sbHtml.Append("</td>");
                 for (int j = 0; j < _dtmyMonth.Columns.Count; j++)
                 {
                     sbHtml.Append("<td ");               
@@ -127,6 +128,7 @@ namespace BLL.gigade.Mgr
             return sbHtml.ToString();
 
         }
+
         public bool Start(string schedule_code)
         {
                       
@@ -142,15 +144,14 @@ namespace BLL.gigade.Mgr
             //bool IsDisplyName = true;
            
             try
-            {
-               
-
+            {            
                 //獲取該排程參數
                 List<ScheduleConfigQuery> store_config = new List<ScheduleConfigQuery>();
                 ScheduleConfigQuery query_config = new ScheduleConfigQuery();
                 query_config.schedule_code = schedule_code;
                 ScheduleServiceMgr _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
                 store_config = _secheduleServiceMgr.GetScheduleConfig(query_config);
+
                 #region mailhelp賦值
                 foreach (ScheduleConfigQuery item in store_config)
                 {
@@ -171,7 +172,7 @@ namespace BLL.gigade.Mgr
                     {
                         mailModel.MailFromUser = item.value;
                     }
-                    else if (item.parameterCode.Equals("MailFormPwd"))
+                    else if (item.parameterCode.Equals("EmailPassWord"))
                     {
                         mailModel.MailFormPwd = item.value;
                     }
@@ -199,6 +200,7 @@ namespace BLL.gigade.Mgr
                 {
                     hourNum = "1";
                 }
+                #endregion
 
                 //獲取期望到貨日調整記錄(邮件内容)
                 #region 獲取期望到貨日調整記錄表格
@@ -208,10 +210,14 @@ namespace BLL.gigade.Mgr
                 aclQuery.time_end = DateTime.Now;
                 System.Data.DataTable dclTable = _IDeliverChangeLogDao.GetDeliverChangeLogDataTable(aclQuery);
 
+                System.Data.DataTable dmTable = _IDeliverChangeLogDao.GetDataTable(aclQuery);
+
+
                 DataTable _dt = new DataTable();
                 DataRow dr;
                 _dt.Columns.Add("訂單編號", typeof(string));
                 _dt.Columns.Add("出貨單號", typeof(string));
+                _dt.Columns.Add("供應商名稱", typeof(string));
                 _dt.Columns.Add("出貨方式", typeof(string));
                 _dt.Columns.Add("異動人", typeof(string));
                 _dt.Columns.Add("異動類型", typeof(string));//
@@ -222,16 +228,92 @@ namespace BLL.gigade.Mgr
                 _dt.Columns.Add("備註", typeof(string));
                 _dt.Columns.Add("來源IP", typeof(string));
 
+
+                //自行出貨的供應商
+                DataTable deliverDt = new DataTable();
+                DataRow deliverDr;
+                deliverDt.Columns.Add("訂單編號", typeof(string));
+                deliverDt.Columns.Add("出貨單號", typeof(string));
+                deliverDt.Columns.Add("付款完成時間", typeof(string));
+                deliverDt.Columns.Add("供應商編號", typeof(string));
+                deliverDt.Columns.Add("供應商郵箱", typeof(string));
+                deliverDt.Columns.Add("供應商名稱", typeof(string));     
+                deliverDt.Columns.Add("期望到貨日", typeof(string));
+                deliverDt.Columns.Add("期望到貨時段", typeof(string));
+                deliverDt.Columns.Add("預計到貨日", typeof(string));
+                deliverDt.Columns.Add("備註", typeof(string));
+               
+
+
                 if (dclTable.Rows.Count > 0)
                 {
                     #region 循環賦值
-                    for (int i = 0; i < dclTable.Rows.Count; i++)
+
+                    for (int i = 0; i < dmTable.Rows.Count; i++)
                     {
+                        #region 自行出貨的供應商的table賦值
+                        deliverDr = deliverDt.NewRow();
+                        deliverDr["訂單編號"] = dmTable.Rows[i]["order_id"].ToString();
+                        deliverDr["出貨單號"] = dmTable.Rows[i]["deliver_id"].ToString();
+                        if (Convert.ToInt32(dmTable.Rows[i]["order_date_pay"]) == 0)
+                        {
+                            deliverDr["付款完成時間"] = "";
+                        }
+                        else
+                        {
+                            deliverDr["付款完成時間"] = CommonFunction.GetNetTime(Convert.ToInt32(dmTable.Rows[i]["order_date_pay"])).ToString("yyyy-MM-dd HH:mm:ss");
+                        }
+                        deliverDr["供應商編號"] = dmTable.Rows[i]["vendor_id"].ToString();
+                        deliverDr["供應商郵箱"] = dmTable.Rows[i]["vendor_email"].ToString();
+                        deliverDr["供應商名稱"] = dmTable.Rows[i]["vendor_name_full"].ToString();
+
+                        if (Convert.ToDateTime(dmTable.Rows[i]["expect_arrive_date_dm"]).ToString("yyyy-MM-dd") == "0001-01-01")
+                        {
+                            deliverDr["期望到貨日"] = "";
+                        }
+                        else
+                        {
+                            deliverDr["期望到貨日"] = Convert.ToDateTime(dmTable.Rows[i]["expect_arrive_date_dm"]).ToString("yyyy-MM-dd");
+                        }
+                        //期望到貨時段
+                        StringBuilder expectArrivePeriodSb = new StringBuilder();
+                        if (dmTable.Rows[i]["expect_arrive_period_dm"].ToString() == "1")
+                        {
+                            expectArrivePeriodSb.Append("12:00以前");
+                        }
+                        if (dmTable.Rows[i]["expect_arrive_period_dm"].ToString() == "2")
+                        {
+                            expectArrivePeriodSb.Append("12:00-17:00");
+                        }
+                        if (dmTable.Rows[i]["expect_arrive_period_dm"].ToString() == "3")
+                        {
+                            expectArrivePeriodSb.Append("17:00-20:00");
+                        }
+                        if (dmTable.Rows[i]["expect_arrive_period_dm"].ToString() == "0")
+                        {
+                            expectArrivePeriodSb.Append("不限制");
+                        }
+                        deliverDr["期望到貨時段"] = expectArrivePeriodSb.ToString();
+                        if (Convert.ToInt32(dmTable.Rows[i]["deliver_org_days"]) == 0)
+                        {
+                            deliverDr["預計到貨日"] = "";
+                        }
+                        else
+                        {
+                            deliverDr["預計到貨日"] = Convert.ToDateTime(CommonFunction.GetNetTime(Convert.ToInt32(dmTable.Rows[i]["deliver_org_days"]))).ToString("yyyy-MM-dd");
+                        }
+                        deliverDr["備註"] = dmTable.Rows[i]["dcl_note"].ToString();
+                        deliverDt.Rows.Add(deliverDr);                       
+                        #endregion
+                    }
+
+                    for (int i = 0; i < dclTable.Rows.Count; i++)
+                    {                       
                         dr = _dt.NewRow();
                         StringBuilder sb = new StringBuilder();
                         dr["訂單編號"] = dclTable.Rows[i]["order_id"].ToString();
-                        dr["出貨單號"] = dclTable.Rows[i]["deliver_id"].ToString(); 
-                    
+                        dr["出貨單號"] = dclTable.Rows[i]["deliver_id"].ToString();
+                        dr["供應商名稱"] = dclTable.Rows[i]["vendor_name_full"].ToString();
                         if (dclTable.Rows[i]["type"].ToString() == "1")
                         {
                             dr["出貨方式"] = "統倉出貨";
@@ -240,8 +322,8 @@ namespace BLL.gigade.Mgr
                         {
                             dr["出貨方式"] = "供應商自行出貨";
                         }
-                        else 
-                            //if (dclTable.Rows[i]["type"].ToString() == "101")
+                        else
+                        //if (dclTable.Rows[i]["type"].ToString() == "101")
                         {
                             dr["出貨方式"] = "其他";
                         }
@@ -280,27 +362,27 @@ namespace BLL.gigade.Mgr
                         //}
                         #endregion
 
-                        if (Convert.ToDateTime(dclTable.Rows[i]["expect_arrive_date"]).ToString("yyyy-MM-dd") == "0001-01-01")
+                        if (Convert.ToDateTime(dclTable.Rows[i]["expect_arrive_date_dcl"]).ToString("yyyy-MM-dd") == "0001-01-01")
                         {
                             dr["期望到貨日"] = "";
                         }
                         else
                         {
-                            dr["期望到貨日"] = Convert.ToDateTime(dclTable.Rows[i]["expect_arrive_date"]).ToString("yyyy-MM-dd");
+                            dr["期望到貨日"] = Convert.ToDateTime(dclTable.Rows[i]["expect_arrive_date_dcl"]).ToString("yyyy-MM-dd");
                         }
-                        if (dclTable.Rows[i]["expect_arrive_period"].ToString() == "1")
+                        if (dclTable.Rows[i]["expect_arrive_period_dcl"].ToString() == "1")
                         {
                             sb.Append("12:00以前");
                         }
-                        if (dclTable.Rows[i]["expect_arrive_period"].ToString() == "2")
+                        if (dclTable.Rows[i]["expect_arrive_period_dcl"].ToString() == "2")
                         {
                             sb.Append("12:00-17:00");
                         }
-                        if (dclTable.Rows[i]["expect_arrive_period"].ToString() == "3")
+                        if (dclTable.Rows[i]["expect_arrive_period_dcl"].ToString() == "3")
                         {
                             sb.Append("17:00-20:00");
                         }
-                        if (dclTable.Rows[i]["expect_arrive_period"].ToString() == "0")
+                        if (dclTable.Rows[i]["expect_arrive_period_dcl"].ToString() == "0")
                         {
                             sb.Append("不限制");
                         }
@@ -309,6 +391,83 @@ namespace BLL.gigade.Mgr
                         dr["來源IP"] = dclTable.Rows[i]["dcl_ipfrom"].ToString();
                         _dt.Rows.Add(dr);
                         sb.Clear();
+                    }
+                    #endregion
+                    
+                    #region 出貨方式為“供應商自行出貨”的出貨單整理后，發郵件給對應的供應商
+
+                    Dictionary<string, string> vendorDictionary = new Dictionary<string, string>();
+                    for (int i = 0; i < deliverDt.Rows.Count; i++)
+                    {
+                        if (!vendorDictionary.ContainsKey(deliverDt.Rows[i]["出貨單號"].ToString()))
+                        {
+                            vendorDictionary.Add(deliverDt.Rows[i]["出貨單號"].ToString(), deliverDt.Rows[i]["供應商編號"].ToString());
+                        }
+                    }
+
+                    List<string> SendEmailVendorIdList = new List<string>();
+                    
+                    foreach (KeyValuePair<string, string> kvp in vendorDictionary)
+                    {
+                        DataTable deliverDt_1 = deliverDt.Clone();
+
+                        string MailToAddress_1 = string.Empty;
+                        string vendor_name_full = string.Empty;
+                        if (!SendEmailVendorIdList.Contains(kvp.Value))
+                        {
+                            for (int i = 0; i < deliverDt.Rows.Count; i++)
+                            {
+                                DataRow deliverDr_1 = deliverDt_1.NewRow();
+                                if (kvp.Value == deliverDt.Rows[i]["供應商編號"].ToString())
+                                {
+                                    MailToAddress_1 = deliverDt.Rows[i]["供應商郵箱"].ToString();
+                                    vendor_name_full = deliverDt.Rows[i]["供應商名稱"].ToString();
+
+                                    deliverDr_1["訂單編號"] = deliverDt.Rows[i]["訂單編號"].ToString();
+                                    deliverDr_1["出貨單號"] = deliverDt.Rows[i]["出貨單號"].ToString();
+                                    deliverDr_1["付款完成時間"] = deliverDt.Rows[i]["付款完成時間"].ToString();
+                                    //deliverDr_1["供應商編號"] = deliverDt.Rows[i]["供應商編號"].ToString();
+                                    //deliverDr_1["供應商郵箱"] = deliverDt.Rows[i]["供應商郵箱"].ToString();
+                                    //deliverDr_1["供應商名稱"] = deliverDt.Rows[i]["供應商名稱"].ToString();
+                                    deliverDr_1["期望到貨日"] = deliverDt.Rows[i]["期望到貨日"].ToString();
+                                    deliverDr_1["期望到貨時段"] = deliverDt.Rows[i]["期望到貨時段"].ToString();
+                                    deliverDr_1["預計到貨日"] = deliverDt.Rows[i]["預計到貨日"].ToString();
+                                    deliverDr_1["備註"] = deliverDt.Rows[i]["備註"].ToString();
+
+                                    deliverDt_1.Rows.Add(deliverDr_1);
+                                }
+                            }
+                            SendEmailVendorIdList.Add(kvp.Value);
+                            BLL.gigade.Common.MailModel mailModel_1 = new Common.MailModel();
+                            mailModel_1.MysqlConnectionString = mySqlConnectionString;
+                            mailModel_1.MailFromAddress = mailModel.MailFromAddress;
+                            mailModel_1.MailHost = mailModel.MailHost;
+                            mailModel_1.MailPort = mailModel.MailPort;
+                            mailModel_1.MailFromUser = mailModel.MailFromUser;
+                            mailModel_1.MailFormPwd = mailModel.MailFormPwd;
+
+
+                            //string MailBody_1 = "<br/><font size=\"4\">" + "<font color=\"#00BB00\" >" + vendor_name_full + "</font>" + " 您好，在前 " + "<font color=\"#FF0000\" >" + Convert.ToDouble(hourNum)
+                            //                      + "</font>" + " 個小時之內，貴公司自行出貨的商品出貨單期望到貨日調整記錄如下：</font><br/><p/>" + GetHtmlByDataTable(deliverDt_1);
+                            deliverDt_1.Columns.Remove("供應商編號");
+                            deliverDt_1.Columns.Remove("供應商郵箱");
+                            deliverDt_1.Columns.Remove("供應商名稱");
+                            string MailBody_1 = "<p>吉甲地市集【期望到貨日改變】通知信</p><p><font color=\"#00BB00\" >" + vendor_name_full + "</font>&nbsp&nbsp您好：</p>" +
+                                "<p>以下訂單已改變出貨單期望到貨日，訂單資訊如下。</p>" +                                    
+                                //"<p>============================================================</p>"+
+                                            GetHtmlByDataTable(deliverDt_1) +
+                                //"<p>============================================================</p>"+
+              "<p>訂單的相關資訊，請至<a href='http://vendor.gigade100.com' style='color:#3399ff;text-decoration: none;'>【後台管理】</a>中查詢。</p>"+
+              "<p>※本信由系統寄出，請勿直接回覆！</p>"+
+              "有任何問題與建議，歡迎聯絡我們<a href='http://www.gigade100.com/contact_service.php' target='_blank'>&nbsp&nbsp<img src='http://www.gigade100.com/images/send_mail.jpg'></a>" +
+              "<p>吉甲地市集<a href='http://www.gigade100.com/'>http://www.gigade100.com/</a></p>";
+
+                            string MailTitle_1 = MailTitle;
+                            //MailToAddress_1 = "zhaozhi0623j@gimg.tw";
+                            BLL.gigade.Common.MailHelper mailHelper = new MailHelper(mailModel_1);
+                            //public Boolean SendMailAction(string MailToAddress, string MailTitle, string MailBody)
+                            mailHelper.SendMailAction(MailToAddress_1, MailTitle_1, MailBody_1 + " ");//給單個供應商發送郵件
+                        }                     
                     }
                     #endregion
                 }
@@ -325,15 +484,7 @@ namespace BLL.gigade.Mgr
                     MailBody = "<br/><font size=\"4\">出貨單期望到貨日在前 " + "<font color=\"#FF0000\" >" + Convert.ToDouble(hourNum) + "</font>" + " 個小時之內的調整記錄如下：</font><br/><p/>" + GetHtmlByDataTable(_dt);
                 }
 
-                #endregion
-
-                //DateTime endTime = DateTime.Now;
-                //TimeSpan ts = endTime - startTime;
-                //double Second = ts.TotalSeconds;
-                BLL.gigade.Common.MailHelper mail = new Common.MailHelper(mailModel);
-                //public Boolean SendToGroup(int GroupID, string MailTitle, string MailBody, 
-                //                           Boolean IsSeparate = false, Boolean IsDisplyName = false)
-                //return mail.SendToGroup(GroupCode, MailTitle, MailBody + "<br/>郵件發送共耗時" + Second + "秒", true, true);  
+                BLL.gigade.Common.MailHelper mail = new Common.MailHelper(mailModel);                
                 return mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true); 
             }
             catch (Exception ex)
@@ -341,6 +492,7 @@ namespace BLL.gigade.Mgr
                 throw new Exception("DeliverChangeLogMgr-->Start-->" + ex.Message, ex);
             }
         } 
+
         #endregion
 
         #region 是否能夠修改期望到貨日 +bool isCanModifyExpertArriveDate(string apiServer,long deliver_id) 
