@@ -398,5 +398,28 @@ namespace Admin.gigade.Controllers
             return result;
         }
         #endregion
+
+        #region 檢查異地IP登錄
+        public bool CheckIPAddress()
+        {
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+                CheckIPAddressMgr dsMgr = new CheckIPAddressMgr(mySqlConnectionString);
+                return dsMgr.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return true;
+        }
+        #endregion
     }
 }
