@@ -154,6 +154,7 @@
     <Compile Include="Controllers\ChinatrustController.cs" />
     <Compile Include="Controllers\ConsumeStatisticController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
+    <Compile Include="Controllers\Default1Controller.cs" />
     <Compile Include="Controllers\DeliveryStoreController.cs" />
     <Compile Include="Controllers\DispatchingSystemController.cs" />
     <Compile Include="Controllers\EdmController.cs" />
@@ -4513,6 +4514,7 @@
     <Content Include="Views\Order\OrderAmountDetial.cshtml" />
     <Content Include="Views\WareHouse\Inventory.cshtml" />
     <Content Include="Views\MarketTally\AutoMarketTally.cshtml" />
+    <Content Include="Views\Default1\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
