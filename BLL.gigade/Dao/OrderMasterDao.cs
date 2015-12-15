@@ -2591,7 +2591,7 @@ WHERE od.item_mode=1 AND pcs.category_id='{0}' AND od.detail_status NOT IN(89,90
                    {
                        user_id += odMaster[i].user_id + ",";
                    }
-                   user_id.TrimEnd(',');
+                   user_id=user_id.TrimEnd(',');
                    sb.AppendFormat(" SELECT us.user_name,us.user_email,om.order_ipfrom,om.order_id,FROM_UNIXTIME(om.order_date_pay)as new_time ");
                    sb.AppendFormat(" FROM order_master om LEFT JOIN users us on us.user_id=om.user_id ");
                    sb.AppendFormat(" WHERE om.order_date_pay>'{0}' and om.user_id in({1}) ", CommonFunction.GetPHPTime(query.order_date_pay_startTime.ToString("yyyy/MM/dd HH:mm:ss")), user_id);

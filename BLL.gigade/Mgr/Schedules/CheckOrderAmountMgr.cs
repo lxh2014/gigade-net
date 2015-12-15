@@ -85,8 +85,8 @@ namespace BLL.gigade.Mgr.Schedules
                 MailHelper mail = new MailHelper(mailModel);
 
                 OrderMasterQuery query = new OrderMasterQuery();
-                query.order_date_pay_startTime = DateTime.Now;
-                query.order_date_pay_endTime = query.order_date_pay_startTime.AddHours(-1);
+                query.order_date_pay_endTime = DateTime.Now;
+                query.order_date_pay_startTime = query.order_date_pay_endTime.AddHours(-1);
                 StringBuilder sbMailBody = new StringBuilder();
                 try
                 {
@@ -200,7 +200,7 @@ namespace BLL.gigade.Mgr.Schedules
             strbody.AppendLine("大金額訂單檢查");
             _orderMaster = new OrderMasterMgr(mySqlConnectionString);
 
-            DataTable _dt = _orderMaster.GetBigOrderNumbers(query);
+            DataTable _dt = _orderMaster.GetBigAmount(query);
 
             if (_dt.Rows.Count > 0)
             {
@@ -232,7 +232,7 @@ namespace BLL.gigade.Mgr.Schedules
             strbody.AppendLine("首購超過5000訂單檢查");
             _orderMaster = new OrderMasterMgr(mySqlConnectionString);
 
-            DataTable _dt = _orderMaster.GetBigAmount(query);
+            DataTable _dt = _orderMaster.GetUsersOrderAmount(query);
             if (_dt.Rows.Count > 0)
             {
                 DataTable _newdt = new DataTable();
