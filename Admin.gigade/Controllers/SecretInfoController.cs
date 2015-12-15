@@ -49,6 +49,7 @@ namespace Admin.gigade.Controllers
         private IBrowseDataImplMgr _IBrowseDataMgr; 
         private ZipMgr zMgr;
         private ITabShowImplMgr _tabshow;
+        private OrderReturnStatusMgr _orderReturnStatus;
 
         #region 視圖
         /// <summary>
@@ -911,6 +912,11 @@ namespace Admin.gigade.Controllers
                        //  OrderPaymentNcccQuery OPNQuery = new OrderPaymentNcccQuery();
                         OrderPaymentNcccQuery OPNQuery = _tabshow.GetNCCC(new OrderPaymentNcccQuery { nccc_id = (uint)related_id, IsPage = false, isSecret = false }, out totalCount).FirstOrDefault();
                         json = "{success:true,\"nccc_id\":\"" + OPNQuery.nccc_id + "\",\"nccc_pan\":\"" + OPNQuery.pan + "\",\"nccc_bankname\":\"" + OPNQuery.bankname + "\"}";
+                        break;
+                    case 23://退貨
+                        _orderReturnStatus = new OrderReturnStatusMgr(mySqlConnectionString);
+                        OrderMaster om = _orderReturnStatus.GetOrderInfo( Convert.ToUInt32(related_id));
+                        json = "{success:true,\"orc_name\":\"" + om.Delivery_Name + "\",\"orc_phone\":\"" + om.Delivery_Mobile + "\",\"orc_address\":\"" + om.Delivery_Address + "\"}";
                         break;
 
                 }

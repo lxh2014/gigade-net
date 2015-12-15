@@ -1259,37 +1259,37 @@ namespace Admin.gigade.Controllers
         }
         #endregion
 
-        public HttpResponseBase Getpic()
-        {//判斷該文件是否超過限制
-            string Json = "";
-            FileManagement fileLoad = new FileManagement();
+        //public HttpResponseBase Getpic()
+        //{//判斷該文件是否超過限制
+        //    string Json = "";
+        //    FileManagement fileLoad = new FileManagement();
 
-            string path = Server.MapPath(xmlPath);
-            SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
-            SiteConfig minValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_Min_Element");
-            SiteConfig maxValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MaxValue");
-            //擴展名、最小值、最大值
-            string minValue = minValue_config.Value == "" ? minValue_config.DefaultValue : minValue_config.Value;
-            string maxValue = maxValue_config.Value == "" ? maxValue_config.DefaultValue : maxValue_config.Value;
-            //if (Request.Files.Count > 0)//單個圖片上傳
-            for (int iFile = 0; iFile < Request.Files.Count; iFile++)//多個上傳圖片
-            {
-                HttpPostedFileBase file = Request.Files[iFile];//單個Request.Files[0]
-                int fileSize = file.ContentLength;
-                if (fileSize > int.Parse(minValue) && fileSize < int.Parse(maxValue))
-                {
-                    Json = "{success:true}";
-                }
-                else
-                {
-                    Json = "{success:false}";
-                }
-            }
-            this.Response.Clear();
-            this.Response.Write(Json);
-            this.Response.End();
-            return this.Response;
-        }
+        //    string path = Server.MapPath(xmlPath);
+        //    SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+        //    SiteConfig minValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_Min_Element");
+        //    SiteConfig maxValue_config = _siteConfigMgr.GetConfigByName("PIC_Length_MaxValue");
+        //    //擴展名、最小值、最大值
+        //    string minValue = minValue_config.Value == "" ? minValue_config.DefaultValue : minValue_config.Value;
+        //    string maxValue = maxValue_config.Value == "" ? maxValue_config.DefaultValue : maxValue_config.Value;
+        //    //if (Request.Files.Count > 0)//單個圖片上傳
+        //    for (int iFile = 0; iFile < Request.Files.Count; iFile++)//多個上傳圖片
+        //    {
+        //        HttpPostedFileBase file = Request.Files[iFile];//單個Request.Files[0]
+        //        int fileSize = file.ContentLength;
+        //        if (fileSize > int.Parse(minValue) && fileSize < int.Parse(maxValue))
+        //        {
+        //            Json = "{success:true}";
+        //        }
+        //        else
+        //        {
+        //            Json = "{success:false}";
+        //        }
+        //    }
+        //    this.Response.Clear();
+        //    this.Response.Write(Json);
+        //    this.Response.End();
+        //    return this.Response;
+        //}
 
         #endregion
 

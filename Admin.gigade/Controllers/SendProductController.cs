@@ -5614,11 +5614,11 @@ namespace Admin.gigade.Controllers
 
                 #region 查詢條件
 
-                if (Request.Params["productMode"] != "-1")//type為0時，表示全部
+                if (!string.IsNullOrEmpty(Request.Params["productMode"]))//type為0時，表示全部
                 {
                     dmQuery.type = Convert.ToUInt32(Request.Params["productMode"]);
                 }
-                if (Request.Params["freightType"] != "-1")//freight_set為0時，表示全部
+                if (!string.IsNullOrEmpty(Request.Params["freightType"]))//freight_set為0時，表示全部
                 {
                     dmQuery.freight_set = Convert.ToUInt32(Request.Params["freightType"]);
                 }
@@ -5660,11 +5660,18 @@ namespace Admin.gigade.Controllers
 
                 int totalCount = 0;
                 dmList = _DeliverMsterMgr.GetDeliverExpectArriveList(dmQuery,out totalCount);
-                //foreach (var item in dmList)
-                //{
-                //    if(item.type==)
-                    
-                //}
+
+                foreach (var item in dmList)
+                {
+                    if (item.deliver_org_days == 0)
+                    {
+                        item.deliver_org_days_str = "";
+                    }
+                    else
+                    {
+                        item.deliver_org_days_str = CommonFunction.GetNetTime(item.deliver_org_days).ToString("yyyy-MM-dd");
+                    }                 
+                }
 
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     

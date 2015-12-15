@@ -154,6 +154,7 @@
     <Compile Include="Controllers\ChinatrustController.cs" />
     <Compile Include="Controllers\ConsumeStatisticController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
+    <Compile Include="Controllers\Default1Controller.cs" />
     <Compile Include="Controllers\DeliveryStoreController.cs" />
     <Compile Include="Controllers\DispatchingSystemController.cs" />
     <Compile Include="Controllers\EdmController.cs" />
@@ -2035,6 +2036,7 @@
     <Content Include="Scripts\Views\WareHouse\IlocChangeDetailLink.js" />
     <Content Include="Scripts\Views\WareHouse\IlocChangeDetailList.js" />
     <Content Include="Scripts\Views\WareHouse\IlocExportInto.js" />
+    <Content Include="Scripts\Views\WareHouse\InventoryList.js" />
     <Content Include="Scripts\Views\WareHouse\IplasExportEnter.js" />
     <Content Include="Scripts\Views\WareHouse\IplasExportInto.js" />
     <Content Include="Scripts\Views\WareHouse\IpodCheckNo.js" />
@@ -4513,9 +4515,11 @@
     <Content Include="Views\SendProduct\DeliverExpectArrival.cshtml" />
     <Content Include="Views\SendProduct\ExpectArrivalChangeLog.cshtml" />
     <Content Include="Views\Order\OrderAmountDetial.cshtml" />
+    <Content Include="Views\WareHouse\Inventory.cshtml" />
     <Content Include="Views\MarketTally\AutoMarketTally.cshtml" />
     <Content Include="Views\WareHouse\IpoNvd.cshtml" />
     <Content Include="Views\ReceiptShelves\IpoNvdList.cshtml" />
+    <Content Include="Views\Default1\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

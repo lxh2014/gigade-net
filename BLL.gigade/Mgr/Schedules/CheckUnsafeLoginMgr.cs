@@ -153,16 +153,17 @@ GROUP BY login_ipfrom,login_type,login_mail ;", login_start, login_end, errorCou
                 if (_newDt.Rows.Count > 0)
                 {
                     MailBody = GetHtmlByDataTable(_newDt);
-                    MailBody = "<br/><font size=\"4\">   在 " + "<font color=\"#FF0000\" >" + start_time + " ~ " + end_time + "</font>" + " 的一個小時里，用戶登錄異常記錄如下：</font><br/><p/>" + GetHtmlByDataTable(_newDt);
-
+                    //MailBody = "<br/><font size=\"4\">   在 " + "<font color=\"#FF0000\" >" + start_time + " ~ " + end_time + "</font>" + " 的一個小時里，用戶登錄異常記錄如下：</font><br/><p/>" + GetHtmlByDataTable(_newDt);
+                    MailHelper mail = new MailHelper(mailModel);
+                   // mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", IsSeparate, IsDisplyName);
+                    mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true);
                 }
                 else
                 {
-                    MailBody = "<br/><p><font size=\"4\">    在 <font color=\"#FF0000\" >" + start_time + " ~ " + end_time + "</font> 的一個小時里，沒有用戶登錄異常的記錄!</font><p/>";
+                    //MailBody = "<br/><p><font size=\"4\">    在 <font color=\"#FF0000\" >" + start_time + " ~ " + end_time + "</font> 的一個小時里，沒有用戶登錄異常的記錄!</font><p/>";
 
                 }
-                MailHelper mail = new MailHelper(mailModel);
-                mail.SendToGroup(GroupCode, MailTitle, MailBody, IsSeparate, IsDisplyName);
+                
             }
             catch (Exception ex)
             {
@@ -170,61 +171,37 @@ GROUP BY login_ipfrom,login_type,login_mail ;", login_start, login_end, errorCou
             }
             return true;
         }
-        static string GetHtmlByDataTable(DataTable _dtmyMonth)
+        static string GetHtmlByDataTable(DataTable _dt)
         {
-            System.Text.StringBuilder sbHtml = new System.Text.StringBuilder();
-            //sbHtml.Append("<table  cellpadding=3 cellspacing=1  border=2 style=\"border:white solid #ccc; \">");
-            sbHtml.Append("<table cellpadding=2 cellspacing=2  style='border: #d1d1d1 solid;border-width:1 0 1 0'>");//style='border-collapse: collapse '
-            sbHtml.Append("<tr style=\"text-align: center; COLOR: black; BACKGROUND-COLOR: #99ccff; font-weight: bold\">");//B3D4FF
+            StringBuilder sbHtml = new StringBuilder();
+            sbHtml.Append("<table  cellpadding=3 cellspacing=1  border=1 style=\"border-collapse: collapse\">");
+            sbHtml.Append("<tr  style=\"text-align: center; COLOR: #0076C8; BACKGROUND-COLOR: #F4FAFF; font-weight: bold\">");
+            string[] str = { "style=\"background-color:#dda29a;\"", "style=\"background-color:#d98722;\"", "style=\"background-color:#cfbd2d;\"", "style=\"background-color:#cbd12c;\"", "style=\"background-color:#91ca15;\"", "style=\"background-color:#6dc71e;\"", "style=\"background-color:#25b25c;\"", "style=\"background-color:#13a7a2;\"" };
+            string aligns = "align=\"right\"";
 
-            string aligns = "align=\"center\"";
-            string color = "style=\"background-color:#eeeeee;\"";//單數行的樣式f0f0f0 dcb5ff  e0e0e0 ffeedd
-
-            sbHtml.Append("<th ");
-            sbHtml.Append(" >");
-            sbHtml.Append("行號");
-            sbHtml.Append("</th>");
-
-            //插入列頭
-            for (int i = 0; i < _dtmyMonth.Columns.Count; i++)
+            
+            for (int i = 0; i < _dt.Columns.Count; i++)
             {
                 sbHtml.Append("<th ");
+                sbHtml.Append(str[i]);
                 sbHtml.Append(" >");
-                sbHtml.Append(_dtmyMonth.Columns[i].ColumnName);
+                sbHtml.Append(_dt.Columns[i].ColumnName);
                 sbHtml.Append("</th>");
             }
             sbHtml.Append("</tr>");
-            //插入數據，單數行設置背景色
-            for (int i = 0; i < _dtmyMonth.Rows.Count; i++)//行
+            for (int i = 0; i < _dt.Rows.Count; i++)//行
             {
-                sbHtml.Append("<tr>");
-
-                sbHtml.Append("<td ");
-                if (i % 2 == 0)
-                {
-                    sbHtml.Append(aligns + color);
-                }
-                else
-                {
-                    sbHtml.Append(aligns);
-                }
-
-                sbHtml.Append(" >");
-                sbHtml.Append(i + 1);
-                sbHtml.Append("</td>");
-                for (int j = 0; j < _dtmyMonth.Columns.Count; j++)
+                //sbHtml.Append("<tr>");
+                //sbHtml.Append("<td ");                
+                //sbHtml.Append(" >");
+                //sbHtml.Append(i + 1);
+                //sbHtml.Append("</td>");
+                for (int j = 0; j < _dt.Columns.Count; j++)
                 {
                     sbHtml.Append("<td ");
-                    if (i % 2 == 0)
-                    {
-                        sbHtml.Append(aligns + color);
-                    }
-                    else
-                    {
-                        sbHtml.Append(aligns);
-                    }
+                    sbHtml.Append(aligns);
                     sbHtml.Append(" >");
-                    sbHtml.Append(_dtmyMonth.Rows[i][j]);
+                    sbHtml.Append(_dt.Rows[i][j]);
                     sbHtml.Append("</td>");
                 }
                 sbHtml.Append("</tr>");
@@ -232,6 +209,69 @@ GROUP BY login_ipfrom,login_type,login_mail ;", login_start, login_end, errorCou
             sbHtml.Append("</table>");
             return sbHtml.ToString();
 
-        }       
+        }
+        //static string GetHtmlByDataTable(DataTable _dtmyMonth)
+        //{
+        //    System.Text.StringBuilder sbHtml = new System.Text.StringBuilder();
+        //    //sbHtml.Append("<table  cellpadding=3 cellspacing=1  border=2 style=\"border:white solid #ccc; \">");
+        //    sbHtml.Append("<table cellpadding=2 cellspacing=2  style='border: #d1d1d1 solid;border-width:1 0 1 0'>");//style='border-collapse: collapse '
+        //    sbHtml.Append("<tr style=\"text-align: center; COLOR: black; BACKGROUND-COLOR: #99ccff; font-weight: bold\">");//B3D4FF
+
+        //    string aligns = "align=\"center\"";
+        //    string color = "style=\"background-color:#eeeeee;\"";//單數行的樣式f0f0f0 dcb5ff  e0e0e0 ffeedd
+
+        //    sbHtml.Append("<th ");
+        //    sbHtml.Append(" >");
+        //    sbHtml.Append("行號");
+        //    sbHtml.Append("</th>");
+
+        //    //插入列頭
+        //    for (int i = 0; i < _dtmyMonth.Columns.Count; i++)
+        //    {
+        //        sbHtml.Append("<th ");
+        //        sbHtml.Append(" >");
+        //        sbHtml.Append(_dtmyMonth.Columns[i].ColumnName);
+        //        sbHtml.Append("</th>");
+        //    }
+        //    sbHtml.Append("</tr>");
+        //    //插入數據，單數行設置背景色
+        //    for (int i = 0; i < _dtmyMonth.Rows.Count; i++)//行
+        //    {
+        //        sbHtml.Append("<tr>");
+
+        //        sbHtml.Append("<td ");
+        //        if (i % 2 == 0)
+        //        {
+        //            sbHtml.Append(aligns + color);
+        //        }
+        //        else
+        //        {
+        //            sbHtml.Append(aligns);
+        //        }
+
+        //        sbHtml.Append(" >");
+        //        sbHtml.Append(i + 1);
+        //        sbHtml.Append("</td>");
+        //        for (int j = 0; j < _dtmyMonth.Columns.Count; j++)
+        //        {
+        //            sbHtml.Append("<td ");
+        //            if (i % 2 == 0)
+        //            {
+        //                sbHtml.Append(aligns + color);
+        //            }
+        //            else
+        //            {
+        //                sbHtml.Append(aligns);
+        //            }
+        //            sbHtml.Append(" >");
+        //            sbHtml.Append(_dtmyMonth.Rows[i][j]);
+        //            sbHtml.Append("</td>");
+        //        }
+        //        sbHtml.Append("</tr>");
+        //    }
+        //    sbHtml.Append("</table>");
+        //    return sbHtml.ToString();
+
+        //}       
     }
 }

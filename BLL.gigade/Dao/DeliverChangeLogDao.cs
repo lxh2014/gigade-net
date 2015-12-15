@@ -142,14 +142,16 @@ namespace BLL.gigade.Dao
             {
                 //sbSql.AppendFormat("select dm.order_id,dcl.deliver_id,dcl_create_type, u.user_name as dcl_create_username,mu.user_username as dcl_create_musername ,
                 //                            dcl.dcl_create_datetime,'' as ori_expect_arrive_date,dcl.expect_arrive_date,dcl.expect_arrive_period,dcl.dcl_note,dcl.dcl_ipfrom
-                sbSql.AppendFormat(@"select dm.order_id,dcl.deliver_id,dcl_create_type, u.user_name as dcl_create_username,mu.user_username as dcl_create_musername ,
-                                            dcl.dcl_create_datetime,dcl.expect_arrive_date,dcl.expect_arrive_period,dcl.dcl_note,dcl.dcl_ipfrom
+                sbSql.AppendFormat(@"select dm.order_id,dcl.deliver_id,v.vendor_id,v.vendor_name_full,v.vendor_email,dm.type,dcl_create_type, u.user_name as dcl_create_username,mu.user_username as dcl_create_musername ,
+                                            dcl.dcl_create_datetime,dcl.expect_arrive_date as expect_arrive_date_dcl,dcl.expect_arrive_period as expect_arrive_period_dcl,dcl.dcl_note,dcl.dcl_ipfrom,
+                                         dm.deliver_org_days,dm.expect_arrive_date as expect_arrive_date_dm,dm.expect_arrive_period as expect_arrive_period_dm
 from delivery_change_log dcl
-LEFT JOIN deliver_master dm on dm.deliver_id=dcl.deliver_id 
+LEFT JOIN deliver_master dm on dm.deliver_id=dcl.deliver_id
+inner JOIN vendor v on v.vendor_id=dm.export_id 
 LEFT JOIN users u on u.user_id=dcl.dcl_create_user 
 LEFT JOIN manage_user mu on mu.user_id=dcl.dcl_create_muser where 1=1");
                 sbSql.AppendFormat(" and dcl.dcl_create_datetime between '{0}' and '{1}'", Query.time_start.ToString("yyyy-MM-dd HH:mm:ss"), Query.time_end.ToString("yyyy-MM-dd HH:mm:ss"));
-                sbSql.Append(" order by dcl_create_datetime desc");
+                sbSql.Append(" order by deliver_id,dcl_create_datetime desc");
                 System.Data.DataTable dt=_access.getDataTable(sbSql.ToString());
                 return dt;
             
@@ -159,6 +161,33 @@ LEFT JOIN manage_user mu on mu.user_id=dcl.dcl_create_muser where 1=1");
                 throw new Exception("DeliverChangeLog-->GetDeliverChangeLogDataTable-->" + ex.Message + sbSql.ToString(), ex);
             }
         }
+
+        public DataTable GetDataTable(DeliverChangeLogQuery Query)
+        {
+            StringBuilder sbSql = new StringBuilder();
+            Query.Replace4MySQL();
+            try
+            {
+                sbSql.AppendFormat(@"select  m.deliver_id,m.order_id,m.vendor_id,m.vendor_name_full,m.vendor_email,m.dcl_note,
+                                         m.deliver_org_days,m.expect_arrive_date_dm,m.expect_arrive_period_dm ,m.dcl_create_datetime ,m.type,m.order_date_pay                                  
+from(
+select dcl.deliver_id, dm.order_id,dm.type,v.vendor_id,v.vendor_name_full,v.vendor_email,dcl.dcl_note,om.order_date_pay, 
+        dm.deliver_org_days,dm.expect_arrive_date as expect_arrive_date_dm,dm.expect_arrive_period as expect_arrive_period_dm ,dcl.dcl_create_datetime from delivery_change_log dcl
+LEFT JOIN deliver_master dm on dm.deliver_id=dcl.deliver_id LEFT JOIN order_master om on om.order_id=dm.order_id
+inner JOIN vendor v on v.vendor_id=dm.export_id
+      where 1=1 and dm.type=2 ");
+                sbSql.AppendFormat(" and dcl.dcl_create_datetime between '{0}' and '{1}'", Query.time_start.ToString("yyyy-MM-dd HH:mm:ss"), Query.time_end.ToString("yyyy-MM-dd HH:mm:ss"));
+                sbSql.Append(" order by deliver_id,dcl_create_datetime desc )m GROUP BY m.deliver_id");
+                System.Data.DataTable dt = _access.getDataTable(sbSql.ToString());
+                return dt;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("DeliverChangeLog-->GetDataTable-->" + ex.Message + sbSql.ToString(), ex);
+            }
+        }
+
         public DataTable GetExpectArriveDateByCreatetime(DeliverChangeLogQuery Query)
         {
             StringBuilder sbSql = new StringBuilder();

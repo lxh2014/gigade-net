@@ -50,7 +50,7 @@ namespace BLL.gigade.Mgr
             _mySqlDao = new MySqlDao(connectionStr);
             _productCategoryDao = new ProductCategoryDao(connectionStr);
             _parametersrcDao = new ParametersrcDao(connectionStr);
-            //_siteDao = new SiteDao(connectionStr);
+            //_siteDao = new SiteDao(connectionStr); 
             _channelDao = new ChannelDao(connectionStr);
         }
 
@@ -443,13 +443,13 @@ namespace BLL.gigade.Mgr
                         {
                             dr["order_createdate_format"] = CommonFunction.DateTimeToString(CommonFunction.GetNetTime(Convert.ToInt32(dr["order_createdate"].ToString())));
                         }
-                        if (dr["deduct_bonus"] != null && dr["deduct_welfare"]!=null)
+                        if (dr["deduct_bonus"] != null)
                         {
-                            dr["deducts"] = Convert.ToInt32(dr["deduct_bonus"].ToString()) + Convert.ToInt32(dr["deduct_welfare"]);
+                            dr["deducts"] = Convert.ToInt32(dr["deduct_bonus"].ToString());
                         }
                         if (dr["money"] != null)
                         {
-                            dr["amount"] = Convert.ToInt32(dr["money"].ToString()) - Convert.ToInt32(dr["deducts"]);
+                            dr["amount"] = Convert.ToInt32(dr["money"].ToString());
                         }
                     }
                 }
