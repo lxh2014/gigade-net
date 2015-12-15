@@ -115,6 +115,7 @@
     <Compile Include="Common\CreateCode.cs" />
     <Compile Include="Common\CsvHelper.cs" />
     <Compile Include="Common\DataCheck.cs" />
+    <Compile Include="Common\EncryptComputer.cs" />
     <Compile Include="Common\ExcelHelperXhf.cs" />
     <Compile Include="Common\FileManagement.cs" />
     <Compile Include="Common\FTP.cs" />
