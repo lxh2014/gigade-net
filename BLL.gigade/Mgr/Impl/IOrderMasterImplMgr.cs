@@ -93,5 +93,9 @@ namespace BLL.gigade.Mgr.Impl
         DataTable OrderDetialExportInfo(OrderDetailQuery query);
         DataTable GetInvoiceData(uint order_id);
         DataTable GetInvoice(uint order_id, uint pid);
+        DataTable GetBigOrderNumbers(OrderMasterQuery query);
+        DataTable GetBigAmount(OrderMasterQuery query);
+        DataTable GetUsersOrderAmount(OrderMasterQuery query);
+        DataTable GetOtherTWPay(OrderMasterQuery query);
     }
 }

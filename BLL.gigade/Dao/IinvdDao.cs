@@ -1393,7 +1393,7 @@ us.user_username as user_name from iinvd ii ");
                 {
                     sbwhere.AppendFormat(" and ii.cde_dt='{0}' and ii.made_date='{1}' ", ivd.cde_dt.ToString("yyyy-MM-dd"), ivd.made_date.ToString("yyyy-MM-dd"));
                 }
-
+                sbwhere.Append(" order by ii.cde_dt asc ");
 
                 return _access.getDataTableForObj<IinvdQuery>(sql.ToString() + sbwhere.ToString());
             }

@@ -35,7 +35,7 @@ var deliveryStatusStore = Ext.create('Ext.data.Store', {
 var freightTypeStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
-        //{ "txt": '全部', "value": "0" },
+        { "txt": '全部', "value": "1000" },
         { "txt": '常溫', "value": "1" },
         { "txt": '低溫', "value": "2" }
     ]
@@ -44,6 +44,7 @@ var freightTypeStore = Ext.create('Ext.data.Store', {
 var productModeStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
+        { "txt": '全部', "value": "1000" },
         { "txt": '統倉出貨', "value": "1" },
         { "txt": '供應商自行出貨', "value": "2" },
         { "txt": '其他', "value": "101" }
@@ -153,8 +154,8 @@ Ext.onReady(function () {
                         valueField: 'value',
                         editable: false,
                         allowBlank: true,
-                        emptyText: '全部',
-                        value: -1,
+                        //emptyText: '全部',
+                        value: 10000,
                         listeners: {
                             //change: function (ths, newValue, oldValue, eOpts) {
                             //    alert(Ext.getCmp('productMode').getValue());
@@ -180,8 +181,8 @@ Ext.onReady(function () {
                         displayField: 'txt',
                         valueField: 'value',
                         submitValue: true,
-                        emptyText: '全部',
-                        value: -1
+                        //emptyText: '全部',
+                        value: 10000
                         ,
                         listeners: {
                             specialkey: function (field, e) {
@@ -205,7 +206,7 @@ Ext.onReady(function () {
                         valueField: 'parameterCode',
                         editable: false,
                         allowBlank: true,
-                        emptyText:'全部',
+                        //emptyText:'全部',
                         value: 10000
                         ,
                         listeners: {
@@ -630,8 +631,8 @@ function Tomorrow() {
 //查询
 Query = function () {
     var falg = 0;
-    var productMode = Ext.getCmp('productMode').getValue(); if (productMode != -1) { falg++; }
-    var freightType = Ext.getCmp('freightType').getValue(); if (freightType != -1) { falg++; }
+    var productMode = Ext.getCmp('productMode').getValue(); if (productMode != 10000) { falg++; }
+    var freightType = Ext.getCmp('freightType').getValue(); if (freightType != 10000) { falg++; }
     var deliveryStatus = Ext.getCmp('deliveryStatus').getValue(); if (deliveryStatus != 10000) { falg++; }
 
     var deliverId = Ext.getCmp('deliverId').getValue().trim(); if (deliverId != '') { falg++; }

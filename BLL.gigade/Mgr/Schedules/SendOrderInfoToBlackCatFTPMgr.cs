@@ -315,7 +315,7 @@ namespace BLL.gigade.Mgr.Schedules
             string GroupCode = string.Empty;
             string MailTitle = string.Empty;
             string MailBody = string.Empty;
-            bool IsSeparate = true;
+            bool IsSeparate = false;
             bool IsDisplyName = true;
 
             try

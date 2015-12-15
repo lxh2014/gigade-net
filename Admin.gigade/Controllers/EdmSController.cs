@@ -115,6 +115,10 @@ namespace Admin.gigade.Controllers
                     {
                         json = "{success:true}";
                     }
+                    else
+                    {
+                        json = "{success:false}";
+                    }
                 }
             }
             catch (Exception ex)

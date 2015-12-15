@@ -1462,5 +1462,52 @@ set ");
                 throw new Exception("OrderMgr-->GetInvoice-->" + ex.Message, ex);
             }
         }
+        #region 異常訂單
+        public DataTable GetBigOrderNumbers(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.GetBigOrderNumbers(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->GetBigOrderNumbers-->" + ex.Message, ex);
+            }
+        }
+        public DataTable GetBigAmount(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.GetBigAmount(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->GetBigAmount-->" + ex.Message, ex);
+            }
+        }
+        public DataTable GetUsersOrderAmount(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.GetUsersOrderAmount(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->GetUsersOrderAmount-->" + ex.Message, ex);
+            }
+        }
+        public DataTable GetOtherTWPay(OrderMasterQuery query)
+        {
+            try
+            {
+                return _orderMasterDao.GetOtherTWPay(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("OrderMgr-->GetOtherTWPay-->" + ex.Message, ex);
+            }
+        }
+        #endregion
+
     }
 }
