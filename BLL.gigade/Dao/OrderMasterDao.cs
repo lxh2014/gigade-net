@@ -360,17 +360,17 @@ namespace BLL.gigade.Dao
                     case 1:
                         if (query.datestart > DateTime.MinValue && query.dateend > DateTime.MinValue)
                         {
-                            sqlwhere.AppendFormat(" AND om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd 00:00:00")));
-                            sqlwhere.AppendFormat(" AND om.order_createdate <= '{0}'", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd 23:59:59")));
+                            sqlwhere.AppendFormat(" AND om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd HH:mm:ss")));
+                            sqlwhere.AppendFormat(" AND om.order_createdate <= '{0}'", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd HH:mm:ss")));
                         }
                         break;
                     case 2:
                         if (query.datestart > DateTime.MinValue && query.dateend > DateTime.MinValue)
                         {
-                            sqlwhere.AppendFormat(" AND (om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd 00:00:00")));
-                            sqlwhere.AppendFormat(" AND om.order_createdate <= '{0}' or", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd 23:59:59")));
-                            sqlwhere.AppendFormat("  om.money_collect_date >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd 00:00:00")));
-                            sqlwhere.AppendFormat(" AND om.money_collect_date <= '{0}') ", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd 23:59:59")));
+                            sqlwhere.AppendFormat(" AND (om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd HH:mm:ss")));
+                            sqlwhere.AppendFormat(" AND om.order_createdate <= '{0}' or", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd HH:mm:ss")));
+                            sqlwhere.AppendFormat("  om.money_collect_date >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd HH:mm:ss")));
+                            sqlwhere.AppendFormat(" AND om.money_collect_date <= '{0}') ", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd HH:mm:ss")));
                         }
                         break;
                     default:
@@ -380,11 +380,11 @@ namespace BLL.gigade.Dao
                 {
                     if (query.datestart > DateTime.MinValue)
                     {
-                        sqlwhere.AppendFormat(" AND om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd 00:00:00")));
+                        sqlwhere.AppendFormat(" AND om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd HH:mm:ss")));
                     }
                     if (query.dateend > DateTime.MinValue)
                     {
-                        sqlwhere.AppendFormat(" AND om.order_createdate <= '{0}'", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd 23:59:59")));
+                        sqlwhere.AppendFormat(" AND om.order_createdate <= '{0}'", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd HH:mm:ss")));
                     }
                 }
                 if (!string.IsNullOrEmpty(query.orderStatus) && query.orderStatus != "-1")
@@ -514,17 +514,17 @@ namespace BLL.gigade.Dao
                     case 1:
                         if (query.datestart > DateTime.MinValue && query.dateend > DateTime.MinValue)
                         {
-                            sqlwhere.AppendFormat(" AND om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd 00:00:00")));
-                            sqlwhere.AppendFormat(" AND om.order_createdate <= '{0}'", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd 23:59:59")));
+                            sqlwhere.AppendFormat(" AND om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd HH:mm:ss")));
+                            sqlwhere.AppendFormat(" AND om.order_createdate <= '{0}'", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd HH:mm:ss")));
                         }
                         break;
                     case 2:
                         if (query.datestart > DateTime.MinValue && query.dateend > DateTime.MinValue)
                         {
-                            sqlwhere.AppendFormat(" AND (om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd 00:00:00")));
-                            sqlwhere.AppendFormat(" AND om.order_createdate <= '{0}' or", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd 23:59:59")));
-                            sqlwhere.AppendFormat("  om.money_collect_date >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd 00:00:00")));
-                            sqlwhere.AppendFormat(" AND om.money_collect_date <= '{0}') ", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd 23:59:59")));
+                            sqlwhere.AppendFormat(" AND (om.order_createdate  >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd HH:mm:ss")));
+                            sqlwhere.AppendFormat(" AND om.order_createdate <= '{0}' or", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd HH:mm:ss")));
+                            sqlwhere.AppendFormat("  om.money_collect_date >= '{0}' ", CommonFunction.GetPHPTime(query.datestart.ToString("yyyy-MM-dd HH:mm:ss")));
+                            sqlwhere.AppendFormat(" AND om.money_collect_date <= '{0}') ", CommonFunction.GetPHPTime(query.dateend.ToString("yyyy-MM-dd HH:mm:ss")));
                         }
                         break;
                     default:

@@ -1530,11 +1530,11 @@ namespace Admin.gigade.Controllers
                 DateTime dt;
                 if (DateTime.TryParse(Request.Params["deliverstart"].ToString(), out dt))//開始時間
                 {
-                    query.deliverstart = Convert.ToInt32(CommonFunction.GetPHPTime(dt.ToString("yyyy-MM-dd 00:00:00")));
+                    query.deliverstart = Convert.ToInt32(CommonFunction.GetPHPTime(dt.ToString("yyyy-MM-dd HH:mm:ss")));
                 }
                 if (DateTime.TryParse(Request.Params["deliverend"].ToString(), out dt))//結束時間
                 {
-                    query.deliverend = Convert.ToInt32(CommonFunction.GetPHPTime(dt.ToString("yyyy-MM-dd 23:59:59")));
+                    query.deliverend = Convert.ToInt32(CommonFunction.GetPHPTime(dt.ToString("yyyy-MM-dd HH:mm:ss")));
                 }
                 int totalCount = 0;
                 stores = _IorderDeliver.GetOrderDeliverList(query, out totalCount);
@@ -1591,7 +1591,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
                 {
-                    query.dateTwo = DateTime.Parse(Request.Params["dateTwo"]).AddDays(1);
+                    query.dateTwo = DateTime.Parse(Request.Params["dateTwo"]);
                 }
                 if (!string.IsNullOrEmpty(Request.Params["slave_status"]) && Request.Params["slave_status"] != "null")
                 {
@@ -1680,7 +1680,7 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(Request.Params["dateTwo"]))
             {
-                query.dateTwo = DateTime.Parse(Request.Params["dateTwo"]).AddDays(1);
+                query.dateTwo = DateTime.Parse(Request.Params["dateTwo"]);
             }
             if (!string.IsNullOrEmpty(Request.Params["slave_status"]) && Request.Params["slave_status"] != "null")
             {
@@ -1890,11 +1890,11 @@ namespace Admin.gigade.Controllers
                 DateTime dtime;
                 if (DateTime.TryParse(Request.Params["dateStart"].ToString(), out dtime))
                 {
-                    query.dateStart = dtime;
+                    query.dateStart =Convert.ToDateTime(Request.Params["dateStart"]);
                 }
                 if (DateTime.TryParse(Request.Params["dateEnd"].ToString(), out dtime))
                 {
-                    query.dateEnd = dtime.AddDays(1);
+                    query.dateEnd = Convert.ToDateTime(Request.Params["dateEnd"]);
                 }
                 if (!string.IsNullOrEmpty(Request.Params["order_status"]))
                 {//狀態
