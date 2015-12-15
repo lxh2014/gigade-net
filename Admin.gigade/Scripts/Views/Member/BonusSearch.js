@@ -245,7 +245,7 @@ Ext.onReady(function () {
                             id: 'time_end_create',
                             name: 'time_end_create',
                             margin: '5 0 0 6',
-                            format: 'Y-m-d  H:i:s',
+                            format: 'Y-m-d H:i:s',
                             time: { hour: 23, min: 59, sec: 59 },
                             editable: false,
                             listeners: {

@@ -247,17 +247,23 @@ Ext.onReady(function () {
                     value: 1
                 },
                 {
-                    xtype: "datefield",
-                    format: 'Y-m-d',
+                    xtype: "datetimefield",
+                    time: { hour: 00, min: 00, sec: 00 },
+                    format: 'Y-m-d H:i:s',
                     labelWidth: 60,
                     id: 'dateStart',
                     name: 'dateStart',
                     editable: false,
-                    value: new Date(Today().setMonth(Today().getMonth() - 1)),
+                    value: setNextMonth(TodayVendor(), -1),
                     listeners: {
                         select: function (a, b, c) {
-                            var Month = new Date(this.getValue()).getMonth() + 1;
-                            Ext.getCmp("dateEnd").setValue(new Date(new Date(this.getValue()).setMonth(Month)));
+                            var start = Ext.getCmp("dateStart");
+                            var end = Ext.getCmp("dateEnd");
+                            var s_date = new Date(end.getValue());
+                            if (end.getValue() < start.getValue()) {
+                                var start_date = start.getValue();
+                                Ext.getCmp('dateEnd').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                            }
                         }
                     }
                 },
@@ -267,20 +273,20 @@ Ext.onReady(function () {
                     value: "~"
                 },
                 {
-                    xtype: "datefield",
-                    format: 'Y-m-d',
+                    xtype: "datetimefield",
+                    format: 'Y-m-d H:i:s',
+                    time: { hour: 23, min: 59, sec: 59 },
                     id: 'dateEnd',
                     name: 'dateEnd',
-                    value: Today(),
+                    value: TodayVendor(),
                     editable: false,
                     listeners: {
                         select: function (a, b, c) {
                             var start = Ext.getCmp("dateStart");
                             var end = Ext.getCmp("dateEnd");
-                            var s_date = new Date(start.getValue());
                             if (end.getValue() < start.getValue()) {
-                                Ext.Msg.alert("提示信息", "開始時間不能大於結束時間！");
-                                end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                var end_date = end.getValue();
+                                Ext.getCmp('dateStart').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                             }
                         }
                     }
@@ -409,8 +415,8 @@ Ext.onReady(function () {
                                 Ext.getCmp("search_con").setValue("");
                                 Ext.getCmp("product_freight_set").setValue("");
                                 Ext.getCmp("product_manage").setValue("");
-                                Ext.getCmp('dateStart').setValue(new Date(Today().setMonth(Today().getMonth() - 1)));
-                                Ext.getCmp('dateEnd').setValue(Today());
+                                Ext.getCmp('dateStart').setValue(new Date(TodayVendor().setMonth(TodayVendor().getMonth() - 1)));
+                                Ext.getCmp('dateEnd').setValue(TodayVendor());
                             }
                         }
                     },                    
@@ -580,7 +586,7 @@ onEditClick = function () {
 
 /************匯入到Exce************/
 function Export() {
-    window.open("/OrderManage/ExportCSV?selecttype=" + Ext.getCmp('select_type').getValue() + "&searchcon=" + Ext.getCmp('search_con').getValue() + "&datetype=" + Ext.getCmp('datetype').getValue() + "&dateStart=" + Ext.Date.format(new Date(Ext.getCmp('dateStart').getValue()), 'Y-m-d') + "&dateEnd=" + Ext.Date.format(new Date(Ext.getCmp('dateEnd').getValue()), 'Y-m-d') + "&Vendor_Id=" + Ext.getCmp('Vendor').getValue() + "&product_freight_set=" + Ext.getCmp('product_freight_set').getValue() + "&product_manage=" + Ext.getCmp('product_manage').getValue() + "&order_status=" + Ext.getCmp('order_status').getValue() + "&order_payment=" + Ext.getCmp('order_payment').getValue());
+    window.open("/OrderManage/ExportCSV?selecttype=" + Ext.getCmp('select_type').getValue() + "&searchcon=" + Ext.getCmp('search_con').getValue() + "&datetype=" + Ext.getCmp('datetype').getValue() + "&dateStart=" + Ext.Date.format(new Date(Ext.getCmp('dateStart').getValue()), 'Y-m-d H:i:s') + "&dateEnd=" + Ext.Date.format(new Date(Ext.getCmp('dateEnd').getValue()), 'Y-m-d H:i:s') + "&Vendor_Id=" + Ext.getCmp('Vendor').getValue() + "&product_freight_set=" + Ext.getCmp('product_freight_set').getValue() + "&product_manage=" + Ext.getCmp('product_manage').getValue() + "&order_status=" + Ext.getCmp('order_status').getValue() + "&order_payment=" + Ext.getCmp('order_payment').getValue());
 }
 //查询
 Query = function () {
@@ -600,8 +606,8 @@ Query = function () {
             selecttype: Ext.getCmp('select_type').getValue(), //選擇查詢種類
             searchcon: Ext.getCmp('search_con').getValue(),
             datetype: Ext.getCmp('datetype').getValue(),
-            dateStart: Ext.Date.format(new Date(Ext.getCmp('dateStart').getValue()), 'Y-m-d'),
-            dateEnd: Ext.Date.format(new Date(Ext.getCmp('dateEnd').getValue()), 'Y-m-d'),
+            dateStart: Ext.Date.format(new Date(Ext.getCmp('dateStart').getValue()), 'Y-m-d H:i:s'),
+            dateEnd: Ext.Date.format(new Date(Ext.getCmp('dateEnd').getValue()), 'Y-m-d H:i:s'),
             Vendor_Id: Ext.getCmp('Vendor').getValue(),
             product_freight_set: Ext.getCmp('product_freight_set').getValue(),
             product_manage: Ext.getCmp('product_manage').getValue(),
@@ -640,4 +646,30 @@ function onUserEditClick() {
             SecretLoginFun(secret_type, ralated_id, false, true, false, url, info_type, info_id, secret_info);//直接彈出顯示框
         }
     }
+}
+
+function TodayVendor() {
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate());
+    dt.setHours(23, 59, 59);
+    return dt;                                 // 返回日期。
+}
+
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

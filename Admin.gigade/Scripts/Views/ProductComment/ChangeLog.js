@@ -129,16 +129,16 @@ var searchfrm = Ext.create('Ext.form.Panel', {
             value: "創建時間："
         },
         {
-            xtype: "datefield",
+            xtype: "datetimefield",
             width: 150,
             margin: '5 0 0 0',
             id: 'date_one',
             name: 'date_one',
             editable: false,
-            format: 'Y-m-d',
+            format: 'Y-m-d H:i:s',
             time: { hour: 00, min: 00, sec: 00 },//開始時間00：00：00
             submitValue: true,
-            value: Tomorrow(1 - new Date().getDate()),
+            value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
             listeners: {
                 select: function (a, b, c)
                 {
@@ -147,10 +147,10 @@ var searchfrm = Ext.create('Ext.form.Panel', {
                     if (end.getValue() == null)
                     {
                         end.setValue(setNextMonth(start.getValue(), 1));
-                    } else if (end.getValue() < start.getValue())
+                    } else if (start.getValue()>end.getValue())
                     {
                         Ext.Msg.alert(INFORMATION, DATA_TIP);
-                        start.setValue(setNextMonth(end.getValue(), -1));
+                        end.setValue(setNextMonth(start.getValue(), 1));
                     }
                 }
             }
@@ -162,15 +162,15 @@ var searchfrm = Ext.create('Ext.form.Panel', {
           },
 
      {
-         xtype: "datefield",
-         format: 'Y-m-d',
+         xtype: "datetimefield",
+         format: 'Y-m-d H:i:s',
          editable: false,
          time: { hour: 23, min: 59, sec: 59 },//開始時間00：00：00
          id: 'date_two',
          name: 'date_two',
          margin: '5 0 0 0',
          width: 150,
-         value: Tomorrow(0),
+         value: setNextMonth(Tomorrow(), 0),
          listeners: {
              select: function (a, b, c)
              {
@@ -181,7 +181,7 @@ var searchfrm = Ext.create('Ext.form.Panel', {
                      if (end.getValue() < start.getValue())
                      {
                          Ext.Msg.alert(INFORMATION, DATA_TIP);
-                         end.setValue(setNextMonth(start.getValue(), 1));
+                         start.setValue(setNextMonth(end.getValue(), -1));
                      }
                  }
                  else
@@ -212,8 +212,8 @@ var searchfrm = Ext.create('Ext.form.Panel', {
         handler: function ()
         {
             Ext.getCmp('comment_id').setValue(null);
-            Ext.getCmp('date_one').setValue(Tomorrow(1 - new Date().getDate()));
-            Ext.getCmp('date_two').setValue(Tomorrow(0));
+            Ext.getCmp('date_one').reset();
+            Ext.getCmp('date_two').reset();
 
         }
     },
@@ -420,10 +420,26 @@ setNextMonth = function (source, n)
 }
 
 /******************************************************************************************************************************************************************************************/
-function Tomorrow(s)
-{
+function Tomorrow() {
     var d;
-    d = new Date();                             // 创建 Date 对象。                               // 返回日期。
-    d.setDate(d.getDate() + s);
-    return d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate() + 1);
+    return dt;                  // 返回日期。
+}
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n >= 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

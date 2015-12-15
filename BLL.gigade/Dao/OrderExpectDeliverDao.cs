@@ -46,12 +46,12 @@ namespace BLL.gigade.Dao
 
                 if (query.date_one != DateTime.MinValue)
                 {
-                    sqlCondi.AppendFormat(" and oed.createdate >='{0}'", CommonFunction.GetPHPTime(query.date_one.ToString("yyyy-MM-dd 00:00:00")));
+                    sqlCondi.AppendFormat(" and oed.createdate >='{0}'", CommonFunction.GetPHPTime(query.date_one.ToString("yyyy-MM-dd HH:mm:ss")));
 
                 }
                 if (query.date_two != DateTime.MinValue)
                 {
-                    sqlCondi.AppendFormat(" and oed.createdate <='{0}'", CommonFunction.GetPHPTime(query.date_two.ToString("yyyy-MM-dd 23:59:59")));
+                    sqlCondi.AppendFormat(" and oed.createdate <='{0}'", CommonFunction.GetPHPTime(query.date_two.ToString("yyyy-MM-dd HH:mm:ss")));
                 }
 
                 if (query.query_status != -1)//-1表所有狀態，0表示未出貨
@@ -107,12 +107,12 @@ namespace BLL.gigade.Dao
 
                 if (store.date_one != DateTime.MinValue)
                 {
-                    sqlCondi.AppendFormat(" and oed.createdate >='{0}'", CommonFunction.GetPHPTime(store.date_one.ToString("yyyy-MM-dd 00:00:00")));
+                    sqlCondi.AppendFormat(" and oed.createdate >='{0}'", CommonFunction.GetPHPTime(store.date_one.ToString("yyyy-MM-dd HH:mm:ss")));
 
                 }
                 if (store.date_two != DateTime.MinValue)
                 {
-                    sqlCondi.AppendFormat(" and oed.createdate <='{0}'", CommonFunction.GetPHPTime(store.date_two.ToString("yyyy-MM-dd 23:59:59")));
+                    sqlCondi.AppendFormat(" and oed.createdate <='{0}'", CommonFunction.GetPHPTime(store.date_two.ToString("yyyy-MM-dd HH:mm:ss")));
                 }
 
                 if (store.query_status != -1)//-1表所有狀態，0表示未出貨

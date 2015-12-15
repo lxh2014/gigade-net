@@ -124,9 +124,9 @@ Ext.onReady(function () {
                                Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
                                endTime.setValue(setNextMonth(startTime.getValue(), 3));
                            }
-                           else if (endTime.getValue() > setNextMonth(startTime.getValue(), 3)) {
-                               endTime.setValue(setNextMonth(startTime.getValue(), 3));
-                           }
+                           //else if (endTime.getValue() > setNextMonth(startTime.getValue(), 3)) {
+                           //    endTime.setValue(setNextMonth(startTime.getValue(), 3));
+                           //}
                        },
                        specialkey: function (field, e) {
                            if (e.getKey() == e.ENTER) {
@@ -160,11 +160,11 @@ Ext.onReady(function () {
                            if (startTime.getValue() != "" && startTime.getValue() != null) {
                                if (endTime.getValue() < startTime.getValue()) {
                                    Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間");
-                                   endTime.setValue(setNextMonth(startTime.getValue(), 3));
-                               }
-                               else if (endTime.getValue() > setNextMonth(startTime.getValue(), 3)) {
                                    startTime.setValue(setNextMonth(endTime.getValue(), -3));
                                }
+                               //else if (endTime.getValue() > setNextMonth(startTime.getValue(), 3)) {
+                               //    startTime.setValue(setNextMonth(endTime.getValue(), -3));
+                               //}
                            }
                            else {
                                startTime.setValue(setNextMonth(endTime.getValue(), -3));

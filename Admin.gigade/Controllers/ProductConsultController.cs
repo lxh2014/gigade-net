@@ -107,11 +107,11 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["timestart"]))
                 {
-                    query.beginTime = Convert.ToDateTime(Convert.ToDateTime(Request.Params["timestart"]).ToString("yyyy-MM-dd 00:00:00")) ;
+                    query.beginTime = Convert.ToDateTime(Convert.ToDateTime(Request.Params["timestart"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["timeend"]))
                 {
-                    query.endTime = Convert.ToDateTime(Convert.ToDateTime(Request.Params["timeend"]).ToString("yyyy-MM-dd 23:59:59"));
+                    query.endTime = Convert.ToDateTime(Convert.ToDateTime(Request.Params["timeend"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (Convert.ToBoolean(Request.Params["shopClass1"]) && Convert.ToBoolean(Request.Params["shopClass2"]))
                 {
