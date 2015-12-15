@@ -49,6 +49,7 @@ x64/
 *.pubxml
 *.csv
 Web.config
+Config.xml
 *.publish.xml
 
 # OS generated files #

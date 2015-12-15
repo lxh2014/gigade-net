@@ -115,6 +115,7 @@
     <Compile Include="Common\CreateCode.cs" />
     <Compile Include="Common\CsvHelper.cs" />
     <Compile Include="Common\DataCheck.cs" />
+    <Compile Include="Common\EncryptComputer.cs" />
     <Compile Include="Common\ExcelHelperXhf.cs" />
     <Compile Include="Common\FileManagement.cs" />
     <Compile Include="Common\FTP.cs" />
@@ -686,6 +687,8 @@
     <Compile Include="Dao\WebContentTypeSetupDao.cs" />
     <Compile Include="Dao\ZipDao.cs" />
     <Compile Include="Dao\DeliverChangeLogDao.cs" />
+    <Compile Include="Dao\LogisticsTcatEodDao.cs" />
+    <Compile Include="Dao\LogisticsTcatSodDao.cs" />
     <Compile Include="Mgr\AnnounceMgr.cs" />
     <Compile Include="Mgr\AppcategoryMgr.cs" />
     <Compile Include="Mgr\AppmessageMgr.cs" />
@@ -1179,6 +1182,9 @@
     <Compile Include="Mgr\ScheduleParamerMgr.cs" />
     <Compile Include="Mgr\ScheduleRelationMgr.cs" />
     <Compile Include="Mgr\ScheduleServiceMgr.cs" />
+    <Compile Include="Mgr\Schedules\CheckOrderAmountMgr.cs" />
+    <Compile Include="Mgr\Schedules\ProductPurchaseMgr.cs" />
+    <Compile Include="Mgr\Schedules\PromotionsAmountGiftMgr.cs" />
     <Compile Include="Mgr\Schedules\DeliverStatusMgr.cs" />
     <Compile Include="Mgr\Schedules\SetConfigXmlMgr.cs" />
     <Compile Include="Mgr\Schedules\UserLoginLogMgr.cs" />

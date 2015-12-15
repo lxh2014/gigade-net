@@ -600,5 +600,16 @@ namespace BLL.gigade.Mgr
             }
         
         }
+        public DataTable getVentory(IinvdQuery m)
+        {
+            try
+            {
+                return _ivddao.getVentory(m);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdMgr-->getVentory-->" + ex.Message, ex);
+            }
+        }
     }
 }

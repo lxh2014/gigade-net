@@ -460,13 +460,15 @@ namespace BLL.gigade.Dao
                     if (deduct_happygo > 0)
                     {
                         //插入hg_deduct_refund
-                       
                         arrList.Add(hg_batch_deduct_refund(hgBatch));
-                        
                     }
                     if (deductbonus > 0)
                     {
                         Deduct_Refund(om, deductbonus, 0, 0, omQuery);
+                    }
+                    if (deductcash > 0)
+                    {
+                        Deduct_Refund(om, 0, deductcash, 0, omQuery);
                     }
                     #endregion
                     DataTable _dt = GetTotalCount(om.Order_Id, 1);
@@ -811,6 +813,7 @@ namespace BLL.gigade.Dao
             #region 抵用券
             if (deductcash > 0)
             {
+                bm.bonus_type = 2;
                 bm.master_total = Convert.ToUInt32(deductcash);
                 bm.master_balance = Convert.ToInt32(deductcash);
                 DateTime master_end = master_start.AddDays(Convert.ToDouble(expireDay));
