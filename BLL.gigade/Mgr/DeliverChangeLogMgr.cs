@@ -452,14 +452,14 @@ namespace BLL.gigade.Mgr
                             deliverDt_1.Columns.Remove("供應商編號");
                             deliverDt_1.Columns.Remove("供應商郵箱");
                             deliverDt_1.Columns.Remove("供應商名稱");
-                            string MailBody_1 = "<p>吉甲地市集【期望到貨日改變】通知信</p><p><font color=\"#00BB00\" >" + vendor_name_full + "</font>&nbsp&nbsp您好：</p>" +
+                            string MailBody_1 = "<p>吉甲地市集【期望到貨日改變】通知信</p><p><font color=\"#00BB00\" >" + vendor_name_full + "</font> 您好：</p>" +
                                 "<p>以下訂單已改變出貨單期望到貨日，訂單資訊如下。</p>" +                                    
                                 //"<p>============================================================</p>"+
                                             GetHtmlByDataTable(deliverDt_1) +
                                 //"<p>============================================================</p>"+
               "<p>訂單的相關資訊，請至<a href='http://vendor.gigade100.com' style='color:#3399ff;text-decoration: none;'>【後台管理】</a>中查詢。</p>"+
               "<p>※本信由系統寄出，請勿直接回覆！</p>"+
-              "有任何問題與建議，歡迎聯絡我們<a href='http://www.gigade100.com/contact_service.php' target='_blank'>&nbsp&nbsp<img src='http://www.gigade100.com/images/send_mail.jpg'></a>" +
+              "有任何問題與建議，歡迎聯絡我們<a href='http://www.gigade100.com/contact_service.php' target='_blank'> <img src='http://www.gigade100.com/images/send_mail.jpg'></a>" +
               "<p>吉甲地市集<a href='http://www.gigade100.com/'>http://www.gigade100.com/</a></p>";
 
                             string MailTitle_1 = MailTitle;

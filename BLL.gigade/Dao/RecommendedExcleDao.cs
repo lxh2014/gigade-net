@@ -317,7 +317,7 @@ year(FROM_UNIXTIME(max(order_createdate)))  as maxyear from order_master  ");
                                 INNER JOIN price_master pm 
                                 on pm.product_id=pii.product_id and pm.product_id>='{0}' and pm.product_id <= '{1}'
                                 right JOIN product_category_set pcs on pii.item_id=pcs.item_id 
-                                where pii.product_id>='{0}'and pii.product_id <='{1}' ", start_product_id,end_product_id);
+                                where pii.product_id>='{0}'and pii.product_id <='{1}' and pt.sale_status<20 and pt.product_status in (5,6,7) ", start_product_id, end_product_id);
                 }
                 else
                 {
@@ -328,7 +328,7 @@ year(FROM_UNIXTIME(max(order_createdate)))  as maxyear from order_master  ");
                                 on pt.product_id=pii.product_id and pt.combination=1 and pt.product_id>=10001
                                 INNER JOIN price_master pm 
                                 on pm.product_id=pii.product_id and pm.product_id>=10001
-                                where pii.product_id>=10001 ");
+                                where pii.product_id>=10001 and pt.sale_status<20 and pt.product_status in (5,6,7) ");
                 }
                     sql.AppendFormat(" ORDER BY pii.product_id ;");
                
