@@ -466,7 +466,14 @@ namespace BLL.gigade.Mgr
                             //MailToAddress_1 = "zhaozhi0623j@gimg.tw";
                             BLL.gigade.Common.MailHelper mailHelper = new MailHelper(mailModel_1);
                             //public Boolean SendMailAction(string MailToAddress, string MailTitle, string MailBody)
-                            mailHelper.SendMailAction(MailToAddress_1, MailTitle_1, MailBody_1 + " ");//給單個供應商發送郵件
+                            try
+                            {
+                                mailHelper.SendMailAction(MailToAddress_1, MailTitle_1, MailBody_1 + " ");//給單個供應商發送郵件
+                            }
+                            catch (Exception)
+                            {
+                                continue;                               
+                            }
                         }                     
                     }
                     #endregion
