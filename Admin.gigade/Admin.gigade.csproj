@@ -339,9 +339,7 @@
     <Content Include="bin\log4net.dll" />
     <Content Include="bin\Newtonsoft.Json.dll" />
     <Content Include="bin\WebDav.dll" />
-    <Content Include="Config.xml">
-      <SubType>Designer</SubType>
-    </Content>
+    <Content Include="Config.xml" />
     <Content Include="Content\css\dataview.css" />
     <Content Include="Content\css\icon.css" />
     <Content Include="Content\css\login\axurerp_pagespecificstyles.css" />

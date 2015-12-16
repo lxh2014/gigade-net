@@ -195,7 +195,7 @@ namespace BLL.gigade.Mgr
                     {
                         status = "1";
                     }
-                    else if (dtProduct.Rows[i]["product_status"].ToString() == "6")
+                    else
                     {
                         status = "0";
                     }
