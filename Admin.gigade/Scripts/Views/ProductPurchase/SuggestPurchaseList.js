@@ -43,7 +43,8 @@ Ext.define('gigade.Product', {
         { name: "product_status_string", type: "string" },//商品狀態
         { name: "sale_name", type: "string" },//販售狀態
         { name: "create_datetime", type: "string" },//下單採購時間
-        { name: "NoticeGoods",type:"string" }//補貨通知人數
+        { name: "NoticeGoods", type: "string" },//補貨通知人數
+         { name: "ipo_qty", type: "string" }
     ]
 });
 
@@ -518,7 +519,7 @@ Ext.onReady(function () {
             { header: "週期平均量", dataIndex: 'averageCount', width: 80, align: 'center' },//平均平均量
             { header: "建議採購量", dataIndex: 'suggestPurchaseCount', width: 80, align: 'center' },//建議採購量
             { header: "最小採購量", dataIndex: 'min_purchase_amount', width: 80, align: 'center' },
-           
+            { header: "未驗收數量", dataIndex: 'ipo_qty', width: 80, align: 'center' },
             { header: "供應商採購天數", dataIndex: 'procurement_days', width: 90, align: 'center' },
             { header: "補貨通知人數", dataIndex: 'NoticeGoods', width: 90, align: 'center' },
             { header: "售價(單價)", dataIndex: 'item_money', width: 80, align: 'center' },
@@ -526,6 +527,7 @@ Ext.onReady(function () {
             { header: "商品狀態", dataIndex: 'product_status_string', width: 80, align: 'center' },
             { header: "販售狀態", dataIndex: 'sale_name', width: 80, align: 'center' },
             { header: "下單採購時間", dataIndex: 'create_datetime', width: 80, align: 'center' }
+           
         ],
         tbar: [
             { xtype: 'button', text: "匯出", id: 'exportExcel', icon: '../../../Content/img/icons/excel.gif', handler: ExportExcel },

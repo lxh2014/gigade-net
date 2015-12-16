@@ -148,7 +148,8 @@ namespace BLL.gigade.Mgr.Schedules
                     dtExcel.Columns.Add("庫存量", typeof(String));
                     dtExcel.Columns.Add("後台庫存量", typeof(String));
                     dtExcel.Columns.Add("安全存量", typeof(String));
-                    dtExcel.Columns.Add("建議採購量", typeof(String));
+                    dtExcel.Columns.Add("建議採購量", typeof(String));//ipo_qty
+                    dtExcel.Columns.Add("未驗收數量", typeof(String));
                     dtExcel.Columns.Add("補貨通知人數", typeof(String));
                     dtExcel.Columns.Add("成本", typeof(String));
                     dtExcel.Columns.Add("價格", typeof(String));
@@ -230,12 +231,13 @@ namespace BLL.gigade.Mgr.Schedules
 
                         }
                         #endregion
-                        newRow[12] = dt.Rows[i]["NoticeGoods"];
+                        newRow[12] = dt.Rows[i]["ipo_qty"];
+                        newRow[13] = dt.Rows[i]["NoticeGoods"];
 
-                        newRow[13] = dt.Rows[i]["item_cost"];
-                        newRow[14] = dt.Rows[i]["item_money"];
-                        newRow[15] = string.IsNullOrEmpty(dt.Rows[i]["product_start"].ToString()) ? " " : DateTime.Parse(dt.Rows[i]["product_start"].ToString()).ToString("yyyy-MM-dd hh:mm:ss");
-                        newRow[16] = string.IsNullOrEmpty(dt.Rows[i]["product_end"].ToString()) ? "" : DateTime.Parse(dt.Rows[i]["product_end"].ToString()).ToString("yyyy-MM-dd hh:mm:ss");
+                        newRow[14] = dt.Rows[i]["item_cost"];
+                        newRow[15] = dt.Rows[i]["item_money"];
+                        newRow[16] = string.IsNullOrEmpty(dt.Rows[i]["product_start"].ToString()) ? " " : DateTime.Parse(dt.Rows[i]["product_start"].ToString()).ToString("yyyy-MM-dd hh:mm:ss");
+                        newRow[17] = string.IsNullOrEmpty(dt.Rows[i]["product_end"].ToString()) ? "" : DateTime.Parse(dt.Rows[i]["product_end"].ToString()).ToString("yyyy-MM-dd hh:mm:ss");
                         dtExcel.Rows.Add(newRow);
                         #endregion
                     }
@@ -284,7 +286,7 @@ namespace BLL.gigade.Mgr.Schedules
             sb.AppendFormat("<td>{0}</td>", dtExcel.Columns[14]);
             sb.AppendFormat("<td>{0}</td>", dtExcel.Columns[15]);
             sb.AppendFormat("<td>{0}</td>", dtExcel.Columns[16]);
-            //sb.AppendFormat("<td>{0}</td>", dtExcel.Columns[17]);
+            sb.AppendFormat("<td>{0}</td>", dtExcel.Columns[17]);
             //sb.AppendFormat("<td>{0}</td>", dtExcel.Columns[18]);
             sb.AppendFormat("</tr></thead>");
             int i = 0;
@@ -315,7 +317,7 @@ namespace BLL.gigade.Mgr.Schedules
                 sb.AppendFormat("<td>{0}</td>", item[14]);
                 sb.AppendFormat("<td>{0}</td>", item[15]);
                 sb.AppendFormat("<td>{0}</td>", item[16]);
-                //sb.AppendFormat("<td>{0}</td>", item[17]);
+                sb.AppendFormat("<td>{0}</td>", item[17]);
                 //sb.AppendFormat("<td>{0}</td>", item[18]);
                 sb.Append("</tr>");
                 i++;
