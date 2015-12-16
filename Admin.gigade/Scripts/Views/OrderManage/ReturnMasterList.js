@@ -202,20 +202,21 @@ var frm = Ext.create('Ext.form.Panel', {
                     value: 0
                 },
                 {
-                    xtype: 'datefield',
+                    xtype: 'datetimefield',
                     id: 'time_start',
                     name: 'time_start',
                     margin: '5 10 0 0',
                     editable: false,
-                    format: 'Y-m-d',
-                    value: new Date( new Date().getFullYear(),new Date().getMonth(), new Date().getDate()-3),
+                    format: 'Y-m-d H:i:s',
+                    time: { hour: 00, min: 00, sec: 00 },
+                    value: setNextMonth(Today(), -1),
                     listeners: {
                         select: function (a, b, c) {
                             var start = Ext.getCmp("time_start");
                             var end = Ext.getCmp("time_end");
                             if (end.getValue() < start.getValue()) {
-                                var new_time = new Date(start.getValue().getFullYear(), start.getValue().getMonth(), start.getValue().getDate() + 3);
-                                end.setValue(new_time);
+                                var start_date = start.getValue();
+                                Ext.getCmp('time_end').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
                             }
                         },
                         specialkey: function (field, e) {
@@ -227,20 +228,21 @@ var frm = Ext.create('Ext.form.Panel', {
                 },
                 { xtype: 'displayfield', margin: '5 10 0 0', value: '~'},
                 {
-                    xtype: 'datefield',
+                    xtype: "datetimefield",
+                    time: { hour: 23, min: 59, sec: 59 },
                     id: 'time_end',
                     name: 'time_end',
                     margin: '5 10 0 0',
                     editable: false,
-                    format: 'Y-m-d',
-                    value: new Date(),
+                    format: 'Y-m-d H:i:s',
+                    value: Today(),
                     listeners: {
                         select: function (a, b, c) {
                             var start = Ext.getCmp("time_start");
                             var end = Ext.getCmp("time_end");
                             if (end.getValue() < start.getValue()) {
-                                var new_time = new Date(end.getValue().getFullYear(), end.getValue().getMonth(), end.getValue().getDate() - 3);
-                                start.setValue(new_time);
+                                var end_date = end.getValue();
+                                Ext.getCmp('time_start').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                             }
                         },
                         specialkey: function (field, e) {
@@ -438,4 +440,31 @@ function Tomorrow() {
     d = new Date();
     d.setDate(d.getDate() + 1);
     return d;
+}
+
+
+function Today() {
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate());
+    dt.setHours(23, 59, 59);
+    return dt;                                 // 返回日期。
+}
+
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

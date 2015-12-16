@@ -433,12 +433,14 @@ Ext.onReady(function () {
                         margin: "0 5 0 0",
                         items: [
                                {
-                                   xtype: 'datefield',
+                                   xtype: 'datetimefield',
                                    allowBlank: true,
                                    id: 'timestart',
                                    margin: "0 5 0 0",
                                    name: 'serchcontent',
                                    fieldLabel: '諮詢時間',
+                                   format: 'Y-m-d  H:i:s',
+                                   time: { hour: 00, min: 00, sec: 00 },
                                    labelWidth: 60,
                                    editable: false,
                                    listeners: {
@@ -456,12 +458,14 @@ Ext.onReady(function () {
                                    }
                                },
                                {
-                                   xtype: 'datefield',
+                                   xtype: 'datetimefield',
                                    allowBlank: true,
                                    id: 'timeend',
                                    margin: "0 5 0 0",
                                    name: 'serchcontent',
                                    fieldLabel: '到',
+                                   format: 'Y-m-d  H:i:s',
+                                   time: { hour: 23, min: 59, sec: 59 },
                                    labelWidth: 15,
                                    editable: false,
                                    listeners: {

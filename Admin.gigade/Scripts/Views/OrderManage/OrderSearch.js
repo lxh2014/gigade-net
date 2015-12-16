@@ -297,25 +297,24 @@ Ext.onReady(function () {
                     value: 1
                 },
                 {
-                    xtype: "datefield",
+                    xtype: "datetimefield",
+                    time: { hour: 00, min: 00, sec: 00 },
+                    value: setNextMonth(Today(), -1),
                     labelWidth: 60,
                     margin: '0 0 0 0',
                     id: 'dateOne',
                     name: 'dateOne',
-                    format: 'Y-m-d',
+                    format: 'Y-m-d H:i:s',
                     allowBlank: false,
                     editable: false,
                     submitValue: true,
-                    //value: new Date(Tomorrow().setDate(Tomorrow().getDay() - 2)),
-                    value:new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
                     listeners: {
                         select: function (a, b, c) {
                             var start = Ext.getCmp("dateOne");
                             var end = Ext.getCmp("dateTwo");
-                            var s_date = new Date(end.getValue());
                             if (end.getValue() < start.getValue()) {
-                                Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
-                                start.setValue(Tomorrow().setMonth(Tomorrow().getMonth() - 1));
+                                var start_date = start.getValue();
+                                Ext.getCmp('dateTwo').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
                             }
                         },
                         specialkey: function (field, e) {
@@ -327,23 +326,23 @@ Ext.onReady(function () {
                 },
                 { xtype: 'displayfield',margin: '0 0 0 0',value: "~" },
                 {
-                    xtype: "datefield",
-                    format: 'Y-m-d',
+                    xtype: "datetimefield",
+                    format: 'Y-m-d H:i:s',
+                    time: { hour: 23, min: 59, sec: 59 },
                     id: 'dateTwo',
                     name: 'dateTwo',
                     margin: '0 0 0 0',
                     editable: false,
                     allowBlank: false,
                     submitValue: true,
-                    value: Tomorrow(),
+                    value: Today(),
                     listeners: {
                         select: function (a, b, c) {
                             var start = Ext.getCmp("dateOne");
                             var end = Ext.getCmp("dateTwo");
-                            var s_date = new Date(start.getValue());
                             if (end.getValue() < start.getValue()) {
-                                Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
-                                end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                var end_date = end.getValue();
+                                Ext.getCmp('dateOne').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                             }
                         },
                         specialkey: function (field, e) {
@@ -654,8 +653,8 @@ function comeback() {
     Ext.getCmp('timeone').setValue(1);
     Ext.getCmp("a").setValue(-1);  //付款單狀態，付款失敗，已發貨
     Ext.getCmp('channel').setValue();  //賣場
-    Ext.getCmp("dateOne").setValue(new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)));
-    Ext.getCmp("dateTwo").setValue(Tomorrow());    
+    Ext.getCmp("dateOne").setValue(setNextMonth(Today(), -1));
+    Ext.getCmp("dateTwo").setValue(Today());    
     Ext.getCmp('Vip_User_Group').setValue();  //會員群組
     Ext.getCmp("order_payment").setValue();  //付款方式，AT
     Ext.getCmp("P1").setValue(true);  //付款狀態
@@ -728,12 +727,12 @@ function Export() {
    var order_payment= Ext.getCmp("order_payment").getValue(); //付款方式，AT
    var order_pay= Ext.htmlEncode(Ext.getCmp("order_pay").getValue().Order_Pay); //付款狀態
    var invoice= Ext.htmlEncode(Ext.getCmp("invoice").getValue().Invoice);//過濾條件
-    window.open("/OrderManage/OrderSerchExport?selecttype=" + selecttype + "&invoice=" + invoice + "&order_pay=" + order_pay + "&order_payment=" + order_payment + "&channel=" + channel + "&Vip_User_Group=" + Vip_User_Group + "&page_status=" + page_status + "&searchcon=" + searchcon + "&timeone=" + timeone + "&dateOne=" + Ext.Date.format(new Date(Ext.getCmp('dateOne').getValue()), 'Y-m-d') + "&dateTwo=" + Ext.Date.format(new Date(Ext.getCmp('dateTwo').getValue()), 'Y-m-d'));
+    window.open("/OrderManage/OrderSerchExport?selecttype=" + selecttype + "&invoice=" + invoice + "&order_pay=" + order_pay + "&order_payment=" + order_payment + "&channel=" + channel + "&Vip_User_Group=" + Vip_User_Group + "&page_status=" + page_status + "&searchcon=" + searchcon + "&timeone=" + timeone + "&dateOne=" + Ext.Date.format(new Date(Ext.getCmp('dateOne').getValue()), 'Y-m-d H:i:s') + "&dateTwo=" + Ext.Date.format(new Date(Ext.getCmp('dateTwo').getValue()), 'Y-m-d H:i:s'));
 }
 
 function ExportReport() {
-    var dateOne = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('dateOne').getValue()), 'Y-m-d 00:00:00'));
-    var dateTwo = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('dateTwo').getValue()), 'Y-m-d 23:59:59'));
+    var dateOne = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('dateOne').getValue()), 'Y-m-d H:i:s'));
+    var dateTwo = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('dateTwo').getValue()), 'Y-m-d H:i:s'));
     window.open("/OrderManage/ExportReport?dateOne=" + dateOne + "&dateTwo=" + dateTwo);
 }
 function Tomorrow() {
@@ -776,4 +775,30 @@ oneditUser = function (user_id) {
             editFunction(ralated_id);
         }
     }
+}
+
+function Today() {
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate());
+    dt.setHours(23, 59, 59);
+    return dt;                                 // 返回日期。
+}
+
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }
