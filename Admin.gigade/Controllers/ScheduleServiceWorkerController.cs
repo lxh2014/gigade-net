@@ -398,5 +398,29 @@ namespace Admin.gigade.Controllers
             return result;
         }
         #endregion
+
+        #region 檢查Url結果發送郵件
+        public bool CheckUrlResult()
+        {
+            bool result = false;
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+                BLL.gigade.Mgr.Schedules.CheckUrlResultMgr CheckUrlResultMgr = new BLL.gigade.Mgr.Schedules.CheckUrlResultMgr(mySqlConnectionString);
+                result = CheckUrlResultMgr.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return result;
+        }
+        #endregion
     }
 }
