@@ -266,24 +266,25 @@ Ext.onReady(function () {
                            value: 1
                        },
                        {
-                           xtype: "datefield",
+                           xtype: "datetimefield",
                            id: 'deliverstart',
                            fieldLabel: "",
                            labelWidth: 40,
                            name: 'deliverstart',
-                           format: 'Y-m-d',
+                           format: 'Y-m-d H:i:s',
+                           time: { hour: 00, min: 00, sec: 00 },
                            submitValue: true,
                            editable: false,
                            margin: '0 0 0 10',
-                           value: new Date(Today().setMonth(Today().getMonth() - 1)),
+                           value: setNextMonth(Today(),- 1),
                            listeners: {
                                select: function (a, b, c) {
                                    var start = Ext.getCmp("deliverstart");
                                    var end = Ext.getCmp("deliverend");
                                    var s_date = new Date(end.getValue());
                                    if (end.getValue() < start.getValue()) {
-                                       Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
-                                       start.setValue(new Date(s_date.setMonth(s_date.getMonth() - 1)));
+                                       var start_date = start.getValue();
+                                       Ext.getCmp('deliverend').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
                                    }
                                },
                                specialkey: function (field, e) {
@@ -299,8 +300,9 @@ Ext.onReady(function () {
                            value: "~"
                        },
                        {
-                           xtype: "datefield",
-                           format: 'Y-m-d',
+                           xtype: "datetimefield",
+                           format: 'Y-m-d H:i:s',
+                           time: { hour: 23, min: 59, sec: 59 },
                            id: 'deliverend',
                            editable: false,
                            name: 'deliverend',
@@ -311,8 +313,8 @@ Ext.onReady(function () {
                                    var end = Ext.getCmp("deliverend");
                                    var s_date = new Date(start.getValue());
                                    if (end.getValue() < start.getValue()) {
-                                       Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
-                                       end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                       var end_date = end.getValue();
+                                       Ext.getCmp('deliverstart').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                                    }
                                },
                                specialkey: function (field, e) {
@@ -439,4 +441,30 @@ function TransToOrder(orderId) {
     panel.setActiveTab(copy);
     panel.doLayout();
 
+}
+
+function Today() {
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate());
+    dt.setHours(23,59,59);
+    return dt;                                 // 返回日期。
+}
+
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

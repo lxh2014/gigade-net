@@ -118,28 +118,88 @@ namespace BLL.gigade.Common
         }
         #endregion
 
-        public static List<AesResult> EncryptListByApi(List<PlainTextViewModel> plainText)
+        /// <summary>
+        /// 加密解密
+        /// </summary>
+        /// <param name="plainText">需要加密的list</param>
+        /// <param name="isEncrypt">true加密，false解密</param>
+        /// <returns>加密或者解密之後的結果</returns>
+        public static List<AesResult> EncryptDecryptListByApi(List<PlainTextViewModel> plainModeList, bool isEncrypt = true)
         {
+            try
+            {
 
-            GigadeApiRequest request = new GigadeApiRequest();
-            var result = request.Request<List<PlainTextViewModel>, List<AesResult>>("api/Utility/EncryptWithAes", plainText);
-            if (result.success)
-            {
-                return result.result;
+                GigadeApiRequest request = new GigadeApiRequest();
+                string url = string.Empty;
+                if (isEncrypt)
+                {
+                    url = "api/Utility/EncryptWithAes";
+                }
+                else
+                {
+                    url = "api/Utility/DecryptWithAes";
+                }
+                var result = request.Request<List<PlainTextViewModel>, List<AesResult>>("api/Utility/EncryptWithAes", plainModeList);
+                if (result.success)
+                {
+                    return result.result;
+                }
+                else
+                {
+                    return null;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return null;
+                
+                throw ex;
             }
             
         }
 
-        public static string DecryptByApi(string plainText)
+        #region 加密解密單一字串 +string EncryptDecryptTextByApi(string plainText, bool isEncrypt = true)
+        /// <summary>
+        /// 加密解密單一字串
+        /// </summary>
+        /// <param name="plainText">需要加密的list</param>
+        /// <param name="isEncrypt">true加密，false解密</param>
+        /// <returns>加密或者解密之後的結果</returns>
+        public static string EncryptDecryptTextByApi(string plainText, bool isEncrypt = true)
         {
+            try
+            {
+                List<PlainTextViewModel> paintList = new List<PlainTextViewModel>();
+                PlainTextViewModel paintModel = new PlainTextViewModel();
+                paintModel.text = plainText;
+                paintList.Add(paintModel);
+                GigadeApiRequest request = new GigadeApiRequest();
+                string url = string.Empty;
+                if (isEncrypt)
+                {
+                    url = "api/Utility/EncryptWithAes";
+                }
+                else
+                {
+                    url = "api/Utility/DecryptWithAes";
+                }
+                var result = request.Request<List<PlainTextViewModel>, List<AesResult>>(url, paintList);
+                if (result.success)
+                {
+                    List<AesResult> aesResult = result.result;
+                    return aesResult.FirstOrDefault<AesResult>().computed_text;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        } 
+        #endregion
 
-            GigadeApiRequest request = new GigadeApiRequest();
-            var result = request.Request<PlainTextViewModel, AesResult>("api/Utility/DecryptWithAes", new PlainTextViewModel { text = plainText });
-            return result.result.computed_text;
-        }
     }
 }

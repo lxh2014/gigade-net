@@ -70,8 +70,8 @@ var statusStore = Ext.create('Ext.data.Store', {
 OrderExpectListStore.on('beforeload', function () {
     Ext.apply(OrderExpectListStore.proxy.extraParams, {
         seledate:Ext.getCmp('seldate').getValue(),
-        dateOne: Ext.getCmp('dateOne').getValue(),
-        dateTwo: Ext.getCmp('dateTwo').getValue(),
+        dateOne: Ext.Date.format(new Date(Ext.getCmp('dateOne').getValue()), 'Y-m-d H:i:s'),
+        dateTwo: Ext.Date.format(new Date(Ext.getCmp('dateTwo').getValue()), 'Y-m-d H:i:s'),
         status: Ext.htmlEncode(Ext.getCmp("status").getValue())//商品出貨
     })
 });
@@ -181,24 +181,25 @@ Ext.onReady(function () {
                 value: 0
             },
             {
-                xtype: "datefield",
+                xtype: "datetimefield",
                 labelWidth: 60,
                 margin: '0 0 0 10',
                 id: 'dateOne',
                 editable: false,
                 name: 'dateOne',
-                format: 'Y-m-d',
+                format: 'Y-m-d H:i:s',
+                time: { hour: 00, min: 00, sec: 00 },
                 allowBlank: false,
                 submitValue: true,
-                value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
+                value: setLastMonth(LastMonth(),-1),
                 listeners: {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("dateOne");
                         var end = Ext.getCmp("dateTwo");
                         var s_date = new Date(end.getValue());
                         if (end.getValue() < start.getValue()) {
-                            Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
-                            start.setValue(new Date(s_date.setMonth(s_date.getMonth() - 1)));
+                            var start_date = start.getValue();
+                            Ext.getCmp('dateTwo').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
                         }
                     }
                 }
@@ -208,11 +209,12 @@ Ext.onReady(function () {
                 value: "~"
             },
             {
-                xtype: "datefield",
-                format: 'Y-m-d',
+                xtype: "datetimefield",
+                format: 'Y-m-d H:i:s',
                 id: 'dateTwo',
                 name: 'dateTwo',
-                value: Tomorrow(),
+                time: { hour: 23, min: 59, sec: 59 },
+                value:LastMonth(),
                 allowBlank: false,
                 editable: false,
                 submitValue: true,
@@ -220,10 +222,9 @@ Ext.onReady(function () {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("dateOne");
                         var end = Ext.getCmp("dateTwo");
-                        var s_date = new Date(start.getValue());
                         if (end.getValue() < start.getValue()) {
-                            Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
-                            end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                            var end_date = end.getValue();
+                            Ext.getCmp('dateOne').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                         }
                     }
                 }
@@ -301,8 +302,8 @@ Query = function () {
     OrderExpectListStore.removeAll();
     Ext.getCmp("OrderExpectGrid").store.loadPage(1, {
         params: {
-            dateOne: Ext.getCmp('dateOne').getValue(),
-            dateTwo: Ext.getCmp('dateTwo').getValue(),
+            dateOne: Ext.Date.format(new Date(Ext.getCmp('dateOne').getValue()), 'Y-m-d H:i:s'),
+            dateTwo: Ext.Date.format(new Date(Ext.getCmp('dateTwo').getValue()), 'Y-m-d H:i:s'),
             status: Ext.htmlEncode(Ext.getCmp("status").getValue())//商品出貨
         }
     });
@@ -324,4 +325,30 @@ function TranToDetial(orderId) {
     });
     panel.setActiveTab(copy);
     panel.doLayout();
+}
+
+LastMonth = function () {
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth()) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate());
+    dt.setHours(23, 59, 59);
+    return dt;                                 // 返回日期。
+}
+
+function setLastMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

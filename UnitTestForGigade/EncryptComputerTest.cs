@@ -64,18 +64,45 @@ namespace UnitTestForGigade
         #endregion
 
 
+        
+
         /// <summary>
-        ///EncryptByApi 的测试
+        ///EncryptDecryptTextByApi 的测试
         ///</summary>
         [TestMethod()]
-        public void EncryptByApiTest()
+        public void EncryptDecryptTextByApiTest()
         {
-            string plainText = "sfsf"; // TODO: 初始化为适当的值
-            string expected = "sfsf"; // TODO: 初始化为适当的值
+            string plainText = "24d12"; // TODO: 初始化为适当的值
+            bool isEncrypt = true; // TODO: 初始化为适当的值
+            string expected = "24d12"; // TODO: 初始化为适当的值
             string actual;
-            //actual = EncryptComputer.EncryptByApi(plainText);
-           // Assert.AreEqual(expected, actual);
+            actual = EncryptComputer.EncryptDecryptTextByApi(plainText, isEncrypt);
+            Assert.AreEqual(expected, actual);
             Assert.Inconclusive("验证此测试方法的正确性。");
+        }
+
+        /// <summary>
+        ///EncryptDecryptTextByApi 的测试
+        ///</summary>
+        [TestMethod()]
+        public void EncryptDecryptTextByApiTest1()
+        {
+            string plainText = "gasdeaeasef"; // TODO: 初始化为适当的值
+            bool isEncrypt = false; // TODO: 初始化为适当的值
+            string expected = string.Empty; // TODO: 初始化为适当的值
+            string actual;
+            try
+            {
+                actual = EncryptComputer.EncryptDecryptTextByApi(plainText, true);
+            }
+            catch (Exception ex)
+            {
+
+                actual = plainText+ex.Message;
+            }
+            //actual2 = EncryptComputer.EncryptDecryptTextByApi(plainText, false);
+            Assert.AreEqual(plainText, actual + 1);
+            //Assert.Inconclusive("验证此测试方法的正确性。");
         }
     }
 }
