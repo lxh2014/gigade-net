@@ -3471,11 +3471,11 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["time_start"]))
                 {
-                    query.time_start = Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy-MM-dd 00:00:00");
+                    query.time_start = Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy-MM-dd HH:ss:mm");
                 }
                 if (!string.IsNullOrEmpty(Request.Params["time_end"]))
                 {
-                    query.time_end = Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy-MM-dd 23:59:59");
+                    query.time_end = Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy-MM-dd HH:ss:mm");
                 }
                 if (!string.IsNullOrEmpty(Request.Params["return_status"]))
                 {
