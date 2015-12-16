@@ -1416,8 +1416,8 @@ namespace BLL.gigade.Mgr
             //判斷特價活動成本是否過期，如果過期就 賦值 為 0 如果沒有則使用 特價 活動成本  eidt by zhuoqin0830w  2015/10/15  通過溝通 ahon 決定更改 因為前台代碼有判斷 成本取值是活動成本還是原成本
             uint nowTime = uint.Parse(CommonFunction.GetPHPTime(DateTime.Now.ToString()).ToString());
             if (nowTime > price.event_start && nowTime < price.event_end)
-            { newDetail.Event_Cost = 0; }
-            else { newDetail.Event_Cost = Convert.ToUInt32(price.event_cost); }
+            { newDetail.Event_Cost = Convert.ToUInt32(price.event_cost); }
+            else { newDetail.Event_Cost = 0; }
 
             newDetail.Single_Price = Convert.ToUInt32(price.price);
             newDetail.Single_Money = buyCount != 0 ? sumPrice / buyCount : 0;
