@@ -82,11 +82,11 @@ namespace BLL.gigade.Dao
                 }
                 if (store.beginTime != DateTime.MinValue)
                 {
-                    strCondition.AppendFormat(" and pc.create_date>='{0}' ", store.beginTime.ToString("yyyy-MM-dd 00:00:00"));
+                    strCondition.AppendFormat(" and pc.create_date>='{0}' ", store.beginTime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (store.endTime != DateTime.MinValue)
                 {
-                    strCondition.AppendFormat(" and pc.create_date<='{0}' ", store.endTime.ToString("yyyy-MM-dd 23:59:59"));
+                    strCondition.AppendFormat(" and pc.create_date<='{0}' ", store.endTime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 StringBuilder strTotalCount = new StringBuilder(" select count(pc.consult_id) as totalCount ");
                 if (store.IsPage)
