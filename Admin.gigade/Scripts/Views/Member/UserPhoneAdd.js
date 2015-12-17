@@ -155,8 +155,8 @@ Ext.onReady(function () {
                 name: 'tel',
                 allowBlank: false,
                 submitValue: true,
-                regex: /^[-+]?([0-9]\d*|0)$/,
-                regexText: '格式不正確',
+                regex: /^09[0-9]{8}$/,
+                regexText: '格式不正確,必須是09開頭的10位數字！',
                 maxLength: 10,
                 maxLengthText: '最大長度為10'
             },

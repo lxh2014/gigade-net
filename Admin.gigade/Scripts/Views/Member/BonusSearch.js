@@ -7,6 +7,8 @@ Ext.require([
 ]);
 var CallidForm;
 var pageSize = 25;
+var info_type = "users";
+var secret_info = "user_id;user_name;user_email";
 Ext.define('gigade.Gwj', {
     extend: 'Ext.data.Model',
     fields: [
@@ -42,6 +44,62 @@ var BonusStore = Ext.create('Ext.data.Store', {
         }
     }
 });
+
+//頁面加載時判斷是否有數據
+BonusStore.on('load', function (store, records, options) {
+    var uid = document.getElementById("userid").value;
+    if (uid != 0) {
+        var totalcount = records.length;
+        if (totalcount == 0) {
+            Ext.MessageBox.alert(INFORMATION, "～搜尋不到資料～");
+        }
+    }
+});
+
+var edit_BonusStore = Ext.create('Ext.data.Store', {
+    pageSize: pageSize,
+    autoDestroy: true,
+    model: 'gigade.Gwj',
+    proxy: {
+        type: 'ajax',
+        url: '/Member/BonusSearchList',
+        reader: {
+            type: 'json',
+            root: 'data', //在執行成功后。顯示數據。所以record.data.用戶字段可以直接讀取
+            totalProperty: 'totalCount'
+        }
+    }
+});
+
+
+edit_BonusStore.on('beforeload', function () {
+    var start_time = Ext.getCmp('time_start_create').getValue();
+    var end_time = Ext.getCmp('time_end_create').getValue();
+    if (start_time == null && end_time != null) {
+        Ext.Msg.alert("提示", "請把發放日期補充完整");
+        return false;
+    }
+    if (start_time != null && end_time == null) {
+        Ext.Msg.alert("提示", "請把發放日期補充完整");
+        return false;
+    }
+    Ext.apply(edit_BonusStore.proxy.extraParams, {
+        uid: Ext.getCmp('user_id_list').getValue(),
+        userNameMail: Ext.getCmp('mailName').getValue(),
+        timestart: Ext.getCmp('time_start_create').getValue(),
+        timeend: Ext.getCmp('time_end_create').getValue(),
+        bonus_type: Ext.getCmp('ddlSel').getValue(),
+        type_id: Ext.getCmp('ddlSelsend').getValue(),
+        use: Ext.getCmp('use').getValue(),
+        using: Ext.getCmp('using').getValue(),
+        used: Ext.getCmp('used').getValue(),
+        usings: Ext.getCmp('usings').getValue(),
+        useds: Ext.getCmp('useds').getValue(),
+        relation_id: "",
+        isSecret: false
+    });
+});
+
 //發送類型Model
 Ext.define('gigade.sendType', {
     extend: 'Ext.data.Model',
@@ -72,16 +130,6 @@ var sendTypeStore = Ext.create('Ext.data.Store', {
     }
 });
 
-//頁面加載時判斷是否有數據
-BonusStore.on('load', function (store, records, options) {
-    var uid = document.getElementById("userid").value;
-    if (uid != 0) {
-        var totalcount = records.length;
-        if (totalcount == 0) {
-            Ext.MessageBox.alert(INFORMATION, "～搜尋不到資料～");
-        }
-    }
-});
 
 //使用者Model
 Ext.define('gigade.ManageUser', {
@@ -135,6 +183,8 @@ BonusStore.on('beforeload', function () {
         used: Ext.getCmp('used').getValue(),
         usings: Ext.getCmp('usings').getValue(),
         useds: Ext.getCmp('useds').getValue(),
+        relation_id: "",
+        isSecret: true
     });
 });
 
@@ -424,8 +474,18 @@ Ext.onReady(function () {
         columns: [
             { header: "購物金編號", dataIndex: 'master_id', width: 80, align: 'center' },
             { header: "會員編號", dataIndex: 'user_id', width: 70, align: 'center' },
-            { header: "會員姓名", dataIndex: 'user_name', width: 70, align: 'center', hidden: false },
-            { header: "會員Mail", dataIndex: 'user_email', width: 200, align: 'center' },
+            {
+                header: "會員姓名", dataIndex: 'user_name', width: 70, align: 'center', hidden: false,
+                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                    return "<span onclick='SecretLogin(" + record.data.master_id + "," + record.data.user_id + ",\"" + info_type + "\")'  >" + value + "</span>";
+                }
+            },
+            {
+                header: "會員Mail", dataIndex: 'user_email', width: 200, align: 'center',
+                renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
+                    return "<span onclick='SecretLogin(" + record.data.master_id + "," + record.data.user_id + ",\"" + info_type + "\")'  >" + value + "</span>";
+                }
+            },
             { header: "發放類型", dataIndex: 'type_description', width: 120, align: 'center' },
             { header: "總額", dataIndex: 'master_total', width: 70, align: 'center' },
             { header: "結餘", dataIndex: 'master_balance', width: 70, align: 'center' },
@@ -506,30 +566,40 @@ function showbonus_type(val) {
     }
 }
 
-function showbonus_status(value, cellmeta, record, rowIndex, columnIndex, store)
-{
-        if (value > record.data.master_end && record.data.master_balance>0) {
-            return "已過期";
-        }
-        if (value < record.data.master_start) {
-            return "尚未開通";
-        }
-        if (record.data.master_balance > 0 && record.data.master_total > record.data.master_balance && record.data.master_start < value && value < record.data.master_end) {
-            return "尚餘點數";
-        }
-        if (record.data.master_total <= record.data.master_balance && record.data.master_start < value && value < record.data.master_end) {
-            return "未使用";
-        }
-        if (record.data.master_balance == 0) {
-            return "已用完";
-        }
+function showbonus_status(value, cellmeta, record, rowIndex, columnIndex, store) {
+    if (value > record.data.master_end && record.data.master_balance > 0) {
+        return "已過期";
+    }
+    if (value < record.data.master_start) {
+        return "尚未開通";
+    }
+    if (record.data.master_balance > 0 && record.data.master_total > record.data.master_balance && record.data.master_start < value && value < record.data.master_end) {
+        return "尚餘點數";
+    }
+    if (record.data.master_total <= record.data.master_balance && record.data.master_start < value && value < record.data.master_end) {
+        return "未使用";
+    }
+    if (record.data.master_balance == 0) {
+        return "已用完";
+    }
 }
 
+function SecretLogin(rid, info_id, info_type) {//secretcopy
+    var secret_type = "1";//參數表中的"會員查詢列表"
+    var url = "/Member/BonusSearch";
+    var ralated_id = rid;
+    //點擊機敏信息先保存記錄在驗證密碼是否需要輸入
+    boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+    if (boolPassword != "-1") {//不准查看
+        if (boolPassword) {//超過5分鐘沒有輸入密碼
+            //參數1：機敏頁面代碼，2：機敏資料主鍵，3：是否彈出驗證密碼框,4：是否直接顯示機敏信息6.驗證通過后是否打開編輯窗口
+            //  function SecretLoginFun(type, relatedID, isLogin, isShow, editO, isEdit) {
+            SecretLoginFun(secret_type, ralated_id, true, true, false, url, info_type, info_id, secret_info);//先彈出驗證框，關閉時在彈出顯示框
 
-
-/*************************************************************************************新增*************************************************************************************************/
-onAddClick = function () {
-    editFunction(null, BonusStore);
+        } else {
+            SecretLoginFun(secret_type, ralated_id, false, true, false, url, info_type, info_id, secret_info);//直接彈出顯示框
+        }
+    }
 }
 
 /*************************************************************************************編輯*************************************************************************************************/
@@ -540,7 +610,19 @@ onEditClick = function () {
     } else if (row.length > 1) {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
-        editFunction(row[0], BonusStore);
+        // editFunction(row[0], BonusStore);
+        var secret_type = "1";//參數表中的"會員查詢列表"
+        var url = "/Member/BonusSearch/Edit ";
+        var ralated_id = row[0].data.master_id;
+        var info_id = row[0].data.user_id;
+        boolPassword = SaveSecretLog(url, secret_type, ralated_id);//判斷5分鐘之內是否有輸入密碼
+        if (boolPassword != "-1") {
+            if (boolPassword) {//驗證
+                SecretLoginFun(secret_type, ralated_id, true, false, true, url, info_type, info_id, secret_info);//先彈出驗證框，關閉時在彈出顯示框
+            } else {
+                editFunction(ralated_id, BonusStore, row[0].data.bonus_type);
+            }
+        }
     }
 }
 

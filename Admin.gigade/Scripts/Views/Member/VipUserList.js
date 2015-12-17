@@ -62,6 +62,61 @@ var FaresStore = Ext.create('Ext.data.Store', {
     }
     //    autoLoad: true
 });
+
+//群組管理Model 
+Ext.define('gigade.Users', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: "user_id", type: "int" }, //用戶編號     上面的是編輯的時候關係到的
+        { name: "user_email", type: "string" }, //用戶郵箱
+        { name: "user_name", type: "string" }, //用戶名
+        { name: "user_password", type: "string" }, //密碼
+        { name: "user_gender", type: "string" }, //性別
+        { name: "user_birthday_year", type: "string" }, //年
+        { name: "user_birthday_month", type: "string" }, //月
+        { name: "user_birthday_day", type: "string" }, //日
+        { name: "birthday", type: "string" }, //生日 
+        { name: "user_zip", type: "string" }, //用戶地址
+        { name: "user_address", type: "string" }, //用戶地址
+        { name: "user_mobile", type: "string" },
+        { name: "user_phone", type: "string" }, //行動電話
+        { name: "reg_date", type: "string" }, //註冊日期 
+        { name: "mytype", type: "string" },//會員類別
+        { name: "send_sms_ad", type: "bool" }, //是否接收簡訊廣告 
+        { name: "adm_note", type: "string" }, //管理員備註   上面這些編輯時要帶入的值
+        { name: "user_type", type: "string" }, //用戶類別   下面的這些結合上面的會顯示在列表頁
+        { name: "user_status", type: "string" }, //用戶狀態
+        { name: "sfirst_time", type: "string" }, //首次註冊時間
+        { name: "slast_time", type: "string" }, //下次時間
+        { name: "sbe4_last_time", type: "string" }, //下下次時間
+        { name: "user_company_id", type: "string" },
+        { name: "user_source", type: "string" },
+        { name: "source_trace", type: "string" },
+        { name: "s_id", type: "string" },
+        { name: "source_trace_url", type: "string" },
+        { name: "redirect_name", type: "string" },
+        { name: "redirect_url", type: "string" },
+        { name: "paper_invoice", type: "bool" },
+        { name: "ml_code", type: "string" },
+        { name: "order_product_subtotal", type: "string" }
+    ]
+});
+
+//用作編輯時獲得數據包含機敏信息
+var edit_UserStore = Ext.create('Ext.data.Store', {
+    //  autoDestroy: true,
+    pageSize: pageSize,
+    model: 'gigade.Users',
+    proxy: {
+        type: 'ajax',
+        url: '/Member/UsersList',
+        reader: {
+            type: 'json',
+            root: 'data',//在執行成功后。顯示數據。所以record.data.用戶字段可以直接讀取
+            totalProperty: 'totalCount'
+        }
+    }
+});
 var sm = Ext.create('Ext.selection.CheckboxModel', {
     listeners: {
         selectionchange: function (sm, selections) {
@@ -195,7 +250,7 @@ function EditUser() {
     else if (row.length > 1) {
         Ext.Msg.alert(INFORMATION, ONE_SELECTION);
     } else if (row.length == 1) {
-        editFunction(row[0], FaresStore);
+        editFunction(row[0].data.user_id, edit_UserStore);
     }
 
 }
