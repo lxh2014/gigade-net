@@ -1032,11 +1032,11 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(Request.Params["time_start"]))
             {
-                iupc.create_time_start = DateTime.Parse(Request.Params["time_start"]).ToString("yyyy/MM/dd 00:00:00");
+                iupc.create_time_start = DateTime.Parse(Request.Params["time_start"]).ToString("yyyy-MM-dd HH:mm:ss");
             }
             if (!string.IsNullOrEmpty(Request.Params["time_end"]))
             {
-                iupc.create_time_end = DateTime.Parse(Request.Params["time_end"]).ToString("yyyy/MM/dd 23:59:59");
+                iupc.create_time_end = DateTime.Parse(Request.Params["time_end"]).ToString("yyyy-MM-dd HH:mm:ss");
             }
             try
             {
@@ -1720,11 +1720,11 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["time_start"]))
                 {
-                    iupc.create_time_start = DateTime.Parse(Request.Params["time_start"]).ToString("yyyy/MM/dd 00:00:00");
+                    iupc.create_time_start = DateTime.Parse(Request.Params["time_start"]).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 if (!string.IsNullOrEmpty(Request.Params["time_end"]))
                 {
-                    iupc.create_time_end = DateTime.Parse(Request.Params["time_end"]).ToString("yyyy/MM/dd 23:59:59");
+                    iupc.create_time_end = DateTime.Parse(Request.Params["time_end"]).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 List<IupcQuery> store = new List<IupcQuery>();
                 _IiupcMgr = new IupcMgr(mySqlConnectionString);
@@ -1876,11 +1876,11 @@ namespace Admin.gigade.Controllers
                 DateTime time;
                 if (DateTime.TryParse(Request.Params["starttime"].ToString(), out time))
                 {
-                    iplas.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                    iplas.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
                 {
-                    iplas.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                    iplas.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 #endregion
@@ -2440,11 +2440,11 @@ namespace Admin.gigade.Controllers
                 DateTime time;
                 if (DateTime.TryParse(Request.Params["starttime"].ToString(), out time))
                 {
-                    ilpsQuery.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                    ilpsQuery.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
                 {
-                    ilpsQuery.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                    ilpsQuery.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 List<IplasQuery> store = new List<IplasQuery>();
                 _IiplasMgr = new IplasMgr(mySqlConnectionString);
@@ -2862,11 +2862,11 @@ namespace Admin.gigade.Controllers
             DateTime time;
             if (DateTime.TryParse(Request.Params["starttime"].ToString(), out time))
             {
-                iivd.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                iivd.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
             {
-                iivd.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                iivd.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             try
             {
@@ -3619,11 +3619,11 @@ namespace Admin.gigade.Controllers
                 DateTime time;
                 if (DateTime.TryParse(Request.Params["starttime"].ToString(), out time))
                 {
-                    iivd.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                    iivd.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
                 {
-                    iivd.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                    iivd.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 List<IinvdQuery> store = new List<IinvdQuery>();
                 _iinvd = new IinvdMgr(mySqlConnectionString);
@@ -5281,11 +5281,11 @@ namespace Admin.gigade.Controllers
                         DateTime time;
                         if (DateTime.TryParse(Request.Params["time_start"], out time))
                         {
-                            query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                            query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                         }
                         if (DateTime.TryParse(Request.Params["time_end"], out time))
                         {
-                            query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                            query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                         }
                         if (!string.IsNullOrEmpty(Request.Params["dateSel"]))
                         {
@@ -5317,11 +5317,11 @@ namespace Admin.gigade.Controllers
                     DateTime time;
                     if (DateTime.TryParse(Request.Params["time_start"], out time))
                     {
-                        query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                        query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                     }
                     if (DateTime.TryParse(Request.Params["time_end"], out time))
                     {
-                        query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                        query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                     }
                     if (!string.IsNullOrEmpty(Request.Params["dateSel"]))
                     {
@@ -5596,11 +5596,11 @@ namespace Admin.gigade.Controllers
             DateTime time;
             if (DateTime.TryParse(Request.Params["start_time"].ToString(), out time))
             {
-                ilocDetailQuery.start_time = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                ilocDetailQuery.start_time = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (DateTime.TryParse(Request.Params["end_time"].ToString(), out time))
             {
-                ilocDetailQuery.end_time = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                ilocDetailQuery.end_time = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (!string.IsNullOrEmpty(Request.Params["startloc"]))
             {
@@ -5746,11 +5746,11 @@ namespace Admin.gigade.Controllers
 
                 if (DateTime.TryParse(Request.Params["start_time"].ToString(), out time))
                 {
-                    ilocDetailQuery.start_time = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                    ilocDetailQuery.start_time = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["end_time"].ToString(), out time))
                 {
-                    ilocDetailQuery.end_time = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                    ilocDetailQuery.end_time = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["startloc"]))
                 {
@@ -5928,12 +5928,12 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]) && Request.Params["start_time"] != "1970-01-01")//
                 {
-                    query.starttime = DateTime.Parse(DateTime.Parse(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
+                    query.starttime = DateTime.Parse(DateTime.Parse(Request.Params["start_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 if (!string.IsNullOrEmpty(Request.Params["end_time"]) && Request.Params["end_time"] != "1970-01-01")
                 {
-                    query.endtime = DateTime.Parse(DateTime.Parse(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+                    query.endtime = DateTime.Parse(DateTime.Parse(Request.Params["end_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
 
                 }
                 query.IsPage = false;
@@ -6019,11 +6019,11 @@ namespace Admin.gigade.Controllers
                 DateTime time;
                 if (DateTime.TryParse(Request.Params["time_start"], out time))
                 {
-                    query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                    query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["time_end"], out time))
                 {
-                    query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                    query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 _istockMgr = new IstockChangeMgr(mySqlConnectionString);
@@ -7757,11 +7757,11 @@ namespace Admin.gigade.Controllers
           
             if (!string.IsNullOrEmpty(Request.Params["startDate"]))
             {
-                cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd 00:00:00");
+                cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd HH:mm:ss");
             }
             if (!string.IsNullOrEmpty(Request.Params["endDate"]))
             {
-                cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd 23:59:59");
+                cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd HH:mm:ss");
             }
             if (!string.IsNullOrEmpty(Request.Params["sta_id"]))
             {
@@ -7858,11 +7858,11 @@ namespace Admin.gigade.Controllers
 
                 if (!string.IsNullOrEmpty(Request.Params["startDate"]))
                 {
-                    cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd 00:00:00");
+                    cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 if (!string.IsNullOrEmpty(Request.Params["endDate"]))
                 {
-                    cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd 23:59:59");
+                    cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 if (!string.IsNullOrEmpty(Request.Params["sta_id"]))
                 {
@@ -12770,7 +12770,7 @@ namespace Admin.gigade.Controllers
                 {
                     if (DateTime.TryParse(Request.Params["start_time"].ToString(), out date))
                     {
-                        ipod.start_time = date;
+                        ipod.start_time = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                     }
 
                 }
@@ -12778,7 +12778,7 @@ namespace Admin.gigade.Controllers
                 {
                     if (DateTime.TryParse(Request.Params["end_time"].ToString(), out date))
                     {
-                        ipod.end_time = Convert.ToDateTime(date.ToString("yyyy-MM-dd 23:59:59"));
+                        ipod.end_time = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                     }
                 }
                 ipod.IsPage = false;
@@ -12937,11 +12937,11 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(Request.Params["start_time"]))
             {
-                ipod.start_time = Convert.ToDateTime(Request.Params["start_time"].ToString());
+                ipod.start_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["start_time"].ToString()).ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (!string.IsNullOrEmpty(Request.Params["end_time"]))
             {
-                ipod.end_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["end_time"].ToString()).ToString("yyyy-MM-dd 23:59:59"));
+                ipod.end_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["end_time"].ToString()).ToString("yyyy-MM-dd HH:mm:ss"));
             }
             try
             {
@@ -13026,12 +13026,12 @@ namespace Admin.gigade.Controllers
             if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
             {
                 //query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
-                query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
+                query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
             {
                 //query.end_time = Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59");
-                query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+                query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
             }
             List<ProductItemQuery> list = productitemMgr.GetWaitLiaoWeiList(query, out totalcount);
             IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
@@ -13065,12 +13065,12 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
                 {
                     //query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
-                    query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
+                    query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
                 {
                     //query.end_time = Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59");
-                    query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+                    query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 DataTable dtHZ = new DataTable();
                 int totalcount = 0;
@@ -13156,14 +13156,14 @@ namespace Admin.gigade.Controllers
             {
                 if (DateTime.TryParse(Request.Params["start_time"], out date))
                 {
-                    query.start_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd 00:00:00"));
+                    query.start_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
             }
             if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
             {
                 if (DateTime.TryParse(Request.Params["end_time"], out date))
                 {
-                    query.change_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd 23:59:59"));
+                    query.change_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
             }
             DataTable table = aseldMgr.GetAseldTable(query, out totalcount);
@@ -13278,11 +13278,11 @@ namespace Admin.gigade.Controllers
             {
                 if (DateTime.TryParse(Request.Params["start_time"], out date))
                 {
-                    ase_query.start_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd 00:00:00"));
+                    ase_query.start_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["end_time"], out date))
                 {
-                    ase_query.change_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd 23:59:59"));
+                    ase_query.change_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 serchWhr++;
             }
@@ -14008,7 +14008,7 @@ namespace Admin.gigade.Controllers
             {
                 #region 標頭
                 #region 表頭
-                PdfPTable ptable = new PdfPTable(11);
+                PdfPTable ptable = new PdfPTable(12);
 
 
                 ptable.WidthPercentage = 100;//表格寬度

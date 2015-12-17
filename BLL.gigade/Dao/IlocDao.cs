@@ -100,11 +100,11 @@ namespace BLL.gigade.Dao
             }
             if (!string.IsNullOrEmpty(loc.starttime.ToString()) && loc.starttime>DateTime.MinValue)
             {
-                sbt.AppendFormat(@" and iloc.create_dtim >'{0}' ", loc.starttime);
+                sbt.AppendFormat(@" and iloc.create_dtim >='{0}' ", loc.starttime.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (!string.IsNullOrEmpty(loc.endtime.ToString()) && loc.endtime > DateTime.MinValue)
             {
-                sbt.AppendFormat(@" and iloc.create_dtim < '{0}' ", loc.endtime);
+                sbt.AppendFormat(@" and iloc.create_dtim <= '{0}' ", loc.endtime.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             sb.Append(@" select mu.user_username as change_users ,row_id,dc_id,whse_id,loc_id,llts_id,ldes_id,lsta_id,sel_stk_pos,sel_pos_hgt,rsv_stk_pos,rsv_pos_hgt,stk_pos_dep,stk_lmt,");
             sb.Append(" stk_pos_wid,lev,lhnd_id,ldsp_id,create_user,create_dtim,comingle_allow,change_dtim,lcat_id,hash_loc_id ");
@@ -301,11 +301,11 @@ namespace BLL.gigade.Dao
             DateTime dt = DateTime.Parse("1970-01-01 08:00:00");
             if (!string.IsNullOrEmpty(loc.starttime.ToString()) && loc.starttime>dt)
             {
-                sbt.AppendFormat(@" and iloc.create_dtim >'{0}' ", loc.starttime);
+                sbt.AppendFormat(@" and iloc.create_dtim >='{0}' ", loc.starttime.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (!string.IsNullOrEmpty(loc.endtime.ToString()) && loc.endtime > dt)
             {
-                sbt.AppendFormat(@" and iloc.create_dtim < '{0}' ", loc.endtime);
+                sbt.AppendFormat(@" and iloc.create_dtim <= '{0}' ", loc.endtime.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             sb.Append(@" select mu.user_username as change_users ,row_id,dc_id,whse_id,loc_id,llts_id,ldes_id,lsta_id,sel_stk_pos,sel_pos_hgt,rsv_stk_pos,rsv_pos_hgt,stk_pos_dep,stk_lmt,");
             sb.Append(" stk_pos_wid,lev,lhnd_id,ldsp_id,create_user,create_dtim,comingle_allow,change_dtim,lcat_id,hash_loc_id");
