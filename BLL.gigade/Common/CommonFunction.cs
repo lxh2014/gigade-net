@@ -1053,7 +1053,6 @@ namespace BLL.gigade.Common
                 return false;
             }
         }
-
     }
 
 }

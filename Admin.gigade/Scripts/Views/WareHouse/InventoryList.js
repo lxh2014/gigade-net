@@ -358,7 +358,7 @@ var InventoryLeft = Ext.create('Ext.form.Panel', {
               ]
           },
         {
-            fieldLabel: "供應商編號/名稱",
+            fieldLabel: "供應商編號/簡稱",
             xtype: "textfield",
             id: 'vender',
             labelWidth: 110,
