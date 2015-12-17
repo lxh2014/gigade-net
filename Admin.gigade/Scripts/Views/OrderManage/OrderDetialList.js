@@ -10,7 +10,8 @@ var winDetail;
 var productId;
 var statusname;
 var info_type = "order_master";
-var secret_info = "order_id;order_name;order_phone;order_mobile;order_address;delivery_name;delivery_phone;delivery_mobile;delivery_address";
+//order_phone;delivery_phone;
+var secret_info = "order_id;order_name;order_mobile;order_address;delivery_name;delivery_mobile;delivery_address";
 //地址Mode
 Ext.define("gigade.user_zip", {
     extend: 'Ext.data.Model',
@@ -927,13 +928,13 @@ Ext.onReady(function () {
                     name: 'order_name',
                     width: 350
                 },
-                {
-                    xtype: 'displayfield',
-                    fieldLabel: '市內電話',
-                    id: 'order_phone',
-                    name: 'order_phone',
-                    width: 350
-                },
+                //{
+                //    xtype: 'displayfield',
+                //    fieldLabel: '市內電話',
+                //    id: 'order_phone',
+                //    name: 'order_phone',
+                //    width: 350
+                //},
                 {
                     xtype: 'displayfield',
                     fieldLabel: '手機',
@@ -996,13 +997,13 @@ Ext.onReady(function () {
                 //    //}
                 //}
             },
-            {
-                xtype: 'displayfield',
-                fieldLabel: '市內電話',
-                id: 'delivery_phone',
-                name: 'delivery_phone',
-                width: 350
-            },
+            //{
+            //    xtype: 'displayfield',
+            //    fieldLabel: '市內電話',
+            //    id: 'delivery_phone',
+            //    name: 'delivery_phone',
+            //    width: 350
+            //},
             {
                 xtype: 'displayfield',
                 fieldLabel: '手機',
@@ -1181,19 +1182,17 @@ Ext.onReady(function () {
                            var  deliveryGender=result.data.delivery_gender=="0"?"小姐":"先生";
                             //購買人添加資安
                             Ext.getCmp('order_name').setValue("<a href='javascript:void(0);' onclick='oneditUser(" + result.data.user_id + ")'>" + result.data.order_name + "</a>" + " / " + orderGender);
-                            //Ext.getCmp('order_phone').setValue(result.data.order_phone);
-                            Ext.getCmp('order_phone').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.order_phone + "</a>");
-                            //Ext.getCmp('order_mobile').setValue(result.data.order_mobile);
+                            
+                            //Ext.getCmp('order_phone').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.order_phone + "</a>");
+
                             Ext.getCmp('order_mobile').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.order_mobile + "</a>");
-                            //Ext.getCmp('order_zip').setValue(result.data.order_zip);
-                            //Ext.getCmp('order_address').setValue(result.data.order_address);
+
                             Ext.getCmp('order_address').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.order_address + "</a>");
-                            //Ext.getCmp('delivery_phone').setValue(result.data.delivery_phone);
-                            Ext.getCmp('delivery_phone').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.delivery_phone + "</a>");
-                            //Ext.getCmp('delivery_mobile').setValue(result.data.delivery_mobile);
+
+                            //Ext.getCmp('delivery_phone').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.delivery_phone + "</a>");
+
                             Ext.getCmp('delivery_mobile').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.delivery_mobile + "</a>");
-                            //Ext.getCmp('delivery_zip').setValue(result.data.delivery_zip);
-                            //Ext.getCmp('delivery_address').setValue(result.data.delivery_address);
+
                             Ext.getCmp('delivery_address').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.delivery_address + "</a>");
                             Ext.getCmp('delivery_name').setValue("<a href='javascript:void(0);' onclick='SecretLogin(" + result.data.order_id + "," + 0 + ",\"" + info_type + "\")'  >" + result.data.delivery_name + "</a>" + "/" + deliveryGender);
                             //等待付款加驗證

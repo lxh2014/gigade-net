@@ -198,7 +198,7 @@
                                             Ext.getCmp('orc_type').setValue(1);
                                             Ext.getCmp('invoice_deal').setValue(1);
                                             Ext.getCmp('orc_name').setValue(result.name);
-                                            Ext.getCmp('orc_phone').setValue(result.mobile);
+                                            Ext.getCmp('orc_mobile').setValue(result.mobile);
                                             Ext.getCmp('orc_zipcode').setValue(result.zipcode);
                                             Ext.getCmp('orc_address').setValue(result.address);
                                             orderDeliverForm.show();
@@ -381,7 +381,7 @@
                                         Ext.getCmp('orc_type').setValue(1);
                                         Ext.getCmp('invoice_deal').setValue(1);
                                         Ext.getCmp('orc_name').setValue(result.name);
-                                        Ext.getCmp('orc_phone').setValue(result.mobile);
+                                        Ext.getCmp('orc_mobile').setValue(result.mobile);
                                         Ext.getCmp('orc_zipcode').setValue(result.zipcode);
                                         Ext.getCmp('orc_address').setValue(result.address);
                                         orderDeliverForm.show();
@@ -861,8 +861,8 @@
             {
                 xtype: 'textfield',
                 fieldLabel: '客戶電話',
-                id: 'orc_phone',
-                name: 'orc_phone',
+                id: 'orc_mobile',
+                name: 'orc_mobile',
                 allowBlank: false,
                 maxLength: 30,
                 disabled: true,
@@ -968,7 +968,7 @@
                         params: {
                             return_id: Ext.getCmp('return_id').getValue(),
                             orc_name: Ext.getCmp('orc_name').getValue(),
-                            orc_phone: Ext.getCmp('orc_phone').getValue(),
+                            orc_mobile: Ext.getCmp('orc_mobile').getValue(),
                             orc_zipcode: Ext.getCmp('orc_zipcode').getValue(),
                             orc_address: Ext.getCmp('orc_address').getValue(),
                             orc_remark: Ext.getCmp('orc_remark').getValue(),

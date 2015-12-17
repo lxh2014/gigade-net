@@ -106,7 +106,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("insert into order_return_content(orc_order_id,orc_deliver_code,orc_deliver_date,orc_deliver_time,orc_name,orc_phone,orc_zipcode,orc_address,orc_remark,orc_type,orc_service_remark,return_id,orc_send) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}');", query.orc_order_id, query.orc_deliver_code, CommonFunction.DateTimeToString(query.orc_deliver_date), query.orc_deliver_time, query.orc_name, query.orc_phone, query.orc_zipcode, query.orc_address, query.orc_remark,query.orc_type,query.orc_service_remark,query.return_id,query.orc_send);
+                sql.AppendFormat("insert into order_return_content(orc_order_id,orc_deliver_code,orc_deliver_date,orc_deliver_time,orc_name,orc_mobile,orc_zipcode,orc_address,orc_remark,orc_type,orc_service_remark,return_id,orc_send) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}');", query.orc_order_id, query.orc_deliver_code, CommonFunction.DateTimeToString(query.orc_deliver_date), query.orc_deliver_time, query.orc_name, query.orc_mobile, query.orc_zipcode, query.orc_address, query.orc_remark, query.orc_type, query.orc_service_remark, query.return_id, query.orc_send);
                 return sql.ToString();
             }
             catch (Exception ex)

@@ -916,7 +916,7 @@ namespace Admin.gigade.Controllers
                     case 23://退貨
                         _orderReturnStatus = new OrderReturnStatusMgr(mySqlConnectionString);
                         OrderMaster om = _orderReturnStatus.GetOrderInfo( Convert.ToUInt32(related_id));
-                        json = "{success:true,\"orc_name\":\"" + om.Delivery_Name + "\",\"orc_phone\":\"" + om.Delivery_Mobile + "\",\"orc_address\":\"" + om.Delivery_Address + "\"}";
+                        json = "{success:true,\"orc_name\":\"" + om.Delivery_Name + "\",\"orc_mobile\":\"" + om.Delivery_Mobile + "\",\"orc_address\":\"" + om.Delivery_Address + "\"}";
                         break;
 
                 }
