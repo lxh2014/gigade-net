@@ -46,7 +46,6 @@ Ext.define('GIGADE.VipList', {
                 { name: "user_email", type: "string" },
                 { name: "user_address", type: "string" },
                 { name: "birthday", type: "string" },
-                { name: "user_phone", type: "string" },
                 { name: "user_mobile", type: "string" },
                 { name: "mytype", type: "string" }, //1：網絡會員，2：電話會員
                 { name: "send_sms_ad", type: "bool" },
@@ -122,7 +121,6 @@ Ext.define('gigade.Users', {
         { name: "user_zip", type: "string" }, //用戶地址
         { name: "user_address", type: "string" }, //用戶地址
         { name: "user_mobile", type: "string" },
-        { name: "user_phone", type: "string" }, //行動電話
         { name: "reg_date", type: "string" }, //註冊日期 
         { name: "mytype", type: "string" },//會員類別
         { name: "send_sms_ad", type: "bool" }, //是否接收簡訊廣告 
