@@ -421,5 +421,28 @@ namespace Admin.gigade.Controllers
             return true;
         }
         #endregion
+
+        #region 更新已存在登錄地區的IP地址
+        public bool UpdateLoginAddress()
+        {
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+                UpdateLoginAddressMgr dsMgr = new UpdateLoginAddressMgr(mySqlConnectionString);
+                return dsMgr.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return true;
+        }
+        #endregion
     }
 }

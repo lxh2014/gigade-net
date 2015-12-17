@@ -1187,6 +1187,7 @@
     <Compile Include="Mgr\Schedules\PromotionsAmountGiftMgr.cs" />
     <Compile Include="Mgr\Schedules\DeliverStatusMgr.cs" />
     <Compile Include="Mgr\Schedules\SetConfigXmlMgr.cs" />
+    <Compile Include="Mgr\Schedules\UpdateLoginAddressMgr.cs" />
     <Compile Include="Mgr\Schedules\UserLoginLogMgr.cs" />
     <Compile Include="Mgr\Schedules\CheckUnsafeLoginMgr.cs" />
     <Compile Include="Mgr\Schedules\ReceiveStatusFromTCatMgr.cs" />

@@ -79,7 +79,7 @@ namespace BLL.gigade.Mgr.Schedules
             }
 
             MailHelper mail = new MailHelper(mailModel);
-            if (userOtherLogin.Rows.Count == 0)
+            if (userOtherLogin.Rows.Count>0)
             {
                 return mail.SendToGroup(GroupCode, MailTitle,mailBody, false, true);
             }
@@ -88,40 +88,58 @@ namespace BLL.gigade.Mgr.Schedules
 
         private static DataTable GetUserLoginDataTable()
         {
-            _accessMySql = DBFactory.getDBAccess(DBType.MySql, mySqlConnectionString);
-            DataTable userLogin = _accessMySql.getDataTable(string.Format("select login_id,user_id,login_ipfrom, FROM_UNIXTIME(login_createdate) login_createdate from users_login where FROM_UNIXTIME(login_createdate)>'{0}' ", CommonFunction.DateTimeToString(DateTime.Now.AddHours(-1))));
+            DataTable userLogin = _accessMySql.getDataTable(string.Format(@"select login_id,u.user_email,ul.user_id,login_ipfrom, FROM_UNIXTIME(login_createdate) login_createdate,
+(select ul2.login_address from users_login ul2 where ul2.login_ipfrom=ul.login_ipfrom and ul2.login_address<>'' limit 1) login_address 
+from users_login ul 
+INNER JOIN users u on u.user_id=ul.user_id where FROM_UNIXTIME(login_createdate)>'{0}'", CommonFunction.DateTimeToString(DateTime.Now.AddHours(-1))));
             DataTable othenCityUser = new DataTable();
             othenCityUser.Columns.Add("會員編號", typeof(string));
+            othenCityUser.Columns.Add("會員賬號", typeof(string));
             othenCityUser.Columns.Add("IP", typeof(string));
             othenCityUser.Columns.Add("登錄地區", typeof(string));
             othenCityUser.Columns.Add("登錄時間", typeof(string));
 
-
             foreach (DataRow drUser in userLogin.Rows)
             {
-                System.Threading.Thread.Sleep(1000);
                 DataRow newRow = othenCityUser.NewRow();
                 newRow["會員編號"] = drUser["user_id"];
+                newRow["會員賬號"] = drUser["user_email"];
                 newRow["IP"] = drUser["login_ipfrom"];
+                Console.Write("正在處理IP" + newRow["IP"] + "\n");
                 string ip = drUser["login_ipfrom"].ToString();
                 IPMessage ipMessage = new IPMessage();
                 try
                 {
-                    ipMessage = GetMessageByIP(ip);
-                    newRow["登錄地區"] = ipMessage.country.ToString() + ipMessage.city;
-                    if (ipMessage.country_id.ToString() == "TW")
+                    if (null == drUser["login_address"] || string.IsNullOrEmpty(drUser["login_address"].ToString()))
+                    {
+                        if (drUser["login_ipfrom"].ToString().Contains("192.168"))
+                        {
+                            newRow["登錄地區"] = "內網";
+                        }
+                        else
+                        {
+                            ipMessage = GetMessageByIP(ip);
+                            newRow["登錄地區"] = ipMessage.country.ToString() + ipMessage.region + ipMessage.city + ipMessage.county;
+                        }
+                    }
+                    else
+                    {
+                        newRow["登錄地區"] = drUser["login_address"];
+
+                    }
+                    _accessMySql.execCommand(string.Format(@"update users_login set login_address='{0}' where login_ipfrom='{1}'", newRow["登錄地區"].ToString(), drUser["login_ipfrom"]));
+                    if (newRow["登錄地區"].ToString().Contains("台湾") || newRow["登錄地區"].ToString() == "內網")
                     {
                         continue;
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-
+                    //ErrorLogHelper loghelper = new ErrorLogHelper("項目名稱:Program/Main" + ex.ToString());
                     newRow["登錄地區"] = "無資訊";
+                    continue;
                 }
-
-                newRow["登錄時間"] = drUser["login_createdate"];
-
+                newRow["登錄時間"] = CommonFunction.DateTimeToString(Convert.ToDateTime(drUser["login_createdate"]));
                 othenCityUser.Rows.Add(newRow);
             }
             return othenCityUser;
