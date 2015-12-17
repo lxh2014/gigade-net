@@ -523,11 +523,11 @@ namespace Admin.gigade.Controllers
                 DateTime datetime;
                 if (DateTime.TryParse(Request.Params["time_start"], out datetime))
                 {
-                    query.created_start = DateTime.Parse(datetime.ToString("yyyy-MM-dd 00:00:00"));
+                    query.created_start = DateTime.Parse(datetime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["time_end"], out datetime))
                 {
-                    query.created_end = DateTime.Parse(datetime.ToString("yyyy-MM-dd 23:59:59"));
+                    query.created_end = DateTime.Parse(datetime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 int totalCount = 0;
                 sphinxExcludeMgr = new SphinxExcludeMgr(SqlConnectionString);

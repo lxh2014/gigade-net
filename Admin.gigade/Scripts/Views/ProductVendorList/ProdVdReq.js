@@ -92,27 +92,57 @@ var reqTime = {
             valueField: 'value'
         },
         {
-            xtype: 'datefield',
+            xtype: 'datetimefield',
+            format: 'Y/m/d H:i:s',
+            time: { hour: 00, min: 00, sec: 00 },
             id: 'time_start',
             name: 'time_start',
             fieldLabel: '申請時間',
             margin: '0 5px 0 15px',
-            width: 220,
+            width: 245,
             editable: false,
-            vtype: 'daterange',
-            endDateField: 'time_end'
+            listeners: {//change by shiwei0620j 20151217,將時間控件改為可以選擇時分秒，開始時間時分秒默認為00:00:00,結束時間時分秒默認為23:59:59，當選擇的開始時間大於結束時間，結束時間在開始時間月份加1，當選擇的結束時間大於開始時間，開始時間在結束時間月份加1;
+                select: function (a, b, c) {
+                    var start = Ext.getCmp("time_start");
+                    var end = Ext.getCmp("time_end");
+                    var start_date = start.getValue();
+                    if (end.getValue() == ""||end.getValue() == null) {
+                        Ext.getCmp('time_end').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                    }
+                    else if (end.getValue() < start.getValue()) {
+                        Ext.getCmp('time_end').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                    }
+                }
+            }
+            //vtype: 'daterange',
+            //endDateField: 'time_end'
         }, {
             xtype: 'displayfield',
             value: '~'
         }, {
-            xtype: 'datefield',
+            xtype: 'datetimefield',
+            format: 'Y/m/d H:i:s',
+            time: { hour: 23, min: 59, sec: 59 },
             id: 'time_end',
             name: 'time_end',
-            width: 110,
+            width: 140,
             margin: '0 5px',
             editable: false,
-            vtype: 'daterange',
-            startDateField: 'time_start'
+            listeners: {
+                select: function (a, b, c) {
+                    var start = Ext.getCmp("time_start");
+                    var end = Ext.getCmp("time_end");
+                    var end_date = end.getValue();
+                    if (start.getValue() == ""||start.getValue() ==null) {
+                        Ext.getCmp('time_start').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
+                    }
+                    if (end.getValue() < start.getValue()) {
+                        Ext.getCmp('time_start').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
+                    }
+                }
+            },
+            //vtype: 'daterange',
+            //startDateField: 'time_start'
         }
     ]
 };

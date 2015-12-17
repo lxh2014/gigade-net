@@ -265,6 +265,7 @@ Ext.onReady(function () {
                 name: 'orderTime',
                 width: 200,
                 fieldLabel: '日期',
+                time:{hour:00,min:00,sec:00},
                 value: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 14),
                 labelWidth: 60,
                 listeners: {
@@ -300,6 +301,7 @@ Ext.onReady(function () {
                 name: 'orderTime',
                 fieldLabel: '到',
                 width: 200,
+                time: { hour: 23, min: 59, sec: 59 },
                 value: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
                 labelWidth: 15,
                 listeners: {

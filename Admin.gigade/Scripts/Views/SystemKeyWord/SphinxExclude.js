@@ -302,12 +302,13 @@ Ext.onReady(function () {
                             value: '建立起止時間:'
                         },
                        {
-                           xtype: "datefield",
+                           xtype: "datetimefield",
                            editable: false,
                            margin: '0 0 0 14',
                            id: 'start_time',
+                           time:{hour:00,sec:00,min:00},
                            name: 'start_time',
-                           format: 'Y-m-d 00:00:00',
+                           format: 'Y-m-d H:i:s',
                            width: 150,
                            listeners: {
                                specialkey: function (field, e) {
@@ -315,21 +316,28 @@ Ext.onReady(function () {
                                        Query();
                                    }
                                }
-                                , select: function () {
-                                    if (Ext.getCmp("start_time").getValue() != null) {
-                                        Ext.getCmp("end_time").setMinValue(Ext.getCmp("start_time").getValue());
+                                , select: function (a, b, c) {
+                                    var start = Ext.getCmp("start_time");
+                                    var end = Ext.getCmp("end_time");
+                                    var start_date = start.getValue();
+                                    if (end.getValue() == "") {
+                                        Ext.getCmp('end_time').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                                    }
+                                    else if (end.getValue() < start.getValue()) {
+                                        Ext.getCmp('end_time').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
                                     }
                                 }
                            }
                        },
                        { xtype: 'displayfield', value: '~ ', margin: '0 0 0 10', },
                        {
-                           xtype: "datefield",
+                           xtype: "datetimefield",
                            editable: false,
                            margin: '0 0 0 10',
+                           time: { hour: 23, sec: 59, min: 59 },
                            id: 'end_time',
                            name: 'end_time',
-                           format: 'Y-m-d 23:59:59',
+                           format: 'Y-m-d H:i:s',
                            width: 150,
                            listeners: {
                                specialkey: function (field, e) {
@@ -337,9 +345,15 @@ Ext.onReady(function () {
                                        Query();
                                    }
                                }
-                                , select: function () {
-                                    if (Ext.getCmp("end_time").getValue() != null) {
-                                        Ext.getCmp("start_time").setMaxValue(Ext.getCmp("end_time").getValue());
+                                , select: function (a, b, c) {
+                                    var start = Ext.getCmp("start_time");
+                                    var end = Ext.getCmp("end_time");
+                                    var end_date = end.getValue();
+                                    if (start.getValue() == "") {
+                                        Ext.getCmp('start_time').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
+                                    }
+                                    if (end.getValue() < start.getValue()) {
+                                        Ext.getCmp('start_time').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                                     }
                                 }
                            }
