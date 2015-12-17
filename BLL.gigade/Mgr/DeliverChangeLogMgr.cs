@@ -481,18 +481,17 @@ namespace BLL.gigade.Mgr
 
                 #endregion
 
-
                 if (_dt.Rows.Count == 0)
                 {
-                    MailBody = "<br/><p><font size=\"4\">   出貨單期望日在前 <font color=\"#FF0000\" >" + Convert.ToDouble(hourNum) + "</font> 個小時之內沒有調整記錄!</font><p/>";
+                    //MailBody = "<br/><p><font size=\"4\">   出貨單期望日在前 <font color=\"#FF0000\" >" + Convert.ToDouble(hourNum) + "</font> 個小時之內沒有調整記錄!</font><p/>";
                 }
                 else
                 {
                     MailBody = "<br/><font size=\"4\">出貨單期望到貨日在前 " + "<font color=\"#FF0000\" >" + Convert.ToDouble(hourNum) + "</font>" + " 個小時之內的調整記錄如下：</font><br/><p/>" + GetHtmlByDataTable(_dt);
+                    BLL.gigade.Common.MailHelper mail = new Common.MailHelper(mailModel);
+                    mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true); 
                 }
-
-                BLL.gigade.Common.MailHelper mail = new Common.MailHelper(mailModel);                
-                return mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true); 
+                return true;
             }
             catch (Exception ex)
             {
