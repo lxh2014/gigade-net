@@ -49,8 +49,6 @@ editFunction = function (rowID) {
                 });
             }
         });
-
-
     }
     else {
         editWin.show();
@@ -537,7 +535,6 @@ editFunction = function (rowID) {
                             user_zip: Ext.htmlEncode(Ext.getCmp('user_zip').getValue()),
                             my_birthday: Ext.htmlEncode(Ext.getCmp('my_birthday').getValue()),
                             user_address_add: Ext.htmlEncode(Ext.getCmp('user_address').getValue()),
-                            user_phone: Ext.htmlEncode(Ext.getCmp('user_phone').getValue()),
                             user_mobile: Ext.htmlEncode(Ext.getCmp('user_mobile').getValue()),
                             send_sms_ad: Ext.htmlEncode(Ext.getCmp('send_sms_ad').getValue()),
                             user_password_edit: Ext.htmlEncode(Ext.getCmp('user_passwords').getValue()),
@@ -570,6 +567,7 @@ editFunction = function (rowID) {
                                 //  UserStore.load();
                                 Ext.Msg.alert(INFORMATION, SUCCESS);
                                 editWin.close();
+                                UserStore.load();
                             } else {
                                 if (result.error != "") {
                                     Ext.Msg.alert(INFORMATION, result.error);
@@ -698,27 +696,10 @@ editFunction = function (rowID) {
                             id: 'user_mobile',
                             name: 'user_mobile',
                             allowBlank: true,
-                            regex: /^[-+]?([0-9]\d*|0)$/,
-                            regexText: '格式不正確',
-                            maxLength: 20,
-                            maxLengthText: '最大長度為20'
-                        },
-                        {
-                            xtype: 'textfield',
-
-
-                            //Edit Start Modify by Gaoyuwei 2015-12-07
-                            //fieldLabel: "聯絡電話",
-                            fieldLabel: "市話",
-                            //Edit End Modify by Gaoyuwei 2015-12-07
-
-
-                            id: 'user_phone',
-                            name: 'user_phone',
-                            allowBlank: true,
-                            regexText: '格式不正確',
-                            maxLength: 20,
-                            maxLengthText: '最大長度為20'
+                            regex: /^09[0-9]{8}$/,
+                            regexText: '格式不正確,必須是09開頭的10位數字！',
+                            maxLength: 10,
+                            maxLengthText: '最大長度為10'
                         },
                         {
                             xtype: 'displayfield',
@@ -921,7 +902,7 @@ editFunction = function (rowID) {
                                 { id: 'e_info5', boxLabel: "高職", inputValue: '4' },
                                 { id: 'e_info6', boxLabel: "大學", inputValue: '5' },
                                 { id: 'e_info7', boxLabel: "研究院及以上", inputValue: '6' }
-                              
+
                             ]
                         },
                         {

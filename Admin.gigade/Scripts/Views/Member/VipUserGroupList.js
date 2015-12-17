@@ -115,6 +115,13 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
             //            Ext.getCmp("vugGrid").down('#remove').setDisabled(selections.length == 0);
             //            Ext.getCmp("vugGrid").down('#auth').setDisabled(selections.length == 0);
             //            Ext.getCmp("vugGrid").down('#callid').setDisabled(selections.length == 0);
+            VipUserStore.on('beforeload', function () {
+                Ext.apply(VipUserStore.proxy.extraParams, {
+                    groupid: Ext.getCmp('vugGrid').getSelectionModel().getSelection()[0].data.group_id,
+                    serchs: Ext.getCmp('searchtype').getValue(),
+                    serchcontent: Ext.getCmp('searchcontent').getValue().trim(),
+                })
+            });
         }
     }
 });
@@ -143,13 +150,7 @@ var VipUserStore = Ext.create('Ext.data.Store', {
     },
     autoLoad: true
 });
-VipUserStore.on('beforeload', function () {
-    Ext.apply(VipUserStore.proxy.extraParams, {
-        groupid: Ext.getCmp('vugGrid').getSelectionModel().getSelection()[0].data.group_id,
-        serchs: Ext.getCmp('searchtype').getValue(),
-        serchcontent: Ext.getCmp('searchcontent').getValue().trim(),        
-    })
-});
+
 var DDLStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
