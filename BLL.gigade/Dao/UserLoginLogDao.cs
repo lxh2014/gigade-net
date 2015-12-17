@@ -100,7 +100,7 @@ namespace BLL.gigade.Dao
         {
             StringBuilder sql = new StringBuilder();
             StringBuilder sqlfrom = new StringBuilder();
-            sql.Append("SELECT ul.login_id,ul.user_id,u.user_name,u.user_email,u.user_phone,u.user_address ");
+            sql.Append("SELECT ul.login_id,ul.user_id,u.user_name,u.user_email,u.user_address ");
             sqlfrom.Append("FROM users_login ul left join users u on ul.user_id=u.user_id ");
             sqlfrom.Append(" WHERE 1=1");
             try

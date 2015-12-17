@@ -1183,11 +1183,13 @@
     <Compile Include="Mgr\ScheduleParamerMgr.cs" />
     <Compile Include="Mgr\ScheduleRelationMgr.cs" />
     <Compile Include="Mgr\ScheduleServiceMgr.cs" />
+    <Compile Include="Mgr\Schedules\CheckIPAddressMgr.cs" />
     <Compile Include="Mgr\Schedules\CheckOrderAmountMgr.cs" />
     <Compile Include="Mgr\Schedules\ProductPurchaseMgr.cs" />
     <Compile Include="Mgr\Schedules\PromotionsAmountGiftMgr.cs" />
     <Compile Include="Mgr\Schedules\DeliverStatusMgr.cs" />
     <Compile Include="Mgr\Schedules\SetConfigXmlMgr.cs" />
+    <Compile Include="Mgr\Schedules\UpdateLoginAddressMgr.cs" />
     <Compile Include="Mgr\Schedules\UserLoginLogMgr.cs" />
     <Compile Include="Mgr\Schedules\CheckUnsafeLoginMgr.cs" />
     <Compile Include="Mgr\Schedules\ReceiveStatusFromTCatMgr.cs" />

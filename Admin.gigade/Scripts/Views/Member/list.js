@@ -34,7 +34,7 @@ Ext.define('gigade.Users', {
     //{ name: "user_mobile", type: "string" },
     //{ name: "user_phone", type: "string" }, //行動電話
     { name: "user_mobile", type: "string" },//行動電話
-    { name: "user_phone", type: "string" }, //市話
+   // { name: "user_phone", type: "string" }, //市話
     //Edti End Modify by Gaoyuwei 2015-12-07
 
 
@@ -165,7 +165,7 @@ var DDLStore = Ext.create('Ext.data.Store', {
 
 
     { "txt": "會員編號", "value": "4" },
-    { "txt": "市話", "value": "5" },
+  //  { "txt": "市話", "value": "5" },
     { "txt": "地址", "value": "6" },
     //Edit Start
     //Add by yuwei1015j 2015-12-02
