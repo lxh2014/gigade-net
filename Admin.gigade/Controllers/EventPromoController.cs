@@ -1243,12 +1243,12 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["date_start"]))
                 {
                     query.date_start =Convert.ToDateTime( Request.Params["date_start"]);
-                    query.date_start = Convert.ToDateTime(query.date_start.ToString("yyyy-MM-dd 00:00:00"));
+                    query.date_start = Convert.ToDateTime(query.date_start.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["date_end"]))
                 {
                     query.date_end =Convert.ToDateTime( Request.Params["date_end"]);
-                    query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd 23:59:59"));
+                    query.date_end = Convert.ToDateTime(query.date_end.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["activeStatus"]))
                 {

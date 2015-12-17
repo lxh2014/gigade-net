@@ -80,11 +80,11 @@ namespace BLL.gigade.Dao
                 DateTime dt = DateTime.Parse("1970-01-02 08:00:00");
                 if (!string.IsNullOrEmpty(ivd.starttime.ToString()) && dt < ivd.starttime)
                 {
-                    sbwhere.AppendFormat(" and ii.create_dtim>'{0}' ", CommonFunction.DateTimeToString(ivd.starttime));
+                    sbwhere.AppendFormat(" and ii.create_dtim>='{0}' ", CommonFunction.DateTimeToString(ivd.starttime));
                 }
                 if (!string.IsNullOrEmpty(ivd.endtime.ToString()) && dt < ivd.endtime)
                 {
-                    sbwhere.AppendFormat(" and ii.create_dtim<'{0}' ", CommonFunction.DateTimeToString(ivd.endtime));
+                    sbwhere.AppendFormat(" and ii.create_dtim<='{0}' ", CommonFunction.DateTimeToString(ivd.endtime));
                 }
                 //if (!string.IsNullOrEmpty(ivd.serchcontent))
                 //{
