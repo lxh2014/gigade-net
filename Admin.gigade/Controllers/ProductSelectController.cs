@@ -178,11 +178,11 @@ namespace Admin.gigade.Controllers
                 query.date_type = Request.Form["date_type"] ?? "";
                 if (!string.IsNullOrEmpty(Request.Form["time_start"]))
                 {
-                    query.time_start = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Form["time_start"]).ToString("yyyy/MM/dd 00:00:00")).ToString();
+                    query.time_start = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Form["time_start"]).ToString("yyyy/MM/dd HH:mm:ss")).ToString();
                 }
                 if (!string.IsNullOrEmpty(Request.Form["time_end"]))
                 {
-                    query.time_end = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Form["time_end"]).ToString("yyyy/MM/dd 23:59:59")).ToString();
+                    query.time_end = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Form["time_end"]).ToString("yyyy/MM/dd HH:mm:ss")).ToString();
                 }
                 query.name_number = Request.Form["key"] ?? "";
                 //增加查詢值  按鈕選中  add by zhuoqin0830w  2015/02/10

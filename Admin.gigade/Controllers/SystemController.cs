@@ -51,12 +51,12 @@ namespace Admin.gigade.Controllers
             //添加 級別 的查詢條件  add by zhuoqin0830w 2015/02/04
             string level = Request.Form["level"] ?? "";
 
-            if (startDate.Equals("1970-01-01"))
+            if (startDate.Equals("1970-01-01 08:00:00"))
             {
                 startDate = "";
             }
 
-            if (endDate.Equals("1970-01-01"))
+            if (endDate.Equals("1970-01-01 08:00:00"))
             {
                 endDate = "";
             }

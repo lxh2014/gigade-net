@@ -174,10 +174,11 @@ Ext.onReady(function () {
                 margin: '5 10 0 5',
             },
             {
-                xtype: 'datefield',
+                xtype: 'datetimefield',
                 allowBlank: true,
                 id: 'timestart',
-                format: 'Y-m-d',
+                format: 'Y-m-d H:i:s',
+                time: { hour: 00, min: 00, sec: 00 },
                 margin: '5 5 0 0',
                 editable: false,
                 labelWidth: 60,
@@ -199,10 +200,11 @@ Ext.onReady(function () {
                 value: "~"
             },
             {
-                xtype: 'datefield',
+                xtype: 'datetimefield',
                 allowBlank: true,
                 id: 'timeend',
-                format: 'Y-m-d',
+                format: 'Y-m-d  H:i:s',
+                time: { hour: 23, min: 59, sec: 59 },
                 editable: false,
                 margin: '5 0 0 5',
                 listeners: {

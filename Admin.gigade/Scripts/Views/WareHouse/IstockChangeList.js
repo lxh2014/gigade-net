@@ -38,7 +38,7 @@ setNextMonth = function (source, n) {
     s.setMonth(s.getMonth() + n);
     if (n < 0) {
         s.setHours(0, 0, 0);
-    } else if (n > 0) {
+    } else if (n >= 0) {
         s.setHours(23, 59, 59);
     }
     return s;
@@ -117,12 +117,13 @@ Ext.onReady(function () {
                         },
                             { xtype: 'displayfield', value: '時間區間:', margin: '0 0 0 15' },
                               {
-                                  xtype: "datefield",
+                                  xtype: "datetimefield",
                                   editable: false,
                                   margin: '0 0 0 5',
                                   id: 'start_time',
                                   name: 'start_time',
-                                  format: 'Y/m/d',
+                                  format: 'Y-m-d  H:i:s',
+                                  time: { hour: 00, min: 00, sec: 00 },
                                   listeners: {
                                       select: function () {
                                           var start = Ext.getCmp("start_time");
@@ -144,11 +145,12 @@ Ext.onReady(function () {
                               },
                        { xtype: 'displayfield', value: '~ ' },
                        {
-                           xtype: "datefield",
+                           xtype: "datetimefield",
                            editable: false,
                            id: 'end_time',
                            name: 'end_time',
-                           format: 'Y/m/d',
+                           format: 'Y-m-d  H:i:s',
+                           time: { hour: 23, min: 59, sec: 59 },
                            listeners: {
                                select: function () {
                                    var start = Ext.getCmp("start_time");
@@ -158,7 +160,7 @@ Ext.onReady(function () {
                                    if (start.getValue() != "" && start.getValue() != null) {
                                        if (end.getValue() < start.getValue()) {
                                            Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間");
-                                           end.setValue(setNextMonth(start.getValue(), 1));
+                                           start.setValue(setNextMonth(end.getValue(), -1));
                                        }
                                    } else {
                                        start.setValue(setNextMonth(end.getValue(), -1));
@@ -214,7 +216,7 @@ Ext.onReady(function () {
             return false;
         }
 
-        var url = "oid=" + Ext.getCmp('oid').getValue() + "&start_time=" +  Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d') + "&end_time=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d') ;
+        var url = "oid=" + Ext.getCmp('oid').getValue() + "&start_time=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s') + "&end_time=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s');
         window.open("/WareHouse/IstockChangeExcelList?" + url);
     }
     function Query() {
