@@ -32,9 +32,7 @@ Ext.define('gigade.Users', {
 
     //Edit Start Modify by Gaoyuwei 2015-12-07
     //{ name: "user_mobile", type: "string" },
-    //{ name: "user_phone", type: "string" }, //行動電話
     { name: "user_mobile", type: "string" },//行動電話
-   // { name: "user_phone", type: "string" }, //市話
     //Edti End Modify by Gaoyuwei 2015-12-07
 
 

@@ -72,10 +72,8 @@ Ext.define('gigade.VipUser', {
     //        {name: "user_birthday_day", type: "int" }, //日
         { name: "birthday", type: "string" },
         { name: "user_mobile", type: "string" },
-        { name: "user_phone", type: "string" }, //行動電話
         { name: "user_zip", type: "string" }, //用戶地址
         { name: "user_address", type: "string" }, //用戶地址
-        { name: "user_phone", type: "string" }, //聯絡電話
         { name: "reg_date", type: "string" }, //註冊日期
 
 

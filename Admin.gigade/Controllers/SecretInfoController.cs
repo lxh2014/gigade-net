@@ -758,7 +758,7 @@ namespace Admin.gigade.Controllers
                     case "vip_user":
                         VipUserMgr vipusersMgr = new VipUserMgr(mySqlConnectionString);
                         VipUser model = vipusersMgr.GetSingleByID(related_id);
-                        json = "{success:true,\"user_id\":\"" + model.user_id + "\",\"user_email\":\"" + model.user_email + "\"}";
+                        json = "{success:true,\"v_id\":\"" + model.v_id + "\",\"user_id\":\"" + model.user_id + "\",\"user_email\":\"" + model.user_email + "\"}";
                         break;
                     case "edm_group_email":
                         EdmGroupEmailMgr edmgroupmailMgr = new EdmGroupEmailMgr(mySqlConnectionString);
@@ -902,7 +902,7 @@ namespace Admin.gigade.Controllers
                         DataTable _dtmu = _IMailUserMgr.GetUserInfo(related_id);
                         if (_dtmu.Rows.Count > 0)
                         {
-                            json = "{success:true,\"user_id\":\"" + _dtmu.Rows[0]["user_id"] + "\",\"user_name\":\"" + _dtmu.Rows[0]["user_name"] + "\",\"user_email\":\"" + _dtmu.Rows[0]["user_email"] +  "\",\"user_adress\":\"" + _dtmu.Rows[0]["user_address"] + "\"}";
+                            json = "{success:true,\"user_id\":\"" + _dtmu.Rows[0]["user_id"] + "\",\"user_name\":\"" + _dtmu.Rows[0]["user_name"] + "\",\"user_email\":\"" + _dtmu.Rows[0]["user_email"] + "\",\"user_adress\":\"" + _dtmu.Rows[0]["user_address"] + "\"}";
                         }
                         break;
                     case 10:
