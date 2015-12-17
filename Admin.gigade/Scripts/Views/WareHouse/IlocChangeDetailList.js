@@ -153,13 +153,14 @@ Ext.onReady(function () {
                 layout: 'hbox',
                 items: [
                     {
-                        xtype: "datefield",
+                        xtype: "datetimefield",
                         editable: false,
                         fieldLabel: "搬移日期區間",
                         margin: '0 0 0 5',
                         id: 'start_time',
                         name: 'start_time',
-                        format: 'Y/m/d',
+                        format: 'Y-m-d H:i:s',
+                        time: { hour: 00, min: 00, sec: 00 },
                         listeners: {
                             select: function (a, b, c) {
                                 var start = Ext.getCmp("start_time");
@@ -195,11 +196,12 @@ Ext.onReady(function () {
                     },
                     { xtype: 'displayfield', value: '~ ' },
                     {
-                        xtype: "datefield",
+                        xtype: "datetimefield",
                         editable: false,
                         id: 'end_time',
                         name: 'end_time',
-                        format: 'Y/m/d',
+                        format: 'Y-m-d  H:i:s',
+                        time: { hour: 23, min: 59, sec: 59 },
                         listeners: {
                             select: function (a, b, c) {
                                 var start = Ext.getCmp("start_time");
@@ -209,7 +211,7 @@ Ext.onReady(function () {
                                 if (start.getValue() != "" && start.getValue() != null) {
                                     if (end.getValue() < start.getValue()) {
                                         Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間");
-                                        end.setValue(setNextMonth(start.getValue(), 1));
+                                        start.setValue(setNextMonth(end.getValue(), -1));
                                     }
                                     //else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
                                     //    //Ext.Msg.alert(INFORMATION, DATE_LIMIT);

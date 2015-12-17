@@ -107,19 +107,24 @@ Ext.onReady(function () {
                     },
 
                      {
-                         xtype: 'datefield',
+                         xtype: 'datetimefield',
                          fieldLabel: "創建時間",
                          labelWidth: 60,
                          // width: 210,
                          id: 'time_start',
                          name: 'time_start',
                          margin: '5 0 0 5',
-                         format: 'Y-m-d',
+                         format: 'Y-m-d H:i:s',
+                         time: { hour: 00, min: 00, sec: 00 },
                          editable: false,
                          listeners: {
                              select: function () {
-                                 if (Ext.getCmp("time_start").getValue() != null) {
-                                     Ext.getCmp("time_end").setMinValue(Ext.getCmp("time_start").getValue());
+                                 var start = Ext.getCmp("time_start");
+                                 var end = Ext.getCmp("time_end");
+                                 if (end.getValue() == null) {
+                                     end.setValue(setNextMonth(start.getValue(), 1));
+                                 } else if (start.getValue() > end.getValue()) {                                 
+                                     end.setValue(setNextMonth(start.getValue(), 1));
                                  }
                              }
                               , specialkey: function (field, e) {
@@ -137,18 +142,25 @@ Ext.onReady(function () {
                             margin: '5 0 0 5'
                         },
                         {
-                            xtype: 'datefield',
+                            xtype: 'datetimefield',
                             labelWidth: 60,
                             // width: 210,
                             id: 'time_end',
                             name: 'time_end',
                             margin: '5 0 0 5',
-                            format: 'Y-m-d',
+                            format: 'Y-m-d  H:i:s',
+                            time: { hour: 23, min: 59, sec: 59 },
                             editable: false,
                             listeners: {
                                 select: function () {
-                                    if (Ext.getCmp("time_end").getValue() != null) {
-                                        Ext.getCmp("time_start").setMaxValue(Ext.getCmp("time_end").getValue());
+                                    var start = Ext.getCmp("time_start");
+                                    var end = Ext.getCmp("time_end");
+                                    var s_date = new Date(start.getValue());
+                                    if (start.getValue() == null) {
+                                        start.setValue(setNextMonth(end.getValue(), -1));
+                                    }
+                                    else if (end.getValue() < start.getValue()) {                                     
+                                        start.setValue(setNextMonth(end.getValue(), -1));
                                     }
                                 }
                                 , specialkey: function (field, e) {
@@ -235,7 +247,7 @@ Ext.onReady(function () {
             { header: "訂货量", dataIndex: 'ord_qty', width: 60, align: 'center' },
             { header: "已撿貨量 ", dataIndex: 'act_pick_qty', width: 65, align: 'center' },
             { header: "待撿货量", dataIndex: 'out_qty', width: 65, align: 'center' },
-            { header: "創建時間", dataIndex: 'create_dtim', width: 120, align: 'center' }
+            { header: "創建時間", dataIndex: 'create_dtim', width: 150, align: 'center' }
         ],
         tbar: [
            { xtype: 'button', text: "總量撿貨報表匯出PDF", id: 'outExcel', icon: '../../../Content/img/icons/excel.gif', handler: outExcel }
@@ -292,4 +304,14 @@ outExcel = function () {
     }
     var params = 'assg_id=' + Ext.getCmp('assg_id').getValue() + "&start_time=" + start_time + "&end_time=" + end_time;
     window.open('/WareHouse/AseldPDFS?' + params);
+}
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    } else if (n >= 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

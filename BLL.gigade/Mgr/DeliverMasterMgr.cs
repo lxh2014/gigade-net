@@ -127,7 +127,7 @@ namespace BLL.gigade.Mgr
                     _newDtRow[0] = _dt.Rows[i]["delivery_code"];
                     _newDtRow[1] = _dt.Rows[i]["deliver_id"];
                     _newDtRow[2] = _dt.Rows[i]["order_id"];
-                    _newDtRow[3] = _dt.Rows[i]["order_date"];
+                    _newDtRow[3] = Convert.ToDateTime(_dt.Rows[i]["order_date"]).ToString("yyyy-MM-dd HH:mm:ss");
                     DataTable _dtOrderStatus = _access.getDataTable(string.Format("SELECT rowid,parameterType,parameterCode,parameterName,remark FROM t_parametersrc WHERE parameterType='order_status' and parameterCode='{0}'", _dt.Rows[i]["order_status"]));//order_status
                     if (_dtOrderStatus.Rows.Count > 0)
                     {
