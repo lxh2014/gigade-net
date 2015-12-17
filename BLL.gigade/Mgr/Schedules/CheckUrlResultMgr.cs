@@ -94,39 +94,46 @@ namespace BLL.gigade.Mgr.Schedules
                 HttpWebResponse httpResponse;
                 try
                 {
-                     httpResponse = (HttpWebResponse)httpRequest.GetResponse();
-                     if (httpResponse.StatusCode == HttpStatusCode.OK)
-                     {
-                         sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.UTF8);
-                         string result = sr.ReadToEnd();                         
-                         result = result.Trim();
-                         if (result == "success")
-                         {
-                             MailBody = "更新成功";
-                             MailHelper mail = new MailHelper(mailModel);
-                             mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true);
-                         }
-                         else if (result == "error")
-                         {
-                             MailBody = "更新失敗";
-                             MailHelper mail = new MailHelper(mailModel);
-                             mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true);
-                         }
-                     }
-                     else
-                     {
-                         MailBody = "更新失敗";
-                         MailHelper mail = new MailHelper(mailModel);
-                         mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true);
-                     }     
+                     httpResponse = (HttpWebResponse)httpRequest.GetResponse();                         
                 }
                 catch (Exception ex)
                 {
-                    MailBody = "更新失敗";
+                    MailBody = "URL請求失敗，失敗原因：" + ex.Message;
                     MailHelper mail = new MailHelper(mailModel);
                     mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true);
                     throw new Exception(ex.Message);
-                }                                      
+                }
+
+                if (httpResponse.StatusCode == HttpStatusCode.OK)
+                {
+                    sr = new StreamReader(httpResponse.GetResponseStream(), System.Text.Encoding.UTF8);
+                    string result = sr.ReadToEnd();
+                    result = result.Trim();
+                    if (result == "success")
+                    {
+                        MailBody = "更新成功";
+                        MailHelper mail = new MailHelper(mailModel);
+                        mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true);
+                    }
+                    else if (result == "error")
+                    {
+                        MailBody = "更新失敗";
+                        MailHelper mail = new MailHelper(mailModel);
+                        mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true);
+                    }
+                    else
+                    {
+                        MailBody = "請求遠端返回的值不為 success 或者 error ";
+                        MailHelper mail = new MailHelper(mailModel);
+                        mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true);
+                    }
+                }
+                else
+                {
+                    MailBody = "URL請求失敗，失敗原因：遠端響應狀態為 " + httpResponse.StatusCode;
+                    MailHelper mail = new MailHelper(mailModel);
+                    mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true);
+                }                      
             }
             catch (Exception ex)
             {

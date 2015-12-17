@@ -451,9 +451,9 @@ namespace Admin.gigade.Controllers
             string time_end = string.Empty;
             if (!string.IsNullOrEmpty(Request.Params["time_start"]))
             {
-                if (qvCon.date_type == "apply_time")//time 為整形
+                if (qvCon.date_type == "apply_time")//time 為整形【表中apply_time為datetime類型,change by shiwei0620j 】
                 {
-                    time_start = CommonFunction.GetPHPTime(Request.Params["time_start"]).ToString();
+                    time_start =  (Request.Params["time_start"]).ToString();
                     //time_end = CommonFunction.GetPHPTime(Request.Params["time_end"]).ToString();
                 }
                 else
@@ -466,13 +466,13 @@ namespace Admin.gigade.Controllers
 
             if (!string.IsNullOrEmpty(Request.Params["time_end"]))
             {
-                if (qvCon.date_type == "apply_time")//time 為整形
+                if (qvCon.date_type == "apply_time")//time 為整形【表中apply_time為datetime類型,change by shiwei0620j 】
                 {
-                    time_start = CommonFunction.GetPHPTime(Request.Params["time_end"]).ToString();
+                    time_end =  (Request.Params["time_end"]).ToString();
                 }
                 else
                 {
-                    time_start = Request.Params["time_end"];
+                    time_end = Request.Params["time_end"];
                 }
                 qvCon.time_end = time_end;
             }
@@ -539,11 +539,11 @@ namespace Admin.gigade.Controllers
 
                 if (!string.IsNullOrEmpty(Request.Params["time_start"]))
                 {
-                    query.time_start = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy/MM/dd 00:00:00")).ToString();
+                    query.time_start = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy/MM/dd HH:mm:ss")).ToString();
                 }
                 if (!string.IsNullOrEmpty(Request.Params["time_end"]))
                 {
-                    query.time_end = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy/MM/dd 23:59:59")).ToString();
+                    query.time_end = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy/MM/dd HH:mm:ss")).ToString();
                 }
 
                 query.Start = startPage;
@@ -727,14 +727,14 @@ namespace Admin.gigade.Controllers
                 {
                     if (query.date_type != "apply_time")            //time 為整型
                     {
-                        query.time_start = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy/MM/dd 00:00:00")).ToString();
-                        query.time_end = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy/MM/dd 23:59:59")).ToString();
+                        query.time_start = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy/MM/dd HH:mm:ss")).ToString();
+                        query.time_end = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy/MM/dd HH:mm:ss")).ToString();
 
                     }
                     else
                     {
-                        query.time_start = Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy/MM/dd 00:00:00");
-                        query.time_end = Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy/MM/dd 23:59:59");
+                        query.time_start = Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy/MM/dd HH:mm:ss");
+                        query.time_end = Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy/MM/dd HH:mm:ss");
                     }
                 }
 
@@ -1254,11 +1254,11 @@ namespace Admin.gigade.Controllers
                 query.date_type = Request.Form["date_type"] ?? "";
                 if (!string.IsNullOrEmpty(Request.Form["time_start"]))
                 {
-                    query.time_start = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Form["time_start"]).ToString("yyyy/MM/dd 00:00:00")).ToString();
+                    query.time_start = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Form["time_start"]).ToString("yyyy/MM/dd HH:mm:ss")).ToString();
                 }
                 if (!string.IsNullOrEmpty(Request.Form["time_end"]))
                 {
-                    query.time_end = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Form["time_end"]).ToString("yyyy/MM/dd 23:59:59")).ToString();
+                    query.time_end = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Form["time_end"]).ToString("yyyy/MM/dd HH:mm:ss")).ToString();
                 }
                 query.name_number = Request.Form["key"] ?? "";
                 if (query.price_check)

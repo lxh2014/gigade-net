@@ -232,23 +232,27 @@ Ext.onReady(function () {
                     value: -1
                 },
                 {
-                    xtype: "datefield",
+                    xtype: "datetimefield",
                     editable: false,
                     margin: '0 5 2 0',
                     fieldLabel: '調整時間',
                     labelWidth: 60,
                     id: 'start_time',
                     name: 'start_time',
-                    //format: 'Y/m/d',
+                    format: 'Y-m-d H:i:s',
+                    time: { hour: 00, min: 00, sec: 00 },
                     value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
                     listeners: {
                         select: function (a, b, c) {
                             var start = Ext.getCmp("start_time");
                             var end = Ext.getCmp("end_time");
                             var s_date = new Date(end.getValue());
-                            if (end.getValue() < start.getValue()) {
+                            if (start.getValue() == null) {
+                                end.setValue(setNextMonth(start.getValue(), 1));
+                            }
+                           else if (end.getValue() < start.getValue()) {
                                 Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
-                                start.setValue(new Date(s_date.setMonth(s_date.getMonth() - 1)));
+                                end.setValue(setNextMonth(start.getValue(), 1));
                             }
                         },
                         specialkey: function (field, e) {
@@ -260,21 +264,25 @@ Ext.onReady(function () {
                 },
                 { xtype: 'displayfield', value: '~ ' },
                 {
-                    xtype: "datefield",
+                    xtype: "datetimefield",
                     editable: false,
                     id: 'end_time',
                     name: 'end_time',
                     margin: '0 5 2 0',
-                    //format: 'Y/m/d',
-                    value: Tomorrow(),
+                    format: 'Y-m-d  H:i:s',
+                    time: { hour: 23, min: 59, sec: 59 },
+                    value: setNextMonth(Tomorrow(), 0),
                     listeners: {
                         select: function (a, b, c) {
                             var start = Ext.getCmp("start_time");
                             var end = Ext.getCmp("end_time");
                             var s_date = new Date(start.getValue());
-                            if (end.getValue() < start.getValue()) {
+                            if (start.getValue() == null) {
+                                start.setValue(setNextMonth(end.getValue(), -1));
+                            }
+                           else if (end.getValue() < start.getValue()) {
                                 Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
-                                end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                start.setValue(setNextMonth(end.getValue(), -1));
                             }
                         },
                         specialkey: function (field, e) {
@@ -429,7 +437,24 @@ ExportExcel = function () {
 }
 function Tomorrow() {
     var d;
-    d = new Date();
-    d.setDate(d.getDate() + 1);
-    return d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate() + 1);
+    return dt;                  // 返回日期。
+}
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n >= 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

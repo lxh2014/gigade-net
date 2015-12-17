@@ -109,13 +109,14 @@ Ext.onReady(function () {
             }
         },
         {
-            xtype: 'datefield',
+            xtype: 'datetimefield',
             fieldLabel: "建立時間",
             id: 'start',
             name: 'start',
             labelWidth: 60,
             //margin: '0 5 3 0',
-            format: 'Y-m-d',
+            format: 'Y-m-d H:i:s',
+            time: { hour: 00, min: 00, sec: 00 },
             editable: false,
             listeners: {
                 select: function () {
@@ -127,10 +128,10 @@ Ext.onReady(function () {
                         Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
                         end.setValue(setNextMonth(start.getValue(), 1));
                     }
-                    else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                        // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                        end.setValue(setNextMonth(start.getValue(), 1));
-                    }
+                    //else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
+                    //    // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                    //    end.setValue(setNextMonth(start.getValue(), 1));
+                    //}
                 },
                 specialkey: function (field, e) {
                     if (e.getKey() == e.ENTER) {
@@ -146,10 +147,11 @@ Ext.onReady(function () {
             //margin: '0 10 3 7'
         },
         {
-            xtype: 'datefield',
+            xtype: 'datetimefield',
             id: 'end',
             name: 'end',
-            format: 'Y-m-d',
+            format: 'Y-m-d  H:i:s',
+            time: { hour: 23, min: 59, sec: 59 },
             editable: false,
             listeners: {
                 select: function (a, b, c) {
@@ -160,11 +162,11 @@ Ext.onReady(function () {
                     if (start.getValue() != "" && start.getValue() != null) {
                         if (end.getValue() < start.getValue()) {
                             Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間");
-                            end.setValue(setNextMonth(start.getValue(), 1));
-                        } else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                            //Ext.Msg.alert(INFORMATION, DATE_LIMIT);
                             start.setValue(setNextMonth(end.getValue(), -1));
-                        }
+                        } //else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
+                        //    //Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                        //    start.setValue(setNextMonth(end.getValue(), -1));
+                        //}
                     } else {
                         start.setValue(setNextMonth(end.getValue(), -1));
                     }

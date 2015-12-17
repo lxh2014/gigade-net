@@ -6,6 +6,7 @@ using BLL.gigade.Model;
 using DBAccess;
 using BLL.gigade.Dao.Impl;
 using System.Data;
+using BLL.gigade.Common;
 namespace BLL.gigade.Dao
 {
     public class ErrorLogDao:IErrorLogImplDao
@@ -27,12 +28,12 @@ namespace BLL.gigade.Dao
             {
                 if (!string.IsNullOrEmpty(startDate))
                 {
-                    tempStr += string.Format(" and log_date > '{0}'",startDate);
+                    tempStr += string.Format(" and log_date >= '{0}'",CommonFunction.DateTimeToString(Convert.ToDateTime(startDate)));
                 }
 
                 if (!string.IsNullOrEmpty(endDate))
                 {
-                    tempStr += string.Format(" and log_date < '{0}'", Convert.ToDateTime(endDate).AddDays(1));
+                    tempStr += string.Format(" and log_date <= '{0}'", CommonFunction.DateTimeToString(Convert.ToDateTime(endDate)));
                 }
                 //添加 級別 的查詢條件  edit by zhuoqin0830w 2015/02/05
                 if (!string.IsNullOrEmpty(level))

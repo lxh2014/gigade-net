@@ -21,7 +21,7 @@ Ext.define('gigade.DesignRequent', {
     { name: "dr_modified", type: "datetime" },
     { name: "dr_expected", type: "datetime" },
     { name: "Isgq", type: "int" }
-    
+
     ]
 });
 var DesignRequentStore = Ext.create('Ext.data.Store', {
@@ -154,7 +154,7 @@ var sm = Ext.create('Ext.selection.CheckboxModel', {
         }
     }
 });
-Ext.onReady(function () {    
+Ext.onReady(function () {
     var searchFrm = Ext.create('Ext.form.Panel', {
         id: 'searchFrm',
         bodyPadding: '15',
@@ -177,7 +177,7 @@ Ext.onReady(function () {
                             xtype: 'combobox',
                             fieldLabel: "需求類型",
                             labelWidth: 110,
-                            margin:'0 0 0 5px',
+                            margin: '0 0 0 5px',
                             id: 'drtype',
                             name: 'drtype',
                             width: 250,
@@ -214,7 +214,7 @@ Ext.onReady(function () {
                         xtype: 'combobox',
                         fieldLabel: "需求狀態",
                         labelWidth: 110,
-                        margin:'0 0 0 5px',
+                        margin: '0 0 0 5px',
                         id: 'status',
                         name: 'status',
                         width: 250,
@@ -248,13 +248,14 @@ Ext.onReady(function () {
 
                    },
                    {
-                       xtype: 'datefield',
+                       xtype: 'datetimefield',
                        id: 'start_time',
                        name: 'start_time',
-                       format: 'Y-m-d',
+                       format: 'Y-m-d  H:i:s',
+                       time: { hour: 00, min: 00, sec: 00 },
                        editable: false,
-                       width: 140,
-                       value: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
+                       width: 150,
+                       value: new Date(Tomorrow(-1).setMonth(Tomorrow(-1).getMonth() - 1)),
                        listeners: {
                            select: function () {
                                var start = Ext.getCmp("start_time");
@@ -279,23 +280,22 @@ Ext.onReady(function () {
                         labelWidth: 10
                     },
                    {
-                       xtype: 'datefield',
+                       xtype: 'datetimefield',
                        id: 'end_time',
                        name: 'end_time',
-                       format: 'Y-m-d',
-                       width: 140,
+                       format: 'Y-m-d  H:i:s',
+                       time: { hour: 23, min: 59, sec: 59 },
+                       width: 150,
                        editable: false,
-                       value: new Date(),
+                       value: setNextMonth(Tomorrow(-1), 0),
                        listeners: {
                            select: function (a, b, c) {
                                var start = Ext.getCmp("start_time");
                                var end = Ext.getCmp("end_time");
-                               var s_date = new Date(start.getValue());
-                               var now_date = new Date(end.getValue());
                                if (start.getValue() != "" && start.getValue() != null) {
                                    if (end.getValue() < start.getValue()) {
                                        Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間");
-                                       end.setValue(setNextMonth(start.getValue(), 1));
+                                       start.setValue(setNextMonth(end.getValue(), -1));
                                    }
                                } else {
                                    start.setValue(setNextMonth(end.getValue(), -1));
@@ -335,7 +335,7 @@ Ext.onReady(function () {
         frame: true,
         flex: 8.1,
         columns: [
-            { header: "ID", dataIndex: 'dr_id', width: 100, align: 'center',hidden:true },
+            { header: "ID", dataIndex: 'dr_id', width: 100, align: 'center', hidden: true },
             {
                 header: "需求提出者", dataIndex: 'dr_requester_id_name', width: 100, align: 'center'
             },
@@ -367,8 +367,8 @@ Ext.onReady(function () {
             { xtype: 'button', text: "刪除", id: 'remove', iconCls: 'ui-icon ui-icon-user-delete', disabled: true, handler: onRemoveClick, hidden: true },
             { xtype: 'button', text: "認領工作", id: 'take', iconCls: 'ui-icon ui-icon-user-edit', disabled: true, hidden: true, handler: TakeJob },
             { xtype: 'button', text: "指派人員", id: 'order', iconCls: 'ui-icon ui-icon-user-edit', disabled: true, hidden: true, handler: OrderPeople },
-            { xtype: 'button', text: "變更狀態", id: 'update', iconCls: 'ui-icon ui-icon-user-edit', disabled: true, hidden: true, handler: UpdateStatus } ,
-            { xtype: 'button', text: "審核通過", id: 'pass', iconCls: 'ui-icon ui-icon-user-edit', disabled: true, hidden: true, handler: UpdateStatus } 
+            { xtype: 'button', text: "變更狀態", id: 'update', iconCls: 'ui-icon ui-icon-user-edit', disabled: true, hidden: true, handler: UpdateStatus },
+            { xtype: 'button', text: "審核通過", id: 'pass', iconCls: 'ui-icon ui-icon-user-edit', disabled: true, hidden: true, handler: UpdateStatus }
         ],
         viewConfig: {
             forceFit: true,
@@ -484,7 +484,7 @@ onRemoveClick = function () {
                     success: function (form, action) {
                         var result = Ext.decode(form.responseText);
                         if (result.success) {
-                            if (result.msg ==0) {
+                            if (result.msg == 0) {
                                 Ext.Msg.alert("提示信息", "刪除成功！");
                             }
                             else if (result.msg == 2) {
@@ -512,12 +512,6 @@ onRemoveClick = function () {
             }
         });
     }
-}
-function NextMonth() {
-    var d;
-    d = new Date();                             // 创建 Date 对象。
-    d.setDate(d.getMonth() + 1);
-    return d;
 }
 OrderPeople = function () {
     var row = Ext.getCmp("DesignRequentGrid").getSelectionModel().getSelection();
@@ -579,17 +573,29 @@ UpdateStatus = function () {
         });
     }
 }
-setNextMonth = function (source, n) {
+function Tomorrow(n) {
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate() + n);
+    return dt;                  // 返回日期。
+}
+function setNextMonth(source, n) {
     var s = new Date(source);
     s.setMonth(s.getMonth() + n);
     if (n < 0) {
         s.setHours(0, 0, 0);
-    } else if (n > 0) {
+    }
+    else if (n >= 0) {
         s.setHours(23, 59, 59);
     }
     return s;
 }
-
 //*********認領工作********//
 TakeJob = function () {
     var row = Ext.getCmp("DesignRequentGrid").getSelectionModel().getSelection();
