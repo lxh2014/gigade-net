@@ -167,7 +167,7 @@ namespace BLL.gigade.Mgr.Schedules
             _newErrorDt.Columns.Add("郵箱", typeof(String));
             _newErrorDt.Columns.Add("IP地址", typeof(String));
             _newErrorDt.Columns.Add("訂單編號", typeof(String));
-            _newErrorDt.Columns.Add("訂購時間", typeof(String));
+            _newErrorDt.Columns.Add("付款時間", typeof(String));
             _orderMaster = new OrderMasterMgr(mySqlConnectionString);
 
             DataTable _dtResult = _orderMaster.GetBigOrderNumbers(query);
