@@ -99,42 +99,45 @@ Ext.onReady(function () {
             { xtype: 'button', text: EDIT, id: 'edit', hidden: true, iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
             { xtype: 'button', text: '刪除', id: 'remove', hidden: false, disabled: true, iconCls: 'icon-user-remove', handler: onRemoveClick },
              '->',
-                              {
-                                  xtype: 'datefield',
-                                  allowBlank: true,
-                                  id: 'timestart',
-                                  margin: "0 5 0 0",
-                                  editable: false,
-                                  value: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
-                                  name: 'serchcontent',
-                                  fieldLabel: '創建時間',
-                                  labelWidth: 60,
-                                  width:170,
-                                  editable: false,
-                                  listeners: {
-                                      select: function (a, b, c) {
-                                          var tstart = Ext.getCmp("timestart");
-                                          var tend = Ext.getCmp("timeend");
-                                          if (tend.getValue() == null) {
-                                              tend.setValue(setNextMonth(tstart.getValue(), 1));
-                                          }
-                                          else if (tend.getValue() < tstart.getValue()) {
-                                              Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
-                                              tend.setValue(setNextMonth(tstart.getValue(), 1));
-                                          }
-                                      }
-                                  }
-                              },
+            {
+                xtype: 'datetimefield',
+                allowBlank: true,
+                id: 'timestart',
+                margin: "0 5 0 0",
+                editable: false,
+                value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
+                name: 'serchcontent',
+                fieldLabel: '創建時間',
+                format: 'Y-m-d  H:i:s',
+                time: { hour: 00, min: 00, sec: 00 },
+                labelWidth: 60,
+                width:220,
+                editable: false,
+                listeners: {
+                    select: function (a, b, c) {
+                        var tstart = Ext.getCmp("timestart");
+                        var tend = Ext.getCmp("timeend");
+                        if (tend.getValue() == null) {
+                            tend.setValue(setNextMonth(tstart.getValue(), 1));
+                        }
+                        else if (tend.getValue() < tstart.getValue()) {                          
+                            tend.setValue(setNextMonth(tstart.getValue(), 1));
+                        }
+                    }
+                }
+            },
              {
-                 xtype: 'datefield',
+                 xtype: 'datetimefield',
                  allowBlank: true,
                  editable: false,
                  id: 'timeend',
                  margin: "0 5 0 0",
                  name: 'serchcontent',
                  fieldLabel: '到',
-                 width: 125,
-                 value:new Date(),
+                 format: 'Y-m-d  H:i:s',
+                 time: { hour: 23, min: 59, sec: 59 },
+                 width: 175,
+                 value: setNextMonth(Tomorrow(), 0),
                  labelWidth: 15,
                  listeners: {
                      select: function (a, b, c) {
@@ -143,8 +146,7 @@ Ext.onReady(function () {
                          if (tstart.getValue() == null) {
                              tstart.setValue(setNextMonth(tend.getValue(), -1));
                          }
-                         else if (tend.getValue() < tstart.getValue()) {
-                             Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                         else if (tend.getValue() < tstart.getValue()) {                          
                              tstart.setValue(setNextMonth(tend.getValue(), -1));
                          }
                      }
@@ -176,8 +178,8 @@ Ext.onReady(function () {
                 listeners: {
                     click: function () {
                         Ext.getCmp('serchcontent').setValue("");
-                        Ext.getCmp('timestart').setValue(new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()));
-                        Ext.getCmp('timeend').setValue(new Date());
+                        Ext.getCmp('timestart').reset();
+                        Ext.getCmp('timeend').reset();
                         Query();
                     }
                 }
@@ -265,13 +267,25 @@ onRemoveClick = function () {
         });
     }
 }
-setNextMonth = function (source, n) {
+function Tomorrow() {
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate() + 1);
+    return dt;                  // 返回日期。
+}
+function setNextMonth(source, n) {
     var s = new Date(source);
     s.setMonth(s.getMonth() + n);
     if (n < 0) {
         s.setHours(0, 0, 0);
     }
-    else if (n > 0) {
+    else if (n >= 0) {
         s.setHours(23, 59, 59);
     }
     return s;

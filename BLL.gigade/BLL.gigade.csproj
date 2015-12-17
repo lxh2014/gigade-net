@@ -115,6 +115,7 @@
     <Compile Include="Common\CreateCode.cs" />
     <Compile Include="Common\CsvHelper.cs" />
     <Compile Include="Common\DataCheck.cs" />
+    <Compile Include="Common\EncryptComputer.cs" />
     <Compile Include="Common\ExcelHelperXhf.cs" />
     <Compile Include="Common\FileManagement.cs" />
     <Compile Include="Common\FTP.cs" />
@@ -1192,6 +1193,7 @@
     <Compile Include="Mgr\Schedules\CheckUnsafeLoginMgr.cs" />
     <Compile Include="Mgr\Schedules\ReceiveStatusFromTCatMgr.cs" />
     <Compile Include="Mgr\Schedules\SendOrderInfoToBlackCatFTPMgr.cs" />
+    <Compile Include="Mgr\Schedules\CheckUrlResultMgr.cs" />
     <Compile Include="Mgr\SecretAccountSetMgr.cs" />
     <Compile Include="Mgr\SecretInfoLogMgr.cs" />
     <Compile Include="Mgr\SerialMgr.cs" />
@@ -1273,9 +1275,11 @@
     <Compile Include="Mgr\ZipMgr.cs" />
     <Compile Include="Mgr\DeliverChangeLogMgr.cs" />
     <Compile Include="Model\Announce.cs" />
+    <Compile Include="Model\APIModels\AesResult.cs" />
     <Compile Include="Model\APIModels\DeliverIdViewModel.cs" />
     <Compile Include="Model\APIModels\ExpectArrivePeriod.cs" />
     <Compile Include="Model\APIModels\ModifyExpertArriveDateViewModel.cs" />
+    <Compile Include="Model\APIModels\PlainTextViewModel.cs" />
     <Compile Include="Model\APIModels\SuppliersLoginResult.cs" />
     <Compile Include="Model\APIModels\SuppliersLoginViewModel.cs" />
     <Compile Include="Model\Appcategory.cs" />

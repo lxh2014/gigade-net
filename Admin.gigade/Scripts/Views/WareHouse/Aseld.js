@@ -227,9 +227,9 @@ Ext.onReady(function () {
         columns: [
             { header: "工作代號", dataIndex: 'assg_id', width: 120, align: 'center' },
             { header: "商品編號", dataIndex: 'product_id', width: 60, align: 'center' },
+            { header: "細項編號", dataIndex: 'item_id', width: 85, align: 'center' },
             { header: "條碼", dataIndex: 'upc_id', width: 120, align: 'center' },
             { header: "商品名稱", dataIndex: 'product_name', width: 300, align: 'center' },
-            { header: "細項編號", dataIndex: 'item_id', width: 85, align: 'center' },
             { header: "料位編號", dataIndex: 'loc_id', width: 85, align: 'center' },
             { header: "規格", dataIndex: 'spec', width: 170, align: 'center' },
             { header: "訂货量", dataIndex: 'ord_qty', width: 60, align: 'center' },

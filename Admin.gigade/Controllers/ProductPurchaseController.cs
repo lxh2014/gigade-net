@@ -326,6 +326,7 @@ namespace Admin.gigade.Controllers
                 dtExcel.Columns.Add("週期平均量", typeof(String));
                 dtExcel.Columns.Add("建議採購量", typeof(String));
                 dtExcel.Columns.Add("最小採購量", typeof(String));
+                dtExcel.Columns.Add("未驗收數量", typeof(String));
                 dtExcel.Columns.Add("供應商採購天數", typeof(String));
                 dtExcel.Columns.Add("補貨通知人數", typeof(String));
                 dtExcel.Columns.Add("售價(單價)", typeof(String));
@@ -444,21 +445,22 @@ namespace Admin.gigade.Controllers
                         }
                     }
 
-                    newRow[15] = dt.Rows[i]["min_purchase_amount"];
-                    newRow[16] = dt.Rows[i]["procurement_days"];
-                    newRow[17] = dt.Rows[i]["NoticeGoods"];
-                    newRow[18] = dt.Rows[i]["item_money"];
-                    newRow[19] = dt.Rows[i]["item_cost"];
-                    newRow[20] = dt.Rows[i]["product_status_string"];
-                    newRow[21] = dt.Rows[i]["sale_name"];
+                    newRow[15] = dt.Rows[i]["min_purchase_amount"];//最小採購量
+                    newRow[16] = dt.Rows[i]["ipo_qty"];
+                    newRow[17] = dt.Rows[i]["procurement_days"];
+                    newRow[18] = dt.Rows[i]["NoticeGoods"];
+                    newRow[19] = dt.Rows[i]["item_money"];
+                    newRow[20] = dt.Rows[i]["item_cost"];
+                    newRow[21] = dt.Rows[i]["product_status_string"];
+                    newRow[22] = dt.Rows[i]["sale_name"];
                    // newRow[22] = dt.Rows[i]["create_datetime"];
 
-                    newRow[22] = dt.Rows[i]["loc_id"];
-                    newRow[23] = dt.Rows[i]["made_date"];
-                    newRow[24] = dt.Rows[i]["cde_dt"];
-                    newRow[25] = dt.Rows[i]["cde_dt_incr"];
+                    newRow[23] = dt.Rows[i]["loc_id"];
+                    newRow[24] = dt.Rows[i]["made_date"];
+                    newRow[25] = dt.Rows[i]["cde_dt"];
+                    newRow[26] = dt.Rows[i]["cde_dt_incr"];
 
-                    newRow[26] = dt.Rows[i]["pwy_dte_ctl"];
+                    newRow[27] = dt.Rows[i]["pwy_dte_ctl"];
                     dtExcel.Rows.Add(newRow);
                 }
                 if (dtExcel.Rows.Count > 0)

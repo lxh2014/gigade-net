@@ -154,6 +154,7 @@
     <Compile Include="Controllers\ChinatrustController.cs" />
     <Compile Include="Controllers\ConsumeStatisticController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
+    <Compile Include="Controllers\Default1Controller.cs" />
     <Compile Include="Controllers\DeliveryStoreController.cs" />
     <Compile Include="Controllers\DispatchingSystemController.cs" />
     <Compile Include="Controllers\EdmController.cs" />
@@ -338,9 +339,7 @@
     <Content Include="bin\log4net.dll" />
     <Content Include="bin\Newtonsoft.Json.dll" />
     <Content Include="bin\WebDav.dll" />
-    <Content Include="Config.xml">
-      <SubType>Designer</SubType>
-    </Content>
+    <Content Include="Config.xml" />
     <Content Include="Content\css\dataview.css" />
     <Content Include="Content\css\icon.css" />
     <Content Include="Content\css\login\axurerp_pagespecificstyles.css" />
@@ -4513,6 +4512,7 @@
     <Content Include="Views\Order\OrderAmountDetial.cshtml" />
     <Content Include="Views\WareHouse\Inventory.cshtml" />
     <Content Include="Views\MarketTally\AutoMarketTally.cshtml" />
+    <Content Include="Views\Default1\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4717,7 +4717,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>37492</DevelopmentServerPort>
+          <DevelopmentServerPort>48570</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

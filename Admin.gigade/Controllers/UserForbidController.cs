@@ -56,12 +56,12 @@ namespace Admin.gigade.Controllers
                 query.login_mail = Request.Params["login_mail"];
                 query.login_ipfrom = Request.Params["login_ipfrom"];
                 if (!string.IsNullOrEmpty(Request.Params["start_date"]))
-                {                  
-                    query.slogin_createdate = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_date"]).ToString("yyyy-MM-dd 00:00:00"));
+                {
+                    query.slogin_createdate = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_date"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["end"]))
                 {
-                    query.elogin_createdate = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end"]).ToString("yyyy-MM-dd 23:59:59"));
+                    query.elogin_createdate = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["sumtotal"]))
                 {
@@ -121,11 +121,11 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["timestart"]))
                 {
-                    query.timestart =Convert.ToDateTime( Request.Params["timestart"].ToString()).ToString("yyyy-MM-dd 00:00:00");
+                    query.timestart = Convert.ToDateTime(Request.Params["timestart"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 if (!string.IsNullOrEmpty(Request.Params["timeend"]))
                 {
-                    query.timeend = Convert.ToDateTime(Request.Params["timeend"].ToString()).ToString("yyyy-MM-dd 23:59:59");
+                    query.timeend = Convert.ToDateTime(Request.Params["timeend"].ToString()).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 _IuserForbidMgr = new UserForbidMgr(mySqlConnectionString);
                 int totalCount = 0;

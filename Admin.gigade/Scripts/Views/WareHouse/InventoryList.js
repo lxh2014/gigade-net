@@ -688,7 +688,7 @@ function InsertInventory()
                             sta_id:Ext.getCmp('cbStatus').getValue(),
                             jobStart: Ext.getCmp('IlocLeft').getValue(),
                             jobEnd: Ext.getCmp('IlocRight').getValue(),
-                            
+                            start: 0
                         }
                     });
                    // Ext.Msg.alert(INFORMATION, "1");

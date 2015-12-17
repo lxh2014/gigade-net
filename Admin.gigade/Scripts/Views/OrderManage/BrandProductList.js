@@ -250,42 +250,48 @@ Ext.onReady(function () {
                         value: 1
                     },
                     {
-                        xtype: "datefield",
+                        xtype: "datetimefield",
                         labelWidth: 60,
                         margin: '0 0 0 10',
                         id: 'dateOne',
                         name: 'dateOne',
-                        format: 'Y-m-d',
+                        format: 'Y-m-d H:i:s',
+                        time: { hour: 00, min: 00, sec: 00 },
                         allowBlank: false,
                         editable: false,
                         submitValue: true,
-                        value: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+                        value: setNextMonth(Today(), -1),
                         listeners: {
                             select: function (a, b, c) {
-                                var Month = new Date(this.getValue()).getMonth() + 1;
-                                Ext.getCmp("dateTwo").setValue(new Date(new Date(this.getValue()).setMonth(Month)));
+                                var start = Ext.getCmp("dateOne");
+                                var end = Ext.getCmp("dateTwo");
+                                var s_date = new Date(end.getValue());
+                                if (end.getValue() < start.getValue()) {
+                                    var start_date = start.getValue();
+                                    Ext.getCmp('dateTwo').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                                }
                             }
                         }
                     },
                     { xtype: 'displayfield',margin: '0 0 0 0',value: "~" },
                     {
-                        xtype: "datefield",
-                        format: 'Y-m-d',
+                        xtype: "datetimefield",
+                        format: 'Y-m-d H:i:s',
+                        time: { hour: 23, min: 59, sec: 59 },
                         id: 'dateTwo',
                         name: 'dateTwo',
                         margin: '0 0 0 0',
                         allowBlank: false,
                         editable: false,
                         submitValue: true,
-                        value: new Date(),
+                        value: Today(),
                         listeners: {
                             select: function (a, b, c) {
                                 var start = Ext.getCmp("dateOne");
                                 var end = Ext.getCmp("dateTwo");
-                                var s_date = start.getValue();
                                 if (end.getValue() < start.getValue()) {
-                                    Ext.Msg.alert("提示信息", "開始時間不能大於結束時間！");
-                                    end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                    var end_date = end.getValue();
+                                    Ext.getCmp('dateOne').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                                 }
                             }
                         }
@@ -463,7 +469,7 @@ Ext.onReady(function () {
 
 /************匯入到Excel**************/
 function Export() {
-    window.open("/OrderManage/OrderBrandProducesExport?selecttype=" + Ext.getCmp('select_type').getValue() + "&searchcon=" + Ext.getCmp('search_con').getValue() + "&date_type=" + Ext.getCmp('date_type').getValue() + "&dateOne=" + Ext.Date.format(new Date(Ext.getCmp('dateOne').getValue()), 'Y-m-d') + "&dateTwo=" + Ext.Date.format(new Date(Ext.getCmp('dateTwo').getValue()), 'Y-m-d') + "&slave_status=" + Ext.getCmp('slave_status').getValue() + "&order_payment=" + Ext.getCmp('order_payment').getValue());
+    window.open("/OrderManage/OrderBrandProducesExport?selecttype=" + Ext.getCmp('select_type').getValue() + "&searchcon=" + Ext.getCmp('search_con').getValue() + "&date_type=" + Ext.getCmp('date_type').getValue() + "&dateOne=" + Ext.Date.format(new Date(Ext.getCmp('dateOne').getValue()), 'Y-m-d H:i:s') + "&dateTwo=" + Ext.Date.format(new Date(Ext.getCmp('dateTwo').getValue()), 'Y-m-d H:i:s') + "&slave_status=" + Ext.getCmp('slave_status').getValue() + "&order_payment=" + Ext.getCmp('order_payment').getValue());
 }
 //查询
 Query = function () {
@@ -524,4 +530,29 @@ function onUserEditClick() {
 
     //editFunction(row[0], OrderUserReduceListStore);//user_id
     // editFunction(row[0].data.user_id);
+}
+Today=function() {
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate());
+    dt.setHours(23, 59, 59);
+    return dt;                                 // 返回日期。
+}
+
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

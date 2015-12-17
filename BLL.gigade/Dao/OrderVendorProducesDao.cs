@@ -119,11 +119,11 @@ LEFT JOIN vendor v ON od.item_vendor_id = v.vendor_id LEFT JOIN manage_user mu O
                         case "4":
                             if (store.dateStart > DateTime.MinValue)
                             {
-                                sqlwhere.AppendFormat(" AND om.slave_date_delivery  >= '{0}' ", CommonFunction.GetPHPTime(store.dateStart.ToString()));
+                                sqlwhere.AppendFormat(" AND os.slave_date_delivery  >= '{0}' ", CommonFunction.GetPHPTime(store.dateStart.ToString()));
                             }
                             if (store.dateEnd > DateTime.MinValue)
                             {
-                                sqlwhere.AppendFormat(" AND om.slave_date_delivery < '{0}' ", CommonFunction.GetPHPTime(store.dateEnd.ToString()));
+                                sqlwhere.AppendFormat(" AND os.slave_date_delivery < '{0}' ", CommonFunction.GetPHPTime(store.dateEnd.ToString()));
                             }
                             break;
                         case "5":
@@ -260,11 +260,11 @@ LEFT JOIN users u ON om.user_id = u.user_id where 1=1 ");
                         case "4":
                             if (store.dateStart > DateTime.MinValue)
                             {
-                                sqlwhere.AppendFormat(" AND om.slave_date_delivery  >= '{0}' ", CommonFunction.GetPHPTime(store.dateStart.ToString()));
+                                sqlwhere.AppendFormat(" AND os.slave_date_delivery  >= '{0}' ", CommonFunction.GetPHPTime(store.dateStart.ToString()));
                             }
                             if (store.dateEnd > DateTime.MinValue)
                             {
-                                sqlwhere.AppendFormat(" AND om.slave_date_delivery < '{0}' ", CommonFunction.GetPHPTime(store.dateEnd.ToString()));
+                                sqlwhere.AppendFormat(" AND os.slave_date_delivery < '{0}' ", CommonFunction.GetPHPTime(store.dateEnd.ToString()));
                             }
                             break;
                         case "5":

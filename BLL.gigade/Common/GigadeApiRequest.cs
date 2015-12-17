@@ -7,6 +7,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using Newtonsoft.Json;
+using System.Configuration;
+using BLL.gigade.Mgr;
 
 namespace BLL.gigade.Common
 {
@@ -16,11 +18,20 @@ namespace BLL.gigade.Common
        // public event System.Action ServerError;
 
         static GigadeApiClientSettings Settings;
+        public GigadeApiRequest()
+        {
+            string xmlPath = ConfigurationManager.AppSettings["SiteConfig"];//XML的設置
+            string path = HttpContext.Current.Server.MapPath(xmlPath);
+            SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+            string apiServer = _siteConfigMgr.GetConfigByName("APIServer").Value;
+            Settings = new GigadeApiClientSettings(apiServer, Language.ZhTw, "8d7d4d7fc27111e483cffcaa14733140", "8d801aa0c27111e483cffcaa147331408d840b64c27111e483cffcaa14733140");
+            //GigadeApiRequest request = new GigadeApiRequest(Settings);
+        }
         public GigadeApiRequest(string apiServer)
         {
 
             Settings = new GigadeApiClientSettings(apiServer, Language.ZhTw, "8d7d4d7fc27111e483cffcaa14733140", "8d801aa0c27111e483cffcaa147331408d840b64c27111e483cffcaa14733140");
-            GigadeApiRequest request = new GigadeApiRequest(Settings);
+            //GigadeApiRequest request = new GigadeApiRequest(Settings);
         }
         public GigadeApiRequest(GigadeApiClientSettings settings)
         {
