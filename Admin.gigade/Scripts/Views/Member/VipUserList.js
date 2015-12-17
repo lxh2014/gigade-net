@@ -147,7 +147,7 @@ Ext.onReady(function () {
     FaresStore.load({ params: { start: 0, limit: 25 } });
 });
 function SecretLogin(rid, info_id, info_type) {//secretcopy
-    var secret_type = "15";
+    var secret_type = "1";
     var url = "/Manager/VipUserList?group_id=" + document.getElementById("groupid").value + "&vid=" + rid;
     var ralated_id = rid;
     //點擊機敏信息先保存記錄在驗證密碼是否需要輸入
