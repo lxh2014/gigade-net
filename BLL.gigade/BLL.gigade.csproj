@@ -689,6 +689,7 @@
     <Compile Include="Dao\DeliverChangeLogDao.cs" />
     <Compile Include="Dao\LogisticsTcatEodDao.cs" />
     <Compile Include="Dao\LogisticsTcatSodDao.cs" />
+    <Compile Include="Dao\InvoiceWinningNumberDao.cs" />
     <Compile Include="Mgr\AnnounceMgr.cs" />
     <Compile Include="Mgr\AppcategoryMgr.cs" />
     <Compile Include="Mgr\AppmessageMgr.cs" />
@@ -1192,6 +1193,7 @@
     <Compile Include="Mgr\Schedules\ReceiveStatusFromTCatMgr.cs" />
     <Compile Include="Mgr\Schedules\SendOrderInfoToBlackCatFTPMgr.cs" />
     <Compile Include="Mgr\Schedules\CheckUrlResultMgr.cs" />
+    <Compile Include="Mgr\Schedules\WinningInvoiceSynchronismMgr.cs" />
     <Compile Include="Mgr\SecretAccountSetMgr.cs" />
     <Compile Include="Mgr\SecretInfoLogMgr.cs" />
     <Compile Include="Mgr\SerialMgr.cs" />
