@@ -11,6 +11,7 @@ using BLL.gigade.Model;
 using gigadeExcel.Comment;
 using System.Configuration;
 using BLL.gigade.Model.Custom;
+using System.Web;
 
 namespace BLL.gigade.Mgr
 {
@@ -201,9 +202,9 @@ namespace BLL.gigade.Mgr
                     }
                     str.AppendLine(@"<status>" + status + "</status>");//1表示上架 0表示下架
                     str.AppendLine(@"<sales>" + dtProduct.Rows[i]["event_starts"] + "," + dtProduct.Rows[i]["event_ends"] + "," + dtProduct.Rows[i]["event_price"] + "</sales>");//類別id
-                    str.AppendLine(@"<name>" + dtProduct.Rows[i]["product_name"] + "</name>");
-                    str.AppendLine(@"<subtitle>" + dtProduct.Rows[i]["product_alt"] + "</subtitle>");
-                    str.AppendLine(@"<brief>" + dtProduct.Rows[i]["page_content_1"] + "</brief>");
+                    str.AppendLine(@"<name>" + HttpUtility.HtmlEncode(dtProduct.Rows[i]["product_name"].ToString().Trim().Replace("", "")) + "</name>");
+                    str.AppendLine(@"<subtitle>" + HttpUtility.HtmlEncode(dtProduct.Rows[i]["product_alt"].ToString().Trim().Replace("", "")) + "</subtitle>");
+                    str.AppendLine(@"<brief>" + HttpUtility.HtmlEncode(dtProduct.Rows[i]["page_content_1"].ToString().Trim().Replace("", "")) + "</brief>");
                     str.AppendLine(@"<price>" + dtProduct.Rows[i]["price"] + "</price>");
                     str.AppendLine(@"<mprice>" + dtProduct.Rows[i]["cost"] + "</mprice>");
                     //根据食品管和用品管的不同,连接也不相同
@@ -220,8 +221,8 @@ namespace BLL.gigade.Mgr
                     {
                         strurl = @"<![CDATA[http://" + "www.gigade100.com/newweb" + "/product.php?pid=" + dtProduct.Rows[i]["product_id"] + "&view=" + DateTime.Now.ToString("yyyyMMdd") + "]]>";//商品預覽
                     }
-                    str.AppendLine(@"<url>" + strurl + "</url>");
-                    str.AppendLine(@"<imgurl>" + "<![CDATA[" + picPath + "/product/" + dtProduct.Rows[i]["product_image"] + "]]>" + "</imgurl>");//图片
+                    str.AppendLine(@"<url>" + HttpUtility.HtmlEncode(strurl.ToString()) + "</url>");
+                    str.AppendLine(@"<imgurl>" + HttpUtility.HtmlEncode("<![CDATA[" + picPath + "/product/" + dtProduct.Rows[i]["product_image"] + "]]>") + "</imgurl>");//图片
                     str.AppendLine(@"<adforbid>0</adforbid>");
                     str.AppendLine(@"</item>");
                 }
