@@ -779,7 +779,23 @@ namespace gigadeExcel.Comment
             sheet = null;
             return table;
         }
-
+        /// <summary>读取excel
+        /// 默认第一行为标头
+        /// </summary>
+        /// <param name="strFileName">excel文档路径</param>
+        /// <returns></returns>
+        public static DataTable ImportExcel2007toDt(string strFileName)
+        {
+            DataTable dt = new DataTable();
+            IWorkbook hssfworkbook;
+            using (FileStream file = new FileStream(strFileName, FileMode.Open, FileAccess.Read))
+            {
+                hssfworkbook = new XSSFWorkbook(file);
+            }
+            ISheet sheet = hssfworkbook.GetSheetAt(0);
+            dt = ImportExcel2007InDt(sheet, 0, true);
+            return dt;
+        }
         /// <summary>
         /// 读取excel
         /// </summary>

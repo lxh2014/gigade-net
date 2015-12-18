@@ -1186,6 +1186,7 @@
     <Compile Include="Mgr\Schedules\ProductPurchaseMgr.cs" />
     <Compile Include="Mgr\Schedules\PromotionsAmountGiftMgr.cs" />
     <Compile Include="Mgr\Schedules\DeliverStatusMgr.cs" />
+    <Compile Include="Mgr\Schedules\ReadLogMgr.cs" />
     <Compile Include="Mgr\Schedules\SetConfigXmlMgr.cs" />
     <Compile Include="Mgr\Schedules\UserLoginLogMgr.cs" />
     <Compile Include="Mgr\Schedules\CheckUnsafeLoginMgr.cs" />
