@@ -716,12 +716,12 @@ namespace Admin.gigade.Controllers
                         {
                             if (!string.IsNullOrEmpty(uModel.user_mobile))
                             {
-                                if (!mobile.IsMatch(uModel.user_mobile))
+                                if (!CommonFunction.isMobile(uModel.user_mobile))
                                 {
                                     if (uModel.user_mobile.ToString().Length == 48)
                                     {
                                         uModel.user_mobile = EncryptComputer.EncryptDecryptTextByApi(uModel.user_mobile, false);
-                                        if (!mobile.IsMatch(uModel.user_mobile))
+                                        if (!CommonFunction.isMobile(uModel.user_mobile))
                                         {
                                             //異常記錄
                                             Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();

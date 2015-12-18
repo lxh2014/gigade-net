@@ -538,8 +538,8 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                                 Ext.getCmp('user_name_simple').setValue(result.simple_name).show();
                             }
                             if (result.order_id != undefined) {//供應商簡稱
-                                // Ext.getCmp('u_order').setValue(result.order_id).show();
-                                Ext.getCmp('u_order').setValue(Ext.String.format("<a id='order_id' onclick='SaveRecord({0},4)' href='javascript:void(0);' >{1}</a>", relatedID, result.order_id)).show();//
+                                Ext.getCmp('u_order').setValue(result.order_id).show();
+                                //Ext.getCmp('u_order').setValue(Ext.String.format("<a id='order_id' onclick='SaveRecord({0},4)' href='javascript:void(0);' >{1}</a>", relatedID, result.order_id)).show();//
 
                             }
                             if (result.ur_name != undefined) {//供應商簡稱
@@ -801,7 +801,7 @@ function SaveRecord(rID, type, win) {
         var orderId = document.getElementById('order_id').innerHTML;
         url = '/OrderManage/OrderDetialList?Order_Id=' + orderId;
         SaveSecretLog(url, "2", rID);
-        TransToOrder(orderId);
+        //TransToOrder(orderId);
         return false;
     }
     else if (type == "15") {//發信名單統計

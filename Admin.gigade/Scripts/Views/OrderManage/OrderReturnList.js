@@ -863,6 +863,7 @@
                 fieldLabel: '客戶電話',
                 id: 'orc_mobile',
                 name: 'orc_mobile',
+                regex: /^09[0-9]{8}$/,
                 allowBlank: false,
                 maxLength: 30,
                 disabled: true,
