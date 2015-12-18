@@ -385,7 +385,7 @@ namespace Admin.gigade.Controllers
             }
             if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
             {
-                iloc.endtime = time.AddDays(1);
+                iloc.endtime = time;
             }
             try
             {

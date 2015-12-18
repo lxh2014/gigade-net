@@ -2130,7 +2130,7 @@ namespace Admin.gigade.Controllers
             model.link_mode = Convert.ToInt32(Request.Params["link_mode"]);
             model.keywords = Request.Params["keywords"].ToString();
             model.sort = Convert.ToInt32(Request.Params["sort"]);
-            if (string.IsNullOrEmpty(Request.Params["start_time"].ToString()))
+            if (!string.IsNullOrEmpty(Request.Params["start_time"].ToString()))
             {
                 model.start_time = DateTime.Parse(Request.Params["start_time"].ToString());
             }
