@@ -468,5 +468,33 @@ namespace Admin.gigade.Controllers
             return true;
         }
         #endregion
+
+        #region 中獎發票同步
+        /// <summary>
+        /// 中獎發票同步排程
+        /// </summary>
+        /// <returns></returns>
+        public bool WinningInvoiceSynchronism()
+        {
+            bool result = false;
+            if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+            {
+                return false;
+            }
+            try
+            {
+                BLL.gigade.Mgr.Schedules.WinningInvoiceSynchronismMgr WinningInvoiceSynchronismMgr = new BLL.gigade.Mgr.Schedules.WinningInvoiceSynchronismMgr(mySqlConnectionString);
+                result = WinningInvoiceSynchronismMgr.Start(Request.Params["schedule_code"]);
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+            }
+            return result;
+        }     
+        #endregion
     }
 }

@@ -289,20 +289,26 @@ Ext.onReady(function () {
                      },
 
                      {
-                         xtype: 'datefield',
+                         xtype: 'datetimefield',
                          fieldLabel: "異動時間",
                          labelWidth: 60,
                         // width: 210,
                          id: 'time_start',
                          name: 'time_start',
                          margin: '5 0 0 5',
-                         format: 'Y-m-d',
+                         format: 'Y-m-d H:i:s',
+                         time: { hour: 00, min: 00, sec: 00 },
                          editable: false,
                          listeners: {
                               select: function () {
-                                 if (Ext.getCmp("time_start").getValue() != null) {
-                                     Ext.getCmp("time_end").setMinValue(Ext.getCmp("time_start").getValue());
-                                 }
+                                  var start = Ext.getCmp("time_start");
+                                  var end = Ext.getCmp("time_end");
+                                  if (end.getValue() == null) {
+                                      end.setValue(setNextMonth(start.getValue(), 1));
+                                  }
+                                  else if (end.getValue() < start.getValue()) {
+                                      end.setValue(setNextMonth(start.getValue(), 1));
+                                  }
                               }
                               , specialkey: function (field, e) {
                                   if (e.getKey() == Ext.EventObject.ENTER) {
@@ -319,18 +325,25 @@ Ext.onReady(function () {
                             margin: '5 0 0 5'
                         },
                         {
-                            xtype: 'datefield',
+                            xtype: 'datetimefield',
                             labelWidth: 60,
                            // width: 210,
                             id: 'time_end',
                             name: 'time_end',
                             margin: '5 0 0 5',
-                            format: 'Y-m-d',
+                            format: 'Y-m-d  H:i:s',
+                            time: { hour: 23, min: 59, sec: 59 },
                             editable: false,
                             listeners: {
                                 select: function () {
-                                    if (Ext.getCmp("time_end").getValue() != null) {
-                                        Ext.getCmp("time_start").setMaxValue(Ext.getCmp("time_end").getValue()) ;
+                                    var start = Ext.getCmp("time_start");
+                                    var end = Ext.getCmp("time_end");
+                                    if (start.getValue() == null) {
+                                        start.setValue(setNextMonth(end.getValue(), -1));
+                                    }
+                                    else if (end.getValue() < start.getValue()) {
+                                        Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
+                                        start.setValue(setNextMonth(end.getValue(), -1));
                                     }
                                 }
                                 , specialkey: function (field, e) {
@@ -509,6 +522,16 @@ Ext.onReady(function () {
         }
     });
 });
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    } else if (n >= 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
+}
 outExcel = function () {
     var product_id = Ext.getCmp('product_id').getValue();
     var product_name = Ext.getCmp('product_name').getValue();
@@ -525,10 +548,10 @@ outExcel = function () {
         return false;
     }
     if (start_time!=null) {
-        start_time= Ext.htmlEncode(Ext.Date.format(new Date(start_time), 'Y-m-d 00:00:00'));
+        start_time = Ext.htmlEncode(Ext.Date.format(new Date(start_time), 'Y-m-d H:i:s'));
     }
     if(end_time!=null){
-        end_time = Ext.htmlEncode(Ext.Date.format(new Date(end_time), 'Y-m-d 00:00:00'));
+        end_time = Ext.htmlEncode(Ext.Date.format(new Date(end_time), 'Y-m-d H:i:s'));
     }
     var params = 'Potype=' + Ext.getCmp('Poty').getValue() + '&erp_id=' + Ext.getCmp('erp_id').getValue() + '&vendor_id=' + Ext.getCmp('vendor_id').getValue() + '&check=' + Ext.getCmp('checkInfoYesOrNo').getValue() + '&vendor_name_full=' + Ext.getCmp('vendor_name_full').getValue().trim()
     + "&product_id=" + product_id + "&product_name=" + product_name + "&start_time=" + start_time + "&end_time=" + end_time + "&freight=" + freight + "&updateuser=" + updateuser;

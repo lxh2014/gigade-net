@@ -167,7 +167,7 @@ namespace BLL.gigade.Mgr.Schedules
             _newErrorDt.Columns.Add("郵箱", typeof(String));
             _newErrorDt.Columns.Add("IP地址", typeof(String));
             _newErrorDt.Columns.Add("訂單編號", typeof(String));
-            _newErrorDt.Columns.Add("訂購時間", typeof(String));
+            _newErrorDt.Columns.Add("付款時間", typeof(String));
             _orderMaster = new OrderMasterMgr(mySqlConnectionString);
 
             DataTable _dtResult = _orderMaster.GetBigOrderNumbers(query);
@@ -180,7 +180,7 @@ namespace BLL.gigade.Mgr.Schedules
                     drtwo[1] = _dtResult.Rows[j][1];
                     drtwo[2] = _dtResult.Rows[j][2];
                     drtwo[3] = _dtResult.Rows[j][3];
-                    drtwo[4] = _dtResult.Rows[j][4];
+                    drtwo[4] = CommonFunction.GetNetTime(Convert.ToInt64(_dtResult.Rows[j][4])).ToString("yyyy/MM/dd HH:mm:ss"); 
                     _newErrorDt.Rows.Add(drtwo);
                 }
 
@@ -278,7 +278,7 @@ namespace BLL.gigade.Mgr.Schedules
                     DataRow dr = _newdt.NewRow();
                     dr[0] = _dt.Rows[i][0];
                     dr[1] = _dt.Rows[i][1].ToString();
-                    dr[2] = CommonFunction.GetNetTime(Convert.ToInt64(_dt.Rows[i][2])).ToString();
+                    dr[2] = CommonFunction.GetNetTime(Convert.ToInt64(_dt.Rows[i][2])).ToString("yyyy/MM/dd HH:mm:ss");
                     dr[3] = _dt.Rows[i][3].ToString();
                     _newdt.Rows.Add(dr);
                 }

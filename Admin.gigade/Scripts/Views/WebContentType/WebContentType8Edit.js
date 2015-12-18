@@ -210,11 +210,16 @@
                format: 'Y-m-d H:i:s',
                allowBlank: false,
                submitValue: true,
+               time: { hour: 00, min: 00, sec: 00 },
                value: Tomorrow(),
                listeners: {
                    select: function (a, b, c) {
-                       var s_date = new Date(start.getValue());
-                       end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                       var start = Ext.getCmp("start_time");
+                       var end = Ext.getCmp("end_time");
+                       if (end.getValue() < start.getValue()) {
+                           var start_date = start.getValue();
+                           Ext.getCmp('end_time').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                       }
                    }
                }
            },
@@ -222,18 +227,19 @@
                xtype: "datetimefield",
                fieldLabel: ENDTIME,
                format: 'Y-m-d H:i:s',
+               time: { hour: 23, min: 59, sec: 59 },
                id: 'end_time',
                name: 'end_time',
                allowBlank: false,
                submitValue: true,
-               value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+               value: setNextMonth(Tomorrow(), 1),
                listeners: {
                    select: function (a, b, c) {
                        var start = Ext.getCmp("start_time");
                        var end = Ext.getCmp("end_time");
-                       if (end.getValue() < start.getValue()) {
-                           alert("上架時間不能大於下架時間！");
-                           end.setValue(new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)));
+                       if (end.getValue() < start.getValue()) {//開始時間大於了結束時間
+                           var end_date = end.getValue();
+                           Ext.getCmp('start_time').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
                        }
                    }
                }
@@ -445,5 +451,17 @@
     });
     areaidStore.load();
 }
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
+}
+
 
 

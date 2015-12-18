@@ -390,7 +390,7 @@ namespace BLL.gigade.Dao
             //sbSqlCondition.Append(" (SELECT pc.product_id from product pc INNER JOIN product_combo pcm on pcm.child_id=pc.product_id  INNER JOIN product pm on pm.product_id=pcm.parent_id where pm.product_status =5)))  "); 
             #endregion
 
-            sbSqlColumn.Append("select vendor_id,spec_title_2,spec_title_1,''as loc_id,'' as cde_dt,''as made_date,'' as pwy_dte_ctl,''as cde_dt_incr,v_product_onsale.product_id,v_product_onsale.product_name,(select max(create_time) from item_ipo_create_log where item_id=v_product_onsale.item_id ) as create_datetime, sale_status ,'' as sale_name,product_mode ,'' as product_mode_name, prepaid,erp_id,v_product_onsale.item_id,item_stock, item_alarm,safe_stock_amount,  ");
+            sbSqlColumn.Append("select vendor_id,CONCAT_WS(':',spec_title_2,ps2.spec_name) as spec_title_2 ,CONCAT_WS(':',spec_title_1,ps1.spec_name) as spec_title_1,''as loc_id,'' as cde_dt,''as made_date,'' as pwy_dte_ctl,''as cde_dt_incr,v_product_onsale.product_id,v_product_onsale.product_name,(select max(create_time) from item_ipo_create_log where item_id=v_product_onsale.item_id ) as create_datetime, sale_status ,'' as sale_name,product_mode ,'' as product_mode_name, prepaid,erp_id,v_product_onsale.item_id,item_stock, item_alarm,safe_stock_amount,  ");
             sbSqlColumn.Append(" '' as item_money,'' as item_cost,sum_biao.sum_total, subTtotal.iinvd_stock,v_product_onsale.product_start,v_product_onsale.product_end, min_purchase_amount,vendor_name_simple,vendor_name_full, procurement_days,product_status,'' as product_status_string, ");
             sbSqlColumn.Append(" spec_id_1 ,spec_id_2,''as NoticeGoods,ipod.ipo_qty ");
 
@@ -407,6 +407,9 @@ namespace BLL.gigade.Dao
             sbSqlTable.Append(" LEFT JOIN  (select sum(qty_ord)as ipo_qty,prod_id from ipod where plst_id='O' GROUP BY prod_id) as ipod on ipod.prod_id=v_product_onsale.item_id ");
             sbSqlTable.Append(" LEFT JOIN item_ipo_create_log iicl on iicl.item_id=v_product_onsale.item_id ");
            // sbSqlTable.Append(" INNER join price_master pm on pm.product_id=v_product_onsale.product_id and pm.site_id=1 ");//and ((prepaid=1) or (prepaid=0 and product_mode=2))
+            
+            sbSqlTable.Append(" left join product_spec ps1 on ps1.spec_id=v_product_onsale.spec_id_1 ");
+            sbSqlTable.Append(" left join product_spec ps2 on ps2.spec_id=v_product_onsale.spec_id_2 ");
             sbSqlCondition.Append("  where 1=1 and ((prepaid=1) or (prepaid=0 and product_mode=2)) ");
 
 
@@ -586,17 +589,17 @@ namespace BLL.gigade.Dao
                         dr["product_status_string"] = slist.parameterName;
                     }
 
-                    ProductSpec spec1 = _specDao.query(Convert.ToInt32(dr["spec_id_1"].ToString()));
-                    ProductSpec spec2 = _specDao.query(Convert.ToInt32(dr["spec_id_2"].ToString()));
-                    if (spec1 != null)
-                    {
-                        dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString())?"":dr["spec_title_1"]+":"+spec1.spec_name;
-                    }
-                    if (spec2 != null)
-                    {
-                        dr["spec_title_2"] = string.IsNullOrEmpty(dr["spec_title_2"].ToString()) ? "" : dr["spec_title_2"] +":"+ spec2.spec_name;
-                    }
-                    dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString()) ? "" : dr["spec_title_1"].ToString() +"  "+ dr["spec_title_2"];
+                    //ProductSpec spec1 = _specDao.query(Convert.ToInt32(dr["spec_id_1"].ToString()));
+                    //ProductSpec spec2 = _specDao.query(Convert.ToInt32(dr["spec_id_2"].ToString()));
+                    //if (spec1 != null)
+                    //{
+                    //    dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString())?"":dr["spec_title_1"]+":"+spec1.spec_name;
+                    //}
+                    //if (spec2 != null)
+                    //{
+                    //    dr["spec_title_2"] = string.IsNullOrEmpty(dr["spec_title_2"].ToString()) ? "" : dr["spec_title_2"] +":"+ spec2.spec_name;
+                    //}
+                    dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString()) ? dr["spec_title_2"] : dr["spec_title_1"].ToString() + "  " + dr["spec_title_2"];
                 }
                 return dtResult;
             }

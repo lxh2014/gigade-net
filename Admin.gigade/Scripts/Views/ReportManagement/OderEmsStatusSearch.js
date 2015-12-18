@@ -44,12 +44,12 @@ Ext.define('gigade.OrderEmsStatusSearch', {
         { name: "delivery_status",type:"string" }
     ]
 });
-function Tomorrow(days) {
-    var d;
-    d = new Date();                             // 创建 Date 对象。
-    d.setDate(d.getDate()+days);
-    return d;
-}
+//function Tomorrow(days) {
+//    var d;
+//    d = new Date();                             // 创建 Date 对象。
+//    d.setDate(d.getDate()+days);
+//    return d;
+//}
 function TheMonthFirstDay()
 {
     var times;
@@ -377,13 +377,15 @@ Ext.onReady(function () {
                   layout: 'hbox',
                   items: [ 
                       {
-                          xtype: 'datefield',
+                          xtype: 'datetimefield',
                           id: 'dateStart',
                           name: 'dateStart',
                           margin: '0 0 0 20px',
                           labelWidth: 70,
                           editable: false,
                           fieldLabel: '訂單日期',
+                          format: 'Y-m-d H:i:s',
+                          time: { hour: 00, min: 00, sec: 00 },
                           value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
                           listeners: {
                               select: function (a, b, c) {
@@ -410,11 +412,13 @@ Ext.onReady(function () {
                           labelWidth: 10
                       },
                       {
-                          xtype: 'datefield',
+                          xtype: 'datetimefield',
                           id: 'dateEnd',
                           name: 'dateEnd',                          
                           editable: false,
-                          value: Tomorrow(),
+                          format: 'Y-m-d H:i:s',
+                          time: { hour: 23, min: 59, sec: 59 },
+                          value: setNextMonth(Tomorrow(), 0),
                           listeners: {
                               select: function (a, b, c) {
                                   var start = Ext.getCmp("dateStart");
@@ -463,8 +467,8 @@ Ext.onReady(function () {
                                 Ext.getCmp('order_status_id').setValue(-1);
                                 Ext.getCmp('payment_id').setValue(0);
                                 Ext.getCmp('logistics_type').setValue(0);
-                                Ext.getCmp('dateStart').setValue(new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)));
-                                Ext.getCmp('dateEnd').setValue(Tomorrow());
+                                Ext.getCmp('dateStart').reset();
+                                Ext.getCmp('dateEnd').reset();
                                 Ext.getCmp("delivery_status").setValue(-1)
                             }
                         }
@@ -554,14 +558,21 @@ setNextMonth = function (source, n) {
     if (n < 0) {
         s.setHours(0, 0, 0);
     }
-    else if (n > 0) {
+    else if (n >= 0) {
         s.setHours(23, 59, 59);
     }
     return s;
 }
 
 function Tomorrow() {
-    var d = new Date();                             // 创建 Date 对象。
-    d.setDate(d.getDate() + 1);
-    return d;                                 // 返回日期。
+    var d;
+    var dt;
+    var s = "";
+    d = new Date();                             // 创建 Date 对象。
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate() + 1);
+    return dt;                  // 返回日期。
 }

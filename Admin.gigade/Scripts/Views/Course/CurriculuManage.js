@@ -369,24 +369,52 @@ var center = Ext.create('Ext.form.Panel', {
                 }, {
                     xtype: 'datetimefield',
                     format: 'Y-m-d H:i:s',
+                    time: { hour: 00, min: 00, sec: 00 },
                     id: 'start_date',
                     allowBlank: false,
                     editable: false,
                     celleditable: false,
+                    listeners: {//change by shiwei0620j 20151217,將時間控件改為可以選擇時分秒，開始時間時分秒默認為00:00:00,結束時間時分秒默認為23:59:59，當選擇的開始時間大於結束時間，結束時間在開始時間月份加1，當選擇的結束時間大於開始時間，開始時間在結束時間月份加1;
+                        select: function (a, b, c) {
+                            var start = Ext.getCmp("start_date");
+                            var end = Ext.getCmp("end_date");
+                            var start_date = start.getValue();
+                            if (end.getValue() == ""||end.getValue() == null) {
+                                Ext.getCmp('end_date').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                            }
+                            else if (end.getValue() < start.getValue()) {
+                                Ext.getCmp('end_date').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                            }
+                        }
+                    },
                     //vtype: 'daterange',
                     //endDateField: 'end_date',
-                    minValue: new Date(),
+                    //minValue: new Date(),
                     fieldLabel: BEGIN_DATE//開始時間
                 }, {
                     xtype: 'datetimefield',
                     format: 'Y-m-d H:i:s',
+                    time: { hour: 23, min: 59, sec: 59 },
                     id: 'end_date',
                     allowBlank: false,
                     editable: false,
                     celleditable: false,
+                    listeners: {
+                        select: function (a, b, c) {
+                            var start = Ext.getCmp("start_date");
+                            var end = Ext.getCmp("end_date");
+                            var end_date = end.getValue();
+                            if (start.getValue() == "" || start.getValue() == null) {
+                                Ext.getCmp('start_date').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
+                            }
+                            if (end.getValue() < start.getValue()) {
+                                Ext.getCmp('start_date').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
+                            }
+                        }
+                    },
                     //vtype: 'daterange',
                     //startDateField: 'start_date',
-                    minValue: new Date(),
+                   // minValue: new Date(),
                     fieldLabel: END_DATE//結束時間
                 }]
             }, {
@@ -663,6 +691,7 @@ function detailAdd(store) {
         }, {
             xtype: 'datetimefield',
             format: 'Y-m-d H:i:s',
+            time:{hour:'00',sec:'00',min:'00'},
             fieldLabel: BEGIN_CURRICULUM_TIME,//上課時間
             id: 'dadd_start_date',
             name: 'Start_Date',
@@ -671,11 +700,24 @@ function detailAdd(store) {
             celleditable: false,
             //vtype: 'daterange',
             //endDateField: 'dadd_end_date',
-            minValue: new Date(),
+            listeners: {//change by shiwei0620j 20151217,將時間控件改為可以選擇時分秒，開始時間時分秒默認為00:00:00,結束時間時分秒默認為23:59:59，當選擇的開始時間大於結束時間，結束時間在開始時間月份加1，當選擇的結束時間大於開始時間，開始時間在結束時間月份加1;
+                select: function (a, b, c) {
+                    var start = Ext.getCmp("dadd_start_date");
+                    var end = Ext.getCmp("dadd_end_date");
+                    var start_date = start.getValue();
+                    if (end.getValue() == "" || end.getValue() == null) {
+                        Ext.getCmp('dadd_end_date').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                    }
+                    else if (end.getValue() < start.getValue()) {
+                        Ext.getCmp('dadd_end_date').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                    }
+                }
+            },
             width: 230
         }, {
             xtype: 'datetimefield',
             format: 'Y-m-d H:i:s',
+            time: { hour: '23', sec: '59', min: '59' },
             fieldLabel: END_CURRICULUM_TIME,//下課時間
             id: 'dadd_end_date',
             name: 'End_Date',
@@ -684,7 +726,19 @@ function detailAdd(store) {
             celleditable: false,
             //vtype: 'daterange',
             //endDateField: 'dadd_start_date',
-            minValue: new Date(),
+            listeners: {
+                select: function (a, b, c) {
+                    var start = Ext.getCmp("dadd_start_date");
+                    var end = Ext.getCmp("dadd_end_date");
+                    var end_date = end.getValue();
+                    if (start.getValue() == "" || start.getValue() == null) {
+                        Ext.getCmp('dadd_start_date').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
+                    }
+                    if (end.getValue() < start.getValue()) {
+                        Ext.getCmp('dadd_start_date').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
+                    }
+                }
+            },
             width: 230
         }, {
             xtype: 'numberfield',
@@ -795,18 +849,46 @@ EditFunction = function (row, store) {
         }, {
             xtype: 'datetimefield',
             format: 'Y-m-d H:i:s',
+            time:{hour:'00',min:'00',sec:'00'},
             fieldLabel: BEGIN_CURRICULUM_TIME,//上課時間
             id: 'dedit_start_date',
             name: 'Start_Date',
             allowBlank: false,
+            listeners: {//change by shiwei0620j 20151217,將時間控件改為可以選擇時分秒，開始時間時分秒默認為00:00:00,結束時間時分秒默認為23:59:59，當選擇的開始時間大於結束時間，結束時間在開始時間月份加1，當選擇的結束時間大於開始時間，開始時間在結束時間月份加1;
+                select: function (a, b, c) {
+                    var start = Ext.getCmp("dedit_start_date");
+                    var end = Ext.getCmp("dedit_end_date");
+                    var start_date = start.getValue();
+                    if (end.getValue() == "" || end.getValue() == null) {
+                        Ext.getCmp('dedit_end_date').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                    }
+                    else if (end.getValue() < start.getValue()) {
+                        Ext.getCmp('dedit_end_date').setValue(new Date(start_date.getFullYear(), start_date.getMonth() + 1, start_date.getDate(), 23, 59, 59));
+                    }
+                }
+            },
             width: 230
         }, {
             xtype: 'datetimefield',
             format: 'Y-m-d H:i:s',
+            time: { hour: '23', min: '59', sec: '59' },
             fieldLabel: END_CURRICULUM_TIME,//下課時間
             id: 'dedit_end_date',
             name: 'End_Date',
             allowBlank: false,
+            listeners: {
+                select: function (a, b, c) {
+                    var start = Ext.getCmp("dedit_start_date");
+                    var end = Ext.getCmp("dedit_end_date");
+                    var end_date = end.getValue();
+                    if (start.getValue() == "" || start.getValue() == null) {
+                        Ext.getCmp('dedit_start_date').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
+                    }
+                    if (end.getValue() < start.getValue()) {
+                        Ext.getCmp('dedit_start_date').setValue(new Date(end_date.getFullYear(), end_date.getMonth() - 1, end_date.getDate()));
+                    }
+                }
+            },
             width: 230
         }, {
             xtype: 'numberfield',

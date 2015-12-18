@@ -242,6 +242,12 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
         labelWidth: 45,
         defaults: { anchor: "95%", msgTarget: "side" },
         items: [
+             {
+                 fieldLabel: '客戶編號',
+                 id: 'v_id',
+                 name: 'v_id',
+                 hidden: true
+             },
             {
                 fieldLabel: '客戶編號',
                 id: 'user_id',
@@ -501,6 +507,11 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                     success: function (form, action) {
                         var result = Ext.decode(form.responseText);
                         if (result.success) {
+                            if (infoarr.indexOf("v_id") >= 0 || infoarr == "") {
+                                if (result.v_id != "" && result.v_id != "0" && result.v_id != undefined) {
+                                    Ext.getCmp('v_id').setValue(result.v_id).show();
+                                }
+                            }
                             if (infoarr.indexOf("user_id") >= 0 || infoarr == "") {
                                 if (result.user_id != "" && result.user_id != "0" && result.user_id != undefined) {
                                     Ext.getCmp('user_id').setValue(result.user_id).show();

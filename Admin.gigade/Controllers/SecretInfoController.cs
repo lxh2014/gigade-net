@@ -760,7 +760,7 @@ namespace Admin.gigade.Controllers
                     case "vip_user":
                         VipUserMgr vipusersMgr = new VipUserMgr(mySqlConnectionString);
                         VipUser model = vipusersMgr.GetSingleByID(related_id);
-                        json = "{success:true,\"user_id\":\"" + model.user_id + "\",\"user_email\":\"" + model.user_email + "\"}";
+                        json = "{success:true,\"v_id\":\"" + model.v_id + "\",\"user_id\":\"" + model.user_id + "\",\"user_email\":\"" + model.user_email + "\"}";
                         break;
                     case "edm_group_email":
                         EdmGroupEmailMgr edmgroupmailMgr = new EdmGroupEmailMgr(mySqlConnectionString);
@@ -912,8 +912,7 @@ namespace Admin.gigade.Controllers
                         if (_dtmu.Rows.Count > 0)
                         {
 
-                            json = "{success:true,\"user_id\":\"" + _dtmu.Rows[0]["user_id"] + "\",\"user_name\":\"" + _dtmu.Rows[0]["user_name"] + "\",\"user_email\":\"" + _dtmu.Rows[0]["user_email"] +  "\",\"user_adress\":\"" + _dtmu.Rows[0]["user_address"] + "\"}";
-                        }
+                            json = "{success:true,\"user_id\":\"" + _dtmu.Rows[0]["user_id"] + "\",\"user_name\":\"" + _dtmu.Rows[0]["user_name"] + "\",\"user_email\":\"" + _dtmu.Rows[0]["user_email"] +  "\",\"user_adress\":\"" + _dtmu.Rows[0]["user_address"] + "\"}";                        }
                         break;
                     case 10:
                         PaperAnswerMgr _paperAnswerMgr = new PaperAnswerMgr(mySqlConnectionString);
@@ -961,6 +960,7 @@ namespace Admin.gigade.Controllers
                         _orderReturnStatus = new OrderReturnStatusMgr(mySqlConnectionString);
 
                         OrderMaster om = _orderReturnStatus.GetOrderInfo(Convert.ToUInt32(related_id));
+
 
                         json = "{success:true,\"orc_name\":\"" + om.Delivery_Name + "\",\"orc_mobile\":\"" + om.Delivery_Mobile + "\",\"orc_address\":\"" + om.Delivery_Address + "\"}";
                         break;

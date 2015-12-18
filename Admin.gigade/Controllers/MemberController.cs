@@ -1479,6 +1479,12 @@ namespace Admin.gigade.Controllers
                     {
                         item.reg_date = CommonFunction.GetNetTime(0);
                     }
+                    if (!string.IsNullOrEmpty(item.user_name))
+                    {
+                        item.user_name = item.user_name.Substring(0, 1) + "**";
+                    }
+                    item.vuser_email = item.vuser_email.Split('@')[0] + "@***";
+                    item.user_email = item.user_email.Split('@')[0] + "@***";
                 }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     

@@ -66,8 +66,8 @@ namespace Admin.gigade.Controllers
                 dmQuery.deliver_store = Convert.ToInt32(Request.Params["shipment_id"]);
                 dmQuery.i_order_status = Convert.ToInt32(Request.Params["order_status_id"]);
                 dmQuery.payment = Convert.ToInt32(Request.Params["payment_id"]);
-                dmQuery.order_time_begin = Convert.ToDateTime(Convert.ToDateTime(Request.Params["dateStart"]).ToString("yyyy-MM-dd 00:00:00"));//建立時間
-                dmQuery.order_time_end = Convert.ToDateTime(Convert.ToDateTime(Request.Params["dateEnd"]).ToString("yyyy-MM-dd 23:59:59"));
+                dmQuery.order_time_begin = Convert.ToDateTime(Convert.ToDateTime(Request.Params["dateStart"]).ToString("yyyy-MM-dd HH:mm:ss"));//建立時間
+                dmQuery.order_time_end = Convert.ToDateTime(Convert.ToDateTime(Request.Params["dateEnd"]).ToString("yyyy-MM-dd HH:mm:ss"));
 
                 int totalCount = 0;
                 _dt = _delverMgr.GetReportManagementList(dmQuery, out totalCount);
