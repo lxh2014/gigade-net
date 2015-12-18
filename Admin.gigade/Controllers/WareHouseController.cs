@@ -13235,7 +13235,7 @@ namespace Admin.gigade.Controllers
         {
             PdfHelper pdf = new PdfHelper();
             List<string> pdfList = new List<string>();
-            float[] arrColWidth = new float[] { 50, 135, 60, 45, 55, 55, 45, 60, 35, 45, 45, 35 };
+            float[] arrColWidth = new float[] {  135,50,45, 60,  55, 55,60, 45,  35, 45, 45, 35 };
             int index = 0;
             string newFileName = string.Empty;
             string newName = string.Empty;
@@ -13289,15 +13289,16 @@ namespace Admin.gigade.Controllers
             IAseldImplMgr aseldMgr = new AseldMgr(mySqlConnectionString);
 
             DataTable _dtBody = new DataTable();
-            _dtBody.Columns.Add("料位編號", typeof(string));
+           
             _dtBody.Columns.Add("商品名稱", typeof(string));
-            _dtBody.Columns.Add("條碼", typeof(string));
-            _dtBody.Columns.Add("細項編號", typeof(string));
-            _dtBody.Columns.Add("製造日期", typeof(string)); 
-            _dtBody.Columns.Add("有效日期", typeof(string));
+            _dtBody.Columns.Add("料位編號", typeof(string));
             _dtBody.Columns.Add("撿貨庫存", typeof(string));
             _dtBody.Columns.Add("本次撿貨量", typeof(string));
-           
+            _dtBody.Columns.Add("製造日期", typeof(string)); 
+            _dtBody.Columns.Add("有效日期", typeof(string));
+            _dtBody.Columns.Add("條碼", typeof(string));
+            _dtBody.Columns.Add("細項編號", typeof(string));
+
             _dtBody.Columns.Add("訂貨量", typeof(string));
             _dtBody.Columns.Add("已撿貨量", typeof(string));
             _dtBody.Columns.Add("待撿貨量", typeof(string));
@@ -13421,21 +13422,20 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
                 ptable.AddCell(cell);
-
-                cell = new PdfPCell(new Phrase("料位編號", new iTextSharp.text.Font(bf, 12)));
-                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.DisableBorderSide(8);
-                ptable.AddCell(cell);
                 cell = new PdfPCell(new Phrase("商品名稱", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-
-                cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("料位編號", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+
+                cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -13451,15 +13451,16 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-
-                cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
+               
+               
                
 
                 cell = new PdfPCell(new Phrase("訂貨量", new iTextSharp.text.Font(bf, 12)));
@@ -13769,20 +13770,20 @@ namespace Admin.gigade.Controllers
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
                     ptable.AddCell(cell);
-                    cell = new PdfPCell(new Phrase("料位編號", new iTextSharp.text.Font(bf, 12)));
-                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.DisableBorderSide(8);
-                    ptable.AddCell(cell);
                     cell = new PdfPCell(new Phrase("商品名稱", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
-
-                    cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("料位編號", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
-                    cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
+                     cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
+                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                    cell.DisableBorderSide(8);
+                    ptable.AddCell(cell);
+
+                    cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
@@ -13798,15 +13799,16 @@ namespace Admin.gigade.Controllers
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
-                    cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
-
-                    cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
+                    
+                   
                    
 
                     cell = new PdfPCell(new Phrase("訂貨量", new iTextSharp.text.Font(bf, 12)));
@@ -14117,8 +14119,16 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("料位編碼", new iTextSharp.text.Font(bf, 12)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -14134,15 +14144,12 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-
-                cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
-                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.DisableBorderSide(8);
-                ptable.AddCell(cell);
+                
+               
                 cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
@@ -14162,10 +14169,7 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("料位編碼", new iTextSharp.text.Font(bf, 12)));
-                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.DisableBorderSide(8);
-                ptable.AddCell(cell);
+                
 
 
                 //cell = new PdfPCell(new Phrase("創建時間", new iTextSharp.text.Font(bf, 8)));

@@ -297,10 +297,10 @@ outExcel = function () {
         return false;
     }
     if (start_time != null) {
-        start_time = Ext.htmlEncode(Ext.Date.format(new Date(start_time), 'Y-m-d 00:00:00'));
+        start_time = Ext.htmlEncode(Ext.Date.format(new Date(start_time), 'Y-m-d H:i:s'));
     }
     if (end_time != null) {
-        end_time = Ext.htmlEncode(Ext.Date.format(new Date(end_time), 'Y-m-d 00:00:00'));
+        end_time = Ext.htmlEncode(Ext.Date.format(new Date(end_time), 'Y-m-d H:i:s'));
     }
     var params = 'assg_id=' + Ext.getCmp('assg_id').getValue() + "&start_time=" + start_time + "&end_time=" + end_time;
     window.open('/WareHouse/AseldPDFS?' + params);
