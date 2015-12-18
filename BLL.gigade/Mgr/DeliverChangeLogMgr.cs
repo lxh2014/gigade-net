@@ -142,6 +142,7 @@ namespace BLL.gigade.Mgr
             string hourNum = string.Empty;
             //bool IsSeparate = false;
             //bool IsDisplyName = true;
+            string isSendMailToGroup = string.Empty;
            
             try
             {            
@@ -194,7 +195,11 @@ namespace BLL.gigade.Mgr
                         {
                             hourNum = item.value;
                         }
-                    }                 
+                    }
+                    else if (item.parameterCode.Equals("isSendMailToGroup"))
+                    {
+                        isSendMailToGroup = item.value;
+                    }
                 }
                 if (hourNum.Trim() == string.Empty)
                 {
@@ -487,9 +492,12 @@ namespace BLL.gigade.Mgr
                 }
                 else
                 {
-                    MailBody = "<br/><font size=\"4\">出貨單期望到貨日在前 " + "<font color=\"#FF0000\" >" + Convert.ToDouble(hourNum) + "</font>" + " 個小時之內的調整記錄如下：</font><br/><p/>" + GetHtmlByDataTable(_dt);
-                    BLL.gigade.Common.MailHelper mail = new Common.MailHelper(mailModel);
-                    mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true); 
+                    if (isSendMailToGroup.Trim() == "true")
+                    {
+                        MailBody = "<br/><font size=\"4\">出貨單期望到貨日在前 " + "<font color=\"#FF0000\" >" + Convert.ToDouble(hourNum) + "</font>" + " 個小時之內的調整記錄如下：</font><br/><p/>" + GetHtmlByDataTable(_dt);
+                        BLL.gigade.Common.MailHelper mail = new Common.MailHelper(mailModel);
+                        mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true); 
+                    }                
                 }
                 return true;
             }
