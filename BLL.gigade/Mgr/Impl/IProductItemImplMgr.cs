@@ -42,5 +42,8 @@ namespace BLL.gigade.Mgr.Impl
         List<ProductItemQuery> GetInventoryQueryList(ProductItemQuery query, out int totalCount); //by yachao1120j 2015-9-10 商品库存查询
         int UpdateItemStock(ProductItem query, string path, BLL.gigade.Model.Caller user);//料位庫存調整的時候，商品庫存也做相應的調整add chaojie1124j2015/9/17
         List<ProductItemQuery> GetWaitLiaoWeiList(ProductItemQuery query, out int totalCount); //by yachao1120j 2015-10-20 等待料位報表
+        int GetATMStock(ProductItemQuery query);
+        List<ProductItemQuery> GetProdItemByERp(ProductItemQuery query);
+        int UpdateStockAsErpId(ProductItemQuery query);
     }
 }
