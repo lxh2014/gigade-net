@@ -932,6 +932,14 @@ namespace BLL.gigade.Common
                     for (int j = 0; j < dtSource.Columns.Count; j++)
                     {
                         PdfPCell cell = new PdfPCell(new Phrase(dtSource.Rows[i][j].ToString(), font));
+                        if (i%2==1)
+                        {
+                            cell.BackgroundColor = BaseColor.LIGHT_GRAY;
+                        }
+                        else
+                        {
+                            cell.BackgroundColor = BaseColor.WHITE;
+                        }
                         cell.VerticalAlignment = Element.ALIGN_MIDDLE;
                         cell.HorizontalAlignment = Element.ALIGN_LEFT;//水平居左
                         if (rows == 1)
