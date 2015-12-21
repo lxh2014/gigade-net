@@ -21,8 +21,8 @@ Ext.define("gigade.paraModel", {
 var createTypeStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [       
-        { "txt": '前臺', "value": "1" },
-        { "txt": '後臺', "value": "2" }
+        { "txt": '前台', "value": "1" },
+        { "txt": '後台', "value": "2" }
     ]
 });
 ////管理員store
@@ -347,10 +347,10 @@ Ext.onReady(function () {
                 header: '創建類型', dataIndex: 'dcl_create_type', width: 90, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (value == 1) {
-                        return "前臺";
+                        return "前台";
                     }
                     else if (value == 2) {
-                        return "後臺";
+                        return "後台";
                     } else {
                         return value;
                     }

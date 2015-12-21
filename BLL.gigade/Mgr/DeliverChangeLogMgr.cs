@@ -331,12 +331,12 @@ namespace BLL.gigade.Mgr
                         if (dclTable.Rows[i]["dcl_create_type"].ToString() == "1")
                         {
                             dr["異動人"] = dclTable.Rows[i]["dcl_create_username"].ToString();
-                            dr["異動類型"] = "前臺";
+                            dr["異動類型"] = "前台";
                         }
                         else if (dclTable.Rows[i]["dcl_create_type"].ToString() == "2")
                         {
                             dr["異動人"] = dclTable.Rows[i]["dcl_create_musername"].ToString();
-                            dr["異動類型"] = "後臺";
+                            dr["異動類型"] = "後台";
                         }
                         dr["異動時間"] = Convert.ToDateTime(dclTable.Rows[i]["dcl_create_datetime"]).ToString("yyyy-MM-dd HH:mm:ss");
 
