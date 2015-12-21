@@ -163,7 +163,7 @@ namespace BLL.gigade.Mgr
                 DataTable dtProduct = _iRecommendedExcleImplDao.GetThisProductInfo(start_product_id, end_product_id);
                 //获取到所有商品和品牌信息
                 DataTable dtBrand = _iRecommendedExcleImplDao.GetAllBrandByProductId();
-                string picPath = ConfigurationManager.AppSettings["imgServerPath"];//获取图片显示的路径
+                string picPath = "http://img.gigade100.com";//获取图片显示的路径
                 str.AppendLine(@"<?xml version='1.0' encoding='UTF-8'?>");
                 str.AppendLine(@"<feeds>");
                 str.AppendLine(@"<info>");
@@ -173,7 +173,7 @@ namespace BLL.gigade.Mgr
                 for (int i = 0; i < dtProduct.Rows.Count; i++)
                 {
                     str.AppendLine(@"<item>");
-                    str.AppendLine(@"<id>" + dtProduct.Rows[i]["item_id"] + "</id>");//item_id
+                    str.AppendLine(@"<id>" + dtProduct.Rows[i]["product_id"] + "</id>");//product_id
                     #region 根据product_id和brand_id获取到cid内的值
                     DataRow[] _dtNew = dtBrand.Select("product_id=" + dtProduct.Rows[i]["product_id"]);
                     string tcidstr = string.Empty;
@@ -200,13 +200,13 @@ namespace BLL.gigade.Mgr
                     {
                         status = "0";
                     }
-                    str.AppendLine(@"<status>" + status + "</status>");//1表示上架 0表示下架
+                    str.AppendLine(@"<status>" + status + "</status>");//1表示上架 0表示下架 .Trim().Replace("", "")
                     str.AppendLine(@"<sales>" + dtProduct.Rows[i]["event_starts"] + "," + dtProduct.Rows[i]["event_ends"] + "," + dtProduct.Rows[i]["event_price"] + "</sales>");//類別id
-                    str.AppendLine(@"<name>" + HttpUtility.HtmlEncode(dtProduct.Rows[i]["product_name"].ToString().Trim().Replace("", "")) + "</name>");
-                    str.AppendLine(@"<subtitle>" + HttpUtility.HtmlEncode(dtProduct.Rows[i]["product_alt"].ToString().Trim().Replace("", "")) + "</subtitle>");
-                    str.AppendLine(@"<brief>" + HttpUtility.HtmlEncode(dtProduct.Rows[i]["page_content_1"].ToString().Trim().Replace("", "")) + "</brief>");
-                    str.AppendLine(@"<price>" + dtProduct.Rows[i]["price"] + "</price>");
-                    str.AppendLine(@"<mprice>" + dtProduct.Rows[i]["cost"] + "</mprice>");
+                    str.AppendLine(@"<name>" + "<![CDATA[" + dtProduct.Rows[i]["product_name"].ToString().Trim().Replace("", "") + "]]>" + "</name>");
+                    str.AppendLine(@"<subtitle>" + "<![CDATA[" + dtProduct.Rows[i]["product_alt"].ToString().Trim().Replace("", "") + "]]>" + "</subtitle>");
+                    str.AppendLine(@"<brief>" + "<![CDATA[" + dtProduct.Rows[i]["page_content_1"].ToString().Trim().Replace("", "") + "]]>" + "</brief>");
+                    str.AppendLine(@"<price>" + dtProduct.Rows[i]["cost"] + "</price>");
+                    str.AppendLine(@"<mprice>" + dtProduct.Rows[i]["price"] + "</mprice>");//原價格
                     //根据食品管和用品管的不同,连接也不相同
                     string strurl = string.Empty;
                     if (dtProduct.Rows[i]["prod_classify"] == "10")
@@ -221,8 +221,8 @@ namespace BLL.gigade.Mgr
                     {
                         strurl = @"<![CDATA[http://" + "www.gigade100.com/newweb" + "/product.php?pid=" + dtProduct.Rows[i]["product_id"] + "&view=" + DateTime.Now.ToString("yyyyMMdd") + "]]>";//商品預覽
                     }
-                    str.AppendLine(@"<url>" + HttpUtility.HtmlEncode(strurl.ToString()) + "</url>");
-                    str.AppendLine(@"<imgurl>" + HttpUtility.HtmlEncode("<![CDATA[" + picPath + "/product/" + dtProduct.Rows[i]["product_image"] + "]]>") + "</imgurl>");//图片
+                    str.AppendLine(@"<url>" + strurl.ToString() + "</url>");
+                    str.AppendLine(@"<imgurl>" + "<![CDATA[" + picPath + "/product/" + dtProduct.Rows[i]["product_image"] + "]]>" + "</imgurl>");//图片
                     str.AppendLine(@"<adforbid>0</adforbid>");
                     str.AppendLine(@"</item>");
                 }
