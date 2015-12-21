@@ -1454,6 +1454,7 @@
     <Compile Include="Model\Query\IlocChangeDetailQuery.cs" />
     <Compile Include="Model\Query\InspectionReportQuery.cs" />
     <Compile Include="Model\Query\IpodQuery.cs" />
+    <Compile Include="Model\Query\IpoNvdLogQuery.cs" />
     <Compile Include="Model\Query\IpoNvdQuery.cs" />
     <Compile Include="Model\Query\IpoQuery.cs" />
     <Compile Include="Model\Query\IstockChangeQuery.cs" />
@@ -1898,6 +1899,7 @@
     <Compile Include="Model\DeliverChangeLog.cs" />
     <Compile Include="Model\LogisticsTcatSod.cs" />
     <Compile Include="Model\LogisticsTcatEod.cs" />
+    <Compile Include="Model\IpoNvdLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\TrialPicture.cs" />
     <Compile Include="Model\TrialRecord.cs" />

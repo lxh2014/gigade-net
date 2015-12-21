@@ -42,21 +42,31 @@ var SearchTypeStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [
     { "txt": '全部', "value": "all_type" },
+    { "txt": '工作單號', "value": "work_id" },
     { "txt": '採購單編號', "value": "ipo_id" },
     { "txt": '商品細項編號', "value": "item_id" },
     ]
 });
 
-
+var WorkStatusStore = Ext.create('Ext.data.Store', {
+    fields: ['txt', 'value'],
+    data: [
+    { "txt": '全部', "value": "all_type" },
+    { "txt": '未處理', "value": "AVL" },
+    { "txt": '已處理但未完成', "value": "SKP" },
+    { "txt": '已完成', "value": "COM" },
+    ]
+});
+//
 IpoNvd_Store.on('beforeload', function ()
 {
     Ext.apply(IpoNvd_Store.proxy.extraParams,
         {
             search_type: Ext.getCmp("search_type").getValue(),
             search_con: Ext.getCmp("search_con").getValue(),
+            work_status: Ext.getCmp('work_status').getValue(),
             start_time: Ext.getCmp('start_time').getValue() == null ? null : Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s'),
             end_time: Ext.getCmp('end_time').getValue() == null ? null : Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'),
-            work_id: 'empty', //僅允許查詢work_id為""的記錄
         });
 });
 //前面選擇框 選擇之後顯示快速結單
@@ -74,7 +84,7 @@ Ext.onReady(function ()
     var Searchform = Ext.create('Ext.form.Panel', {
         id: 'Searchform',
         layout: 'anchor',
-        height: 100,
+        height: 150,
         border: 0,
         bodyPadding: 10,
         width: document.documentElement.clientWidth,
@@ -125,6 +135,28 @@ Ext.onReady(function ()
                              }
                          }
                      }
+                 ]
+             },
+             {
+                 xtype: 'fieldcontainer',
+                 combineErrors: true,
+                 layout: 'hbox',
+                 items: [
+
+                     {
+                         xtype: 'combobox',
+                         fieldLabel: '上架狀態',
+                         margin: '0 5 0 5',
+                         labelWidth: 60,
+                         width: 200,
+                         id: 'work_status',
+                         editable: false,
+                         displayField: 'txt',
+                         valueField: 'value',
+                         value: "all_type",
+                         store: WorkStatusStore,
+                     },
+
                  ]
              },
             {
@@ -203,6 +235,7 @@ Ext.onReady(function ()
                     
                 ]
             },
+            
             {
                 xtype: 'fieldcontainer',
                 combineErrors: true,
@@ -233,13 +266,13 @@ Ext.onReady(function ()
         id: 'IpoNvd_grid',
         store: IpoNvd_Store,
         width: document.documentElement.clientWidth,
-        height: document.documentElement.clientHeight - 100,
+        height: document.documentElement.clientHeight - 150,
         columnLines: true,
         frame: true,
         columns: [
             //new Ext.grid.RowNumberer(),//自動顯示行號
 
-         { header: "工作單號", dataIndex: "work_id", width: 150, align: 'center', hidden:true },
+         { header: "工作單號", dataIndex: "work_id", width: 150, align: 'center' },
          { header: "採購單編號", dataIndex: "ipo_id", width: 150, align: 'center' },
          { header: "商品細項編號", dataIndex: "item_id", width: 100, align: 'center' },
          { header: "採購單驗收數量", dataIndex: "ipo_qty", width: 100, align: 'center' },
@@ -279,7 +312,8 @@ Ext.onReady(function ()
         ],
         tbar: [
             {
-                xtype: 'button', text: '生成收貨上架工作編號', id: 'addjob', iconCls: 'icon-user-edit', disabled: true, handler: GetJobMsg
+                //xtype: 'button', text: '生成收貨上架工作編號', id: 'addjob', iconCls: 'icon-user-edit', disabled: true, handler: GetJobMsg
+                xtype: 'button', text: '匯出', id: 'export', icon: '../../../Content/img/icons/excel.gif', disabled: false, handler: Export
             }
         ],
         bbar: Ext.create('Ext.PagingToolbar', {
@@ -321,6 +355,7 @@ function Reset()
 {
     Ext.getCmp('search_type').reset();
     Ext.getCmp('search_con').reset();
+    Ext.getCmp('work_status').reset();
     Ext.getCmp('start_time').reset();
     Ext.getCmp('end_time').reset();
 }
@@ -341,8 +376,13 @@ function Query(x)
         Ext.Msg.alert(INFORMATION, '請輸入商品細項編號');
         return false;
     }
-
-    if (search_con.trim() == "" && Ext.getCmp('start_time').getValue() == null && Ext.getCmp('end_time').getValue() == null)
+    else if (search_type == "work_id" && search_con.trim() == "")
+    {
+        Ext.Msg.alert(INFORMATION, '請輸入工作單號');
+        return false;
+    }
+    
+    if (Ext.getCmp('work_status').getValue() == "all_type" && search_con.trim() == "" && Ext.getCmp('start_time').getValue() == null && Ext.getCmp('end_time').getValue() == null)
     {
         Ext.Msg.alert(INFORMATION, '請先輸入查詢條件');
         return false;
@@ -354,57 +394,51 @@ function Query(x)
         }
     });
 }
-function GetJobMsg()
+
+function Export ()
 {
-    var row = Ext.getCmp("IpoNvd_grid").getSelectionModel().getSelection();
-    if (row.length <= 0)
+    search_type = Ext.getCmp("search_type").getValue();
+    search_con = Ext.getCmp("search_con").getValue();
+    if (search_type == "ipo_id" && search_con.trim() == "")
     {
-        Ext.Msg.alert("未選中任何行!");
+        Ext.Msg.alert(INFORMATION, '請輸入採購單編號');
+        return false;
+    }
+    else if (search_type == "item_id" && search_con.trim() == "")
+    {
+        Ext.Msg.alert(INFORMATION, '請輸入商品細項編號');
+        return false;
+    }
+    else if (search_type == "work_id" && search_con.trim() == "")
+    {
+        Ext.Msg.alert(INFORMATION, '請輸入工作單號');
+        return false;
     }
 
-    else
+    if (Ext.getCmp('work_status').getValue() == "all_type" && search_con.trim() == "" && Ext.getCmp('start_time').getValue() == null && Ext.getCmp('end_time').getValue() == null)
     {
-        //  var id = Ext.getCmp('id').getValue();
-        Ext.Msg.confirm('提示', Ext.String.format("確定將選中的" + row.length + "條數據生產工作單?", row.length), function (btn)
-        {
-            if (btn == 'yes')
-            {
-                var rowIDs = '';
-                for (var i = 0; i < row.length; i++)
-                {
-                    rowIDs += row[i].data.row_id + ',';//
-                }
-                Ext.Ajax.request({
-                    url: '/ReceiptShelves/CreateTallyList',
-                    method: 'post',
-                    params: { id: rowIDs },
-                    success: function (form, action)
-                    {
-                        var result = Ext.decode(form.responseText);
-                        if (result.success)
-                        {
-                            if (result.work_id != null && result.work_id != "")
-                            {
-                                Ext.Msg.alert(INFORMATION, "生產工作單成功!工作單號為:" + result.work_id);
-                            }
-                            IpoNvd_Store.load();
-                        }
-                        else
-                        {
-                            Ext.Msg.alert(INFORMATION, "生產工作單失敗!");
-                            IpoNvd_Store.load();
-                        }
-                    },
-                    failure: function ()
-                    {
-                        Ext.Msg.alert(INFORMATION, "生產工作單失敗!");
-                        IpoNvd_Store.load();
-                    }
-                });
-            }
-        });
+        Ext.Msg.alert(INFORMATION, '請先輸入查詢條件');
+        return false;
     }
+
+    search_type= Ext.getCmp("search_type").getValue(),
+    search_con = Ext.getCmp("search_con").getValue(),
+    work_status= Ext.getCmp('work_status').getValue(),
+    start_time= Ext.getCmp('start_time').getValue() == null ? null : Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s'),
+    end_time = Ext.getCmp('end_time').getValue() == null ? null : Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s')
+
+    var url="/ReceiptShelves/ExportIpoNvdList?search_type=" + search_type + "&search_con=" + search_con + "&work_status=" + work_status ;
+    if (start_time != null)
+    {
+        url = url + "&start_time=" + start_time;
+    }
+    if (end_time != null)
+    {
+        url = url + "&end_time=" + end_time;
+    }
+    window.open(url);
 }
+
 /******************************************************************************************************************************************************************************************/
 function Tomorrow(s)
 {

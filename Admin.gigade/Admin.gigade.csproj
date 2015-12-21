@@ -1988,6 +1988,7 @@
     <Content Include="Scripts\Views\Product\ProductDetailList.js" />
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsEdit.js" />
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsList.js" />
+    <Content Include="Scripts\Views\ReceiptShelves\IpoNvdExport.js" />
     <Content Include="Scripts\Views\Redirect\RedirectView.js" />
     <Content Include="Scripts\Views\ReportManagement\OderMessageSearch.js" />
     <Content Include="Scripts\Views\ScheduleService\SchedeleLogSearch.js" />
@@ -4520,6 +4521,10 @@
     <Content Include="Views\WareHouse\IpoNvd.cshtml" />
     <Content Include="Views\ReceiptShelves\IpoNvdList.cshtml" />
     <Content Include="Views\Default1\Index.cshtml" />
+    <Content Include="Views\ReceiptShelves\ReceiptShelvesWorkid.cshtml" />
+    <Content Include="Views\ReceiptShelves\ReceiptShelvesItemid.cshtml" />
+    <Content Include="Views\ReceiptShelves\ReceiptShelvesIpoNvd.cshtml" />
+    <Content Include="Views\ReceiptShelves\IpoNvdExport.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
