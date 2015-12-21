@@ -89,9 +89,9 @@ namespace BLL.gigade.Mgr
                 iinvd_query.change_user = invd_query.modify_user;
                 iinvd_query.plas_loc_id = invd_query.loc_id;
                 iinvd_query.item_id = query.item_id;
-
-                string UpdateIinvdSql = _iinvdDao.UpdateIinvdSql(iinvd_query);
-                 //sc_trans_id,sc_cd_id,item_id,sc_trans_type,sc_num_old
+                string ista_id = string.Empty;
+                string UpdateIinvdSql = _iinvdDao.UpdateIinvdSql(iinvd_query, out ista_id);
+                
                 //更新istockchange表
                 IstockChangeQuery stock_query = new IstockChangeQuery();
                 stock_query.sc_trans_id = ""; 
@@ -103,15 +103,21 @@ namespace BLL.gigade.Mgr
                 stock_query.sc_user = invd_query.modify_user;
                 stock_query.sc_note = "收貨上架";
                 stock_query.sc_istock_why = 4;
+                string insertIstockChangeSql = string.Empty;
+                if (ista_id != "H")
+                {
+                    insertIstockChangeSql = istockchangeDao.insertIstockChangeSql(stock_query);
+                }
 
-                string insertIstockChangeSql = istockchangeDao.insertIstockChangeSql(stock_query);
-                
                 //執行SQL
                 ArrayList arrList = new ArrayList();
                 arrList.Add(UpdateIpoNvdSql);
                 arrList.Add(InsertIpoNvdLogSql);
                 arrList.Add(UpdateIinvdSql);
-                arrList.Add(insertIstockChangeSql);
+                if (ista_id != "H")
+                {
+                    arrList.Add(insertIstockChangeSql);
+                }
 
                 bool result = myDao.ExcuteSqls(arrList);
                 return result;

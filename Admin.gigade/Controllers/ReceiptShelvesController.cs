@@ -211,30 +211,6 @@ namespace Admin.gigade.Controllers
                 
                 //匯出excel
                 //////
-
-         //{
-         //    header: "收穫上架狀態", dataIndex: "work_status", width: 100, align: 'center',
-         //    renderer: function (value)
-         //    {
-         //        if (value == "AVL")
-         //        {
-         //            return Ext.String.format('未處理');
-         //        }
-         //        else if (value == "SKP")
-         //        {
-         //            return Ext.String.format('已處理但未完成');
-         //        }
-         //        else if (value == "COM")
-         //        {
-         //            return Ext.String.format('已完成');
-         //        } 
-         //    }
-         //},
-         //{ header: "創建人", dataIndex: "create_username", width: 100, align: 'center' },
-         //{ header: "創建時間", dataIndex: "create_datetime", width: 150, align: 'center' },
-         //{ header: "修改人", dataIndex: "modify_username", width: 100, align: 'center' },
-         //{ header: "修改時間", dataIndex: "modify_datetime", width: 150, align: 'center' },
-                /////////
                 DataTable dtExcel = new DataTable();
                 dtExcel.Columns.Add("工作單號", typeof(String));
                 dtExcel.Columns.Add("採購單編號", typeof(String));

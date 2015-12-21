@@ -10,8 +10,8 @@ Ext.define('GIGADE.IpoNvd', {
         { name: 'ipo_qty', type: 'string' },//採購單驗收數量
         { name: "out_qty", type: "string" },//未收貨上架數量
         { name: "com_qty", type: "int" },//完成收穫上架數量
-        { name: "cde_dt", type: "string" },//有效日期
-        { name: "made_date", type: "string" },//製造日期
+        { name: "cde_dt", type: 'date', dateFormat: "Y-m-d H:i:s" },//有效日期
+        { name: "made_date", type: 'date', dateFormat: "Y-m-d H:i:s" },//製造日期
         { name: "work_status", type: "string" },//收穫上架狀態 
         { name: "create_username", type: 'string' },  //創建人
         { name: "create_datetime", type: 'string' },  //創建時間
@@ -248,6 +248,7 @@ Ext.onReady(function ()
          {
              header: "有效日期", dataIndex: "cde_dt", width: 150, align: 'center',
              renderer: Ext.util.Format.dateRenderer('Y-m-d')
+             
          },
          {
              header: "製造日期", dataIndex: "made_date", width: 150, align: 'center',
