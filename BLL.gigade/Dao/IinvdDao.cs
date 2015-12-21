@@ -1711,7 +1711,7 @@ ORDER BY loc.loc_id,loc.row_id DESC  ", sbWhere.ToString(), sbjoin.ToString());/
             try
             {
 
-                sql.AppendFormat(@" select i.row_id,i.prod_qty from iinvd i LEFT JOIN product_ext pe ON i.item_id = pe.item_id WHERE made_date='{0}' and cde_dt='{1}' and ista_id='{2}' and i.item_id='{3}' ", query.made_date.ToString("yyyy-MM-dd"), query.cde_dt.ToString("yyyy-MM-dd"), query.ista_id,query.item_id);
+                sql.AppendFormat(@" select i.row_id,i.prod_qty from iinvd i LEFT JOIN product_ext pe ON i.item_id = pe.item_id WHERE made_date='{0}' and cde_dt='{1}' and i.item_id='{2}' ", query.made_date.ToString("yyyy-MM-dd"), query.cde_dt.ToString("yyyy-MM-dd"), query.item_id);
                 if (query.pwy_dte_ctl == "Y")
                 {
                     sql.AppendFormat(@" and pwy_dte_ctl='{0}' ;",query.pwy_dte_ctl);
