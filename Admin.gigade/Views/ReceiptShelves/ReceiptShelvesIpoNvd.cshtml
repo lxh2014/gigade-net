@@ -313,8 +313,10 @@
                         $("#productname").text(result.data[0].description + prod);
                         $("#loc_id").text(result.data[0].loc_id);
  
-                        $("#made_date_label").val(result.data[0].made_date);
-                        $("#cde_date_label").val(result.data[0].cde_dt);
+                        //$("#made_date_label").val(result.data[0].made_date);
+                        //$("#cde_date_label").val(result.data[0].cde_dt);
+                        $("#made_date_label").val(new Date(result.data[0].made_date).Format("yyyy-MM-dd"));
+                        $("#cde_date_label").val(new Date(result.data[0].cde_dt).Format("yyyy-MM-dd"));
                         $("#out_qty").text(result.data[0].out_qty);
                         $("#pwy_dte_ctl").text(result.data[0].pwy_dte_ctl);
                         $("#cde_dt_incr").text(result.data[0].cde_dt_incr); 

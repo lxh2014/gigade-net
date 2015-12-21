@@ -136,8 +136,8 @@ namespace Admin.gigade.Controllers
 
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
-                timeConverter.DateTimeFormat = "yyyy-MM-dd";
-                //timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                //timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = "{success:true,totalCount:" + totalCount + ",msg:" + msg + ",data:" + JsonConvert.SerializeObject(store, Formatting.Indented, timeConverter) + "}";//返回json數據
             }
             catch (Exception ex)

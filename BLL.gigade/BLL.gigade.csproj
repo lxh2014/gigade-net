@@ -1395,7 +1395,7 @@
     <Compile Include="Model\InspectionReport.cs" />
     <Compile Include="Model\Ipo.cs" />
     <Compile Include="Model\Ipod.cs" />
-    <Compile Include="Model\IpoNvd.cs" />
+    <Compile Include="Model\IpoNvdLog.cs" />
     <Compile Include="Model\IstockChange.cs" />
     <Compile Include="Model\ItemIpoCreateLog.cs" />
     <Compile Include="Model\IwmsRrecord.cs" />
@@ -1905,7 +1905,7 @@
     <Compile Include="Model\DeliverChangeLog.cs" />
     <Compile Include="Model\LogisticsTcatSod.cs" />
     <Compile Include="Model\LogisticsTcatEod.cs" />
-    <Compile Include="Model\IpoNvdLog.cs" />
+    <Compile Include="Model\IpoNvd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\TrialPicture.cs" />
     <Compile Include="Model\TrialRecord.cs" />
