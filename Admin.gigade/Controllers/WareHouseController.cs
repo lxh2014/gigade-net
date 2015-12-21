@@ -352,6 +352,7 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+
         #endregion
 
         #region 料位管理模塊
@@ -385,7 +386,7 @@ namespace Admin.gigade.Controllers
             }
             if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
             {
-                iloc.endtime = time.AddDays(1);
+                iloc.endtime = time;
             }
             try
             {
@@ -1032,11 +1033,11 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(Request.Params["time_start"]))
             {
-                iupc.create_time_start = DateTime.Parse(Request.Params["time_start"]).ToString("yyyy/MM/dd 00:00:00");
+                iupc.create_time_start = DateTime.Parse(Request.Params["time_start"]).ToString("yyyy-MM-dd HH:mm:ss");
             }
             if (!string.IsNullOrEmpty(Request.Params["time_end"]))
             {
-                iupc.create_time_end = DateTime.Parse(Request.Params["time_end"]).ToString("yyyy/MM/dd 23:59:59");
+                iupc.create_time_end = DateTime.Parse(Request.Params["time_end"]).ToString("yyyy-MM-dd HH:mm:ss");
             }
             try
             {
@@ -1720,11 +1721,11 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["time_start"]))
                 {
-                    iupc.create_time_start = DateTime.Parse(Request.Params["time_start"]).ToString("yyyy/MM/dd 00:00:00");
+                    iupc.create_time_start = DateTime.Parse(Request.Params["time_start"]).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 if (!string.IsNullOrEmpty(Request.Params["time_end"]))
                 {
-                    iupc.create_time_end = DateTime.Parse(Request.Params["time_end"]).ToString("yyyy/MM/dd 23:59:59");
+                    iupc.create_time_end = DateTime.Parse(Request.Params["time_end"]).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 List<IupcQuery> store = new List<IupcQuery>();
                 _IiupcMgr = new IupcMgr(mySqlConnectionString);
@@ -1876,11 +1877,11 @@ namespace Admin.gigade.Controllers
                 DateTime time;
                 if (DateTime.TryParse(Request.Params["starttime"].ToString(), out time))
                 {
-                    iplas.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                    iplas.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
                 {
-                    iplas.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                    iplas.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 #endregion
@@ -2440,11 +2441,11 @@ namespace Admin.gigade.Controllers
                 DateTime time;
                 if (DateTime.TryParse(Request.Params["starttime"].ToString(), out time))
                 {
-                    ilpsQuery.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                    ilpsQuery.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
                 {
-                    ilpsQuery.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                    ilpsQuery.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 List<IplasQuery> store = new List<IplasQuery>();
                 _IiplasMgr = new IplasMgr(mySqlConnectionString);
@@ -2862,11 +2863,11 @@ namespace Admin.gigade.Controllers
             DateTime time;
             if (DateTime.TryParse(Request.Params["starttime"].ToString(), out time))
             {
-                iivd.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                iivd.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
             {
-                iivd.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                iivd.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             try
             {
@@ -3619,11 +3620,11 @@ namespace Admin.gigade.Controllers
                 DateTime time;
                 if (DateTime.TryParse(Request.Params["starttime"].ToString(), out time))
                 {
-                    iivd.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                    iivd.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
                 {
-                    iivd.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                    iivd.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 List<IinvdQuery> store = new List<IinvdQuery>();
                 _iinvd = new IinvdMgr(mySqlConnectionString);
@@ -5281,11 +5282,11 @@ namespace Admin.gigade.Controllers
                         DateTime time;
                         if (DateTime.TryParse(Request.Params["time_start"], out time))
                         {
-                            query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                            query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                         }
                         if (DateTime.TryParse(Request.Params["time_end"], out time))
                         {
-                            query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                            query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                         }
                         if (!string.IsNullOrEmpty(Request.Params["dateSel"]))
                         {
@@ -5317,11 +5318,11 @@ namespace Admin.gigade.Controllers
                     DateTime time;
                     if (DateTime.TryParse(Request.Params["time_start"], out time))
                     {
-                        query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                        query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                     }
                     if (DateTime.TryParse(Request.Params["time_end"], out time))
                     {
-                        query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                        query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                     }
                     if (!string.IsNullOrEmpty(Request.Params["dateSel"]))
                     {
@@ -5596,11 +5597,11 @@ namespace Admin.gigade.Controllers
             DateTime time;
             if (DateTime.TryParse(Request.Params["start_time"].ToString(), out time))
             {
-                ilocDetailQuery.start_time = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                ilocDetailQuery.start_time = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (DateTime.TryParse(Request.Params["end_time"].ToString(), out time))
             {
-                ilocDetailQuery.end_time = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                ilocDetailQuery.end_time = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (!string.IsNullOrEmpty(Request.Params["startloc"]))
             {
@@ -5746,11 +5747,11 @@ namespace Admin.gigade.Controllers
 
                 if (DateTime.TryParse(Request.Params["start_time"].ToString(), out time))
                 {
-                    ilocDetailQuery.start_time = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                    ilocDetailQuery.start_time = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["end_time"].ToString(), out time))
                 {
-                    ilocDetailQuery.end_time = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                    ilocDetailQuery.end_time = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["startloc"]))
                 {
@@ -5928,12 +5929,12 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]) && Request.Params["start_time"] != "1970-01-01")//
                 {
-                    query.starttime = DateTime.Parse(DateTime.Parse(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
+                    query.starttime = DateTime.Parse(DateTime.Parse(Request.Params["start_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 if (!string.IsNullOrEmpty(Request.Params["end_time"]) && Request.Params["end_time"] != "1970-01-01")
                 {
-                    query.endtime = DateTime.Parse(DateTime.Parse(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+                    query.endtime = DateTime.Parse(DateTime.Parse(Request.Params["end_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
 
                 }
                 query.IsPage = false;
@@ -6019,11 +6020,11 @@ namespace Admin.gigade.Controllers
                 DateTime time;
                 if (DateTime.TryParse(Request.Params["time_start"], out time))
                 {
-                    query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd 00:00:00"));
+                    query.starttime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["time_end"], out time))
                 {
-                    query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd 23:59:59"));
+                    query.endtime = DateTime.Parse(time.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 _istockMgr = new IstockChangeMgr(mySqlConnectionString);
@@ -7757,11 +7758,11 @@ namespace Admin.gigade.Controllers
           
             if (!string.IsNullOrEmpty(Request.Params["startDate"]))
             {
-                cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd 00:00:00");
+                cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd HH:mm:ss");
             }
             if (!string.IsNullOrEmpty(Request.Params["endDate"]))
             {
-                cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd 23:59:59");
+                cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd HH:mm:ss");
             }
             if (!string.IsNullOrEmpty(Request.Params["sta_id"]))
             {
@@ -7858,11 +7859,11 @@ namespace Admin.gigade.Controllers
 
                 if (!string.IsNullOrEmpty(Request.Params["startDate"]))
                 {
-                    cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd 00:00:00");
+                    cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 if (!string.IsNullOrEmpty(Request.Params["endDate"]))
                 {
-                    cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd 23:59:59");
+                    cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 if (!string.IsNullOrEmpty(Request.Params["sta_id"]))
                 {
@@ -10443,6 +10444,12 @@ namespace Admin.gigade.Controllers
                 {
                     ipodStore[i].spec = GetProductSpec(ipodStore[i].prod_id.ToString());
                     ipodStore[i].plst_id = ipodStore[i].plst_id.ToString() == "F" ? "已驗收" : "未驗收";
+
+                    if (ipodStore[i].pwy_dte_ctl != "Y")
+                    {
+                        ipodStore[i].made_date = DateTime.Now.Date;
+                        ipodStore[i].cde_dt = DateTime.Now.Date;
+                    }
                 }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
@@ -10471,6 +10478,8 @@ namespace Admin.gigade.Controllers
         {
 
             IpodQuery query = new IpodQuery();
+            IpoNvdQuery ipoNvd = new IpoNvdQuery();
+
             string json = string.Empty;
             try
             {
@@ -10480,6 +10489,12 @@ namespace Admin.gigade.Controllers
                     query.change_user = (Session["caller"] as Caller).user_id;
                     query.user_email = (Session["caller"] as Caller).user_email;
                     query.change_dtim = DateTime.Now;
+                    ////ipoNvd
+                    ipoNvd.create_user = (Session["caller"] as Caller).user_id;
+                    ipoNvd.create_datetime = DateTime.Now;
+                    ipoNvd.modify_user = (Session["caller"] as Caller).user_id;
+                    ipoNvd.modify_datetime = DateTime.Now;
+
                 }
                 if (!string.IsNullOrEmpty(Request.Params["qty_damaged"]))
                 {
@@ -10488,6 +10503,8 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["qty_claimed"]))
                 {
                     query.qty_claimed = Convert.ToInt32(Request.Params["qty_claimed"].ToString());
+                    ipoNvd.ipo_qty = query.qty_claimed;
+                    ipoNvd.out_qty = query.qty_claimed;
                 }
                 if (!string.IsNullOrEmpty(Request.Params["item_stock"]))
                 {
@@ -10497,10 +10514,32 @@ namespace Admin.gigade.Controllers
                 {
                     query.plst_id = Request.Params["plst_id"].ToString();
                 }
+                if (!string.IsNullOrEmpty(Request.Params["made_date"]))
+                {
+                    query.made_date = Convert.ToDateTime(Request.Params["made_date"].ToString());
+                    ipoNvd.made_date = query.made_date;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["cde_dt"]))
+                {
+                    query.cde_dt = Convert.ToDateTime(Request.Params["cde_dt"].ToString());
+                    ipoNvd.cde_dt = query.cde_dt;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["item_id"]))
+                {
+                    ipoNvd.item_id = Convert.ToUInt32(Request.Params["item_id"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["ipo_id"]))
+                {
+                    ipoNvd.ipo_id = Request.Params["ipo_id"].ToString();
+                }
+
+                //ipoNvd.work_id = "IN" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                ipoNvd.com_qty = 0;
+                ipoNvd.work_status = "AVL";
 
                 _ipodMgr = new IpodMgr(mySqlConnectionString);
 
-                bool result = _ipodMgr.UpdateIpodCheck(query);
+                bool result = _ipodMgr.UpdateIpodCheck(query, ipoNvd);
                 if (result)
                 {
 
@@ -12770,7 +12809,7 @@ namespace Admin.gigade.Controllers
                 {
                     if (DateTime.TryParse(Request.Params["start_time"].ToString(), out date))
                     {
-                        ipod.start_time = date;
+                        ipod.start_time = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                     }
 
                 }
@@ -12778,7 +12817,7 @@ namespace Admin.gigade.Controllers
                 {
                     if (DateTime.TryParse(Request.Params["end_time"].ToString(), out date))
                     {
-                        ipod.end_time = Convert.ToDateTime(date.ToString("yyyy-MM-dd 23:59:59"));
+                        ipod.end_time = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                     }
                 }
                 ipod.IsPage = false;
@@ -12937,11 +12976,11 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(Request.Params["start_time"]))
             {
-                ipod.start_time = Convert.ToDateTime(Request.Params["start_time"].ToString());
+                ipod.start_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["start_time"].ToString()).ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (!string.IsNullOrEmpty(Request.Params["end_time"]))
             {
-                ipod.end_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["end_time"].ToString()).ToString("yyyy-MM-dd 23:59:59"));
+                ipod.end_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["end_time"].ToString()).ToString("yyyy-MM-dd HH:mm:ss"));
             }
             try
             {
@@ -13026,12 +13065,12 @@ namespace Admin.gigade.Controllers
             if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
             {
                 //query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
-                query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
+                query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
             }
             if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
             {
                 //query.end_time = Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59");
-                query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+                query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
             }
             List<ProductItemQuery> list = productitemMgr.GetWaitLiaoWeiList(query, out totalcount);
             IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
@@ -13065,12 +13104,12 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
                 {
                     //query.start_time = Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00");
-                    query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
+                    query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
                 {
                     //query.end_time = Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59");
-                    query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+                    query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 DataTable dtHZ = new DataTable();
                 int totalcount = 0;
@@ -13156,14 +13195,14 @@ namespace Admin.gigade.Controllers
             {
                 if (DateTime.TryParse(Request.Params["start_time"], out date))
                 {
-                    query.start_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd 00:00:00"));
+                    query.start_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
             }
             if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
             {
                 if (DateTime.TryParse(Request.Params["end_time"], out date))
                 {
-                    query.change_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd 23:59:59"));
+                    query.change_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
             }
             DataTable table = aseldMgr.GetAseldTable(query, out totalcount);
@@ -13235,7 +13274,7 @@ namespace Admin.gigade.Controllers
         {
             PdfHelper pdf = new PdfHelper();
             List<string> pdfList = new List<string>();
-            float[] arrColWidth = new float[] { 50, 135, 60, 45, 55, 55, 45, 60, 35, 45, 45, 35 };
+            float[] arrColWidth = new float[] {  135,50,45, 60,  55, 55,60, 45,  35, 45, 45, 35 };
             int index = 0;
             string newFileName = string.Empty;
             string newName = string.Empty;
@@ -13278,26 +13317,27 @@ namespace Admin.gigade.Controllers
             {
                 if (DateTime.TryParse(Request.Params["start_time"], out date))
                 {
-                    ase_query.start_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd 00:00:00"));
+                    ase_query.start_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["end_time"], out date))
                 {
-                    ase_query.change_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd 23:59:59"));
+                    ase_query.change_dtim = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 serchWhr++;
             }
             IAseldImplMgr aseldMgr = new AseldMgr(mySqlConnectionString);
 
             DataTable _dtBody = new DataTable();
-            _dtBody.Columns.Add("料位編號", typeof(string));
+           
             _dtBody.Columns.Add("商品名稱", typeof(string));
-            _dtBody.Columns.Add("條碼", typeof(string));
-            _dtBody.Columns.Add("細項編號", typeof(string));
-            _dtBody.Columns.Add("製造日期", typeof(string)); 
-            _dtBody.Columns.Add("有效日期", typeof(string));
+            _dtBody.Columns.Add("料位編號", typeof(string));
             _dtBody.Columns.Add("撿貨庫存", typeof(string));
             _dtBody.Columns.Add("本次撿貨量", typeof(string));
-           
+            _dtBody.Columns.Add("製造日期", typeof(string)); 
+            _dtBody.Columns.Add("有效日期", typeof(string));
+            _dtBody.Columns.Add("條碼", typeof(string));
+            _dtBody.Columns.Add("細項編號", typeof(string));
+
             _dtBody.Columns.Add("訂貨量", typeof(string));
             _dtBody.Columns.Add("已撿貨量", typeof(string));
             _dtBody.Columns.Add("待撿貨量", typeof(string));
@@ -13421,21 +13461,20 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(2);
                 cell.DisableBorderSide(4);
                 ptable.AddCell(cell);
-
-                cell = new PdfPCell(new Phrase("料位編號", new iTextSharp.text.Font(bf, 12)));
-                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.DisableBorderSide(8);
-                ptable.AddCell(cell);
                 cell = new PdfPCell(new Phrase("商品名稱", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-
-                cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("料位編號", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+
+                cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -13451,15 +13490,16 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-
-                cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
+               
+               
                
 
                 cell = new PdfPCell(new Phrase("訂貨量", new iTextSharp.text.Font(bf, 12)));
@@ -13769,20 +13809,20 @@ namespace Admin.gigade.Controllers
                     cell.DisableBorderSide(2);
                     cell.DisableBorderSide(4);
                     ptable.AddCell(cell);
-                    cell = new PdfPCell(new Phrase("料位編號", new iTextSharp.text.Font(bf, 12)));
-                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                    cell.DisableBorderSide(8);
-                    ptable.AddCell(cell);
                     cell = new PdfPCell(new Phrase("商品名稱", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
-
-                    cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("料位編號", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
-                    cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
+                     cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
+                    cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                    cell.DisableBorderSide(8);
+                    ptable.AddCell(cell);
+
+                    cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
@@ -13798,15 +13838,16 @@ namespace Admin.gigade.Controllers
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
-                    cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
-
-                    cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
+                    cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
                     cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                     cell.DisableBorderSide(8);
                     ptable.AddCell(cell);
+                    
+                   
                    
 
                     cell = new PdfPCell(new Phrase("訂貨量", new iTextSharp.text.Font(bf, 12)));
@@ -14008,7 +14049,7 @@ namespace Admin.gigade.Controllers
             {
                 #region 標頭
                 #region 表頭
-                PdfPTable ptable = new PdfPTable(11);
+                PdfPTable ptable = new PdfPTable(12);
 
 
                 ptable.WidthPercentage = 100;//表格寬度
@@ -14117,8 +14158,16 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("料位編碼", new iTextSharp.text.Font(bf, 12)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
+                cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
+                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
+                cell.DisableBorderSide(8);
+                ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -14134,15 +14183,12 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("撿貨庫存", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("條碼", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-
-                cell = new PdfPCell(new Phrase("本次撿貨量", new iTextSharp.text.Font(bf, 12)));
-                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.DisableBorderSide(8);
-                ptable.AddCell(cell);
+                
+               
                 cell = new PdfPCell(new Phrase("細項編號", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
@@ -14162,10 +14208,7 @@ namespace Admin.gigade.Controllers
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
-                cell = new PdfPCell(new Phrase("料位編碼", new iTextSharp.text.Font(bf, 12)));
-                cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
-                cell.DisableBorderSide(8);
-                ptable.AddCell(cell);
+                
 
 
                 //cell = new PdfPCell(new Phrase("創建時間", new iTextSharp.text.Font(bf, 8)));

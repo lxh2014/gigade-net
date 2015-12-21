@@ -91,7 +91,7 @@ Ext.onReady(function () {
              xtype: 'combobox', fieldLabel: "類型", id: 'datatype', labelWidth: 50, store: typeStore, displayField: 'datatxt', valueField: 'datavalue', editable: false,
              value:'2'
          },
-        { xtype: 'datetimefield', id: 'dateactual', hidden: false, value: new Date(), format: 'Y-m-d', fieldLabel: '查詢日期', editable: false, },
+        { xtype: 'datefield', id: 'dateactual', hidden: false, value: new Date(), format: 'Y-m-d', fieldLabel: '查詢日期', editable: false, },
          { xtype: 'button', text: "查詢", id: 'query', hidden: false, handler: onQueryActual },
           {
               xtype: 'button', text: "重置", id: 'reset', hidden: false,

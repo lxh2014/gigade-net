@@ -55,5 +55,6 @@ namespace BLL.gigade.Dao.Impl
         int GetProd_qty(int item_id, string loc_id,string pwy_dte_ctl, string row_id);
         List<IinvdQuery> GetPlasIinvd(Model.Query.IinvdQuery ivd);
         DataTable getVentory(IinvdQuery m);
+        string UpdateIinvdSql(IinvdQuery query, out string ista_id);
     }
 }

@@ -153,11 +153,11 @@ CommonFunction.DateTimeToString(q.made_dt),CommonFunction.DateTimeToString(q.cde
 
                 if (q.starttime > DateTime.MinValue)
                 {
-                    sql.AppendFormat(" and ia.create_dtim>='{0}' ", q.starttime.ToString("yyyy-MM-dd 00:00:00"));
+                    sql.AppendFormat(" and ia.create_dtim>='{0}' ", q.starttime.ToString("yyyy-MM-dd  HH:mm:ss"));
                 }
                 if (q.endtime > DateTime.MinValue)
                 {
-                    sql.AppendFormat(" and ia.create_dtim<='{0}' ", q.endtime.ToString("yyyy-MM-dd 23:59:59"));
+                    sql.AppendFormat(" and ia.create_dtim<='{0}' ", q.endtime.ToString("yyyy-MM-dd  HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(q.doc_no))//by zhaozhi0623j add 20151006 用於庫存調整單號查詢
                 {
@@ -219,11 +219,11 @@ CommonFunction.DateTimeToString(q.made_dt),CommonFunction.DateTimeToString(q.cde
                 //}
                 if (q.starttime > DateTime.MinValue)
                 {
-                    sql.AppendFormat(" and ia.create_dtim>='{0}' ", q.starttime.ToString("yyyy-MM-dd 00:00:00"));
+                    sql.AppendFormat(" and ia.create_dtim>='{0}' ", q.starttime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (q.endtime > DateTime.MinValue)
                 {
-                    sql.AppendFormat(" and ia.create_dtim<='{0}' ", q.endtime.ToString("yyyy-MM-dd 23:59:59"));
+                    sql.AppendFormat(" and ia.create_dtim<='{0}' ", q.endtime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(q.doc_no))//by zhaozhi0623j add 20151006 用於庫存調整單號查詢
                 {

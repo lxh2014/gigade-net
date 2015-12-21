@@ -114,12 +114,13 @@ Ext.onReady(function () {
                         { xtype: 'textfield', allowBlank: true, fieldLabel: "查詢內容", id: 'searchcontent', name: 'searchcontent', labelWidth: 60 },
                          { xtype: 'label', margin: '2 0 0 10', text: '創建時間:' },
                         {
-                            xtype: "datefield",
+                            xtype: "datetimefield",
                             editable: false,
                             margin: '0 0 0 5',
                             id: 'start_time',
                             name: 'start_time',
-                            format: 'Y/m/d',
+                            format: 'Y-m-d H:i:s',
+                            time: { hour: 00, min: 00, sec: 00 },
                             listeners: {
                                 select: function (a, b, c) {
                                     var start = Ext.getCmp("start_time");
@@ -144,11 +145,12 @@ Ext.onReady(function () {
                         },
                         { xtype: 'displayfield', value: '~ ' },
                         {
-                            xtype: "datefield",
+                            xtype: "datetimefield",
                             editable: false,
                             id: 'end_time',
                             name: 'end_time',
-                            format: 'Y/m/d',
+                            format: 'Y-m-d  H:i:s',
+                            time: { hour: 23, min: 59, sec: 59 },
                             listeners: {
                                 select: function (a, b, c) {
                                     var start = Ext.getCmp("start_time");

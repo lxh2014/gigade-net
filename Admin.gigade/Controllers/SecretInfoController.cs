@@ -32,6 +32,7 @@ using Newtonsoft.Json.Converters;
 using System.Data;
 using BLL.gigade.Common;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace Admin.gigade.Controllers
 {
@@ -46,10 +47,11 @@ namespace Admin.gigade.Controllers
         private IManageUserImplMgr _muMgr;
         private UserLoginAttemptsMgr ulaMgr;
         private VipUserGroupMgr _vipUserGroup;
-        private IBrowseDataImplMgr _IBrowseDataMgr; 
+        private IBrowseDataImplMgr _IBrowseDataMgr;
         private ZipMgr zMgr;
         private ITabShowImplMgr _tabshow;
         private OrderReturnStatusMgr _orderReturnStatus;
+        private Regex mobile = new System.Text.RegularExpressions.Regex("/^09[0-9]{8}$/");
 
         #region 視圖
         /// <summary>
@@ -708,7 +710,36 @@ namespace Admin.gigade.Controllers
                         UsersMgr _usermgr = new UsersMgr(mySqlConnectionString);
                         Users u = new Users();
                         Users uModel = _usermgr.GetUser(new Users { user_id = Convert.ToUInt32(info_id) }).FirstOrDefault();
-                        json = "{success:true,\"user_id\":\"" + uModel.user_id + "\",\"user_name\":\"" + uModel.user_name + "\",\"user_email\":\"" + uModel.user_email + "\",\"user_mobile\":\"" + uModel.user_mobile + "\",\"user_phone\":\"" + uModel.user_phone + "\",\"user_adress\":\"" + uModel.user_address + "\"}";
+                        if (uModel != null)
+                        {
+                            if (!string.IsNullOrEmpty(uModel.user_mobile))
+                            {
+                                if (!mobile.IsMatch(uModel.user_mobile))
+                                {
+                                    if (uModel.user_mobile.ToString().Length == 48)
+                                    {
+                                        uModel.user_mobile = EncryptComputer.EncryptDecryptTextByApi(uModel.user_mobile, false);
+                                        if (!mobile.IsMatch(uModel.user_mobile))
+                                        {
+                                            //異常記錄
+                                            Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                                            logMessage.Content = string.Format("表名:{0},編號:{1},行動電話:{2},Message:{3}", "users", uModel.user_id, uModel.user_mobile, "行動電話解密后不滿足正則表達式");
+                                            logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                                            log.Error(logMessage);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //異常記錄
+                                        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                                        logMessage.Content = string.Format("表名:{0},編號:{1},行動電話:{2},Message:{3}", "users", uModel.user_id, uModel.user_mobile, "行動電話錯誤");
+                                        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                                        log.Error(logMessage);
+                                    }
+                                }
+                            }
+                        }
+                        json = "{success:true,\"user_id\":\"" + uModel.user_id + "\",\"user_name\":\"" + uModel.user_name + "\",\"user_email\":\"" + uModel.user_email + "\",\"user_mobile\":\"" + uModel.user_mobile + "\",\"user_adress\":\"" + uModel.user_address + "\"}";
 
                         this.Response.Clear();
                         this.Response.Write(json);
@@ -727,7 +758,7 @@ namespace Admin.gigade.Controllers
                     case "vip_user":
                         VipUserMgr vipusersMgr = new VipUserMgr(mySqlConnectionString);
                         VipUser model = vipusersMgr.GetSingleByID(related_id);
-                        json = "{success:true,\"user_id\":\"" + model.user_id + "\",\"user_email\":\"" + model.user_email + "\"}";
+                        json = "{success:true,\"v_id\":\"" + model.v_id + "\",\"user_id\":\"" + model.user_id + "\",\"user_email\":\"" + model.user_email + "\"}";
                         break;
                     case "edm_group_email":
                         EdmGroupEmailMgr edmgroupmailMgr = new EdmGroupEmailMgr(mySqlConnectionString);
@@ -738,7 +769,7 @@ namespace Admin.gigade.Controllers
                         EdmTestMgr edmtestMgr = new EdmTestMgr(mySqlConnectionString);
                         EdmTestQuery etmodel = edmtestMgr.GetModel(new EdmTestQuery { email_id = Convert.ToUInt32(related_id) }).FirstOrDefault();
                         json = "{success:true,\"user_id\":\"" + etmodel.email_id + "\",\"user_name\":\"" + etmodel.test_username + "\",\"user_email\":\"" + etmodel.email_address + "\"}";
-                        break;    
+                        break;
                     case "order_master":
                         OrderMasterMgr omMgr = new OrderMasterMgr(mySqlConnectionString);
                         zMgr = new ZipMgr(mySqlConnectionString);
@@ -779,7 +810,7 @@ namespace Admin.gigade.Controllers
                             DataTable _urdtno = _userrecommendMgr.getUserInfo(related_id);
                             if (_urdtno.Rows.Count > 0)
                             {
-                                json = "{success:true,\"user_id\":\"" + "" + "\",\"user_name\":\"" + "" + "\",\"user_email\":\"" + "" + "\",\"user_phone\":\"" + "" + "\",\"user_adress\":\"" + "" + "\",\"ur_name\":\"" + _urdtno.Rows[0]["name"] + "\",\"ur_mail\":\"" + _urdtno.Rows[0]["mail"] + "\",\"no_ur_name\":\"" + _urdtno.Rows[0]["user_name"] + "\"}";
+                                json = "{success:true,\"user_id\":\"" + "" + "\",\"user_name\":\"" + "" + "\",\"user_email\":\"" + "" + "\",\"user_adress\":\"" + "" + "\",\"ur_name\":\"" + _urdtno.Rows[0]["name"] + "\",\"ur_mail\":\"" + _urdtno.Rows[0]["mail"] + "\",\"no_ur_name\":\"" + _urdtno.Rows[0]["user_name"] + "\"}";
                             }
                         }
                         else if (urlType == "/Member/UserLoginLog")//會員登入記錄
@@ -788,7 +819,7 @@ namespace Admin.gigade.Controllers
                             DataTable _dtull = _userloginlog.GetUserInfo(related_id);
                             if (_dtull.Rows.Count > 0)
                             {
-                                json = "{success:true,\"user_id\":\"" + _dtull.Rows[0]["user_id"] + "\",\"user_name\":\"" + _dtull.Rows[0]["user_name"] + "\",\"user_email\":\"" + _dtull.Rows[0]["user_email"] + "\",\"user_phone\":\"" + _dtull.Rows[0]["user_phone"] + "\",\"user_adress\":\"" + _dtull.Rows[0]["user_address"] + "\"}";
+                                json = "{success:true,\"user_id\":\"" + _dtull.Rows[0]["user_id"] + "\",\"user_name\":\"" + _dtull.Rows[0]["user_name"] + "\",\"user_email\":\"" + _dtull.Rows[0]["user_email"] + "\",\"user_adress\":\"" + _dtull.Rows[0]["user_address"] + "\"}";
                             }
                         }
                         else
@@ -797,7 +828,7 @@ namespace Admin.gigade.Controllers
                             BLL.gigade.Model.Custom.Users _user = _userMgr.getModel(related_id);
                             if (_user != null)
                             {
-                                json = "{success:true,\"user_id\":\"" + _user.user_id + "\",\"user_name\":\"" + _user.user_name + "\",\"user_email\":\"" + _user.user_email + "\",\"user_phone\":\"" + _user.user_phone + "\",\"user_adress\":\"" + _user.user_address + "\"}";
+                                json = "{success:true,\"user_id\":\"" + _user.user_id + "\",\"user_name\":\"" + _user.user_name + "\",\"user_email\":\"" + _user.user_email + "\",\"user_adress\":\"" + _user.user_address + "\"}";
                             }
                         }
                         break;
@@ -806,7 +837,7 @@ namespace Admin.gigade.Controllers
                         DataTable _dtques = _IOrderQuesMgr.GetUserInfo(related_id);
                         if (_dtques.Rows.Count > 0)
                         {
-                            json = "{success:true,\"user_id\":\"" + _dtques.Rows[0]["user_id"] + "\",\"user_name\":\"" + _dtques.Rows[0]["user_name"] + "\",\"user_email\":\"" + _dtques.Rows[0]["user_email"] + "\",\"user_phone\":\"" + _dtques.Rows[0]["user_phone"] + "\",\"user_adress\":\"" + "" + "\",\"order_id\":\"" + _dtques.Rows[0]["order_id"] + "\"}";
+                            json = "{success:true,\"user_id\":\"" + _dtques.Rows[0]["user_id"] + "\",\"user_name\":\"" + _dtques.Rows[0]["user_name"] + "\",\"user_email\":\"" + _dtques.Rows[0]["user_email"] + "\",\"user_adress\":\"" + "" + "\",\"order_id\":\"" + _dtques.Rows[0]["order_id"] + "\"}";
                         }
                         break;
                     case 3:
@@ -815,7 +846,7 @@ namespace Admin.gigade.Controllers
                         SmsQuery SmsStore = _ISmsMgr.GetSmsList(new SmsQuery { id = related_id }, out totalCount).FirstOrDefault();
                         if (SmsStore != null)
                         {
-                            json = "{success:true,\"user_id\":\"" + "" + "\",\"user_name\":\"" + "" + "\",\"user_email\":\"" + "" + "\",\"user_phone\":\"" + SmsStore.mobile + "\",\"user_adress\":\"" + "" + "\"}";
+                            json = "{success:true,\"user_id\":\"" + "" + "\",\"user_name\":\"" + "" + "\",\"user_email\":\"" + "" + "\",\"user_mobile\":\"" + SmsStore.mobile + "\",\"user_adress\":\"" + "" + "\"}";
                         }
                         break;
                     case 4:
@@ -823,7 +854,7 @@ namespace Admin.gigade.Controllers
                         DataTable _dt = _ctactMgr.GetUserInfo(related_id);
                         if (_dt.Rows.Count > 0)
                         {
-                            json = "{success:true,\"user_id\":\"" + _dt.Rows[0]["user_id"] + "\",\"user_name\":\"" + _dt.Rows[0]["user_name"] + "\",\"user_email\":\"" + _dt.Rows[0]["user_email"] + "\",\"user_phone\":\"" + _dt.Rows[0]["user_phone"] + "\",\"user_adress\":\"" + "" + "\"}";
+                            json = "{success:true,\"user_id\":\"" + _dt.Rows[0]["user_id"] + "\",\"user_name\":\"" + _dt.Rows[0]["user_name"] + "\",\"user_email\":\"" + _dt.Rows[0]["user_email"] + "\",\"user_adress\":\"" + "" + "\"}";
                         }
                         break;
                     case 7://供應商詳情
@@ -871,7 +902,7 @@ namespace Admin.gigade.Controllers
                         DataTable _dtmu = _IMailUserMgr.GetUserInfo(related_id);
                         if (_dtmu.Rows.Count > 0)
                         {
-                            json = "{success:true,\"user_id\":\"" + _dtmu.Rows[0]["user_id"] + "\",\"user_name\":\"" + _dtmu.Rows[0]["user_name"] + "\",\"user_email\":\"" + _dtmu.Rows[0]["user_email"] + "\",\"user_phone\":\"" + _dtmu.Rows[0]["user_phone"] + "\",\"user_adress\":\"" + _dtmu.Rows[0]["user_address"] + "\"}";
+                            json = "{success:true,\"user_id\":\"" + _dtmu.Rows[0]["user_id"] + "\",\"user_name\":\"" + _dtmu.Rows[0]["user_name"] + "\",\"user_email\":\"" + _dtmu.Rows[0]["user_email"] + "\",\"user_adress\":\"" + _dtmu.Rows[0]["user_address"] + "\"}";
                         }
                         break;
                     case 10:
@@ -886,7 +917,7 @@ namespace Admin.gigade.Controllers
                         UserLevelLogMgr _userLevelLog = new UserLevelLogMgr(mySqlConnectionString);
                         //   UserLevelLogQuery store
 
-                        UserLevelLogQuery levelStore = _userLevelLog.GetUserLevelLogList(new UserLevelLogQuery { user_id = Convert.ToUInt32(related_id), IsPage = false, isSecret=false}, out totalCount).FirstOrDefault();
+                        UserLevelLogQuery levelStore = _userLevelLog.GetUserLevelLogList(new UserLevelLogQuery { user_id = Convert.ToUInt32(related_id), IsPage = false, isSecret = false }, out totalCount).FirstOrDefault();
                         if (levelStore != null)
                         {
                             json = "{success:true,\"user_id\":\"" + levelStore.user_id + "\",\"user_name\":\"" + levelStore.user_name + "\",\"user_email\":\"" + levelStore.user_email + "\"}";
@@ -894,8 +925,8 @@ namespace Admin.gigade.Controllers
                         break;
                     case 18://企業會員管理
                         _vipUserGroup = new VipUserGroupMgr(mySqlConnectionString);
-                    VipUserGroupQuery vipStore = _vipUserGroup.GetVipUserGList(new VipUserGroupQuery { group_id = Convert.ToUInt32(related_id), IsPage = false,isSecret=false }, out totalCount).FirstOrDefault();
-                    if (vipStore != null)
+                        VipUserGroupQuery vipStore = _vipUserGroup.GetVipUserGList(new VipUserGroupQuery { group_id = Convert.ToUInt32(related_id), IsPage = false, isSecret = false }, out totalCount).FirstOrDefault();
+                        if (vipStore != null)
                         {
                             json = "{success:true,\"group_committe_chairman\":\"" + vipStore.group_committe_chairman + "\",\"group_committe_phone\":\"" + vipStore.group_committe_phone + "\",\"group_committe_mail\":\"" + vipStore.group_committe_mail + "\"}";
                         }
@@ -909,13 +940,13 @@ namespace Admin.gigade.Controllers
                         break;
                     case 22://聯合信用卡銀行卡號
                         _tabshow = new TabShowMgr(mySqlConnectionString);
-                       //  OrderPaymentNcccQuery OPNQuery = new OrderPaymentNcccQuery();
+                        //  OrderPaymentNcccQuery OPNQuery = new OrderPaymentNcccQuery();
                         OrderPaymentNcccQuery OPNQuery = _tabshow.GetNCCC(new OrderPaymentNcccQuery { nccc_id = (uint)related_id, IsPage = false, isSecret = false }, out totalCount).FirstOrDefault();
                         json = "{success:true,\"nccc_id\":\"" + OPNQuery.nccc_id + "\",\"nccc_pan\":\"" + OPNQuery.pan + "\",\"nccc_bankname\":\"" + OPNQuery.bankname + "\"}";
                         break;
                     case 23://退貨
                         _orderReturnStatus = new OrderReturnStatusMgr(mySqlConnectionString);
-                        OrderMaster om = _orderReturnStatus.GetOrderInfo( Convert.ToUInt32(related_id));
+                        OrderMaster om = _orderReturnStatus.GetOrderInfo(Convert.ToUInt32(related_id));
                         json = "{success:true,\"orc_name\":\"" + om.Delivery_Name + "\",\"orc_phone\":\"" + om.Delivery_Mobile + "\",\"orc_address\":\"" + om.Delivery_Address + "\"}";
                         break;
 

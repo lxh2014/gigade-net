@@ -75,11 +75,11 @@ namespace BLL.gigade.Dao
                 DateTime dt = DateTime.Parse("1970-01-02 08:00:00");
                 if (!string.IsNullOrEmpty(m.starttime.ToString()) && dt < m.starttime)
                 {
-                    sqlwhere.AppendFormat(" and ip.create_dtim>'{0}' ", CommonFunction.DateTimeToString(m.starttime));
+                    sqlwhere.AppendFormat(" and ip.create_dtim>='{0}' ", m.starttime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(m.endtime.ToString()) && dt < m.endtime)
                 {
-                    sqlwhere.AppendFormat(" and ip.create_dtim<'{0}' ", CommonFunction.DateTimeToString(m.endtime));
+                    sqlwhere.AppendFormat(" and ip.create_dtim<='{0}' ", m.endtime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 //DateTime dt = DateTime.MinValue;
                 //if (!string.IsNullOrEmpty(m.starttime.ToString()) && m.starttime>dt)
@@ -622,11 +622,11 @@ LEFT  join vendor_brand v on p.brand_id=v.brand_id  ");
                 DateTime dt = DateTime.Parse("1970-01-02 08:00:00");
                 if (!string.IsNullOrEmpty(iplas.starttime.ToString()) && dt < iplas.starttime)
                 {
-                    sql.AppendFormat(" and ip.create_dtim>'{0}' ", CommonFunction.DateTimeToString(iplas.starttime));
+                    sql.AppendFormat(" and ip.create_dtim>='{0}' ",iplas.starttime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(iplas.endtime.ToString()) && dt < iplas.endtime)
                 {
-                    sql.AppendFormat(" and ip.create_dtim<'{0}' ", CommonFunction.DateTimeToString(iplas.endtime));
+                    sql.AppendFormat(" and ip.create_dtim<='{0}' ", iplas.endtime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 //if (!string.IsNullOrEmpty(iplas.searchcontent))
                 //{

@@ -293,6 +293,7 @@ namespace Admin.gigade.Controllers
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 //listUser是准备转换的对象
+
                 foreach (var item in store)
                 {
 
@@ -316,19 +317,23 @@ namespace Admin.gigade.Controllers
                     {
                         item.user_email = item.user_email.Split('@')[0] + "@***";
                     }
+                    //if (!string.IsNullOrEmpty(item.user_phone))
+                    //{
+                    //    if (item.user_phone.ToString().Length > 3)
+                    //    {
+                    //        item.user_phone = item.user_phone.Substring(0, 3) + "***";
+                    //    }
+                    //    else
+                    //    {
+                    //        item.user_phone = item.user_phone + "***";
+                    //    }
+                    //}
                     if (!string.IsNullOrEmpty(item.user_mobile))
                     {
-                        if (item.user_phone.ToString().Length > 3)
+                        if (item.user_mobile.ToString().Length == 48)
                         {
-                            item.user_phone = item.user_phone.Substring(0, 3) + "***";
+                            item.user_mobile = EncryptComputer.EncryptDecryptTextByApi(item.user_mobile, false);
                         }
-                        else
-                        {
-                            item.user_phone = item.user_phone + "***";
-                        }
-                    }
-                    if (!string.IsNullOrEmpty(item.user_mobile))
-                    {
                         if (item.user_mobile.ToString().Length > 3)
                         {
                             item.user_mobile = item.user_mobile.Substring(0, 3) + "***";
@@ -337,6 +342,7 @@ namespace Admin.gigade.Controllers
                         {
                             item.user_mobile = item.user_mobile + "***";
                         }
+
                     }
                     if (item.user_address.ToString().Length > 3)
                     {
@@ -539,20 +545,33 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["tel"]))
                 {
-                    user.user_mobile = Request.Params["tel"].ToString();
-                    if (user.user_mobile.Length < 10 || user.user_mobile.Substring(0, 2).ToString() != "09")
+                    if (!CommonFunction.isMobile(Request.Params["tel"].ToString()))
                     {
-                        for (int i = user.user_mobile.Length; i < 10; i++)
-                        {
-                            user.user_mobile = "0" + user.user_mobile;
-                        }
+                        jsonStr = "{success:false,msg:0}";
+                        this.Response.Clear();
+                        this.Response.Write(jsonStr.ToString());
+                        this.Response.End();
+                        return this.Response;
                     }
+                    else
+                    {
+                        //user.user_mobile = EncryptComputer.EncryptDecryptTextByApi(Request.Params["tel"].ToString());
+                        user.user_mobile = Request.Params["tel"].ToString();
+                    }
+                    //if (user.user_mobile.Length < 10 || user.user_mobile.Substring(0, 2).ToString() != "09")
+                    //{
+                    //    for (int i = user.user_mobile.Length; i < 10; i++)
+                    //    {
+                    //        user.user_mobile = "0" + user.user_mobile;
+                    //    }
+                    //}
                 }
                 else
                 {
                     user.user_mobile = "";
                 }
-                user.user_email = user.user_mobile + "@user.gigade.com.tw";
+
+                user.user_email = Request.Params["tel"] + "@user.gigade.com.tw";
                 #region 獲取生日的年月日
                 try
                 {
@@ -842,7 +861,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Params["user_id"]))
                 {
-                    query.user_id = uint.Parse(Request.Params["user_id"]); 
+                    query.user_id = uint.Parse(Request.Params["user_id"]);
                 }
 
                 usersMgr = new UsersMgr(mySqlConnectionString);
@@ -867,7 +886,7 @@ namespace Admin.gigade.Controllers
                     //獲取客單價的上限
                     decimal s = item.sum_amount / item.cou;
                     int sint = Convert.ToInt32(s);
-                    item.aver_amount = s > sint ? sint + 1 : sint;                  
+                    item.aver_amount = s > sint ? sint + 1 : sint;
                     //獲取時間
                     item.reg_date = CommonFunction.GetNetTime(item.user_reg_date);
                     item.create_date = CommonFunction.GetNetTime(item.order_createdate);
@@ -904,7 +923,7 @@ namespace Admin.gigade.Controllers
             UserVipListQuery query = new UserVipListQuery();
             List<UserVipListQuery> stores = new List<UserVipListQuery>();
             try
-            {              
+            {
                 if (!string.IsNullOrEmpty(Request.Params["dateOne"]))
                 {
                     query.create_dateOne = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["dateOne"]).ToString("yyyy-MM-dd HH:mm:ss"));
@@ -922,7 +941,7 @@ namespace Admin.gigade.Controllers
                 query.IsPage = false;
                 zMgr = new ZipMgr(mySqlConnectionString);
                 usersMgr = new UsersMgr(mySqlConnectionString);
-                stores = usersMgr.ExportVipListCsv(query,ref totalCount );
+                stores = usersMgr.ExportVipListCsv(query, ref totalCount);
                 DataTable _vipdt = usersMgr.IsVipUserId(0);
                 DataTable newDt = new DataTable();
                 newDt.Columns.Add("user_id", typeof(string));
@@ -958,13 +977,13 @@ namespace Admin.gigade.Controllers
                     switch (stores[i].user_status)
                     {
                         case 0: newRow["user_status"] = "未啟用";
-                                break;
+                            break;
                         case 1: newRow["user_status"] = "已啟用";
-                                break;
+                            break;
                         case 2: newRow["user_status"] = "停用";
-                                break;
+                            break;
                         case 5: newRow["user_status"] = "簡易會員";
-                                break;
+                            break;
                     }
                     newRow["user_name"] = stores[i].user_name;
                     newRow["user_gender"] = stores[i].user_gender == 0 ? "小姐" : "先生";
@@ -1020,7 +1039,7 @@ namespace Admin.gigade.Controllers
                     newDt.Rows.Add(newRow);
                 }
                 // string[] columnName = { "編號", "會員狀態", "姓名", "性別", "VIP", "電子郵件", "年齡", "生日月份", "居住區", "註冊時間", "最近歸檔日", "最近購買日", "購買金額", "購買次數", "客單價", "購物金使用", "常溫商品總額", "常溫商品運費", "低溫商品總額", "低溫商品運費", "中信折抵", "HG折抵", "台新折抵" };
-                string[] columnName = { "會員編號", "會員狀態", "姓名", "性別", "VIP", "年齡", "生日月份", "註冊時間", "最近歸檔日", "最近購買日", "購買金額", "購買次數", "客單價", "購物金使用", "常溫商品總額", "常溫商品運費", "低溫商品總額", "低溫商品運費", "中信折抵", "HG折抵", "台新折抵", "會員等級"};//, "近期累積金額" };
+                string[] columnName = { "會員編號", "會員狀態", "姓名", "性別", "VIP", "年齡", "生日月份", "註冊時間", "最近歸檔日", "最近購買日", "購買金額", "購買次數", "客單價", "購物金使用", "常溫商品總額", "常溫商品運費", "低溫商品總額", "低溫商品運費", "中信折抵", "HG折抵", "台新折抵", "會員等級" };//, "近期累積金額" };
 
                 string fileName = "Vip_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
                 string newFileName = Server.MapPath(excelPath) + fileName;
@@ -1460,6 +1479,12 @@ namespace Admin.gigade.Controllers
                     {
                         item.reg_date = CommonFunction.GetNetTime(0);
                     }
+                    if (!string.IsNullOrEmpty(item.user_name))
+                    {
+                        item.user_name = item.user_name.Substring(0, 1) + "**";
+                    }
+                    item.vuser_email = item.vuser_email.Split('@')[0] + "@***";
+                    item.user_email = item.user_email.Split('@')[0] + "@***";
                 }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
@@ -1932,19 +1957,20 @@ namespace Admin.gigade.Controllers
                             item.user_name = item.user_name.Substring(0, 1) + "**";
                         }
                         item.user_email = item.user_email.Split('@')[0] + "@***";
+                        //if (!string.IsNullOrEmpty(item.user_mobile))
+                        //{
+                        //    if (item.user_phone.ToString().Length > 3)
+                        //    {
+                        //        item.user_phone = item.user_phone.Substring(0, 3) + "***";
+                        //    }
+                        //    else
+                        //    {
+                        //        item.user_phone = item.user_phone + "***";
+                        //    }
+                        //}
                         if (!string.IsNullOrEmpty(item.user_mobile))
                         {
-                            if (item.user_phone.ToString().Length > 3)
-                            {
-                                item.user_phone = item.user_phone.Substring(0, 3) + "***";
-                            }
-                            else
-                            {
-                                item.user_phone = item.user_phone + "***";
-                            }
-                        }
-                        if (!string.IsNullOrEmpty(item.user_mobile))
-                        {
+                            item.user_mobile = UnSecretMobile(item);
                             if (item.user_mobile.ToString().Length > 3)
                             {
                                 item.user_mobile = item.user_mobile.Substring(0, 3) + "***";
@@ -1953,6 +1979,7 @@ namespace Admin.gigade.Controllers
                             {
                                 item.user_mobile = item.user_mobile + "***";
                             }
+
                         }
                         if (item.user_address.ToString().Length > 3)
                         {
@@ -1961,6 +1988,13 @@ namespace Admin.gigade.Controllers
                         else
                         {
                             item.user_address = item.user_address + "***";
+                        }
+                    }
+                    else
+                    {
+                        if (item.user_mobile.Length == 48)
+                        {
+                            item.user_mobile = EncryptComputer.EncryptDecryptTextByApi(item.user_mobile, false);
                         }
                     }
                     //獲取時間
@@ -2158,13 +2192,14 @@ namespace Admin.gigade.Controllers
                 {
                     user.user_gender = Convert.ToUInt32(Request.Params["user_gender"]);
                 }
-                if (!string.IsNullOrEmpty(Request.Params["user_phone"]))
-                {
-                    user.user_phone = Request.Params["user_phone"].ToString();
-                }
+                //if (!string.IsNullOrEmpty(Request.Params["user_phone"]))
+                //{
+                //    user.user_phone = Request.Params["user_phone"].ToString();
+                //}
                 if (!string.IsNullOrEmpty(Request.Params["user_mobile"]))
                 {
-                    user.user_mobile = Request.Params["user_mobile"].ToString();
+                     user.user_mobile = Request.Params["user_mobile"].ToString();
+                   // user.user_mobile = EncryptComputer.EncryptDecryptTextByApi(Request.Params["user_mobile"].ToString());
                 }
                 if (!string.IsNullOrEmpty(Request.Params["my_birthday"]))
                 {
@@ -2433,6 +2468,10 @@ namespace Admin.gigade.Controllers
                     query.user_id = uint32;
                 }
                 bool status = true;
+                if (!string.IsNullOrEmpty(Request.Params["relation_id"]))//待回覆
+                {
+                    query.master_id = Convert.ToUInt32(Request.Params["relation_id"]);
+                }
                 if (bool.TryParse(Request.Params["use"], out status))
                 {
                     query.use = status;
@@ -2461,7 +2500,7 @@ namespace Admin.gigade.Controllers
                 DateTime dt;
                 if (DateTime.TryParse(Request.Params["timestart"], out dt))
                 {
-                    query.smaster_start =Convert.ToDateTime(dt.ToString("yyyy-MM-dd HH:mm:ss"));
+                    query.smaster_start = Convert.ToDateTime(dt.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (DateTime.TryParse(Request.Params["timeend"], out dt))
                 {
@@ -2486,11 +2525,14 @@ namespace Admin.gigade.Controllers
                     item.smaster_end = CommonFunction.GetNetTime(item.master_end);
                     item.smaster_createtime = CommonFunction.GetNetTime(item.master_createdate);
                     item.now_time = Convert.ToInt32(CommonFunction.GetPHPTime());
-                    if (!string.IsNullOrEmpty(item.user_name))
+                    if (Convert.ToBoolean(Request.Params["isSecret"]))
                     {
-                        item.user_name = item.user_name.Substring(0, 1) + "**";
+                        if (!string.IsNullOrEmpty(item.user_name))
+                        {
+                            item.user_name = item.user_name.Substring(0, 1) + "**";
+                        }
+                        item.user_email = item.user_email.Split('@')[0] + "@***";
                     }
-                    item.user_email = item.user_email.Split('@')[0] + "@***";
                 }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
@@ -2945,5 +2987,35 @@ namespace Admin.gigade.Controllers
         }
 
         #endregion
+
+
+        public string UnSecretMobile(UsersListQuery item)
+        {
+            if (!CommonFunction.isMobile(item.user_mobile))
+            {
+                if (item.user_mobile.ToString().Length == 48)
+                {
+                    item.user_mobile = EncryptComputer.EncryptDecryptTextByApi(item.user_mobile, false);
+                    if (!CommonFunction.isMobile(item.user_mobile))
+                    {
+                        //異常記錄
+                        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                        logMessage.Content = string.Format("表名:{0},編號:{1},行動電話:{2},Message:{3}", "users", item.user_id, item.user_mobile, "行動電話解密后不滿足正則表達式");
+                        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                        log.Error(logMessage);
+                    }
+                }
+                else
+                {
+                    //異常記錄
+                    Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                    logMessage.Content = string.Format("表名:{0},編號:{1},行動電話:{2},Message:{3}", "users", item.user_id, item.user_mobile, "行動電話錯誤");
+                    logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                    log.Error(logMessage);
+                }
+
+            }
+            return item.user_mobile;
+        }
     }
 }

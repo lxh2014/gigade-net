@@ -19,5 +19,6 @@ namespace BLL.gigade.Dao.Impl
         bool GetIpodfreight(string po_id, int freight);
         BLL.gigade.Model.ProductItem GetStockHistorySql(IpodQuery query, out string Stock);
         BLL.gigade.Model.Product GetIgnoreHistorySql(IpodQuery query, out string Shortage);
+        string GetInsertIpoNvdSql(IpoNvdQuery query);
     }
 }

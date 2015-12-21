@@ -400,6 +400,41 @@ namespace BLL.gigade.Mgr
                 throw new Exception("ProductItemMgr->GetWaitLiaoWeiList" + ex.Message);
             }
         }
+        public int GetATMStock(ProductItemQuery query) 
+        {
+            try
+            {
+                return _productItemDao.GetATMStock(query);
+            }
+            catch (Exception ex)
+            {
+               throw new Exception("ProductItemMgr->GetATMStock" + ex.Message);
+            }
+        }
+        public List<ProductItemQuery> GetProdItemByERp(ProductItemQuery query)
+        {
+            try
+            {
+                return _productItemDao.GetProdItemByERp(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemMgr->GetProdItemByERp" + ex.Message);
+            }
+           
+        }
+        public int UpdateStockAsErpId(ProductItemQuery query)
+        {
+            try
+            {
+                return _productItemDao.UpdateStockAsErpId(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemMgr->UpdateStockAsErpId" + ex.Message);
+            }
+        
+        }
 
     }
 }

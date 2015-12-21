@@ -80,11 +80,11 @@ namespace BLL.gigade.Dao
                 DateTime dt = DateTime.Parse("1970-01-02 08:00:00");
                 if (!string.IsNullOrEmpty(ivd.starttime.ToString()) && dt < ivd.starttime)
                 {
-                    sbwhere.AppendFormat(" and ii.create_dtim>'{0}' ", CommonFunction.DateTimeToString(ivd.starttime));
+                    sbwhere.AppendFormat(" and ii.create_dtim>='{0}' ", CommonFunction.DateTimeToString(ivd.starttime));
                 }
                 if (!string.IsNullOrEmpty(ivd.endtime.ToString()) && dt < ivd.endtime)
                 {
-                    sbwhere.AppendFormat(" and ii.create_dtim<'{0}' ", CommonFunction.DateTimeToString(ivd.endtime));
+                    sbwhere.AppendFormat(" and ii.create_dtim<='{0}' ", CommonFunction.DateTimeToString(ivd.endtime));
                 }
                 //if (!string.IsNullOrEmpty(ivd.serchcontent))
                 //{
@@ -1701,6 +1701,54 @@ ORDER BY loc.loc_id,loc.row_id DESC  ", sbWhere.ToString(), sbjoin.ToString());/
             }
         }
 
+        #endregion
+
+        #region 收貨上架獲取更新iinvd表的SQL
+        public string UpdateIinvdSql(IinvdQuery query,out string ista_id)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder sql_result = new StringBuilder();
+            try
+            {
+                ista_id = string.Empty;
+                sql.AppendFormat(@" select i.row_id,i.prod_qty,i.ista_id from iinvd i LEFT JOIN product_ext pe ON i.item_id = pe.item_id WHERE made_date='{0}' and cde_dt='{1}' and i.item_id='{2}' ", query.made_date.ToString("yyyy-MM-dd"), query.cde_dt.ToString("yyyy-MM-dd"), query.item_id);
+                if (query.pwy_dte_ctl == "Y")
+                {
+                    sql.AppendFormat(@" and pwy_dte_ctl='{0}' ;",query.pwy_dte_ctl);
+                }
+                else if (query.pwy_dte_ctl == "N")
+                {
+                    sql.AppendFormat(@" and ( pwy_dte_ctl ='{0}' or pwy_dte_ctl is NULL ) ;", "N");
+                }
+                DataTable _dt = _access.getDataTable(sql.ToString());
+                if (_dt.Rows.Count > 0)
+                {
+                    int row_id = Convert.ToInt32(_dt.Rows[0]["row_id"]);
+                    int prod_qty = Convert.ToInt32(_dt.Rows[0]["prod_qty"]);
+                    sql_result.AppendFormat(@"update iinvd set prod_qty='{0}' where row_id='{1}';", query.prod_qty + prod_qty, row_id);
+                    if (_dt.Rows[0]["ista_id"].ToString() == "H")
+                    {
+                        ista_id = "H";//該情況下不修改料位帳卡；
+                    }
+                }
+                else
+                {
+                    sql_result.AppendFormat(@"
+INSERT INTO `iinvd` (`lic_plt_id`, `dc_id`, `whse_id`, `po_id`, `plas_id`, `prod_qty`, `rcpt_id`, `lot_no`, `hgt_used`, `create_user`,");
+                    sql_result.AppendFormat(@"`create_dtim`, `change_user`, `change_dtim`, `cde_dt`, `ista_id`, `receipt_dtim`, `stor_ti`, `stor_hi`, `inv_pos_cat`, `plas_loc_id`,");
+                    sql_result.AppendFormat(@"`item_id`, `plas_prdd_id`, `made_date`, `qity_id`, `st_qty`) VALUES (");
+                    sql_result.AppendFormat(@"'{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}',", query.lic_plt_id, query.dc_id, query.whse_id, query.po_id, query.plas_id, query.prod_qty, query.rcpt_id, query.lot_no, query.hgt_used, query.create_user);
+                    sql_result.AppendFormat(@"'{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}',", CommonFunction.DateTimeToString(DateTime.Now), query.change_user, CommonFunction.DateTimeToString(DateTime.Now), CommonFunction.DateTimeToString(query.cde_dt), query.ista_id, CommonFunction.DateTimeToString(query.receipt_dtim), query.stor_ti, query.stor_hi, query.inv_pos_cat, query.plas_loc_id);
+                    sql_result.AppendFormat(@"'{0}', '{1}', '{2}', '{3}', '{4}'); ", query.item_id, query.plas_prdd_id,CommonFunction.DateTimeToString(query.made_date), query.qity_id, query.st_qty);
+
+                }
+                return sql_result.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IinvdDao-->UpdateIinvdSql-->" + ex.Message + sql.ToString(), ex);
+            }
+        } 
         #endregion
 
     }

@@ -80,16 +80,17 @@ namespace BLL.gigade.Dao
                         }
                         else if (store.serchtype.ToString() == "3")
                         {
+                            store.content = EncryptComputer.EncryptDecryptTextByApi(store.content.Trim());
                             sqlfrom.AppendFormat(" and user_mobile like '%{0}%' ", store.content.Trim());
                         }
                         else if (store.serchtype.ToString() == "4")
                         {
                             sqlfrom.AppendFormat(" and users.user_id like '%{0}%' ", store.content.Trim());
                         }
-                        else if (store.serchtype.ToString() == "5")
-                        {
-                            sqlfrom.AppendFormat(" and user_phone like '%{0}%' ", store.content.Trim());
-                        }
+                        //else if (store.serchtype.ToString() == "5")
+                        //{
+                        //    sqlfrom.AppendFormat(" and user_phone like '%{0}%' ", store.content.Trim());
+                        //}
                         else if (store.serchtype.ToString() == "6")
                         {
                             sqlfrom.AppendFormat(" and user_address like '%{0}%' ", store.content.Trim());
@@ -230,6 +231,10 @@ namespace BLL.gigade.Dao
                 sql.Append(@"SELECT	bm.master_id,bm.user_id,bm.master_total,bm.master_balance,bm.master_start,bm.master_end,bm.master_createdate,bm.bonus_type,bm.master_note,us.user_name,us.user_email,bt.type_admin_link,bt.type_description");
                 sqlcount.Append("SELECT	count(bm.master_id) AS search_total ");
                 sqlfrom.Append(" FROM bonus_master bm left join bonus_type bt on bm.type_id=bt.type_id left join users us on bm.user_id=us.user_id  where 1=1 ");
+                if (query.master_id != 0)
+                {
+                    sqlfrom.AppendFormat(" and  bm.master_id='{0}' ", query.master_id);
+                }
                 if (query.user_id != 0)
                 {
                     sqlfrom.AppendFormat(" and  bm.user_id='{0}' ", query.user_id);
@@ -381,6 +386,7 @@ namespace BLL.gigade.Dao
                     }
                     else if (store.serchtype.ToString() == "3")
                     {
+                        store.content = EncryptComputer.EncryptDecryptTextByApi(store.content.Trim());
                         sqlfrom.AppendFormat(" and user_mobile like '%{0}%' ", store.content.Trim());
                     }
                     else if (store.serchtype.ToString() == "4")
