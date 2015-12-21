@@ -390,48 +390,28 @@ namespace BLL.gigade.Dao
             //sbSqlCondition.Append(" (SELECT pc.product_id from product pc INNER JOIN product_combo pcm on pcm.child_id=pc.product_id  INNER JOIN product pm on pm.product_id=pcm.parent_id where pm.product_status =5)))  "); 
             #endregion
 
-            sbSqlColumn.Append("select vendor_id,spec_title_2,spec_title_1,''as loc_id,'' as cde_dt,''as made_date,'' as pwy_dte_ctl,''as cde_dt_incr,v_product_onsale.product_id,v_product_onsale.product_name,(select max(create_time) from item_ipo_create_log where item_id=sum_biao.item_id ) as create_datetime, sale_status ,'' as sale_name,product_mode ,'' as product_mode_name, prepaid,erp_id,sum_biao.item_id,item_stock, item_alarm,safe_stock_amount,  ");
+            sbSqlColumn.Append("select vendor_id,CONCAT_WS(':',spec_title_2,ps2.spec_name) as spec_title_2 ,CONCAT_WS(':',spec_title_1,ps1.spec_name) as spec_title_1,''as loc_id,'' as cde_dt,''as made_date,'' as pwy_dte_ctl,''as cde_dt_incr,v_product_onsale.product_id,v_product_onsale.product_name,(select max(create_time) from item_ipo_create_log where item_id=v_product_onsale.item_id ) as create_datetime, sale_status ,'' as sale_name,product_mode ,'' as product_mode_name, prepaid,erp_id,v_product_onsale.item_id,item_stock, item_alarm,safe_stock_amount,  ");
             sbSqlColumn.Append(" '' as item_money,'' as item_cost,sum_biao.sum_total, subTtotal.iinvd_stock,v_product_onsale.product_start,v_product_onsale.product_end, min_purchase_amount,vendor_name_simple,vendor_name_full, procurement_days,product_status,'' as product_status_string, ");
-            sbSqlColumn.Append(" spec_id_1 ,spec_id_2,''as NoticeGoods ");
+            sbSqlColumn.Append(" spec_id_1 ,spec_id_2,''as NoticeGoods,ipod.ipo_qty ");
 
-            sbSqlTable.Append(" from (SELECT  od.item_id,sum( case dt1.item_mode when 0 then dt1.buy_num when  2 then dt1.buy_num*dt1.parent_num end ) as sum_total from order_master om INNER JOIN order_slave os USING(order_id)INNER JOIN order_detail od USING(slave_id)  ");
+
+
+            sbSqlTable.Append(" from v_product_onsale left join (SELECT  od.item_id, sum( case dt1.item_mode when 0 then dt1.buy_num when  2 then dt1.buy_num*dt1.parent_num end ) as sum_total from order_master om ");
+            sbSqlTable.Append("INNER JOIN order_slave os USING(order_id)INNER JOIN order_detail od USING(slave_id)  ");
             sbSqlTable.AppendFormat(" left join order_detail dt1 on dt1.detail_id=od.detail_id and dt1.detail_status=4 where FROM_UNIXTIME( om.order_createdate)>='{0}' and od.item_mode in (0,2) GROUP BY od.item_id) sum_biao ", sumdate);
-            sbSqlTable.Append(" INNER JOIN  v_product_onsale  on v_product_onsale.item_id=sum_biao.item_id ");
-            sbSqlTable.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=sum_biao.item_id ");
-
-            sbSqlTable.Append(" LEFT JOIN item_ipo_create_log iicl on iicl.item_id=sum_biao.item_id ");
+            sbSqlTable.Append(" on v_product_onsale.item_id=sum_biao.item_id ");
+           /* sbSqlTable.Append(" from (SELECT  od.item_id,sum( case dt1.item_mode when 0 then dt1.buy_num when  2 then dt1.buy_num*dt1.parent_num end ) as sum_total from order_master om INNER JOIN order_slave os USING(order_id)INNER JOIN order_detail od USING(slave_id)  ");
+            sbSqlTable.AppendFormat(" left join order_detail dt1 on dt1.detail_id=od.detail_id and dt1.detail_status=4 where FROM_UNIXTIME( om.order_createdate)>='{0}' and od.item_mode in (0,2) GROUP BY od.item_id) sum_biao ", sumdate);
+            sbSqlTable.Append(" INNER JOIN  v_product_onsale  on v_product_onsale.item_id=sum_biao.item_id ");*/
+            sbSqlTable.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=v_product_onsale.item_id ");
+            sbSqlTable.Append(" LEFT JOIN  (select sum(qty_ord)as ipo_qty,prod_id from ipod where plst_id='O' GROUP BY prod_id) as ipod on ipod.prod_id=v_product_onsale.item_id ");
+            sbSqlTable.Append(" LEFT JOIN item_ipo_create_log iicl on iicl.item_id=v_product_onsale.item_id ");
            // sbSqlTable.Append(" INNER join price_master pm on pm.product_id=v_product_onsale.product_id and pm.site_id=1 ");//and ((prepaid=1) or (prepaid=0 and product_mode=2))
+            
+            sbSqlTable.Append(" left join product_spec ps1 on ps1.spec_id=v_product_onsale.spec_id_1 ");
+            sbSqlTable.Append(" left join product_spec ps2 on ps2.spec_id=v_product_onsale.spec_id_2 ");
             sbSqlCondition.Append("  where 1=1 and ((prepaid=1) or (prepaid=0 and product_mode=2)) ");
-            #region 視圖
-            //sbSqlTable.AppendFormat(" from (select sum(buy_num) as sum_total ,item_id from v_product_order where FROM_UNIXTIME(order_createdate)>='{0}' group by item_id) sum_biao ", sumdate);
 
-            //sbSqlTable.Append(" INNER JOIN  v_product_onsale  on v_product_onsale.item_id=sum_biao.item_id ");
-            //sbSqlTable.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=sum_biao.item_id ");
-
-            //sbSqlTable.Append(" LEFT JOIN item_ipo_create_log iicl on iicl.item_id=sum_biao.item_id ");
-            //sbSqlTable.Append(" INNER join price_master pm on pm.product_id=v_product_onsale.product_id and pm.site_id=1 ");//and ((prepaid=1) or (prepaid=0 and product_mode=2))
-            //sbSqlCondition.Append("  where 1=1 and ((prepaid=1) or (prepaid=0 and product_mode=2)) ");
-            #endregion
-            //sbSqlColumn.Append("select v.vendor_id,p.spec_title_2,p.spec_title_1,p.product_id,p.product_name,(select max(create_time) from item_ipo_create_log where item_id=pi.item_id ) as create_datetime, p.sale_status ,'' as sale_name,p.product_mode ,'' as product_mode_name, p.prepaid,pi.erp_id,pi.item_id,pi.item_stock, pi.item_alarm,p.safe_stock_amount,  ");
-            //sbSqlColumn.Append("pm.price as item_money,pm.cost as item_cost,sum_biao.sum_total, subTtotal.iinvd_stock, p.min_purchase_amount,v.vendor_name_simple, v.procurement_days,p.product_status,'' as product_status_string, ");
-            //sbSqlColumn.Append("  pi.product_id,pi.spec_id_1 ,pi.spec_id_2,''as NoticeGoods ");
-            //sbSqlTable.Append(" from (SELECT  od.item_id,sum( case item_mode when 0 then od.buy_num when  2 then od.buy_num*od.parent_num end ) as sum_total from order_master om INNER JOIN order_slave os USING(order_id)INNER JOIN order_detail od USING(slave_id)  ");
-            //sbSqlTable.AppendFormat(" where FROM_UNIXTIME( om.order_createdate)>='{0}' and od.item_mode in (0,2) GROUP BY od.item_id) sum_biao ", sumdate);
-            //sbSqlTable.Append(" INNER join  product_item pi on sum_biao.item_id=pi.item_id");
-            //sbSqlTable.Append(" left join (select item_id,sum(prod_qty) as iinvd_stock  from iinvd where ista_id='A' GROUP BY item_id ) as subTtotal on subTtotal.item_id=pi.item_id ");
-            //sbSqlTable.Append(" INNER join product p on p.product_id=pi.product_id ");
-            //sbSqlTable.Append(" INNER JOIN vendor_brand vb on vb.brand_id=p.brand_id");
-            //sbSqlTable.Append(" INNER JOIN vendor v on v.vendor_id=vb.vendor_id ");
-            //sbSqlTable.Append(" LEFT JOIN item_ipo_create_log iicl on iicl.item_id=pi.item_id ");
-            //sbSqlTable.Append(" INNER join price_master pm on pm.product_id=p.product_id and pm.site_id=1 ");
-            //sbSqlTable.Append(" INNER join (SELECT pi.item_id,p.product_id from product_item pi INNER JOIN product p on p.product_id=pi.product_id ");
-            //sbSqlTable.Append(" where p.product_id>10000 and ((p.prepaid=1) or (p.prepaid=0 and p.product_mode=2))and( ");
-            //sbSqlTable.Append(" p.product_status=5 or( p.product_status <>5 and p.product_id in ");
-            //sbSqlTable.Append(" (SELECT pc.product_id from product pc INNER JOIN product_combo pcm on pcm.child_id=pc.product_id ");
-            //sbSqlTable.Append(" INNER JOIN product pm on pm.product_id=pcm.parent_id where pm.product_status =5)))) t_tb on t_tb.item_id=sum_biao.item_id ");
-           
-            //sbSqlCondition.Append(" WHERE  p.product_status =5  ");  //現在只要上架的
-            //sbSqlCondition.Append(" and ((p.prepaid=1) or (p.prepaid=0 and p.product_mode=2)) ");  //如果商品為買斷商品（product.prepaid=1）,則全部顯示.如果商品為非買斷商品（product.prepaid=0）,則只要寄倉的
 
             if (query.prepaid != -1)
             {
@@ -501,18 +481,18 @@ namespace BLL.gigade.Dao
                     //sbSqlCondition.Append(" and (pi.item_stock<pi.item_alarm) ");//庫存數量小於安全存量
                     //當前庫存量-供應商的採購天數*平均銷售數量(最小值為1))<=安全存量時,就需要採購
 
-                    sbSqlCondition.AppendFormat(" and v_product_onsale.item_stock-(v_product_onsale.procurement_days* sum_total/'{0}'*'{1}')<=v_product_onsale.item_alarm", query.sumDays, query.periodDays);
+                    sbSqlCondition.AppendFormat(" and v_product_onsale.item_stock-(v_product_onsale.procurement_days* IFNULL(sum_total,0)/'{0}'*'{1}')<=v_product_onsale.item_alarm", query.sumDays, query.periodDays);
                     break;
                 default:
                     break;
             }
-            sbSqlCondition.AppendFormat(" order by sum_biao.item_id desc ");
+            sbSqlCondition.AppendFormat(" order by v_product_onsale.item_id desc ");
             try
             {
 
                 if (query.IsPage)//
                 {
-                    DataTable dt = _dbAccess.getDataTable("select count(sum_biao.item_id) as totalCount  " + sbSqlTable.ToString() + sbSqlCondition.ToString());
+                    DataTable dt = _dbAccess.getDataTable("select count(v_product_onsale.item_id) as totalCount  " + sbSqlTable.ToString() + sbSqlCondition.ToString());
                     if (dt != null && dt.Rows.Count > 0)
                     {
                         TotalCount = Convert.ToInt32(dt.Rows[0]["totalCount"]);
@@ -533,6 +513,11 @@ namespace BLL.gigade.Dao
 //where 1=1 and iin.ista_id='A' order by cde_dt asc  
                 foreach (DataRow dr in dtResult.Rows)
                 {
+                    if (string.IsNullOrEmpty(dr["ipo_qty"].ToString()))
+                    {
+                        dr["ipo_qty"] = 0; 
+                    }
+
                     if (string.IsNullOrEmpty(dr["iinvd_stock"].ToString()))
                     {
                         dr["iinvd_stock"] = 0;
@@ -604,17 +589,17 @@ namespace BLL.gigade.Dao
                         dr["product_status_string"] = slist.parameterName;
                     }
 
-                    ProductSpec spec1 = _specDao.query(Convert.ToInt32(dr["spec_id_1"].ToString()));
-                    ProductSpec spec2 = _specDao.query(Convert.ToInt32(dr["spec_id_2"].ToString()));
-                    if (spec1 != null)
-                    {
-                        dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString())?"":dr["spec_title_1"]+":"+spec1.spec_name;
-                    }
-                    if (spec2 != null)
-                    {
-                        dr["spec_title_2"] = string.IsNullOrEmpty(dr["spec_title_2"].ToString()) ? "" : dr["spec_title_2"] +":"+ spec2.spec_name;
-                    }
-                    dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString()) ? "" : dr["spec_title_1"].ToString() +"  "+ dr["spec_title_2"];
+                    //ProductSpec spec1 = _specDao.query(Convert.ToInt32(dr["spec_id_1"].ToString()));
+                    //ProductSpec spec2 = _specDao.query(Convert.ToInt32(dr["spec_id_2"].ToString()));
+                    //if (spec1 != null)
+                    //{
+                    //    dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString())?"":dr["spec_title_1"]+":"+spec1.spec_name;
+                    //}
+                    //if (spec2 != null)
+                    //{
+                    //    dr["spec_title_2"] = string.IsNullOrEmpty(dr["spec_title_2"].ToString()) ? "" : dr["spec_title_2"] +":"+ spec2.spec_name;
+                    //}
+                    dr["spec_title_1"] = string.IsNullOrEmpty(dr["spec_title_1"].ToString()) ? dr["spec_title_2"] : dr["spec_title_1"].ToString() + "  " + dr["spec_title_2"];
                 }
                 return dtResult;
             }
@@ -1023,6 +1008,83 @@ namespace BLL.gigade.Dao
                 throw new Exception("ProductItemDao-->GetStatusListLowerShelf-->" + ex.Message + "", ex);
             }
         }
+
+        #region ERP庫存更新異常提醒排程
+        /// <summary>
+        /// ATM匯款未付款數量查詢
+        /// </summary>chaojie1124j 2015/12/16 10:05am
+        /// <param name="erp_id"></param>
+        /// <returns></returns>
+        public int GetATMStock(ProductItemQuery query)
+        {
+            StringBuilder str = new StringBuilder();
+            StringBuilder strCondi = new StringBuilder();
+            try
+            {
+                str.Append(" SELECT IFNULL(sum(case item_mode when 0 then buy_num when 2 then buy_num*parent_num end),0)as 'buynum' from order_detail od LEFT JOIN product_item pi USING(item_id) ");
+                strCondi.AppendFormat(" where 1=1 and od.detail_status=0 and  item_mode<>1 ");
+                if (!string.IsNullOrEmpty(query.Erp_Id))
+                {
+                    strCondi.AppendFormat(" and  pi.erp_id={0} ", query.Erp_Id);
+                }
+                return Convert.ToInt32(_access.getDataTable(str.ToString() + strCondi.ToString()).Rows[0]["buynum"]);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->GetATMStock-->" + ex.Message + str.ToString() + strCondi.ToString(), ex);
+            }
+        }
+        /// <summary>
+        /// 通過ERP編號，查看商品信息，然後確定是否修改。
+        /// chaojie1124j add by 2015/12/16 10:32am
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public List<ProductItemQuery> GetProdItemByERp(ProductItemQuery query)
+        {
+            StringBuilder str = new StringBuilder();
+            StringBuilder strCondi = new StringBuilder();
+            try
+            {
+                 str.AppendFormat("SELECT p.product_id,p.product_name,pi.item_id,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1 ");
+                 str.AppendFormat(" ,CONCAT(p.spec_title_2,' ',ps2.spec_name) as Spec_Name_2,pi.item_stock ");
+                str.AppendFormat("  from product_item pi ");
+                str.AppendFormat(" left JOIN product p on p.product_id=pi.product_id ");
+                str.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
+                str.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
+                strCondi.Append(" where 1=1 and  (p.product_mode=2 or p.prepaid=1) ");
+                if (!string.IsNullOrEmpty(query.Erp_Id))
+                {
+                    strCondi.AppendFormat(" and  pi.erp_id={0} ", query.Erp_Id);
+                }
+                return _access.getDataTableForObj<ProductItemQuery>(str.ToString() + strCondi.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->GetProdItemByERp-->" + ex.Message + str.ToString() + strCondi.ToString(), ex);
+            }
+        }
+        /// <summary>
+        /// 更改商品庫存，通過ERP編號
+        /// chaojie1124j add by 2015/12/16 10:32am
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public int UpdateStockAsErpId(ProductItemQuery query) 
+        {
+            StringBuilder str = new StringBuilder();
+            try
+            {
+                str.AppendFormat(" update product_item set item_stock={0} where erp_id={1} ", query.item_stock, query.Erp_Id);
+                return _access.execCommand(str.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->GetProdItemByERp-->" + ex.Message + str.ToString() ,ex);
+            }
+        }
+        #endregion
 
     }
 }

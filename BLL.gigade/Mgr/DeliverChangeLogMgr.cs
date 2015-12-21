@@ -142,6 +142,7 @@ namespace BLL.gigade.Mgr
             string hourNum = string.Empty;
             //bool IsSeparate = false;
             //bool IsDisplyName = true;
+            string isSendMailToGroup = string.Empty;
            
             try
             {            
@@ -194,7 +195,11 @@ namespace BLL.gigade.Mgr
                         {
                             hourNum = item.value;
                         }
-                    }                 
+                    }
+                    else if (item.parameterCode.Equals("isSendMailToGroup"))
+                    {
+                        isSendMailToGroup = item.value;
+                    }
                 }
                 if (hourNum.Trim() == string.Empty)
                 {
@@ -452,21 +457,28 @@ namespace BLL.gigade.Mgr
                             deliverDt_1.Columns.Remove("供應商編號");
                             deliverDt_1.Columns.Remove("供應商郵箱");
                             deliverDt_1.Columns.Remove("供應商名稱");
-                            string MailBody_1 = "<p>吉甲地市集【期望到貨日改變】通知信</p><p><font color=\"#00BB00\" >" + vendor_name_full + "</font>&nbsp&nbsp您好：</p>" +
+                            string MailBody_1 = "<p>吉甲地市集【期望到貨日改變】通知信</p><p><font color=\"#00BB00\" >" + vendor_name_full + "</font> 您好：</p>" +
                                 "<p>以下訂單已改變出貨單期望到貨日，訂單資訊如下。</p>" +                                    
                                 //"<p>============================================================</p>"+
                                             GetHtmlByDataTable(deliverDt_1) +
                                 //"<p>============================================================</p>"+
               "<p>訂單的相關資訊，請至<a href='http://vendor.gigade100.com' style='color:#3399ff;text-decoration: none;'>【後台管理】</a>中查詢。</p>"+
               "<p>※本信由系統寄出，請勿直接回覆！</p>"+
-              "有任何問題與建議，歡迎聯絡我們<a href='http://www.gigade100.com/contact_service.php' target='_blank'>&nbsp&nbsp<img src='http://www.gigade100.com/images/send_mail.jpg'></a>" +
+              "有任何問題與建議，歡迎聯絡我們<a href='http://www.gigade100.com/contact_service.php' target='_blank'> <img src='http://www.gigade100.com/images/send_mail.jpg'></a>" +
               "<p>吉甲地市集<a href='http://www.gigade100.com/'>http://www.gigade100.com/</a></p>";
 
                             string MailTitle_1 = MailTitle;
                             //MailToAddress_1 = "zhaozhi0623j@gimg.tw";
                             BLL.gigade.Common.MailHelper mailHelper = new MailHelper(mailModel_1);
                             //public Boolean SendMailAction(string MailToAddress, string MailTitle, string MailBody)
-                            mailHelper.SendMailAction(MailToAddress_1, MailTitle_1, MailBody_1 + " ");//給單個供應商發送郵件
+                            try
+                            {
+                                mailHelper.SendMailAction(MailToAddress_1, MailTitle_1, MailBody_1 + " ");//給單個供應商發送郵件
+                            }
+                            catch (Exception)
+                            {
+                                continue;                               
+                            }
                         }                     
                     }
                     #endregion
@@ -474,18 +486,20 @@ namespace BLL.gigade.Mgr
 
                 #endregion
 
-
                 if (_dt.Rows.Count == 0)
                 {
-                    MailBody = "<br/><p><font size=\"4\">   出貨單期望日在前 <font color=\"#FF0000\" >" + Convert.ToDouble(hourNum) + "</font> 個小時之內沒有調整記錄!</font><p/>";
+                    //MailBody = "<br/><p><font size=\"4\">   出貨單期望日在前 <font color=\"#FF0000\" >" + Convert.ToDouble(hourNum) + "</font> 個小時之內沒有調整記錄!</font><p/>";
                 }
                 else
                 {
-                    MailBody = "<br/><font size=\"4\">出貨單期望到貨日在前 " + "<font color=\"#FF0000\" >" + Convert.ToDouble(hourNum) + "</font>" + " 個小時之內的調整記錄如下：</font><br/><p/>" + GetHtmlByDataTable(_dt);
+                    if (isSendMailToGroup.Trim() == "true")
+                    {
+                        MailBody = "<br/><font size=\"4\">出貨單期望到貨日在前 " + "<font color=\"#FF0000\" >" + Convert.ToDouble(hourNum) + "</font>" + " 個小時之內的調整記錄如下：</font><br/><p/>" + GetHtmlByDataTable(_dt);
+                        BLL.gigade.Common.MailHelper mail = new Common.MailHelper(mailModel);
+                        mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true); 
+                    }                
                 }
-
-                BLL.gigade.Common.MailHelper mail = new Common.MailHelper(mailModel);                
-                return mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true); 
+                return true;
             }
             catch (Exception ex)
             {

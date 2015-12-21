@@ -32,12 +32,29 @@ Query = function ()
         }
     });
 }
-function Tomorrow(days)
-{
+
+function Tomorrow() {
     var d;
+    var dt;
+    var s = "";
     d = new Date();                             // 创建 Date 对象。
-    d.setDate(d.getDate() - days);
-    return d;
+    s += d.getFullYear() + "/";                     // 获取年份。
+    s += (d.getMonth() + 1) + "/";              // 获取月份。
+    s += d.getDate();
+    dt = new Date(s);
+    dt.setDate(dt.getDate() + 1);
+    return dt;                  // 返回日期。
+}
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n >= 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }
 //登入錯誤類型
 var LoginTypeStore = Ext.create('Ext.data.Store', {
@@ -142,24 +159,25 @@ var frm = Ext.create('Ext.form.Panel', {
                     labelWidth: 60
                 },
                 {
-                    xtype: 'datefield',
+                    xtype: 'datetimefield',
                     id: 'start',
                     name: 'start',
                     margin: '0 5px 0 0',
-                    width: 110,
-                    format: 'Y-m-d',
+                    width: 150,
+                    format: 'Y-m-d H:i:s',
+                    time: { hour: 00, min: 00, sec: 00 },
                     editable: false,
-                    value: Tomorrow(1),
+                    value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
                     listeners: {
                         select: function ()
                         {
-                            var start = Ext.getCmp('start').getValue();
-                            var endDate = Ext.getCmp('end').getValue();
-                            if (start > endDate)
-                            {
-                                var stime = new Date(start);
-                                stime.setDate(stime.getDate() + 1);
-                                Ext.getCmp('end').setValue(Ext.Date.format(stime, 'Y-m-d'));
+                            var start = Ext.getCmp('start');
+                            var endDate = Ext.getCmp('end');
+                            if (endDate.getValue() == null) {
+                                endDate.setValue(setNextMonth(start.getValue(), 1));
+                            }
+                            else if (start.getValue() > endDate.getValue()) {
+                                endDate.setValue(setNextMonth(start.getValue(), 1));
                             }
                         }
                     }
@@ -170,24 +188,25 @@ var frm = Ext.create('Ext.form.Panel', {
                     margin: '0 5px'
                 },
                 {
-                    xtype: 'datefield',
+                    xtype: 'datetimefield',
                     id: 'end',
                     name: 'end',
                     margin: '0 5px',
-                    width: 110,
-                    format: 'Y-m-d',
+                    width: 150,
+                    format: 'Y-m-d  H:i:s',
+                    time: { hour: 23, min: 59, sec: 59 },
                     editable: false,
-                    value: new Date(),
+                    value: setNextMonth(Tomorrow(), 0),
                     listeners: {
                         select: function ()
                         {
-                            var start = Ext.getCmp('start').getValue();
-                            var endDate = Ext.getCmp('end').getValue();
-                            if (start > endDate)
-                            {
-                                var etime = new Date(endDate);
-                                etime.setDate(etime.getDate() - 1);
-                                Ext.getCmp('start').setValue(Ext.Date.format(etime, 'Y-m-d'));
+                            var start = Ext.getCmp('start');
+                            var endDate = Ext.getCmp('end');
+                            if (start.getValue() == null) {
+                                start.setValue(setNextMonth(endDate.getValue(), -1));
+                            }
+                            else if (endDate.getValue() < start.getValue()) {
+                                start.setValue(setNextMonth(endDate.getValue(), -1));
                             }
                         }
                     }
@@ -341,8 +360,8 @@ var frm = Ext.create('Ext.form.Panel', {
                                 Ext.getCmp('login_ipfrom').setValue("");
                                 Ext.getCmp('login_type').setValue(0);
                                 Ext.getCmp('sumtotal').setValue("");
-                                Ext.getCmp('start').setValue(Tomorrow(1));
-                                Ext.getCmp('end').setValue(new Date());
+                                Ext.getCmp('start').reset();
+                                Ext.getCmp('end').reset();
                                 Ext.getCmp('alls').setValue(true);
                                 Query();
                             }

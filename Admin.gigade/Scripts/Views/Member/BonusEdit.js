@@ -1,12 +1,27 @@
 ﻿
-editFunction = function (row, store) {
-    var bonus_type;
-    if (row.data.bonus_type == 1) {
+editFunction = function (rowID, store, bonustype) {
+    var row = null;
+    var bonus_type = "";
+    if (rowID != null) {
+        edit_BonusStore.load({
+            params: { relation_id: rowID },
+            callback: function () {
+                row = edit_BonusStore.getAt(0);
+
+                editWin.show();
+            }
+        });
+    }
+    else {
+        editWin.show();
+    }
+    if (bonustype == 1) {
         bonus_type = "購物金";
     }
     else {
         bonus_type = "抵用劵";
     }
+
     var editFrm = Ext.create('Ext.form.Panel', {
         id: 'editFrm',
         frame: true,
@@ -32,7 +47,7 @@ editFunction = function (row, store) {
             },
             {
                 xtype: 'displayfield',
-                fieldLabel: bonus_type+"編號",
+                fieldLabel: bonus_type + "編號",
                 id: 'master_id',
                 name: 'master_id',
                 allowBlank: false
@@ -88,7 +103,7 @@ editFunction = function (row, store) {
                         return;
                     }
                     if (parseInt(Ext.getCmp('master_total').getValue()) <= 0) {
-                        Ext.Msg.alert(INFORMATION, bonus_type+"金額錯誤");
+                        Ext.Msg.alert(INFORMATION, bonus_type + "金額錯誤");
                         return;
                     }
                     if (parseInt(Ext.getCmp('master_total').getValue()) > 9999) {
@@ -140,7 +155,7 @@ editFunction = function (row, store) {
     });
 
     var editWin = Ext.create('Ext.window.Window', {
-        title: row.data.bonus_type == "1" ? "修改購物金" : "修改抵用劵",
+        title: "修改" + bonus_type,
         id: 'editWin',
         iconCls: 'icon-user-edit',
         width: 400,
@@ -197,5 +212,5 @@ editFunction = function (row, store) {
             }
         }
     });
-    editWin.show();
+
 }

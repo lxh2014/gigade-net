@@ -358,7 +358,7 @@ var InventoryLeft = Ext.create('Ext.form.Panel', {
               ]
           },
         {
-            fieldLabel: "供應商編號/名稱",
+            fieldLabel: "供應商編號/簡稱",
             xtype: "textfield",
             id: 'vender',
             labelWidth: 110,
@@ -688,7 +688,7 @@ function InsertInventory()
                             sta_id:Ext.getCmp('cbStatus').getValue(),
                             jobStart: Ext.getCmp('IlocLeft').getValue(),
                             jobEnd: Ext.getCmp('IlocRight').getValue(),
-                            
+                            start: 0
                         }
                     });
                    // Ext.Msg.alert(INFORMATION, "1");

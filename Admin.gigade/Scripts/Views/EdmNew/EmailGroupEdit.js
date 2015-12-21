@@ -75,7 +75,7 @@
     });
 
     var editWin = Ext.create('Ext.window.Window', {
-        title: '電子報新增/編輯',
+        title: '信箱名單管理新增/編輯',
         iconCls: 'icon-user-edit',
         id: 'editWin',
         height:145,

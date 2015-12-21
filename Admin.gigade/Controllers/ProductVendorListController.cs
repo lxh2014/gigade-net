@@ -162,13 +162,14 @@ namespace Admin.gigade.Controllers
                 {
                     if (query.date_type != "apply_time")            //time 為整型
                     {
-                        query.time_start = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy/MM/dd 00:00:00")).ToString();
-                        query.time_end = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy/MM/dd 23:59:59")).ToString();
+                        //change by shiwei0620j 20151217 將00:00:00和23:59:59改為 HH:mm:ss
+                        query.time_start = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy/MM/dd HH:mm:ss")).ToString();
+                        query.time_end = CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy/MM/dd HH:mm:ss")).ToString();
                     }
                     else
                     {
-                        query.time_start = Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy/MM/dd 00:00:00");
-                        query.time_end = Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy/MM/dd 23:59:59");
+                        query.time_start = Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy/MM/dd HH:mm:ss");
+                        query.time_end = Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy/MM/dd HH:mm:ss");
                     }
                 }
 
@@ -621,11 +622,11 @@ namespace Admin.gigade.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request.Form["time_start"]))
                 {
-                    query.time_start = Convert.ToDateTime(Convert.ToDateTime(Request.Form["time_start"]).ToString("yyyy/MM/dd 00:00:00"));
+                    query.time_start = Convert.ToDateTime(Convert.ToDateTime(Request.Form["time_start"]).ToString("yyyy/MM/dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Form["time_end"]))
                 {
-                    query.time_end = Convert.ToDateTime(Convert.ToDateTime(Request.Form["time_end"]).ToString("yyyy/MM/dd 23:59:59"));
+                    query.time_end = Convert.ToDateTime(Convert.ToDateTime(Request.Form["time_end"]).ToString("yyyy/MM/dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Form["req_type"]))
                 {

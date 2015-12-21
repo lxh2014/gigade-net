@@ -247,11 +247,11 @@ namespace Admin.gigade.Controllers
 
                 if (!string.IsNullOrEmpty(Request.Params["start_time"]))//開始時間
                 {
-                    query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd 00:00:00"));
+                    query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["end_time"]))//結束時間
                 {
-                    query.end_time = (int)CommonFunction.GetPHPTime( Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd 23:59:59"));
+                    query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
               
 

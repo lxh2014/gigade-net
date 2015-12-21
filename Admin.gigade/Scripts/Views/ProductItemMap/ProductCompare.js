@@ -670,7 +670,7 @@ Ext.onReady(function () {
                             var uploadFile = Ext.getCmp("UPfile");
                             var combox = Ext.getCmp("channel");
                             if (combox.isValid() && uploadFile.isValid()) {
-                                uploadForm.submit({
+                                upEditloadForm.submit({  // edit by zhuoqin0830w  2015/12/17   原因：頁面顯示的from與修改之前所調用的from不一致，所以導致點擊匯入按鈕時沒有任何反應
                                     url: '/ProductItemMap/EditUpload',
                                     waitMsg: IMPORT_NOW,
                                     success: function (form, action) {

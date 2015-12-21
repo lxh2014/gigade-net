@@ -292,11 +292,13 @@ Ext.onReady(function () {
                 }
             },
             {
-                xtype: 'datefield',
+                xtype: 'datetimefield',
                 allowBlank: true,
                 id: 'timestart',
                 margin: "0 5 0 0",
                 name: 'serchcontent',
+                format: 'Y-m-d  H:i:s',
+                time: { hour: 00, min: 00, sec: 00 },
                 fieldLabel: '評價時間',
                 labelWidth: 60,
                 editable: false,
@@ -315,11 +317,13 @@ Ext.onReady(function () {
                 }
             },
             {
-                xtype: 'datefield',
+                xtype: 'datetimefield',
                 allowBlank: true,
                 id: 'timeend',
                 margin: "0 5 0 0",
                 name: 'serchcontent',
+                format: 'Y-m-d  H:i:s',
+                time: { hour: 23, min: 59, sec: 59 },
                 fieldLabel: '到',
                 labelWidth: 60,
                 editable: false,
@@ -633,14 +637,14 @@ Ext.onReady(function () {
                 var ddlSel = Ext.getCmp('ddlSel').getValue();
                 var brand_name = Ext.getCmp('brand_name').getValue();
                 var productName = Ext.getCmp('productName').getValue();
-                var timestart = null;
-                if (Ext.getCmp('timestart').getValue() != null) {
-                    timestart = new Date(Ext.getCmp('timestart').getValue()).toLocaleDateString();
-                }
-                var timeend = null;
-                if (Ext.getCmp('timeend').getValue() != null) {
-                    timeend = new Date(Ext.getCmp('timeend').getValue()).toLocaleDateString();
-                }
+                var timestart = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('timestart').getValue()), 'Y-m-d H:i:s'));
+                //if (Ext.getCmp('timestart').getValue() != null) {
+                //    timestart = new Date(Ext.getCmp('timestart').getValue()).toLocaleDateString();
+                //}
+                var timeend = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('timeend').getValue()), 'Y-m-d H:i:s'));
+                //if (Ext.getCmp('timeend').getValue() != null) {
+                //    timeend = new Date(Ext.getCmp('timeend').getValue()).toLocaleDateString();
+                //}
                 // var timeend = new Date(Ext.getCmp('timeend').getValue()).toLocaleDateString();
                 var shopClass = Ext.getCmp('shopClass').getValue();
                 var productId = Ext.getCmp('productId').getValue();

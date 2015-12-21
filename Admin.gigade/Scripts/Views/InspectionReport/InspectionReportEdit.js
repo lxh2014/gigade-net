@@ -312,6 +312,10 @@ editFunction = function (row, store) {
                                     }
                                     Ext.Msg.alert("提示信息", "排序重複 ！");
                                 }
+                                else if (action.result.msg == "5") {
+                                    myMask.hide();
+                                    Ext.Msg.alert("提示信息", "出現異常，請稍後重試！");
+                                }
                                 else {
                                     myMask.hide();
                                     Ext.Msg.alert("提示信息", action.result.msg);

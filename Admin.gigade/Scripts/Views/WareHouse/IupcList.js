@@ -133,10 +133,11 @@ Ext.onReady(function () {
             { xtype: 'button', text: "匯出Excel", id: 'exportExcel', icon: '../../../Content/img/icons/excel.gif', handler: ExportExcel },
             '->',
             {
-                xtype: 'datefield',
+                xtype: 'datetimefield',
                 margin: '0 0 0 10',
                 id: 'start_time',
-                format: 'Y-m-d',
+                format: 'Y-m-d H:i:s',
+                time: { hour: 00, min: 00, sec: 00 },
                 fieldLabel: "創建時間",
                 labelWidth: 70,
                 editable: false,
@@ -168,20 +169,19 @@ Ext.onReady(function () {
                 value: '~',
             },
             {
-                xtype: 'datefield',
+                xtype: 'datetimefield',
                 id: 'end_time',
-                format: 'Y-m-d',
+                format: 'Y-m-d  H:i:s',
+                time: { hour: 23, min: 59, sec: 59 },
                 editable: false,
                 listeners: {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("start_time");
-                        var end = Ext.getCmp("end_time");
-                        var s_date = new Date(start.getValue());
-                        var now_date = new Date(end.getValue());
+                        var end = Ext.getCmp("end_time");                       
                         if (start.getValue() != "" && start.getValue() != null) {
                             if (end.getValue() < start.getValue()) {
                                 Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間");
-                                end.setValue(setNextMonth(start.getValue(), 1));
+                                start.setValue(setNextMonth(end.getValue(), -1));
                             }
                             //else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
                             //    start.setValue(setNextMonth(end.getValue(), -1));

@@ -71,7 +71,6 @@ Ext.define('gigade.Fares', {
         { name: "user_reg_date", type: "string" }, //註冊日期
         { name: "adm_note", type: "string" }, //管理員備註
         { name: "mytype", type: "string" },
-        { name: "user_phone", type: "string" },
         { name: "user_mobile", type: "string" },
         { name: "u_user_name", type: "string" }
     //        ,
@@ -134,7 +133,6 @@ Ext.define('gigade.Users', {
         { name: "user_zip", type: "string" }, //用戶地址
         { name: "user_address", type: "string" }, //用戶地址
         { name: "user_mobile", type: "string" },
-        { name: "user_phone", type: "string" }, //行動電話
         { name: "reg_date", type: "string" }, //註冊日期 
         { name: "mytype", type: "string" },//會員類別
         { name: "send_sms_ad", type: "bool" }, //是否接收簡訊廣告 
