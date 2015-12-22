@@ -72,7 +72,7 @@ namespace BLL.gigade.Mgr
                 IpoNvdLogQuery invdLog = new IpoNvdLogQuery();
                 invdLog.work_id = query.work_id;
                 invdLog.ipo_id = query.ipo_id;
-                invdLog.item_id = (int)query.item_id;
+                invdLog.item_id = (uint)query.item_id;
                 invdLog.add_qty = pick_num;
                 invdLog.cde_date = query.cde_dt;
                 invdLog.made_date = query.made_date;
