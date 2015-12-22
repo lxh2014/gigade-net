@@ -707,7 +707,7 @@ function editFunction(row, store) {
                     colName: 'url_by',
                     name: 'url_by',
                     defaults: {
-                        name: 'url_by'
+                        name: 'btr'
                     },
                     columns: 2,
                     vertical: true,
@@ -1110,13 +1110,15 @@ function editFunction(row, store) {
                                     setTimeout(2000);
                                 }
                               
-                                Ext.Ajax.request({//-----
-                                    method: 'post',
-                                    url: '/PromoAdditionalPrice/PromoAdditionalPriceEdit',
+                                //Ext.Ajax.request({//-----
+                                //    method: 'post',
+                                //    url: '/PromoAdditionalPrice/PromoAdditionalPriceEdit',
+                                form.submit({
                                     params: {
                                         rowid: promoID,
                                         event_name: Ext.getCmp('event_name').getValue(),
                                         event_desc: Ext.getCmp('event_desc').getValue(),
+                                        url_by: Ext.htmlEncode(Ext.getCmp("url_by").getValue().btr),
                                         banner_url: Ext.htmlEncode(Ext.getCmp('banner_link_url').getValue()),
                                         banner: Ext.htmlEncode(Ext.getCmp('banner_image').getValue()),
                                         //group_id: Ext.htmlEncode(Ext.getCmp('groupname').getValue()),
@@ -1239,12 +1241,12 @@ function editFunction(row, store) {
                 else {
                     //Ext.getCmp('usr1').setValue(true);
                     //Ext.getCmp('usr2').setValue(false);
-                    if (row.data.group_name == "" || row.data.group_name == null) {
-                        Ext.getCmp('groupname').setValue("0");
-                    }
-                    else {
-                        Ext.getCmp('groupname').setValue(row.data.group_name);
-                    }
+                    //if (row.data.group_name == "" || row.data.group_name == null) {//當前js未找到id 為groupname的控件 changeby shiwei0620j 20151222
+                    //    Ext.getCmp('groupname').setValue("0");
+                    //}
+                    //else {
+                    //    Ext.getCmp('groupname').setValue(row.data.group_name);
+                    //}
                 }
                 var deli = row.data.deliver_type;
                 if (devi == 0) {
@@ -1275,6 +1277,7 @@ function editFunction(row, store) {
                     Ext.getCmp("CW1").setValue(false);
                     Ext.getCmp("LC1").setValue(true);
                 }
+           
                 if (row.data.url_by == 0) {
                     Ext.getCmp('btr1').setValue(false);
                     Ext.getCmp('btr2').setValue(true);
@@ -1293,8 +1296,10 @@ function editFunction(row, store) {
         }
     });
     if (row != null) {
+        //alert(row.data.url_by);
 
         Updwin.show();
+     
 
     } else {
 
