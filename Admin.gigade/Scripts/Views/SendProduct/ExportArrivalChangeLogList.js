@@ -215,8 +215,9 @@ Ext.onReady(function () {
                         margin: '0 5 0 0',
                     },                   
                     {
-                        xtype: 'datefield',
-                        format: 'Y-m-d',
+                        xtype: 'datetimefield',
+                        format: 'Y-m-d H:i:s',
+                        time: { hour: 00, min: 00, sec: 00 },//開始時間00：00：00
                         id: 'time_start',
                         name: 'time_start',
                         margin: '0 5 0 0',
@@ -245,8 +246,9 @@ Ext.onReady(function () {
                         value: '~&nbsp&nbsp'
                     },
                     {
-                        xtype: 'datefield',
-                        format: 'Y-m-d',
+                        xtype: 'datetimefield',
+                        format: 'Y-m-d H:i:s',
+                        time: { hour: 23, min: 59, sec: 59 },//標記結束時間23:59:59
                         id: 'time_end',
                         name: 'time_end',
                         margin: '0 5 0 0',

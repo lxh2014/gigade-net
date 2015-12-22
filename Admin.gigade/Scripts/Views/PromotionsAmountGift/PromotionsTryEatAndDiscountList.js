@@ -131,7 +131,7 @@ Ext.onReady(function () {
             },
             {
                 xtype: 'datetimefield', margin: '0 5 3 0', allowBlank: true, id: 'timestart', name: 'serchcontent', fieldLabel: PROMOSSTARTTIME, labelWidth: 100,
-                editable: false,
+                editable: false, format: 'Y-m-d H:i:s',
                 time: { hour: 00, min: 00, sec: 00 },//開始時間00：00：00
                 listeners: {
                     select: function () {
@@ -143,10 +143,10 @@ Ext.onReady(function () {
                             Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
                             end.setValue(setNextMonth(start.getValue(), 1));
                         }
-                        else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                            // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
-                            end.setValue(setNextMonth(start.getValue(), 1));
-                        }
+                        //else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
+                        //    // Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                        //    end.setValue(setNextMonth(start.getValue(), 1));
+                        //}
                     },
                     specialkey: function (field, e) {
                         if (e.getKey() == e.ENTER) {
@@ -164,6 +164,7 @@ Ext.onReady(function () {
             {
                 xtype: 'datetimefield', allowBlank: true, id: 'timeend', name: 'serchcontent', editable: false,
                 time: { hour: 23, min: 59, sec: 59 },//標記結束時間23:59:59
+                format: 'Y-m-d H:i:s',
                 listeners: {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("timestart");
@@ -173,11 +174,11 @@ Ext.onReady(function () {
                         if (start.getValue() != "" && start.getValue() != null) {
                             if (end.getValue() < start.getValue()) {
                                 Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間");
-                                end.setValue(setNextMonth(start.getValue(), 1));
-                            } else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
-                                //Ext.Msg.alert(INFORMATION, DATE_LIMIT);
                                 start.setValue(setNextMonth(end.getValue(), -1));
-                            }
+                            }// else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
+                            //    //Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                            //    start.setValue(setNextMonth(end.getValue(), -1));
+                            //}
 
                         } else {
                             start.setValue(setNextMonth(end.getValue(), -1));

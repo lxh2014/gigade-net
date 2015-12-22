@@ -551,20 +551,28 @@ namespace Admin.gigade.Controllers
                 query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");//用於分頁的變量
                 if (!string.IsNullOrEmpty(Request.Form["msg_start_first"]))//判斷分類一是否為空
                 {
-                    query.msg_start_first = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_start_first"]).ToString());
+                    //query.msg_start_first = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_start_first"]).ToString());
+                    //modify by jiaohe0625j
+                    query.msg_start_first = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["msg_start_first"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Form["msg_start_second"]))//判斷分類一是否為空
                 {
-                    query.msg_start_second = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_start_second"]).ToString()) + 86399;
+                    //query.msg_start_second = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_start_second"]).ToString()) + 86399;
                     //時間戳，86399表示時間是23時59分59秒，用於比較時間的大小進行查詢
+                    //modify by jiaohe0625j
+                    query.msg_start_second = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["msg_start_second"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Form["msg_end_first"]))//判斷分類一是否為空
                 {
-                    query.msg_end_first = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_end_first"]).ToString());
+                    //query.msg_end_first = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_end_first"]).ToString());
+                    //modify by jiaohe0625j
+                    query.msg_end_first = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["msg_end_first"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Form["msg_end_second"]))//判斷分類一是否為空
                 {
-                    query.msg_end_second = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_end_second"]).ToString()) + 86399;
+                    //query.msg_end_second = uint.Parse(CommonFunction.GetPHPTime(Request.Form["msg_end_second"]).ToString()) + 86399;
+                    //modify by jiaohe0625j
+                    query.msg_end_second = (uint)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["msg_end_second"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 _iappmessageMgr = new AppmessageMgr(mySqlConnectionString);
                 int totalCount = 0;
