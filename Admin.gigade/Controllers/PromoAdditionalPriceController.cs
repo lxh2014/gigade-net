@@ -681,6 +681,10 @@ namespace Admin.gigade.Controllers
                     model.event_name = Request.Params["event_name"].ToString();
                     model.event_desc = Request.Params["event_desc"].ToString();
                     model.event_type = oldermodel.event_type;
+                    if (!string.IsNullOrEmpty(Request.Params["url_by"]))
+                    {
+                        model.url_by =Convert.ToInt32(Request.Params["url_by"]);
+                    }
                     #region 會員群組 會員條件
                     if (Request.Params["group_id"].ToString() != "")
                     {
