@@ -261,6 +261,7 @@ editFunction = function (row, store) {
                           id: 'end',
                           name: 'end',
                           format: 'Y-m-d H:i:s',
+                          time: { hour: 23, min: 59, sec: 59 },
                           width: 150,
                           allowBlank: false,
                           submitValue: true, //

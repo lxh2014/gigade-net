@@ -39,6 +39,9 @@ namespace BLL.gigade.Model
         public int active { get; set; }
 
         public  UInt64 static_template { get; set; }
+
+        public string user_username_create { get; set; }
+        public string user_username_update { get; set; }
         public EdmContentNew()
         {
             content_id = 0;
@@ -63,6 +66,8 @@ namespace BLL.gigade.Model
             edm_pm = string.Empty;
             active = 0;
             static_template = 1;
+            user_username_create = string.Empty;
+            user_username_update = string.Empty;
         }
     }
 }
