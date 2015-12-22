@@ -137,20 +137,32 @@ Ext.onReady(function () {
         dockedItems: [{
             dock: 'top',
             xtype: 'toolbar',
-            items: [{
+            items: [{    //modify by jiaohe0625j
                 xtype: 'datetimefield',
-                format: 'Y-m-d H:i:s',
-                time: {hour:'00',sec:'00',min:'00'},
+                //format: 'Y-m-d',
+                format: 'Y-m-d  H:i:s',
+                time: { hour: 00, min: 00, sec: 00 },
                 id: 'msg_start_first',
                 fieldLabel: MSG_START_TIME,//開始時間
                 labelWidth: 60,
-                width: 200,
+                //width: 200,
+                width: 220,
                 editable: false,
                 listeners: {
-                    change: function () {
-                        Ext.getCmp("msg_start_second").setMinValue(this.getValue());
-                        Ext.getCmp("msg_end_first").setMinValue(this.getValue());
-                        Ext.getCmp("msg_end_second").setMinValue(this.getValue());
+                    //change: function () {
+                    //    Ext.getCmp("msg_start_second").setMinValue(this.getValue());
+                    //    Ext.getCmp("msg_end_first").setMinValue(this.getValue());
+                    //    Ext.getCmp("msg_end_second").setMinValue(this.getValue());
+                    //}
+                    select: function (a, b, c) {
+                        var start = Ext.getCmp("msg_start_first");
+                        var end = Ext.getCmp("msg_start_second");
+                        if (end.getValue() == null) {
+                            end.setValue(setNextMonth(start.getValue(), 1));
+                        }
+                        else if (end.getValue() < start.getValue()) {
+                            end.setValue(setNextMonth(start.getValue(), 1));
+                        }                      
                     }
                 }
             }, {
@@ -159,30 +171,61 @@ Ext.onReady(function () {
                 id: 'blp_start',
                 disabled: true,
                 margin: '0 5 0 5'
-            }, {
-                xtype: 'datefield',
-                format: 'Y-m-d H:i:s',
-                time: { hour: '23', sec: '59', min: '59' },
+            }, {    //modify by jiaohe0625j
+                xtype: 'datetimefield',
+                //format: 'Y-m-d',
+                format: 'Y-m-d  H:i:s',
+                time: { hour: 23, min: 59, sec: 59 },
                 id: 'msg_start_second',
                 labelWidth: 60,
                 editable: false,
                 listeners: {
-                    change: function () {
-                        Ext.getCmp("msg_start_first").setMaxValue(this.getValue());
+                    //change: function () {
+                    //    Ext.getCmp("msg_start_first").setMaxValue(this.getValue());
+                    //}
+                    select: function (a, b, c) {
+                        var start = Ext.getCmp("msg_start_first");
+                        var end = Ext.getCmp("msg_start_second");
+                        if (start.getValue() == null) {
+                            start.setValue(setNextMonth(end.getValue(), -1));
+                        }
+                        if (end.getValue() < start.getValue()) {
+                            Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間");
+                            end.setValue(setNextMonth(start.getValue(), 1));
+                        }                     
                     }
                 }
-            }, {
-                xtype: 'datefield',
-                format: 'Y-m-d H:i:s',
-                time: { hour: '00', sec: '00', min: '00' },
+            }, {    //modify by jiaohe0625j
+                xtype: 'datetimefield',
+                //format: 'Y-m-d',
+                format: 'Y-m-d  H:i:s',
+                time: { hour: 00, min: 00, sec: 00 },
                 id: 'msg_end_first',
                 fieldLabel: MSG_END_TIME,
                 labelWidth: 60,
-                width: 200,
+                //width: 200,
+                width: 220,
                 editable: false,
+                vtype: 'regxvalid_end',
                 listeners: {
-                    change: function () {
-                        Ext.getCmp("msg_end_second").setMinValue(this.getValue());
+                    //change: function () {
+                    //    Ext.getCmp("msg_end_second").setMinValue(this.getValue());
+                    //}
+                    select: function (a, b, c) {
+                        var start = Ext.getCmp("msg_end_first");
+                        var end = Ext.getCmp("msg_end_second");
+                        if (start.getValue() < Ext.getCmp("msg_start_first").getValue())
+                        {
+                            Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間");
+                            start.setValue(setNextMonth(Ext.getCmp("msg_start_first").getValue(), 1));
+                        }
+                        if (end.getValue() == null) {
+                            end.setValue(setNextMonth(start.getValue(), 1));
+                        }
+                        else if (end.getValue() < start.getValue()) {
+                            end.setValue(setNextMonth(start.getValue(), 1));
+                        }
+                       
                     }
                 }
             }, {
@@ -191,18 +234,30 @@ Ext.onReady(function () {
                 id: 'blp_end',
                 disabled: true,
                 margin: '0 5 0 5'
-            }, {
-                xtype: 'datefield',
-                format: 'Y-m-d H:i:s',
-                time: { hour: '23', sec: '59', min: '59' },
+            }, {    //modify by jiaohe0625j
+                xtype: 'datetimefield',
+                //format: 'Y-m-d',
+                format: 'Y-m-d  H:i:s',
+                time: { hour: 23, min: 59, sec: 59 },
                 id: 'msg_end_second',
                 labelWidth: 60,
                 editable: false,
                 listeners: {
-                    change: function () {
-                        Ext.getCmp("msg_start_first").setMaxValue(this.getValue());
-                        Ext.getCmp("msg_start_second").setMaxValue(this.getValue());
-                        Ext.getCmp("msg_end_first").setMaxValue(this.getValue());
+                    //change: function () {
+                    //    Ext.getCmp("msg_start_first").setMaxValue(this.getValue());
+                    //    Ext.getCmp("msg_start_second").setMaxValue(this.getValue());
+                    //    Ext.getCmp("msg_end_first").setMaxValue(this.getValue());
+                    //}
+                    select: function (a, b, c) {
+                        var start = Ext.getCmp("msg_end_first");
+                        var end = Ext.getCmp("msg_end_second");
+                        if (start.getValue() == null) {
+                            start.setValue(setNextMonth(end.getValue(), -1));
+                        }
+                        if (end.getValue() < start.getValue()) {
+                            Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間");
+                            end.setValue(setNextMonth(start.getValue(), 1));
+                        }                      
                     }
                 }
             }, {
@@ -266,4 +321,15 @@ function onAddClick() {
     pcFrm.getForm().reset();
     addPc.show();
     Ext.getCmp('new_display_type').setValue(1);
+}
+// add by jiaohe0625j
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    } else if (n >= 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }
