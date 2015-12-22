@@ -124,8 +124,8 @@ Ext.onReady(function () {
             { header: DEVICE, dataIndex: 'devicename', width: 80, align: 'center', renderer: BufenShow },
             { header: VENDORCOVERAGE, dataIndex: 'vendor_coverage', width: 80, align: 'center' },
             { header: WEBSITESET, dataIndex: 'site', width: 80, align: 'center', renderer: BufenShow },
-            { header: START, dataIndex: 'startdate', width: 80, align: 'center' },
-            { header: END, dataIndex: 'enddate', width: 80, align: 'center' },
+            { header: START, dataIndex: 'startdate', width: 125, align: 'center' },
+            { header: END, dataIndex: 'enddate', width: 125, align: 'center' },
             { header: 'muser', dataIndex: 'muser', hidden: true },
             { header: QuanXianMuser, dataIndex: 'user_username', width: 80, align: 'center' },
             {

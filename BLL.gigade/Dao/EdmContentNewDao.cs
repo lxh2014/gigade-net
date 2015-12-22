@@ -29,9 +29,11 @@ namespace BLL.gigade.Dao
             try
             {
                 sqlCount.AppendFormat("select count(edn.content_id) as countTotal ");
-                sql.AppendFormat("select edn.content_id,edn.group_id,`subject`,esl.count,esl.date,edn.sender_id,ms.sender_email,ms.sender_name,edn.importance,edn.template_id,edn.template_data,'' as 'template_data_send', et.edit_url,et.content_url , edn.pm,  para.parameterName 'edm_pm',et.static_template  ");
+                sql.AppendFormat("select edn.content_id,edn.group_id,`subject`,esl.count,esl.date,edn.sender_id,ms.sender_email,ms.sender_name,edn.importance,edn.template_id,edn.template_data,'' as 'template_data_send', et.edit_url,et.content_url , edn.pm,  para.parameterName 'edm_pm',et.static_template,mu.user_username 'user_username_create',mu2.user_username 'user_username_update'  ");
                 sqlFrom.AppendFormat("from edm_content_new edn LEFT JOIN  (SELECT content_id,COUNT(content_id) as count,MAX(schedule_date) as date from edm_send_log WHERE test_send=0 GROUP BY content_id)  esl ON edn.content_id=esl.content_id LEFT JOIN mail_sender ms on edn.sender_id=ms.sender_id LEFT JOIN edm_template et on et.template_id=edn.template_id ");
                 sqlFrom.Append(" left join (select  parameterCode,parameterName from t_parametersrc where parameterType='edm_pm_name' and used=1) para on edn.pm=para.parameterCode    ");
+                sqlFrom.Append(" left join manage_user mu on mu.user_id=edn.content_create_userid   ");
+                sqlFrom.Append(" left join manage_user mu2 on mu2.user_id=edn.content_update_userid   ");
                 sqlWhere.AppendFormat(" where 1=1 ");
                 sqlWhere.AppendFormat(" and edn.content_createdate between '{0}' and '{1}' ", CommonFunction.DateTimeToString(DateTime.Now.AddDays(-5)), CommonFunction.DateTimeToString(DateTime.Now));
                 if (query.group_id != 0)

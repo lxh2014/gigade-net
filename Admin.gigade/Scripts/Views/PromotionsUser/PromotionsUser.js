@@ -84,6 +84,7 @@ showUserSetForm = function (condition_name, conditionID, TxtId) {
                      id: 'reg_start',
                      name: 'reg_start',
                      format: 'Y-m-d H:i:s',
+                     time:{hour:00,sec:00,min:00},
                      allowBlank: false,
                      editable: false,
                      submitValue: true,
@@ -93,7 +94,7 @@ showUserSetForm = function (condition_name, conditionID, TxtId) {
                              var start = Ext.getCmp("reg_start");
                              var end = Ext.getCmp("reg_end");
                              var s_date = new Date(start.getValue());
-                             end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                             end.setValue(setNextMonth(s_date,1));
                          }
                      }
                  },
@@ -101,12 +102,14 @@ showUserSetForm = function (condition_name, conditionID, TxtId) {
                     xtype: "datetimefield",
                     fieldLabel: USEREND,
                     format: 'Y-m-d H:i:s',
+                    time: { hour: 23, sec: 59, min: 59 },
                     id: 'reg_end',
                     editable: false,
                     name: 'reg_end',
                     allowBlank: false,
                     submitValue: true,
-                    value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+                    //value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)).setHours(23,59,59),
+                    value:setNextMonth(Tomorrow(),1),
                     listeners: {
                         select: function (a, b, c) {
                             var start = Ext.getCmp("reg_start");
@@ -114,7 +117,7 @@ showUserSetForm = function (condition_name, conditionID, TxtId) {
                             var s_date = new Date(start.getValue());
                             if (end.getValue() < start.getValue()) {
                                 Ext.Msg.alert(INFORMATION, TIMETIP);
-                                end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                end.setValue(setNextMonth(s_date,1));
                             }
                         }
                     }
@@ -220,6 +223,7 @@ showUserSetForm = function (condition_name, conditionID, TxtId) {
                     id: 'last_time_start',
                     name: 'last_time_start',
                     format: 'Y-m-d H:i:s',
+                    time:{hour:00,sec:00,min:00},
                     editable: false,
                     allowBlank: false,
                     submitValue: true,
@@ -229,19 +233,21 @@ showUserSetForm = function (condition_name, conditionID, TxtId) {
                             var start = Ext.getCmp("last_time_start");
                             var end = Ext.getCmp("last_time_end");
                             var s_date = new Date(start.getValue());
-                            end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                            end.setValue(setNextMonth(s_date,1));
                         }
                     }
                 }, {
                     xtype: "datetimefield",
                     fieldLabel: LASTCONSUMETIMEEND,
                     format: 'Y-m-d H:i:s',
+                    time: { hour: 23, sec: 59, min: 59 },
                     id: 'last_time_end',
                     name: 'last_time_end',
                     editable: false,
                     allowBlank: false,
                     submitValue: true,
-                    value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+                    value:setNextMonth(Tomorrow(),1),
+                    //value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
                     listeners: {
                         select: function (a, b, c) {
                             var start = Ext.getCmp("last_time_start");
@@ -249,7 +255,7 @@ showUserSetForm = function (condition_name, conditionID, TxtId) {
                             var s_date = new Date(start.getValue());
                             if (end.getValue() < start.getValue()) {
                                 Ext.Msg.alert(INFORMATION, TIMETIP);
-                                end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                end.setValue(setNextMonth(s_date,1));
                             }
                         }
                     }
@@ -403,4 +409,15 @@ ShowConditionData = function (conditionID, str) {
             }
         });
     }
+}
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

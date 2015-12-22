@@ -439,6 +439,7 @@ function fewDiscountForm(rowID, PriceStore, condition_name, Type) {
                           id: 'enddate',
                           name: 'end_date',
                           format: 'Y-m-d H:i:s',
+                          time: { hour: 23, min: 59, sec: 59 },
                           width: 150,
                           allowBlank: false,
                           submitValue: true, //

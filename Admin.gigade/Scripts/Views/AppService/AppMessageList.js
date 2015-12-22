@@ -138,8 +138,9 @@ Ext.onReady(function () {
             dock: 'top',
             xtype: 'toolbar',
             items: [{
-                xtype: 'datefield',
-                format: 'Y-m-d',
+                xtype: 'datetimefield',
+                format: 'Y-m-d H:i:s',
+                time: {hour:'00',sec:'00',min:'00'},
                 id: 'msg_start_first',
                 fieldLabel: MSG_START_TIME,//開始時間
                 labelWidth: 60,
@@ -160,7 +161,8 @@ Ext.onReady(function () {
                 margin: '0 5 0 5'
             }, {
                 xtype: 'datefield',
-                format: 'Y-m-d',
+                format: 'Y-m-d H:i:s',
+                time: { hour: '23', sec: '59', min: '59' },
                 id: 'msg_start_second',
                 labelWidth: 60,
                 editable: false,
@@ -171,7 +173,8 @@ Ext.onReady(function () {
                 }
             }, {
                 xtype: 'datefield',
-                format: 'Y-m-d',
+                format: 'Y-m-d H:i:s',
+                time: { hour: '00', sec: '00', min: '00' },
                 id: 'msg_end_first',
                 fieldLabel: MSG_END_TIME,
                 labelWidth: 60,
@@ -190,7 +193,8 @@ Ext.onReady(function () {
                 margin: '0 5 0 5'
             }, {
                 xtype: 'datefield',
-                format: 'Y-m-d',
+                format: 'Y-m-d H:i:s',
+                time: { hour: '23', sec: '59', min: '59' },
                 id: 'msg_end_second',
                 labelWidth: 60,
                 editable: false,
