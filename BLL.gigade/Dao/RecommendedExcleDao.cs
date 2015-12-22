@@ -306,31 +306,15 @@ year(FROM_UNIXTIME(max(order_createdate)))  as maxyear from order_master  ");
             StringBuilder sql = new StringBuilder();
             try
             {
+
+
+                sql.AppendFormat(@"SELECT pt.product_id,pt.brand_id,FROM_UNIXTIME(pt.product_start)as crate_time,pt.product_status,pt.product_name,pt.product_alt,pt.page_content_1,
+                                pt.product_image,price,event_price,pm.cost,pm.event_cost,FROM_UNIXTIME(pm.event_start)as event_starts,FROM_UNIXTIME(pm.event_end)as event_ends,pt.prod_classify
+                                FROM product pt 
+                                INNER JOIN price_master pm 
+                                on pm.product_id=pt.product_id  where pt.product_id >10000 and pm.product_id>10000 and pt.sale_status<20 and pt.product_status in (5,6,7) ");
                
-                if (end_product_id > start_product_id && start_product_id > 10000)
-                {
-                    sql.AppendFormat(@"SELECT pt.product_id,pcs.category_id,pii.item_id,pt.brand_id,FROM_UNIXTIME(pt.product_start)as crate_time,pt.product_status,pt.product_name,pt.product_alt,pt.page_content_1,
-                                pt.product_image,price,event_price,pm.cost,pm.event_cost,FROM_UNIXTIME(pm.event_start)as event_starts,FROM_UNIXTIME(pm.event_end)as event_ends,pt.prod_classify
-                                FROM product pt 
-                                INNER JOIN product_item pii 
-                                on pt.product_id=pii.product_id and pt.combination=1 and pt.product_id >= '{0}' and pt.product_id <= '{1}' 
-                                INNER JOIN price_master pm 
-                                on pm.product_id=pii.product_id and pm.product_id>='{0}' and pm.product_id <= '{1}'
-                                right JOIN product_category_set pcs on pii.item_id=pcs.item_id 
-                                where pii.product_id>='{0}'and pii.product_id <='{1}' and pt.sale_status<20 and pt.product_status in (5,6,7) ", start_product_id, end_product_id);
-                }
-                else
-                {
-                    sql.AppendFormat(@"SELECT pt.product_id,pii.item_id,pt.brand_id,FROM_UNIXTIME(pt.product_start)as crate_time,pt.product_status,pt.product_name,pt.product_alt,pt.page_content_1,
-                                pt.product_image,price,event_price,pm.cost,pm.event_cost,FROM_UNIXTIME(pm.event_start)as event_starts,FROM_UNIXTIME(pm.event_end)as event_ends,pt.prod_classify
-                                FROM product pt 
-                                INNER JOIN product_item pii 
-                                on pt.product_id=pii.product_id and pt.combination=1 and pt.product_id>=10001
-                                INNER JOIN price_master pm 
-                                on pm.product_id=pii.product_id and pm.product_id>=10001
-                                where pii.product_id>=10001 and pt.sale_status<20 and pt.product_status in (5,6,7) ");
-                }
-                    sql.AppendFormat(" ORDER BY pii.product_id ;");
+                    sql.AppendFormat(" ORDER BY pt.product_id ;");
                
                 DataTable dt = _access.getDataTable(sql.ToString());
                 return dt;

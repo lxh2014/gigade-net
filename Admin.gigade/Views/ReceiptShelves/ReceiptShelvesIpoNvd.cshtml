@@ -1,0 +1,479 @@
+﻿@{
+    ViewBag.Title = "ReceiptShelvesIpoNvd";
+}
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes " />
+
+<script src="../../Scripts/jquery-2.1.4.min.js"></script>
+<link href="../../Scripts/Bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<script src="../../Scripts/Bootstrap/bootstrap.min.js"></script>
+<script src="../../Scripts/Bootstrap/bootstrap-table.min.js"></script>
+<link href="../../Scripts/Bootstrap/css/bootstrap-table.min.css" rel="stylesheet" />
+<link href="../../Scripts/Bootstrap/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+<script src="../../Scripts/Bootstrap/bootstrap-datetimepicker.min.js"></script>
+<script src="../../Scripts/Bootstrap/bootstrap-datetimepicker.zh-TW.js"></script>
+
+    <title></title>
+</head>
+
+<div class="container">
+    <h1 >提示：請輸入收貨上架數量!</h1>
+    <br />
+    <h3>工作代號： <span class="label label-info">@ViewBag.number</span></h3>
+    @*<h3>產品條碼： <span class="label label-info">@ViewBag.upc</span></h3>*@
+
+    <div>
+        <h3 id="note_order_label" hidden="hidden">備註：&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp  <span class="label label-info" id="note_order"></span></h3>
+        <h3 >品名：&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp  <span class="label label-info " id="productname"></span></h3>
+        
+        <h3 >料位：&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp  <span class="label label-info " id="loc_id"/></h3>
+        <h3 >是否為有效期控管： <span class="label label-info " id="pwy_dte_ctl"/></h3>
+        <h3 >有效期天數： <span class="label label-info " id="cde_dt_incr"/></h3>
+        <h3 class="hidden">row_id： <span class="label label-info " id="row_id"></span></h3>
+
+        <div class="row">
+            <div class="col-lg-12 text-right">
+                <button class="btn btn-default btn-lg" disabled="disabled"  id="amsure" type="button">確認收貨上架</button>
+            </div>
+        </div>
+        <!-- /.row -->
+        @*data-toggle="table" data-url="/MarketTally/GetStockByItemid?item_id=@ViewBag.itemid" id="stock_table" *@
+        <br />
+        <table class="table table-bordered table-striped table-hover"  >
+            <thead class="lead">
+                <tr>
+                    <th class="text-center">製造日期 
+                    </th>
+                    <th class="text-center">有效日期
+                    </th>                   
+                    <th class="text-center" >待收貨上架數量
+                    </th>
+                    <th class="text-center">撿貨數量
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-md-3" >
+                        <div class="input-group date form_date " id="made_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd"><input class="form-control"  type="text" value="" readonly="readonly" id="made_date_label"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span></div>
+                    </td>
+                    <td class="col-md-3" >
+                        <div class="input-group date form_date col-md-12" id="cde_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd"><input class="form-control" type="text" value="" readonly="readonly" id="cde_date_label"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span></div>
+                    </td>
+                     <td class="col-md-3">
+                         <h4 class="text-center" id="out_qty"></h4>
+                    </td>
+                    <td class="col-md-3" >
+                        <input type="number"  min="0" class="form-control" id="pick_num"  onkeydown="return check(event);">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+       
+        <br />
+              
+    </div>
+</div>
+
+<div class="modal fade MarketTally-modal-alert" role="dialog" aria-labelledby="gridSystemModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 class="modal-title" >提示</h3>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">         
+          <h4 id="MessageContentId" class="text-center">錯誤提示</h4>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="modal-dialog-close" data-dismiss="modal">確定</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade MarketTally-modal-warn" role="dialog" aria-labelledby="gridSystemModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        @*<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>*@
+        <h3 class="modal-title" >警告</h3>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">         
+          <h4 id="WarnContentId" class="text-center">錯誤提示</h4>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="modal-warn-yes" data-dismiss="modal">是</button>
+        <button type="button" class="btn btn-default" id="modal-warn-no" data-dismiss="modal" >否</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+    function check(e)
+    {
+        var keynum
+        var keychar
+        var numcheck
+
+        if (window.event) // IE
+        {
+            keynum = e.keyCode
+        }
+        else if (e.which) // Netscape/Firefox/Opera
+        {
+            keynum = e.which
+        }
+
+        keychar = String.fromCharCode(keynum)
+        //numcheck = /\D/
+        //console.log(keychar+":"+keynum)
+        if ((keynum == 46) || (keynum == 8) || (keynum == 37) || (keynum == 39))
+        {
+            return true;
+        }
+        
+        if (((keynum >= 48 && keynum <= 57) || (keynum >= 96 && keynum <= 105)))
+        {
+            return true;
+        }
+        return false
+
+        
+    }
+
+    function datetimepicker()
+    {
+        $('#made_date').datetimepicker({
+            language: 'zh-TW',
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            minView: 2,
+            pickerPosition: 'top-right',
+            forceParse: 0
+        }).on('changeDate', function (ev)
+        {
+            //有效期控管
+            if ($("#pwy_dte_ctl").text() == "Y")
+            {
+                var cde_dt_incr = parseInt($('#cde_dt_incr').text())
+                var start = $('#made_date_label');
+                var end = $('#cde_date_label');
+                var date = new Date(start.val());
+                end.val(new Date(date.setDate(date.getDate() + cde_dt_incr)).Format("yyyy-MM-dd"));
+            }
+                //非有效期控管
+            else
+            {
+                $('#cde_date_label').val($('#made_date_label').val());
+            }
+        });
+        $('#cde_date').datetimepicker({
+            language: 'zh-TW',
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            minView: 2,
+            pickerPosition: 'top-right',
+            forceParse: 0
+        }).on('changeDate', function (ev)
+        {
+            //有效期控管
+            if ($("#pwy_dte_ctl").text() == "Y")
+            {
+                var cde_dt_incr = parseInt($('#cde_dt_incr').text())
+                var start = $('#made_date_label');
+                var end = $('#cde_date_label');
+                var date = new Date(end.val());
+                start.val(new Date(date.setDate(date.getDate() - cde_dt_incr)).Format("yyyy-MM-dd"));
+
+            }
+                //非有效期控管
+            else
+            {
+                $('#made_date_label').val($('#cde_date_label').val());
+            }
+        });
+    }
+
+    Date.prototype.Format = function (fmt)
+    { //author: meizz 
+        var o = {
+            "M+": this.getMonth() + 1, //月份 
+            "d+": this.getDate(), //日 
+            "h+": this.getHours(), //小时 
+            "m+": this.getMinutes(), //分 
+            "s+": this.getSeconds(), //秒 
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+            "S": this.getMilliseconds() //毫秒 
+        };
+        if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+
+    function GetNextItemid()
+    {
+        var itemid = '@ViewBag.itemid'
+        var number = '@ViewBag.number'; 
+        $.get('/ReceiptShelves/GetIpoNvdList', { work_id: number, item_id: itemid, locid_allownull: false }, function (data)
+        {
+            var result = eval("(" + data + ")");
+            if (result.success)
+            {
+                if (result.totalCount > 0)
+                {
+                    document.location.href = "/ReceiptShelves/ReceiptShelvesIpoNvd?number=" + number + "&itemid=" + itemid;
+                }
+                else
+                {
+                    $.get('/ReceiptShelves/GetIpoNvdList', { work_id: number, locid_allownull: false }, function (data)
+                    {
+                        var result = eval("(" + data + ")");
+                        if (result.success)
+                        {
+                            if (result.totalCount > 0)
+                            {
+                                document.location.href = document.location.href = "/ReceiptShelves/ReceiptShelvesItemid?number=" + number;
+                            }
+                            else
+                            {
+                                document.location.href = document.location.href = "/ReceiptShelves/ReceiptShelvesWorkid"
+                            }
+                        }
+                    })
+
+
+                }
+            }
+        }).error(function ()
+        {
+            $('#MessageContentId').text("查詢失敗!");
+            $('.MarketTally-modal-alert').modal('toggle')
+            $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
+            {
+                $('#modal-dialog-close').focus();
+            })
+        });
+    }
+    function InitTable()
+    {
+        $('#pick_num').val(parseInt($('#out_qty').text()));
+        if ($('#pick_num').val() != "" && parseInt($('#pick_num').val()) <= parseInt($('#out_qty').text()));
+        {
+            $('#amsure').attr("class", "btn btn-success btn-lg");
+            $('#amsure').removeAttr("disabled");
+        }
+    }
+    
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {      
+        //頁面加載時調用
+        {
+            {
+                $("#pick_num").focus();
+            }
+            var itemid = '@ViewBag.itemid'
+            var number = '@ViewBag.number'
+            $.get('/ReceiptShelves/GetIpoNvdList', { work_id: number, item_id: itemid, locid_allownull: false }, function (data)
+            {
+                var result = eval("(" + data + ")"); 
+                if (result.success)
+                {
+                    if (result.totalCount > 0)
+                    {
+                        var prod = "";
+                        if (result.data[0].prod_sz != "")
+                        {
+                            prod = "(" + result.data[0].prod_sz + ")";
+                        }
+
+                        $("#productname").text(result.data[0].description + prod);
+                        $("#loc_id").text(result.data[0].loc_id);
+ 
+                        ////
+                        $("#made_date_label").val(result.data[0].made_date.substr(0, 10));
+                        $("#cde_date_label").val(result.data[0].cde_dt.substr(0, 10));
+                        $("#out_qty").text(result.data[0].out_qty);
+                        $("#pwy_dte_ctl").text(result.data[0].pwy_dte_ctl);
+                        $("#cde_dt_incr").text(result.data[0].cde_dt_incr); 
+                        $("#row_id").text(result.data[0].row_id);
+                    }
+                    else
+                    {
+                        $('#MessageContentId').text("當前工作代號中沒有該產品條碼!");
+                        $('.MarketTally-modal-alert').modal('toggle');
+                        $('#modal - dialog - close').focus();
+                        $('.MarketTally-modal-alert').on('hidden.bs.modal', function (e)
+                        {
+                            document.location.href = "/ReceiptShelves/ReceiptShelvesWorkid";
+                        })
+                    }
+                }
+            }).error(function ()
+            {
+                $('#MessageContentId').text("查詢失敗!");
+                $('.MarketTally-modal-alert').modal('toggle')
+                $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
+                {
+                    $('#modal-dialog-close').focus();
+                })
+            });
+            datetimepicker()
+            //分配庫存初始值
+            setTimeout(function ()
+            {
+                InitTable();
+            }, 1000);
+            
+        }
+        $('#pick_num').on('input', function ()
+        {
+            var pick_num = $('#pick_num').val();
+            if (pick_num == "")
+            {
+                $('#MessageContentId').text("必須輸入撿貨數量!");
+                $('.MarketTally-modal-alert').modal('toggle')
+                $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
+                {
+                    $('#modal-dialog-close').focus();
+                })
+                $('.MarketTally-modal-alert').on('hidden.bs.modal', function (event)
+                {
+                    $('#pick_num').focus();
+                })
+                $('#amsure').attr("class", "btn btn-default btn-lg");
+                $('#amsure').attr("disabled", "disabled");
+
+                return false;
+            }
+            else if (parseInt(pick_num) > parseInt($('#out_qty').text()))
+            {
+                $('#pick_num').blur();
+                $('#MessageContentId').text("揀貨數量不能大於待收貨上架數量!");
+                $('.MarketTally-modal-alert').modal('toggle')
+                $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
+                {
+                    $('#modal-dialog-close').focus();
+                })
+                $('.MarketTally-modal-alert').on('hidden.bs.modal', function (event)
+                {
+                    $('#pick_num').focus();
+                })
+
+                $('#amsure').attr("class", "btn btn-default btn-lg");
+                $('#amsure').attr("disabled", "disabled");
+                
+                return false;
+            }
+            else
+            {
+                $('#amsure').attr("class", "btn btn-success btn-lg");
+                $('#amsure').removeAttr("disabled");
+            }
+        })
+        $('#amsure').on('click', function ()
+        {
+            if (parseInt($('#pick_num').val()) < parseInt($('#out_qty').text()))
+            {
+                ///////////////
+                $('#WarnContentId').text("揀貨數量小於待收貨上架數量，確認收貨上架？");
+                $('.MarketTally-modal-warn').modal({
+                    backdrop: 'static'
+                })
+                $('.MarketTally-modal-warn').on('shown.bs.modal', function (event)
+                {
+                    $('#modal-warn-no').focus();
+
+                })
+                $('.MarketTally-modal-warn').on('hidden.bs.modal', function (event)
+                {
+
+                })
+            }
+            else if (parseInt($('#pick_num').val()) == parseInt($('#out_qty').text()))
+            {
+                $('#amsure').attr("disabled", "disabled");
+                MarketTally();
+            }
+
+        });
+        $('#modal-warn-yes').on('click', function ()
+        {
+            //繼續分貨；
+            MarketTally();
+        })
+        function MarketTally()
+        {
+            row_id = $("#row_id").text();//待收貨上架數量
+            out_qty = $("#out_qty").text();//待收貨上架數量
+            pick_num = $("#pick_num").val();//揀貨數量
+            made_date = $('#made_date_label').val();//
+            cde_dt = $('#cde_date_label').val();//
+            loc_id = $('#loc_id').text();//
+            $.ajax({
+                url: "/ReceiptShelves/SaveReceiptShelves",
+                type: "POST",
+                dataType: "text",
+                traditional: true,
+                data: {
+                    row_id: row_id, pick_num: pick_num, made_date: made_date, cde_dt: cde_dt, loc_id: loc_id
+                },
+                success: function (data)
+                {
+                    var result = eval("(" + data + ")");
+                    if (result.success)
+                    {
+                        $('#MessageContentId').text("收貨上架成功！");
+                        $('.MarketTally-modal-alert').modal('toggle')
+                        $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
+                        {
+                            $('#modal-dialog-close').focus();
+                        })
+                        $('.MarketTally-modal-alert').on('hidden.bs.modal', function (event)
+                        {
+                            GetNextItemid();
+                        })
+                    }
+                    else
+                    {
+                        msg = "收貨上架失敗！";
+                        $('#MessageContentId').text(msg);
+                        $('.MarketTally-modal-alert').modal('toggle')
+                        $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
+                        {
+                            $('#modal-dialog-close').focus();
+                        })
+                    }
+                },
+                error: function ()
+                {
+                    $('#MessageContentId').text("系統異常,請稍后再試,如有重複出錯請聯繫管理員!");
+                    $('.MarketTally-modal-alert').modal('toggle')
+                    $('.MarketTally-modal-alert').on('shown.bs.modal', function (event)
+                    {
+                        $('#modal-dialog-close').focus();
+                    })
+                }
+            });
+        }
+                
+    });
+</script>

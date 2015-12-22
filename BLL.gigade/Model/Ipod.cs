@@ -29,6 +29,8 @@ namespace BLL.gigade.Model
         public double off_invoice { set; get; }
         public double new_cost { set; get; }
         public int freight_price { set; get; }
+        public DateTime made_date { set; get; }
+        public DateTime cde_dt { set; get; }
         public Ipod()
         {
             row_id = 0;
@@ -53,6 +55,8 @@ namespace BLL.gigade.Model
             off_invoice = 0;
             new_cost = 0;
             freight_price = 0;
+            made_date = DateTime.MinValue;
+            cde_dt = DateTime.MinValue;
         }
     }
 }

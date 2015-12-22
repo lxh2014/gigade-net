@@ -352,6 +352,7 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+
         #endregion
 
         #region 料位管理模塊
@@ -10443,6 +10444,12 @@ namespace Admin.gigade.Controllers
                 {
                     ipodStore[i].spec = GetProductSpec(ipodStore[i].prod_id.ToString());
                     ipodStore[i].plst_id = ipodStore[i].plst_id.ToString() == "F" ? "已驗收" : "未驗收";
+
+                    if (ipodStore[i].pwy_dte_ctl != "Y")
+                    {
+                        ipodStore[i].made_date = DateTime.Now.Date;
+                        ipodStore[i].cde_dt = DateTime.Now.Date;
+                    }
                 }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
@@ -10471,6 +10478,8 @@ namespace Admin.gigade.Controllers
         {
 
             IpodQuery query = new IpodQuery();
+            IpoNvdQuery ipoNvd = new IpoNvdQuery();
+
             string json = string.Empty;
             try
             {
@@ -10480,6 +10489,12 @@ namespace Admin.gigade.Controllers
                     query.change_user = (Session["caller"] as Caller).user_id;
                     query.user_email = (Session["caller"] as Caller).user_email;
                     query.change_dtim = DateTime.Now;
+                    ////ipoNvd
+                    ipoNvd.create_user = (Session["caller"] as Caller).user_id;
+                    ipoNvd.create_datetime = DateTime.Now;
+                    ipoNvd.modify_user = (Session["caller"] as Caller).user_id;
+                    ipoNvd.modify_datetime = DateTime.Now;
+
                 }
                 if (!string.IsNullOrEmpty(Request.Params["qty_damaged"]))
                 {
@@ -10488,6 +10503,8 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["qty_claimed"]))
                 {
                     query.qty_claimed = Convert.ToInt32(Request.Params["qty_claimed"].ToString());
+                    ipoNvd.ipo_qty = query.qty_claimed;
+                    ipoNvd.out_qty = query.qty_claimed;
                 }
                 if (!string.IsNullOrEmpty(Request.Params["item_stock"]))
                 {
@@ -10497,10 +10514,32 @@ namespace Admin.gigade.Controllers
                 {
                     query.plst_id = Request.Params["plst_id"].ToString();
                 }
+                if (!string.IsNullOrEmpty(Request.Params["made_date"]))
+                {
+                    query.made_date = Convert.ToDateTime(Request.Params["made_date"].ToString());
+                    ipoNvd.made_date = query.made_date;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["cde_dt"]))
+                {
+                    query.cde_dt = Convert.ToDateTime(Request.Params["cde_dt"].ToString());
+                    ipoNvd.cde_dt = query.cde_dt;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["item_id"]))
+                {
+                    ipoNvd.item_id = Convert.ToUInt32(Request.Params["item_id"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["ipo_id"]))
+                {
+                    ipoNvd.ipo_id = Request.Params["ipo_id"].ToString();
+                }
+
+                //ipoNvd.work_id = "IN" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                ipoNvd.com_qty = 0;
+                ipoNvd.work_status = "AVL";
 
                 _ipodMgr = new IpodMgr(mySqlConnectionString);
 
-                bool result = _ipodMgr.UpdateIpodCheck(query);
+                bool result = _ipodMgr.UpdateIpodCheck(query, ipoNvd);
                 if (result)
                 {
 
