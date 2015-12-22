@@ -59,6 +59,7 @@ function editFunction(RowID, Store) {
             valueField: 'ParameterCode',
             emptyText: '請選擇...',
             typeAhead: true,
+            lastQuery: '',
             forceSelection: false
         },
         {//建立時間
