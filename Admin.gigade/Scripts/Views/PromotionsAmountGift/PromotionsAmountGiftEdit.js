@@ -484,12 +484,21 @@ function editFunction(RowID, PromoAmountGiftStore) {
                                 id: 'us_startChoice',
                                 name: 'us_startChoice',
                                 format: 'Y-m-d H:i:s',
+                                time: { hour: 00, min: 00, sec: 00 },
                                 allowBlank: false,
                                 submitValue: true,
                                 editable: false,
                                 width: 170,
                                 value: Tomorrow(),
-                                disabled: true
+                                disabled: true,
+                                listeners: {
+                                    select: function () {
+                                        var start = Ext.getCmp('us_startChoice');
+                                        var end = Ext.getCmp('use_endChoice');
+                                        var s_date = new Date(start.getValue());
+                                        end.setValue(setNextMonth(s_date, 1));
+                                    }
+                                },
                             }
                                 ]
                             },
@@ -569,12 +578,23 @@ function editFunction(RowID, PromoAmountGiftStore) {
                               id: 'use_endChoice',
                               name: 'use_endChoice',
                               format: 'Y-m-d H:i:s',
+                              time: { hour: 23, min: 59, sec: 59 },
                               width: 170,
                               allowBlank: false,
                               submitValue: true,
                               editable: false,
                               disabled: true,
-                              value: Tomorrow()
+                              value: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()+1, 23, 59, 59),
+                              listeners: {
+                                  select: function (a, b, c) {
+                                      var start = Ext.getCmp("us_startChoice");
+                                      var end = Ext.getCmp("use_endChoice");
+                                          if (end.getValue() < start.getValue()) {
+                                              Ext.Msg.alert(INFORMATION, DATA_TIP);
+                                              end.setValue(setNextMonth(start.getValue(), 1));
+                                          }
+                                  }
+                              }
                           }
                             ]
                         }
@@ -750,10 +770,18 @@ function editFunction(RowID, PromoAmountGiftStore) {
                                 name: 'us_bstartChoice',
                                 format: 'Y-m-d H:i:s',
                                 allowBlank: false,
-
+                                time:{hour:00,sec:00,min:00},
                                 submitValue: true,
                                 value: Tomorrow(),
-                                disabled: true
+                                disabled: true,
+                                listeners: {
+                                    select: function (a, b, c) {
+                                        var start = Ext.getCmp("us_bstartChoice");
+                                        var end = Ext.getCmp("use_bendChoice");
+                                        var s_date = new Date(start.getValue());
+                                        end.setValue(setNextMonth(s_date, 1));
+                                    }
+                                }
                             }
                                 ]
                             },
@@ -834,11 +862,24 @@ function editFunction(RowID, PromoAmountGiftStore) {
                               name: 'use_bendChoice',
                               width: 170,
                               format: 'Y-m-d H:i:s',
+                              time: { hour: 23, sec: 59, min: 59 },
                               allowBlank: false,
                               editable: false,
                               submitValue: true,
-                              value: Tomorrow(),
-                              disabled: true
+                              value: new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate()+1,23,59,59),
+                              disabled: true,
+                              listeners: {
+                                  select: function (a, b, c) {
+                                      var start = Ext.getCmp("us_bstartChoice");
+                                      var end = Ext.getCmp("use_bendChoice");
+                                      var s_date = new Date(start.getValue());
+                                      if (end.getValue() < start.getValue()) {
+                                          Ext.Msg.alert(INFORMATION, TIMETIP);
+                                          end.setValue(setNextMonth(s_date, 1));
+                                      }
+                                   
+                                  }
+                              }
                           }
                             ]
                         }]
@@ -1328,6 +1369,7 @@ function editFunction(RowID, PromoAmountGiftStore) {
                     name: 'startdate',
                     anchor: '95%',
                     format: 'Y-m-d H:i:s',
+                    time:{hour:00,sec:00,min:00},
                     width: 150,
                     allowBlank: false,
                     submitValue: true,
@@ -1337,12 +1379,12 @@ function editFunction(RowID, PromoAmountGiftStore) {
                             var start = Ext.getCmp("startdate");
                             var end = Ext.getCmp("enddate");
                             var s_date = new Date(start.getValue());
-                            var ttime = s_date;
-                            ttime = new Date(ttime.setMonth(s_date.getMonth() + 1));
-                            ttime = new Date(ttime.setMinutes(59));
-                            ttime = new Date(ttime.setSeconds(59));
-                            ttime = new Date(ttime.setHours(23));
-                            end.setValue(ttime);
+                            //var ttime = s_date;
+                            //ttime = new Date(ttime.setMonth(s_date.getMonth() + 1));
+                            //ttime = new Date(ttime.setMinutes(59));
+                            //ttime = new Date(ttime.setSeconds(59));
+                            //ttime = new Date(ttime.setHours(23));
+                            end.setValue(setNextMonth(s_date,1));
                         }
                     }
                 },
@@ -1354,9 +1396,11 @@ function editFunction(RowID, PromoAmountGiftStore) {
                     anchor: '95%',
                     name: 'enddate',
                     format: 'Y-m-d H:i:s',
+                    time: { hour: 23, sec: 59, min: 59 },
                     allowBlank: false,
                     submitValue: true,
-                    value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+                    value:setNextMonth(Tomorrow(),1),
+                   // value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
                     listeners: {
                         select: function (a, b, c) {
                             var start = Ext.getCmp("startdate");
@@ -1365,13 +1409,14 @@ function editFunction(RowID, PromoAmountGiftStore) {
                             var now_date = new Date(end.getValue());
                             if (end.getValue() < start.getValue()) {
                                 Ext.Msg.alert(INFORMATION, TIMETIP);
+                                end.setValue(setNextMonth(s_date, 1));
                             }
-                            var ttime = now_date;
-                            ttime = new Date(ttime.setMonth(now_date.getMonth()));
-                            ttime = new Date(ttime.setMinutes(59));
-                            ttime = new Date(ttime.setSeconds(59));
-                            ttime = new Date(ttime.setHours(23));
-                            end.setValue(ttime);
+                            //var ttime = now_date;
+                            //ttime = new Date(ttime.setMonth(now_date.getMonth()));
+                            //ttime = new Date(ttime.setMinutes(59));
+                            //ttime = new Date(ttime.setSeconds(59));
+                            //ttime = new Date(ttime.setHours(23));
+                            //end.setValue(ttime);
                         }
                     }
                 },
@@ -2383,3 +2428,14 @@ function GetEventId(ctype, cid) {
     return sResult;
 }
 
+function setNextMonth(source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    }
+    else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
+}

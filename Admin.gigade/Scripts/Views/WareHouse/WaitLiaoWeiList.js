@@ -122,21 +122,27 @@ Ext.onReady(function () {
                 layout: 'hbox',
                 items: [
                            {
-                               xtype: 'datefield',
+                               xtype: 'datetimefield',
                                margin: '5 0 0 5',
                                fieldLabel: '商品建立時間',
                                labelWidth: 80,
                                id: 'start_time',
-                               format: 'Y-m-d',
-                               width: 180,
-                               value: Tomorrow(1 - new Date().getDate()),
+                               format: 'Y-m-d H:i:s',
+                               time: { hour: 00, min: 00, sec: 00 },
+                               width: 230,
+                               value: new Date(Tomorrow(0).setMonth(Tomorrow(0).getMonth() - 1)),
                                editable: false,
                                listeners: {
                                    select: function (a, b, c) {
                                        var start = Ext.getCmp("start_time");
-                                       var end = Ext.getCmp("end_time");
-                                       var s_date = new Date(start.getValue());
-                                       end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                       var end = Ext.getCmp("end_time");                                      
+                                       if (end.getValue() == null) {
+                                           end.setValue(setNextMonth(start.getValue(), 1));
+                                       }
+                                       else if (end.getValue() < start.getValue()) {
+                                           Ext.Msg.alert(INFORMATION, DATA_TIP);
+                                           end.setValue(setNextMonth(start.getValue(), 1));
+                                       }
                                    },
                                    specialkey: function (field, e) {
                                        if (e.getKey() == Ext.EventObject.ENTER) {
@@ -151,22 +157,23 @@ Ext.onReady(function () {
                     value: '~'
                 },
                 {
-                    xtype: 'datefield',
+                    xtype: 'datetimefield',
                     id: 'end_time',
                     margin: '5 0 0 5',
-                    format: 'Y-m-d',
-                    width: 110,
-                    value: Tomorrow(0),
+                    format: 'Y-m-d  H:i:s',
+                    time: { hour: 23, min: 59, sec: 59 },
+                    width: 150,
+                    value: setNextMonth(Tomorrow(0), 0),
                     editable: false,
                     listeners: {
                         select: function (a, b, c) {
                             var start = Ext.getCmp("start_time");
                             var end = Ext.getCmp("end_time");
-                            var s_date = new Date(start.getValue());
-
+                            if (start.getValue() == null) {
+                                start.setValue(setNextMonth(end.getValue(), -1));
+                            }
                             if (end.getValue() < start.getValue()) {
-                                Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
-                                end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                start.setValue(setNextMonth(end.getValue(), -1));
                             }
                         },
                         specialkey: function (field, e) {
@@ -382,13 +389,28 @@ function Query(x) {
 }
 
 /******************************************************************************************************************************************************************************************/
-function Tomorrow(s) {
-    var d;
-    d = new Date();                             // 创建 Date 对象。                               // 返回日期。
-    d.setDate(d.getDate() + s);
-    return d;
+function Tomorrow(n) {
+        var d;
+        var dt;
+        var s = "";
+        d = new Date();                             // 创建 Date 对象。
+        s += d.getFullYear() + "/";                     // 获取年份。
+        s += (d.getMonth() + 1) + "/";              // 获取月份。
+        s += d.getDate();
+        dt = new Date(s);
+        dt.setDate(dt.getDate() + n);
+        return dt;                  // 返回日期。
 }
-
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    } else if (n >= 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
+}
 /************匯出到Exce************/
 function Export() {
     var freight = Ext.getCmp('freight').getValue();
@@ -396,6 +418,6 @@ function Export() {
     var product_mode = Ext.getCmp('product_mode').getValue();
     var start_time = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s'));
     var end_time = Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'));
-    window.open("/WareHouse/ExportCSV?product_mode=" + product_mode + "&freight=" + freight + "&start_time=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d') + "&end_time=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d'));
+    window.open("/WareHouse/ExportCSV?product_mode=" + product_mode + "&freight=" + freight + "&start_time=" + Ext.Date.format(new Date(Ext.getCmp('start_time').getValue()), 'Y-m-d H:i:s') + "&end_time=" + Ext.Date.format(new Date(Ext.getCmp('end_time').getValue()), 'Y-m-d H:i:s'));
 
 }

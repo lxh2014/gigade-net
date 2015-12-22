@@ -10,6 +10,9 @@ namespace BLL.gigade.Model
         public int row_id { get; set; }
         public string work_id {get;set;}
         public string ipo_id {get;set;}
+        public int item_id {get;set;}
+        public int add_qty {get;set;}
+        public DateTime cde_date {get;set;}
         public uint item_id {get;set;}
         public int add_qty {get;set;}
         public DateTime cde_date {get;set;}

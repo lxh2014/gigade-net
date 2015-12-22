@@ -21,8 +21,8 @@ Ext.define("gigade.paraModel", {
 var createTypeStore = Ext.create('Ext.data.Store', {
     fields: ['txt', 'value'],
     data: [       
-        { "txt": '前臺', "value": "1" },
-        { "txt": '後臺', "value": "2" }
+        { "txt": '前台', "value": "1" },
+        { "txt": '後台', "value": "2" }
     ]
 });
 ////管理員store
@@ -215,8 +215,9 @@ Ext.onReady(function () {
                         margin: '0 5 0 0',
                     },                   
                     {
-                        xtype: 'datefield',
-                        format: 'Y-m-d',
+                        xtype: 'datetimefield',
+                        format: 'Y-m-d H:i:s',
+                        time: { hour: 00, min: 00, sec: 00 },//開始時間00：00：00
                         id: 'time_start',
                         name: 'time_start',
                         margin: '0 5 0 0',
@@ -245,8 +246,9 @@ Ext.onReady(function () {
                         value: '~&nbsp&nbsp'
                     },
                     {
-                        xtype: 'datefield',
-                        format: 'Y-m-d',
+                        xtype: 'datetimefield',
+                        format: 'Y-m-d H:i:s',
+                        time: { hour: 23, min: 59, sec: 59 },//標記結束時間23:59:59
                         id: 'time_end',
                         name: 'time_end',
                         margin: '0 5 0 0',
@@ -347,10 +349,10 @@ Ext.onReady(function () {
                 header: '創建類型', dataIndex: 'dcl_create_type', width: 90, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (value == 1) {
-                        return "前臺";
+                        return "前台";
                     }
                     else if (value == 2) {
-                        return "後臺";
+                        return "後台";
                     } else {
                         return value;
                     }

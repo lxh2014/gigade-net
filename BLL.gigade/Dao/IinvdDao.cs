@@ -1704,14 +1704,14 @@ ORDER BY loc.loc_id,loc.row_id DESC  ", sbWhere.ToString(), sbjoin.ToString());/
         #endregion
 
         #region 收貨上架獲取更新iinvd表的SQL
-        public string UpdateIinvdSql(IinvdQuery query)
+        public string UpdateIinvdSql(IinvdQuery query,out string ista_id)
         {
             StringBuilder sql = new StringBuilder();
             StringBuilder sql_result = new StringBuilder();
             try
             {
-
-                sql.AppendFormat(@" select i.row_id,i.prod_qty from iinvd i LEFT JOIN product_ext pe ON i.item_id = pe.item_id WHERE made_date='{0}' and cde_dt='{1}' and i.item_id='{2}' ", query.made_date.ToString("yyyy-MM-dd"), query.cde_dt.ToString("yyyy-MM-dd"), query.item_id);
+                ista_id = string.Empty;
+                sql.AppendFormat(@" select i.row_id,i.prod_qty,i.ista_id from iinvd i LEFT JOIN product_ext pe ON i.item_id = pe.item_id WHERE made_date='{0}' and cde_dt='{1}' and i.item_id='{2}' ", query.made_date.ToString("yyyy-MM-dd"), query.cde_dt.ToString("yyyy-MM-dd"), query.item_id);
                 if (query.pwy_dte_ctl == "Y")
                 {
                     sql.AppendFormat(@" and pwy_dte_ctl='{0}' ;",query.pwy_dte_ctl);
@@ -1726,6 +1726,10 @@ ORDER BY loc.loc_id,loc.row_id DESC  ", sbWhere.ToString(), sbjoin.ToString());/
                     int row_id = Convert.ToInt32(_dt.Rows[0]["row_id"]);
                     int prod_qty = Convert.ToInt32(_dt.Rows[0]["prod_qty"]);
                     sql_result.AppendFormat(@"update iinvd set prod_qty='{0}' where row_id='{1}';", query.prod_qty + prod_qty, row_id);
+                    if (_dt.Rows[0]["ista_id"].ToString() == "H")
+                    {
+                        ista_id = "H";//該情況下不修改料位帳卡；
+                    }
                 }
                 else
                 {

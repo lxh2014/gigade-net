@@ -228,16 +228,19 @@ function editFunction(RowID, PromoAmountTrialStore) {
             name: 'start_date',
             anchor: '95%',
             format: 'Y-m-d H:i:s',
+            time: { hour: 00, min: 00, sec: 00 },//add by jiaohe0625j
             width: 150,
             allowBlank: false,
             submitValue: true,
-            value: Tomorrow(),
+            //value: Tomorrow(),
+            value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),//modify by jiaohe0625j
             listeners: {
                 select: function (a, b, c) {
                     var start = Ext.getCmp("start_date");
                     var end = Ext.getCmp("end_date");
                     if (end.getValue() < start.getValue()) {
-                        Ext.Msg.alert(INFORMATION, TIMETIP);
+                        //Ext.Msg.alert(INFORMATION, TIMETIP);
+                        end.setValue(setNextMonth(start.getValue(), 1));//add by jiaohe0625j
                     }
                 }
             }
@@ -250,24 +253,30 @@ function editFunction(RowID, PromoAmountTrialStore) {
             anchor: '95%',
             name: 'end_date',
             format: 'Y-m-d H:i:s',
+            time: { hour: 23, min: 59, sec: 59 },//add by jiaohe0625j
             allowBlank: false,
             submitValue: true,
-            value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+            //value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+            value: setNextMonth(Tomorrow(), 0),//modify by jiaohe0625j
             listeners: {
                 select: function (a, b, c) {
                     var start = Ext.getCmp("start_date");
                     var end = Ext.getCmp("end_date");
                     var s_date = new Date(start.getValue());
                     var now_date = new Date(end.getValue());
+                    //if (end.getValue() < start.getValue()) {
+                    //    Ext.Msg.alert(INFORMATION, TIMETIP);
+                    //}
+                    //var ttime = now_date;
+                    //ttime = new Date(ttime.setMonth(now_date.getMonth()));
+                    //ttime = new Date(ttime.setMinutes(59));
+                    //ttime = new Date(ttime.setSeconds(59));
+                    //ttime = new Date(ttime.setHours(23));
+                    //end.setValue(ttime);
+                    //modify by jiaohe0625j
                     if (end.getValue() < start.getValue()) {
-                        Ext.Msg.alert(INFORMATION, TIMETIP);
+                        start.setValue(setNextMonth(end.getValue(), -1));
                     }
-                    var ttime = now_date;
-                    ttime = new Date(ttime.setMonth(now_date.getMonth()));
-                    ttime = new Date(ttime.setMinutes(59));
-                    ttime = new Date(ttime.setSeconds(59));
-                    ttime = new Date(ttime.setHours(23));
-                    end.setValue(ttime);
                 }
             }
         },
@@ -1180,4 +1189,14 @@ function editFunction(RowID, PromoAmountTrialStore) {
         return dt;                                 // 返回日期。
     }
 
+}
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    } else {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }

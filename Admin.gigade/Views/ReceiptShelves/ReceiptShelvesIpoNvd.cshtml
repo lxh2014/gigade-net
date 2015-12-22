@@ -149,7 +149,8 @@
 
         
     }
-    $('#made_date').on('click', function ()
+
+    function datetimepicker()
     {
         $('#made_date').datetimepicker({
             language: 'zh-TW',
@@ -171,19 +172,13 @@
                 var end = $('#cde_date_label');
                 var date = new Date(start.val());
                 end.val(new Date(date.setDate(date.getDate() + cde_dt_incr)).Format("yyyy-MM-dd"));
-
             }
-            //非有效期控管
+                //非有效期控管
             else
             {
                 $('#cde_date_label').val($('#made_date_label').val());
             }
         });
-        //$('#made_date').datetimepicker('show');
-    })
-
-    $('#cde_date').on('click', function ()
-    {
         $('#cde_date').datetimepicker({
             language: 'zh-TW',
             weekStart: 1,
@@ -211,9 +206,9 @@
             {
                 $('#made_date_label').val($('#cde_date_label').val());
             }
-          });
-        
-    })
+        });
+    }
+
     Date.prototype.Format = function (fmt)
     { //author: meizz 
         var o = {
@@ -313,8 +308,9 @@
                         $("#productname").text(result.data[0].description + prod);
                         $("#loc_id").text(result.data[0].loc_id);
  
-                        $("#made_date_label").val(result.data[0].made_date);
-                        $("#cde_date_label").val(result.data[0].cde_dt);
+                        ////
+                        $("#made_date_label").val(result.data[0].made_date.substr(0, 10));
+                        $("#cde_date_label").val(result.data[0].cde_dt.substr(0, 10));
                         $("#out_qty").text(result.data[0].out_qty);
                         $("#pwy_dte_ctl").text(result.data[0].pwy_dte_ctl);
                         $("#cde_dt_incr").text(result.data[0].cde_dt_incr); 
@@ -340,7 +336,7 @@
                     $('#modal-dialog-close').focus();
                 })
             });
-            
+            datetimepicker()
             //分配庫存初始值
             setTimeout(function ()
             {
