@@ -417,6 +417,7 @@ Ext.onReady(function () {
         // height: 645,
         flex: 8.5,
         columnLines: true,
+        hidden:true,
         frame: true,
         columns: [
 
@@ -577,6 +578,7 @@ Ext.onReady(function () {
               xtype: 'button',
               text: '編輯',
               disabled: true,
+              hidden: true,
               iconCls: 'icon-user-edit',
               id: 'edit',
               handler: onEditClick
@@ -605,7 +607,7 @@ Ext.onReady(function () {
         }
     });
     
-    //ToolAuthority();
+    ToolAuthority();
     //DeliversListStore.load({ params: { start: 0, limit: 25 } });
     
 })
@@ -655,6 +657,7 @@ Query = function () {
         Ext.Msg.alert("提示", "請選擇開始時間");
         return false;
     }
+    Ext.getCmp('deliverExpectArrivalGrid').show();
     
     
    

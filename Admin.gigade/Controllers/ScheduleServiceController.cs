@@ -58,8 +58,11 @@ namespace Admin.gigade.Controllers
                             SchedulePeriodQuery query_period = new SchedulePeriodQuery();
                             query_period.rowid = item.schedule_period_id;
                             query_period = _secheduleServiceMgr.GetSchedulePeriod(query_period);
-                            query_period.current_nums += 1;
-                            _secheduleServiceMgr.UpdateSchedulePeriod(query_period);
+                            if (query_period != null)
+                            {
+                                query_period.current_nums += 1;
+                                _secheduleServiceMgr.UpdateSchedulePeriod(query_period);
+                            }
 
                             //更新ScheduleMaster表的previous_execute_time、next_execute_time、state；
                             item.previous_execute_time = (int)CommonFunction.GetPHPTime();
