@@ -2329,6 +2329,7 @@ function editFunction(rowID) {
                                    if (result.success) {
                                        if (result.msg == 0) {
                                            Ext.Msg.alert(INFORMATION, "公司email不能重複，請修改您的輸入 ");
+                                           Ext.getCmp("save").setDisabled(false);
                                        } else {
                                            Ext.Msg.alert(INFORMATION, SUCCESS);
                                            VendorListStore.loadPage(1);
