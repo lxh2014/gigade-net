@@ -333,7 +333,7 @@ Ext.onReady(function ()
                 }
             }
         },
-        selModel: sm
+        //selModel: sm
     });
     Ext.create('Ext.Viewport', {
         layout: 'vbox',

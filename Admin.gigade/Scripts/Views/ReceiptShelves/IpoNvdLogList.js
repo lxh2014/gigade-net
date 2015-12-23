@@ -61,7 +61,7 @@ var IpoNvdLogStore = Ext.create('Ext.data.Store', {
     model: 'GIGADE.IpoNvdLog',
     proxy: {
         type: 'ajax',
-        url: '/WareHouse/GetIpoNvdLogList',
+        url: '/ReceiptShelves/GetIpoNvdLogList',
         actionMethods: 'post',
         reader: {
             type: 'json',
@@ -362,16 +362,16 @@ Ext.onReady(function () {
         columns: [
    
             { header: '流水號', dataIndex: 'row_id', width: 50, align: 'center' },
-            { header: '工作編號', dataIndex: 'work_id', width: 120, align: 'center'},
+            { header: '工作編號', dataIndex: 'work_id', width: 150, align: 'center'},
             {
-                header: '採購單單號', dataIndex: 'ipo_id', width: 120, align: 'center'               
+                header: '採購單單號', dataIndex: 'ipo_id', width: 150, align: 'center'               
             },
             //{ header: '商品條碼', dataIndex: 'upc_id', width: 120, align: 'center' },
-            { header: '商品細項編號', dataIndex: 'item_id', width: 90, align: 'center' },
-            { header: '商品主料位', dataIndex: 'loc_id', width: 90, align: 'center' },
-            { header: '收貨上架數量', dataIndex: 'add_qty', width: 90, align: 'center' },
+            { header: '商品細項編號', dataIndex: 'item_id', width: 100, align: 'center' },
+            { header: '商品主料位', dataIndex: 'loc_id', width: 100, align: 'center' },
+            { header: '收貨上架數量', dataIndex: 'add_qty', width: 100, align: 'center' },
             {
-                header: '製造日期', dataIndex: 'made_date', width: 130, align: 'center',
+                header: '製造日期', dataIndex: 'made_date', width: 100, align: 'center',
                 renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
                     if (value.substr(0, 10) == "0001-01-01") {
                         return ""
@@ -403,8 +403,8 @@ Ext.onReady(function () {
                     }                  
                 }
             },
-            { header: '創建人', dataIndex: 'create_user_string', width: 90, align: 'center' },
-            { header: '創建時間', dataIndex: 'create_datetime', width: 140, align: 'center' }
+            { header: '創建人', dataIndex: 'create_user_string', width: 100, align: 'center' },
+            { header: '創建時間', dataIndex: 'create_datetime', width: 150, align: 'center' }
         ],
         listeners: {
             scrollershow: function (scroller) {
@@ -431,7 +431,7 @@ Ext.onReady(function () {
             displayMsg: NOW_DISPLAY_RECORD + ': {0} - {1}' + TOTAL + ': {2}',
             emptyMsg: NOTHING_DISPLAY
         }),
-        selModel: sm
+        //selModel: sm
     });
     Ext.create('Ext.Viewport', {
         layout: 'vbox',

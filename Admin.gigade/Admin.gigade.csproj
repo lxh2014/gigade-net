@@ -1999,7 +1999,7 @@
     <Content Include="Scripts\Views\SendProduct\DeliverExportArrivalList.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverExportArrivalEdit.js" />
     <Content Include="Scripts\Views\SendProduct\ExportArrivalChangeLogList.js" />
-    <Content Include="Scripts\Views\SendProduct\IpoNvdLogList.js" />
+    <Content Include="Scripts\Views\ReceiptShelves\IpoNvdLogList.js" />
     <Content Include="Scripts\Views\Service\OrderQuestionAdd.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaEdit.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaList.js" />
@@ -4524,7 +4524,7 @@
     <Content Include="Views\ReceiptShelves\ReceiptShelvesItemid.cshtml" />
     <Content Include="Views\ReceiptShelves\ReceiptShelvesIpoNvd.cshtml" />
     <Content Include="Views\ReceiptShelves\IpoNvdExport.cshtml" />
-    <Content Include="Views\WareHouse\IpoNvdLogList.cshtml" />
+    <Content Include="Views\ReceiptShelves\IpoNvdLogList.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

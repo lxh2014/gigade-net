@@ -63,7 +63,7 @@ namespace Admin.gigade.Controllers
         IProductItemImplMgr _proditemMgr;
         IParametersrcImplMgr _IparasrcMgr;
         ICbjobMasterImplMgr _CbjobMasterMgr;
-        IpoNvdLogMgr ipoNvdLogMgr;
+
         #region Views
         /// <summary>
         /// 
@@ -350,11 +350,6 @@ namespace Admin.gigade.Controllers
         }
         //等待料位報表
         public ActionResult WaitLiaoWei()
-        {
-            return View();
-        }
-        //ipo_nvd_log查詢頁面
-        public ActionResult IpoNvdLogList()
         {
             return View();
         }
@@ -14874,70 +14869,6 @@ namespace Admin.gigade.Controllers
             return Json(new { success = result,date=ReturnDate });
         }
         #endregion
-
-        public HttpResponseBase GetIpoNvdLogList()
-        {
-            string json = string.Empty;
-            int totalcount = 0;
-            IpoNvdLogQuery query = new IpoNvdLogQuery();
-            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
-            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
-            ipoNvdLogMgr = new IpoNvdLogMgr(mySqlConnectionString);
-            if (!string.IsNullOrEmpty(Request.Params["work_id"].Trim()))
-            {
-                query.work_id = Request.Params["work_id"].Trim();
-            }
-            if (!string.IsNullOrEmpty(Request.Params["ipo_id"].Trim()))
-            {
-                query.ipo_id = Request.Params["ipo_id"].Trim();
-            }
-            if (!string.IsNullOrEmpty(Request.Params["itemId_or_upcId"].Trim()))
-            {
-                uint itemId = Convert.ToUInt32(Request.Params["itemId_or_upcId"].Trim());
-                bool result = ipoNvdLogMgr.GetInfoByItemId(itemId);
-               
-                if (result == false)
-                {
-                    query.upc_id = Request.Params["itemId_or_upcId"].Trim();//條碼
-                }
-                else 
-                {
-                    query.item_id = Convert.ToUInt32(Request.Params["itemId_or_upcId"].Trim());
-                }             
-            }
-            if (!string.IsNullOrEmpty(Request.Params["loc_id"].Trim()))
-            {
-                query.loc_id = Request.Params["loc_id"].Trim();
-            }
-            if (!string.IsNullOrEmpty(Request.Params["time_start"]))//開始時間
-            {
-                query.start_time = Convert.ToDateTime(Request.Params["time_start"]);
-                //query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
-            }
-            if (!string.IsNullOrEmpty(Request.Params["time_end"]))//結束時間
-            {
-                query.end_time = Convert.ToDateTime(Request.Params["time_end"]);
-                //query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
-            }
-            try
-            {
-                List<IpoNvdLogQuery> list = ipoNvdLogMgr.GetIpoNvdLogList(query, out totalcount);
-                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:true,totalCount:0,data:[]}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return Response;
-        }
+        
     }
 }
