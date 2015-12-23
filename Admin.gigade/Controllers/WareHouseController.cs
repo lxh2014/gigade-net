@@ -63,6 +63,7 @@ namespace Admin.gigade.Controllers
         IProductItemImplMgr _proditemMgr;
         IParametersrcImplMgr _IparasrcMgr;
         ICbjobMasterImplMgr _CbjobMasterMgr;
+
         #region Views
         /// <summary>
         /// 
@@ -14868,5 +14869,6 @@ namespace Admin.gigade.Controllers
             return Json(new { success = result,date=ReturnDate });
         }
         #endregion
+        
     }
 }
