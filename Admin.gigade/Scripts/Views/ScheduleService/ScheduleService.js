@@ -544,10 +544,6 @@ function ondelete_master() {
                 for (var i = 0; i < row.length; i++) {
 
                     rowIDs += row[i].data.rowid + ',';//可以刪除多條數據記錄
-
-                    //  rowIDs += row[i].data.id//刪除一條數據記錄
-
-                    Ext.Msg.alert(rowIDs);
                 }
                 Ext.Ajax.request({
                     //控制器下的delete方法
@@ -568,7 +564,7 @@ function ondelete_master() {
                         }
                     },
                     failure: function () {
-                        Ext.Msg.alert("刪除失敗!");
+                        Ext.Msg.alert(INFORMATION, "刪除失敗!");
                     }
                 });
             }
@@ -592,10 +588,6 @@ function ondelete_config() {
                 for (var i = 0; i < row.length; i++) {
 
                     rowIDs += row[i].data.rowid + ',';//可以刪除多條數據記錄
-
-                    //  rowIDs += row[i].data.id//刪除一條數據記錄
-
-                    Ext.Msg.alert(rowIDs);
                 }
                 Ext.Ajax.request({
                     //控制器下的delete方法
@@ -616,7 +608,7 @@ function ondelete_config() {
                         }
                     },
                     failure: function () {
-                        Ext.Msg.alert("刪除失敗!");
+                        Ext.Msg.alert(INFORMATION, "刪除失敗!");
                     }
                 });
             }
@@ -641,9 +633,6 @@ function ondelete_period() {
 
                     rowIDs += row[i].data.rowid + ',';//可以刪除多條數據記錄
 
-                    //  rowIDs += row[i].data.id//刪除一條數據記錄
-
-                    Ext.Msg.alert(rowIDs);
                 }
                 Ext.Ajax.request({
                     //控制器下的delete方法
@@ -664,7 +653,7 @@ function ondelete_period() {
                         }
                     },
                     failure: function () {
-                        Ext.Msg.alert("刪除失敗!");
+                        Ext.Msg.alert(INFORMATION, "刪除失敗!");
                     }
                 });
             }

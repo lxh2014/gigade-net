@@ -74,11 +74,7 @@ namespace BLL.gigade.Mgr
             
             string aligns = "align=\"left\"";
             string color = "style=\"background-color:#ffeedd;\"";//單數行的樣式f0f0f0 dcb5ff  e0e0e0
-            
-            //sbHtml.Append("<th ");
-            //sbHtml.Append(" >");
-            //sbHtml.Append("行號");
-            //sbHtml.Append("</th>");
+          
 
             //插入列頭
             for (int i = 0; i < _dtmyMonth.Columns.Count; i++)
@@ -94,19 +90,6 @@ namespace BLL.gigade.Mgr
             {
                 sbHtml.Append("<tr>");
 
-                //sbHtml.Append("<td ");
-                //if (i % 2 == 0)
-                //{
-                //    sbHtml.Append(aligns + color);
-                //}
-                //else
-                //{
-                //    sbHtml.Append(aligns);
-                //}
-                
-                //sbHtml.Append(" >");
-                //sbHtml.Append(i+1);
-                //sbHtml.Append("</td>");
                 for (int j = 0; j < _dtmyMonth.Columns.Count; j++)
                 {
                     sbHtml.Append("<td ");               
@@ -336,12 +319,12 @@ namespace BLL.gigade.Mgr
                         if (dclTable.Rows[i]["dcl_create_type"].ToString() == "1")
                         {
                             dr["異動人"] = dclTable.Rows[i]["dcl_create_username"].ToString();
-                            dr["異動類型"] = "前臺";
+                            dr["異動類型"] = "前台";
                         }
                         else if (dclTable.Rows[i]["dcl_create_type"].ToString() == "2")
                         {
                             dr["異動人"] = dclTable.Rows[i]["dcl_create_musername"].ToString();
-                            dr["異動類型"] = "後臺";
+                            dr["異動類型"] = "後台";
                         }
                         dr["異動時間"] = Convert.ToDateTime(dclTable.Rows[i]["dcl_create_datetime"]).ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -536,7 +519,7 @@ namespace BLL.gigade.Mgr
             }
             catch (Exception ex)
             {
-                return false;
+               
                 throw new Exception("DeliverChangeLogMgr-->isCanModifyExpertArriveDate-->" + ex.Message, ex);
 
             }
@@ -570,7 +553,7 @@ namespace BLL.gigade.Mgr
             }
             catch (Exception ex)
             {
-                return false;
+               
                 throw new Exception("DeliverChangeLogMgr-->isCanModifyExpertArriveDate-->" + ex.Message, ex);
 
             }

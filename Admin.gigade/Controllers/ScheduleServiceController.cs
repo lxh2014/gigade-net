@@ -58,8 +58,11 @@ namespace Admin.gigade.Controllers
                             SchedulePeriodQuery query_period = new SchedulePeriodQuery();
                             query_period.rowid = item.schedule_period_id;
                             query_period = _secheduleServiceMgr.GetSchedulePeriod(query_period);
-                            query_period.current_nums += 1;
-                            _secheduleServiceMgr.UpdateSchedulePeriod(query_period);
+                            if (query_period != null)
+                            {
+                                query_period.current_nums += 1;
+                                _secheduleServiceMgr.UpdateSchedulePeriod(query_period);
+                            }
 
                             //更新ScheduleMaster表的previous_execute_time、next_execute_time、state；
                             item.previous_execute_time = (int)CommonFunction.GetPHPTime();
@@ -700,16 +703,44 @@ namespace Admin.gigade.Controllers
         public HttpResponseBase SchedulePeriodDelete()
         {
             string json = string.Empty;
-            SchedulePeriodQuery query = new SchedulePeriodQuery();
+            SchedulePeriodQuery period = new SchedulePeriodQuery();
             _secheduleServiceMgr = new ScheduleServiceMgr(mySqlConnectionString);
             try
             {
                 string id = Request.Params["id"];
+                id = id.Substring(0, id.Length - 1).ToString();
                 string[] ids = id.Split(',');
-                for (int i = 0; i < ids.Length - 1; i++)
+                if (ids.Length>0)
                 {
-                    query.rowid = int.Parse(ids[i].ToString());
-                    _secheduleServiceMgr.SchedulePeriodDelete(query.rowid.ToString());
+
+                    period.rowid = int.Parse(ids[0].ToString());
+                    period = _secheduleServiceMgr.GetSchedulePeriod(period);
+
+                    ScheduleMasterQuery query_master = new ScheduleMasterQuery();
+                    query_master.schedule_code = period.schedule_code;
+                    
+                    //刪除
+                    int result = _secheduleServiceMgr.SchedulePeriodDelete(id);
+                    if (result > 0)
+                    {
+                         ScheduleMasterQuery item = _secheduleServiceMgr.GetScheduleMaster(query_master);
+                        //更新ScheduleMaster表的previous_execute_time、next_execute_time、state；
+
+                        //獲取next_execute_time和schedule_period_id
+                        int schedule_period_id = 0;
+                        int next_execute_time = _secheduleServiceMgr.GetNext_Execute_Time(item.schedule_code, out schedule_period_id);
+                        //if (item.next_execute_time > next_execute_time || (item.next_execute_time == 0 && item.next_execute_time < next_execute_time))
+                        {
+                            item.next_execute_time = next_execute_time;
+                            if (item.next_execute_time == 0)
+                            {
+                                item.schedule_state = 0;
+                            }
+                            item.schedule_period_id = schedule_period_id;
+                            //修改ScheduleMaster
+                            _secheduleServiceMgr.UpdateScheduleMaster(item);
+                        }
+                    }
 
                 }
                 json = "{success:true}";

@@ -658,5 +658,40 @@ namespace BLL.gigade.Common
             }
             return newName;
         }
+
+        #region 獲取一個文件夾下面所有文件 +string[] GetAllFiles(string path, string geshi)
+        /// <summary>
+        /// 獲取一個文件夾下面所有文件
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="geshi">文件類型</param>
+        /// <returns></returns>
+        public string[] GetAllFiles(string path, string geshi)
+        {
+            string[] files = Directory.GetFiles(path, geshi);
+            return files;
+        }
+        #endregion
+        #region 移動一個文件 + void MoveOneFile(string oldfilePath, string newfilePath)
+        /// <summary>
+        /// 移動一個文件
+        /// </summary>
+        /// <param name="oldfilePath">文件原來的全路徑</param>
+        /// <param name="newfilePath">文件新的全路徑</param>
+        public void MoveOneFile(string oldfilePath, string newfilePath, string newFileName)
+        {
+            string newPath = newfilePath + "\\" + newFileName;
+            if (!Directory.Exists(newfilePath))
+            {
+                Directory.CreateDirectory(newfilePath);
+            }
+            if (File.Exists(newPath))
+            {
+                File.Delete(newPath);
+            }
+            File.Move(oldfilePath, newPath);
+
+        }
+        #endregion
     }
 }

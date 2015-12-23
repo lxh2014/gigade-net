@@ -106,7 +106,9 @@ Ext.define('gigade.Ipod', {
      { name: "parameterName", type: "string" },
      { name: "plst_id", type: "string" },
      { name: "spec", type: "string" },
-    { name: "item_stock", type: "string" }//庫存
+     { name: "item_stock", type: "string" },//庫存
+     { name: 'cde_dt', type: "string" },
+     { name: 'made_date', type: "string" },
     ]
 });
 
@@ -197,6 +199,30 @@ IpodStore.on("beforeload", function ()
         ipod: Ext.getCmp("ipod") ? Ext.getCmp("ipod").getValue() : ''
     })
 })
+
+/************************編輯*********************************/
+onEditClick = function ()
+{
+    var row = Ext.getCmp("detailist").getSelectionModel().getSelection();
+    if (row.length == 0)
+    {
+        Ext.Msg.alert(INFORMATION, NO_SELECTION);
+    } else if (row.length > 1)
+    {
+        Ext.Msg.alert(INFORMATION, ONE_SELECTION);
+    } else if (row.length == 1)
+    {
+        if (row[0].data.plst_id == "已驗收")
+        {
+            Ext.Msg.alert(INFORMATION, "請選擇未驗收的商品！");
+        }
+        else
+        {
+            CheckEditFunction(row[0], IpodStore);
+        }
+        
+    }
+}
 
 //左邊活動列表
 var ipoList = Ext.create('Ext.grid.Panel', {
@@ -462,7 +488,15 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
 });
 Ext.grid.RowEditor.prototype.saveBtnText = "保存";
 Ext.grid.RowEditor.prototype.cancelBtnText = "取消";
-//Ext.grid.RowEditor.buttonAlign = "center";
+
+var sm = Ext.create('Ext.selection.CheckboxModel', {
+    listeners: {
+        selectionchange: function (sm, selections)
+        {
+            Ext.getCmp("center").down('#edit').setDisabled(selections.length == 0);
+        }
+    }
+});
 var center = Ext.create('Ext.form.Panel', {
     id: 'center',
     autoScroll: true,
@@ -493,7 +527,7 @@ var center = Ext.create('Ext.form.Panel', {
             frame: false,
             height: document.documentElement.clientHeight-15,
             store: IpodStore,
-            plugins: [rowEditing],
+            //plugins: [rowEditing],
             columns: [
                 {
                     header: "驗收狀態", dataIndex: 'plst_id', width: 80, align: 'center',
@@ -510,9 +544,9 @@ var center = Ext.create('Ext.form.Panel', {
                         }
                     }
                 },
-                { header: "商品編號", dataIndex: 'product_id', width: 100, align: 'center' },
-                { header: "商品名稱", dataIndex: 'product_name', width: 300, align: 'center' },
-                { header: "商品細項編號", dataIndex: 'prod_id', width: 100, align: 'center' },
+                { header: "商品編號", dataIndex: 'product_id', width: 80, align: 'center' },
+                { header: "商品名稱", dataIndex: 'product_name', width: 200, align: 'center' },
+                { header: "商品細項編號", dataIndex: 'prod_id', width: 80, align: 'center' },
                 { header: "規格", dataIndex: 'spec', width: 80, align: 'center' },
                 //{ header: "收貨狀態", dataIndex: 'parameterName', width: 100, align: 'center' },
                 //{ header: "收貨狀態", dataIndex: 'ParameterCode', width: 100, align: 'center', hidden: true },
@@ -528,7 +562,38 @@ var center = Ext.create('Ext.form.Panel', {
                     editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, maxValue: 99999, allowDecimals: false }
 
                 },
-                { header: "允收數量", dataIndex: 'qty_claimed', flex: 1, align: 'center', editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, maxValue: 99999, allowDecimals: false } },
+                {
+                    header: "允收數量", dataIndex: 'qty_claimed', flex: 1, align: 'center',
+                    editor: { xtype: 'numberfield', allowBlank: false, minValue: 0, maxValue: 99999, allowDecimals: false }
+                },
+                {
+                    header: "製造日期", dataIndex: 'made_date', flex: 1, align: 'center',
+                    renderer: function (value, cellmeta, record, rowIndex, columnIndex, store)
+                    {
+                        if (value == "0001-01-01")
+                        {
+                            return '';
+                        }
+                        else
+                        {
+                            return value;
+                        }
+                    }
+                },
+                {
+                    header: "有效日期", dataIndex: 'cde_dt', flex: 1, align: 'center',
+                    renderer: function (value, cellmeta, record, rowIndex, columnIndex, store)
+                    {
+                        if (value == "0001-01-01")
+                        {
+                            return '';
+                        }
+                        else
+                        {
+                            return value;
+                        }
+                    }
+                },
                 //{ header: "品項庫存用途", dataIndex: 'promo_invs_flg', flex: 1, align: 'center' },
                 //{ header: "訂貨價格", dataIndex: 'new_cost', flex: 1, align: 'center' },
                 //{ header: "運費", dataIndex: 'freight_price', flex: 1, align: 'center' },
@@ -542,7 +607,7 @@ var center = Ext.create('Ext.form.Panel', {
                 { header: "修改時間", dataIndex: 'change_dtim', flex: 1, align: 'center' }
             ],
             tbar: [
-                 //{ xtype: 'button', text: "編輯", id: 'edit', iconCls: 'icon-user-edit', disabled: true, },//handler: onEditClick 
+                 { xtype: 'button', text: "驗收", id: 'edit', iconCls: 'icon-user-edit', disabled: true, handler: onEditClick },
                  // { xtype: 'button', text: "刪除", id: 'delete', iconCls: 'icon-user-remove', disabled: true,  }//handler: onDeleteClick
             ],
 
@@ -556,8 +621,8 @@ var center = Ext.create('Ext.form.Panel', {
                     }
                 },
                 
-            }
-
+            },
+            selModel: sm
         }
     ],
     //bbar: Ext.create('Ext.PagingToolbar', {
@@ -624,17 +689,6 @@ Ext.onReady(function ()
     });
 
 });
-//複選框列
-var cbm = Ext.create('Ext.selection.CheckboxModel', {
-    listeners: {
-        selectionchange: function (sm, selections)
-        {
-            Ext.getCmp("edit").setDisabled(selections.length == 0);
-            Ext.getCmp("delete").setDisabled(selections.length == 0);
-        }
-    }
-});
-
 
 function LoadDetail(record)
 {

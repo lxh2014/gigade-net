@@ -63,6 +63,7 @@ namespace Admin.gigade.Controllers
         IProductItemImplMgr _proditemMgr;
         IParametersrcImplMgr _IparasrcMgr;
         ICbjobMasterImplMgr _CbjobMasterMgr;
+        IpoNvdLogMgr ipoNvdLogMgr;
         #region Views
         /// <summary>
         /// 
@@ -352,6 +353,12 @@ namespace Admin.gigade.Controllers
         {
             return View();
         }
+        //ipo_nvd_log查詢頁面
+        public ActionResult IpoNvdLogList()
+        {
+            return View();
+        }
+
         #endregion
 
         #region 料位管理模塊
@@ -385,7 +392,7 @@ namespace Admin.gigade.Controllers
             }
             if (DateTime.TryParse(Request.Params["endtime"].ToString(), out time))
             {
-                iloc.endtime = time.AddDays(1);
+                iloc.endtime = time;
             }
             try
             {
@@ -10443,6 +10450,12 @@ namespace Admin.gigade.Controllers
                 {
                     ipodStore[i].spec = GetProductSpec(ipodStore[i].prod_id.ToString());
                     ipodStore[i].plst_id = ipodStore[i].plst_id.ToString() == "F" ? "已驗收" : "未驗收";
+
+                    if (ipodStore[i].pwy_dte_ctl != "Y")
+                    {
+                        ipodStore[i].made_date = DateTime.Now.Date;
+                        ipodStore[i].cde_dt = DateTime.Now.Date;
+                    }
                 }
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
@@ -10471,6 +10484,8 @@ namespace Admin.gigade.Controllers
         {
 
             IpodQuery query = new IpodQuery();
+            IpoNvdQuery ipoNvd = new IpoNvdQuery();
+
             string json = string.Empty;
             try
             {
@@ -10480,6 +10495,12 @@ namespace Admin.gigade.Controllers
                     query.change_user = (Session["caller"] as Caller).user_id;
                     query.user_email = (Session["caller"] as Caller).user_email;
                     query.change_dtim = DateTime.Now;
+                    ////ipoNvd
+                    ipoNvd.create_user = (Session["caller"] as Caller).user_id;
+                    ipoNvd.create_datetime = DateTime.Now;
+                    ipoNvd.modify_user = (Session["caller"] as Caller).user_id;
+                    ipoNvd.modify_datetime = DateTime.Now;
+
                 }
                 if (!string.IsNullOrEmpty(Request.Params["qty_damaged"]))
                 {
@@ -10488,6 +10509,8 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["qty_claimed"]))
                 {
                     query.qty_claimed = Convert.ToInt32(Request.Params["qty_claimed"].ToString());
+                    ipoNvd.ipo_qty = query.qty_claimed;
+                    ipoNvd.out_qty = query.qty_claimed;
                 }
                 if (!string.IsNullOrEmpty(Request.Params["item_stock"]))
                 {
@@ -10497,10 +10520,32 @@ namespace Admin.gigade.Controllers
                 {
                     query.plst_id = Request.Params["plst_id"].ToString();
                 }
+                if (!string.IsNullOrEmpty(Request.Params["made_date"]))
+                {
+                    query.made_date = Convert.ToDateTime(Request.Params["made_date"].ToString());
+                    ipoNvd.made_date = query.made_date;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["cde_dt"]))
+                {
+                    query.cde_dt = Convert.ToDateTime(Request.Params["cde_dt"].ToString());
+                    ipoNvd.cde_dt = query.cde_dt;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["item_id"]))
+                {
+                    ipoNvd.item_id = Convert.ToUInt32(Request.Params["item_id"].ToString());
+                }
+                if (!string.IsNullOrEmpty(Request.Params["ipo_id"]))
+                {
+                    ipoNvd.ipo_id = Request.Params["ipo_id"].ToString();
+                }
+
+                //ipoNvd.work_id = "IN" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                ipoNvd.com_qty = 0;
+                ipoNvd.work_status = "AVL";
 
                 _ipodMgr = new IpodMgr(mySqlConnectionString);
 
-                bool result = _ipodMgr.UpdateIpodCheck(query);
+                bool result = _ipodMgr.UpdateIpodCheck(query, ipoNvd);
                 if (result)
                 {
 
@@ -14829,5 +14874,70 @@ namespace Admin.gigade.Controllers
             return Json(new { success = result,date=ReturnDate });
         }
         #endregion
+
+        public HttpResponseBase GetIpoNvdLogList()
+        {
+            string json = string.Empty;
+            int totalcount = 0;
+            IpoNvdLogQuery query = new IpoNvdLogQuery();
+            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+            ipoNvdLogMgr = new IpoNvdLogMgr(mySqlConnectionString);
+            if (!string.IsNullOrEmpty(Request.Params["work_id"].Trim()))
+            {
+                query.work_id = Request.Params["work_id"].Trim();
+            }
+            if (!string.IsNullOrEmpty(Request.Params["ipo_id"].Trim()))
+            {
+                query.ipo_id = Request.Params["ipo_id"].Trim();
+            }
+            if (!string.IsNullOrEmpty(Request.Params["itemId_or_upcId"].Trim()))
+            {
+                uint itemId = Convert.ToUInt32(Request.Params["itemId_or_upcId"].Trim());
+                bool result = ipoNvdLogMgr.GetInfoByItemId(itemId);
+               
+                if (result == false)
+                {
+                    query.upc_id = Request.Params["itemId_or_upcId"].Trim();//條碼
+                }
+                else 
+                {
+                    query.item_id = Convert.ToUInt32(Request.Params["itemId_or_upcId"].Trim());
+                }             
+            }
+            if (!string.IsNullOrEmpty(Request.Params["loc_id"].Trim()))
+            {
+                query.loc_id = Request.Params["loc_id"].Trim();
+            }
+            if (!string.IsNullOrEmpty(Request.Params["time_start"]))//開始時間
+            {
+                query.start_time = Convert.ToDateTime(Request.Params["time_start"]);
+                //query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
+            }
+            if (!string.IsNullOrEmpty(Request.Params["time_end"]))//結束時間
+            {
+                query.end_time = Convert.ToDateTime(Request.Params["time_end"]);
+                //query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
+            }
+            try
+            {
+                List<IpoNvdLogQuery> list = ipoNvdLogMgr.GetIpoNvdLogList(query, out totalcount);
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
+            }
+            catch (Exception ex)
+            {
+                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                log.Error(logMessage);
+                json = "{success:true,totalCount:0,data:[]}";
+            }
+            this.Response.Clear();
+            this.Response.Write(json);
+            this.Response.End();
+            return Response;
+        }
     }
 }

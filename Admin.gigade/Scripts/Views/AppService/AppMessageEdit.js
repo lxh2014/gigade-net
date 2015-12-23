@@ -66,6 +66,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
     }, {
         xtype: 'datetimefield',
         format: 'Y-m-d H:i:s',
+        time: { hour: 00, min: 00, sec: 00 },//add by jiaohe0625j
         id: 'new_msg_start',
         fieldLabel: MSG_START_TIME,//開始時間
         width: 300,
@@ -76,6 +77,7 @@ var pcFrm = Ext.create('Ext.form.Panel', {
     }, {
         xtype: 'datetimefield',
         format: 'Y-m-d H:i:s',
+        time: { hour: 23, min: 59, sec: 59 },//add by jiaohe0625j
         id: 'new_msg_end',
         fieldLabel: MSG_END_TIME,//結束時間
         width: 300,

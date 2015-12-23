@@ -258,7 +258,30 @@ WHERE invd.st_qty<> invd.prod_qty
             }
         }
 
+        public string insertIstockChangeSql(IstockChange q)
+        {
+            StringBuilder sb = new StringBuilder();
+            StringBuilder sql = new StringBuilder();
+            try
+            {
+                sql.AppendFormat("select sum(prod_qty) as prod_qty from iinvd where item_id='{0}' and ista_id='A'", q.item_id);
+                DataTable _dtprod_qty = _accessMySql.getDataTable(sql.ToString());
+                if (string.IsNullOrEmpty(_dtprod_qty.Rows[0][0].ToString()))
+                {
+                    _dtprod_qty.Rows[0][0] = 0;
+                }
+                q.sc_num_old = Convert.ToInt32(_dtprod_qty.Rows[0][0]);
+                q.sc_num_new = Convert.ToInt32(_dtprod_qty.Rows[0][0]) + q.sc_num_chg;
 
+                sb.AppendFormat("insert into istock_change(sc_trans_id,sc_cd_id,item_id,sc_trans_type,sc_num_old,sc_num_chg,sc_num_new,sc_time,sc_user,sc_note,sc_istock_why) Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')", q.sc_trans_id, q.sc_cd_id, q.item_id, q.sc_trans_type, q.sc_num_old, q.sc_num_chg, q.sc_num_new, CommonFunction.DateTimeToString(q.sc_time), q.sc_user, q.sc_note, q.sc_istock_why);
+
+                return sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("IstockChangeDao-->insertIstockChangeSql-->" + ex.Message + sb.ToString(), ex);
+            }
+        }
 
 
     }

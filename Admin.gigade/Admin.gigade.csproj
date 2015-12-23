@@ -236,6 +236,7 @@
     <Compile Include="Controllers\PromotionsDiscountController.cs" />
     <Compile Include="Controllers\PromotionsMaintainController.cs" />
     <Compile Include="Controllers\PromotionsUserController.cs" />
+    <Compile Include="Controllers\ReceiptShelvesController.cs" />
     <Compile Include="Controllers\RedirectController.cs" />
     <Compile Include="Controllers\ReportManagementController.cs" />
     <Compile Include="Controllers\ScheduleServiceController.cs" />
@@ -1985,6 +1986,7 @@
     <Content Include="Scripts\Views\Product\ProductDetailList.js" />
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsEdit.js" />
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsList.js" />
+    <Content Include="Scripts\Views\ReceiptShelves\IpoNvdExport.js" />
     <Content Include="Scripts\Views\Redirect\RedirectView.js" />
     <Content Include="Scripts\Views\ReportManagement\OderMessageSearch.js" />
     <Content Include="Scripts\Views\ScheduleService\SchedeleLogSearch.js" />
@@ -1997,6 +1999,7 @@
     <Content Include="Scripts\Views\SendProduct\DeliverExportArrivalList.js" />
     <Content Include="Scripts\Views\SendProduct\DeliverExportArrivalEdit.js" />
     <Content Include="Scripts\Views\SendProduct\ExportArrivalChangeLogList.js" />
+    <Content Include="Scripts\Views\SendProduct\IpoNvdLogList.js" />
     <Content Include="Scripts\Views\Service\OrderQuestionAdd.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaEdit.js" />
     <Content Include="Scripts\Views\SiteManager\PageMetaList.js" />
@@ -2025,6 +2028,7 @@
     <Content Include="Scripts\Views\VipUserGroup\GCCInfo.js" />
     <Content Include="Scripts\Views\VipUserGroup\list.js" />
     <Content Include="Scripts\Views\WareHouse\Aseld.js" />
+    <Content Include="Scripts\Views\ReceiptShelves\IpoNvdList.js" />
     <Content Include="Scripts\Views\WareHouse\Check.js" />
     <Content Include="Scripts\Views\WareHouse\Idiff_count_book.js" />
     <Content Include="Scripts\Views\WareHouse\IialgList.js" />
@@ -2043,6 +2047,7 @@
     <Content Include="Scripts\Views\WareHouse\IstockChangeList.js" />
     <Content Include="Scripts\Views\WareHouse\IwmsRecord.js" />
     <Content Include="Scripts\Views\WareHouse\WaitLiaoWeiList.js" />
+    <Content Include="Scripts\Views\WareHouse\CheckEdit.js" />
     <Content Include="Scripts\Views\Website\BannerCategoryList.js" />
     <Content Include="Scripts\Views\Website\BannerImageEdit.js" />
     <Content Include="Scripts\Views\Website\BannerImageHistoryDetail.js" />
@@ -4512,7 +4517,14 @@
     <Content Include="Views\Order\OrderAmountDetial.cshtml" />
     <Content Include="Views\WareHouse\Inventory.cshtml" />
     <Content Include="Views\MarketTally\AutoMarketTally.cshtml" />
+    <Content Include="Views\WareHouse\IpoNvd.cshtml" />
+    <Content Include="Views\ReceiptShelves\IpoNvdList.cshtml" />
     <Content Include="Views\Default1\Index.cshtml" />
+    <Content Include="Views\ReceiptShelves\ReceiptShelvesWorkid.cshtml" />
+    <Content Include="Views\ReceiptShelves\ReceiptShelvesItemid.cshtml" />
+    <Content Include="Views\ReceiptShelves\ReceiptShelvesIpoNvd.cshtml" />
+    <Content Include="Views\ReceiptShelves\IpoNvdExport.cshtml" />
+    <Content Include="Views\WareHouse\IpoNvdLogList.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -4717,7 +4729,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>48570</DevelopmentServerPort>
+          <DevelopmentServerPort>65424</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

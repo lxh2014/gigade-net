@@ -428,6 +428,7 @@ function fewYuanForm(rowID, PriceStore, condition_name, Type) {
                           allowBlank: false,
                           submitValue: true, //
                           value: setNextMonth(Tomorrow(), 1),
+                          time: { hour: 23, min: 59, sec: 59 },
                           listeners: {
                               select: function (a, b, c) {
                                   var start = Ext.getCmp("startdate");

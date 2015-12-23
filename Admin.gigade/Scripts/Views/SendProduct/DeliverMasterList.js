@@ -57,14 +57,15 @@ Ext.onReady(function () {
         ],
         tbar: [
             {
-                xtype: 'datefield',
+                xtype: 'datetimefield',
                 fieldLabel: "開始時間",
                 labelWidth: 80,
                 width: 230,
                 id: 'time_start',
                 name: 'time_start',
                 margin: '0 0 0 0',
-                format: 'Y-m-d 00:00:00',
+                format: 'Y-m-d H:i:s',
+                time: { hour: 00, min: 00, sec: 00 },//開始時間00：00：00
                 editable: false,
                 listeners: {
                     select: function () {
@@ -81,14 +82,15 @@ Ext.onReady(function () {
                 margin: '0 0 0 5'
             },
             {
-                xtype: 'datefield',
+                xtype: 'datetimefield',
                 fieldLabel: "結束時間",
                 labelWidth: 80,
                 width: 230,
                 id: 'time_end',
                 name: 'time_end',
                 margin: '0 0 0 6',
-                format: 'Y-m-d 23:59:59',
+                format: 'Y-m-d H:i:s',
+                time: { hour: 23, min: 59, sec: 59 },//標記結束時間23:59:59
                 editable: false,
                 listeners: {
                     select: function () {

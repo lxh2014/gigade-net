@@ -180,7 +180,7 @@ namespace BLL.gigade.Mgr.Schedules
                     drtwo[1] = _dtResult.Rows[j][1];
                     drtwo[2] = _dtResult.Rows[j][2];
                     drtwo[3] = _dtResult.Rows[j][3];
-                    drtwo[4] = CommonFunction.GetNetTime(Convert.ToInt64(_dtResult.Rows[j][4])).ToString("yyyy/MM/dd HH:mm:ss"); 
+                    drtwo[4] = DateTime.Parse(_dtResult.Rows[j][4].ToString()).ToString("yyyy/MM/dd HH:mm:ss"); 
                     _newErrorDt.Rows.Add(drtwo);
                 }
 

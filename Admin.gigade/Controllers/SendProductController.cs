@@ -5525,7 +5525,7 @@ namespace Admin.gigade.Controllers
                 DateTime date;
                 if (DateTime.TryParse(Request.Params["time_start"], out date))
                 {
-                    query.time_start = Convert.ToDateTime(date.ToString("yyyy-MM-dd 00:00:00"));
+                    query.time_start = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 else
                 {
@@ -5533,7 +5533,7 @@ namespace Admin.gigade.Controllers
                 }
                 if (DateTime.TryParse(Request.Params["time_end"], out date))
                 {
-                    query.time_end = Convert.ToDateTime(date.ToString("yyyy-MM-dd 23:59:59"));
+                    query.time_end = Convert.ToDateTime(date.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 else
                 {
@@ -5897,11 +5897,11 @@ namespace Admin.gigade.Controllers
 
                 if (!string.IsNullOrEmpty(Request.Params["time_start"]))//dcl_create_datetime
                 {
-                    dclQuery.time_start = Convert.ToDateTime(Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy-MM-dd 00:00:00"));
+                    dclQuery.time_start = Convert.ToDateTime(Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (!string.IsNullOrEmpty(Request.Params["time_end"]))
                 {
-                    dclQuery.time_end = Convert.ToDateTime(Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy-MM-dd 23:59:59"));
+                    dclQuery.time_end = Convert.ToDateTime(Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 #endregion
 

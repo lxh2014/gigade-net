@@ -1009,5 +1009,82 @@ namespace BLL.gigade.Dao
             }
         }
 
+        #region ERP庫存更新異常提醒排程
+        /// <summary>
+        /// ATM匯款未付款數量查詢
+        /// </summary>chaojie1124j 2015/12/16 10:05am
+        /// <param name="erp_id"></param>
+        /// <returns></returns>
+        public int GetATMStock(ProductItemQuery query)
+        {
+            StringBuilder str = new StringBuilder();
+            StringBuilder strCondi = new StringBuilder();
+            try
+            {
+                str.Append(" SELECT IFNULL(sum(case item_mode when 0 then buy_num when 2 then buy_num*parent_num end),0)as 'buynum' from order_detail od LEFT JOIN product_item pi USING(item_id) ");
+                strCondi.AppendFormat(" where 1=1 and od.detail_status=0 and  item_mode<>1 ");
+                if (!string.IsNullOrEmpty(query.Erp_Id))
+                {
+                    strCondi.AppendFormat(" and  pi.erp_id={0} ", query.Erp_Id);
+                }
+                return Convert.ToInt32(_access.getDataTable(str.ToString() + strCondi.ToString()).Rows[0]["buynum"]);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->GetATMStock-->" + ex.Message + str.ToString() + strCondi.ToString(), ex);
+            }
+        }
+        /// <summary>
+        /// 通過ERP編號，查看商品信息，然後確定是否修改。
+        /// chaojie1124j add by 2015/12/16 10:32am
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public List<ProductItemQuery> GetProdItemByERp(ProductItemQuery query)
+        {
+            StringBuilder str = new StringBuilder();
+            StringBuilder strCondi = new StringBuilder();
+            try
+            {
+                 str.AppendFormat("SELECT p.product_id,p.product_name,pi.item_id,CONCAT(p.spec_title_1,' ',ps1.spec_name) as Spec_Name_1 ");
+                 str.AppendFormat(" ,CONCAT(p.spec_title_2,' ',ps2.spec_name) as Spec_Name_2,pi.item_stock ");
+                str.AppendFormat("  from product_item pi ");
+                str.AppendFormat(" left JOIN product p on p.product_id=pi.product_id ");
+                str.AppendFormat(" left JOIN product_spec ps1 on ps1.spec_id=pi.spec_id_1 ");
+                str.AppendFormat(" left JOIN product_spec ps2 on  ps2.spec_id=pi.spec_id_2 ");
+                strCondi.Append(" where 1=1 and  (p.product_mode=2 or p.prepaid=1) ");
+                if (!string.IsNullOrEmpty(query.Erp_Id))
+                {
+                    strCondi.AppendFormat(" and  pi.erp_id={0} ", query.Erp_Id);
+                }
+                return _access.getDataTableForObj<ProductItemQuery>(str.ToString() + strCondi.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->GetProdItemByERp-->" + ex.Message + str.ToString() + strCondi.ToString(), ex);
+            }
+        }
+        /// <summary>
+        /// 更改商品庫存，通過ERP編號
+        /// chaojie1124j add by 2015/12/16 10:32am
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public int UpdateStockAsErpId(ProductItemQuery query) 
+        {
+            StringBuilder str = new StringBuilder();
+            try
+            {
+                str.AppendFormat(" update product_item set item_stock={0} where erp_id={1} ", query.item_stock, query.Erp_Id);
+                return _access.execCommand(str.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ProductItemDao-->GetProdItemByERp-->" + ex.Message + str.ToString() ,ex);
+            }
+        }
+        #endregion
+
     }
 }

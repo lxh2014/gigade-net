@@ -25,6 +25,9 @@ Ext.define('gigade.EdmContentNew', {
    { name: "pm", type: "int" },
    { name: "edm_pm", type: "string" },
    { name: "static_template", type: "int" },
+      { name: "user_username_create", type: "string" },
+           { name: "user_username_update", type: "string" },
+   
     ]
 });
 EdmContentNewStore = Ext.create('Ext.data.Store', {
@@ -115,6 +118,8 @@ Ext.onReady(function () {
                 return "<a href='javascript:void(0)' onclick='ReviewEdm()'><img src='../../../Content/img/icon_report.gif' /></a>"
             }
         },
+        { header: "建立人", dataIndex: 'user_username_create', width: 85, align: 'center' },
+           { header: "更新人", dataIndex: 'user_username_update', width: 85, align: 'center' },
         ],
         tbar: [
         { xtype: 'button', text: '新增', id: 'add', hidden: false, iconCls: 'icon-user-add', handler: onAddClick },

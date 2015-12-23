@@ -564,6 +564,7 @@ function editFunction(row, store) {
                     name: 'start_date',
                     anchor: '95%',
                     format: 'Y-m-d H:i:s',
+                    time: { hour: 00, sec: 00, min: 00 },
                     width: 150,
                     allowBlank: false,
                     submitValue: true,
@@ -573,13 +574,7 @@ function editFunction(row, store) {
                             var start = Ext.getCmp("start_date");
                             var end = Ext.getCmp("end_date");
                             var s_date = new Date(start.getValue());
-                            var ttime = s_date;
-                            ttime = new Date(ttime.setMonth(s_date.getMonth() + 1));
-                            ttime = new Date(ttime.setMinutes(59));
-                            ttime = new Date(ttime.setSeconds(59));
-                            ttime = new Date(ttime.setHours(23));
-
-                            end.setValue(ttime);
+                            end.setValue(setNextMonth(s_date, 1));
                         }
                     }
                 },
@@ -591,24 +586,20 @@ function editFunction(row, store) {
                       anchor: '95%',
                       name: 'end_date',
                       format: 'Y-m-d H:i:s',
+                      time: { hour: 23, sec: 59, min: 59 },
                       allowBlank: false,
                       submitValue: true,
-                      value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+                      value: setNextMonth(Tomorrow(), 1),
                       listeners: {
                           select: function (a, b, c) {
+
                               var start = Ext.getCmp("start_date");
                               var end = Ext.getCmp("end_date");
                               var s_date = new Date(start.getValue());
-                              var now_date = new Date(end.getValue());
                               if (end.getValue() < start.getValue()) {
                                   Ext.Msg.alert(INFORMATION, TIMETIP);
+                                  end.setValue(setNextMonth(s_date, 1));
                               }
-                              var ttime = now_date;
-                              ttime = new Date(ttime.setMonth(now_date.getMonth()));
-                              ttime = new Date(ttime.setMinutes(59));
-                              ttime = new Date(ttime.setSeconds(59));
-                              ttime = new Date(ttime.setHours(23));
-                              end.setValue(ttime);
                           }
                       }
                   }
@@ -716,7 +707,7 @@ function editFunction(row, store) {
                     colName: 'url_by',
                     name: 'url_by',
                     defaults: {
-                        name: 'url_by'
+                        name: 'btr'
                     },
                     columns: 2,
                     vertical: true,
@@ -1052,6 +1043,7 @@ function editFunction(row, store) {
                           name: 'starts',
                           anchor: '95%',
                           format: 'Y-m-d H:i:s',
+                          time: { hour: 00, sec: 00, min: 00 },
                           width: 150,
                           allowBlank: false,
                           submitValue: true,
@@ -1061,13 +1053,7 @@ function editFunction(row, store) {
                                   var start = Ext.getCmp("starts");
                                   var end = Ext.getCmp("end");
                                   var s_date = new Date(start.getValue());
-                                  var ttime = s_date;
-                                  ttime = new Date(ttime.setMonth(s_date.getMonth() + 1));
-                                  ttime = new Date(ttime.setMinutes(59));
-                                  ttime = new Date(ttime.setSeconds(59));
-                                  ttime = new Date(ttime.setHours(23));
-
-                                  end.setValue(ttime);
+                                  end.setValue(setNextMonth(s_date, 1));
                               }
                           }
                       },
@@ -1079,24 +1065,19 @@ function editFunction(row, store) {
                           anchor: '95%',
                           name: 'end',
                           format: 'Y-m-d H:i:s',
+                          time: { hour: 23, sec: 59, min: 59 },
                           allowBlank: false,
                           submitValue: true,
-                          value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+                          value: setNextMonth(Tomorrow(), 1),
                           listeners: {
                               select: function (a, b, c) {
                                   var start = Ext.getCmp("starts");
                                   var end = Ext.getCmp("end");
                                   var s_date = new Date(start.getValue());
-                                  var now_date = new Date(end.getValue());
                                   if (end.getValue() < start.getValue()) {
                                       Ext.Msg.alert(INFORMATION, TIMETIP);
+                                      end.setValue(setNextMonth(s_date, 1));
                                   }
-                                  var ttime = now_date;
-                                  ttime = new Date(ttime.setMonth(now_date.getMonth()));
-                                  ttime = new Date(ttime.setMinutes(59));
-                                  ttime = new Date(ttime.setSeconds(59));
-                                  ttime = new Date(ttime.setHours(23));
-                                  end.setValue(ttime);
                               }
                           }
                       }
@@ -1129,13 +1110,15 @@ function editFunction(row, store) {
                                     setTimeout(2000);
                                 }
                               
-                                Ext.Ajax.request({//-----
-                                    method: 'post',
-                                    url: '/PromoAdditionalPrice/PromoAdditionalPriceEdit',
+                                //Ext.Ajax.request({//-----
+                                //    method: 'post',
+                                //    url: '/PromoAdditionalPrice/PromoAdditionalPriceEdit',
+                                form.submit({
                                     params: {
                                         rowid: promoID,
                                         event_name: Ext.getCmp('event_name').getValue(),
                                         event_desc: Ext.getCmp('event_desc').getValue(),
+                                        url_by: Ext.htmlEncode(Ext.getCmp("url_by").getValue().btr),
                                         banner_url: Ext.htmlEncode(Ext.getCmp('banner_link_url').getValue()),
                                         banner: Ext.htmlEncode(Ext.getCmp('banner_image').getValue()),
                                         //group_id: Ext.htmlEncode(Ext.getCmp('groupname').getValue()),
@@ -1258,12 +1241,12 @@ function editFunction(row, store) {
                 else {
                     //Ext.getCmp('usr1').setValue(true);
                     //Ext.getCmp('usr2').setValue(false);
-                    if (row.data.group_name == "" || row.data.group_name == null) {
-                        Ext.getCmp('groupname').setValue("0");
-                    }
-                    else {
-                        Ext.getCmp('groupname').setValue(row.data.group_name);
-                    }
+                    //if (row.data.group_name == "" || row.data.group_name == null) {//當前js未找到id 為groupname的控件 changeby shiwei0620j 20151222
+                    //    Ext.getCmp('groupname').setValue("0");
+                    //}
+                    //else {
+                    //    Ext.getCmp('groupname').setValue(row.data.group_name);
+                    //}
                 }
                 var deli = row.data.deliver_type;
                 if (devi == 0) {
@@ -1294,6 +1277,7 @@ function editFunction(row, store) {
                     Ext.getCmp("CW1").setValue(false);
                     Ext.getCmp("LC1").setValue(true);
                 }
+           
                 if (row.data.url_by == 0) {
                     Ext.getCmp('btr1').setValue(false);
                     Ext.getCmp('btr2').setValue(true);
@@ -1312,8 +1296,10 @@ function editFunction(row, store) {
         }
     });
     if (row != null) {
+        //alert(row.data.url_by);
 
         Updwin.show();
+     
 
     } else {
 
