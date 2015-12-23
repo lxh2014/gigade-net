@@ -46,7 +46,7 @@ Ext.define('GIGADE.IpoNvdLog', {
         //{ name: 'upc_id', type: 'string' },//商品條碼
         { name: 'loc_id', type: 'string' },//商品主料位
         { name: 'add_qty', type: 'string' },//收貨上架數量
-        { name: 'made_date', type: 'string' },//收穫上架的製造日期
+        { name: 'made_date', type: 'string' },//收貨上架的製造日期
         { name: 'pwy_dte_ctl', type: 'string' },//是否效期控管
         { name: 'cde_date', type: 'string' },//保存期限
         { name: 'create_user_string', type: 'string' },//創建人
