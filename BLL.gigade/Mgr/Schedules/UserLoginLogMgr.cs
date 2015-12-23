@@ -142,16 +142,17 @@ namespace BLL.gigade.Mgr.Schedules
                 {
                     MailBody = GetHtmlByDataTable(_dt);
                     /////////////////
-                    MailHelper mail = new MailHelper(mailModel);
-                    mail.SendToGroup(GroupCode, MailTitle, MailBody, IsSeparate, IsDisplyName);
+                    _secheduleServiceMgr.SendMail(mailModel, GroupCode, MailTitle, MailBody, IsSeparate, IsDisplyName);
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("ScheduleServiceMgr-->Start-->" + ex.Message);
+                throw new Exception("UserLoginLogMgr-->Start-->" + ex.Message);
             }
             return true;
         }
+
+
         static string GetHtmlByDataTable(DataTable _dtmyMonth)
         {
             System.Text.StringBuilder sbHtml = new System.Text.StringBuilder();
@@ -186,4 +187,6 @@ namespace BLL.gigade.Mgr.Schedules
 
         }
     }
+    
+
 }
