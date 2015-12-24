@@ -20,6 +20,7 @@ using System.Text;
 using BLL.gigade.Mgr.Impl;
 using BLL.gigade.Dao.Impl;
 using BLL.gigade.Dao;
+using BLL.gigade.Model;
 
 namespace BLL.gigade.Mgr
 {
@@ -66,6 +67,29 @@ namespace BLL.gigade.Mgr
             {
                 throw new Exception("PromotionsBonusSerialMgr-->YesOrNoExist-->" + ex.Message, ex);
             }
+        }
+        public List<Model.PromotionsBonusSerial> QueryById(PromotionsBonusSerial query, out int TotalCount)
+        {
+            try
+            {
+                return _bonusDao.QueryById(query, out TotalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("PromotionsBonusMgr-->UpdateActive-->" + ex.Message, ex);
+            }
+        }
+        public int AddPromoBonusSerial(StringBuilder str)
+        {
+            try
+            {
+                return _bonusDao.AddPromoBonusSerial(str);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("PromotionsBonusMgr-->AddPromoBonusSerial-->" + ex.Message, ex);
+            }
+        
         }
     }
 }

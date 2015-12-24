@@ -1986,6 +1986,9 @@
     <Content Include="Scripts\Views\Product\ProductDetailList.js" />
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsEdit.js" />
     <Content Include="Scripts\Views\PromotionAmountDiscounts\PromotionAmountDiscountsList.js" />
+    <Content Include="Scripts\Views\PromotionsBonus\BonusSerial.js" />
+    <Content Include="Scripts\Views\PromotionsBonus\BonusSerialAdd.js" />
+    <Content Include="Scripts\Views\PromotionsBonus\SerialHistory.js" />
     <Content Include="Scripts\Views\ReceiptShelves\IpoNvdExport.js" />
     <Content Include="Scripts\Views\Redirect\RedirectView.js" />
     <Content Include="Scripts\Views\ReportManagement\OderMessageSearch.js" />

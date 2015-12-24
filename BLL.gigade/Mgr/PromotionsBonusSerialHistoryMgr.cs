@@ -43,5 +43,16 @@ namespace BLL.gigade.Mgr
                 throw new Exception("PromotionsBonusSerialHistoryMgr-->QueryById-->" + ex.Message, ex);
             }
         }
+        public List<Model.Query.PromotionsBonusSerialHistoryQuery> QueryById(PromotionsBonusSerialHistoryQuery query, out int TotalCount)
+        {
+            try
+            {
+                return _bonusDao.QueryById(query,out TotalCount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("PromotionsBonusSerialHistoryMgr-->QueryById-->" + ex.Message, ex);
+            }
+        }
     }
 }
