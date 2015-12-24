@@ -466,7 +466,7 @@ and cm.status=1 and sta_id= 'COM'and invd.st_qty <> 0 and invd.st_qty <> invd.pr
             {
                 str.AppendFormat(" select row_id from cbjob_master where cbjob_id='{0}' and sta_id<>'END' ", cb.cb_jobid);
                 DataTable dt_result = _access.getDataTable(str.ToString());
-                sql.Append(" SELECT cd.iinvd_id,pe.pwy_dte_ctl,cd.cb_jobid,ii.prod_qty,pi.spec_id_1,p.spec_title_1,p.spec_title_2,pi.spec_id_2,p.product_name, ");//icb.st_qty,icb.pro_qty,
+                sql.Append(" SELECT cd.iinvd_id,pe.pwy_dte_ctl,cd.cb_jobid,sum(ii.prod_qty)as prod_qty,pi.spec_id_1,p.spec_title_1,p.spec_title_2,pi.spec_id_2,p.product_name, ");//icb.st_qty,icb.pro_qty,
                 if (dt_result.Rows.Count > 0)
                 {
                    sql.Append(" ii.plas_loc_id as loc_id,ii.item_id from cbjob_detail cd ");
@@ -495,6 +495,7 @@ and cm.status=1 and sta_id= 'COM'and invd.st_qty <> 0 and invd.st_qty <> invd.pr
                 {
                     sql.AppendFormat(" and cd.cb_jobid='{0}' ", cb.cb_jobid);
                 }
+                sql.Append(" group by ii.plas_loc_id ");
                 DataTable dtResult = _access.getDataTable(sql.ToString());
                 IProductSpecImplDao _specDao = new ProductSpecDao(connStr);
                 foreach (DataRow dr in dtResult.Rows)

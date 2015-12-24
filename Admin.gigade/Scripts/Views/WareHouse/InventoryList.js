@@ -144,15 +144,6 @@ Ext.onReady(function () {
     });
 
 });
-//匯出詳細報表
-ExportAllExcel = function () {
-    var startDate = Ext.getCmp('dateOne').getValue();
-    var endDate = Ext.getCmp('dateTwo').getValue();
-    var sta_id = Ext.getCmp('cbStatus').getValue();
-    var jobStart = Ext.getCmp('IlocLeft').getValue();
-    var jobEnd = Ext.getCmp('IlocRight').getValue();
-    window.open("/WareHouse/GetAllCountBook?startDate=" + Ext.Date.format(new Date(Ext.getCmp('dateOne').getValue()), 'Y-m-d H:i:s') + "&endDate=" + Ext.Date.format(new Date(Ext.getCmp('dateTwo').getValue()), 'Y-m-d H:i:s') + "&sta_id=" + sta_id + "&jobStart=" + jobStart + "&jobEnd=" + jobEnd);
-}
 
 function ExportDetailPDF(x) {
 
@@ -202,13 +193,24 @@ function ExportDetailPDF(x) {
 }
 ///匯出總報表
 ExportAllExcel = function () {
+    var row = Ext.getCmp("detailist").getSelectionModel().getSelection();
+    var rowIDs = '';
+    if (row.length > 0) {
+        for (var i = 0; i < row.length; i++) {
+
+            rowIDs += row[i].data.row_id + ',';
+
+        }
+    }
+    
     var startDate = Ext.getCmp('dateOne').getValue();
     var endDate = Ext.getCmp('dateTwo').getValue();
     var sta_id = Ext.getCmp('cbStatus').getValue();
     var jobStart = Ext.getCmp('IlocLeft').getValue();
     var jobEnd = Ext.getCmp('IlocRight').getValue();
-    window.open("/WareHouse/GetAllCountBook?startDate=" + Ext.Date.format(new Date(Ext.getCmp('dateOne').getValue()), 'Y-m-d H:i:s') + "&endDate=" + Ext.Date.format(new Date(Ext.getCmp('dateTwo').getValue()), 'Y-m-d H:i:s') + "&sta_id=" + sta_id + "&jobStart=" + jobStart + "&jobEnd=" + jobEnd);
+    window.open("/WareHouse/GetAllCountBook?startDate=" + Ext.Date.format(new Date(Ext.getCmp('dateOne').getValue()), 'Y-m-d H:i:s') + "&endDate=" + Ext.Date.format(new Date(Ext.getCmp('dateTwo').getValue()), 'Y-m-d H:i:s') + "&rowIDs=" + rowIDs + "&sta_id=" + sta_id + "&jobStart=" + jobStart + "&jobEnd=" + jobEnd);
 }
+
 
 //左邊課程列表
 var InventoryLeft = Ext.create('Ext.form.Panel', {
@@ -418,25 +420,27 @@ var center = Ext.create('Ext.form.Panel', {
                                  layout: 'hbox',
                                  items: [
                                  {
-                                     xtype: "datefield",
+                                     xtype: "datetimefield",
                                      labelWidth: 60,
                                      margin: '0 0 0 0',
                                      id: 'dateOne',
                                      name: 'dateOne',
-                                     format: 'Y-m-d',
-                                     allowBlank: false,
                                      editable: false,
+                                     time: { hour: 00, min: 00, sec: 00 },
+                                     format: 'Y-m-d H:i:s',
+                                     allowBlank: false,
                                      submitValue: true,
                                      //value: new Date(Tomorrow().setDate(Tomorrow().getDay() - 2)),
-                                     value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
+                                    // value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),
                                      listeners: {
                                          select: function (a, b, c) {
                                              var start = Ext.getCmp("dateOne");
                                              var end = Ext.getCmp("dateTwo");
-                                             var s_date = new Date(end.getValue());
-                                             if (end.getValue() < start.getValue()) {
-                                                 Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
-                                                 start.setValue(Tomorrow().setMonth(Tomorrow().getMonth() - 1));
+                                             if (end.getValue() == null) {
+                                                 end.setValue(setNextMonth(start.getValue(), 1));
+                                             } else if (start.getValue() > end.getValue()) {
+                                                 Ext.Msg.alert(INFORMATION, "開始時間不能大於結束時間");
+                                                 end.setValue(setNextMonth(start.getValue(), 1));
                                              }
                                          },
                                          specialkey: function (field, e) {
@@ -450,24 +454,43 @@ var center = Ext.create('Ext.form.Panel', {
                                      xtype: 'displayfield', margin: '0 0 0 0', value: "~"
                                  },
                                  {
-                                     xtype: "datefield",
-                                     format: 'Y-m-d',
+                                     
+                                     xtype: "datetimefield",
+                                     format: 'Y-m-d  H:i:s',
+                                     time: { hour: 23, min: 59, sec: 59 },
                                      id: 'dateTwo',
                                      name: 'dateTwo',
                                      margin: '0 0 0 0',
                                      editable: false,
                                      allowBlank: false,
                                      submitValue: true,
-                                     value: Tomorrow(),
+                                    // value: Tomorrow(),
                                      listeners: {
                                          select: function (a, b, c) {
                                              var start = Ext.getCmp("dateOne");
                                              var end = Ext.getCmp("dateTwo");
                                              var s_date = new Date(start.getValue());
-                                             if (end.getValue() < start.getValue()) {
-                                                 Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
-                                                 end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                             var now_date = new Date(end.getValue());
+                                             if (start.getValue() != "" && start.getValue() != null) {
+                                                 if (end.getValue() < start.getValue()) {
+                                                     Ext.Msg.alert(INFORMATION, "結束時間不能小於開始時間");
+                                                     start.setValue(setNextMonth(end.getValue(), -1));
+                                                 }
+                                                 //else if (end.getValue() > setNextMonth(start.getValue(), 1)) {
+                                                 //    //Ext.Msg.alert(INFORMATION, DATE_LIMIT);
+                                                 //    start.setValue(setNextMonth(end.getValue(), -1));
+                                                 //}
+
+                                             } else {
+                                                 start.setValue(setNextMonth(end.getValue(), -1));
                                              }
+                                             //var start = Ext.getCmp("dateOne");
+                                             //var end = Ext.getCmp("dateTwo");
+                                             //var s_date = new Date(start.getValue());
+                                             //if (end.getValue() < start.getValue()) {
+                                             //    Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
+                                             //    end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+                                             //}
                                          },
                                          specialkey: function (field, e) {
                                              if (e.getKey() == Ext.EventObject.ENTER) {
@@ -611,14 +634,6 @@ var center = Ext.create('Ext.form.Panel', {
     ]
 })
 
-
-
-
-
-
-
-
-
 function Search() {
     CbMasterStore.removeAll();
     CbMasterStore.load({
@@ -632,13 +647,26 @@ function Search() {
         }
     });
 }
-
-function Tomorrow() {
-    var d;
-    d = new Date();
-    d.setDate(d.getDate() + 1);
-    return d;
+setNextMonth = function (source, n) {
+    var s = new Date(source);
+    s.setMonth(s.getMonth() + n);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    } else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
 }
+setNextDay = function (source, n) {
+    var s = new Date(source);
+    if (n < 0) {
+        s.setHours(0, 0, 0);
+    } else if (n > 0) {
+        s.setHours(23, 59, 59);
+    }
+    return s;
+}
+
 function InsertInventory()
 {
     var checked = Ext.getCmp("prepaid").items;
@@ -677,8 +705,8 @@ function InsertInventory()
                     if (Ext.getCmp('endIloc').getValue().trim() != "") {
                         Ext.getCmp('IlocRight').setValue(Ext.getCmp('endIloc').getValue());
                     }
-                    Ext.getCmp('dateOne').setValue(new Date());
-                    Ext.getCmp('dateTwo').setValue(new Date());
+                    Ext.getCmp('dateOne').setValue(setNextDay(new Date(), -1));
+                    Ext.getCmp('dateTwo').setValue(setNextDay(new Date(), 1));
                     Ext.getCmp('cbStatus').setValue('CNT');
 
                     CbMasterStore.load({
