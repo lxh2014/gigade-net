@@ -19,6 +19,7 @@ editFunction = function (row, store) {
                 fieldLabel: '序號數量',
                 allowNegative: false,
                 minValue: 1,
+                maxValue: 50000,
                 value:1,
                 hideTrigger:true,
                 allowDecimals:false,

@@ -8027,7 +8027,7 @@ namespace Admin.gigade.Controllers
         {
             PdfHelper pdf = new PdfHelper();
             List<string> pdfList = new List<string>();
-            float[] arrColWidth = new float[] { 25, 60, 40, 30, 55,40, 140, 50, 40, 55};
+            float[] arrColWidth = new float[] { 25, 60, 40, 40, 55,40, 140, 50, 40, 50};
             string newFileName = string.Empty;
             string newName = string.Empty;
             string json = string.Empty;
@@ -8056,7 +8056,7 @@ namespace Admin.gigade.Controllers
             _dtBody.Columns.Add("編號", typeof(string));
             _dtBody.Columns.Add("條碼", typeof(string));
             _dtBody.Columns.Add("料位", typeof(string));
-            _dtBody.Columns.Add("答案", typeof(string));
+            _dtBody.Columns.Add("現有庫存", typeof(string));
             _dtBody.Columns.Add("盤點數量", typeof(string));
             _dtBody.Columns.Add("效期控制", typeof(string));
             _dtBody.Columns.Add("品名", typeof(string));
@@ -8148,7 +8148,7 @@ namespace Admin.gigade.Controllers
                         cell.DisableBorderSide(8);
                         ptable.AddCell(cell);
 
-                        cell = new PdfPCell(new Phrase("答案", new iTextSharp.text.Font(bf, 12)));
+                        cell = new PdfPCell(new Phrase("現有庫存", new iTextSharp.text.Font(bf, 12)));
                         cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                         cell.DisableBorderSide(8);
                         ptable.AddCell(cell);
@@ -8231,7 +8231,7 @@ namespace Admin.gigade.Controllers
                                 row["條碼"] = upc_id;
 
                                 row["料位"] = rows["loc_id"];
-                                row["答案"] = rows["prod_qty"];
+                                row["現有庫存"] = rows["prod_qty"];
                                 row["盤點數量"] = "";
                                 row["效期控制"] = string.IsNullOrEmpty(rows["pwy_dte_ctl"].ToString()) ? "否" : (rows["pwy_dte_ctl"].ToString() == "Y" ? "是" : "否");
                                 row["品名"] = rows["product_name"];
@@ -8321,7 +8321,7 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("答案", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("現有庫存", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -8371,7 +8371,7 @@ namespace Admin.gigade.Controllers
                 cell = new PdfPCell(new Phrase(" ", font));
                 cell.Colspan = 3;
                 cell.VerticalAlignment = Element.ALIGN_CENTER;//字體水平居左
-                cell.DisableBorderSide(8);
+                //cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
 
