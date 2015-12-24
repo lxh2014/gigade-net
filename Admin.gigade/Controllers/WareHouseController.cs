@@ -7759,11 +7759,11 @@ namespace Admin.gigade.Controllers
           
             if (!string.IsNullOrEmpty(Request.Params["startDate"]))
             {
-                cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd HH:mm:ss");
+                cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd 00:00:00");
             }
             if (!string.IsNullOrEmpty(Request.Params["endDate"]))
             {
-                cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd HH:mm:ss");
+                cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd 23:59:59");
             }
             if (!string.IsNullOrEmpty(Request.Params["sta_id"]))
             {
