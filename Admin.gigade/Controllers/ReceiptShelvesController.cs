@@ -411,13 +411,11 @@ namespace Admin.gigade.Controllers
             }
             if (!string.IsNullOrEmpty(Request.Params["time_start"]))//開始時間
             {
-                query.start_time = Convert.ToDateTime(Request.Params["time_start"]);
-                //query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
+                query.start_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["time_start"]).ToString("yyyy-MM-dd 00:00:00"));
             }
             if (!string.IsNullOrEmpty(Request.Params["time_end"]))//結束時間
             {
-                query.end_time = Convert.ToDateTime(Request.Params["time_end"]);
-                //query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
+                query.end_time = Convert.ToDateTime(Convert.ToDateTime(Request.Params["time_end"]).ToString("yyyy-MM-dd 23:59:59"));
             }
             try
             {

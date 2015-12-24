@@ -80,7 +80,7 @@ IpoNvdLogStore.on('beforeload', function () {
         loc_id: Ext.getCmp('loc_id').getValue().trim(),//商品主料位
 
         time_start: Ext.getCmp('time_start').getValue(),//log創建日期，開始時間
-        time_end: Ext.getCmp('time_end').getValue(),//結束時間       
+        time_end: Ext.getCmp('time_end').getValue()//結束時間       
     })
 });
 
@@ -224,12 +224,12 @@ Ext.onReady(function () {
                     {
                         xtype: 'displayfield',
                         value: '創建時間:&nbsp&nbsp&nbsp',
-                        margin: '0 5 0 0',
+                        margin: '0 5 0 0'
                     },                   
                     {
-                        xtype: 'datetimefield',
-                        format: 'Y-m-d  H:i:s',
-                        time: { hour: 00, min: 00, sec: 00 },
+                        xtype: 'datefield',
+                        format: 'Y-m-d',
+                        //time: { hour: 00, min: 00, sec: 00 },
                         id: 'time_start',
                         name: 'time_start',
                         margin: '0 5 0 0',
@@ -238,13 +238,18 @@ Ext.onReady(function () {
                         //value: Tomorrow(),
                         listeners: {
                             select: function (a, b, c) {
+                                //var start = Ext.getCmp("time_start");
+                                //var end = Ext.getCmp("time_end");
+                          
+                                //if (end.getValue() != null && start.getValue() > end.getValue()) {
+                                //    Ext.Msg.alert("提示信息","開始時間不能大於結束時間");
+                                //    start.setValue(setNextMonth(end.getValue(),-1));
+                                //}
                                 var start = Ext.getCmp("time_start");
                                 var end = Ext.getCmp("time_end");
-                          
-                                if (end.getValue() != null && start.getValue() > end.getValue()) {
-                                    Ext.Msg.alert("提示信息","開始時間不能大於結束時間");
-                                    start.setValue(setNextMonth(end.getValue(),-1));
-                                }
+                                var s_date = new Date(start.getValue());
+                                end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
+
                             },
                             specialkey: function (field, e) {
                                 if (e.getKey() == Ext.EventObject.ENTER) {
@@ -259,9 +264,9 @@ Ext.onReady(function () {
                         value: '~&nbsp&nbsp'
                     },
                     {
-                        xtype: 'datetimefield',
-                        format: 'Y-m-d  H:i:s',
-                        time: { hour: 23, min: 59, sec: 59 },
+                        xtype: 'datefield',
+                        format: 'Y-m-d',
+                        //time: { hour: 23, min: 59, sec: 59 },
                         id: 'time_end',
                         name: 'time_end',
                         margin: '0 5 0 0',
@@ -269,12 +274,26 @@ Ext.onReady(function () {
                         editable: false,
                         listeners: {
                             select: function (a, b, c) {
+                                //var start = Ext.getCmp("time_start");
+                                //var end = Ext.getCmp("time_end");
+
+                                //if (start.getValue() != null && start.getValue() > end.getValue()) {
+                                //    Ext.Msg.alert("提示信息", "結束時間不能小於開始時間");
+                                //    end.setValue(setNextMonth(start.getValue(),+1));
+                                //}
                                 var start = Ext.getCmp("time_start");
                                 var end = Ext.getCmp("time_end");
+                                var s_date = new Date(start.getValue());
+                                var end_date = new Date(end.getValue());
+                                if (start.getValue() == null)
+                                {
+                                    start.setValue(new Date(end_date.setMonth(end_date.getMonth() - 1)));
+                                }
 
-                                if (start.getValue() != null && start.getValue() > end.getValue()) {
-                                    Ext.Msg.alert("提示信息", "結束時間不能小於開始時間");
-                                    end.setValue(setNextMonth(start.getValue(),+1));
+                                if (end.getValue() < start.getValue())
+                                {
+                                    Ext.Msg.alert("提示", "開始時間不能大於結束時間！");
+                                    end.setValue(new Date(s_date.setMonth(s_date.getMonth() + 1)));
                                 }
                             },
                             specialkey: function (field, e) {
@@ -430,7 +449,7 @@ Ext.onReady(function () {
             displayInfo: true,
             displayMsg: NOW_DISPLAY_RECORD + ': {0} - {1}' + TOTAL + ': {2}',
             emptyMsg: NOTHING_DISPLAY
-        }),
+        })
         //selModel: sm
     });
     Ext.create('Ext.Viewport', {
@@ -505,7 +524,7 @@ Query = function () {
             loc_id: Ext.getCmp('loc_id').getValue().trim(),//商品主料位
 
             time_start: Ext.getCmp('time_start').getValue(),//log創建日期，開始時間
-            time_end: Ext.getCmp('time_end').getValue(),//結束時間             
+            time_end: Ext.getCmp('time_end').getValue()//結束時間             
         }
     });
 }
