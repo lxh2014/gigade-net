@@ -7759,11 +7759,11 @@ namespace Admin.gigade.Controllers
           
             if (!string.IsNullOrEmpty(Request.Params["startDate"]))
             {
-                cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd 00:00:00");
+                cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd HH:mm:ss");
             }
             if (!string.IsNullOrEmpty(Request.Params["endDate"]))
             {
-                cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd 23:59:59");
+                cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd HH:mm:ss");
             }
             if (!string.IsNullOrEmpty(Request.Params["sta_id"]))
             {
@@ -7826,7 +7826,7 @@ namespace Admin.gigade.Controllers
               
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式    ,totalCount:" + totalCount + " 
-                timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = "{success:true,'msg':'user',totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(cbmasterList, Formatting.Indented, timeConverter) + "}";//返回json數據
             }
             catch (Exception ex)
@@ -7857,64 +7857,68 @@ namespace Admin.gigade.Controllers
             {
                 #region 查詢條件
 
-
-                if (!string.IsNullOrEmpty(Request.Params["startDate"]))
+                if (!string.IsNullOrEmpty(Request.Params["rowIDs"]))
                 {
-                    cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd HH:mm:ss");
+                    cbmaster.row_id_IN = Request.Params["rowIDs"].TrimEnd(',');
                 }
-                if (!string.IsNullOrEmpty(Request.Params["endDate"]))
-                {
-                    cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd HH:mm:ss");
-                }
-                if (!string.IsNullOrEmpty(Request.Params["sta_id"]))
-                {
-                    cbmaster.sta_id = Request.Params["sta_id"];
-                }
-
-
-                if (!string.IsNullOrEmpty(Request.Params["jobStart"]) || !string.IsNullOrEmpty(Request.Params["jobEnd"]))
-                {
-                    cbmaster.cbjob_id = "PC";
-                    if (!string.IsNullOrEmpty(Request.Params["jobStart"]))
+                if (!string.IsNullOrEmpty(Request.Params["startDate"]) && Request.Params["startDate"].Substring(0, 10) != "1970-01-01")
                     {
-                        switch (Request.Params["jobStart"].Trim().Length)
-                        {
-                            case 0:
-                            //cbmaster.cbjob_id  += "00";
-                            //break;
-                            case 1:
-                                cbmaster.cbjob_id += "%" + Request.Params["jobStart"].Trim().ToUpper();
-                                break;
-                            default:
-                                cbmaster.cbjob_id += Request.Params["jobStart"].Trim().ToUpper().Substring(0, 2);
-                                break;
-                        }
+                        cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd HH:mm:ss");
                     }
-                    else
+                if (!string.IsNullOrEmpty(Request.Params["endDate"]) && Request.Params["endDate"].Substring(0, 10) != "1970-01-01")
                     {
+                        cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd HH:mm:ss");
+                    }
+                    if (!string.IsNullOrEmpty(Request.Params["sta_id"]))
+                    {
+                        cbmaster.sta_id = Request.Params["sta_id"];
+                    }
+
+
+                    if (!string.IsNullOrEmpty(Request.Params["jobStart"]) || !string.IsNullOrEmpty(Request.Params["jobEnd"]))
+                    {
+                        cbmaster.cbjob_id = "PC";
+                        if (!string.IsNullOrEmpty(Request.Params["jobStart"]))
+                        {
+                            switch (Request.Params["jobStart"].Trim().Length)
+                            {
+                                case 0:
+                                //cbmaster.cbjob_id  += "00";
+                                //break;
+                                case 1:
+                                    cbmaster.cbjob_id += "%" + Request.Params["jobStart"].Trim().ToUpper();
+                                    break;
+                                default:
+                                    cbmaster.cbjob_id += Request.Params["jobStart"].Trim().ToUpper().Substring(0, 2);
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            cbmaster.cbjob_id += "%";
+                        }
+                        if (!string.IsNullOrEmpty(Request.Params["jobEnd"]))
+                        {
+                            switch (Request.Params["jobEnd"].Trim().Length)
+                            {
+                                case 0:
+                                //cbmaster.cbjob_id  += "00";
+                                //break;
+                                case 1:
+                                    cbmaster.cbjob_id += "%" + Request.Params["jobEnd"].Trim().ToUpper();
+                                    break;
+                                default:
+                                    cbmaster.cbjob_id += Request.Params["jobEnd"].Trim().ToUpper().Substring(0, 2);
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            cbmaster.cbjob_id += "%";
+                        }
                         cbmaster.cbjob_id += "%";
                     }
-                    if (!string.IsNullOrEmpty(Request.Params["jobEnd"]))
-                    {
-                        switch (Request.Params["jobEnd"].Trim().Length)
-                        {
-                            case 0:
-                            //cbmaster.cbjob_id  += "00";
-                            //break;
-                            case 1:
-                                cbmaster.cbjob_id += "%" + Request.Params["jobEnd"].Trim().ToUpper();
-                                break;
-                            default:
-                                cbmaster.cbjob_id += Request.Params["jobEnd"].Trim().ToUpper().Substring(0, 2);
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        cbmaster.cbjob_id += "%";
-                    }
-                    cbmaster.cbjob_id += "%";
-                }
+                
 
                 #endregion
                 cbmaster.IsPage = false;
@@ -7934,36 +7938,12 @@ namespace Admin.gigade.Controllers
                     dtCountBook.Columns.Add("工作代號", typeof(String));
                     dtCountBook.Columns.Add("料位區間", typeof(String));
                     dtCountBook.Columns.Add("領取人員", typeof(String));
-                    dtCountBook.Columns.Add(" ", typeof(String));
-                    dtCountBook.Columns.Add("  ", typeof(String));
-                    dtCountBook.Columns.Add("時間記錄", typeof(String));
-                    dtCountBook.Columns.Add("   ", typeof(String));
-                    dtCountBook.Columns.Add("    ", typeof(String));
-                    dtCountBook.Columns.Add("     ", typeof(String));
-                    DataRow drt = dtCountBook.NewRow();
-                    //dr[0] = "NO.";
-                    //dr[1] = "工作代號";
-                    //dr[2] = "料位區間";
-                    //dr[3] = "領取人員";
-                    //dr[4] = " ";
-                    //dr[5] = " ";
-                    //dr[6] = "時間記錄";
-                    //dr[7] = " ";
-                    //dr[8] = " ";
-                    //dr[9] = " ";
-                    //dtCountBook.Rows.Add(dr);
-                    //dr = dtCountBook.NewRow();
-                    drt[0] = " ";
-                    drt[1] = " ";
-                    drt[2] = " ";
-                    drt[3] = " ";
-                    drt[4] = "   出去   ";
-                    drt[5] = "   回來   ";
-                    drt[6] = "初盤KEY IN";
-                    drt[7] = "複盤結束";
-                    drt[8] = "盤點差異報表";
-                    drt[9] = "執行蓋帳";
-                    dtCountBook.Rows.Add(drt);
+                    dtCountBook.Columns.Add("出去", typeof(String));
+                    dtCountBook.Columns.Add("回來", typeof(String));
+                    dtCountBook.Columns.Add("初盤KEY IN", typeof(String));
+                    dtCountBook.Columns.Add("複盤結束", typeof(String));
+                    dtCountBook.Columns.Add("盤點差異報表", typeof(String));
+                    dtCountBook.Columns.Add("執行蓋帳", typeof(String));
                     for (int i = 0; i < cbmasterList.Count; i++)
                     {
                         DataRow dr = dtCountBook.NewRow();
@@ -7998,7 +7978,7 @@ namespace Admin.gigade.Controllers
                         DataRow dr = dtCountBook.NewRow();
                         dr[0] = "";
                         dr[1] = "";
-                        dr[2] ="";
+                        dr[2] =" ";
                         dr[3] = " ";
                         dr[4] = " ";
                         dr[5] = " ";
@@ -8015,7 +7995,6 @@ namespace Admin.gigade.Controllers
                         dtCountBook.Rows.Add(dr);
                     }
 
-                    string s = " ";
                     //dtCountBook.Columns.RemoveAt(0);
                     
                     #endregion
