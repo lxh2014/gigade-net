@@ -448,30 +448,72 @@ namespace Admin.gigade.Controllers
 
         #region 序號兌換-檢視序號 +HttpResponseBase PromotionsBonusSerialLists()
         [CustomHandleError]
-        public HttpResponseBase PromotionsBonusSerialLists()
+        #region MyRegion
+        
+       
+        //public HttpResponseBase PromotionsBonusSerialLists()
+        //{
+        //    List<PromotionsBonusSerial> stores = new List<PromotionsBonusSerial>();
+        //    List<PromotionsBonusSerial> mystores = new List<PromotionsBonusSerial>();
+        //    _promBnusSeral = new PromotionsBonusSerialMgr(mySqlConnectionString);
+        //    string json = string.Empty;
+        //    try
+        //    {
+        //        int id = Convert.ToInt32(Request.Params["ids"]);
+        //        stores = _promBnusSeral.QueryById(id);
+        //        int i;
+        //        int j = 1;
+        //        for (i = 0; i < stores.Count; i++)
+        //        {
+        //            PromotionsBonusSerial query = new PromotionsBonusSerial();
+        //            query.id = stores[i].id;
+        //            query.active = stores[i].active;
+        //            query.promotion_id = stores[i].promotion_id;
+        //            query.serial = stores[i].serial;
+        //            query.myid = j++;
+        //            mystores.Add(query);
+        //        }
+        //        json = "{success:true,data:" + JsonConvert.SerializeObject(mystores) + "}";//返回json數據
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+        //        logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+        //        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+        //        log.Error(logMessage);
+        //        json = "{success:true,data:[]}";
+        //    }
+        //    this.Response.Clear();
+        //    this.Response.Write(json);
+        //    this.Response.End();
+        //    return this.Response;
+        //}
+        #endregion
+        public HttpResponseBase PromotionsBonusSerialLists2()
         {
-            List<PromotionsBonusSerial> stores = new List<PromotionsBonusSerial>();
-            List<PromotionsBonusSerial> mystores = new List<PromotionsBonusSerial>();
-            _promBnusSeral = new PromotionsBonusSerialMgr(mySqlConnectionString);
             string json = string.Empty;
+            int totalcount = 0;
+            PromotionsBonusSerial query = new PromotionsBonusSerial();
+            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
+            List<PromotionsBonusSerial> stores = new List<PromotionsBonusSerial>();
+            _promBnusSeral = new PromotionsBonusSerialMgr(mySqlConnectionString);
+            query.promotion_id = Convert.ToInt32(Request.Params["ids"]);
+         
             try
             {
-                int id = Convert.ToInt32(Request.Params["ids"]);
-                stores = _promBnusSeral.QueryById(id);
-                int i;
+               // int id = Convert.ToInt32(Request.Params["ids"]);
+                stores = _promBnusSeral.QueryById(query, out totalcount);
                 int j = 1;
-                for (i = 0; i < stores.Count; i++)
+                for (int i = 0; i < stores.Count; i++)
                 {
-                    PromotionsBonusSerial query = new PromotionsBonusSerial();
-                    query.id = stores[i].id;
-                    query.active = stores[i].active;
-                    query.promotion_id = stores[i].promotion_id;
-                    query.serial = stores[i].serial;
-                    query.myid = j++;
-                    mystores.Add(query);
+                    stores[i].myid = j++;
                 }
-                json = "{success:true,data:" + JsonConvert.SerializeObject(mystores) + "}";//返回json數據
-
+               // json = "{success:true,data:" + JsonConvert.SerializeObject(stores) + "}";//返回json數據
+                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(stores, Formatting.Indented, timeConverter) + "}";
             }
             catch (Exception ex)
             {
@@ -490,16 +532,23 @@ namespace Admin.gigade.Controllers
 
         #region 序號兌換-檢視記錄 + HttpResponseBase PromotionsBonusSerialHistoryLists()
         [CustomHandleError]
-        public HttpResponseBase PromotionsBonusSerialHistoryLists()
+        public HttpResponseBase PromotionsBonusSerialHistoryLists2()
         {
+            string json = string.Empty;
+            int totalcount = 0;
+            PromotionsBonusSerialHistoryQuery query = new PromotionsBonusSerialHistoryQuery();
+            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
+            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
             List<PromotionsBonusSerialHistoryQuery> stores = new List<PromotionsBonusSerialHistoryQuery>();
             _promBnusSeralHitory = new PromotionsBonusSerialHistoryMgr(mySqlConnectionString);
-            PromotionsBonusSerialHistoryQuery query = new PromotionsBonusSerialHistoryQuery();
-            string json = string.Empty;
+           
+           
+           
             try
             {
+                query.promotion_id = Convert.ToInt32(Request.Params["ids"]);
                 int id = Convert.ToInt32(Request.Params["ids"]);
-                stores = _promBnusSeralHitory.QueryById(id);
+                stores = _promBnusSeralHitory.QueryById(query, out totalcount);
 
                 foreach (var item in stores)
                 {
@@ -507,9 +556,8 @@ namespace Admin.gigade.Controllers
                 }
 
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
                 timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                json = "{success:true,items:" + JsonConvert.SerializeObject(stores, timeConverter) + "}";//返回json數據
+                json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(stores, Formatting.Indented, timeConverter) + "}";
             }
             catch (Exception ex)
             {
@@ -524,14 +572,101 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+        #region MyRegion
+      
+        //public HttpResponseBase PromotionsBonusSerialHistoryLists()
+        //{
+        //    List<PromotionsBonusSerialHistoryQuery> stores = new List<PromotionsBonusSerialHistoryQuery>();
+        //    _promBnusSeralHitory = new PromotionsBonusSerialHistoryMgr(mySqlConnectionString);
+        //    PromotionsBonusSerialHistoryQuery query = new PromotionsBonusSerialHistoryQuery();
+        //    string json = string.Empty;
+        //    try
+        //    {
+        //        int id = Convert.ToInt32(Request.Params["ids"]);
+        //        stores = _promBnusSeralHitory.QueryById(id);
+
+        //        foreach (var item in stores)
+        //        {
+        //            item.user_email = item.user_email.Split('@')[0] + "@***";
+        //        }
+
+        //        IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
+        //        //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
+        //        timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+        //        json = "{success:true,items:" + JsonConvert.SerializeObject(stores, timeConverter) + "}";//返回json數據
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+        //        logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+        //        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+        //        log.Error(logMessage);
+        //        json = "{success:true,data:[]}";
+        //    }
+        //    this.Response.Clear();
+        //    this.Response.Write(json);
+        //    this.Response.End();
+        //    return this.Response;
+        //}
+
+        #endregion
         #endregion
 
         #region 序號兌換-檢視序號-插入數據+HttpResponseBase InsertPromotionsBonusSerial()
-        public HttpResponseBase InsertPromotionsBonusSerial()
+        #region
+        //public HttpResponseBase InsertPromotionsBonusSerial()
+        //{
+        //    string json = string.Empty;
+        //    try
+        //    {
+        //        _pbsd = new PromotionsBonusSerialDao(mySqlConnectionString);
+        //        _promBnusSeral = new PromotionsBonusSerialMgr(mySqlConnectionString);
+        //        PromotionsBonusSerial pbs = new PromotionsBonusSerial();
+        //        int couts = Convert.ToInt32(Request.Params["xhsl"]);
+        //        int lenghts = Convert.ToInt32(Request.Params["xhcd"]);
+        //        int id = Convert.ToInt32(Request.Params["ids"]);
+        //        Random rd = new Random();
+        //        for (int i = 0; i < couts; i++)
+        //        {
+        //            string serials = CommonFunction.Getserials(lenghts, rd);
+        //            List<PromotionsBonusSerial> ls = new List<PromotionsBonusSerial>();
+        //            ls = _pbsd.YesOrNoExist(serials);
+        //            if (ls.Single().serial == serials)
+        //            {
+        //                continue;
+        //            }
+        //            else
+        //            {
+        //                int count = _promBnusSeral.Save(serials, id);
+        //                if (count > 0)
+        //                {
+        //                    continue;
+        //                }
+        //            }
+        //        }
+        //        json = "{success:true}";//返回json數據
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+        //        logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+        //        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+        //        log.Error(logMessage);
+        //        json = "{success:false}";
+        //    }
+        //    this.Response.Clear();
+        //    this.Response.Write(json);
+        //    this.Response.End();
+        //    return this.Response;
+        //}
+        #endregion
+
+        public HttpResponseBase InsertPromotionsBonusSerial2()
         {
             string json = string.Empty;
             try
             {
+                //SuccessNum = 0;
                 _pbsd = new PromotionsBonusSerialDao(mySqlConnectionString);
                 _promBnusSeral = new PromotionsBonusSerialMgr(mySqlConnectionString);
                 PromotionsBonusSerial pbs = new PromotionsBonusSerial();
@@ -539,6 +674,10 @@ namespace Admin.gigade.Controllers
                 int lenghts = Convert.ToInt32(Request.Params["xhcd"]);
                 int id = Convert.ToInt32(Request.Params["ids"]);
                 Random rd = new Random();
+                StringBuilder sb = new StringBuilder();
+                _promBnusSeral = new PromotionsBonusSerialMgr(mySqlConnectionString);  
+                //FileStream fs = new FileStream("D:\\2.txt", FileMode.OpenOrCreate);
+                //StreamWriter sw = new StreamWriter(fs);
                 for (int i = 0; i < couts; i++)
                 {
                     string serials = CommonFunction.Getserials(lenghts, rd);
@@ -550,13 +689,31 @@ namespace Admin.gigade.Controllers
                     }
                     else
                     {
-                        int count = _promBnusSeral.Save(serials, id);
-                        if (count > 0)
+                     //   SuccessNum=i+1;
+                        //////
+                      
+                        //开始写入
+                      //  sw.Write(SuccessNum+",");
+                        //清空缓冲区
+                     
+                        sb.AppendFormat(" insert into promotions_bonus_serial(serial,active,promotion_id)values('{0}','{1}','{2}');", serials, 1, id);
+                        if (sb.ToString().Length > 1000)
                         {
-                            continue;
+                            _promBnusSeral.AddPromoBonusSerial(sb);
+                            sb.Clear();
                         }
                     }
+                    
                 }
+                if (sb.ToString().Length > 0)
+                {
+                    _promBnusSeral.AddPromoBonusSerial(sb);
+                    //執行事務
+                }  
+                //sw.Flush();
+                //        //关闭流
+                //sw.Close();
+                //fs.Close();
                 json = "{success:true}";//返回json數據
             }
             catch (Exception ex)
@@ -572,6 +729,48 @@ namespace Admin.gigade.Controllers
             this.Response.End();
             return this.Response;
         }
+
+        #region MyRegion
+        
+       
+        //public HttpResponseBase GetInsertNum()
+        //{
+        //    string jsonStr = "";
+        //    try
+        //    {
+        //        //StreamReader sr = new StreamReader(@"D:\\2.txt", Encoding.UTF8);
+        //        //string result = "";
+        //        //string re = sr.ReadToEnd();
+        //        //if (re.Length > 0)
+        //        //{
+        //        //    result = re.Trim().TrimEnd(',');
+        //        //}
+        //        //string[] ge = result.Split(',');
+        //        //string a = ge[(ge.Count() - 1)];
+
+
+        //        //jsonStr = "{success:true,msg:" + a + "}";//返回json數據
+           
+        //        jsonStr = "{success:true,msg:" + SuccessNum + "}";//返回json數據
+        //       // sr.Close();
+               
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+        //        logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+        //        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+        //        log.Error(logMessage);
+        //        jsonStr = "{success:false}";
+        //    }
+        //    this.Response.Clear();
+        //    this.Response.Write(jsonStr.ToString());
+        //    this.Response.End();
+        //    return this.Response;
+
+        //}
+        #endregion
         #endregion
 
         #region 序號兌換 更改活動使用狀態+JsonResult UpdateActive()

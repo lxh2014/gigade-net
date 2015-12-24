@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BLL.gigade.Model
 {
-    public class PromotionsBonusSerial
+    public class PromotionsBonusSerial:PageBase
     {
         public int id { get; set; }
         public int promotion_id { get; set; }
