@@ -1169,19 +1169,14 @@ function editFunction(row, store) {
                 width: 150,
                 allowBlank: false,
                 submitValue: true,
-                value: Tomorrow(),
+                value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() - 1)),//modify by jiaohe0625j
                 listeners: {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("starts");
                         var end = Ext.getCmp("end");
-                        var s_date = new Date(start.getValue());
-                        var ttime = s_date;
-                        ttime = new Date(ttime.setMonth(s_date.getMonth() + 1));
-                        ttime = new Date(ttime.setMinutes(59));
-                        ttime = new Date(ttime.setSeconds(59));
-                        ttime = new Date(ttime.setHours(23));
-
-                        end.setValue(ttime);
+                        if (end.getValue() < start.getValue()) {
+                            end.setValue(setNextMonth(start.getValue(), 1));//modify by jiaohe0625j
+                        }
                     }
                 }
             },
@@ -1196,22 +1191,14 @@ function editFunction(row, store) {
                 time: { hour: 23, min: 59, sec: 59 },//標記結束時間23:59:59
                 allowBlank: false,
                 submitValue: true,
-                value: new Date(Tomorrow().setMonth(Tomorrow().getMonth() + 1)),
+                value: setNextMonth(Tomorrow(), 0),//modify by jiaohe0625j
                 listeners: {
                     select: function (a, b, c) {
                         var start = Ext.getCmp("starts");
                         var end = Ext.getCmp("end");
-                        var s_date = new Date(start.getValue());
-                        var now_date = new Date(end.getValue());
                         if (end.getValue() < start.getValue()) {
-                            Ext.Msg.alert(INFORMATION, TIMETIP);
+                            start.setValue(setNextMonth(end.getValue(), -1));//modify by jiaohe0625j
                         }
-                        var ttime = now_date;
-                        ttime = new Date(ttime.setMonth(now_date.getMonth()));
-                        ttime = new Date(ttime.setMinutes(59));
-                        ttime = new Date(ttime.setSeconds(59));
-                        ttime = new Date(ttime.setHours(23));
-                        end.setValue(ttime);
                     }
                 }
             }

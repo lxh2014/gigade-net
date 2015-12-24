@@ -126,7 +126,8 @@ editFunction_period= function (row, store) {
                                 if (result.success) {
                                     Ext.Msg.alert(INFORMATION, "保存成功! ");
                                    // store.load();
-                                     Schedule_Period_Store.load();
+                                    Schedule_Period_Store.load();
+                                    ScheduleStore.load();
                                     editWin.close();
                                 }
                                 else {

@@ -240,7 +240,7 @@ namespace BLL.gigade.Common
             Boolean result = false;
             try
             {
-
+                MailBody = MailBody + " ";
                 //根據群組代碼獲取收件人信息
                 StringBuilder sql = new StringBuilder();
                 sql.Append(@" select mu.user_mail,mu.user_name");

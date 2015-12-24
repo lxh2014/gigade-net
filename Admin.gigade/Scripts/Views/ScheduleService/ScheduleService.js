@@ -191,7 +191,7 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
     columnLines: true,
     store: ScheduleStore,
     columns: [                      //顯示master
-        { header: '編號', dataIndex: 'rowid', align: 'left', width: 40, menuDisabled: true, sortable: false, align: 'center' },
+        { header: '編號', dataIndex: 'rowid',  width: 40, menuDisabled: true, sortable: false, align: 'center' },
          {
              header: "排程狀態", dataIndex: 'schedule_state', align: 'center', width: 60, hidden: false,
              renderer: function (value, cellmeta, record, rowIndex, columnIndex, store) {
@@ -202,17 +202,17 @@ var masterGiftList = Ext.create('Ext.grid.Panel', {
                  }
              }
          },
-        { header: '排程Code', dataIndex: 'schedule_code', align: 'left', width: 100, menuDisabled: true, sortable: false, align: 'center' },
-        { header: '排程名稱', dataIndex: 'schedule_name', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: 'contriller/action', dataIndex: 'schedule_api', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '排程描述', dataIndex: 'schedule_description', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: 'schedule_period表主鍵', dataIndex: 'schedule_period_id', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '創建人', dataIndex: 'create_username', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '修改人', dataIndex: 'change_username', align: 'left', width: 60, menuDisabled: true, sortable: false, align: 'center' },
-        { header: '上次執行時間', dataIndex: 'show_previous_execute_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '下次執行時間', dataIndex: 'show_next_execute_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '創建時間', dataIndex: 'show_create_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
-       { header: '修改時間', dataIndex: 'show_change_time', align: 'left', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+        { header: '排程Code', dataIndex: 'schedule_code',  width: 150, menuDisabled: true, sortable: false, align: 'left' },
+        { header: '排程名稱', dataIndex: 'schedule_name', width: 150, menuDisabled: true, sortable: false, align: 'left' },
+       { header: 'contriller/action', dataIndex: 'schedule_api', width: 250, menuDisabled: true, sortable: false, align: 'left' },
+       { header: '排程描述', dataIndex: 'schedule_description', width: 150, menuDisabled: true, sortable: false, align: 'left' },
+       { header: '上次執行時間', dataIndex: 'show_previous_execute_time', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+       { header: '下次執行時間', dataIndex: 'show_next_execute_time', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+       { header: 'schedule_period表主鍵', dataIndex: 'schedule_period_id', width: 60, menuDisabled: true, sortable: false, align: 'center' },
+       { header: '創建人', dataIndex: 'create_username',  width: 60, menuDisabled: true, sortable: false, align: 'center' },
+       { header: '創建時間', dataIndex: 'show_create_time', width: 150, menuDisabled: true, sortable: false, align: 'center' },
+       { header: '修改人', dataIndex: 'change_username',  width: 60, menuDisabled: true, sortable: false, align: 'center' },       
+       { header: '修改時間', dataIndex: 'show_change_time',  width: 150, menuDisabled: true, sortable: false, align: 'center' },
     ],
     tbar: [
      { xtype: 'button', text: "添加", id: 'add_master', iconCls: 'icon-user-add',hidden:true, handler: add_master },//添加按鈕
@@ -544,10 +544,6 @@ function ondelete_master() {
                 for (var i = 0; i < row.length; i++) {
 
                     rowIDs += row[i].data.rowid + ',';//可以刪除多條數據記錄
-
-                    //  rowIDs += row[i].data.id//刪除一條數據記錄
-
-                    Ext.Msg.alert(rowIDs);
                 }
                 Ext.Ajax.request({
                     //控制器下的delete方法
@@ -568,7 +564,7 @@ function ondelete_master() {
                         }
                     },
                     failure: function () {
-                        Ext.Msg.alert("刪除失敗!");
+                        Ext.Msg.alert(INFORMATION, "刪除失敗!");
                     }
                 });
             }
@@ -592,10 +588,6 @@ function ondelete_config() {
                 for (var i = 0; i < row.length; i++) {
 
                     rowIDs += row[i].data.rowid + ',';//可以刪除多條數據記錄
-
-                    //  rowIDs += row[i].data.id//刪除一條數據記錄
-
-                    Ext.Msg.alert(rowIDs);
                 }
                 Ext.Ajax.request({
                     //控制器下的delete方法
@@ -616,7 +608,7 @@ function ondelete_config() {
                         }
                     },
                     failure: function () {
-                        Ext.Msg.alert("刪除失敗!");
+                        Ext.Msg.alert(INFORMATION, "刪除失敗!");
                     }
                 });
             }
@@ -641,9 +633,6 @@ function ondelete_period() {
 
                     rowIDs += row[i].data.rowid + ',';//可以刪除多條數據記錄
 
-                    //  rowIDs += row[i].data.id//刪除一條數據記錄
-
-                    Ext.Msg.alert(rowIDs);
                 }
                 Ext.Ajax.request({
                     //控制器下的delete方法
@@ -656,6 +645,7 @@ function ondelete_period() {
                             Ext.Msg.alert(INFORMATION, "刪除成功!");
                             // ScheduleStore.loadPage(1);
                             Schedule_Period_Store.load();
+                            ScheduleStore.load();
                         }
                         else {
                             Ext.Msg.alert(INFORMATION, "無法刪除!");
@@ -664,7 +654,7 @@ function ondelete_period() {
                         }
                     },
                     failure: function () {
-                        Ext.Msg.alert("刪除失敗!");
+                        Ext.Msg.alert(INFORMATION, "刪除失敗!");
                     }
                 });
             }
