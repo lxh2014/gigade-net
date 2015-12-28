@@ -92,14 +92,30 @@ namespace BLL.gigade.Mgr
                     }
                     else 
                     {
-                        sbHtml.Append("<tr style='background-color:#FF9BFF'>");
+                        sbHtml.Append("<tr style='background-color:#FF0000'>");
                     }
                     for (int j = 0; j < _dtmyMonth.Columns.Count-1; j++)
                     {
-                        sbHtml.Append("<td ");
-                        sbHtml.Append(aligns);
-                        sbHtml.Append(" >");
-                        sbHtml.Append(_dtmyMonth.Rows[i][j]);
+                        if (_dtmyMonth.Rows[i][DeleteName].ToString() == value)
+                        {
+                            sbHtml.Append("<td ");
+                            sbHtml.Append(aligns);
+                            sbHtml.Append(" >");
+                            sbHtml.Append(_dtmyMonth.Rows[i][j]);
+                        }
+                        else
+                        {
+                            sbHtml.Append("<td style='color: #FFFFFF' ");
+                            sbHtml.Append(aligns);
+                            sbHtml.Append(" >");
+                            sbHtml.Append("<strong>");
+                            sbHtml.Append(_dtmyMonth.Rows[i][j]);
+                            sbHtml.Append("</strong>"); 
+                        }
+                        //sbHtml.Append("<td ");
+                        //sbHtml.Append(aligns);
+                        //sbHtml.Append(" >");
+                        //sbHtml.Append(_dtmyMonth.Rows[i][j]);
                         sbHtml.Append("</td>");
                     }
                     sbHtml.Append("</tr>");
@@ -133,48 +149,7 @@ namespace BLL.gigade.Mgr
           
             sbHtml.Append("</table>");
             return sbHtml.ToString();
-            //System.Text.StringBuilder sbHtml = new System.Text.StringBuilder();
-            ////sbHtml.Append("<table  cellpadding=3 cellspacing=1  border=2 style=\"border:white solid #ccc; \">");
-            //sbHtml.Append("<table cellpadding=2 cellspacing=2  style='border: black solid;border-width:2 0 2 0'>");//style='border-collapse: collapse '
-            //sbHtml.Append("<tr style=\"text-align: center; COLOR: black; BACKGROUND-COLOR: #c0e0f0; font-weight: bold\">");//B3D4FF
             
-            //string aligns = "align=\"left\"";
-            //string color = "style=\"background-color:#ffeedd;\"";//單數行的樣式f0f0f0 dcb5ff  e0e0e0
-          
-
-            ////插入列頭
-            //for (int i = 0; i < _dtmyMonth.Columns.Count; i++)
-            //{
-            //    sbHtml.Append("<th ");
-            //    sbHtml.Append(" >");
-            //    sbHtml.Append(_dtmyMonth.Columns[i].ColumnName);
-            //    sbHtml.Append("</th>");
-            //}
-            //sbHtml.Append("</tr>");
-            ////插入數據，單數行設置背景色
-            //for (int i = 0; i < _dtmyMonth.Rows.Count; i++)//行
-            //{
-            //    sbHtml.Append("<tr>");
-
-            //    for (int j = 0; j < _dtmyMonth.Columns.Count; j++)
-            //    {
-            //        sbHtml.Append("<td ");               
-            //        if (i % 2 == 0)
-            //        {
-            //            sbHtml.Append(aligns + color);
-            //        }
-            //        else
-            //        {
-            //            sbHtml.Append(aligns);
-            //        }
-            //        sbHtml.Append(" >");
-            //        sbHtml.Append(_dtmyMonth.Rows[i][j]);
-            //        sbHtml.Append("</td>");
-            //    }
-            //    sbHtml.Append("</tr>");
-            //}
-            //sbHtml.Append("</table>");
-            //return sbHtml.ToString();
 
         }
 
