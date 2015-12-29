@@ -5086,6 +5086,10 @@ namespace Admin.gigade.Controllers
                 {
                     query.orc_send = Convert.ToInt32(Request.Params["orc_send"]);
                 }
+                if (!string.IsNullOrEmpty(Request.Params["bank_note"]))
+                {//退款諮詢添加到此
+                    query.bank_note = Request.Params["bank_note"];
+                }
                 
                 query.ors_createuser = (Session["caller"] as Caller).user_id;
              

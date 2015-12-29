@@ -147,7 +147,6 @@
             listeners: {
                 specialkey: function (field, e) {
                     if (e.getKey() == e.ENTER) {
-                     
                         var regex = /^[0-9]*$/;
                         if (regex.test(Ext.getCmp('return_id').getValue())) {
                             var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
@@ -194,6 +193,7 @@
                                             Ext.getCmp('returnMoney').setDisabled(true);
                                             Ext.getCmp('package').hide();
                                             Ext.getCmp('orc_service_remark').setValue("");
+                                            Ext.getCmp('bank_note1').setValue("");
                                             Ext.getCmp('orc_remark').setValue("");
                                             Ext.getCmp('orc_type').setValue(1);
                                             Ext.getCmp('invoice_deal').setValue(1);
@@ -377,6 +377,7 @@
                                         Ext.getCmp('returnMoney').setDisabled(true);
                                         Ext.getCmp('package').hide();
                                         Ext.getCmp('orc_service_remark').setValue("");
+                                        Ext.getCmp('bank_note1').setValue("");
                                         Ext.getCmp('orc_remark').setValue("");
                                         Ext.getCmp('orc_type').setValue(1);
                                         Ext.getCmp('invoice_deal').setValue(1);
@@ -936,6 +937,14 @@
                 name: 'orc_service_remark',
                 width: 360,
                 maxLength: 200,
+            },            
+            {
+                xtype: 'textarea',
+                id: 'bank_note1',
+                name: 'bank_note1',
+                fieldLabel: '退款資訊 (最多200字)',
+                width: 360,
+                maxLength: 200,
             },
             {
                 xtype: 'radiogroup',
@@ -977,6 +986,7 @@
                             orc_service_remark: Ext.getCmp('orc_service_remark').getValue(),
                             invoice_deal: Ext.getCmp('invoice_deal').getValue(),
                             orc_send: Ext.getCmp('orc_send').getValue().orc_send_name,
+                            bank_note: Ext.getCmp('bank_note1').getValue()
                         },
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);

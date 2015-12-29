@@ -1066,18 +1066,28 @@ namespace BLL.gigade.Dao
         public string UpdateORM(OrderReturnStatusQuery query)
         {
             StringBuilder sql = new StringBuilder();
+            StringBuilder sql1 = new StringBuilder();
             try
             {
                 sql.AppendFormat("update order_return_master  set ");
                 if (query.invoice_deal == 0 && query.ormpackage != 0)
                 {
-                    sql.AppendFormat("   package='{0}' ",query.ormpackage);
+                    sql1.AppendFormat("   package='{0}' ", query.ormpackage);
                 }
                 else   if (query.invoice_deal != 0 && query.ormpackage == 0)
                 {
-                    sql.AppendFormat(" invoice_deal='{0}'  ", query.invoice_deal);
+                    sql1.AppendFormat(" invoice_deal='{0}'  ", query.invoice_deal);
                 }
-                sql.AppendFormat(" where return_id='{0}'; ", query.return_id);
+                if (query.bank_note != "")
+                {
+                    if (sql1.Length > 1)
+                    {
+                        sql1.Append(",");
+                    }
+                    sql1.AppendFormat(" bank_note='{0}'  ", query.bank_note);
+                }
+                sql1.AppendFormat(" where return_id='{0}'; ", query.return_id);
+                sql.Append(sql1.ToString());
                 return sql.ToString();
             }
             catch (Exception ex)
