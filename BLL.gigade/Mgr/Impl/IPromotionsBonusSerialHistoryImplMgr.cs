@@ -9,5 +9,6 @@ namespace BLL.gigade.Mgr.Impl
     public interface IPromotionsBonusSerialHistoryImplMgr
     {
         List<PromotionsBonusSerialHistoryQuery> QueryById(int id);
+        List<Model.Query.PromotionsBonusSerialHistoryQuery> QueryById(PromotionsBonusSerialHistoryQuery query, out int TotalCount);
     }
 }

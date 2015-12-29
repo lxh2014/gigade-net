@@ -440,7 +440,7 @@ namespace BLL.gigade.Mgr
             }
             catch (Exception ex)
             {
-                throw new Exception("ScheduleServiceDao-->SaveScheduleMasterInfo-->" + ex.Message);
+                throw new Exception("ScheduleServiceMgr-->SaveScheduleMasterInfo-->" + ex.Message);
             }
         }
 
@@ -460,7 +460,7 @@ namespace BLL.gigade.Mgr
             }
             catch (Exception ex)
             {
-                throw new Exception("ScheduleServiceDao-->SaveScheduleConfigInfo-->" + ex.Message);
+                throw new Exception("ScheduleServiceMgr-->SaveScheduleConfigInfo-->" + ex.Message);
             }
         }
 
@@ -480,7 +480,7 @@ namespace BLL.gigade.Mgr
             }
             catch (Exception ex)
             {
-                throw new Exception("ScheduleServiceDao-->SaveSchedulePeriodInfo-->" + ex.Message);
+                throw new Exception("ScheduleServiceMgr-->SaveSchedulePeriodInfo-->" + ex.Message);
             } 
         }
 
@@ -493,7 +493,7 @@ namespace BLL.gigade.Mgr
             }
             catch (Exception ex)
             {
-                throw new Exception("ScheduleServiceDao-->ScheduleMasterDelete-->" + ex.Message);
+                throw new Exception("ScheduleServiceMgr-->ScheduleMasterDelete-->" + ex.Message);
             }
             
         }
@@ -507,7 +507,7 @@ namespace BLL.gigade.Mgr
             }
             catch (Exception ex)
             {
-                throw new Exception("ScheduleServiceDao-->ScheduleConfigDelete-->" + ex.Message);
+                throw new Exception("ScheduleServiceMgr-->ScheduleConfigDelete-->" + ex.Message);
             }  
             
         }
@@ -521,11 +521,75 @@ namespace BLL.gigade.Mgr
             }
             catch (Exception ex)
             {
-                throw new Exception("ScheduleServiceDao-->SchedulePeriodDelete-->" + ex.Message);
+                throw new Exception("ScheduleServiceMgr-->SchedulePeriodDelete-->" + ex.Message);
             }    
            
         }
+        public Boolean SendMail(MailModel mailModel, string GroupCode, string MailTitle, string MailBody, Boolean IsSeparate = false, Boolean IsDisplyName = false)
+        {
+            Boolean result = false;
+            try
+            {
+                mailModel = GetDeafultMailConfig(mailModel);
+                MailHelper mail = new MailHelper(mailModel);
 
+                MailBody = MailBody + " ";
+                mail.SendToGroup(GroupCode, MailTitle, MailBody, IsSeparate, IsDisplyName);
+                
+                //根據群組代碼獲取收件人信息
+                
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(" ScheduleServiceMgr-->SendMail-->" + ex.Message, ex);
+            }
+
+            return result;
+        }
+
+        public MailModel GetDeafultMailConfig(MailModel mailModel)
+        {
+            try
+            {
+                string xmlPath = System.Configuration.ConfigurationManager.AppSettings["SiteConfig"];//
+                string path = System.Web.HttpContext.Current.Server.MapPath(xmlPath);
+                SiteConfigMgr _siteConfigMgr = new SiteConfigMgr(path);
+                BLL.gigade.Model.SiteConfig NETDoMain_Name;
+
+                if (string.IsNullOrEmpty(mailModel.MailFromAddress))
+                {
+                    NETDoMain_Name = _siteConfigMgr.GetConfigByName("Mail_From");
+                    mailModel.MailFromAddress = NETDoMain_Name.Value;
+                }
+                if (string.IsNullOrEmpty(mailModel.MailFromUser))
+                {
+                    NETDoMain_Name = _siteConfigMgr.GetConfigByName("Mail_UserName");
+                    mailModel.MailFromUser = NETDoMain_Name.Value;
+                }
+                if (string.IsNullOrEmpty(mailModel.MailFormPwd))
+                {
+                    NETDoMain_Name = _siteConfigMgr.GetConfigByName("Mail_UserPasswd");
+                    mailModel.MailFormPwd = NETDoMain_Name.Value;
+                }
+                if (string.IsNullOrEmpty(mailModel.MailPort))
+                {
+                    NETDoMain_Name = _siteConfigMgr.GetConfigByName("Mail_Port");
+                    mailModel.MailPort = NETDoMain_Name.Value;
+                }
+                if (string.IsNullOrEmpty(mailModel.MailHost))
+                {
+                    NETDoMain_Name = _siteConfigMgr.GetConfigByName("Mail_Host");
+                    mailModel.MailHost = NETDoMain_Name.Value;
+                }
+                
+                return mailModel;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ScheduleServiceMgr-->GetDeafultMailConfig-->" + ex.Message);
+            }
+        }
       
 
     }

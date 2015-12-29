@@ -65,50 +65,91 @@ namespace BLL.gigade.Mgr
         #region 期望到貨日調整記錄通知排程 add by zhaozhi0623j 20151118PM
         //將DataTable轉化為Html 
 
-        public string GetHtmlByDataTable(DataTable _dtmyMonth)
+        public string GetHtmlByDataTable(DataTable _dtmyMonth,string DeleteName=null,string value=null)
         {
-            System.Text.StringBuilder sbHtml = new System.Text.StringBuilder();
-            //sbHtml.Append("<table  cellpadding=3 cellspacing=1  border=2 style=\"border:white solid #ccc; \">");
-            sbHtml.Append("<table cellpadding=2 cellspacing=2  style='border: black solid;border-width:2 0 2 0'>");//style='border-collapse: collapse '
-            sbHtml.Append("<tr style=\"text-align: center; COLOR: black; BACKGROUND-COLOR: #c0e0f0; font-weight: bold\">");//B3D4FF
-            
-            string aligns = "align=\"left\"";
-            string color = "style=\"background-color:#ffeedd;\"";//單數行的樣式f0f0f0 dcb5ff  e0e0e0
-          
-
-            //插入列頭
-            for (int i = 0; i < _dtmyMonth.Columns.Count; i++)
+            StringBuilder sbHtml = new StringBuilder();
+            sbHtml.Append("<table  cellpadding=3 cellspacing=1  border=1 style=\"border-collapse: collapse\">");
+            sbHtml.Append("<tr  style=\"text-align: center; COLOR: #0076C8; BACKGROUND-COLOR: #F4FAFF; font-weight: bold\">");
+            string[] str = { "style=\"background-color:#dda29a;\"", "style=\"background-color:#d98722;\"", "style=\"background-color:#cfbd2d;\"", "style=\"background-color:#cbd12c;\"", "style=\"background-color:#91ca15;\"", "style=\"background-color:#6dc71e;\"", "style=\"background-color:#25b25c;\"", "style=\"background-color:#13a7a2;\"", "style=\"background-color:#dda29a;\"", "style=\"background-color:#d98722;\"", "style=\"background-color:#cfbd2d;\"", "style=\"background-color:#cbd12c;\""};
+            string aligns = "align=\"right\"";
+            if (!string.IsNullOrEmpty(DeleteName))
             {
-                sbHtml.Append("<th ");
-                sbHtml.Append(" >");
-                sbHtml.Append(_dtmyMonth.Columns[i].ColumnName);
-                sbHtml.Append("</th>");
-            }
-            sbHtml.Append("</tr>");
-            //插入數據，單數行設置背景色
-            for (int i = 0; i < _dtmyMonth.Rows.Count; i++)//行
-            {
-                sbHtml.Append("<tr>");
-
-                for (int j = 0; j < _dtmyMonth.Columns.Count; j++)
+               
+                for (int i = 0; i < _dtmyMonth.Columns.Count - 1; i++)
                 {
-                    sbHtml.Append("<td ");               
-                    if (i % 2 == 0)
-                    {
-                        sbHtml.Append(aligns + color);
-                    }
-                    else
-                    {
-                        sbHtml.Append(aligns);
-                    }
+                    sbHtml.Append("<th ");
+                    sbHtml.Append(str[i]);
                     sbHtml.Append(" >");
-                    sbHtml.Append(_dtmyMonth.Rows[i][j]);
-                    sbHtml.Append("</td>");
+                    sbHtml.Append(_dtmyMonth.Columns[i].ColumnName);
+                    sbHtml.Append("</th>");
                 }
                 sbHtml.Append("</tr>");
+                for (int i = 0; i < _dtmyMonth.Rows.Count; i++)//行
+                {
+                    if (_dtmyMonth.Rows[i][DeleteName].ToString() == value)
+                    {
+                        sbHtml.Append("<tr style='background-color:#FFFF9B'>");
+                    }
+                    else 
+                    {
+                        sbHtml.Append("<tr style='background-color:#FF0000'>");
+                    }
+                    for (int j = 0; j < _dtmyMonth.Columns.Count-1; j++)
+                    {
+                        if (_dtmyMonth.Rows[i][DeleteName].ToString() == value)
+                        {
+                            sbHtml.Append("<td ");
+                            sbHtml.Append(aligns);
+                            sbHtml.Append(" >");
+                            sbHtml.Append(_dtmyMonth.Rows[i][j]);
+                        }
+                        else
+                        {
+                            sbHtml.Append("<td style='color: #FFFFFF' ");
+                            sbHtml.Append(aligns);
+                            sbHtml.Append(" >");
+                            sbHtml.Append("<strong>");
+                            sbHtml.Append(_dtmyMonth.Rows[i][j]);
+                            sbHtml.Append("</strong>"); 
+                        }
+                        //sbHtml.Append("<td ");
+                        //sbHtml.Append(aligns);
+                        //sbHtml.Append(" >");
+                        //sbHtml.Append(_dtmyMonth.Rows[i][j]);
+                        sbHtml.Append("</td>");
+                    }
+                    sbHtml.Append("</tr>");
+                }
             }
+            else 
+            {
+                for (int i = 0; i < _dtmyMonth.Columns.Count; i++)
+                {
+                    sbHtml.Append("<th ");
+                    sbHtml.Append(str[i]);
+                    sbHtml.Append(" >");
+                    sbHtml.Append(_dtmyMonth.Columns[i].ColumnName);
+                    sbHtml.Append("</th>");
+                }
+                sbHtml.Append("</tr>");
+                for (int i = 0; i < _dtmyMonth.Rows.Count; i++)//行
+                {
+                    sbHtml.Append("<tr>");
+                    for (int j = 0; j < _dtmyMonth.Columns.Count; j++)
+                    {
+                        sbHtml.Append("<td ");
+                        sbHtml.Append(aligns);
+                        sbHtml.Append(" >");
+                        sbHtml.Append(_dtmyMonth.Rows[i][j]);
+                        sbHtml.Append("</td>");
+                    }
+                    sbHtml.Append("</tr>");
+                }
+            }
+          
             sbHtml.Append("</table>");
             return sbHtml.ToString();
+            
 
         }
 
@@ -215,6 +256,8 @@ namespace BLL.gigade.Mgr
                 _dt.Columns.Add("期望到貨時段", typeof(string));
                 _dt.Columns.Add("備註", typeof(string));
                 _dt.Columns.Add("來源IP", typeof(string));
+                _dt.Columns.Add("異動時段", typeof(string));
+                _dt.Columns.Add("時間", typeof(string));//difftime
 
 
                 //自行出貨的供應商
@@ -294,7 +337,9 @@ namespace BLL.gigade.Mgr
                         deliverDt.Rows.Add(deliverDr);                       
                         #endregion
                     }
-
+                    #region MyRegion
+                    
+                   
                     for (int i = 0; i < dclTable.Rows.Count; i++)
                     {                       
                         dr = _dt.NewRow();
@@ -377,11 +422,20 @@ namespace BLL.gigade.Mgr
                         dr["期望到貨時段"] = sb.ToString();
                         dr["備註"] = dclTable.Rows[i]["dcl_note"].ToString();
                         dr["來源IP"] = dclTable.Rows[i]["dcl_ipfrom"].ToString();
+                        TimeSpan ti = aclQuery.time_end-Convert.ToDateTime(dclTable.Rows[i]["dcl_create_datetime"]);
+                        dr["異動時段"] = hourNum + "小時以外";
+                        dr["時間"] = "0";
+                        if (ti.TotalHours < int.Parse(hourNum))
+                        {
+                            dr["異動時段"] = Convert.ToInt32(ti.TotalHours) + "小時";
+                            dr["時間"] = "1";
+                        }
                         _dt.Rows.Add(dr);
                         sb.Clear();
                     }
                     #endregion
-                    
+                    #endregion
+
                     #region 出貨方式為“供應商自行出貨”的出貨單整理后，發郵件給對應的供應商
 
                     Dictionary<string, string> vendorDictionary = new Dictionary<string, string>();
@@ -477,7 +531,7 @@ namespace BLL.gigade.Mgr
                 {
                     if (isSendMailToGroup.Trim() == "true")
                     {
-                        MailBody = "<br/><font size=\"4\">出貨單期望到貨日在前 " + "<font color=\"#FF0000\" >" + Convert.ToDouble(hourNum) + "</font>" + " 個小時之內的調整記錄如下：</font><br/><p/>" + GetHtmlByDataTable(_dt);
+                        MailBody = "<br/><font size=\"4\">出貨單期望到貨日在前 " + "<font color=\"#FF0000\" >" + Convert.ToDouble(hourNum) + "</font>" + " 個小時之內的調整記錄如下：</font><br/><p/>" + GetHtmlByDataTable(_dt, "時間","0");
                         BLL.gigade.Common.MailHelper mail = new Common.MailHelper(mailModel);
                         mail.SendToGroup(GroupCode, MailTitle, MailBody + " ", false, true); 
                     }                

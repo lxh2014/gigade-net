@@ -63,7 +63,7 @@ namespace Admin.gigade.Controllers
         IProductItemImplMgr _proditemMgr;
         IParametersrcImplMgr _IparasrcMgr;
         ICbjobMasterImplMgr _CbjobMasterMgr;
-        IpoNvdLogMgr ipoNvdLogMgr;
+
         #region Views
         /// <summary>
         /// 
@@ -350,11 +350,6 @@ namespace Admin.gigade.Controllers
         }
         //等待料位報表
         public ActionResult WaitLiaoWei()
-        {
-            return View();
-        }
-        //ipo_nvd_log查詢頁面
-        public ActionResult IpoNvdLogList()
         {
             return View();
         }
@@ -7831,7 +7826,7 @@ namespace Admin.gigade.Controllers
               
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式    ,totalCount:" + totalCount + " 
-                timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 json = "{success:true,'msg':'user',totalCount:" + totalCount + ",data:" + JsonConvert.SerializeObject(cbmasterList, Formatting.Indented, timeConverter) + "}";//返回json數據
             }
             catch (Exception ex)
@@ -7862,64 +7857,68 @@ namespace Admin.gigade.Controllers
             {
                 #region 查詢條件
 
-
-                if (!string.IsNullOrEmpty(Request.Params["startDate"]))
+                if (!string.IsNullOrEmpty(Request.Params["rowIDs"]))
                 {
-                    cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd HH:mm:ss");
+                    cbmaster.row_id_IN = Request.Params["rowIDs"].TrimEnd(',');
                 }
-                if (!string.IsNullOrEmpty(Request.Params["endDate"]))
-                {
-                    cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd HH:mm:ss");
-                }
-                if (!string.IsNullOrEmpty(Request.Params["sta_id"]))
-                {
-                    cbmaster.sta_id = Request.Params["sta_id"];
-                }
-
-
-                if (!string.IsNullOrEmpty(Request.Params["jobStart"]) || !string.IsNullOrEmpty(Request.Params["jobEnd"]))
-                {
-                    cbmaster.cbjob_id = "PC";
-                    if (!string.IsNullOrEmpty(Request.Params["jobStart"]))
+                if (!string.IsNullOrEmpty(Request.Params["startDate"]) && Request.Params["startDate"].Substring(0, 10) != "1970-01-01")
                     {
-                        switch (Request.Params["jobStart"].Trim().Length)
-                        {
-                            case 0:
-                            //cbmaster.cbjob_id  += "00";
-                            //break;
-                            case 1:
-                                cbmaster.cbjob_id += "%" + Request.Params["jobStart"].Trim().ToUpper();
-                                break;
-                            default:
-                                cbmaster.cbjob_id += Request.Params["jobStart"].Trim().ToUpper().Substring(0, 2);
-                                break;
-                        }
+                        cbmaster.startDate = DateTime.Parse(Request.Params["startDate"]).ToString("yyyy-MM-dd HH:mm:ss");
                     }
-                    else
+                if (!string.IsNullOrEmpty(Request.Params["endDate"]) && Request.Params["endDate"].Substring(0, 10) != "1970-01-01")
                     {
+                        cbmaster.endDate = DateTime.Parse(Request.Params["endDate"]).ToString("yyyy-MM-dd HH:mm:ss");
+                    }
+                    if (!string.IsNullOrEmpty(Request.Params["sta_id"]))
+                    {
+                        cbmaster.sta_id = Request.Params["sta_id"];
+                    }
+
+
+                    if (!string.IsNullOrEmpty(Request.Params["jobStart"]) || !string.IsNullOrEmpty(Request.Params["jobEnd"]))
+                    {
+                        cbmaster.cbjob_id = "PC";
+                        if (!string.IsNullOrEmpty(Request.Params["jobStart"]))
+                        {
+                            switch (Request.Params["jobStart"].Trim().Length)
+                            {
+                                case 0:
+                                //cbmaster.cbjob_id  += "00";
+                                //break;
+                                case 1:
+                                    cbmaster.cbjob_id += "%" + Request.Params["jobStart"].Trim().ToUpper();
+                                    break;
+                                default:
+                                    cbmaster.cbjob_id += Request.Params["jobStart"].Trim().ToUpper().Substring(0, 2);
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            cbmaster.cbjob_id += "%";
+                        }
+                        if (!string.IsNullOrEmpty(Request.Params["jobEnd"]))
+                        {
+                            switch (Request.Params["jobEnd"].Trim().Length)
+                            {
+                                case 0:
+                                //cbmaster.cbjob_id  += "00";
+                                //break;
+                                case 1:
+                                    cbmaster.cbjob_id += "%" + Request.Params["jobEnd"].Trim().ToUpper();
+                                    break;
+                                default:
+                                    cbmaster.cbjob_id += Request.Params["jobEnd"].Trim().ToUpper().Substring(0, 2);
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            cbmaster.cbjob_id += "%";
+                        }
                         cbmaster.cbjob_id += "%";
                     }
-                    if (!string.IsNullOrEmpty(Request.Params["jobEnd"]))
-                    {
-                        switch (Request.Params["jobEnd"].Trim().Length)
-                        {
-                            case 0:
-                            //cbmaster.cbjob_id  += "00";
-                            //break;
-                            case 1:
-                                cbmaster.cbjob_id += "%" + Request.Params["jobEnd"].Trim().ToUpper();
-                                break;
-                            default:
-                                cbmaster.cbjob_id += Request.Params["jobEnd"].Trim().ToUpper().Substring(0, 2);
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        cbmaster.cbjob_id += "%";
-                    }
-                    cbmaster.cbjob_id += "%";
-                }
+                
 
                 #endregion
                 cbmaster.IsPage = false;
@@ -7939,36 +7938,12 @@ namespace Admin.gigade.Controllers
                     dtCountBook.Columns.Add("工作代號", typeof(String));
                     dtCountBook.Columns.Add("料位區間", typeof(String));
                     dtCountBook.Columns.Add("領取人員", typeof(String));
-                    dtCountBook.Columns.Add(" ", typeof(String));
-                    dtCountBook.Columns.Add("  ", typeof(String));
-                    dtCountBook.Columns.Add("時間記錄", typeof(String));
-                    dtCountBook.Columns.Add("   ", typeof(String));
-                    dtCountBook.Columns.Add("    ", typeof(String));
-                    dtCountBook.Columns.Add("     ", typeof(String));
-                    DataRow drt = dtCountBook.NewRow();
-                    //dr[0] = "NO.";
-                    //dr[1] = "工作代號";
-                    //dr[2] = "料位區間";
-                    //dr[3] = "領取人員";
-                    //dr[4] = " ";
-                    //dr[5] = " ";
-                    //dr[6] = "時間記錄";
-                    //dr[7] = " ";
-                    //dr[8] = " ";
-                    //dr[9] = " ";
-                    //dtCountBook.Rows.Add(dr);
-                    //dr = dtCountBook.NewRow();
-                    drt[0] = " ";
-                    drt[1] = " ";
-                    drt[2] = " ";
-                    drt[3] = " ";
-                    drt[4] = "   出去   ";
-                    drt[5] = "   回來   ";
-                    drt[6] = "初盤KEY IN";
-                    drt[7] = "複盤結束";
-                    drt[8] = "盤點差異報表";
-                    drt[9] = "執行蓋帳";
-                    dtCountBook.Rows.Add(drt);
+                    dtCountBook.Columns.Add("出去", typeof(String));
+                    dtCountBook.Columns.Add("回來", typeof(String));
+                    dtCountBook.Columns.Add("初盤KEY IN", typeof(String));
+                    dtCountBook.Columns.Add("複盤結束", typeof(String));
+                    dtCountBook.Columns.Add("盤點差異報表", typeof(String));
+                    dtCountBook.Columns.Add("執行蓋帳", typeof(String));
                     for (int i = 0; i < cbmasterList.Count; i++)
                     {
                         DataRow dr = dtCountBook.NewRow();
@@ -8003,7 +7978,7 @@ namespace Admin.gigade.Controllers
                         DataRow dr = dtCountBook.NewRow();
                         dr[0] = "";
                         dr[1] = "";
-                        dr[2] ="";
+                        dr[2] =" ";
                         dr[3] = " ";
                         dr[4] = " ";
                         dr[5] = " ";
@@ -8020,7 +7995,6 @@ namespace Admin.gigade.Controllers
                         dtCountBook.Rows.Add(dr);
                     }
 
-                    string s = " ";
                     //dtCountBook.Columns.RemoveAt(0);
                     
                     #endregion
@@ -8053,7 +8027,7 @@ namespace Admin.gigade.Controllers
         {
             PdfHelper pdf = new PdfHelper();
             List<string> pdfList = new List<string>();
-            float[] arrColWidth = new float[] { 25, 60, 40, 30, 55,40, 140, 50, 40, 55};
+            float[] arrColWidth = new float[] { 25, 60, 40, 40, 55,40, 140, 50, 40, 50};
             string newFileName = string.Empty;
             string newName = string.Empty;
             string json = string.Empty;
@@ -8082,7 +8056,7 @@ namespace Admin.gigade.Controllers
             _dtBody.Columns.Add("編號", typeof(string));
             _dtBody.Columns.Add("條碼", typeof(string));
             _dtBody.Columns.Add("料位", typeof(string));
-            _dtBody.Columns.Add("答案", typeof(string));
+            _dtBody.Columns.Add("現有庫存", typeof(string));
             _dtBody.Columns.Add("盤點數量", typeof(string));
             _dtBody.Columns.Add("效期控制", typeof(string));
             _dtBody.Columns.Add("品名", typeof(string));
@@ -8174,7 +8148,7 @@ namespace Admin.gigade.Controllers
                         cell.DisableBorderSide(8);
                         ptable.AddCell(cell);
 
-                        cell = new PdfPCell(new Phrase("答案", new iTextSharp.text.Font(bf, 12)));
+                        cell = new PdfPCell(new Phrase("現有庫存", new iTextSharp.text.Font(bf, 12)));
                         cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                         cell.DisableBorderSide(8);
                         ptable.AddCell(cell);
@@ -8257,7 +8231,7 @@ namespace Admin.gigade.Controllers
                                 row["條碼"] = upc_id;
 
                                 row["料位"] = rows["loc_id"];
-                                row["答案"] = rows["prod_qty"];
+                                row["現有庫存"] = rows["prod_qty"];
                                 row["盤點數量"] = "";
                                 row["效期控制"] = string.IsNullOrEmpty(rows["pwy_dte_ctl"].ToString()) ? "否" : (rows["pwy_dte_ctl"].ToString() == "Y" ? "是" : "否");
                                 row["品名"] = rows["product_name"];
@@ -8347,7 +8321,7 @@ namespace Admin.gigade.Controllers
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase("答案", new iTextSharp.text.Font(bf, 12)));
+                cell = new PdfPCell(new Phrase("現有庫存", new iTextSharp.text.Font(bf, 12)));
                 cell.VerticalAlignment = Element.ALIGN_LEFT;//字體水平居左
                 cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
@@ -8397,7 +8371,7 @@ namespace Admin.gigade.Controllers
                 cell = new PdfPCell(new Phrase(" ", font));
                 cell.Colspan = 3;
                 cell.VerticalAlignment = Element.ALIGN_CENTER;//字體水平居左
-                cell.DisableBorderSide(8);
+                //cell.DisableBorderSide(8);
                 ptable.AddCell(cell);
 
 
@@ -14874,70 +14848,6 @@ namespace Admin.gigade.Controllers
             return Json(new { success = result,date=ReturnDate });
         }
         #endregion
-
-        public HttpResponseBase GetIpoNvdLogList()
-        {
-            string json = string.Empty;
-            int totalcount = 0;
-            IpoNvdLogQuery query = new IpoNvdLogQuery();
-            query.Start = Convert.ToInt32(Request.Params["start"] ?? "0");
-            query.Limit = Convert.ToInt32(Request.Params["limit"] ?? "25");
-            ipoNvdLogMgr = new IpoNvdLogMgr(mySqlConnectionString);
-            if (!string.IsNullOrEmpty(Request.Params["work_id"].Trim()))
-            {
-                query.work_id = Request.Params["work_id"].Trim();
-            }
-            if (!string.IsNullOrEmpty(Request.Params["ipo_id"].Trim()))
-            {
-                query.ipo_id = Request.Params["ipo_id"].Trim();
-            }
-            if (!string.IsNullOrEmpty(Request.Params["itemId_or_upcId"].Trim()))
-            {
-                uint itemId = Convert.ToUInt32(Request.Params["itemId_or_upcId"].Trim());
-                bool result = ipoNvdLogMgr.GetInfoByItemId(itemId);
-               
-                if (result == false)
-                {
-                    query.upc_id = Request.Params["itemId_or_upcId"].Trim();//條碼
-                }
-                else 
-                {
-                    query.item_id = Convert.ToUInt32(Request.Params["itemId_or_upcId"].Trim());
-                }             
-            }
-            if (!string.IsNullOrEmpty(Request.Params["loc_id"].Trim()))
-            {
-                query.loc_id = Request.Params["loc_id"].Trim();
-            }
-            if (!string.IsNullOrEmpty(Request.Params["time_start"]))//開始時間
-            {
-                query.start_time = Convert.ToDateTime(Request.Params["time_start"]);
-                //query.start_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["start_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
-            }
-            if (!string.IsNullOrEmpty(Request.Params["time_end"]))//結束時間
-            {
-                query.end_time = Convert.ToDateTime(Request.Params["time_end"]);
-                //query.end_time = (int)CommonFunction.GetPHPTime(Convert.ToDateTime(Request.Params["end_time"]).ToString("yyyy-MM-dd HH:mm:ss"));
-            }
-            try
-            {
-                List<IpoNvdLogQuery> list = ipoNvdLogMgr.GetIpoNvdLogList(query, out totalcount);
-                IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
-                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                json = "{success:true,totalCount:" + totalcount + ",data:" + JsonConvert.SerializeObject(list, Formatting.Indented, timeConverter) + "}";
-            }
-            catch (Exception ex)
-            {
-                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
-                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.Error(logMessage);
-                json = "{success:true,totalCount:0,data:[]}";
-            }
-            this.Response.Clear();
-            this.Response.Write(json);
-            this.Response.End();
-            return Response;
-        }
+        
     }
 }

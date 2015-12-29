@@ -142,16 +142,18 @@ namespace BLL.gigade.Dao
             {
                 //sbSql.AppendFormat("select dm.order_id,dcl.deliver_id,dcl_create_type, u.user_name as dcl_create_username,mu.user_username as dcl_create_musername ,
                 //                            dcl.dcl_create_datetime,'' as ori_expect_arrive_date,dcl.expect_arrive_date,dcl.expect_arrive_period,dcl.dcl_note,dcl.dcl_ipfrom
-                sbSql.AppendFormat(@"select dm.order_id,dcl.deliver_id,v.vendor_id,v.vendor_name_full,v.vendor_email,dm.type,dcl_create_type, u.user_name as dcl_create_username,mu.user_username as dcl_create_musername ,
-                                            dcl.dcl_create_datetime,dcl.expect_arrive_date as expect_arrive_date_dcl,dcl.expect_arrive_period as expect_arrive_period_dcl,dcl.dcl_note,dcl.dcl_ipfrom,
-                                         dm.deliver_org_days,dm.expect_arrive_date as expect_arrive_date_dm,dm.expect_arrive_period as expect_arrive_period_dm
-from delivery_change_log dcl
-LEFT JOIN deliver_master dm on dm.deliver_id=dcl.deliver_id
-inner JOIN vendor v on v.vendor_id=dm.export_id 
-LEFT JOIN users u on u.user_id=dcl.dcl_create_user 
-LEFT JOIN manage_user mu on mu.user_id=dcl.dcl_create_muser where 1=1");
-                sbSql.AppendFormat(" and dcl.dcl_create_datetime between '{0}' and '{1}'", Query.time_start.ToString("yyyy-MM-dd HH:mm:ss"), Query.time_end.ToString("yyyy-MM-dd HH:mm:ss"));
-                sbSql.Append(" order by deliver_id,dcl_create_datetime desc");
+                sbSql.Append(@"select dm.order_id,dcl.deliver_id,v.vendor_id,v.vendor_name_full,v.vendor_email,dm.type,dcl_create_type, u.user_name as dcl_create_username,mu.user_username as dcl_create_musername ,");
+                sbSql.Append("dcl.dcl_create_datetime,dm.expect_arrive_date as expect_arrive_date_dcl,dm.expect_arrive_period as expect_arrive_period_dcl,dcl.dcl_note,dcl.dcl_ipfrom,");
+                sbSql.Append("dm.deliver_org_days,dm.expect_arrive_date as expect_arrive_date_dm,dm.expect_arrive_period as expect_arrive_period_dm,'' as delivery_date ");
+                sbSql.Append(" from delivery_change_log dcl ");
+                sbSql.AppendFormat(" inner join(select MAX(dcl_id) as dcl_id from delivery_change_log  ");//where dcl_create_datetime between '{0}' and '{1}', Query.time_start.ToString("yyyy-MM-dd HH:mm:ss"), Query.time_end.ToString("yyyy-MM-dd HH:mm:ss")
+                sbSql.Append(" group by deliver_id order by deliver_id,dcl_create_datetime desc  ) dc on dc.dcl_id=dcl.dcl_id ");
+                sbSql.Append(" inner JOIN deliver_master dm on dm.deliver_id=dcl.deliver_id ");
+                sbSql.Append("inner JOIN vendor v on v.vendor_id=dm.export_id ");
+                sbSql.Append(" LEFT JOIN users u on u.user_id=dcl.dcl_create_user ");
+                sbSql.Append(" LEFT JOIN manage_user mu on mu.user_id=dcl.dcl_create_muser where 1=1 and dm.delivery_date is null order by dcl.dcl_create_datetime desc ");
+                //sbSql.AppendFormat(" and dcl.dcl_create_datetime between '{0}' and '{1}'", Query.time_start.ToString("yyyy-MM-dd HH:mm:ss"), Query.time_end.ToString("yyyy-MM-dd HH:mm:ss"));
+                //sbSql.Append(" order by deliver_id,dcl_create_datetime desc");
                 System.Data.DataTable dt=_access.getDataTable(sbSql.ToString());
                 return dt;
             

@@ -21,6 +21,7 @@ using System.Text;
 using BLL.gigade.Dao.Impl;
 using DBAccess;
 using BLL.gigade.Model.Query;
+using System.Data;
 
 namespace BLL.gigade.Dao
 {
@@ -42,6 +43,32 @@ namespace BLL.gigade.Dao
                 sb.AppendFormat(@" SELECT id,serial,promotion_id,created,pseh.user_id,user_email from promotions_bonus_serial_history  pseh ");
                 sb.AppendFormat(@" LEFT JOIN users u on pseh.user_id=u.user_id where `promotion_id` = '{0}'", id);
                 return _access.getDataTableForObj<PromotionsBonusSerialHistoryQuery>(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("PromotionsBonusSerialHistoryDao-->QueryById-->" + ex.Message + sb.ToString(), ex);
+            }
+        }
+        public List<Model.Query.PromotionsBonusSerialHistoryQuery> QueryById(PromotionsBonusSerialHistoryQuery query, out int TotalCount)
+        {
+            StringBuilder sb = new StringBuilder();
+            StringBuilder sbStr = new StringBuilder();
+            try
+            {
+                sb.AppendFormat("SELECT id,serial,promotion_id,created,pseh.user_id,user_email ");
+                sbStr.AppendFormat(" from promotions_bonus_serial_history  pseh  LEFT JOIN users u on pseh.user_id=u.user_id where `promotion_id` = '{0}'", query.promotion_id);
+                TotalCount = 0;
+                if (query.IsPage)
+                {
+                    DataTable _dt = _access.getDataTable(" select count(id) as ToTalCount " + sbStr.ToString());
+                    if (_dt != null && _dt.Rows.Count > 0)
+                    {
+                        TotalCount = Convert.ToInt32(_dt.Rows[0]["ToTalCount"]);
+                    }
+
+                    sbStr.AppendFormat(" limit {0},{1}", query.Start, query.Limit);
+                }
+                return _access.getDataTableForObj<PromotionsBonusSerialHistoryQuery>(sb.ToString() + sbStr.ToString());
             }
             catch (Exception ex)
             {

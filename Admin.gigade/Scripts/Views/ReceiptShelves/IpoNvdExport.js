@@ -7,12 +7,13 @@ Ext.define('GIGADE.IpoNvd', {
         { name: 'work_id', type: 'string' }, //工作單號
         { name: 'ipo_id', type: 'string' }, //採購單編號
         { name: 'item_id', type: 'string' }, //商品細項編號
+        { name: 'loc_id', type: 'string' }, //商品主料位
         { name: 'ipo_qty', type: 'string' },//採購單驗收數量
         { name: "out_qty", type: "string" },//未收貨上架數量
-        { name: "com_qty", type: "int" },//完成收穫上架數量
+        { name: "com_qty", type: "int" },//完成收貨上架數量
         { name: "cde_dt", type: 'date', dateFormat: "Y-m-d H:i:s" },//有效日期
         { name: "made_date", type: 'date', dateFormat: "Y-m-d H:i:s" },//製造日期
-        { name: "work_status", type: "string" },//收穫上架狀態 
+        { name: "work_status", type: "string" },//收貨上架狀態 
         { name: "create_username", type: 'string' },  //創建人
         { name: "create_datetime", type: 'string' },  //創建時間
         { name: "modify_username", type: 'string' },  //修改人
@@ -275,19 +276,20 @@ Ext.onReady(function ()
          { header: "工作單號", dataIndex: "work_id", width: 150, align: 'center' },
          { header: "採購單編號", dataIndex: "ipo_id", width: 150, align: 'center' },
          { header: "商品細項編號", dataIndex: "item_id", width: 100, align: 'center' },
+         { header: '商品主料位', dataIndex: 'loc_id', width: 100, align: 'center' },
          { header: "採購單驗收數量", dataIndex: "ipo_qty", width: 100, align: 'center' },
          { header: "未收貨上架數量", dataIndex: "out_qty", width: 100, align: 'center' },
-         { header: "完成收穫上架數量", dataIndex: "com_qty", width: 100, align: 'center' },
+         { header: "完成收貨上架數量", dataIndex: "com_qty", width: 100, align: 'center' },
          {
-             header: "有效日期", dataIndex: "cde_dt", width: 150, align: 'center',
+             header: "有效日期", dataIndex: "cde_dt", width: 100, align: 'center',
              renderer: Ext.util.Format.dateRenderer('Y-m-d')
          },
          {
-             header: "製造日期", dataIndex: "made_date", width: 150, align: 'center',
+             header: "製造日期", dataIndex: "made_date", width: 100, align: 'center',
              renderer: Ext.util.Format.dateRenderer('Y-m-d')
          },
          {
-             header: "收穫上架狀態", dataIndex: "work_status", width: 100, align: 'center',
+             header: "收貨上架狀態", dataIndex: "work_status", width: 100, align: 'center',
              renderer: function (value)
              {
                  if (value == "AVL")
@@ -333,7 +335,7 @@ Ext.onReady(function ()
                 }
             }
         },
-        selModel: sm
+        //selModel: sm
     });
     Ext.create('Ext.Viewport', {
         layout: 'vbox',

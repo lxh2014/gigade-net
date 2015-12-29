@@ -21,6 +21,7 @@ using BLL.gigade.Dao.Impl;
 using DBAccess;
 using BLL.gigade.Model;
 using System.Data;
+using MySql.Data.MySqlClient;
 
 namespace BLL.gigade.Dao
 {
@@ -28,10 +29,12 @@ namespace BLL.gigade.Dao
     {
         private IDBAccess _access;
         string strSql = string.Empty;
+        private string connStr;
         public PromotionsBonusSerialDao(string connectionString)
         {
             // TODO: Complete member initialization  this
             _access = DBFactory.getDBAccess(DBType.MySql, connectionString);
+            this.connStr = connectionString;
         }
         #region QueryById +List<Model.PromotionsBonusSerial> QueryById(int id)
         public List<Model.PromotionsBonusSerial> QueryById(int id)
@@ -81,6 +84,65 @@ namespace BLL.gigade.Dao
             {
                 throw new Exception("PromotionsBonusSerialDao-->YesOrNoExist-->" + ex.Message + sb.ToString(), ex);
             }
+        }
+        public List<Model.PromotionsBonusSerial> QueryById(PromotionsBonusSerial query,out int TotalCount)
+        {
+            StringBuilder sb = new StringBuilder();
+            StringBuilder sbStr = new StringBuilder();
+            try
+            {
+                sb.AppendFormat("SELECT `PromotionBonusSerial`.`id`, `PromotionBonusSerial`.`promotion_id`, `PromotionBonusSerial`.`serial`, `PromotionBonusSerial`.`active` ");
+                sbStr.AppendFormat(" FROM `promotions_bonus_serial` AS `PromotionBonusSerial` WHERE `PromotionBonusSerial`.`promotion_id`='{0}'", query.promotion_id);
+                TotalCount = 0;
+                if (query.IsPage)
+                {
+                    DataTable _dt = _access.getDataTable(" select count(id) as ToTalCount " + sbStr.ToString());
+                    if (_dt != null && _dt.Rows.Count > 0)
+                    {
+                        TotalCount = Convert.ToInt32(_dt.Rows[0]["ToTalCount"]);
+                    }
+                   
+                    sbStr.AppendFormat(" limit {0},{1}", query.Start, query.Limit);
+                }
+                return _access.getDataTableForObj<PromotionsBonusSerial>(sb.ToString() + sbStr.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("PromotionsBonusSerialDao-->QueryById-->" + ex.Message + sb.ToString(), ex);
+            }
+        }
+
+        public int AddPromoBonusSerial(StringBuilder str)
+        {
+            int result = 0;
+            MySqlCommand mySqlCmd = new MySqlCommand();
+            MySqlConnection mySqlConn = new MySqlConnection(connStr);
+            try
+            {
+                if (mySqlConn != null && mySqlConn.State == System.Data.ConnectionState.Closed)
+                {
+                    mySqlConn.Open();
+                }
+                mySqlCmd.Connection = mySqlConn;
+                mySqlCmd.Transaction = mySqlConn.BeginTransaction();
+                mySqlCmd.CommandType = System.Data.CommandType.Text;
+                mySqlCmd.CommandText = str.ToString();
+                result = mySqlCmd.ExecuteNonQuery();
+                mySqlCmd.Transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                mySqlCmd.Transaction.Rollback();
+                throw new Exception("PromotionsBonusSerialDao-->AddPromoBonusSerial-->" + ex.Message + str.ToString(), ex);
+            }
+            finally
+            {
+                if (mySqlConn != null && mySqlConn.State == System.Data.ConnectionState.Open)
+                {
+                    mySqlConn.Close();
+                }
+            }
+            return result;
         }
     }
 }
