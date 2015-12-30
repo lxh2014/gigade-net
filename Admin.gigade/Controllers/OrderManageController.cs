@@ -4915,98 +4915,106 @@ namespace Admin.gigade.Controllers
             {
                 if (!string.IsNullOrEmpty(Request.Params["return_id"]))
                 {
-                     query.return_id =   Convert.ToUInt32(Request.Params["return_id"]);
+                    query.return_id =   Convert.ToUInt32(Request.Params["return_id"]);
                     //如果ors_order_id為0則證明return_id不存在
-                     _orderReturnStatus = new OrderReturnStatusMgr(mySqlConnectionString);
-                     query.ors_order_id = _orderReturnStatus.GetOrderIdByReturnId(query.return_id);
-                     query.orc_order_id = query.ors_order_id;
+                    _orderReturnStatus = new OrderReturnStatusMgr(mySqlConnectionString);
+                    query.ors_order_id = _orderReturnStatus.GetOrderIdByReturnId(query.return_id);
+                    query.orc_order_id = query.ors_order_id;
 
-                     _dt = _orderReturnStatus.CheckOrderId(query);
-                     _tranDt = _orderReturnStatus.CheckTransport(query);
-                     int totalCount = 0;
-                     query.IsPage = false;
+                    //add 歸檔取消退貨的商品 直接告知不再繼續往下
+                    if (query.ors_order_id == 0)
+                    {
+                        json = "{success:true,status:'-1'}";
+                    }
+                    else
+                    {
+                        _dt = _orderReturnStatus.CheckOrderId(query);
+                        _tranDt = _orderReturnStatus.CheckTransport(query);
+                        int totalCount = 0;
+                        query.IsPage = false;
 
-                     store = _orderReturnStatus.CouldGridList(query, out totalCount);
-                     if (_dt != null && _dt.Rows.Count > 0)
-                     {
-                         if (Convert.ToInt32(_dt.Rows[0][0]) == 2 || Convert.ToInt32(_dt.Rows[0][0]) == 3 || Convert.ToInt32(_dt.Rows[0][0]) == 4)
-                         {
-                             json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "',order_payment:'" + store[0].order_payment + "',bank_name:'" + store[0].bank_name + "',bank_branch:'" + store[0].bank_branch + "',bank_account:'" + store[0].bank_account + "',account_name:'" + store[0].account_name + "',bank_note:'" + store[0].bank_note + "' }";
-                         }
-                         else if (_tranDt == null || _tranDt.Rows[0][0].ToString() == "")
-                         {
-                             json = "{success:true,status:'0.5'}";
-                         }
-                         else
-                         {
-                             if (Convert.ToInt32(_dt.Rows[0]["ors_status"]) == 2)//此時需要點擊確認入庫
-                             {
+                        store = _orderReturnStatus.CouldGridList(query, out totalCount);
+                        if (_dt != null && _dt.Rows.Count > 0)
+                        {
+                            if (Convert.ToInt32(_dt.Rows[0][0]) == 2 || Convert.ToInt32(_dt.Rows[0][0]) == 3 || Convert.ToInt32(_dt.Rows[0][0]) == 4)
+                            {
+                                json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "',order_payment:'" + store[0].order_payment + "',bank_name:'" + store[0].bank_name + "',bank_branch:'" + store[0].bank_branch + "',bank_account:'" + store[0].bank_account + "',account_name:'" + store[0].account_name + "',bank_note:'" + store[0].bank_note + "' }";
+                            }
+                            else if (_tranDt == null || _tranDt.Rows[0][0].ToString() == "")
+                            {
+                                json = "{success:true,status:'0.5'}";
+                            }
+                            else
+                            {
+                                if (Convert.ToInt32(_dt.Rows[0]["ors_status"]) == 2)//此時需要點擊確認入庫
+                                {
 
-                                 json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "'}";
-                             }
-                             else
-                             {
-                                 json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "'}";
-                             }
-                         }
-                     }
-                     else
-                     {
-                         OrderMaster om = _orderReturnStatus.GetOrderInfo(Convert.ToUInt32(query.return_id));
-                         string delivery_name = "***";
-                         string delivery_mobile = "***";
-                         string delivery_address = "***";
-                         if (!string.IsNullOrEmpty(om.Delivery_Name))
-                         {
-                             delivery_name = om.Delivery_Name.Substring(0, 1) + "**";
-                         }
-                         if (!string.IsNullOrEmpty(om.Delivery_Mobile))
-                         {
-                             if (!CommonFunction.isMobile(om.Delivery_Mobile))
-                             {
-                                 if (om.Delivery_Mobile.ToString().Length == 48)
-                                 {
-                                     om.Delivery_Mobile = EncryptComputer.EncryptDecryptTextByApi(om.Delivery_Mobile, false);
-                                     if (!CommonFunction.isMobile(om.Delivery_Mobile))
-                                     {
-                                         //異常記錄
-                                         Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                                         logMessage.Content = string.Format("表名:{0},訂單編號:{1},行動電話:{2},Message:{3}", "order_master", query.orc_order_id, om.Delivery_Mobile, "訂購人行動電話解密后不滿足正則表達式");
-                                         logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                                         log.Error(logMessage);
-                                     }
-                                 }
-                                 else
-                                 {
-                                     //異常記錄
-                                     Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
-                                     logMessage.Content = string.Format("表名:{0},訂單編號:{1},行動電話:{2},Message:{3}", "order_master", query.orc_order_id, om.Delivery_Mobile, "訂購人行動電話錯誤");
-                                     logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-                                     log.Error(logMessage);
-                                 }
-                             }
-                             if (om.Delivery_Mobile.ToString().Length > 3)
-                             {
-                                 om.Delivery_Mobile = om.Delivery_Mobile.Substring(0, 3) + "***";
-                             }
-                             else
-                             {
-                                 om.Delivery_Mobile = om.Delivery_Mobile + "***";
-                             }
-                         }
-                         if (!string.IsNullOrEmpty(om.Delivery_Address))
-                         {
-                             if (om.Delivery_Address.Length > 3)
-                             {
-                                 delivery_address = om.Delivery_Address.Substring(0, 3) + "**";
-                             }
-                             else
-                             {
-                                 delivery_address = om.Delivery_Address + "***";
-                             }
-                         }
-                         json = "{success:true,name:'" + delivery_name + "',mobile:'" + delivery_mobile + "',address:'" + delivery_address + "',zipcode:'" + om.Delivery_Zip + "',status:'0'}";
-                     }                   
+                                    json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "'}";
+                                }
+                                else
+                                {
+                                    json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "'}";
+                                }
+                            }
+                        }
+                        else
+                        {
+                            OrderMaster om = _orderReturnStatus.GetOrderInfo(Convert.ToUInt32(query.return_id));
+                            string delivery_name = "***";
+                            string delivery_mobile = "***";
+                            string delivery_address = "***";
+                            if (!string.IsNullOrEmpty(om.Delivery_Name))
+                            {
+                                delivery_name = om.Delivery_Name.Substring(0, 1) + "**";
+                            }
+                            if (!string.IsNullOrEmpty(om.Delivery_Mobile))
+                            {
+                                if (!CommonFunction.isMobile(om.Delivery_Mobile))
+                                {
+                                    if (om.Delivery_Mobile.ToString().Length == 48)
+                                    {
+                                        om.Delivery_Mobile = EncryptComputer.EncryptDecryptTextByApi(om.Delivery_Mobile, false);
+                                        if (!CommonFunction.isMobile(om.Delivery_Mobile))
+                                        {
+                                            //異常記錄
+                                            Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                                            logMessage.Content = string.Format("表名:{0},訂單編號:{1},行動電話:{2},Message:{3}", "order_master", query.orc_order_id, om.Delivery_Mobile, "訂購人行動電話解密后不滿足正則表達式");
+                                            logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                                            log.Error(logMessage);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //異常記錄
+                                        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                                        logMessage.Content = string.Format("表名:{0},訂單編號:{1},行動電話:{2},Message:{3}", "order_master", query.orc_order_id, om.Delivery_Mobile, "訂購人行動電話錯誤");
+                                        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                                        log.Error(logMessage);
+                                    }
+                                }
+                                if (om.Delivery_Mobile.ToString().Length > 3)
+                                {
+                                    om.Delivery_Mobile = om.Delivery_Mobile.Substring(0, 3) + "***";
+                                }
+                                else
+                                {
+                                    om.Delivery_Mobile = om.Delivery_Mobile + "***";
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(om.Delivery_Address))
+                            {
+                                if (om.Delivery_Address.Length > 3)
+                                {
+                                    delivery_address = om.Delivery_Address.Substring(0, 3) + "**";
+                                }
+                                else
+                                {
+                                    delivery_address = om.Delivery_Address + "***";
+                                }
+                            }
+                            json = "{success:true,name:'" + delivery_name + "',mobile:'" + delivery_mobile + "',address:'" + delivery_address + "',zipcode:'" + om.Delivery_Zip + "',status:'0',bank_note:'" + store[0].bank_note + "'}";
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -5287,7 +5295,7 @@ namespace Admin.gigade.Controllers
                 }
                 query.ors_status = 4;
                 query.ors_createuser = (Session["caller"] as Caller).user_id;
-               json = _orderReturnStatus.CouldReturnMoney(query);
+                json = _orderReturnStatus.CouldReturnMoney(query);
             }
             catch (Exception ex)
             {
@@ -5296,7 +5304,6 @@ namespace Admin.gigade.Controllers
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
                 json = "{success:false}";
- 
             }
             this.Response.Clear();
             this.Response.Write(json);

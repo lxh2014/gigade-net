@@ -157,9 +157,16 @@ namespace BLL.gigade.Dao
         public string UpOrderReturnMaster(OrderReturnStatusQuery query)
         {
             StringBuilder sql = new StringBuilder();
+            StringBuilder sql1 = new StringBuilder();
             try
             {
-                sql.AppendFormat("set sql_safe_updates = 0;update order_return_master set return_status=1,bank_name='{0}', bank_branch='{1}',bank_account='{2}',account_name='{3}',bank_note='{4}'  where return_id='{5}';set sql_safe_updates = 1;", query.bank_name, query.bank_branch, query.bank_account, query.account_name, query.bank_note,query.return_id);
+                sql.AppendFormat("set sql_safe_updates = 0;update order_return_master set return_status=1,bank_name='{0}', bank_branch='{1}',bank_account='{2}',account_name='{3}' ", query.bank_name, query.bank_branch, query.bank_account, query.account_name);
+                if (!String.IsNullOrEmpty(query.bank_note))
+                {//add 如果退款備註不為空則更新
+                    sql1.AppendFormat(",bank_note='{0}' ", query.bank_note);
+                }
+                sql.Append(sql1.ToString());
+                sql.AppendFormat(" where return_id='{0}';set sql_safe_updates = 1;", query.return_id);
                 return sql.ToString();
             }
             catch (Exception ex)
