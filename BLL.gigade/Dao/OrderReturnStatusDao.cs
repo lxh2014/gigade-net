@@ -106,7 +106,7 @@ namespace BLL.gigade.Dao
             StringBuilder sql = new StringBuilder();
             try
             {
-                sql.AppendFormat("insert into order_return_content(orc_order_id,orc_deliver_code,orc_deliver_date,orc_deliver_time,orc_name,orc_phone,orc_zipcode,orc_address,orc_remark,orc_type,orc_service_remark,return_id,orc_send) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}');", query.orc_order_id, query.orc_deliver_code, CommonFunction.DateTimeToString(query.orc_deliver_date), query.orc_deliver_time, query.orc_name, query.orc_phone, query.orc_zipcode, query.orc_address, query.orc_remark,query.orc_type,query.orc_service_remark,query.return_id,query.orc_send);
+                sql.AppendFormat("insert into order_return_content(orc_order_id,orc_deliver_code,orc_deliver_date,orc_deliver_time,orc_name,orc_mobile,orc_zipcode,orc_address,orc_remark,orc_type,orc_service_remark,return_id,orc_send) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}');", query.orc_order_id, query.orc_deliver_code, CommonFunction.DateTimeToString(query.orc_deliver_date), query.orc_deliver_time, query.orc_name, query.orc_mobile, query.orc_zipcode, query.orc_address, query.orc_remark, query.orc_type, query.orc_service_remark, query.return_id, query.orc_send);
                 return sql.ToString();
             }
             catch (Exception ex)
@@ -157,9 +157,16 @@ namespace BLL.gigade.Dao
         public string UpOrderReturnMaster(OrderReturnStatusQuery query)
         {
             StringBuilder sql = new StringBuilder();
+            StringBuilder sql1 = new StringBuilder();
             try
             {
-                sql.AppendFormat("set sql_safe_updates = 0;update order_return_master set return_status=1,bank_name='{0}', bank_branch='{1}',bank_account='{2}',account_name='{3}',bank_note='{4}'  where return_id='{5}';set sql_safe_updates = 1;", query.bank_name, query.bank_branch, query.bank_account, query.account_name, query.bank_note,query.return_id);
+                sql.AppendFormat("set sql_safe_updates = 0;update order_return_master set return_status=1,bank_name='{0}', bank_branch='{1}',bank_account='{2}',account_name='{3}' ", query.bank_name, query.bank_branch, query.bank_account, query.account_name);
+                if (!String.IsNullOrEmpty(query.bank_note))
+                {//add 如果退款備註不為空則更新
+                    sql1.AppendFormat(",bank_note='{0}' ", query.bank_note);
+                }
+                sql.Append(sql1.ToString());
+                sql.AppendFormat(" where return_id='{0}';set sql_safe_updates = 1;", query.return_id);
                 return sql.ToString();
             }
             catch (Exception ex)
@@ -1066,18 +1073,28 @@ namespace BLL.gigade.Dao
         public string UpdateORM(OrderReturnStatusQuery query)
         {
             StringBuilder sql = new StringBuilder();
+            StringBuilder sql1 = new StringBuilder();
             try
             {
                 sql.AppendFormat("update order_return_master  set ");
                 if (query.invoice_deal == 0 && query.ormpackage != 0)
                 {
-                    sql.AppendFormat("   package='{0}' ",query.ormpackage);
+                    sql1.AppendFormat("   package='{0}' ", query.ormpackage);
                 }
                 else   if (query.invoice_deal != 0 && query.ormpackage == 0)
                 {
-                    sql.AppendFormat(" invoice_deal='{0}'  ", query.invoice_deal);
+                    sql1.AppendFormat(" invoice_deal='{0}'  ", query.invoice_deal);
                 }
-                sql.AppendFormat(" where return_id='{0}'; ", query.return_id);
+                if (query.bank_note != "")
+                {
+                    if (sql1.Length > 1)
+                    {
+                        sql1.Append(",");
+                    }
+                    sql1.AppendFormat(" bank_note='{0}'  ", query.bank_note);
+                }
+                sql1.AppendFormat(" where return_id='{0}'; ", query.return_id);
+                sql.Append(sql1.ToString());
                 return sql.ToString();
             }
             catch (Exception ex)

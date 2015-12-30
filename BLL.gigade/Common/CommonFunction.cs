@@ -1041,7 +1041,6 @@ namespace BLL.gigade.Common
             return dt.ToString("yyyy-MM-dd");
         }
 
-
         public static bool isMobile(string mobile)
         {
             Regex regMobile = new Regex("^09[0-9]{8}$");

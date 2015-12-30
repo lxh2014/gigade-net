@@ -862,7 +862,7 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
             StringBuilder strWhr = new StringBuilder();
             StringBuilder strLimit=new StringBuilder();
             StringBuilder strJoin=new StringBuilder();
-            strAll.Append("SELECT a.assg_id,p.product_id,p.product_name,pi.item_id,CONCAT(ps.spec_name,'-',ps2.spec_name)AS spec,SUM(out_qty)out_qty,SUM(act_pick_qty)act_pick_qty,SUM(a.ord_qty)ord_qty, a.create_dtim,");
+            strAll.Append("SELECT a.assg_id,p.product_id,p.product_name,pi.item_id,ps.spec_name AS spec,ps2.spec_name as spec_name2 ,SUM(out_qty)out_qty,SUM(act_pick_qty)act_pick_qty,SUM(a.ord_qty)ord_qty, a.create_dtim,");
             strAll.Append(" case ic.lcat_id when 'S' then i.loc_id else IFNULL(ic.lcat_id,case p.product_mode when 2 then 'YY999999' when 3 then 'ZZ999999' else i.loc_id end ) end as loc_id,i.loc_id as loc_id1, ");
             strAll.Append(" temp.parameterName,ic.lcat_id,ic.lcat_id as upc_id   FROM aseld  a ");
             strJoin.Append(" inner JOIN product_item pi ON a.item_id=pi.item_id");
@@ -893,6 +893,10 @@ LEFT JOIN iplas plas ON plas.item_id=asd.item_id WHERE asd.wust_id <> 'COM' ");
 
                 sql = strAll.ToString()+strJoin.ToString()+strWhr.ToString() + strLimit.ToString();
                 DataTable _dt = _access.getDataTable(sql);
+                foreach (DataRow item in _dt.Rows)
+                {
+                    item["spec"] = string.IsNullOrEmpty(item["spec"].ToString()) ? item["spec_name2"] : (string.IsNullOrEmpty(item["spec_name2"].ToString()) ? item["spec"].ToString() : item["spec"].ToString() + "-" + item["spec_name2"].ToString());
+                }
                 return _dt;
             }
             catch (Exception ex)

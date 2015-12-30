@@ -107,7 +107,7 @@ LEFT JOIN vendor_brand v ON p.brand_id=v.brand_id ");
                     {
                         totalcount = int.Parse(_dt.Rows[0]["totalCount"].ToString());
                     }
-                    sqlWhere.AppendFormat(" limit {0},{1} ", query.Start, query.Limit);
+                    sqlWhere.AppendFormat(" ORDER BY invd.row_id limit {0},{1} ", query.Start, query.Limit);
                 }
 
                 sql.Append(sqlWhere.ToString());

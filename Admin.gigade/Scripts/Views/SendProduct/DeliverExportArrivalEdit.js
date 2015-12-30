@@ -127,7 +127,7 @@
                 var bool_2 = (Ext.getCmp('expect_arrive_period').getValue() == row.data.expect_arrive_period);
                 var bool_3 = (Ext.getCmp('dcl_note').getValue().trim() == '');
 
-                var bool_4 = (Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('expect_arrive_date').getValue()), 'Y-m-d')) <= row.data.expect_arrive_date.toString());
+                var bool_4 = (Ext.htmlEncode(Ext.Date.format(new Date(Ext.getCmp('expect_arrive_date').getValue()), 'Y-m-d')) < row.data.expect_arrive_date.toString());
                 var bool_5 = Ext.getCmp('yes').getValue();
                 var weekDay = ["1","2","3","4","5","6","7"];
                 var bool_6 = (weekDay[Ext.getCmp('expect_arrive_date').getValue().getDay()] == "1");

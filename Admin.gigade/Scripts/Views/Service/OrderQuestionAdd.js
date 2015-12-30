@@ -77,7 +77,7 @@ function questionAdd() {
                 fieldLabel: '聯絡電話',
                 margin: '5 5 5 10',
                 width: 450,
-                regex: /^[-+]?([0-9]\d*|0)$/,
+                regex: /^09[0-9]{8}$/,
                 regexText: '格式不正確',
                 labelWidth: 100,
                 id: 'linkphone',

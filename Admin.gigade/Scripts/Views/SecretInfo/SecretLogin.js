@@ -392,18 +392,6 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                 hidden: true
             },
             {
-                fieldLabel: '購買人市內電話',
-                id: 'order_phone',
-                name: 'order_phone',
-                hidden: true
-            },
-            {
-                fieldLabel: '收貨人市內電話',
-                id: 'delivery_phone',
-                name: 'delivery_phone',
-                hidden: true
-            },
-            {
                 fieldLabel: '購買人手機',
                 id: 'order_mobile',
                 name: 'order_mobile',
@@ -561,8 +549,8 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                                 Ext.getCmp('user_name_simple').setValue(result.simple_name).show();
                             }
                             if (result.order_id != undefined) {//供應商簡稱
-                                // Ext.getCmp('u_order').setValue(result.order_id).show();
-                                Ext.getCmp('u_order').setValue(Ext.String.format("<a id='order_id' onclick='SaveRecord({0},4)' href='javascript:void(0);' >{1}</a>", relatedID, result.order_id)).show();//
+                                Ext.getCmp('u_order').setValue(result.order_id).show();
+                                //Ext.getCmp('u_order').setValue(Ext.String.format("<a id='order_id' onclick='SaveRecord({0},4)' href='javascript:void(0);' >{1}</a>", relatedID, result.order_id)).show();//
 
                             }
                             if (result.ur_name != undefined) {//供應商簡稱
@@ -620,18 +608,18 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                                 var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "Please wait..." });
                                 myMask.show();
                                 Ext.getCmp('orc_name').setValue(result.orc_name);
-                                Ext.getCmp('orc_phone').setValue(result.orc_phone);
+                                Ext.getCmp('orc_mobile').setValue(result.orc_mobile);
                                 Ext.getCmp('orc_address').setValue(result.orc_address);
                                 Ext.getCmp('orc_name').setDisabled(false);
-                                Ext.getCmp('orc_phone').setDisabled(false);
+                                Ext.getCmp('orc_mobile').setDisabled(false);
                                 Ext.getCmp('orc_address').setDisabled(false);
                                 WinShow.hide();
                                 myMask.hide();
                             }
                            
-                            if (result.order_phone != undefined) {//
-                                Ext.getCmp('order_phone').setValue(result.order_phone).show();
-                            }
+                            //if (result.order_phone != undefined) {//
+                            //    Ext.getCmp('order_phone').setValue(result.order_phone).show();
+                            //}
                             if (result.order_mobile != undefined) {//;
                                 Ext.getCmp('order_mobile').setValue(result.order_mobile).show();
                             }
@@ -641,9 +629,9 @@ function SecretLoginFun(type, relatedID, isLogin, isShow, isEdit, urlType, info_
                             if (result.delivery_name != undefined) {//;
                                 Ext.getCmp('delivery_name').setValue(result.delivery_name).show();
                             }
-                            if (result.delivery_phone != undefined) {//;
-                                Ext.getCmp('delivery_phone').setValue(result.delivery_phone).show();
-                            }
+                            //if (result.delivery_phone != undefined) {//;
+                            //    Ext.getCmp('delivery_phone').setValue(result.delivery_phone).show();
+                            //}
                             if (result.delivery_mobile != undefined) {//;
                                 Ext.getCmp('delivery_mobile').setValue(result.delivery_mobile).show();
                             }
@@ -824,7 +812,7 @@ function SaveRecord(rID, type, win) {
         var orderId = document.getElementById('order_id').innerHTML;
         url = '/OrderManage/OrderDetialList?Order_Id=' + orderId;
         SaveSecretLog(url, "2", rID);
-        TransToOrder(orderId);
+        //TransToOrder(orderId);
         return false;
     }
     else if (type == "15") {//發信名單統計

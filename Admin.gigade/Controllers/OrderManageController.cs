@@ -18,6 +18,7 @@ using System.Net;
 using BLL.gigade;
 using System.IO;
 using gigadeExcel.Comment;
+using System.Text.RegularExpressions;
 
 namespace Admin.gigade.Controllers
 {
@@ -52,6 +53,7 @@ namespace Admin.gigade.Controllers
         static string HgCategoty = ConfigurationManager.AppSettings["HG_CATEGORY"];//退货单返回hg点数url
         static string HgWallet = ConfigurationManager.AppSettings["HG_WALLET"];//退货单返回hg点数url
         string vendorServerPath = ConfigurationManager.AppSettings["vendorServerPath"];//鏈接至供應商後台的地址
+
         //
         // GET: /OrderManage/
         #region View視圖
@@ -4340,22 +4342,48 @@ namespace Admin.gigade.Controllers
                     else
                     {
                         store.order_name = store.order_name.ToString() + "**";
-                    }
-                    if (store.order_phone.Length > 1)
+                    }             
+                    //if (store.order_mobile.Length > 1)
+                    //{
+                    //    store.order_mobile = store.order_mobile.ToString().Substring(0, 1) + "****";
+                    //}
+                    //else
+                    //{
+                    //    store.order_mobile = store.order_mobile.ToString() + "**";
+                    //}
+                    if (!string.IsNullOrEmpty(store.order_mobile))
                     {
-                        store.order_phone = store.order_phone.ToString().Substring(0, 1) + "****";
-                    }
-                    else
-                    {
-                        store.order_phone = store.order_phone.ToString() + "**";
-                    }
-                    if (store.order_mobile.Length > 1)
-                    {
-                        store.order_mobile = store.order_mobile.ToString().Substring(0, 1) + "****";
-                    }
-                    else
-                    {
-                        store.order_mobile = store.order_mobile.ToString() + "**";
+                        if (!CommonFunction.isMobile(store.order_mobile))
+                        {
+                            if (store.order_mobile.ToString().Length == 48)
+                            {
+                                store.order_mobile = EncryptComputer.EncryptDecryptTextByApi(store.order_mobile, false);
+                                if (!CommonFunction.isMobile(store.order_mobile))
+                                {
+                                    //異常記錄
+                                    Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                                    logMessage.Content = string.Format("表名:{0},訂單編號:{1},行動電話:{2},Message:{3}", "order_master", store.order_id, store.order_mobile, "訂購人行動電話解密后不滿足正則表達式");
+                                    logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                                    log.Error(logMessage);
+                                }
+                            }
+                            else
+                            {
+                                //異常記錄
+                                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                                logMessage.Content = string.Format("表名:{0},訂單編號:{1},行動電話:{2},Message:{3}", "order_master", store.order_id, store.order_mobile, "訂購人行動電話錯誤");
+                                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                                log.Error(logMessage);
+                            }
+                        }
+                        if (store.order_mobile.ToString().Length > 3)
+                        {
+                            store.order_mobile = store.order_mobile.Substring(0, 3) + "***";
+                        }
+                        else
+                        {
+                            store.order_mobile = store.order_mobile + "***";
+                        }
                     }
                     if (store.order_address.Length > 3)
                     {
@@ -4373,21 +4401,48 @@ namespace Admin.gigade.Controllers
                     {
                         store.delivery_name = store.delivery_name.ToString() + "**";
                     }
-                    if (store.delivery_phone.Length > 1)
+
+                    //if (store.delivery_mobile.Length > 1)
+                    //{
+                    //    store.delivery_mobile = store.delivery_mobile.ToString().Substring(0, 1) + "****";
+                    //}
+                    //else
+                    //{
+                    //    store.delivery_mobile = store.delivery_mobile.ToString() + "**";
+                    //}
+                    if (!string.IsNullOrEmpty(store.delivery_mobile))
                     {
-                        store.delivery_phone = store.delivery_phone.ToString().Substring(0, 1) + "****";
-                    }
-                    else
-                    {
-                        store.delivery_phone = store.delivery_phone.ToString() + "**";
-                    }
-                    if (store.delivery_mobile.Length > 1)
-                    {
-                        store.delivery_mobile = store.delivery_mobile.ToString().Substring(0, 1) + "****";
-                    }
-                    else
-                    {
-                        store.delivery_mobile = store.delivery_mobile.ToString() + "**";
+                        if (!CommonFunction.isMobile(store.delivery_mobile))
+                        {
+                            if (store.delivery_mobile.ToString().Length == 48)
+                            {
+                                store.delivery_mobile = EncryptComputer.EncryptDecryptTextByApi(store.delivery_mobile, false);
+                                if (!CommonFunction.isMobile(store.delivery_mobile))
+                                {
+                                    //異常記錄
+                                    Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                                    logMessage.Content = string.Format("表名:{0},訂單編號:{1},行動電話:{2},Message:{3}", "order_master", store.order_id, store.delivery_mobile, "收貨人行動電話解密后不滿足正則表達式");
+                                    logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                                    log.Error(logMessage);
+                                }
+                            }
+                            else
+                            {
+                                //異常記錄
+                                Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                                logMessage.Content = string.Format("表名:{0},訂單編號:{1},行動電話:{2},Message:{3}", "order_master", store.order_id, store.delivery_mobile, "收貨人行動電話錯誤");
+                                logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                                log.Error(logMessage);
+                            }
+                        }
+                        if (store.delivery_mobile.ToString().Length > 3)
+                        {
+                            store.delivery_mobile = store.delivery_mobile.Substring(0, 3) + "***";
+                        }
+                        else
+                        {
+                            store.delivery_mobile = store.delivery_mobile + "***";
+                        }
                     }
                     if (store.delivery_address.Length > 3)
                     {
@@ -4852,16 +4907,114 @@ namespace Admin.gigade.Controllers
         public HttpResponseBase CheckOrderId()
         {
             string json = string.Empty;
+            OrderReturnStatusQuery query = new OrderReturnStatusQuery();
+            DataTable _dt = new DataTable();
+            DataTable _tranDt = new DataTable();
+            List<OrderReturnStatusQuery> store = new List<OrderReturnStatusQuery>();
             try
             {
-                OrderReturnStatusQuery query = new OrderReturnStatusQuery();
                 if (!string.IsNullOrEmpty(Request.Params["return_id"]))
                 {
-                     query.return_id =   Convert.ToUInt32(Request.Params["return_id"]);
+                    query.return_id =   Convert.ToUInt32(Request.Params["return_id"]);
                     //如果ors_order_id為0則證明return_id不存在
-                     _orderReturnStatus = new OrderReturnStatusMgr(mySqlConnectionString);
-                     query.ors_order_id = _orderReturnStatus.GetOrderIdByReturnId(query.return_id);
-                    json = _orderReturnStatus.CheckOrderId(query);
+                    _orderReturnStatus = new OrderReturnStatusMgr(mySqlConnectionString);
+                    query.ors_order_id = _orderReturnStatus.GetOrderIdByReturnId(query.return_id);
+                    query.orc_order_id = query.ors_order_id;
+
+                    //add 歸檔取消退貨的商品 直接告知不再繼續往下
+                    if (query.ors_order_id == 0)
+                    {
+                        json = "{success:true,status:'-1'}";
+                    }
+                    else
+                    {
+                        _dt = _orderReturnStatus.CheckOrderId(query);
+                        _tranDt = _orderReturnStatus.CheckTransport(query);
+                        int totalCount = 0;
+                        query.IsPage = false;
+
+                        store = _orderReturnStatus.CouldGridList(query, out totalCount);
+                        if (_dt != null && _dt.Rows.Count > 0)
+                        {
+                            if (Convert.ToInt32(_dt.Rows[0][0]) == 2 || Convert.ToInt32(_dt.Rows[0][0]) == 3 || Convert.ToInt32(_dt.Rows[0][0]) == 4)
+                            {
+                                json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "',order_payment:'" + store[0].order_payment + "',bank_name:'" + store[0].bank_name + "',bank_branch:'" + store[0].bank_branch + "',bank_account:'" + store[0].bank_account + "',account_name:'" + store[0].account_name + "',bank_note:'" + store[0].bank_note + "' }";
+                            }
+                            else if (_tranDt == null || _tranDt.Rows[0][0].ToString() == "")
+                            {
+                                json = "{success:true,status:'0.5'}";
+                            }
+                            else
+                            {
+                                if (Convert.ToInt32(_dt.Rows[0]["ors_status"]) == 2)//此時需要點擊確認入庫
+                                {
+
+                                    json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "'}";
+                                }
+                                else
+                                {
+                                    json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "'}";
+                                }
+                            }
+                        }
+                        else
+                        {
+                            OrderMaster om = _orderReturnStatus.GetOrderInfo(Convert.ToUInt32(query.return_id));
+                            string delivery_name = "***";
+                            string delivery_mobile = "***";
+                            string delivery_address = "***";
+                            if (!string.IsNullOrEmpty(om.Delivery_Name))
+                            {
+                                delivery_name = om.Delivery_Name.Substring(0, 1) + "**";
+                            }
+                            if (!string.IsNullOrEmpty(om.Delivery_Mobile))
+                            {
+                                if (!CommonFunction.isMobile(om.Delivery_Mobile))
+                                {
+                                    if (om.Delivery_Mobile.ToString().Length == 48)
+                                    {
+                                        om.Delivery_Mobile = EncryptComputer.EncryptDecryptTextByApi(om.Delivery_Mobile, false);
+                                        if (!CommonFunction.isMobile(om.Delivery_Mobile))
+                                        {
+                                            //異常記錄
+                                            Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                                            logMessage.Content = string.Format("表名:{0},訂單編號:{1},行動電話:{2},Message:{3}", "order_master", query.orc_order_id, om.Delivery_Mobile, "訂購人行動電話解密后不滿足正則表達式");
+                                            logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                                            log.Error(logMessage);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //異常記錄
+                                        Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                                        logMessage.Content = string.Format("表名:{0},訂單編號:{1},行動電話:{2},Message:{3}", "order_master", query.orc_order_id, om.Delivery_Mobile, "訂購人行動電話錯誤");
+                                        logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                                        log.Error(logMessage);
+                                    }
+                                }
+                                if (om.Delivery_Mobile.ToString().Length > 3)
+                                {
+                                    om.Delivery_Mobile = om.Delivery_Mobile.Substring(0, 3) + "***";
+                                }
+                                else
+                                {
+                                    om.Delivery_Mobile = om.Delivery_Mobile + "***";
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(om.Delivery_Address))
+                            {
+                                if (om.Delivery_Address.Length > 3)
+                                {
+                                    delivery_address = om.Delivery_Address.Substring(0, 3) + "**";
+                                }
+                                else
+                                {
+                                    delivery_address = om.Delivery_Address + "***";
+                                }
+                            }
+                            json = "{success:true,name:'" + delivery_name + "',mobile:'" + delivery_mobile + "',address:'" + delivery_address + "',zipcode:'" + om.Delivery_Zip + "',status:'0',bank_note:'" + store[0].bank_note + "'}";
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -4889,9 +5042,28 @@ namespace Admin.gigade.Controllers
                 {
                     query.orc_name = (Request.Params["orc_name"]);
                 }
-                if (!string.IsNullOrEmpty(Request.Params["orc_phone"]))
+                if (!string.IsNullOrEmpty(Request.Params["return_id"]))
                 {
-                    query.orc_phone = (Request.Params["orc_phone"]);
+                    query.return_id = Convert.ToUInt32(Request.Params["return_id"]);
+                    query.orc_order_id = _orderReturnStatus.GetOrderIdByReturnId(query.return_id);
+                    query.ors_order_id = query.orc_order_id;
+                }
+                if (!string.IsNullOrEmpty(Request.Params["orc_mobile"]))
+                {
+                    query.orc_mobile = Request.Params["orc_mobile"];
+                    //變更電話需加密 後期解除注視
+                    //if (!CommonFunction.isMobile(Request.Params["orc_mobile"]))
+                    //{
+                    //    //異常記錄
+                    //    Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                    //    logMessage.Content = string.Format("表名:{0},退貨編號:{1},行動電話:{2},Message:{3}", "order_return_content", query.return_id, Request.Params["orc_mobile"], "退貨狀態查詢行動電話不滿足正則表達式");
+                    //    logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                    //    log.Error(logMessage);
+                    //}
+                    //else { 
+                    //    //加密電話
+                    //    query.orc_mobile = EncryptComputer.EncryptDecryptTextByApi(Request.Params["orc_mobile"]);
+                    //}
                 }
                 if (!string.IsNullOrEmpty(Request.Params["orc_zipcode"]))
                 {
@@ -4914,12 +5086,6 @@ namespace Admin.gigade.Controllers
                     query.orc_remark = (Request.Params["orc_remark"]);
                     query.ors_remark = (Request.Params["orc_remark"]);
                 }
-                if (!string.IsNullOrEmpty(Request.Params["return_id"]))
-                {
-                    query.return_id = Convert.ToUInt32(Request.Params["return_id"]);
-                    query.orc_order_id = _orderReturnStatus.GetOrderIdByReturnId(query.return_id);
-                    query.ors_order_id = query.orc_order_id;
-                }
                 if (!string.IsNullOrEmpty(Request.Params["invoice_deal"]))
                 {
                     query.invoice_deal =Convert.ToInt32(Request.Params["invoice_deal"]);
@@ -4927,6 +5093,10 @@ namespace Admin.gigade.Controllers
                 if (!string.IsNullOrEmpty(Request.Params["orc_send"]))
                 {
                     query.orc_send = Convert.ToInt32(Request.Params["orc_send"]);
+                }
+                if (!string.IsNullOrEmpty(Request.Params["bank_note"]))
+                {//退款諮詢添加到此
+                    query.bank_note = Request.Params["bank_note"];
                 }
                 
                 query.ors_createuser = (Session["caller"] as Caller).user_id;
@@ -5125,7 +5295,7 @@ namespace Admin.gigade.Controllers
                 }
                 query.ors_status = 4;
                 query.ors_createuser = (Session["caller"] as Caller).user_id;
-               json = _orderReturnStatus.CouldReturnMoney(query);
+                json = _orderReturnStatus.CouldReturnMoney(query);
             }
             catch (Exception ex)
             {
@@ -5134,7 +5304,6 @@ namespace Admin.gigade.Controllers
                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 log.Error(logMessage);
                 json = "{success:false}";
- 
             }
             this.Response.Clear();
             this.Response.Write(json);

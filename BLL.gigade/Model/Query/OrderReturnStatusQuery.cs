@@ -13,7 +13,7 @@ namespace BLL.gigade.Model.Query
         public DateTime orc_deliver_date { get; set; }
         public string orc_deliver_time { get; set; }
         public string orc_name { get; set; }
-        public  string orc_phone { get; set; }
+        public string orc_mobile { get; set; }
         public string orc_zipcode { get; set; }
         public string orc_address { get; set; }
         public string orc_remark { get; set; }
@@ -54,7 +54,7 @@ namespace BLL.gigade.Model.Query
             orc_deliver_date = DateTime.MinValue;
             orc_deliver_time = string.Empty;
             orc_name = string.Empty;
-            orc_phone = string.Empty;
+            orc_mobile = string.Empty;
             orc_zipcode = string.Empty;
             orc_address = string.Empty;
             orc_remark = string.Empty;

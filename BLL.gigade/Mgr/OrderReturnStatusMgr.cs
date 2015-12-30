@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using BLL.gigade.Common;
 
 namespace BLL.gigade.Mgr
 {
@@ -22,92 +23,26 @@ namespace BLL.gigade.Mgr
           _mysql = new MySqlDao(connectionString);
       }
 
-      public string CheckOrderId(OrderReturnStatusQuery query)
+      public DataTable CheckTransport(OrderReturnStatusQuery query)
       {
-          string json = string.Empty;
-          List<OrderReturnStatusQuery> store = new List<OrderReturnStatusQuery>();
           try
           {
-            
-            //DataTable _masterDt = _orderReturnStatus.OrderIdIsExist(Convert.ToUInt32(query.ors_order_id));
-            query.orc_order_id = query.ors_order_id;
-            if (query.ors_order_id!=0)//有此編號
-            {
-                //判斷訂單狀態
-                DataTable _dt = _orderReturnStatus.CheckOrderId(query);
-                DataTable _tranDt = _orderReturnStatus.CheckTransport(query);
-                int totalCount = 0;
-                query.IsPage = false;
-                store = _orderReturnStatus.CouldGridList(query, out   totalCount);
-
-                if (_dt != null && _dt.Rows.Count > 0)
-                {
-                    if (Convert.ToInt32(_dt.Rows[0][0]) == 2 || Convert.ToInt32(_dt.Rows[0][0]) == 3 || Convert.ToInt32(_dt.Rows[0][0]) == 4)
-                    {
-                        return json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "',order_payment:'" + store[0].order_payment + "',bank_name:'" + store[0].bank_name + "',bank_branch:'" + store[0].bank_branch + "',bank_account:'" + store[0].bank_account + "',account_name:'" + store[0].account_name + "',bank_note:'" + store[0].bank_note + "' }";
-                    }
-
-                    if (_tranDt==null ||  _tranDt.Rows[0][0].ToString() == "")
-                    {
-                        json = "{success:true,status:'0.5'}";
-                    }
-                    else
-                    {
-                         if (Convert.ToInt32(_dt.Rows[0]["ors_status"])==2)//此時需要點擊確認入庫
-                        {
-                         
-                            json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "'}";
-                        }
-                        else
-                        {
-                            json = "{success:true,status:'" + Convert.ToInt32(_dt.Rows[0]["ors_status"]) + "'}";
-                        }
-                    }
-                }
-                else
-                {
-                    OrderMaster om = _orderReturnStatus.GetOrderInfo(Convert.ToUInt32(query.ors_order_id));
-                    string delivery_name = "***";
-                    string delivery_mobile = "***";
-                    string delivery_address = "***";
-                    if (!string.IsNullOrEmpty(om.Delivery_Name))
-                    {
-                        delivery_name = om.Delivery_Name.Substring(0, 1) + "**";
-                    }
-                    if (!string.IsNullOrEmpty(om.Delivery_Mobile))
-                    {
-                        if (om.Delivery_Mobile.Length > 3)
-                        {
-                            delivery_mobile = om.Delivery_Mobile.Substring(0, 3) + "**";
-                        }
-                        else
-                        {
-                            delivery_mobile = om.Delivery_Mobile + "***";
-                        }
-                    }
-                    if (!string.IsNullOrEmpty(om.Delivery_Address))
-                    {
-                        if (om.Delivery_Address.Length > 3)
-                        {
-                            delivery_address = om.Delivery_Address.Substring(0, 3) + "**";
-                        }
-                        else
-                        {
-                            delivery_address = om.Delivery_Address + "***";
-                        }
-                    }
-                    json = "{success:true,name:'" + delivery_name + "',mobile:'" + delivery_mobile + "',address:'" + delivery_address + "',zipcode:'" + om.Delivery_Zip + "',status:'0'}";
-                }
-            }
-            else//無此訂單編號
-            {
-                json = "{success:true,status:'-1'}";
-            }
-            return json;
+              return _orderReturnStatus.CheckTransport(query);
           }
           catch (Exception ex)
           {
-              throw new Exception("OrderReturnStatusMgr-->CheckOrderId-->"+ex.Message,ex);
+              throw new Exception("OrderReturnStatusMgr-->CheckTransport-->" + ex.Message, ex);
+          }
+      }
+      public DataTable CheckOrderId(OrderReturnStatusQuery query)
+      {
+          try
+          {
+              return _orderReturnStatus.CheckOrderId(query);
+          }
+          catch (Exception ex)
+          {
+              throw new Exception("OrderReturnStatusMgr-->CheckOrderId-->" + ex.Message, ex);
           }
       }
 
@@ -123,7 +58,7 @@ namespace BLL.gigade.Mgr
               {
                   OrderMaster om = _orderReturnStatus.GetOrderInfo(Convert.ToUInt32(query.orc_order_id));
                   query.orc_name = om.Delivery_Name;
-                  query.orc_phone = om.Delivery_Mobile;
+                  query.orc_mobile = om.Delivery_Mobile;
                   query.orc_address = om.Delivery_Address;
               }
               arrList.Add(_orderReturnStatus.InsertOrderReturnContent(query));
