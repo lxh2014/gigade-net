@@ -1199,6 +1199,7 @@
     <Compile Include="Mgr\Schedules\SendOrderInfoToBlackCatFTPMgr.cs" />
     <Compile Include="Mgr\Schedules\CheckUrlResultMgr.cs" />
     <Compile Include="Mgr\Schedules\WinningInvoiceSynchronismMgr.cs" />
+    <Compile Include="Mgr\Schedules\CheckProductPriceMgr.cs" />
     <Compile Include="Mgr\SecretAccountSetMgr.cs" />
     <Compile Include="Mgr\SecretInfoLogMgr.cs" />
     <Compile Include="Mgr\SerialMgr.cs" />

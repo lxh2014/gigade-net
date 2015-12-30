@@ -521,5 +521,30 @@ namespace Admin.gigade.Controllers
             return result;
         }
         #endregion
+
+         #region 檢查商品異常價格排程
+         public bool CheckProductPrice()
+         {
+             bool result = false;
+             if (string.IsNullOrEmpty(Request.Params["schedule_code"]))
+             {
+                 return false;
+             }
+             try
+             {
+                 CheckProductPriceMgr checkproductprice = new CheckProductPriceMgr(mySqlConnectionString);
+                 result = checkproductprice.Start(Request.Params["schedule_code"]);
+             }
+             catch (Exception ex)
+             {
+                 Log4NetCustom.LogMessage logMessage = new Log4NetCustom.LogMessage();
+                 logMessage.Content = string.Format("TargetSite:{0},Source:{1},Message:{2}", ex.TargetSite.Name, ex.Source, ex.Message);
+                 logMessage.MethodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                 log.Error(logMessage);
+             }
+             return result;
+         }
+         #endregion
+
     }
 }
