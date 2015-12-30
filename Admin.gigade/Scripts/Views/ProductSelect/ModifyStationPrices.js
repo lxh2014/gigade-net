@@ -855,6 +855,17 @@ function Save() {
         var priceMasters = [];
         for (var i = 0, j = n_store.getCount() ; i < j; i++) {
             var record = n_store.getAt(i);
+            ///edit by wwei0216w 價格為0時不允許保存 2015/12/28
+            if (record.get("price") == 0 || record.get("cost") == 0 || record.get("event_price") == 0 || record.get("event_cost") == 0) {
+                myMask.hide();
+                Ext.Msg.alert("消息", "成本,價格,活動成本和活動價格不能為0");
+                return;
+            }
+            if (record.get("price") < record.get("cost") || record.get("event_price") < record.get("event_cost")) {
+                myMask.hide();
+                Ext.Msg.alert("消息", "售價不能小於成本");
+                return;
+            }
             if (priceCondition == "1") {
                 priceMasters.push({
                     "price_discount": Ext.getCmp('discount').getValue() ? Ext.getCmp('discount').getValue() : 0,//獲得折數

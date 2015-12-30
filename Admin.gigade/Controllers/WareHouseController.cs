@@ -2878,7 +2878,7 @@ namespace Admin.gigade.Controllers
                 store = _iinvd.GetIinvdList(iivd, out  totalCount);
                 IsoDateTimeConverter timeConverter = new IsoDateTimeConverter();
                 //这里使用自定义日期格式，如果不使用的话，默认是ISO8601格式     
-                timeConverter.DateTimeFormat = "yyyy-MM-dd";
+                timeConverter.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 foreach (var item in store)
                 {
                     item.product_name += GetProductSpec(item.item_id.ToString());

@@ -1150,12 +1150,17 @@ function saveIds(functionid) {
             return false;
         }
     }
+
+    ///edit by wwei0216w 價格為0時不允許保存 2015/12/28
     if (Ext.getCmp('price').getValue() == 0) {
         alert(ITEM_MONEY_EMPTY);
+        return;
     }
     if (Ext.getCmp('cost').getValue() == 0) {
         alert(ITEM_COST_EMPTY);
+        return;
     }
+
     if (product_id == "") {
         if (Ext.getCmp("price_type").rawValue == SELECT) {
             Ext.Msg.alert(PROMPT, SELECT_PRICETYPE);
@@ -1194,9 +1199,20 @@ function saveIds(functionid) {
     var childId = "";
     var MustBuy = "";
     minPrice = 0, maxPrice = 0, maxEventPrice = 0;
+    if (PriceType != 2) {///各自定價不進行該判斷
+        if ((Ext.getCmp('cost').getValue() > Ext.getCmp('price').getValue()) || (Ext.getCmp('event_cost').getValue() > Ext.getCmp('event_price').getValue())) {
+            mask.hide();
+            Ext.Msg.alert('消息', '售價不能小於成本');
+            return;
+        }
+    }
     //獲取各自定價grid數據
     if (PriceType == 2) {
         priceStr = submitData(Ext.getCmp('GridPanel'));
+        if (priceStr == undefined) {
+            mask.hide();
+            Ext.Msg.alert("消息","售價不能小於成本")
+        }
         if (!SameCHK) {
             sunMinMaxPrice(Ext.getCmp('GridPanel'));
         }
@@ -1279,6 +1295,9 @@ function submitData(panel) {
             var store = grids[i].getStore();
             for (var j = 0; j < store.getCount() ; j++) {
                 var record = store.getAt(j);
+                if (record.get('item_money') < record.get("item_cost")){
+                    return;
+                }
                 data += "{Parent_Id:" + record.get('Parent_Id') + ",Child_Id:" + record.get('Child_Id') + ",Product_Name:\"" + record.get('Product_Name') + "\""
                 + ",item_id:" + record.get('item_id') + ",price_master_id:" + record.get('price_master_id') + ",item_price_id:" + record.get('item_price_id')
                 + ",item_money:" + record.get('item_money') + ",item_cost:" + record.get('item_cost') + ",event_money:" + record.get('event_money')
