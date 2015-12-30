@@ -832,8 +832,12 @@ Save = function () {
                             return;
                         }
                     }
-
-
+                    ///edit by wwei0216w 價格為0時不允許保存 2015/12/28
+                    if (record.get("event_price") == 0 || record.get("event_cost") == 0){
+                        Ext.Msg.alert('消息', '活動售價,活動成本不能為0!');
+                        myMask.hide();
+                        return
+                    }
                     priceMasters.push({
                         "product_id": record.get("product_id"),
                         "price_master_id": record.get("price_master_id"),
@@ -911,7 +915,10 @@ Save = function () {
                     }
 
                     if (event_cost == '0' || event_price == '0') {
-                        event_cp = i + 1;
+                        //event_cp = i + 1;
+                        myMask.hide();
+                        Ext.Msg.alert("消息", "活動價或活動成本為0,不能保存");
+                        return;
                     }
 
                     priceMasters.push({
@@ -928,40 +935,40 @@ Save = function () {
 
                 if (event_cp > 0) {
 
-                    Ext.Msg.confirm(CONFIRM, '活動價或活動成本為0,確定保存嗎？', function (btntwo) {
-                        if (btntwo == 'yes') {
+                    //Ext.Msg.confirm(CONFIRM, '活動價或活動成本為0,確定保存嗎？', function (btntwo) {
+                    //    if (btntwo == 'yes') {
 
-                            Ext.Ajax.request({
-                                url: '/ProductSelect/SavePriceMaster',
-                                params: {
-                                    priceMasters: JSON.stringify(priceMasters),
-                                    priceCondition: location.search.substr(location.search.lastIndexOf('=') + 1),
-                                    chkCost: Ext.getCmp("chkCost").getValue() == true ? 0 : 1
-                                },
-                                timeout: 360000,
-                                success: function (response) {
-                                    var res = Ext.decode(response.responseText);
-                                    if (res.success) {
-                                        Ext.Msg.alert(INFORMATION, SUCCESS);
-                                    }
-                                    else {
-                                        Ext.Msg.alert(INFORMATION, FAILURE);
-                                    }
-                                    myMask.hide();
-                                },
-                                failure: function (response, opts) {
-                                    if (response.timedout) {
-                                        Ext.Msg.alert(INFORMATION, TIME_OUT);
-                                    }
-                                    myMask.hide();
-                                }
-                            });
-                        } else {
-                            myMask.hide();
-                            return;
-                        }
+                    //        Ext.Ajax.request({
+                    //            url: '/ProductSelect/SavePriceMaster',
+                    //            params: {
+                    //                priceMasters: JSON.stringify(priceMasters),
+                    //                priceCondition: location.search.substr(location.search.lastIndexOf('=') + 1),
+                    //                chkCost: Ext.getCmp("chkCost").getValue() == true ? 0 : 1
+                    //            },
+                    //            timeout: 360000,
+                    //            success: function (response) {
+                    //                var res = Ext.decode(response.responseText);
+                    //                if (res.success) {
+                    //                    Ext.Msg.alert(INFORMATION, SUCCESS);
+                    //                }
+                    //                else {
+                    //                    Ext.Msg.alert(INFORMATION, FAILURE);
+                    //                }
+                    //                myMask.hide();
+                    //            },
+                    //            failure: function (response, opts) {
+                    //                if (response.timedout) {
+                    //                    Ext.Msg.alert(INFORMATION, TIME_OUT);
+                    //                }
+                    //                myMask.hide();
+                    //            }
+                    //        });
+                    //    } else {
+                    //        myMask.hide();
+                    //        return;
+                    //    }
 
-                    })
+                    //})
                 } else {
 
                     Ext.Ajax.request({

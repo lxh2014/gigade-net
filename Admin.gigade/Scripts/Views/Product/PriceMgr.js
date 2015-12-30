@@ -1753,9 +1753,24 @@ function update(functionid) {
                 var itemPrices = "[";
                 for (var i = 0; i < sitePriceStore.getCount() ; i++) {
                     var record = sitePriceStore.getAt(i);
-                    if (!record.get('item_money') || record.get('item_money') == "0") {
+                    ///價格為0時不允許保存 edit by wwei0216w 2015/12/28
+                    if (!record.get('item_money') || record.get('item_money') == "0" || !record.get('event_money') || record.get('event_cost') == "0") {
                         mask.hide();
                         Ext.Msg.alert(INFORMATION, ITEM_MONEY_EMPTY);
+                        return;
+                    }
+                    if (!record.get('item_cost') || record.get('item_cost') == "0" || !record.get('event_cost') || record.get('cost') == "0") {
+                        mask.hide();
+                        Ext.Msg.alert(INFORMATION, "成本不能為0!");
+                        return;
+                    }
+                    var comPrice = parseInt(record.get('item_money')) - parseInt(record.get('item_cost'));
+                    var comEvent = parseInt(record.get('event_money')) - parseInt(record.get('event_cost'));
+                    ///添加售價不能小於成本的提示 edit by wwei0216w 2015/12/24
+                    if (comPrice < 0 || comEvent < 0) {
+                        mask.hide();
+                        Ext.Msg.alert(INFORMATION, '售價不能夠小於成本!');
+                        return;
                     }
                     if (!event_null) {
                         if (!record.get('event_money') || !record.get('event_cost') || record.get('event_cost') == "0") {

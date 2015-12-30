@@ -221,43 +221,82 @@ Ext.onReady(function () {
             iconCls: 'icon-accept',
             listeners: {
                 click: function () {
+                    ///edit by wwei0216w 價格為0時不允許保存 2015/12/28
+                    var isZero = false;
+                    var row = Ext.getCmp('showGrid').getSelectionModel().getSelection();
                     var myMask = new Ext.LoadMask(Ext.getBody(), {
                         msg: 'Loading...'
                     });
-                    myMask.show();
-
-                    var row = Ext.getCmp('showGrid').getSelectionModel().getSelection();
-
                     var priceMasters = new Array();
                     for (var i = 0, j = row.length; i < j ; i++) {
+                        if (row[i].data.cost == 0 || row[i].data.price == 0 || row[i].data.event_cost == 0 || row[i].data.event_price == 0)
+                        {
+                            isZero = true;
+                        }
                         priceMasters.push({ product_id: row[i].data.product_id, price_master_id: row[i].data.price_master_id, apply_id: row[i].data.apply_id });
                     }
 
-                    Ext.Ajax.request({
-                        url: '/ProductList/PriceVerify',
-                        method: 'post',
-                        timeout: 1000 * 60 * 2,
-                        params: {
-                            "type": 1,
-                            "priceMasters": Ext.encode(priceMasters),
-                            "function": 'pass'
-                        },
-                        success: function (response, opts) {
-                            var resText = Ext.decode(response.responseText);
-                            if (resText.success = true) {
-                                Ext.Msg.alert(INFORMATION, PASS_SUCCESS);
-                                priceListStore.loadPage(1);
+                    if (isZero == false) {
+                        myMask.show();
+                        Ext.Ajax.request({
+                            url: '/ProductList/PriceVerify',
+                            method: 'post',
+                            timeout: 1000 * 60 * 2,
+                            params: {
+                                "type": 1,
+                                "priceMasters": Ext.encode(priceMasters),
+                                "function": 'pass'
+                            },
+                            success: function (response, opts) {
+                                var resText = Ext.decode(response.responseText);
+                                if (resText.success = true) {
+                                    Ext.Msg.alert(INFORMATION, PASS_SUCCESS);
+                                    priceListStore.loadPage(1);
+                                }
+                                else {
+                                    Ext.Msg.alert(INFORMATION, PASS_FAILURE);
+                                }
+                                myMask.hide();
+                            },
+                            failure: function (response, opts) {
+                                myMask.hide();
+                                Ext.Msg.alert(NOTICE, OVERTIME_SAVE);
                             }
-                            else {
-                                Ext.Msg.alert(INFORMATION, PASS_FAILURE);
+                        });
+                    } else {
+                        Ext.Msg.confirm("信息", "商品成本,價格,活動成本和活動價格中存在為0，是否繼續操作?", function (btn) {
+                            if (btn == 'no') {
+                                return;
+                            } else {
+                                myMask.show();
+                                Ext.Ajax.request({
+                                    url: '/ProductList/PriceVerify',
+                                    method: 'post',
+                                    timeout: 1000 * 60 * 2,
+                                    params: {
+                                        "type": 1,
+                                        "priceMasters": Ext.encode(priceMasters),
+                                        "function": 'pass'
+                                    },
+                                    success: function (response, opts) {
+                                        var resText = Ext.decode(response.responseText);
+                                        if (resText.success = true) {
+                                            Ext.Msg.alert(INFORMATION, PASS_SUCCESS);
+                                            priceListStore.loadPage(1);
+                                        }
+                                        else {
+                                            Ext.Msg.alert(INFORMATION, PASS_FAILURE);
+                                        }
+                                        myMask.hide();
+                                    },
+                                    failure: function (response, opts) {
+                                        myMask.hide();
+                                        Ext.Msg.alert(NOTICE, OVERTIME_SAVE);
+                                    }
+                                });
                             }
-                            myMask.hide();
-                        },
-                        failure: function (response, opts) {
-                            myMask.hide();
-                            Ext.Msg.alert(NOTICE, OVERTIME_SAVE);
-                        }
-                    });
+                        });
+                    }
                 }
             }
         }, {
