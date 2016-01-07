@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.gigade", "Admin.gigade\Admin.gigade.csproj", "{02935F5B-C5CF-4036-A197-9FC12AFC4D43}"
 	ProjectSection(ProjectDependencies) = postProject
 		{722FD6AB-D10E-41DD-9B25-A6836D084DDC} = {722FD6AB-D10E-41DD-9B25-A6836D084DDC}
