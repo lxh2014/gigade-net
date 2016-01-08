@@ -1,3 +1,0 @@
-# gigade
-gigade-net 
-
